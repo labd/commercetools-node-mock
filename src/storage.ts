@@ -10,6 +10,7 @@ import {
   ResourceIdentifier,
   Type,
 } from '@commercetools/platform-sdk';
+import { ResourceMap } from 'types';
 
 type QueryParams = {
   expand?: string | string[];
@@ -24,8 +25,14 @@ type QueryParams = {
 export abstract class AbstractStorage {
   abstract assertStorage(typeId: ReferenceTypeId): void;
   abstract all(typeId: ReferenceTypeId): Array<BaseResource>;
-  abstract add(typeId: ReferenceTypeId, obj: BaseResource): void;
-  abstract get(typeId: ReferenceTypeId, id: string): BaseResource | null;
+  abstract add<ReferenceTypeId extends keyof ResourceMap>(
+    typeId: ReferenceTypeId,
+    obj: ResourceMap[ReferenceTypeId]
+  ): void;
+  abstract get<ReferenceTypeId extends keyof ResourceMap>(
+    typeId: ReferenceTypeId,
+    id: string
+  ): ResourceMap[ReferenceTypeId] | null;
   abstract delete(typeId: ReferenceTypeId, id: string): BaseResource | null;
   abstract query(
     typeId: ReferenceTypeId,
@@ -63,12 +70,22 @@ export class InMemoryStorage extends AbstractStorage {
     return [];
   }
 
-  add(typeId: ReferenceTypeId, obj: BaseResource) {
+  add<ReferenceTypeId extends keyof ResourceMap>(
+    typeId: ReferenceTypeId,
+    obj: ResourceMap[ReferenceTypeId]
+  ) {
     this.resources[typeId]?.set(obj.id, obj);
   }
 
-  get(typeId: ReferenceTypeId, id: string): BaseResource | null {
-    return this.resources[typeId]?.get(id) || null;
+  get<ReferenceTypeId extends keyof ResourceMap>(
+    typeId: ReferenceTypeId,
+    id: string
+  ) {
+    const resource = this.resources[typeId]?.get(id);
+    if (resource) {
+      return resource as ResourceMap[ReferenceTypeId];
+    }
+    return null;
   }
 
   delete(typeId: ReferenceTypeId, id: string): BaseResource | null {

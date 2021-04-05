@@ -48,7 +48,7 @@ export default abstract class AbstractRepository {
       resource.version += 1;
     }
 
-    this._storage.add(typeId, resource);
+    this._storage.add(typeId, resource as any);
   }
 
   processUpdateActions(

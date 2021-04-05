@@ -11,6 +11,7 @@ import { CustomObjectService } from './services/custom-object';
 import { CustomerService } from './services/customer';
 import { CartService } from './services/cart';
 import { OrderService } from './services/order';
+import { ResourceMap } from 'types';
 
 export class CommercetoolsMock {
   private _storage: AbstractStorage;
@@ -51,7 +52,10 @@ export class CommercetoolsMock {
       });
   }
 
-  addResource(typeId: ReferenceTypeId, resource: BaseResource) {
+  addResource<ReferenceTypeId extends keyof ResourceMap>(
+    typeId: ReferenceTypeId,
+    resource: ResourceMap[ReferenceTypeId]
+  ) {
     const service = this._services[typeId];
     if (service) {
       this._storage.add(typeId, {
@@ -63,8 +67,11 @@ export class CommercetoolsMock {
     }
   }
 
-  getResource(typeId: ReferenceTypeId, id: string) {
-    return this._storage.get(typeId, id);
+  getResource<ReferenceTypeId extends keyof ResourceMap>(
+    typeId: ReferenceTypeId,
+    id: string
+  ): ResourceMap[ReferenceTypeId] {
+    return this._storage.get(typeId, id) as ResourceMap[ReferenceTypeId];
   }
 
   // TODO: Not sure if we want to expose this...
