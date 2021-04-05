@@ -1,14 +1,15 @@
 import AbstractService from './abstract';
 import { Request, Response, Router } from 'express';
 import { CustomerDraft } from '@commercetools/platform-sdk';
-import { CustomerRepository } from '~src/repositories';
+import { CustomerRepository } from '../repositories/customer';
+import { AbstractStorage } from '../storage';
 
 export class CustomerService extends AbstractService {
-  protected repository: CustomerRepository;
+  public repository: CustomerRepository;
 
-  constructor(parent: Router, repository: CustomerRepository) {
-    super(parent, repository);
-    this.repository = repository;
+  constructor(parent: Router, storage: AbstractStorage) {
+    super(parent);
+    this.repository = new CustomerRepository(storage);
   }
 
   getBasePath() {

@@ -1,23 +1,23 @@
 import AbstractService from './abstract';
 import { Request, Response, Router } from 'express';
-import { CartDraft } from '@commercetools/platform-sdk';
-import { CartRepository } from '../repositories/cart';
+import { TypeDraft } from '@commercetools/platform-sdk';
+import { TypeRepository } from '../repositories/type';
 import { AbstractStorage } from '../storage';
 
-export class CartService extends AbstractService {
-  public repository: CartRepository;
+export class TypeService extends AbstractService {
+  public repository: TypeRepository;
 
   constructor(parent: Router, storage: AbstractStorage) {
     super(parent);
-    this.repository = new CartRepository(storage);
+    this.repository = new TypeRepository(storage);
   }
 
   getBasePath() {
-    return 'carts';
+    return 'types';
   }
 
   post(request: Request, response: Response) {
-    const draft: CartDraft = request.body;
+    const draft: TypeDraft = request.body;
     const resource = this.repository.create(draft);
     return response.status(200).send(resource);
   }

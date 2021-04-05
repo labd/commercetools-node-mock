@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import { CommercetoolsMock } from '~src/index';
+import { CommercetoolsMock } from '../index';
 
 describe('CustomObject create', () => {
   const ctMock = new CommercetoolsMock();

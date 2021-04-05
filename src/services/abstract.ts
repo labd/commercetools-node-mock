@@ -1,14 +1,13 @@
 import { Update } from '@commercetools/platform-sdk';
 import { Request, Response, Router } from 'express';
-import AbstractRepository from '~src/repositories/abstract';
+import AbstractRepository from '../repositories/abstract';
 
 export default abstract class AbstractService {
   protected abstract getBasePath(): string;
-  protected repository: AbstractRepository;
+  public abstract repository: AbstractRepository;
 
-  constructor(parent: Router, repository: AbstractRepository) {
+  constructor(parent: Router) {
     this.registerRoutes(parent);
-    this.repository = repository;
   }
 
   extraRoutes(router: Router) {}
@@ -16,6 +15,10 @@ export default abstract class AbstractService {
   registerRoutes(parent: Router) {
     const basePath = this.getBasePath();
     const router = Router();
+
+    // Bind this first since the `/:id` routes are currently a bit to greedy
+    this.extraRoutes(router);
+
     router.get('/', this.get.bind(this));
     router.get('/:id', this.getWithId.bind(this));
     router.get('/key=:key', this.getWithKey.bind(this));
@@ -27,7 +30,6 @@ export default abstract class AbstractService {
     router.post('/:id', this.postWithId.bind(this));
     router.post('/key=:key', this.postWithKey.bind(this));
 
-    this.extraRoutes(router);
     parent.use(`/${basePath}`, router);
   }
 
@@ -68,7 +70,6 @@ export default abstract class AbstractService {
 
   postWithId(request: Request, response: Response) {
     const updateRequest: Update = request.body;
-
     const resource = this.repository.get(request.params['id']);
     if (!resource) {
       return response.status(404).send('Not found');

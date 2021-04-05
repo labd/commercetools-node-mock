@@ -1,28 +1,25 @@
 import nock from 'nock';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import supertest from 'supertest';
 import morgan from 'morgan';
-import {
-  CartService,
-  CustomerService,
-  CustomObjectService,
-  OrderService,
-} from './services';
-import {
-  CartRepository,
-  CustomerRepository,
-  CustomObjectRepository,
-  OrderRepository,
-} from './repositories';
 import { AbstractStorage, InMemoryStorage } from './storage';
 import { BaseResource, ReferenceTypeId } from '@commercetools/platform-sdk';
 import AbstractService from './services/abstract';
 import AbstractRepository from './repositories/abstract';
+import { TypeService } from './services/type';
+import { CustomObjectService } from './services/custom-object';
+import { CustomerService } from './services/customer';
+import { CartService } from './services/cart';
+import { OrderService } from './services/order';
 
 export class CommercetoolsMock {
   private _storage: AbstractStorage;
   private _repositories: Array<AbstractRepository> = [];
-  private _services: Array<AbstractService> = [];
+  private _services: Partial<
+    {
+      [index in ReferenceTypeId]: AbstractService;
+    }
+  > = {};
 
   constructor() {
     this._storage = new InMemoryStorage();
@@ -55,16 +52,38 @@ export class CommercetoolsMock {
   }
 
   addResource(typeId: ReferenceTypeId, resource: BaseResource) {
-    this._storage.add(typeId, resource);
+    const service = this._services[typeId];
+    if (service) {
+      this._storage.add(typeId, {
+        ...service.repository.getResourceProperties(),
+        ...resource,
+      });
+    } else {
+      throw new Error('Service not implemented yet');
+    }
   }
 
   getResource(typeId: ReferenceTypeId, id: string) {
     return this._storage.get(typeId, id);
   }
 
+  // TODO: Not sure if we want to expose this...
+  getRepository(typeId: ReferenceTypeId) {
+    const service = this._services[typeId];
+    if (service !== undefined) {
+      return service.repository;
+    }
+    throw new Error('No such repository');
+  }
+
   createApp(): express.Express {
     const app = express();
     this.register(app);
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      console.info(err);
+      res.status(500).send('Something broke!');
+    });
+
     return app;
   }
 
@@ -82,16 +101,15 @@ export class CommercetoolsMock {
     app.use(morgan('tiny'));
     app.use('/:projectKey', projectRouter);
 
-    const cartRepository = new CartRepository(this._storage);
-    const customerRepository = new CustomerRepository(this._storage);
-    const customObjectRepository = new CustomObjectRepository(this._storage);
-    const orderRepository = new OrderRepository(this._storage);
-
-    this._services.push(
-      new CartService(projectRouter, cartRepository),
-      new CustomerService(projectRouter, customerRepository),
-      new CustomObjectService(projectRouter, customObjectRepository),
-      new OrderService(projectRouter, orderRepository)
-    );
+    this._services = {
+      cart: new CartService(projectRouter, this._storage),
+      customer: new CustomerService(projectRouter, this._storage),
+      'key-value-document': new CustomObjectService(
+        projectRouter,
+        this._storage
+      ),
+      order: new OrderService(projectRouter, this._storage),
+      type: new TypeService(projectRouter, this._storage),
+    };
   }
 }

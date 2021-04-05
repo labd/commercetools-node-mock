@@ -8,6 +8,7 @@ import {
   QueryParam,
   ReferenceTypeId,
   ResourceIdentifier,
+  Type,
 } from '@commercetools/platform-sdk';
 
 type QueryParams = {
@@ -21,6 +22,7 @@ type QueryParams = {
 };
 
 export abstract class AbstractStorage {
+  abstract assertStorage(typeId: ReferenceTypeId): void;
   abstract all(typeId: ReferenceTypeId): Array<BaseResource>;
   abstract add(typeId: ReferenceTypeId, obj: BaseResource): void;
   abstract get(typeId: ReferenceTypeId, id: string): BaseResource | null;
@@ -44,7 +46,14 @@ export class InMemoryStorage extends AbstractStorage {
     customer: new Map<string, Customer>(),
     'key-value-document': new Map<string, CustomObject>(),
     order: new Map<string, Order>(),
+    type: new Map<string, Type>(),
   };
+
+  assertStorage(typeId: ReferenceTypeId) {
+    if (this.resources[typeId] === undefined) {
+      throw new Error(`Storage not available for type: ${typeId}`);
+    }
+  }
 
   all(typeId: ReferenceTypeId) {
     const store = this.resources[typeId];
@@ -94,13 +103,25 @@ export class InMemoryStorage extends AbstractStorage {
     if (identifier.id) {
       return this.get(identifier.typeId, identifier.id) || null;
     }
-    return null;
 
-    // except KeyError:
-    //     raise ValueError("No resource found with id %r", obj.id)
-    // if obj.key:
-    //     for item in store.values():
-    //         if item.key == obj.key:
-    //             return item
+    if (identifier.key) {
+      const store = this.resources[identifier.typeId];
+      if (store) {
+        // TODO: BaseResource has no key attribute, but the subclasses should
+        // have them all.
+        const resource = Array.from(store.values()).find(
+          // @ts-ignore
+          r => r.key == identifier.key
+        );
+        if (resource) {
+          return resource;
+        }
+      } else {
+        throw new Error(
+          `No storage found for resource type: ${identifier.typeId}`
+        );
+      }
+    }
+    return null;
   }
 }

@@ -6,7 +6,7 @@ import {
   ReferenceTypeId,
   UpdateAction,
 } from '@commercetools/platform-sdk';
-import { AbstractStorage } from '~src/storage';
+import { AbstractStorage } from '../storage';
 
 export default abstract class AbstractRepository {
   protected _storage: AbstractStorage;
@@ -17,6 +17,7 @@ export default abstract class AbstractRepository {
 
   constructor(storage: AbstractStorage) {
     this._storage = storage;
+    this._storage.assertStorage(this.getTypeId());
   }
 
   abstract getTypeId(): ReferenceTypeId;

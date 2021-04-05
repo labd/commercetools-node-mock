@@ -9,9 +9,6 @@
     "sourceMap": true,
     "rootDir": "./src",
     "baseUrl": "src",
-    "paths": {
-      "~src/*": ["*"]
-    },
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

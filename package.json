@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "tsdx watch",
+    "server": "nodemon --watch src --exec 'node -r esbuild-register' src/server.ts",
     "build": "tsdx build --target=node",
     "test": "tsdx test",
     "lint": "tsdx lint",
@@ -52,7 +53,9 @@
     "@types/morgan": "^1.9.2",
     "@types/supertest": "^2.0.11",
     "@types/uuid": "^8.3.0",
+    "esbuild-register": "^2.3.0",
     "husky": "^6.0.0",
+    "nodemon": "^2.0.7",
     "size-limit": "^4.10.2",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",

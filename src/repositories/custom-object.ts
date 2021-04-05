@@ -22,9 +22,7 @@ export class CustomObjectRepository extends AbstractRepository {
   }
 
   getWithContainerAndKeygetBy(container: string, key: string) {
-    const items = this._storage.all('key-value-document') as Array<
-      CustomObject
-    >;
+    const items = this._storage.all(this.getTypeId()) as Array<CustomObject>;
     return items.find(item => item.container == container && item.key == key);
   }
 }
