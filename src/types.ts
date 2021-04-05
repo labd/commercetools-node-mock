@@ -1,4 +1,8 @@
 import * as ctp from '@commercetools/platform-sdk';
+import { CartRepository } from 'repositories/cart';
+import { CustomObjectRepository } from 'repositories/custom-object';
+import { CustomerRepository } from 'repositories/customer';
+import { OrderRepository } from 'repositories/order';
 
 export type ResourceMap = {
   cart: ctp.Cart;
@@ -27,7 +31,38 @@ export type ResourceMap = {
   type: ctp.Type;
   zone: ctp.Zone;
 
-  'customer-email-token': never,
-  'customer-password-token': never
+  'customer-email-token': never;
+  'customer-password-token': never;
 };
 
+export type RepositoryMap = {
+  cart: CartRepository;
+  customer: CustomerRepository;
+  'key-value-document': CustomObjectRepository;
+  type: ctp.Type;
+  zone: ctp.Zone;
+
+  'cart-discount': never;
+  category: never;
+  channel: never;
+  'customer-group': never;
+  'discount-code': never;
+  extension: never;
+  'inventory-entry': never;
+  order: OrderRepository;
+  'order-edit': never;
+  payment: never;
+  product: never;
+  'product-discount': never;
+  'product-type': never;
+  review: never;
+  'shipping-method': never;
+  'shopping-list': never;
+  state: never;
+  store: never;
+  subscription: never;
+  'tax-category': never;
+
+  'customer-email-token': never;
+  'customer-password-token': never;
+};

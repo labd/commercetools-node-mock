@@ -11,7 +11,7 @@ import { CustomObjectService } from './services/custom-object';
 import { CustomerService } from './services/customer';
 import { CartService } from './services/cart';
 import { OrderService } from './services/order';
-import { ResourceMap } from 'types';
+import { RepositoryMap, ResourceMap } from 'types';
 
 export class CommercetoolsMock {
   private _storage: AbstractStorage;
@@ -75,10 +75,12 @@ export class CommercetoolsMock {
   }
 
   // TODO: Not sure if we want to expose this...
-  getRepository(typeId: ReferenceTypeId) {
+  getRepository<ReferenceTypeId extends keyof RepositoryMap>(
+    typeId: ReferenceTypeId
+  ): RepositoryMap[ReferenceTypeId] {
     const service = this._services[typeId];
     if (service !== undefined) {
-      return service.repository;
+      return service.repository as RepositoryMap[ReferenceTypeId];
     }
     throw new Error('No such repository');
   }
