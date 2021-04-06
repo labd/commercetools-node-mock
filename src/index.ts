@@ -129,6 +129,7 @@ export class CommercetoolsMock {
         this._storage
       ),
       order: new OrderService(projectRouter, this._storage),
+      store: new StoreService(projectRouter, this._storage),
       type: new TypeService(projectRouter, this._storage),
     };
   }
