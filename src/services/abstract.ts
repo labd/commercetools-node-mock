@@ -42,7 +42,9 @@ export default abstract class AbstractService {
   }
 
   getWithId(request: Request, response: Response) {
-    const result = this.repository.get(request.params['id']);
+    const result = this.repository.get(request.params['id'], {
+      expand: this._parseParam(request.query.expand),
+    });
     if (!result) {
       return response.status(404).send('Not found');
     }
@@ -99,7 +101,7 @@ export default abstract class AbstractService {
   ): string[] | undefined {
     if (Array.isArray(value)) {
       // @ts-ignore
-      return value
+      return value;
     } else if (value !== undefined) {
       return [`${value}`];
     }

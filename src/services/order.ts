@@ -25,7 +25,6 @@ export class OrderService extends AbstractService {
 
   import(request: Request, response: Response) {
     const importDraft = request.body;
-    console.error(importDraft);
     const resource = this.repository.import(importDraft);
     return response.status(200).send(resource);
   }

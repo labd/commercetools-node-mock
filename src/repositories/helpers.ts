@@ -5,6 +5,9 @@ import {
   Money,
   Price,
   PriceDraft,
+  Store,
+  StoreKeyReference,
+  StoreResourceIdentifier,
   Type,
   TypedMoney,
 } from '@commercetools/platform-sdk';
@@ -45,5 +48,22 @@ export const createTypedMoney = (value: Money): TypedMoney => {
     type: 'centPrecision',
     fractionDigits: 2,
     ...value,
+  };
+};
+
+export const resolveStoreReference = (
+  ref: StoreResourceIdentifier | undefined,
+  storage: AbstractStorage
+): StoreKeyReference | undefined => {
+  if (!ref) return undefined;
+  const resource = storage.getByResourceIdentifier(ref);
+  if (!resource) {
+    throw new Error('No such store');
+  }
+
+  const store = resource as Store;
+  return {
+    typeId: 'store',
+    key: store.key,
   };
 };

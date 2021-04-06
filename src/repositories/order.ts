@@ -24,7 +24,12 @@ import {
   Store,
 } from '@commercetools/platform-sdk';
 import AbstractRepository from './abstract';
-import { createCustomFields, createPrice, createTypedMoney } from './helpers';
+import {
+  createCustomFields,
+  createPrice,
+  createTypedMoney,
+  resolveStoreReference,
+} from './helpers';
 import { Writable } from '../types';
 
 export class OrderRepository extends AbstractRepository {
@@ -62,24 +67,32 @@ export class OrderRepository extends AbstractRepository {
     assert(this);
     const resource: Order = {
       ...this.getResourceProperties(),
-      orderState: draft.orderState || 'Open',
+
+      billingAddress: draft.billingAddress,
+      shippingAddress: draft.shippingAddress,
+
+      custom: createCustomFields(draft.custom, this._storage),
+      customerEmail: draft.customerEmail,
+      lastMessageSequenceNumber: 0,
       orderNumber: draft.orderNumber,
+      orderState: draft.orderState || 'Open',
+      origin: draft.origin || 'Customer',
+      refusedGifts: [],
+      store: resolveStoreReference(draft.store, this._storage),
+      syncInfo: [],
+
       lineItems:
         draft.lineItems?.map(this.lineItemFromImportDraft.bind(this)) || [],
       customLineItems:
         draft.customLineItems?.map(
           this.customLineItemFromImportDraft.bind(this)
         ) || [],
+
       totalPrice: {
         type: 'centPrecision',
         ...draft.totalPrice,
         fractionDigits: 2,
       },
-      refusedGifts: [],
-      origin: draft.origin || 'Customer',
-      syncInfo: [],
-      lastMessageSequenceNumber: 0,
-      custom: createCustomFields(draft.custom, this._storage),
     };
     this.save(resource);
     return resource;
