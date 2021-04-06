@@ -82,7 +82,7 @@ export class CommercetoolsMock {
     typeId: ReferenceTypeId,
     id: string
   ): ResourceMap[ReferenceTypeId] {
-    return this._storage.get(typeId, id) as ResourceMap[ReferenceTypeId];
+    return this._storage.get(typeId, id, {}) as ResourceMap[ReferenceTypeId];
   }
 
   // TODO: Not sure if we want to expose this...

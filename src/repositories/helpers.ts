@@ -18,6 +18,8 @@ export const createCustomFields = (
   storage: AbstractStorage
 ): CustomFields | undefined => {
   if (!draft) return undefined;
+  if (!draft.type) return undefined;
+  if (!draft.type.typeId) return undefined;
   if (!draft.fields) return undefined;
 
   const typeResource = storage.getByResourceIdentifier(draft.type) as Type;
