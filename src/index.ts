@@ -16,6 +16,7 @@ import { RepositoryMap, ResourceMap } from 'types';
 export class CommercetoolsMock {
   private _storage: AbstractStorage;
   private _repositories: Array<AbstractRepository> = [];
+  private _nockScope: nock.Scope | undefined
   private _services: Partial<
     {
       [index in ReferenceTypeId]: AbstractService;
@@ -29,7 +30,7 @@ export class CommercetoolsMock {
   mockHttp(url: string) {
     const app = this.createApp();
 
-    nock(url)
+    this._nockScope = nock(url)
       .persist()
       .get(/.*/)
       .reply(async function(uri) {
@@ -50,6 +51,16 @@ export class CommercetoolsMock {
           .send(body);
         return [response.status, response.body];
       });
+  }
+
+  stop() {
+    this._nockScope?.persist(false)
+    this._nockScope = undefined
+  }
+
+  clear() {
+    this._storage.clear()
+
   }
 
   addResource<ReferenceTypeId extends keyof ResourceMap>(

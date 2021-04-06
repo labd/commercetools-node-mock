@@ -143,7 +143,7 @@ export class OrderRepository extends AbstractRepository {
     return lineItem;
   }
 
-  getWithOrderNumber(orderNumber: string) {
+  getWithOrderNumber(orderNumber: string): Order | undefined {
     const items = this._storage.all(this.getTypeId()) as Array<Order>;
     return items.find(item => item.orderNumber == orderNumber);
   }

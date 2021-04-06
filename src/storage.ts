@@ -23,6 +23,8 @@ type QueryParams = {
 };
 
 export abstract class AbstractStorage {
+
+  abstract clear(): void;
   abstract assertStorage(typeId: ReferenceTypeId): void;
   abstract all(typeId: ReferenceTypeId): Array<BaseResource>;
   abstract add<ReferenceTypeId extends keyof ResourceMap>(
@@ -55,6 +57,12 @@ export class InMemoryStorage extends AbstractStorage {
     order: new Map<string, Order>(),
     type: new Map<string, Type>(),
   };
+
+  clear() {
+    for (const [key, value] of Object.entries(this.resources)) {
+      value?.clear()
+    }
+  }
 
   assertStorage(typeId: ReferenceTypeId) {
     if (this.resources[typeId] === undefined) {
