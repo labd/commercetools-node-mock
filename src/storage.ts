@@ -1,3 +1,4 @@
+import assert from 'assert';
 import {
   BaseResource,
   Cart,
@@ -14,6 +15,10 @@ import {
 } from '@commercetools/platform-sdk';
 import { parseExpandClause } from './lib/expandParser';
 import { ResourceMap, Writable } from 'types';
+
+type GetParams = {
+  expand?: string[];
+};
 
 type QueryParams = {
   expand?: string | string[];
@@ -35,7 +40,8 @@ export abstract class AbstractStorage {
   ): void;
   abstract get<ReferenceTypeId extends keyof ResourceMap>(
     typeId: ReferenceTypeId,
-    id: string
+    id: string,
+    params: GetParams
   ): ResourceMap[ReferenceTypeId] | null;
   abstract delete(typeId: ReferenceTypeId, id: string): BaseResource | null;
   abstract query(
@@ -83,26 +89,43 @@ export class InMemoryStorage extends AbstractStorage {
 
   add<ReferenceTypeId extends keyof ResourceMap>(
     typeId: ReferenceTypeId,
-    obj: ResourceMap[ReferenceTypeId]
-  ) {
+    obj: ResourceMap[ReferenceTypeId],
+    params: GetParams = {}
+  ): ResourceMap[ReferenceTypeId] {
     this.resources[typeId]?.set(obj.id, obj);
+
+    const resource = this.get(typeId, obj.id, params);
+    assert(resource);
+    return resource;
   }
 
   get<ReferenceTypeId extends keyof ResourceMap>(
     typeId: ReferenceTypeId,
-    id: string
+    id: string,
+    params: GetParams = {}
   ): ResourceMap[ReferenceTypeId] | null {
     const resource = this.resources[typeId]?.get(id);
     if (resource) {
-      return resource as ResourceMap[ReferenceTypeId];
+      return this.expand(
+        resource,
+        params.expand
+      ) as ResourceMap[ReferenceTypeId];
     }
     return null;
   }
 
-  delete(typeId: ReferenceTypeId, id: string): BaseResource | null {
+  delete(
+    typeId: ReferenceTypeId,
+    id: string,
+    params: GetParams = {}
+  ): BaseResource | null {
     const resource = this.get(typeId, id);
     if (resource) {
       this.resources[typeId]?.delete(id);
+      return this.expand(
+        resource,
+        params.expand
+      ) as ResourceMap[ReferenceTypeId];
     }
     return resource;
   }
@@ -143,6 +166,9 @@ export class InMemoryStorage extends AbstractStorage {
       if (resource) {
         return resource as ResourceMap[ReferenceTypeId];
       }
+      console.error(
+        `No resource found with typeId=${identifier.typeId}, id=${identifier.id}`
+      );
       return undefined;
     }
 
@@ -169,7 +195,6 @@ export class InMemoryStorage extends AbstractStorage {
 
   private expand = <T>(obj: T, clause: undefined | string | string[]): T => {
     if (!clause) return obj;
-
     const newObj = JSON.parse(JSON.stringify(obj));
     if (Array.isArray(clause)) {
       clause.forEach(c => {
@@ -184,7 +209,6 @@ export class InMemoryStorage extends AbstractStorage {
   private _resolveResource = (obj: any, expand: string) => {
     const params = parseExpandClause(expand);
 
-    let resolved;
     if (!params.index) {
       const reference = obj[params.element];
       if (reference === undefined) {

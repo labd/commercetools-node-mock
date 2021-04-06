@@ -12,6 +12,10 @@ type QueryParams = {
   expand?: string[];
 };
 
+type GetParams = {
+  expand?: string[];
+};
+
 export default abstract class AbstractRepository {
   protected _storage: AbstractStorage;
 
@@ -27,14 +31,14 @@ export default abstract class AbstractRepository {
   abstract getTypeId(): ReferenceTypeId;
   abstract create(draft: any): BaseResource;
 
-  query(params: QueryParams) {
+  query(params: QueryParams = {}) {
     return this._storage.query(this.getTypeId(), {
       expand: params.expand,
     });
   }
 
-  get(id: string): BaseResource | null {
-    return this._storage.get(this.getTypeId(), id);
+  get(id: string, params: GetParams = {}): BaseResource | null {
+    return this._storage.get(this.getTypeId(), id, params);
   }
 
   delete(id: string): BaseResource | null {
