@@ -8,6 +8,10 @@ import {
 } from '@commercetools/platform-sdk';
 import { AbstractStorage } from '../storage';
 
+type QueryParams = {
+  expand?: string[];
+};
+
 export default abstract class AbstractRepository {
   protected _storage: AbstractStorage;
 
@@ -23,8 +27,10 @@ export default abstract class AbstractRepository {
   abstract getTypeId(): ReferenceTypeId;
   abstract create(draft: any): BaseResource;
 
-  query() {
-    return this._storage.query(this.getTypeId(), {});
+  query(params: QueryParams) {
+    return this._storage.query(this.getTypeId(), {
+      expand: params.expand,
+    });
   }
 
   get(id: string): BaseResource | null {
@@ -59,7 +65,12 @@ export default abstract class AbstractRepository {
     const modifiedResource = JSON.parse(JSON.stringify(resource));
 
     actions.forEach(action => {
-      this.actions[action.action](modifiedResource, action);
+      const updateFunc = this.actions[action.action];
+      if (!updateFunc) {
+        console.error(`No mock implemented for update action ${action.action}`);
+        return;
+      }
+      updateFunc(modifiedResource, action);
     });
 
     if (!deepEqual(modifiedResource, resource)) {

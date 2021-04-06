@@ -13,6 +13,14 @@ describe('Order Query', () => {
       .post('/dummy/carts')
       .send({
         currency: 'EUR',
+        custom: {
+          type: {
+            key: 'my-cart',
+          },
+          fields: {
+            description: 'example description',
+          },
+        },
       });
     expect(response.status).toBe(200);
     const cart = response.body;
@@ -151,6 +159,28 @@ describe('Order Import', () => {
           centAmount: 1000,
           currencyCode: 'EUR',
         },
+        customLineItems: [
+          {
+            name: {
+              'nl-NL': 'Something',
+            },
+            slug: 'my-slug',
+            money: {
+              centAmount: 1475,
+              currencyCode: 'EUR',
+            },
+            quantity: 1,
+            // custom: {
+            //   type: {
+            //     typeId: 'type',
+            //     key: 'myCustomLineItem',
+            //   },
+            //   fields: {
+            //     myCustomField: 'myCustomValeu',
+            //   },
+            // },
+          },
+        ],
         lineItems: [
           {
             id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
@@ -271,5 +301,6 @@ describe('Order Import', () => {
 
     const created: Order = response.body;
     expect(created.lineItems).toHaveLength(1);
+    expect(created.customLineItems).toHaveLength(1);
   });
 });

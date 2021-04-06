@@ -4,6 +4,8 @@ import { CustomObjectRepository } from 'repositories/custom-object';
 import { CustomerRepository } from 'repositories/customer';
 import { OrderRepository } from 'repositories/order';
 
+export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> };
+
 export type ResourceMap = {
   cart: ctp.Cart;
   'cart-discount': ctp.CartDiscount;
@@ -33,6 +35,31 @@ export type ResourceMap = {
 
   'customer-email-token': never;
   'customer-password-token': never;
+};
+
+export type ResourceIdentifierMap = {
+  cart: ctp.CartDiscountResourceIdentifier;
+  // 'cart': ctp.CartResourceIdentifier,
+  // 'category': ctp.CategoryResourceIdentifier,
+  // 'foobar': ctp.ChannelResourceIdentifier,
+  // 'foobar': ctp.CustomerGroupResourceIdentifier,
+  // 'foobar': ctp.CustomerResourceIdentifier,
+  // 'foobar': ctp.DiscountCodeResourceIdentifier,
+  // 'foobar': ctp.InventoryEntryResourceIdentifier,
+  // 'foobar': ctp.OrderEditResourceIdentifier,
+  // 'foobar': ctp.OrderResourceIdentifier,
+  // 'foobar': ctp.PaymentResourceIdentifier,
+  // 'foobar': ctp.ProductDiscountResourceIdentifier,
+  // 'foobar': ctp.ProductResourceIdentifier,
+  // 'foobar': ctp.ProductTypeResourceIdentifier,
+  // 'foobar': ctp.ReviewResourceIdentifier,
+  // 'foobar': ctp.ShippingMethodResourceIdentifier,
+  // 'foobar': ctp.ShoppingListResourceIdentifier,
+  // 'foobar': ctp.StateResourceIdentifier,
+  // 'foobar': ctp.StoreResourceIdentifier,
+  // 'foobar': ctp.TaxCategoryResourceIdentifier,
+  // 'foobar': ctp.TypeResourceIdentifier,
+  // 'foobar': ctp.ZoneResourceIdentifier,
 };
 
 export type RepositoryMap = {

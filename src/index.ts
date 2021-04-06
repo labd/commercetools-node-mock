@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import supertest from 'supertest';
 import morgan from 'morgan';
 import { AbstractStorage, InMemoryStorage } from './storage';
-import { BaseResource, ReferenceTypeId } from '@commercetools/platform-sdk';
+import { ReferenceTypeId } from '@commercetools/platform-sdk';
 import AbstractService from './services/abstract';
 import AbstractRepository from './repositories/abstract';
 import { TypeService } from './services/type';
@@ -12,11 +12,12 @@ import { CustomerService } from './services/customer';
 import { CartService } from './services/cart';
 import { OrderService } from './services/order';
 import { RepositoryMap, ResourceMap } from 'types';
+import { StoreService } from './services/store';
 
 export class CommercetoolsMock {
   private _storage: AbstractStorage;
   private _repositories: Array<AbstractRepository> = [];
-  private _nockScope: nock.Scope | undefined
+  private _nockScope: nock.Scope | undefined;
   private _services: Partial<
     {
       [index in ReferenceTypeId]: AbstractService;
@@ -54,13 +55,12 @@ export class CommercetoolsMock {
   }
 
   stop() {
-    this._nockScope?.persist(false)
-    this._nockScope = undefined
+    this._nockScope?.persist(false);
+    this._nockScope = undefined;
   }
 
   clear() {
-    this._storage.clear()
-
+    this._storage.clear();
   }
 
   addResource<ReferenceTypeId extends keyof ResourceMap>(
@@ -100,8 +100,8 @@ export class CommercetoolsMock {
     const app = express();
     this.register(app);
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      console.info(err);
-      res.status(500).send('Something broke!');
+      console.error(err);
+      res.status(500).send({ error: 'Something broke!' });
     });
 
     return app;

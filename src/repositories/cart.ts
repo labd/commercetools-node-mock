@@ -1,5 +1,6 @@
 import { Cart, CartDraft, ReferenceTypeId } from '@commercetools/platform-sdk';
 import AbstractRepository from './abstract';
+import { createCustomFields } from './helpers';
 
 export class CartRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -23,6 +24,7 @@ export class CartRepository extends AbstractRepository {
       taxCalculationMode: 'LineItemLevel',
       refusedGifts: [],
       origin: 'Customer',
+      custom: createCustomFields(draft.custom, this._storage),
     };
     this.save(resource);
     return resource;

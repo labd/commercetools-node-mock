@@ -5,12 +5,15 @@ import {
   CustomObject,
   Order,
   PagedQueryResponse,
+  Store,
   QueryParam,
   ReferenceTypeId,
   ResourceIdentifier,
   Type,
+  Reference,
 } from '@commercetools/platform-sdk';
-import { ResourceMap } from 'types';
+import { parseExpandClause } from './lib/expandParser';
+import { ResourceMap, Writable } from 'types';
 
 type QueryParams = {
   expand?: string | string[];
@@ -23,7 +26,6 @@ type QueryParams = {
 };
 
 export abstract class AbstractStorage {
-
   abstract clear(): void;
   abstract assertStorage(typeId: ReferenceTypeId): void;
   abstract all(typeId: ReferenceTypeId): Array<BaseResource>;
@@ -42,7 +44,7 @@ export abstract class AbstractStorage {
   ): PagedQueryResponse;
   abstract getByResourceIdentifier(
     identifier: ResourceIdentifier
-  ): BaseResource | null;
+  ): BaseResource | undefined;
 }
 
 export class InMemoryStorage extends AbstractStorage {
@@ -55,12 +57,13 @@ export class InMemoryStorage extends AbstractStorage {
     customer: new Map<string, Customer>(),
     'key-value-document': new Map<string, CustomObject>(),
     order: new Map<string, Order>(),
+    store: new Map<string, Store>(),
     type: new Map<string, Type>(),
   };
 
   clear() {
     for (const [key, value] of Object.entries(this.resources)) {
-      value?.clear()
+      value?.clear();
     }
   }
 
@@ -88,7 +91,7 @@ export class InMemoryStorage extends AbstractStorage {
   get<ReferenceTypeId extends keyof ResourceMap>(
     typeId: ReferenceTypeId,
     id: string
-  ) {
+  ): ResourceMap[ReferenceTypeId] | null {
     const resource = this.resources[typeId]?.get(id);
     if (resource) {
       return resource as ResourceMap[ReferenceTypeId];
@@ -114,7 +117,14 @@ export class InMemoryStorage extends AbstractStorage {
 
     const offset = params.offset || 0;
     const limit = params.limit || 20;
-    const matchingResources = resources.slice(offset, offset + limit);
+    let matchingResources = resources.slice(offset, offset + limit);
+
+    // Expand the resources
+    if (params.expand !== undefined) {
+      matchingResources = matchingResources.map(resource => {
+        return this.expand(resource, params.expand);
+      });
+    }
 
     return {
       count: matchingResources.length,
@@ -124,9 +134,16 @@ export class InMemoryStorage extends AbstractStorage {
       results: matchingResources,
     };
   }
-  getByResourceIdentifier(identifier: ResourceIdentifier): BaseResource | null {
+
+  getByResourceIdentifier<ReferenceTypeId extends keyof ResourceMap>(
+    identifier: ResourceIdentifier
+  ): ResourceMap[ReferenceTypeId] | undefined {
     if (identifier.id) {
-      return this.get(identifier.typeId, identifier.id) || null;
+      const resource = this.get(identifier.typeId, identifier.id);
+      if (resource) {
+        return resource as ResourceMap[ReferenceTypeId];
+      }
+      return undefined;
     }
 
     if (identifier.key) {
@@ -139,7 +156,7 @@ export class InMemoryStorage extends AbstractStorage {
           r => r.key == identifier.key
         );
         if (resource) {
-          return resource;
+          return resource as ResourceMap[ReferenceTypeId];
         }
       } else {
         throw new Error(
@@ -147,6 +164,62 @@ export class InMemoryStorage extends AbstractStorage {
         );
       }
     }
-    return null;
+    return undefined;
+  }
+
+  private expand = <T>(obj: T, clause: undefined | string | string[]): T => {
+    if (!clause) return obj;
+
+    const newObj = JSON.parse(JSON.stringify(obj));
+    if (Array.isArray(clause)) {
+      clause.forEach(c => {
+        this._resolveResource(newObj, c);
+      });
+    } else {
+      this._resolveResource(newObj, clause);
+    }
+    return newObj;
+  };
+
+  private _resolveResource = (obj: any, expand: string) => {
+    const params = parseExpandClause(expand);
+
+    let resolved;
+    if (!params.index) {
+      const reference = obj[params.element];
+      if (reference === undefined) {
+        return;
+      }
+      this._resolveReference(reference, params.rest);
+    } else if (params.index == '*') {
+      const reference = obj[params.element];
+      if (reference === undefined || !Array.isArray(reference)) return;
+      reference.map((itemRef: Writable<Reference>) => {
+        this._resolveReference(itemRef, params.rest);
+      });
+    } else {
+      const reference = obj[params.element][params.index];
+      if (reference === undefined) return;
+      this._resolveReference(reference, params.rest);
+    }
+  };
+
+  private _resolveReference(reference: any, expand: string | undefined) {
+    if (reference === undefined) return;
+
+    if (reference.typeId !== undefined && reference.id !== undefined) {
+      // @ts-ignore
+      reference.obj = this.getByResourceIdentifier({
+        typeId: reference.typeId,
+        id: reference.id,
+      } as ResourceIdentifier);
+      if (expand) {
+        this._resolveResource(reference.obj, expand);
+      }
+    } else {
+      if (expand) {
+        this._resolveResource(reference, expand);
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   CustomFields,
   CustomFieldsDraft,
+  Money,
   Price,
   PriceDraft,
   Type,
@@ -35,14 +36,14 @@ export const createCustomFields = (
 export const createPrice = (draft: PriceDraft): Price => {
   return {
     id: uuidv4(),
-    value: createTypedMoney(draft),
+    value: createTypedMoney(draft.value),
   };
 };
 
-export const createTypedMoney = (draft: PriceDraft): TypedMoney => {
+export const createTypedMoney = (value: Money): TypedMoney => {
   return {
     type: 'centPrecision',
     fractionDigits: 2,
-    ...draft.value,
+    ...value,
   };
 };

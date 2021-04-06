@@ -1,4 +1,5 @@
 import { Update } from '@commercetools/platform-sdk';
+import { ParsedQs } from 'qs';
 import { Request, Response, Router } from 'express';
 import AbstractRepository from '../repositories/abstract';
 
@@ -34,7 +35,9 @@ export default abstract class AbstractService {
   }
 
   get(request: Request, response: Response) {
-    const result = this.repository.query();
+    const result = this.repository.query({
+      expand: this._parseParam(request.query.expand),
+    });
     return response.status(200).send(result);
   }
 
@@ -88,5 +91,18 @@ export default abstract class AbstractService {
 
   postWithKey(request: Request, response: Response) {
     return response.status(500).send('Not implemented');
+  }
+
+  // No idea what i'm doing
+  private _parseParam(
+    value: string | ParsedQs | string[] | ParsedQs[] | undefined
+  ): string[] | undefined {
+    if (Array.isArray(value)) {
+      // @ts-ignore
+      return value
+    } else if (value !== undefined) {
+      return [`${value}`];
+    }
+    return undefined;
   }
 }

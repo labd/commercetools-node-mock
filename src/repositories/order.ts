@@ -1,25 +1,31 @@
 import assert from 'assert';
 import {
   Cart,
-  CustomFields,
-  CustomFieldsDraft,
+  CustomLineItem,
+  CustomLineItemDraft,
   LineItem,
-  LineItemDraft,
   LineItemImportDraft,
   Order,
   OrderChangeOrderStateAction,
   OrderChangePaymentStateAction,
   OrderFromCartDraft,
   OrderImportDraft,
+  OrderSetBillingAddressAction,
+  OrderSetCustomerEmailAction,
   OrderSetCustomFieldAction,
+  OrderSetCustomTypeAction,
   OrderSetLocaleAction,
   OrderSetOrderNumberAction,
+  OrderSetShippingAddressAction,
+  OrderSetStoreAction,
   Product,
   ProductVariant,
   ReferenceTypeId,
+  Store,
 } from '@commercetools/platform-sdk';
 import AbstractRepository from './abstract';
 import { createCustomFields, createPrice, createTypedMoney } from './helpers';
+import { Writable } from '../types';
 
 export class OrderRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -60,7 +66,10 @@ export class OrderRepository extends AbstractRepository {
       orderNumber: draft.orderNumber,
       lineItems:
         draft.lineItems?.map(this.lineItemFromImportDraft.bind(this)) || [],
-      customLineItems: [],
+      customLineItems:
+        draft.customLineItems?.map(
+          this.customLineItemFromImportDraft.bind(this)
+        ) || [],
       totalPrice: {
         type: 'centPrecision',
         ...draft.totalPrice,
@@ -121,23 +130,41 @@ export class OrderRepository extends AbstractRepository {
 
     const lineItem: LineItem = {
       ...this.getResourceProperties(),
-      productType: product.productType,
+      custom: createCustomFields(draft.custom, this._storage),
+      discountedPricePerQuantity: [],
+      lineItemMode: 'Standard',
+      name: draft.name,
+      price: createPrice(draft.price),
+      priceMode: 'Platform',
       productId: product.id,
+      productType: product.productType,
+      quantity: draft.quantity,
+      state: draft.state || [],
+      taxRate: draft.taxRate,
+      totalPrice: createTypedMoney(draft.price.value),
       variant: {
         id: variant.id,
         sku: variant.sku,
         price: createPrice(draft.price),
       },
-      taxRate: draft.taxRate,
+    };
+
+    return lineItem;
+  }
+
+  private customLineItemFromImportDraft(
+    draft: CustomLineItemDraft
+  ): CustomLineItem {
+    const lineItem: CustomLineItem = {
+      ...this.getResourceProperties(),
+      custom: createCustomFields(draft.custom, this._storage),
+      discountedPricePerQuantity: [],
+      money: createTypedMoney(draft.money),
       name: draft.name,
       quantity: draft.quantity,
-      price: createPrice(draft.price),
-      totalPrice: createTypedMoney(draft.price),
-      state: draft.state || [],
-      priceMode: 'Platform',
-      discountedPricePerQuantity: [],
-      lineItemMode: 'Standard',
-      custom: createCustomFields(draft.custom, this._storage),
+      slug: draft.slug,
+      state: [],
+      totalPrice: createTypedMoney(draft.money),
     };
 
     return lineItem;
@@ -149,30 +176,29 @@ export class OrderRepository extends AbstractRepository {
   }
 
   actions = {
-    setOrderNumber: (
-      resource: Order,
-      { orderNumber }: OrderSetOrderNumberAction
-    ) => {
-      // @ts-ignore
-      resource.orderNumber = orderNumber;
-    },
     changeOrderState: (
-      resource: Order,
+      resource: Writable<Order>,
       { orderState }: OrderChangeOrderStateAction
     ) => {
-      // @ts-ignore
       resource.orderState = orderState;
     },
     changePaymentState: (
-      resource: Order,
+      resource: Writable<Order>,
       { paymentState }: OrderChangePaymentStateAction
     ) => {
-      // @ts-ignore
       resource.paymentState = paymentState;
     },
-    setLocale: (resource: Order, { locale }: OrderSetLocaleAction) => {
-      // @ts-ignore
-      resource.locale = locale;
+    setBillingAddress: (
+      resource: Writable<Order>,
+      { address }: OrderSetBillingAddressAction
+    ) => {
+      resource.billingAddress = address;
+    },
+    setCustomerEmail: (
+      resource: Writable<Order>,
+      { email }: OrderSetCustomerEmailAction
+    ) => {
+      resource.customerEmail = email;
     },
     setCustomField: (
       resource: Order,
@@ -182,6 +208,58 @@ export class OrderRepository extends AbstractRepository {
         throw new Error('Resource has no custom field');
       }
       resource.custom.fields[name] = value;
+    },
+    setCustomType: (
+      resource: Writable<Order>,
+      { type, fields }: OrderSetCustomTypeAction
+    ) => {
+      if (!type) {
+        resource.custom = undefined;
+      } else {
+        const resolvedType = this._storage.getByResourceIdentifier(type);
+        if (!resolvedType) {
+          throw new Error(`Type ${type} not found`);
+        }
+
+        resource.custom = {
+          type: {
+            typeId: 'type',
+            id: resolvedType.id,
+          },
+          fields: fields || [],
+        };
+      }
+    },
+    setLocale: (
+      resource: Writable<Order>,
+      { locale }: OrderSetLocaleAction
+    ) => {
+      resource.locale = locale;
+    },
+    setOrderNumber: (
+      resource: Writable<Order>,
+      { orderNumber }: OrderSetOrderNumberAction
+    ) => {
+      resource.orderNumber = orderNumber;
+    },
+    setShippingAddress: (
+      resource: Writable<Order>,
+      { address }: OrderSetShippingAddressAction
+    ) => {
+      resource.shippingAddress = address;
+    },
+    setStore: (resource: Writable<Order>, { store }: OrderSetStoreAction) => {
+      if (!store) return;
+      const resolvedType = this._storage.getByResourceIdentifier(store);
+      if (!resolvedType) {
+        throw new Error(`No store found with key=${store.key}`);
+      }
+
+      const storeReference = resolvedType as Store;
+      resource.store = {
+        typeId: 'store',
+        key: storeReference.key,
+      };
     },
   };
 }

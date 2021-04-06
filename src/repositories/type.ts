@@ -13,6 +13,7 @@ export class TypeRepository extends AbstractRepository {
       name: draft.name,
       resourceTypeIds: draft.resourceTypeIds,
       fieldDefinitions: draft.fieldDefinitions || [],
+      description: draft.description,
     };
     this.save(resource);
     return resource;
