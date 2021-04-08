@@ -49,6 +49,7 @@ export class OrderRepository extends AbstractRepository {
 
     const resource: Order = {
       ...this.getResourceProperties(),
+      orderNumber: draft.orderNumber,
       orderState: 'Open',
       lineItems: [],
       customLineItems: [],
@@ -184,8 +185,19 @@ export class OrderRepository extends AbstractRepository {
   }
 
   getWithOrderNumber(orderNumber: string): Order | undefined {
-    const items = this._storage.all(this.getTypeId()) as Array<Order>;
-    return items.find(item => item.orderNumber == orderNumber);
+    const result = this._storage.query(this.getTypeId(), {
+      where: [`orderNumber="${orderNumber}"`],
+    });
+    if (result.count == 1) {
+      return result.results[0] as Order;
+    }
+
+    // Catch this for now, should be checked when creating/updating
+    if (result.count > 1) {
+      throw new Error('Duplicate order numbers');
+    }
+
+    return;
   }
 
   actions = {

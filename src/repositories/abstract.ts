@@ -10,6 +10,7 @@ import { AbstractStorage } from '../storage';
 
 type QueryParams = {
   expand?: string[];
+  where?: string[];
 };
 
 type GetParams = {
@@ -34,6 +35,7 @@ export default abstract class AbstractRepository {
   query(params: QueryParams = {}) {
     return this._storage.query(this.getTypeId(), {
       expand: params.expand,
+      where: params.where,
     });
   }
 

@@ -14,6 +14,22 @@ describe('Predicate filter', () => {
     expect(matchesPredicate(`stringProperty="foobar"`, object)).toBeTruthy();
   });
 
+  test('multiple string value', async () => {
+    expect(
+      matchesPredicate(
+        [`stringProperty="foobar"`, `numberProperty=1234`],
+        object
+      )
+    ).toBeTruthy();
+
+    expect(
+      matchesPredicate(
+        [`stringProperty="foobar"`, `numberProperty=1111`],
+        object
+      )
+    ).toBeFalsy();
+  });
+
   test('number value equals', async () => {
     expect(matchesPredicate(`numberProperty=1234`, object)).toBeTruthy();
     expect(matchesPredicate(`numberProperty = 1234`, object)).toBeTruthy();

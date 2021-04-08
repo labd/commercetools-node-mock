@@ -32,6 +32,7 @@ describe('Order Query', () => {
           typeId: 'cart',
           id: cart.id,
         },
+        orderNumber: 'foobar',
       });
     expect(response.status).toBe(200);
     order = response.body;
@@ -46,6 +47,25 @@ describe('Order Query', () => {
     expect(response.body.total).toBe(1);
     expect(response.body.offset).toBe(0);
     expect(response.body.limit).toBe(20);
+  });
+
+  test('filter orderNumber', async () => {
+    assert(order);
+
+    {
+      const response = await supertest(app)
+        .get(`/dummy/orders`)
+        .query({ where: 'orderNumber=nomatch' });
+      expect(response.status).toBe(200);
+      expect(response.body.count).toBe(0);
+    }
+    {
+      const response = await supertest(app)
+        .get(`/dummy/orders`)
+        .query({ where: 'orderNumber=foobar' });
+      expect(response.status).toBe(200);
+      expect(response.body.count).toBe(1);
+    }
   });
 });
 

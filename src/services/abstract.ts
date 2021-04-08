@@ -37,6 +37,7 @@ export default abstract class AbstractService {
   get(request: Request, response: Response) {
     const result = this.repository.query({
       expand: this._parseParam(request.query.expand),
+      where: this._parseParam(request.query.where),
     });
     return response.status(200).send(result);
   }

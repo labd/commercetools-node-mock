@@ -15,6 +15,7 @@ import {
 } from '@commercetools/platform-sdk';
 import { parseExpandClause } from './lib/expandParser';
 import { ResourceMap, Writable } from 'types';
+import { matchesPredicate } from './lib/predicateParser';
 
 type GetParams = {
   expand?: string[];
@@ -136,25 +137,36 @@ export class InMemoryStorage extends AbstractStorage {
       throw new Error('No type');
     }
 
-    const resources = Array.from(store.values());
+    let resources = Array.from(store.values());
 
+    // Apply predicates
+    if (params.where) {
+      resources = resources.filter(resource =>
+        matchesPredicate(params.where, resource)
+      );
+    }
+
+    // Get the total before slicing the array
+    const totalResources = resources.length
+
+    // Apply offset, limit
     const offset = params.offset || 0;
     const limit = params.limit || 20;
-    let matchingResources = resources.slice(offset, offset + limit);
+    resources = resources.slice(offset, offset + limit);
 
     // Expand the resources
     if (params.expand !== undefined) {
-      matchingResources = matchingResources.map(resource => {
+      resources = resources.map(resource => {
         return this.expand(resource, params.expand);
       });
     }
 
     return {
-      count: matchingResources.length,
+      count: totalResources,
       total: resources.length,
       offset: offset,
       limit: limit,
-      results: matchingResources,
+      results: resources,
     };
   }
 

@@ -3,9 +3,22 @@ import { Parser } from 'pratt';
 
 type MatchFunc = (target: any) => boolean;
 
-export const matchesPredicate = (predicate: string, target: any): boolean => {
-  const func = generateMatchFunc(predicate);
-  return func(target);
+export const matchesPredicate = (
+  predicate: string | string[] | undefined,
+  target: any
+): boolean => {
+  if (!predicate) {
+    return true;
+  }
+  if (Array.isArray(predicate)) {
+    return predicate.every(item => {
+      const func = generateMatchFunc(item);
+      return func(target);
+    });
+  } else {
+    const func = generateMatchFunc(predicate);
+    return func(target);
+  }
 };
 
 const generateMatchFunc = (predicate: string): MatchFunc => {
