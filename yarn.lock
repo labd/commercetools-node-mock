@@ -7054,6 +7054,11 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
+perplex@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/perplex/-/perplex-0.11.0.tgz#950889a5327da5ad162b801c1cd6f67891dd6e2d"
+  integrity sha512-jBloEOPzQWOk5gWaJjmPuOmCdSGquzM6lzA0aharey9qNE24vB+sTqbPzNGRXMejzCmViuj+9XIKX7JkqyqoLA==
+
 picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.2.1, picomatch@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.2.2.tgz#21f333e9b6b8eaff02468f5146ea406d345f4dad"
@@ -7435,6 +7440,11 @@ postcss@^8.2.8:
     colorette "^1.2.2"
     nanoid "^3.1.22"
     source-map "^0.6.1"
+
+pratt@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/pratt/-/pratt-0.7.0.tgz#4943cc5a66a0a135651a0dabfbd395124e91c985"
+  integrity sha512-QmZfgboJk0tZmCJM93PAdd9H16+4fnSj8XRFNJWHV5ilenqdQM489j57baW/vbtouYeewCTRoLzw+lIksnH3JA==
 
 prelude-ls@~1.1.2:
   version "1.1.2"
