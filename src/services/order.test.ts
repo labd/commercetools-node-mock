@@ -38,6 +38,11 @@ describe('Order Query', () => {
     order = response.body;
   });
 
+  afterEach(() => {
+    ctMock.clear()
+
+  })
+
   test('no filter', async () => {
     assert(order);
 

@@ -3,10 +3,13 @@ import deepEqual from 'deep-equal';
 
 import {
   BaseResource,
+  InvalidOperationError,
   ReferenceTypeId,
   UpdateAction,
 } from '@commercetools/platform-sdk';
 import { AbstractStorage } from '../storage';
+import { checkConcurrentModification } from './errors';
+import { CommercetoolsError } from '../exceptions';
 
 type QueryParams = {
   expand?: string[];
@@ -52,14 +55,21 @@ export default abstract class AbstractRepository {
 
     const current = this.get(resource.id);
     if (current) {
-      if (current.version != resource.version) {
-        throw new Error('Concurrent modification');
+      checkConcurrentModification(current, resource.version);
+    } else {
+      if (resource.version != 0) {
+        throw new CommercetoolsError<InvalidOperationError>(
+          {
+            code: 'InvalidOperation',
+            message: 'version on create must be 0',
+          },
+          400
+        );
       }
-
-      // @ts-ignore
-      resource.version += 1;
     }
 
+    // @ts-ignore
+    resource.version += 1;
     this._storage.add(typeId, resource as any);
   }
 
@@ -90,7 +100,7 @@ export default abstract class AbstractRepository {
       id: uuidv4(),
       createdAt: new Date().toISOString(),
       lastModifiedAt: new Date().toISOString(),
-      version: 1,
+      version: 0,
     };
   }
 }

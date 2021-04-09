@@ -1,3 +1,4 @@
+import { CustomObject } from '@commercetools/platform-sdk';
 import supertest from 'supertest';
 import { CommercetoolsMock } from '../index';
 
@@ -25,6 +26,7 @@ describe('CustomObject create', () => {
 describe('CustomObject retrieve', () => {
   const ctMock = new CommercetoolsMock();
   const app = ctMock.createApp();
+  let customObject: CustomObject;
 
   beforeEach(async () => {
     let response = await supertest(app)
@@ -36,10 +38,13 @@ describe('CustomObject retrieve', () => {
       });
 
     expect(response.status).toBe(200);
-    const customObject = response.body;
+    customObject = response.body;
     expect(customObject.container).toBe('my-container');
     expect(customObject.key).toBe('my-key');
     expect(customObject.value).toBe('my-value');
+  });
+  afterEach(async () => {
+    ctMock.clear();
   });
 
   test('createget', async () => {
@@ -52,5 +57,64 @@ describe('CustomObject retrieve', () => {
     expect(customObject.container).toBe('my-container');
     expect(customObject.key).toBe('my-key');
     expect(customObject.value).toBe('my-value');
+  });
+
+  test('Update match current (no conflict)', async () => {
+    const response = await supertest(app)
+      .post('/dummy/custom-objects')
+      .send({
+        container: 'my-container',
+        key: 'my-key',
+        value: 'my-value',
+      });
+
+    expect(response.status).toBe(200);
+  });
+
+  test('New with version (errors)', async () => {
+    const response = await supertest(app)
+      .post('/dummy/custom-objects')
+      .send({
+        container: 'my-new-container',
+        key: 'my-new-key',
+        value: 'my-value',
+        version: 2,
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      statusCode: 400,
+      message: 'version on create must be 0',
+      errors: [
+        {
+          code: 'InvalidOperation',
+          message: 'version on create must be 0',
+        },
+      ],
+    });
+  });
+
+  test('Update match current with version (conflict)', async () => {
+    const response = await supertest(app)
+      .post('/dummy/custom-objects')
+      .send({
+        container: 'my-container',
+        key: 'my-key',
+        value: 'my-value',
+        version: 2,
+      });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      statusCode: 409,
+      message: `Object ${customObject.id} has a different version than expected. Expected: 2 - Actual: 1.`,
+      errors: [
+        {
+          code: 'ConcurrentModification',
+          currentVersion: 1,
+          message: `Object ${customObject.id} has a different version than expected. Expected: 2 - Actual: 1.`,
+        },
+      ],
+    });
   });
 });

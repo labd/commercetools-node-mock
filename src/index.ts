@@ -13,6 +13,7 @@ import { CartService } from './services/cart';
 import { OrderService } from './services/order';
 import { RepositoryMap, ResourceMap } from 'types';
 import { StoreService } from './services/store';
+import { CommercetoolsError } from './exceptions';
 
 export class CommercetoolsMock {
   private _storage: AbstractStorage;
@@ -132,5 +133,17 @@ export class CommercetoolsMock {
       store: new StoreService(projectRouter, this._storage),
       type: new TypeService(projectRouter, this._storage),
     };
+
+    app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
+      if (err instanceof CommercetoolsError) {
+        resp.status(err.statusCode).send({
+          statusCode: err.statusCode,
+          message: err.message,
+          errors: [
+            err.info
+          ]
+        })
+      }
+    })
   }
 }
