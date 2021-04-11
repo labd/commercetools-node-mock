@@ -48,13 +48,6 @@ export class CommercetoolsMock {
   constructor(options: Partial<CommercetoolsMockOptions> = {}) {
     this._options = { ...DEFAULT_OPTIONS, ...options }
 
-    if (process.env.CT_AUTH_URL) {
-      this._options.authHost = process.env.CT_AUTH_URL
-    }
-    if (process.env.CT_API_URL) {
-      this._options.apiHost = process.env.CT_API_URL
-    }
-
     this._storage = new InMemoryStorage()
     this._oauth2 = new OAuth2Server({
       enabled: this._options.enableAuthentication,

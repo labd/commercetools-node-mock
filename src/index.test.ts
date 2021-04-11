@@ -128,12 +128,11 @@ test('Options.enableAuthentication: false', async () => {
   ctMock.stop()
 })
 
-test('Options.apiHost: is overridden by CT_API_URL', async () => {
-  process.env.CT_API_URL = 'http://api.localhost'
-
+test('Options.apiHost: is overridden is set', async () => {
   const ctMock = new CommercetoolsMock({
     enableAuthentication: false,
     validateCredentials: false,
+    apiHost: 'http://api.localhost',
   })
   ctMock.start()
 
@@ -151,11 +150,11 @@ test('Options.apiHost: is overridden by CT_API_URL', async () => {
   ctMock.stop()
 })
 
-test('Options.authHost: is overridden by CT_AUTH_URL', async () => {
-  process.env.CT_AUTH_URL = 'http://auth.localhost'
+test('Options.authHost: is set', async () => {
   const ctMock = new CommercetoolsMock({
     enableAuthentication: true,
     validateCredentials: true,
+    authHost: 'http://auth.localhost',
   })
   ctMock.start()
 
