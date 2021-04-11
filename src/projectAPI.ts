@@ -6,7 +6,11 @@ export class ProjectAPI {
   private _storage: AbstractStorage
   private _services: Services
 
-  constructor(projectKey: string, services: Services, storage: AbstractStorage) {
+  constructor(
+    projectKey: string,
+    services: Services,
+    storage: AbstractStorage
+  ) {
     this.projectKey = projectKey
     this._storage = storage
     this._services = services
