@@ -4,10 +4,9 @@ import { CommercetoolsMock } from '../index'
 
 describe('CustomObject create', () => {
   const ctMock = new CommercetoolsMock()
-  const app = ctMock.createApp()
 
   test('Create new object', async () => {
-    let response = await supertest(app)
+    let response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-container',
@@ -25,11 +24,10 @@ describe('CustomObject create', () => {
 
 describe('CustomObject retrieve', () => {
   const ctMock = new CommercetoolsMock()
-  const app = ctMock.createApp()
   let customObject: CustomObject
 
   beforeEach(async () => {
-    let response = await supertest(app)
+    let response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-container',
@@ -48,7 +46,7 @@ describe('CustomObject retrieve', () => {
   })
 
   test('createget', async () => {
-    let response = await supertest(app)
+    let response = await supertest(ctMock.app)
       .get('/dummy/custom-objects/my-container/my-key')
       .send()
 
@@ -60,7 +58,7 @@ describe('CustomObject retrieve', () => {
   })
 
   test('Update match current (no conflict)', async () => {
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-container',
@@ -72,7 +70,7 @@ describe('CustomObject retrieve', () => {
   })
 
   test('New with version (errors)', async () => {
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-new-container',
@@ -95,7 +93,7 @@ describe('CustomObject retrieve', () => {
   })
 
   test('Update match current with version (conflict)', async () => {
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-container',

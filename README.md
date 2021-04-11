@@ -25,13 +25,8 @@ const ctMock = new CommercetoolsMock({
 
 beforeAll(() => {
   ctMock.start()
-  ctMock.addCredentials({
-    clientId: 'foo',
-    clientSecret: 'bar',
-    scope: 'manage_project:my-project',
-  })
 
-  ctMock.addResource('my-project', 'type', {
+  ctMock.project('my-project').add('type', {
     key: 'my-customt-type',
     fieldDefinitions: [],
   })

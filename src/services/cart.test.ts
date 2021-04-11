@@ -4,11 +4,10 @@ import { CommercetoolsMock } from '../index'
 
 describe('Carts Query', () => {
   const ctMock = new CommercetoolsMock()
-  const app = ctMock.createApp()
 
   beforeEach(async () => {
     let response
-    response = await supertest(app)
+    response = await supertest(ctMock.app)
       .post('/dummy/types')
       .send({
         key: 'my-cart',
@@ -35,7 +34,7 @@ describe('Carts Query', () => {
       })
     expect(response.status).toBe(200)
 
-    response = await supertest(app)
+    response = await supertest(ctMock.app)
       .post('/dummy/carts')
       .send({
         currency: 'EUR',
@@ -53,7 +52,7 @@ describe('Carts Query', () => {
   })
 
   test('no filter', async () => {
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .get('/dummy/carts')
       .query({
         expand: 'custom.type',

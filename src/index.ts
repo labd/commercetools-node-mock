@@ -3,58 +3,58 @@ import express, { NextFunction, Request, Response } from 'express'
 import supertest from 'supertest'
 import morgan from 'morgan'
 import { AbstractStorage, InMemoryStorage } from './storage'
-import { ReferenceTypeId } from '@commercetools/platform-sdk'
-import AbstractService from './services/abstract'
 import { TypeService } from './services/type'
 import { CustomObjectService } from './services/custom-object'
 import { CustomerService } from './services/customer'
 import { CartService } from './services/cart'
 import { OrderService } from './services/order'
-import { RepositoryMap, ResourceMap } from 'types'
+import { Services } from 'types'
 import { StoreService } from './services/store'
 import { CommercetoolsError } from './exceptions'
 import { OAuth2Server } from './oauth/server'
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
+import { ProjectAPI } from './projectAPI'
+import { copyHeaders } from './lib/proxy'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
   enableAuthentication: boolean
+  defaultProjectKey: string | undefined
   apiHost: RegExp | string
   authHost: RegExp | string
 }
 
-const DEFAULT_OPTIONS = {
+const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
   enableAuthentication: false,
   validateCredentials: false,
+  defaultProjectKey: undefined,
   apiHost: DEFAULT_API_HOSTNAME,
   authHost: DEFAULT_AUTH_HOSTNAME,
 }
 
 export class CommercetoolsMock {
+  public app: express.Express
+  public options: CommercetoolsMockOptions
+
   private _storage: AbstractStorage
-  private _app: express.Express
   private _oauth2: OAuth2Server
   private _nockScopes: {
     auth: nock.Scope | undefined
     api: nock.Scope | undefined
   } = { auth: undefined, api: undefined }
-  private _options: CommercetoolsMockOptions
-  private _services: Partial<
-    {
-      [index in ReferenceTypeId]: AbstractService
-    }
-  > = {}
+  private _services: Services
 
   constructor(options: Partial<CommercetoolsMockOptions> = {}) {
-    this._options = { ...DEFAULT_OPTIONS, ...options }
+    this.options = { ...DEFAULT_OPTIONS, ...options }
+    this._services = {}
 
     this._storage = new InMemoryStorage()
     this._oauth2 = new OAuth2Server({
-      enabled: this._options.enableAuthentication,
-      validate: this._options.validateCredentials,
+      enabled: this.options.enableAuthentication,
+      validate: this.options.validateCredentials,
     })
 
-    this._app = this.createApp()
+    this.app = this.createApp()
   }
 
   start() {
@@ -75,39 +75,16 @@ export class CommercetoolsMock {
     this._storage.clear()
   }
 
-  addResource<ReferenceTypeId extends keyof ResourceMap>(
-    projectKey: string,
-    typeId: ReferenceTypeId,
-    resource: ResourceMap[ReferenceTypeId]
-  ) {
-    const service = this._services[typeId]
-    if (service) {
-      this._storage.add(projectKey, typeId, {
-        ...service.repository.getResourceProperties(),
-        ...resource,
-      })
-    } else {
-      throw new Error('Service not implemented yet')
+  project(projectKey?: string) {
+    if (!projectKey && !this.options.defaultProjectKey) {
+      throw new Error('No projectKey passed and no default set')
     }
-  }
 
-  getResource<ReferenceTypeId extends keyof ResourceMap>(
-    projectKey: string,
-    typeId: ReferenceTypeId,
-    id: string
-  ): ResourceMap[ReferenceTypeId] {
-    return this._storage.get(
-      projectKey,
-      typeId,
-      id,
-      {}
-    ) as ResourceMap[ReferenceTypeId]
-  }
-
-  createApp(): express.Express {
-    const app = express()
-    this.register(app)
-    return app
+    return new ProjectAPI(
+      projectKey || this.options.defaultProjectKey!,
+      this._services,
+      this._storage
+    )
   }
 
   runServer(port: number = 3000) {
@@ -117,18 +94,9 @@ export class CommercetoolsMock {
     })
   }
 
-  // TODO: Not sure if we want to expose this...
-  getRepository<ReferenceTypeId extends keyof RepositoryMap>(
-    typeId: ReferenceTypeId
-  ): RepositoryMap[ReferenceTypeId] {
-    const service = this._services[typeId]
-    if (service !== undefined) {
-      return service.repository as RepositoryMap[ReferenceTypeId]
-    }
-    throw new Error('No such repository')
-  }
+  private createApp(): express.Express {
+    const app = express()
 
-  private register(app: express.Express) {
     const projectRouter = express.Router({ mergeParams: true })
     projectRouter.use(express.json())
 
@@ -136,7 +104,7 @@ export class CommercetoolsMock {
     app.use('/oauth', this._oauth2.createRouter())
 
     // Only enable auth middleware if we have enabled this
-    if (this._options.enableAuthentication) {
+    if (this.options.enableAuthentication) {
       app.use('/:projectKey', this._oauth2.createMiddleware(), projectRouter)
     } else {
       app.use('/:projectKey', projectRouter)
@@ -167,25 +135,27 @@ export class CommercetoolsMock {
         })
       }
     })
+
+    return app
   }
 
   private mockApiHost() {
-    const app = this._app
+    const app = this.app
 
-    this._nockScopes.api = nock(this._options.apiHost)
+    this._nockScopes.api = nock(this.options.apiHost)
       .persist()
       .get(/.*/)
       .reply(async function(uri) {
         const response = await supertest(app)
           .get(uri)
-          .set(this.req.headers)
+          .set(copyHeaders(this.req.headers))
         return [response.status, response.body]
       })
       .post(/.*/)
       .reply(async function(uri, body) {
         const response = await supertest(app)
           .post(uri)
-          .set(this.req.headers)
+          .set(copyHeaders(this.req.headers))
           .send(body)
         return [response.status, response.body]
       })
@@ -193,22 +163,22 @@ export class CommercetoolsMock {
       .reply(async function(uri, body) {
         const response = await supertest(app)
           .delete(uri)
-          .set(this.req.headers)
+          .set(copyHeaders(this.req.headers))
           .send(body)
         return [response.status, response.body]
       })
   }
 
   private mockAuthHost() {
-    const app = this._app
+    const app = this.app
 
-    this._nockScopes.auth = nock(this._options.authHost)
+    this._nockScopes.auth = nock(this.options.authHost)
       .persist()
       .post(/^\/oauth\/.*/)
       .reply(async function(uri, body) {
         const response = await supertest(app)
           .post(uri)
-          .set(this.req.headers)
+          .set(copyHeaders(this.req.headers))
           .send(body)
         return [response.status, response.body]
       })

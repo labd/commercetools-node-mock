@@ -1,10 +1,18 @@
 import * as ctp from '@commercetools/platform-sdk'
+import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import { CartRepository } from 'repositories/cart'
 import { CustomObjectRepository } from 'repositories/custom-object'
 import { CustomerRepository } from 'repositories/customer'
 import { OrderRepository } from 'repositories/order'
+import AbstractService from 'services/abstract'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
+
+export type Services = Partial<
+  {
+    [index in ReferenceTypeId]: AbstractService
+  }
+>
 
 export type ResourceMap = {
   cart: ctp.Cart

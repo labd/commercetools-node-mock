@@ -5,11 +5,10 @@ import { CommercetoolsMock } from '../index'
 
 describe('Order Query', () => {
   const ctMock = new CommercetoolsMock()
-  const app = ctMock.createApp()
   let order: Order | undefined
 
   beforeEach(async () => {
-    let response = await supertest(app)
+    let response = await supertest(ctMock.app)
       .post('/dummy/carts')
       .send({
         currency: 'EUR',
@@ -25,7 +24,7 @@ describe('Order Query', () => {
     expect(response.status).toBe(200)
     const cart = response.body
 
-    response = await supertest(app)
+    response = await supertest(ctMock.app)
       .post('/dummy/orders')
       .send({
         cart: {
@@ -45,7 +44,7 @@ describe('Order Query', () => {
   test('no filter', async () => {
     assert(order)
 
-    const response = await supertest(app).get(`/dummy/orders`)
+    const response = await supertest(ctMock.app).get(`/dummy/orders`)
     expect(response.status).toBe(200)
     expect(response.body.count).toBe(1)
     expect(response.body.total).toBe(1)
@@ -57,14 +56,14 @@ describe('Order Query', () => {
     assert(order)
 
     {
-      const response = await supertest(app)
+      const response = await supertest(ctMock.app)
         .get(`/dummy/orders`)
         .query({ where: 'orderNumber=nomatch' })
       expect(response.status).toBe(200)
       expect(response.body.count).toBe(0)
     }
     {
-      const response = await supertest(app)
+      const response = await supertest(ctMock.app)
         .get(`/dummy/orders`)
         .query({ where: 'orderNumber=foobar' })
       expect(response.status).toBe(200)
@@ -75,11 +74,10 @@ describe('Order Query', () => {
 
 describe('Order Update Actions', () => {
   const ctMock = new CommercetoolsMock()
-  const app = ctMock.createApp()
   let order: Order | undefined
 
   beforeEach(async () => {
-    let response = await supertest(app)
+    let response = await supertest(ctMock.app)
       .post('/dummy/carts')
       .send({
         currency: 'EUR',
@@ -87,7 +85,7 @@ describe('Order Update Actions', () => {
     expect(response.status).toBe(200)
     const cart = response.body
 
-    response = await supertest(app)
+    response = await supertest(ctMock.app)
       .post('/dummy/orders')
       .send({
         cart: {
@@ -102,7 +100,7 @@ describe('Order Update Actions', () => {
   test('no update', async () => {
     assert(order)
 
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
@@ -112,7 +110,7 @@ describe('Order Update Actions', () => {
     expect(response.body.version).toBe(2)
     expect(response.body.locale).toBe('nl-NL')
 
-    const responseAgain = await supertest(app)
+    const responseAgain = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 2,
@@ -126,7 +124,7 @@ describe('Order Update Actions', () => {
   test('setOrderNumber', async () => {
     assert(order)
 
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
@@ -140,7 +138,7 @@ describe('Order Update Actions', () => {
   test('changeOrderState', async () => {
     assert(order)
 
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
@@ -154,7 +152,7 @@ describe('Order Update Actions', () => {
   test('changePaymentState | changeOrderState', async () => {
     assert(order)
 
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
@@ -172,10 +170,9 @@ describe('Order Update Actions', () => {
 
 describe('Order Import', () => {
   const ctMock = new CommercetoolsMock()
-  const app = ctMock.createApp()
 
   test('Import', async () => {
-    const response = await supertest(app)
+    const response = await supertest(ctMock.app)
       .post(`/dummy/orders/import`)
       .send({
         orderNumber: '100000001',

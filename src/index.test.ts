@@ -175,3 +175,29 @@ test('Options.authHost: is set', async () => {
   const token = response.body.access_token
   expect(response.body.access_token).toBeDefined()
 })
+
+test('apiHost mock proxy: querystring', async () => {
+  const ctMock = new CommercetoolsMock({
+    enableAuthentication: false,
+    validateCredentials: false,
+    apiHost: 'http://api.localhost',
+  })
+  ctMock.start()
+
+  const response = await got.get('http://api.localhost/my-project/orders', {
+    responseType: 'json',
+    searchParams: {
+      where: 'orderNumber=foobar',
+      expand: 'custom.type',
+    },
+  })
+  expect(response.statusCode).toBe(200)
+  expect(response.body).toStrictEqual({
+    count: 0,
+    total: 0,
+    offset: 0,
+    limit: 20,
+    results: [],
+  })
+  ctMock.stop()
+})
