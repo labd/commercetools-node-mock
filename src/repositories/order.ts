@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'assert'
 import {
   Cart,
   CustomLineItem,
@@ -22,29 +22,30 @@ import {
   ProductVariant,
   ReferenceTypeId,
   Store,
-} from '@commercetools/platform-sdk';
-import AbstractRepository from './abstract';
+} from '@commercetools/platform-sdk'
+import AbstractRepository from './abstract'
 import {
   createCustomFields,
   createPrice,
   createTypedMoney,
   resolveStoreReference,
-} from './helpers';
-import { Writable } from '../types';
+} from './helpers'
+import { Writable } from '../types'
 
 export class OrderRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
-    return 'order';
+    return 'order'
   }
 
-  create(draft: OrderFromCartDraft): Order {
-    assert(draft.cart);
+  create(projectKey: string, draft: OrderFromCartDraft): Order {
+    assert(draft.cart)
 
     const cart = this._storage.getByResourceIdentifier(
+      projectKey,
       draft.cart
-    ) as Cart | null;
+    ) as Cart | null
     if (!cart) {
-      throw new Error('Cannot find cart');
+      throw new Error('Cannot find cart')
     }
 
     const resource: Order = {
@@ -58,35 +59,37 @@ export class OrderRepository extends AbstractRepository {
       origin: 'Customer',
       syncInfo: [],
       lastMessageSequenceNumber: 0,
-    };
-    this.save(resource);
-    return resource;
+    }
+    this.save(projectKey, resource)
+    return resource
   }
 
-  import(draft: OrderImportDraft): Order {
+  import(projectKey: string, draft: OrderImportDraft): Order {
     // TODO: Check if order with given orderNumber already exists
-    assert(this);
+    assert(this)
     const resource: Order = {
       ...this.getResourceProperties(),
 
       billingAddress: draft.billingAddress,
       shippingAddress: draft.shippingAddress,
 
-      custom: createCustomFields(draft.custom, this._storage),
+      custom: createCustomFields(draft.custom, projectKey, this._storage),
       customerEmail: draft.customerEmail,
       lastMessageSequenceNumber: 0,
       orderNumber: draft.orderNumber,
       orderState: draft.orderState || 'Open',
       origin: draft.origin || 'Customer',
       refusedGifts: [],
-      store: resolveStoreReference(draft.store, this._storage),
+      store: resolveStoreReference(draft.store, projectKey, this._storage),
       syncInfo: [],
 
       lineItems:
-        draft.lineItems?.map(this.lineItemFromImportDraft.bind(this)) || [],
+        draft.lineItems?.map(item =>
+          this.lineItemFromImportDraft.bind(this)(projectKey, item)
+        ) || [],
       customLineItems:
-        draft.customLineItems?.map(
-          this.customLineItemFromImportDraft.bind(this)
+        draft.customLineItems?.map(item =>
+          this.customLineItemFromImportDraft.bind(this)(projectKey, item)
         ) || [],
 
       totalPrice: {
@@ -94,14 +97,17 @@ export class OrderRepository extends AbstractRepository {
         ...draft.totalPrice,
         fractionDigits: 2,
       },
-    };
-    this.save(resource);
-    return resource;
+    }
+    this.save(projectKey, resource)
+    return resource
   }
 
-  private lineItemFromImportDraft(draft: LineItemImportDraft): LineItem {
-    let product: Product;
-    let variant: ProductVariant;
+  private lineItemFromImportDraft(
+    projectKey: string,
+    draft: LineItemImportDraft
+  ): LineItem {
+    let product: Product
+    let variant: ProductVariant
 
     // TODO: We need to look up the product. Need to implement this. For now
     // create a dummy product
@@ -109,7 +115,7 @@ export class OrderRepository extends AbstractRepository {
       variant = {
         id: 0,
         sku: draft.variant.sku,
-      };
+      }
 
       product = {
         ...this.getResourceProperties(),
@@ -137,14 +143,14 @@ export class OrderRepository extends AbstractRepository {
           },
           hasStagedChanges: false,
         },
-      };
+      }
     } else {
-      throw new Error('No product found');
+      throw new Error('No product found')
     }
 
     const lineItem: LineItem = {
       ...this.getResourceProperties(),
-      custom: createCustomFields(draft.custom, this._storage),
+      custom: createCustomFields(draft.custom, projectKey, this._storage),
       discountedPricePerQuantity: [],
       lineItemMode: 'Standard',
       name: draft.name,
@@ -161,17 +167,18 @@ export class OrderRepository extends AbstractRepository {
         sku: variant.sku,
         price: createPrice(draft.price),
       },
-    };
+    }
 
-    return lineItem;
+    return lineItem
   }
 
   private customLineItemFromImportDraft(
+    projectKey: string,
     draft: CustomLineItemDraft
   ): CustomLineItem {
     const lineItem: CustomLineItem = {
       ...this.getResourceProperties(),
-      custom: createCustomFields(draft.custom, this._storage),
+      custom: createCustomFields(draft.custom, projectKey, this._storage),
       discountedPricePerQuantity: [],
       money: createTypedMoney(draft.money),
       name: draft.name,
@@ -179,71 +186,83 @@ export class OrderRepository extends AbstractRepository {
       slug: draft.slug,
       state: [],
       totalPrice: createTypedMoney(draft.money),
-    };
+    }
 
-    return lineItem;
+    return lineItem
   }
 
-  getWithOrderNumber(orderNumber: string): Order | undefined {
-    const result = this._storage.query(this.getTypeId(), {
+  getWithOrderNumber(
+    projectKey: string,
+    orderNumber: string
+  ): Order | undefined {
+    const result = this._storage.query(projectKey, this.getTypeId(), {
       where: [`orderNumber="${orderNumber}"`],
-    });
+    })
     if (result.count == 1) {
-      return result.results[0] as Order;
+      return result.results[0] as Order
     }
 
     // Catch this for now, should be checked when creating/updating
     if (result.count > 1) {
-      throw new Error('Duplicate order numbers');
+      throw new Error('Duplicate order numbers')
     }
 
-    return;
+    return
   }
 
   actions = {
     changeOrderState: (
+      projectKey: string,
       resource: Writable<Order>,
       { orderState }: OrderChangeOrderStateAction
     ) => {
-      resource.orderState = orderState;
+      resource.orderState = orderState
     },
     changePaymentState: (
+      projectKey: string,
       resource: Writable<Order>,
       { paymentState }: OrderChangePaymentStateAction
     ) => {
-      resource.paymentState = paymentState;
+      resource.paymentState = paymentState
     },
     setBillingAddress: (
+      projectKey: string,
       resource: Writable<Order>,
       { address }: OrderSetBillingAddressAction
     ) => {
-      resource.billingAddress = address;
+      resource.billingAddress = address
     },
     setCustomerEmail: (
+      projectKey: string,
       resource: Writable<Order>,
       { email }: OrderSetCustomerEmailAction
     ) => {
-      resource.customerEmail = email;
+      resource.customerEmail = email
     },
     setCustomField: (
+      projectKey: string,
       resource: Order,
       { name, value }: OrderSetCustomFieldAction
     ) => {
       if (!resource.custom) {
-        throw new Error('Resource has no custom field');
+        throw new Error('Resource has no custom field')
       }
-      resource.custom.fields[name] = value;
+      resource.custom.fields[name] = value
     },
     setCustomType: (
+      projectKey: string,
       resource: Writable<Order>,
       { type, fields }: OrderSetCustomTypeAction
     ) => {
       if (!type) {
-        resource.custom = undefined;
+        resource.custom = undefined
       } else {
-        const resolvedType = this._storage.getByResourceIdentifier(type);
+        const resolvedType = this._storage.getByResourceIdentifier(
+          projectKey,
+          type
+        )
         if (!resolvedType) {
-          throw new Error(`Type ${type} not found`);
+          throw new Error(`Type ${type} not found`)
         }
 
         resource.custom = {
@@ -252,39 +271,49 @@ export class OrderRepository extends AbstractRepository {
             id: resolvedType.id,
           },
           fields: fields || [],
-        };
+        }
       }
     },
     setLocale: (
+      projectKey: string,
       resource: Writable<Order>,
       { locale }: OrderSetLocaleAction
     ) => {
-      resource.locale = locale;
+      resource.locale = locale
     },
     setOrderNumber: (
+      projectKey: string,
       resource: Writable<Order>,
       { orderNumber }: OrderSetOrderNumberAction
     ) => {
-      resource.orderNumber = orderNumber;
+      resource.orderNumber = orderNumber
     },
     setShippingAddress: (
+      projectKey: string,
       resource: Writable<Order>,
       { address }: OrderSetShippingAddressAction
     ) => {
-      resource.shippingAddress = address;
+      resource.shippingAddress = address
     },
-    setStore: (resource: Writable<Order>, { store }: OrderSetStoreAction) => {
-      if (!store) return;
-      const resolvedType = this._storage.getByResourceIdentifier(store);
+    setStore: (
+      projectKey: string,
+      resource: Writable<Order>,
+      { store }: OrderSetStoreAction
+    ) => {
+      if (!store) return
+      const resolvedType = this._storage.getByResourceIdentifier(
+        projectKey,
+        store
+      )
       if (!resolvedType) {
-        throw new Error(`No store found with key=${store.key}`);
+        throw new Error(`No store found with key=${store.key}`)
       }
 
-      const storeReference = resolvedType as Store;
+      const storeReference = resolvedType as Store
       resource.store = {
         typeId: 'store',
         key: storeReference.key,
-      };
+      }
     },
-  };
+  }
 }

@@ -1,12 +1,12 @@
-import { Type, TypeDraft, ReferenceTypeId } from '@commercetools/platform-sdk';
-import AbstractRepository from './abstract';
+import { Type, TypeDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
+import AbstractRepository from './abstract'
 
 export class TypeRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
-    return 'type';
+    return 'type'
   }
 
-  create(draft: TypeDraft): Type {
+  create(projectKey: string, draft: TypeDraft): Type {
     const resource: Type = {
       ...this.getResourceProperties(),
       key: draft.key,
@@ -14,8 +14,8 @@ export class TypeRepository extends AbstractRepository {
       resourceTypeIds: draft.resourceTypeIds,
       fieldDefinitions: draft.fieldDefinitions || [],
       description: draft.description,
-    };
-    this.save(resource);
-    return resource;
+    }
+    this.save(projectKey, resource)
+    return resource
   }
 }

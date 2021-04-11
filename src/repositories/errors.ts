@@ -1,14 +1,14 @@
 import {
   BaseResource,
   ConcurrentModificationError,
-} from '@commercetools/platform-sdk';
-import { CommercetoolsError } from '../exceptions';
+} from '@commercetools/platform-sdk'
+import { CommercetoolsError } from '../exceptions'
 
 export const checkConcurrentModification = (
   resource: BaseResource,
   expectedVersion: number
 ) => {
-  if (resource.version == expectedVersion) return;
+  if (resource.version == expectedVersion) return
 
   throw new CommercetoolsError<ConcurrentModificationError>(
     {
@@ -17,5 +17,5 @@ export const checkConcurrentModification = (
       code: 'ConcurrentModification',
     },
     409
-  );
-};
+  )
+}

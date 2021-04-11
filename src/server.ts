@@ -1,4 +1,4 @@
-import { CommercetoolsMock } from './index';
+import { CommercetoolsMock } from './index'
 
-const instance = new CommercetoolsMock();
-instance.run();
+const instance = new CommercetoolsMock()
+instance.runServer(3000)

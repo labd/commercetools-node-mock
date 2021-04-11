@@ -1,14 +1,13 @@
-import assert from 'assert';
-import { Cart, Order } from '@commercetools/platform-sdk';
-import supertest from 'supertest';
-import { CommercetoolsMock } from '../index';
+import { Cart } from '@commercetools/platform-sdk'
+import supertest from 'supertest'
+import { CommercetoolsMock } from '../index'
 
 describe('Carts Query', () => {
-  const ctMock = new CommercetoolsMock();
-  const app = ctMock.createApp();
+  const ctMock = new CommercetoolsMock()
+  const app = ctMock.createApp()
 
   beforeEach(async () => {
-    let response;
+    let response
     response = await supertest(app)
       .post('/dummy/types')
       .send({
@@ -33,8 +32,8 @@ describe('Carts Query', () => {
             inputHint: 'SingleLine',
           },
         ],
-      });
-    expect(response.status).toBe(200);
+      })
+    expect(response.status).toBe(200)
 
     response = await supertest(app)
       .post('/dummy/carts')
@@ -49,9 +48,9 @@ describe('Carts Query', () => {
             description: 'example description',
           },
         },
-      });
-    expect(response.status).toBe(200);
-  });
+      })
+    expect(response.status).toBe(200)
+  })
 
   test('no filter', async () => {
     const response = await supertest(app)
@@ -59,15 +58,15 @@ describe('Carts Query', () => {
       .query({
         expand: 'custom.type',
       })
-      .send();
+      .send()
 
-    expect(response.status).toBe(200);
-    expect(response.body.count).toBe(1);
+    expect(response.status).toBe(200)
+    expect(response.body.count).toBe(1)
 
-    const myCart = response.body.results[0] as Cart;
+    const myCart = response.body.results[0] as Cart
 
-    expect(myCart.custom?.type.id).not.toBeUndefined();
-    expect(myCart.custom?.type.id).toBe(myCart.custom?.type.obj?.id);
-    expect(myCart.custom?.type.obj?.description?.en).toBe('Test Type');
-  });
-});
+    expect(myCart.custom?.type.id).not.toBeUndefined()
+    expect(myCart.custom?.type.id).toBe(myCart.custom?.type.obj?.id)
+    expect(myCart.custom?.type.obj?.description?.en).toBe('Test Type')
+  })
+})

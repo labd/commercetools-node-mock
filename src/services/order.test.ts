@@ -1,12 +1,12 @@
-import assert from 'assert';
-import { Order } from '@commercetools/platform-sdk';
-import supertest from 'supertest';
-import { CommercetoolsMock } from '../index';
+import assert from 'assert'
+import { Order } from '@commercetools/platform-sdk'
+import supertest from 'supertest'
+import { CommercetoolsMock } from '../index'
 
 describe('Order Query', () => {
-  const ctMock = new CommercetoolsMock();
-  const app = ctMock.createApp();
-  let order: Order | undefined;
+  const ctMock = new CommercetoolsMock()
+  const app = ctMock.createApp()
+  let order: Order | undefined
 
   beforeEach(async () => {
     let response = await supertest(app)
@@ -21,9 +21,9 @@ describe('Order Query', () => {
             description: 'example description',
           },
         },
-      });
-    expect(response.status).toBe(200);
-    const cart = response.body;
+      })
+    expect(response.status).toBe(200)
+    const cart = response.body
 
     response = await supertest(app)
       .post('/dummy/orders')
@@ -33,60 +33,59 @@ describe('Order Query', () => {
           id: cart.id,
         },
         orderNumber: 'foobar',
-      });
-    expect(response.status).toBe(200);
-    order = response.body;
-  });
+      })
+    expect(response.status).toBe(200)
+    order = response.body
+  })
 
   afterEach(() => {
     ctMock.clear()
-
   })
 
   test('no filter', async () => {
-    assert(order);
+    assert(order)
 
-    const response = await supertest(app).get(`/dummy/orders`);
-    expect(response.status).toBe(200);
-    expect(response.body.count).toBe(1);
-    expect(response.body.total).toBe(1);
-    expect(response.body.offset).toBe(0);
-    expect(response.body.limit).toBe(20);
-  });
+    const response = await supertest(app).get(`/dummy/orders`)
+    expect(response.status).toBe(200)
+    expect(response.body.count).toBe(1)
+    expect(response.body.total).toBe(1)
+    expect(response.body.offset).toBe(0)
+    expect(response.body.limit).toBe(20)
+  })
 
   test('filter orderNumber', async () => {
-    assert(order);
+    assert(order)
 
     {
       const response = await supertest(app)
         .get(`/dummy/orders`)
-        .query({ where: 'orderNumber=nomatch' });
-      expect(response.status).toBe(200);
-      expect(response.body.count).toBe(0);
+        .query({ where: 'orderNumber=nomatch' })
+      expect(response.status).toBe(200)
+      expect(response.body.count).toBe(0)
     }
     {
       const response = await supertest(app)
         .get(`/dummy/orders`)
-        .query({ where: 'orderNumber=foobar' });
-      expect(response.status).toBe(200);
-      expect(response.body.count).toBe(1);
+        .query({ where: 'orderNumber=foobar' })
+      expect(response.status).toBe(200)
+      expect(response.body.count).toBe(1)
     }
-  });
-});
+  })
+})
 
 describe('Order Update Actions', () => {
-  const ctMock = new CommercetoolsMock();
-  const app = ctMock.createApp();
-  let order: Order | undefined;
+  const ctMock = new CommercetoolsMock()
+  const app = ctMock.createApp()
+  let order: Order | undefined
 
   beforeEach(async () => {
     let response = await supertest(app)
       .post('/dummy/carts')
       .send({
         currency: 'EUR',
-      });
-    expect(response.status).toBe(200);
-    const cart = response.body;
+      })
+    expect(response.status).toBe(200)
+    const cart = response.body
 
     response = await supertest(app)
       .post('/dummy/orders')
@@ -95,65 +94,65 @@ describe('Order Update Actions', () => {
           typeId: 'cart',
           id: cart.id,
         },
-      });
-    expect(response.status).toBe(200);
-    order = response.body;
-  });
+      })
+    expect(response.status).toBe(200)
+    order = response.body
+  })
 
   test('no update', async () => {
-    assert(order);
+    assert(order)
 
     const response = await supertest(app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
         actions: [{ action: 'setLocale', locale: 'nl-NL' }],
-      });
-    expect(response.status).toBe(200);
-    expect(response.body.version).toBe(2);
-    expect(response.body.locale).toBe('nl-NL');
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.locale).toBe('nl-NL')
 
     const responseAgain = await supertest(app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 2,
         actions: [{ action: 'setLocale', locale: 'nl-NL' }],
-      });
-    expect(responseAgain.status).toBe(200);
-    expect(responseAgain.body.version).toBe(2);
-    expect(responseAgain.body.locale).toBe('nl-NL');
-  });
+      })
+    expect(responseAgain.status).toBe(200)
+    expect(responseAgain.body.version).toBe(2)
+    expect(responseAgain.body.locale).toBe('nl-NL')
+  })
 
   test('setOrderNumber', async () => {
-    assert(order);
+    assert(order)
 
     const response = await supertest(app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
         actions: [{ action: 'setOrderNumber', orderNumber: '5000123' }],
-      });
-    expect(response.status).toBe(200);
-    expect(response.body.version).toBe(2);
-    expect(response.body.orderNumber).toBe('5000123');
-  });
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.orderNumber).toBe('5000123')
+  })
 
   test('changeOrderState', async () => {
-    assert(order);
+    assert(order)
 
     const response = await supertest(app)
       .post(`/dummy/orders/${order.id}`)
       .send({
         version: 1,
         actions: [{ action: 'changeOrderState', orderState: 'Complete' }],
-      });
-    expect(response.status).toBe(200);
-    expect(response.body.version).toBe(2);
-    expect(response.body.orderState).toBe('Complete');
-  });
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.orderState).toBe('Complete')
+  })
 
   test('changePaymentState | changeOrderState', async () => {
-    assert(order);
+    assert(order)
 
     const response = await supertest(app)
       .post(`/dummy/orders/${order.id}`)
@@ -163,17 +162,17 @@ describe('Order Update Actions', () => {
           { action: 'changeOrderState', orderState: 'Cancelled' },
           { action: 'changePaymentState', paymentState: 'Failed' },
         ],
-      });
-    expect(response.status).toBe(200);
-    expect(response.body.version).toBe(2);
-    expect(response.body.orderState).toBe('Cancelled');
-    expect(response.body.paymentState).toBe('Failed');
-  });
-});
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.orderState).toBe('Cancelled')
+    expect(response.body.paymentState).toBe('Failed')
+  })
+})
 
 describe('Order Import', () => {
-  const ctMock = new CommercetoolsMock();
-  const app = ctMock.createApp();
+  const ctMock = new CommercetoolsMock()
+  const app = ctMock.createApp()
 
   test('Import', async () => {
     const response = await supertest(app)
@@ -320,12 +319,12 @@ describe('Order Import', () => {
             lineItemMode: 'Standard',
           },
         ],
-      });
+      })
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(200)
 
-    const created: Order = response.body;
-    expect(created.lineItems).toHaveLength(1);
-    expect(created.customLineItems).toHaveLength(1);
-  });
-});
+    const created: Order = response.body
+    expect(created.lineItems).toHaveLength(1)
+    expect(created.customLineItems).toHaveLength(1)
+  })
+})

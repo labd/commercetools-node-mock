@@ -2,18 +2,22 @@ import {
   CustomObject,
   CustomObjectDraft,
   ReferenceTypeId,
-} from '@commercetools/platform-sdk';
-import { checkConcurrentModification} from './errors';
-import AbstractRepository from './abstract';
-import { Writable } from 'types';
+} from '@commercetools/platform-sdk'
+import { checkConcurrentModification } from './errors'
+import AbstractRepository from './abstract'
+import { Writable } from 'types'
 
 export class CustomObjectRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
-    return 'key-value-document';
+    return 'key-value-document'
   }
 
-  create(draft: Writable<CustomObjectDraft>): CustomObject {
-    const current = this.getWithContainerAndKeygetBy(draft.container, draft.key)
+  create(projectKey: string, draft: Writable<CustomObjectDraft>): CustomObject {
+    const current = this.getWithContainerAndKey(
+      projectKey,
+      draft.container,
+      draft.key
+    )
 
     const baseProperties = this.getResourceProperties()
     if (current) {
@@ -22,7 +26,7 @@ export class CustomObjectRepository extends AbstractRepository {
       }
 
       checkConcurrentModification(current, draft.version)
-      if (draft.value == current.value) {
+      if (draft.value === current.value) {
         return current
       }
 
@@ -38,13 +42,15 @@ export class CustomObjectRepository extends AbstractRepository {
       container: draft.container,
       key: draft.key,
       value: draft.value,
-    };
-    this.save(resource);
-    return resource;
+    }
+    this.save(projectKey, resource)
+    return resource
   }
 
-  getWithContainerAndKeygetBy(container: string, key: string) {
-    const items = this._storage.all(this.getTypeId()) as Array<CustomObject>;
-    return items.find(item => item.container == container && item.key == key);
+  getWithContainerAndKey(projectKey: string, container: string, key: string) {
+    const items = this._storage.all(projectKey, this.getTypeId()) as Array<
+      CustomObject
+    >
+    return items.find(item => item.container === container && item.key === key)
   }
 }

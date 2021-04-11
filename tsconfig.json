@@ -20,6 +20,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "target": "ES2017"
+    "target": "ES2020"
   }
 }

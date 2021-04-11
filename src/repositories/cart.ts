@@ -1,13 +1,13 @@
-import { Cart, CartDraft, ReferenceTypeId } from '@commercetools/platform-sdk';
-import AbstractRepository from './abstract';
-import { createCustomFields } from './helpers';
+import { Cart, CartDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
+import AbstractRepository from './abstract'
+import { createCustomFields } from './helpers'
 
 export class CartRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
-    return 'cart';
+    return 'cart'
   }
 
-  create(draft: CartDraft): Cart {
+  create(projectKey: string, draft: CartDraft): Cart {
     const resource: Cart = {
       ...this.getResourceProperties(),
       cartState: 'Active',
@@ -24,9 +24,9 @@ export class CartRepository extends AbstractRepository {
       taxCalculationMode: 'LineItemLevel',
       refusedGifts: [],
       origin: 'Customer',
-      custom: createCustomFields(draft.custom, this._storage),
-    };
-    this.save(resource);
-    return resource;
+      custom: createCustomFields(draft.custom, projectKey, this._storage),
+    }
+    this.save(projectKey, resource)
+    return resource
   }
 }
