@@ -3,6 +3,7 @@ import {
   CustomerDraft,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
+import { getBaseResourceProperties } from '../helpers'
 import AbstractRepository from './abstract'
 
 export class CustomerRepository extends AbstractRepository {
@@ -11,7 +12,7 @@ export class CustomerRepository extends AbstractRepository {
   }
   create(projectKey: string, draft: CustomerDraft): Customer {
     const resource: Customer = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
       email: draft.email,
       password: draft.password,
       isEmailVerified: draft.isEmailVerified || false,

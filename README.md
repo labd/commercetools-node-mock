@@ -16,7 +16,7 @@ yarn add --dev @labdigital/commercetools-mock
 ## Example
 
 ```typescript
-import { CommercetoolsMock } from '@labdigital/commercetools-mock'
+import { CommercetoolsMock, getBaseResourceProperties } from '@labdigital/commercetools-mock'
 
 const ctMock = new CommercetoolsMock({
   enableAuthentication: false,
@@ -27,6 +27,7 @@ beforeAll(() => {
   ctMock.start()
 
   ctMock.project('my-project').add('type', {
+    ...getBaseResourceProperties()
     key: 'my-customt-type',
     fieldDefinitions: [],
   })

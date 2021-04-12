@@ -99,13 +99,4 @@ export default abstract class AbstractRepository {
     }
     return modifiedResource
   }
-
-  getResourceProperties() {
-    return {
-      id: uuidv4(),
-      createdAt: new Date().toISOString(),
-      lastModifiedAt: new Date().toISOString(),
-      version: 0,
-    }
-  }
 }

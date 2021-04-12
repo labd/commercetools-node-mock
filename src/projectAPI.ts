@@ -1,3 +1,4 @@
+import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
 import { RepositoryMap, ResourceMap, Services } from './types'
 
@@ -23,7 +24,7 @@ export class ProjectAPI {
     const service = this._services[typeId]
     if (service) {
       this._storage.add(this.projectKey, typeId, {
-        ...service.repository.getResourceProperties(),
+        ...getBaseResourceProperties(),
         ...resource,
       })
     } else {

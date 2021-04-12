@@ -1,4 +1,5 @@
 import { Type, TypeDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
+import { getBaseResourceProperties } from '../helpers'
 import AbstractRepository from './abstract'
 
 export class TypeRepository extends AbstractRepository {
@@ -8,7 +9,7 @@ export class TypeRepository extends AbstractRepository {
 
   create(projectKey: string, draft: TypeDraft): Type {
     const resource: Type = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
       key: draft.key,
       name: draft.name,
       resourceTypeIds: draft.resourceTypeIds,

@@ -1,4 +1,5 @@
 import { Cart, CartDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
+import { getBaseResourceProperties } from '../helpers'
 import AbstractRepository from './abstract'
 import { createCustomFields } from './helpers'
 
@@ -9,7 +10,7 @@ export class CartRepository extends AbstractRepository {
 
   create(projectKey: string, draft: CartDraft): Cart {
     const resource: Cart = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
       cartState: 'Active',
       lineItems: [],
       customLineItems: [],

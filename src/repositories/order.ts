@@ -31,6 +31,7 @@ import {
   resolveStoreReference,
 } from './helpers'
 import { Writable } from '../types'
+import { getBaseResourceProperties } from '../helpers'
 
 export class OrderRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -49,7 +50,7 @@ export class OrderRepository extends AbstractRepository {
     }
 
     const resource: Order = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
       orderNumber: draft.orderNumber,
       orderState: 'Open',
       lineItems: [],
@@ -68,7 +69,7 @@ export class OrderRepository extends AbstractRepository {
     // TODO: Check if order with given orderNumber already exists
     assert(this)
     const resource: Order = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
 
       billingAddress: draft.billingAddress,
       shippingAddress: draft.shippingAddress,
@@ -118,7 +119,7 @@ export class OrderRepository extends AbstractRepository {
       }
 
       product = {
-        ...this.getResourceProperties(),
+        ...getBaseResourceProperties(),
         productType: {
           typeId: 'product-type',
           id: 'dummy',
@@ -149,7 +150,7 @@ export class OrderRepository extends AbstractRepository {
     }
 
     const lineItem: LineItem = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
       custom: createCustomFields(draft.custom, projectKey, this._storage),
       discountedPricePerQuantity: [],
       lineItemMode: 'Standard',
@@ -177,7 +178,7 @@ export class OrderRepository extends AbstractRepository {
     draft: CustomLineItemDraft
   ): CustomLineItem {
     const lineItem: CustomLineItem = {
-      ...this.getResourceProperties(),
+      ...getBaseResourceProperties(),
       custom: createCustomFields(draft.custom, projectKey, this._storage),
       discountedPricePerQuantity: [],
       money: createTypedMoney(draft.money),

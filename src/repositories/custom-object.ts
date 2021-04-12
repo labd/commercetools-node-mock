@@ -5,7 +5,8 @@ import {
 } from '@commercetools/platform-sdk'
 import { checkConcurrentModification } from './errors'
 import AbstractRepository from './abstract'
-import { Writable } from 'types'
+import { Writable } from '../types'
+import { getBaseResourceProperties } from '../helpers'
 
 export class CustomObjectRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -19,7 +20,7 @@ export class CustomObjectRepository extends AbstractRepository {
       draft.key
     )
 
-    const baseProperties = this.getResourceProperties()
+    const baseProperties = getBaseResourceProperties()
     if (current) {
       if (!draft.version) {
         draft.version = current.version
