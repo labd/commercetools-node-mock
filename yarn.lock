@@ -905,7 +905,7 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@commercetools/platform-sdk@^1.9.1":
+"@commercetools/platform-sdk@>= 1.9.1":
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-1.10.0.tgz#71d2a9f319a3925fbc920c3e48471da434f2fac9"
   integrity sha512-FIHVVEnBCWsKMOXzFJpe88GzNIKhRl7gL7FFZLLvZXj0IQTStN9sYV+e1BL4q1CF6MtBErvSswpdGYzMQ1X1EQ==
