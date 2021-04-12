@@ -20,9 +20,6 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {
-    "@commercetools/platform-sdk": ">= 1.9.1"
-  },
   "prettier": {
     "printWidth": 80,
     "semi": false,
@@ -63,6 +60,7 @@
   "dependencies": {
     "basic-auth": "^2.0.1",
     "deep-equal": "^2.0.5",
+    "@commercetools/platform-sdk": ">= 1.9.1",
     "express": "^4.17.1",
     "morgan": "^1.10.0",
     "nock": "^13.0.11",
