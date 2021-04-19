@@ -53,7 +53,8 @@ export abstract class AbstractStorage {
   abstract delete(
     projectKey: string,
     typeId: ReferenceTypeId,
-    id: string
+    id: string,
+    params: GetParams
   ): BaseResource | null
 
   abstract query(

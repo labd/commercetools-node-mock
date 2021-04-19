@@ -50,8 +50,12 @@ export default abstract class AbstractRepository {
     return this._storage.get(projectKey, this.getTypeId(), id, params)
   }
 
-  delete(projectKey: string, id: string): BaseResource | null {
-    return this._storage.delete(projectKey, this.getTypeId(), id)
+  delete(
+    projectKey: string,
+    id: string,
+    params: GetParams = {}
+  ): BaseResource | null {
+    return this._storage.delete(projectKey, this.getTypeId(), id, params)
   }
 
   save(projectKey: string, resource: BaseResource) {

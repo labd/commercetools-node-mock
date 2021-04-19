@@ -53,12 +53,15 @@ export default abstract class AbstractService {
   deletewithId(request: Request, response: Response) {
     const result = this.repository.delete(
       request.params.projectKey,
-      request.params['id']
+      request.params['id'],
+      {
+        expand: this._parseParam(request.query.expand),
+      }
     )
     if (!result) {
       return response.status(404).send('Not found')
     }
-    return this._expandWithId(request, response, result.id)
+    return response.status(200).send(result)
   }
 
   deletewithKey(request: Request, response: Response) {
