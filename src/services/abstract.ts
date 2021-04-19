@@ -43,17 +43,7 @@ export default abstract class AbstractService {
   }
 
   getWithId(request: Request, response: Response) {
-    const result = this.repository.get(
-      request.params.projectKey,
-      request.params['id'],
-      {
-        expand: this._parseParam(request.query.expand),
-      }
-    )
-    if (!result) {
-      return response.status(404).send('Not found')
-    }
-    return response.status(200).send(result)
+    return this._expandWithId(request, response, request.params['id'])
   }
 
   getWithKey(request: Request, response: Response) {
@@ -68,7 +58,7 @@ export default abstract class AbstractService {
     if (!result) {
       return response.status(404).send('Not found')
     }
-    return response.status(200).send(result)
+    return this._expandWithId(request, response, result.id)
   }
 
   deletewithKey(request: Request, response: Response) {
@@ -78,7 +68,7 @@ export default abstract class AbstractService {
   post(request: Request, response: Response) {
     const draft = request.body
     const resource = this.repository.create(request.params.projectKey, draft)
-    return response.status(200).send(resource)
+    return this._expandWithId(request, response, resource.id)
   }
 
   postWithId(request: Request, response: Response) {
@@ -100,11 +90,26 @@ export default abstract class AbstractService {
       resource,
       updateRequest.actions
     )
-    return response.status(200).send(updatedResource)
+
+    return this._expandWithId(request, response, updatedResource.id)
   }
 
   postWithKey(request: Request, response: Response) {
     return response.status(500).send('Not implemented')
+  }
+
+  protected _expandWithId(
+    request: Request,
+    response: Response,
+    resourceId: string
+  ) {
+    const result = this.repository.get(request.params.projectKey, resourceId, {
+      expand: this._parseParam(request.query.expand),
+    })
+    if (!result) {
+      return response.status(404).send('Not found')
+    }
+    return response.status(200).send(result)
   }
 
   // No idea what i'm doing
