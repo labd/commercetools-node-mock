@@ -4,6 +4,7 @@ import {
   ReferenceTypeId,
   StateReference,
   Transaction,
+  TransactionDraft,
 } from '@commercetools/platform-sdk'
 import AbstractRepository from './abstract'
 import {
@@ -37,11 +38,7 @@ export class PaymentRepository extends AbstractRepository {
           }
         : {},
       transactions: (draft.transactions || []).map(
-        (t): Transaction => ({
-          ...t,
-          id: uuidv4(),
-          amount: createTypedMoney(t.amount),
-        })
+        this.transactionFromTransactionDraft
       ),
       interfaceInteractions: (draft.interfaceInteractions || []).map(
         interaction =>
@@ -53,6 +50,12 @@ export class PaymentRepository extends AbstractRepository {
     this.save(projectKey, resource)
     return resource
   }
+
+  transactionFromTransactionDraft = (draft: TransactionDraft) => ({
+    ...draft,
+    id: uuidv4(),
+    amount: createTypedMoney(draft.amount),
+  })
 
   actions = {
     // addInterfaceInteraction: () => {},

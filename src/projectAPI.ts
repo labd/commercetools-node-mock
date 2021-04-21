@@ -28,7 +28,7 @@ export class ProjectAPI {
         ...resource,
       })
     } else {
-      throw new Error('Service not implemented yet')
+      throw new Error(`Service for ${typeId} not implemented yet`)
     }
   }
 

@@ -14,6 +14,9 @@ import {
   Store,
   Type,
   Payment,
+  State,
+  TaxCategory,
+  ShippingMethod,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from 'types'
@@ -93,7 +96,10 @@ export class InMemoryStorage extends AbstractStorage {
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
         payment: new Map<string, Payment>(),
+        'shipping-method': new Map<string, ShippingMethod>(),
+        state: new Map<string, State>(),
         store: new Map<string, Store>(),
+        'tax-category': new Map<string, TaxCategory>(),
         type: new Map<string, Type>(),
       }
     }
@@ -226,6 +232,7 @@ export class InMemoryStorage extends AbstractStorage {
 
     if (identifier.key) {
       const store = this.forProjectKey(projectKey)[identifier.typeId]
+
       if (store) {
         // TODO: BaseResource has no key attribute, but the subclasses should
         // have them all.
@@ -291,11 +298,15 @@ export class InMemoryStorage extends AbstractStorage {
   ) {
     if (reference === undefined) return
 
-    if (reference.typeId !== undefined && reference.id !== undefined) {
+    if (
+      reference.typeId !== undefined &&
+      (reference.id !== undefined || reference.key !== undefined)
+    ) {
       // @ts-ignore
       reference.obj = this.getByResourceIdentifier(projectKey, {
         typeId: reference.typeId,
         id: reference.id,
+        key: reference.key,
       } as ResourceIdentifier)
       if (expand) {
         this._resolveResource(projectKey, reference.obj, expand)
