@@ -1,3 +1,4 @@
+import { PaymentService } from './services/payment'
 import nock from 'nock'
 import express, { NextFunction, Request, Response } from 'express'
 import supertest from 'supertest'
@@ -123,6 +124,7 @@ export class CommercetoolsMock {
         this._storage
       ),
       order: new OrderService(projectRouter, this._storage),
+      payment: new PaymentService(projectRouter, this._storage),
       store: new StoreService(projectRouter, this._storage),
       type: new TypeService(projectRouter, this._storage),
     }
@@ -136,7 +138,7 @@ export class CommercetoolsMock {
         })
       } else {
         return resp.status(500).send({
-          error: 'Unhandled error',
+          error: err.message,
         })
       }
     })

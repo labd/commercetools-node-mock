@@ -13,6 +13,7 @@ import {
   ResourceIdentifier,
   Store,
   Type,
+  Payment,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from 'types'
@@ -91,6 +92,7 @@ export class InMemoryStorage extends AbstractStorage {
         'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
+        payment: new Map<string, Payment>(),
         store: new Map<string, Store>(),
         type: new Map<string, Type>(),
       }
