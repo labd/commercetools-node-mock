@@ -1,4 +1,4 @@
-import { CustomObject, PaymentDraft } from '@commercetools/platform-sdk'
+import { PaymentDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 
