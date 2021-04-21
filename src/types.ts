@@ -3,6 +3,7 @@ import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import { CartRepository } from 'repositories/cart'
 import { CustomObjectRepository } from 'repositories/custom-object'
 import { CustomerRepository } from 'repositories/customer'
+import { InventoryEntryRepository } from 'repositories/inventory-entry'
 import { OrderRepository } from 'repositories/order'
 import AbstractService from 'services/abstract'
 
@@ -49,7 +50,7 @@ export type ResourceIdentifierMap = {
   cart: ctp.CartDiscountResourceIdentifier
   // 'cart': ctp.CartResourceIdentifier,
   // 'category': ctp.CategoryResourceIdentifier,
-  // 'foobar': ctp.ChannelResourceIdentifier,
+  channel: ctp.ChannelResourceIdentifier
   // 'foobar': ctp.CustomerGroupResourceIdentifier,
   // 'foobar': ctp.CustomerResourceIdentifier,
   // 'foobar': ctp.DiscountCodeResourceIdentifier,
@@ -83,7 +84,7 @@ export type RepositoryMap = {
   'customer-group': never
   'discount-code': never
   extension: never
-  'inventory-entry': never
+  'inventory-entry': InventoryEntryRepository
   order: OrderRepository
   'order-edit': never
   payment: never
