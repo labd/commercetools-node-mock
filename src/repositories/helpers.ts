@@ -5,6 +5,8 @@ import {
   Money,
   Price,
   PriceDraft,
+  Reference,
+  ResourceIdentifier,
   Store,
   StoreKeyReference,
   StoreResourceIdentifier,
@@ -27,6 +29,7 @@ export const createCustomFields = (
     projectKey,
     draft.type
   ) as Type
+
   if (!typeResource) {
     throw new Error(
       `No type '${draft.type.typeId}' with id=${draft.type.id} or key=${draft.type.key}`
@@ -73,4 +76,24 @@ export const resolveStoreReference = (
     typeId: 'store',
     key: store.key,
   }
+}
+
+export const getReferenceFromResourceIdentifier = <T extends Reference>(
+  resourceIdentifier: ResourceIdentifier,
+  projectKey: string,
+  storage: AbstractStorage
+): T => {
+  const resource = storage.getByResourceIdentifier(
+    projectKey,
+    resourceIdentifier
+  )
+  if (!resource)
+    throw new Error(
+      `resource type ${resourceIdentifier.typeId} with id ${resourceIdentifier.id} and key ${resourceIdentifier.key} not found`
+    )
+
+  return ({
+    typeId: resourceIdentifier.typeId,
+    id: resource?.id,
+  } as unknown) as T
 }

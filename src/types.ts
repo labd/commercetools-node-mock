@@ -1,3 +1,4 @@
+import { PaymentRepository } from 'repositories/payment'
 import * as ctp from '@commercetools/platform-sdk'
 import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import { CartRepository } from 'repositories/cart'
@@ -51,7 +52,7 @@ export type ResourceIdentifierMap = {
   // 'cart': ctp.CartResourceIdentifier,
   // 'category': ctp.CategoryResourceIdentifier,
   channel: ctp.ChannelResourceIdentifier
-  // 'foobar': ctp.CustomerGroupResourceIdentifier,
+  payment: ctp.PaymentResourceIdentifier
   // 'foobar': ctp.CustomerResourceIdentifier,
   // 'foobar': ctp.DiscountCodeResourceIdentifier,
   // 'foobar': ctp.InventoryEntryResourceIdentifier,
@@ -87,7 +88,7 @@ export type RepositoryMap = {
   'inventory-entry': InventoryEntryRepository
   order: OrderRepository
   'order-edit': never
-  payment: never
+  payment: PaymentRepository
   product: never
   'product-discount': never
   'product-type': never
