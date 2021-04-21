@@ -4,14 +4,15 @@ import {
   Cart,
   Customer,
   CustomObject,
+  InventoryEntry,
   Order,
   PagedQueryResponse,
-  Store,
   QueryParam,
+  Reference,
   ReferenceTypeId,
   ResourceIdentifier,
+  Store,
   Type,
-  Reference, InventoryEntry,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from 'types'
@@ -33,6 +34,7 @@ type QueryParams = {
 
 export abstract class AbstractStorage {
   abstract clear(): void
+
   abstract assertStorage(typeId: ReferenceTypeId): void
 
   abstract all(projectKey: string, typeId: ReferenceTypeId): Array<BaseResource>
@@ -40,40 +42,38 @@ export abstract class AbstractStorage {
   abstract add<ReferenceTypeId extends keyof ResourceMap>(
     projectKey: string,
     typeId: ReferenceTypeId,
-    obj: ResourceMap[ReferenceTypeId]
+    obj: ResourceMap[ReferenceTypeId],
   ): void
 
   abstract get<ReferenceTypeId extends keyof ResourceMap>(
     projectKey: string,
     typeId: ReferenceTypeId,
     id: string,
-    params: GetParams
+    params: GetParams,
   ): ResourceMap[ReferenceTypeId] | null
 
   abstract delete(
     projectKey: string,
     typeId: ReferenceTypeId,
     id: string,
-    params: GetParams
+    params: GetParams,
   ): BaseResource | null
 
   abstract query(
     projectKey: string,
     typeId: ReferenceTypeId,
-    params: QueryParams
+    params: QueryParams,
   ): PagedQueryResponse
 
   abstract getByResourceIdentifier(
     projectKey: string,
-    identifier: ResourceIdentifier
+    identifier: ResourceIdentifier,
   ): BaseResource | undefined
 }
 
-type ProjectStorage = Partial<
-  {
-    [index in ReferenceTypeId]: Map<string, BaseResource>
-  }
->
+type ProjectStorage = Partial<{
+  [index in ReferenceTypeId]: Map<string, BaseResource>
+}>
 
 export class InMemoryStorage extends AbstractStorage {
   protected resources: {
@@ -104,7 +104,8 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  assertStorage(typeId: ReferenceTypeId) {}
+  assertStorage(typeId: ReferenceTypeId) {
+  }
 
   all(projectKey: string, typeId: ReferenceTypeId) {
     const store = this.forProjectKey(projectKey)[typeId]
@@ -118,7 +119,7 @@ export class InMemoryStorage extends AbstractStorage {
     projectKey: string,
     typeId: ReferenceTypeId,
     obj: ResourceMap[ReferenceTypeId],
-    params: GetParams = {}
+    params: GetParams = {},
   ): ResourceMap[ReferenceTypeId] {
     this.forProjectKey(projectKey)[typeId]?.set(obj.id, obj)
 
@@ -131,14 +132,14 @@ export class InMemoryStorage extends AbstractStorage {
     projectKey: string,
     typeId: ReferenceTypeId,
     id: string,
-    params: GetParams = {}
+    params: GetParams = {},
   ): ResourceMap[ReferenceTypeId] | null {
     const resource = this.forProjectKey(projectKey)[typeId]?.get(id)
     if (resource) {
       return this.expand(
         projectKey,
         resource,
-        params.expand
+        params.expand,
       ) as ResourceMap[ReferenceTypeId]
     }
     return null
@@ -148,7 +149,7 @@ export class InMemoryStorage extends AbstractStorage {
     projectKey: string,
     typeId: ReferenceTypeId,
     id: string,
-    params: GetParams = {}
+    params: GetParams = {},
   ): BaseResource | null {
     const resource = this.get(projectKey, typeId, id)
     if (resource) {
@@ -156,7 +157,7 @@ export class InMemoryStorage extends AbstractStorage {
       return this.expand(
         projectKey,
         resource,
-        params.expand
+        params.expand,
       ) as ResourceMap[ReferenceTypeId]
     }
     return resource
@@ -165,7 +166,7 @@ export class InMemoryStorage extends AbstractStorage {
   query(
     projectKey: string,
     typeId: ReferenceTypeId,
-    params: QueryParams
+    params: QueryParams,
   ): PagedQueryResponse {
     const store = this.forProjectKey(projectKey)[typeId]
     if (!store) {
@@ -177,7 +178,7 @@ export class InMemoryStorage extends AbstractStorage {
     // Apply predicates
     if (params.where) {
       resources = resources.filter(resource =>
-        matchesPredicate(params.where, resource)
+        matchesPredicate(params.where, resource),
       )
     }
 
@@ -207,7 +208,7 @@ export class InMemoryStorage extends AbstractStorage {
 
   getByResourceIdentifier<ReferenceTypeId extends keyof ResourceMap>(
     projectKey: string,
-    identifier: ResourceIdentifier
+    identifier: ResourceIdentifier,
   ): ResourceMap[ReferenceTypeId] | undefined {
     if (identifier.id) {
       const resource = this.get(projectKey, identifier.typeId, identifier.id)
@@ -215,7 +216,7 @@ export class InMemoryStorage extends AbstractStorage {
         return resource as ResourceMap[ReferenceTypeId]
       }
       console.error(
-        `No resource found with typeId=${identifier.typeId}, id=${identifier.id}`
+        `No resource found with typeId=${identifier.typeId}, id=${identifier.id}`,
       )
       return undefined
     }
@@ -227,14 +228,14 @@ export class InMemoryStorage extends AbstractStorage {
         // have them all.
         const resource = Array.from(store.values()).find(
           // @ts-ignore
-          r => r.key == identifier.key
+          r => r.key == identifier.key,
         )
         if (resource) {
           return resource as ResourceMap[ReferenceTypeId]
         }
       } else {
         throw new Error(
-          `No storage found for resource type: ${identifier.typeId}`
+          `No storage found for resource type: ${identifier.typeId}`,
         )
       }
     }
@@ -244,7 +245,7 @@ export class InMemoryStorage extends AbstractStorage {
   private expand = <T>(
     projectKey: string,
     obj: T,
-    clause: undefined | string | string[]
+    clause: undefined | string | string[],
   ): T => {
     if (!clause) return obj
     const newObj = JSON.parse(JSON.stringify(obj))
@@ -283,7 +284,7 @@ export class InMemoryStorage extends AbstractStorage {
   private _resolveReference(
     projectKey: string,
     reference: any,
-    expand: string | undefined
+    expand: string | undefined,
   ) {
     if (reference === undefined) return
 
