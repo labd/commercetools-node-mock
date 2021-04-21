@@ -47,7 +47,7 @@ export class InventoryEntryRepository extends AbstractRepository {
       resource: Writable<InventoryEntry>,
       { expectedDelivery }: InventoryEntrySetExpectedDeliveryAction,
     ) => {
-      resource.expectedDelivery = expectedDelivery
+      resource.expectedDelivery = new Date(expectedDelivery!).toISOString()
     },
     setCustomField: (
       projectKey: string,
