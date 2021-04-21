@@ -7,6 +7,7 @@ import { TypeService } from './services/type'
 import { CustomObjectService } from './services/custom-object'
 import { CustomerService } from './services/customer'
 import { CartService } from './services/cart'
+import { InventoryEntryService } from './services/inventory-entry'
 import { OrderService } from './services/order'
 import { Services } from 'types'
 import { StoreService } from './services/store'
@@ -113,6 +114,10 @@ export class CommercetoolsMock {
     this._services = {
       cart: new CartService(projectRouter, this._storage),
       customer: new CustomerService(projectRouter, this._storage),
+      'inventory-entry': new InventoryEntryService(
+        projectRouter,
+        this._storage
+      ),
       'key-value-document': new CustomObjectService(
         projectRouter,
         this._storage

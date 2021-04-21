@@ -1,4 +1,4 @@
-import { InvalidTokenError, Order } from '@commercetools/platform-sdk'
+import { InvalidTokenError } from '@commercetools/platform-sdk'
 import { CommercetoolsMock } from './index'
 import nock from 'nock'
 import got from 'got'
@@ -173,7 +173,7 @@ test('Options.authHost: is set', async () => {
   expect(response.statusCode).toBe(200)
 
   const token = response.body.access_token
-  expect(response.body.access_token).toBeDefined()
+  expect(token).toBeDefined()
 })
 
 test('apiHost mock proxy: querystring', async () => {

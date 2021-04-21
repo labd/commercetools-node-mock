@@ -29,7 +29,7 @@ export class OAuth2Store {
   validateToken(token: string) {
     if (!this.validate) return true
 
-    const foundToken = this.tokens.find(t => t.access_token == token)
+    const foundToken = this.tokens.find(t => t.access_token === token)
     if (foundToken) {
       return true
     }

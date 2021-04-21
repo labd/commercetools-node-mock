@@ -4,14 +4,15 @@ import {
   Cart,
   Customer,
   CustomObject,
+  InventoryEntry,
   Order,
   PagedQueryResponse,
-  Store,
   QueryParam,
+  Reference,
   ReferenceTypeId,
   ResourceIdentifier,
+  Store,
   Type,
-  Reference,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from 'types'
@@ -33,6 +34,7 @@ type QueryParams = {
 
 export abstract class AbstractStorage {
   abstract clear(): void
+
   abstract assertStorage(typeId: ReferenceTypeId): void
 
   abstract all(projectKey: string, typeId: ReferenceTypeId): Array<BaseResource>
@@ -86,6 +88,7 @@ export class InMemoryStorage extends AbstractStorage {
       projectStorage = this.resources[projectKey] = {
         cart: new Map<string, Cart>(),
         customer: new Map<string, Customer>(),
+        'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
         store: new Map<string, Store>(),
@@ -96,8 +99,8 @@ export class InMemoryStorage extends AbstractStorage {
   }
 
   clear() {
-    for (const [projectKey, projectStorage] of Object.entries(this.resources)) {
-      for (const [key, value] of Object.entries(projectStorage)) {
+    for (const [, projectStorage] of Object.entries(this.resources)) {
+      for (const [, value] of Object.entries(projectStorage)) {
         value?.clear()
       }
     }
@@ -226,7 +229,7 @@ export class InMemoryStorage extends AbstractStorage {
         // have them all.
         const resource = Array.from(store.values()).find(
           // @ts-ignore
-          r => r.key == identifier.key
+          r => r.key === identifier.key
         )
         if (resource) {
           return resource as ResourceMap[ReferenceTypeId]
@@ -266,10 +269,10 @@ export class InMemoryStorage extends AbstractStorage {
         return
       }
       this._resolveReference(projectKey, reference, params.rest)
-    } else if (params.index == '*') {
+    } else if (params.index === '*') {
       const reference = obj[params.element]
       if (reference === undefined || !Array.isArray(reference)) return
-      reference.map((itemRef: Writable<Reference>) => {
+      reference.forEach((itemRef: Writable<Reference>) => {
         this._resolveReference(projectKey, itemRef, params.rest)
       })
     } else {

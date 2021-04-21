@@ -8,7 +8,7 @@ export const checkConcurrentModification = (
   resource: BaseResource,
   expectedVersion: number
 ) => {
-  if (resource.version == expectedVersion) return
+  if (resource.version === expectedVersion) return
 
   throw new CommercetoolsError<ConcurrentModificationError>(
     {

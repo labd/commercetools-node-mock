@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import deepEqual from 'deep-equal'
 
 import {
@@ -65,7 +64,7 @@ export default abstract class AbstractRepository {
     if (current) {
       checkConcurrentModification(current, resource.version)
     } else {
-      if (resource.version != 0) {
+      if (resource.version !== 0) {
         throw new CommercetoolsError<InvalidOperationError>(
           {
             code: 'InvalidOperation',

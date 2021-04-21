@@ -56,6 +56,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .led('=', 20, left => {
       const expr = parser.parse()
       return (obj: any) => {
+        // eslint-disable-next-line eqeqeq
         return obj[left.left] == expr
       }
     })

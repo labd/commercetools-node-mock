@@ -94,7 +94,7 @@ export class OAuth2Server {
       )
     }
 
-    if (grantType == 'client_credentials') {
+    if (grantType === 'client_credentials') {
       const token = this.store.getClientToken(
         credentials.name,
         credentials.pass,

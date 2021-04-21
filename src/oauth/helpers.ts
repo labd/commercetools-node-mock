@@ -1,4 +1,3 @@
-import auth from 'basic-auth'
 import { Request } from 'express'
 
 export const getBearerToken = (request: Request): string | undefined => {
