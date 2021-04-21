@@ -1,3 +1,6 @@
+import { ShippingMethodService } from './services/shipping-method'
+import { StateService } from './services/state'
+import { TaxCategoryService } from './services/tax-category'
 import { PaymentService } from './services/payment'
 import nock from 'nock'
 import express, { NextFunction, Request, Response } from 'express'
@@ -125,7 +128,13 @@ export class CommercetoolsMock {
       ),
       order: new OrderService(projectRouter, this._storage),
       payment: new PaymentService(projectRouter, this._storage),
+      'shipping-method': new ShippingMethodService(
+        projectRouter,
+        this._storage
+      ),
+      state: new StateService(projectRouter, this._storage),
       store: new StoreService(projectRouter, this._storage),
+      'tax-category': new TaxCategoryService(projectRouter, this._storage),
       type: new TypeService(projectRouter, this._storage),
     }
 

@@ -48,6 +48,6 @@ Implement the following:
 
 - New repository in src/repositories
 - New service in src/services
-- Add new service to src/ctMock.ts ctMock._services
+- Add new service to src/ctMock.ts ctMock.\_services
 - Add new service to src/storage.ts InMemoryStorage
-- Adjust src/types.ts
+- Adjust src/types.ts RepositoryMap

@@ -1,3 +1,6 @@
+import { TaxCategoryRepository } from './repositories/tax-category'
+import { StateRepository } from './repositories/state'
+import { ShippingMethodRepository } from './repositories/shipping-method'
 import { PaymentRepository } from 'repositories/payment'
 import * as ctp from '@commercetools/platform-sdk'
 import { ReferenceTypeId } from '@commercetools/platform-sdk'
@@ -52,7 +55,6 @@ export type ResourceIdentifierMap = {
   // 'cart': ctp.CartResourceIdentifier,
   // 'category': ctp.CategoryResourceIdentifier,
   channel: ctp.ChannelResourceIdentifier
-  payment: ctp.PaymentResourceIdentifier
   // 'foobar': ctp.CustomerResourceIdentifier,
   // 'foobar': ctp.DiscountCodeResourceIdentifier,
   // 'foobar': ctp.InventoryEntryResourceIdentifier,
@@ -74,18 +76,17 @@ export type ResourceIdentifierMap = {
 
 export type RepositoryMap = {
   cart: CartRepository
-  customer: CustomerRepository
-  'key-value-document': CustomObjectRepository
-  type: ctp.Type
-  zone: ctp.Zone
-
   'cart-discount': never
   category: never
   channel: never
+  customer: CustomerRepository
+  'customer-email-token': never
   'customer-group': never
+  'customer-password-token': never
   'discount-code': never
   extension: never
   'inventory-entry': InventoryEntryRepository
+  'key-value-document': CustomObjectRepository
   order: OrderRepository
   'order-edit': never
   payment: PaymentRepository
@@ -93,13 +94,12 @@ export type RepositoryMap = {
   'product-discount': never
   'product-type': never
   review: never
-  'shipping-method': never
+  'shipping-method': ShippingMethodRepository
   'shopping-list': never
-  state: never
+  state: StateRepository
   store: never
   subscription: never
-  'tax-category': never
-
-  'customer-email-token': never
-  'customer-password-token': never
+  'tax-category': TaxCategoryRepository
+  type: ctp.Type
+  zone: ctp.Zone
 }
