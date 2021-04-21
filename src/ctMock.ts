@@ -177,9 +177,9 @@ export class CommercetoolsMock {
       .post(/^\/oauth\/.*/)
       .reply(async function(uri, body) {
         const response = await supertest(app)
-          .post(uri)
+          .post(uri + '?' + body)
           .set(copyHeaders(this.req.headers))
-          .send(body)
+          .send()
         return [response.status, response.body]
       })
   }
