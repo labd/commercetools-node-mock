@@ -36,7 +36,7 @@ export class InventoryEntryRepository extends AbstractRepository {
     changeQuantity: (
       projectKey: string,
       resource: Writable<InventoryEntry>,
-      { quantity }: InventoryEntryChangeQuantityAction,
+      { quantity }: InventoryEntryChangeQuantityAction
     ) => {
       resource.quantityOnStock = quantity
       // don't know active reservations so just set to same value
@@ -45,14 +45,14 @@ export class InventoryEntryRepository extends AbstractRepository {
     setExpectedDelivery: (
       projectKey: string,
       resource: Writable<InventoryEntry>,
-      { expectedDelivery }: InventoryEntrySetExpectedDeliveryAction,
+      { expectedDelivery }: InventoryEntrySetExpectedDeliveryAction
     ) => {
       resource.expectedDelivery = new Date(expectedDelivery!).toISOString()
     },
     setCustomField: (
       projectKey: string,
       resource: InventoryEntry,
-      { name, value }: InventoryEntrySetCustomFieldAction,
+      { name, value }: InventoryEntrySetCustomFieldAction
     ) => {
       if (!resource.custom) {
         throw new Error('Resource has no custom field')
@@ -62,14 +62,14 @@ export class InventoryEntryRepository extends AbstractRepository {
     setCustomType: (
       projectKey: string,
       resource: Writable<InventoryEntry>,
-      { type, fields }: InventoryEntrySetCustomTypeAction,
+      { type, fields }: InventoryEntrySetCustomTypeAction
     ) => {
       if (!type) {
         resource.custom = undefined
       } else {
         const resolvedType = this._storage.getByResourceIdentifier(
           projectKey,
-          type,
+          type
         )
         if (!resolvedType) {
           throw new Error(`Type ${type} not found`)

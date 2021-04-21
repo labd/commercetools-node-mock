@@ -84,7 +84,7 @@ export default abstract class AbstractService {
       return response.status(404).send('Not found')
     }
 
-    if (resource.version != updateRequest.version) {
+    if (resource.version !== updateRequest.version) {
       return response.status(409).send('Concurrent modification')
     }
 

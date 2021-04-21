@@ -104,7 +104,12 @@ describe('Inventory Entry Update Actions', () => {
       .post(`/dummy/inventory/${inventoryEntry.id}`)
       .send({
         version: 1,
-        actions: [{ action: 'setCustomType', type: { typeId: 'type', id: customType.id } }],
+        actions: [
+          {
+            action: 'setCustomType',
+            type: { typeId: 'type', id: customType.id },
+          },
+        ],
       })
     expect(response.status).toBe(200)
     expect(response.body.version).toBe(2)
@@ -133,7 +138,13 @@ describe('Inventory Entry Update Actions', () => {
       .post(`/dummy/inventory/${inventoryEntry.id}`)
       .send({
         version: 1,
-        actions: [{ action: 'setCustomType', type: { typeId: 'type', id: customType.id }, fields: { 'lol': 'bar' } }],
+        actions: [
+          {
+            action: 'setCustomType',
+            type: { typeId: 'type', id: customType.id },
+            fields: { lol: 'bar' },
+          },
+        ],
       })
     expect(setCustomTypeResponse.status).toBe(200)
     expect(setCustomTypeResponse.body.custom.type.id).toBe(customType.id)

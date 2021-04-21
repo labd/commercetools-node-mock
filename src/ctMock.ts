@@ -114,7 +114,10 @@ export class CommercetoolsMock {
     this._services = {
       cart: new CartService(projectRouter, this._storage),
       customer: new CustomerService(projectRouter, this._storage),
-      'inventory-entry': new InventoryEntryService(projectRouter, this._storage),
+      'inventory-entry': new InventoryEntryService(
+        projectRouter,
+        this._storage
+      ),
       'key-value-document': new CustomObjectService(
         projectRouter,
         this._storage

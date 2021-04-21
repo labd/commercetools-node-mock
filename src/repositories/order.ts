@@ -199,7 +199,7 @@ export class OrderRepository extends AbstractRepository {
     const result = this._storage.query(projectKey, this.getTypeId(), {
       where: [`orderNumber="${orderNumber}"`],
     })
-    if (result.count == 1) {
+    if (result.count === 1) {
       return result.results[0] as Order
     }
 

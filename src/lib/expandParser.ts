@@ -20,9 +20,8 @@ export const parseExpandClause = (clause: string): ExpandResult => {
   }
 
   const match = result.element.match(/\[([^\]+])]/)
-  let index = null
   if (match) {
-    result.index = match[1] == '*' ? '*' : parseInt(match[1], 10)
+    result.index = match[1] === '*' ? '*' : parseInt(match[1], 10)
     result.element = result.element.substring(0, match.index)
   }
   return result
