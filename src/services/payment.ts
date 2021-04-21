@@ -1,7 +1,7 @@
 import AbstractService from './abstract'
 import { Router } from 'express'
 import { AbstractStorage } from '../storage'
-import { PaymentRepository } from 'repositories/payment'
+import { PaymentRepository } from '../repositories/payment'
 
 export class PaymentService extends AbstractService {
   public repository: PaymentRepository
