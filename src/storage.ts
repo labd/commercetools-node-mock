@@ -11,7 +11,7 @@ import {
   ReferenceTypeId,
   ResourceIdentifier,
   Type,
-  Reference,
+  Reference, InventoryEntry,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from 'types'
@@ -86,6 +86,7 @@ export class InMemoryStorage extends AbstractStorage {
       projectStorage = this.resources[projectKey] = {
         cart: new Map<string, Cart>(),
         customer: new Map<string, Customer>(),
+        'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
         store: new Map<string, Store>(),
