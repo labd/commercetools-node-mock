@@ -172,22 +172,21 @@ describe('Order Import', () => {
   const ctMock = new CommercetoolsMock()
   ctMock.project('dummy').add('product', {
     id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
-      // @ts-ignore
+    // @ts-ignore
     masterData: {
       // @ts-ignore
       current: {
-        name: { 'nl-NL': "Dummy"},
-        slug: { 'nl-NL': "Dummy"},
+        name: { 'nl-NL': 'Dummy' },
+        slug: { 'nl-NL': 'Dummy' },
         categories: [],
         masterVariant: {
           id: 0,
-          sku: "MYSKU",
+          sku: 'MYSKU',
         },
         variants: [],
       },
     },
   })
-
 
   test('Import', async () => {
     const response = await supertest(ctMock.app)

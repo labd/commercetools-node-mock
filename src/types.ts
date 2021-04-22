@@ -91,7 +91,7 @@ export type RepositoryMap = {
   order: OrderRepository
   'order-edit': never
   payment: PaymentRepository
-  product: ProductRepository,
+  product: ProductRepository
   'product-discount': never
   'product-type': ProductTypeRepository
   review: never

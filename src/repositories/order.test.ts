@@ -12,16 +12,16 @@ describe('Order Import', () => {
   test('import exiting product', async () => {
     storage.add('dummy', 'product', {
       id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
-        // @ts-ignore
+      // @ts-ignore
       masterData: {
         // @ts-ignore
         current: {
-          name: { 'nl-NL': "Dummy"},
-          slug: { 'nl-NL': "Dummy"},
+          name: { 'nl-NL': 'Dummy' },
+          slug: { 'nl-NL': 'Dummy' },
           categories: [],
           masterVariant: {
             id: 0,
-            sku: "MYSKU",
+            sku: 'MYSKU',
           },
           variants: [],
         },

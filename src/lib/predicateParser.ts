@@ -13,10 +13,9 @@ export const matchesPredicate = (
   // TODO: the `or` handling is temporary. a complete error-prone hack
   if (Array.isArray(predicate)) {
     return predicate.every(item => {
-
-      const items = item.split(" or ")
+      const items = item.split(' or ')
       if (items.length > 1) {
-        for(let i=0; i < items.length; i++) {
+        for (let i = 0; i < items.length; i++) {
           const func = generateMatchFunc(items[i])
           if (func(target)) {
             return true
@@ -29,16 +28,16 @@ export const matchesPredicate = (
       return func(target)
     })
   } else {
-      const items = predicate.split(" or ")
-      if (items.length > 1) {
-        for(let i=0; i < items.length; i++) {
-          const func = generateMatchFunc(items[i])
-          if (func(target)) {
-            return true
-          }
+    const items = predicate.split(' or ')
+    if (items.length > 1) {
+      for (let i = 0; i < items.length; i++) {
+        const func = generateMatchFunc(items[i])
+        if (func(target)) {
+          return true
         }
-        return false
       }
+      return false
+    }
     const func = generateMatchFunc(predicate)
     return func(target)
   }
