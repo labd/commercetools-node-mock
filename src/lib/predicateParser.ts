@@ -1,4 +1,4 @@
-import perplex from 'perplex'
+import perplex, { EOF } from 'perplex'
 import { Parser } from 'pratt'
 
 type MatchFunc = (target: any) => boolean
@@ -13,38 +13,19 @@ export const matchesPredicate = (
   // TODO: the `or` handling is temporary. a complete error-prone hack
   if (Array.isArray(predicate)) {
     return predicate.every(item => {
-      const items = item.split(' or ')
-      if (items.length > 1) {
-        for (let i = 0; i < items.length; i++) {
-          const func = generateMatchFunc(items[i])
-          if (func(target)) {
-            return true
-          }
-        }
-        return false
-      }
-
       const func = generateMatchFunc(item)
       return func(target)
     })
   } else {
-    const items = predicate.split(' or ')
-    if (items.length > 1) {
-      for (let i = 0; i < items.length; i++) {
-        const func = generateMatchFunc(items[i])
-        if (func(target)) {
-          return true
-        }
-      }
-      return false
-    }
     const func = generateMatchFunc(predicate)
     return func(target)
   }
 }
 
-const generateMatchFunc = (predicate: string): MatchFunc => {
-  const lexer = new perplex(predicate)
+const getLexer = (value: string) => {
+  return new perplex(value)
+    .token('AND', /and(?![-_A-Za-z0-9]+)/)
+    .token('OR', /or(?![-_A-Za-z0-9]+)/)
     .token('IDENTIFIER', /[-_A-Za-z0-9]+/)
     .token('LITERAL', /"((?:\\.|[^"\\])*)"/)
     .token('LITERAL', /'((?:\\.|[^'\\])*)'/)
@@ -56,7 +37,20 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .token('=', /=/)
     .token('"', /"/)
     .token('WS', /\s+/, true) // skip
+}
 
+const generateMatchFunc = (predicate: string): MatchFunc => {
+
+  // const debugLexer = getLexer(predicate)
+  // for (let i = 0; i < 10; i++) {
+  //   const token = debugLexer.next()
+  //   console.log(token)
+  //   if (token.type == null){
+  //     break
+  //   }
+  // }
+
+  const lexer = getLexer(predicate)
   const parser = new Parser(lexer)
     .builder()
     .nud('IDENTIFIER', 100, t => {
@@ -66,36 +60,53 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       // @ts-ignore
       return t.token.groups[1]
     })
-    .led('(', 10, left => {
+    .led('AND', 5 , ({left, bp}) => {
+      const expr = parser.parse({ terminals: [bp - 1]})
+      return (obj: any) => {
+        return left(obj) && expr(obj)
+      }
+    })
+    .led('OR', 5 , ({left, token, bp}) => {
+      const expr = parser.parse({ terminals: [bp - 1]})
+      return (obj: any) => {
+        return left(obj) || expr(obj)
+      }
+    })
+    .nud('(', 100, t => {
+      const expr: any = parser.parse()
+      lexer.expect(')')
+      return expr
+    })
+    .led('(', 100, ({left, bp}) => {
       const expr = parser.parse()
       lexer.expect(')')
       return (obj: any) => {
-        if (obj[left.left]) {
-          return expr(obj[left.left])
+        if (obj[left]) {
+          return expr(obj[left])
         }
         return false
       }
     })
-    .led('=', 20, left => {
-      const expr = parser.parse()
+    .bp(')', 0)
+    .led('=', 20, ({left, bp}) => {
+      const expr = parser.parse({terminals: [bp - 1]})
       return (obj: any) => {
         // eslint-disable-next-line eqeqeq
-        return obj[left.left] == expr
+        return obj[left] == expr
       }
     })
-    .led('>', 20, left => {
-      const expr = parser.parse()
+    .led('>', 20, ({left , bp}) => {
+      const expr = parser.parse({terminals: [bp - 1]})
       return (obj: any) => {
-        return obj[left.left] > expr
+        return obj[left] > expr
       }
     })
-    .led('<', 20, left => {
-      const expr = parser.parse()
+    .led('<', 20, ({left, bp}) => {
+      const expr = parser.parse({terminals: [bp - 1]})
       return (obj: any) => {
-        return obj[left.left] < expr
+        return obj[left] < expr
       }
     })
-    .bp(')', 0)
     .build()
 
   return parser.parse()
