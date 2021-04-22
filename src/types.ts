@@ -1,3 +1,4 @@
+import { ProductTypeRepository } from './repositories/product-type'
 import { TaxCategoryRepository } from './repositories/tax-category'
 import { StateRepository } from './repositories/state'
 import { ShippingMethodRepository } from './repositories/shipping-method'
@@ -45,7 +46,6 @@ export type ResourceMap = {
   'tax-category': ctp.TaxCategory
   type: ctp.Type
   zone: ctp.Zone
-
   'customer-email-token': never
   'customer-password-token': never
 }
@@ -92,7 +92,7 @@ export type RepositoryMap = {
   payment: PaymentRepository
   product: never
   'product-discount': never
-  'product-type': never
+  'product-type': ProductTypeRepository
   review: never
   'shipping-method': ShippingMethodRepository
   'shopping-list': never

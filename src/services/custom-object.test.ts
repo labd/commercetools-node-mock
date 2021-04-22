@@ -27,7 +27,7 @@ describe('CustomObject retrieve', () => {
   let customObject: CustomObject
 
   beforeEach(async () => {
-    let response = await supertest(ctMock.app)
+    const response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-container',
@@ -46,7 +46,7 @@ describe('CustomObject retrieve', () => {
   })
 
   test('createget', async () => {
-    let response = await supertest(ctMock.app)
+    const response = await supertest(ctMock.app)
       .get('/dummy/custom-objects/my-container/my-key')
       .send()
 

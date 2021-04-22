@@ -1,18 +1,18 @@
-import { TaxCategoryRepository } from '../repositories/tax-category'
+import { ProductTypeRepository } from '../repositories/product-type'
 import AbstractService from './abstract'
-import { AbstractStorage } from '../storage'
 import { Request, Response, Router } from 'express'
+import { AbstractStorage } from '../storage'
 
-export class TaxCategoryService extends AbstractService {
-  public repository: TaxCategoryRepository
+export class ProductTypeService extends AbstractService {
+  public repository: ProductTypeRepository
 
   constructor(parent: Router, storage: AbstractStorage) {
     super(parent)
-    this.repository = new TaxCategoryRepository(storage)
+    this.repository = new ProductTypeRepository(storage)
   }
 
   getBasePath() {
-    return 'tax-categories'
+    return 'product-types'
   }
 
   extraRoutes(router: Router) {
