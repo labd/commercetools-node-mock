@@ -35,6 +35,11 @@ describe('Predicate filter', () => {
     expect(matchesPredicate(`numberProperty = 1234`, object)).toBeTruthy()
   })
 
+  test('number value or equals', async () => {
+    expect(matchesPredicate(`numberProperty=1234 or numberProperty=1235`, object)).toBeTruthy()
+    expect(matchesPredicate(`numberProperty=1233 or numberProperty=1235`, object)).toBeFalsy()
+  })
+
   test('number value greater then', async () => {
     expect(matchesPredicate(`numberProperty > 1233`, object)).toBeTruthy()
     expect(matchesPredicate(`numberProperty > 1234`, object)).toBeFalsy()

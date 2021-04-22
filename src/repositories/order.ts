@@ -3,6 +3,7 @@ import {
   Cart,
   CustomLineItem,
   CustomLineItemDraft,
+  GeneralError,
   LineItem,
   LineItemImportDraft,
   Order,
@@ -19,6 +20,7 @@ import {
   OrderSetShippingAddressAction,
   OrderSetStoreAction,
   Product,
+  ProductPagedQueryResponse,
   ProductVariant,
   ReferenceTypeId,
   Store,
@@ -32,6 +34,7 @@ import {
 } from './helpers'
 import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
+import { CommercetoolsError } from 'exceptions'
 
 export class OrderRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -108,42 +111,37 @@ export class OrderRepository extends AbstractRepository {
     draft: LineItemImportDraft
   ): LineItem {
     let product: Product
-    let variant: ProductVariant
+    let variant: ProductVariant | undefined
 
-    // TODO: We need to look up the product. Need to implement this. For now
-    // create a dummy product
     if (draft.variant.sku) {
       variant = {
         id: 0,
         sku: draft.variant.sku,
       }
 
-      product = {
-        ...getBaseResourceProperties(),
-        productType: {
-          typeId: 'product-type',
-          id: 'dummy',
-        },
-        masterData: {
-          published: true,
-          staged: {
-            name: draft.name,
-            categories: [],
-            slug: { 'nl-NL': 'todo' },
-            masterVariant: variant,
-            variants: [],
-            searchKeywords: {},
-          },
-          current: {
-            name: draft.name,
-            categories: [],
-            slug: { 'nl-NL': 'todo' },
-            masterVariant: variant,
-            variants: [],
-            searchKeywords: {},
-          },
-          hasStagedChanges: false,
-        },
+      var items = this._storage.query(projectKey, 'product', {
+        where: [
+          `masterData(current(masterVariant(sku="${draft.variant.sku}"))) or masterData(current(variants(sku="${draft.variant.sku}")))`,
+        ],
+      }) as ProductPagedQueryResponse
+
+      if (items.count != 1) {
+        throw new CommercetoolsError<GeneralError>({
+          code: 'General',
+          message: `A product containing a variant with SKU '${draft.variant.sku}' not found.`,
+        })
+      }
+
+      product = items.results[0]
+      if (product.masterData.current.masterVariant.sku == draft.variant.sku) {
+        variant = product.masterData.current.masterVariant
+      } else {
+        variant = product.masterData.current.variants.find(
+          v => v.sku == draft.variant.sku
+        )
+      }
+      if (!variant) {
+        throw new Error('Internal state error')
       }
     } else {
       throw new Error('No product found')

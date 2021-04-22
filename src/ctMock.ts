@@ -21,6 +21,7 @@ import { OAuth2Server } from './oauth/server'
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 import { ProjectAPI } from './projectAPI'
 import { copyHeaders } from './lib/proxy'
+import { ProductService } from 'services/product'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
@@ -140,6 +141,7 @@ export class CommercetoolsMock {
         this._storage
       ),
       'product-type': new ProductTypeService(projectRouter, this._storage),
+      product: new ProductService(projectRouter, this._storage),
       state: new StateService(projectRouter, this._storage),
       store: new StoreService(projectRouter, this._storage),
       'tax-category': new TaxCategoryService(projectRouter, this._storage),

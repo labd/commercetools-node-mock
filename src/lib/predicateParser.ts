@@ -10,12 +10,35 @@ export const matchesPredicate = (
   if (!predicate) {
     return true
   }
+  // TODO: the `or` handling is temporary. a complete error-prone hack
   if (Array.isArray(predicate)) {
     return predicate.every(item => {
+
+      const items = item.split(" or ")
+      if (items.length > 1) {
+        for(let i=0; i < items.length; i++) {
+          const func = generateMatchFunc(items[i])
+          if (func(target)) {
+            return true
+          }
+        }
+        return false
+      }
+
       const func = generateMatchFunc(item)
       return func(target)
     })
   } else {
+      const items = predicate.split(" or ")
+      if (items.length > 1) {
+        for(let i=0; i < items.length; i++) {
+          const func = generateMatchFunc(items[i])
+          if (func(target)) {
+            return true
+          }
+        }
+        return false
+      }
     const func = generateMatchFunc(predicate)
     return func(target)
   }
@@ -26,6 +49,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .token('IDENTIFIER', /[-_A-Za-z0-9]+/)
     .token('LITERAL', /"((?:\\.|[^"\\])*)"/)
     .token('LITERAL', /'((?:\\.|[^'\\])*)'/)
+    .token('LITERAL', /(\d+)/)
     .token('(', /\(/)
     .token(')', /\)/)
     .token('>', />/)

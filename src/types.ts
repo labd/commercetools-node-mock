@@ -11,6 +11,7 @@ import { CustomerRepository } from 'repositories/customer'
 import { InventoryEntryRepository } from 'repositories/inventory-entry'
 import { OrderRepository } from 'repositories/order'
 import AbstractService from 'services/abstract'
+import { ProductRepository } from 'repositories/product'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
@@ -90,7 +91,7 @@ export type RepositoryMap = {
   order: OrderRepository
   'order-edit': never
   payment: PaymentRepository
-  product: never
+  product: ProductRepository,
   'product-discount': never
   'product-type': ProductTypeRepository
   review: never
