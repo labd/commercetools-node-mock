@@ -59,7 +59,6 @@
   },
   "dependencies": {
     "@commercetools/platform-sdk": "^1.10.0",
-    "@labdigital/commercetools-mock": "file:.yalc/@labdigital/commercetools-mock",
     "basic-auth": "^2.0.1",
     "deep-equal": "^2.0.5",
     "express": "^4.17.1",
