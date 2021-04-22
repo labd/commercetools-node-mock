@@ -1,3 +1,4 @@
+import { ProductTypeService } from './services/product-type'
 import { ShippingMethodService } from './services/shipping-method'
 import { StateService } from './services/state'
 import { TaxCategoryService } from './services/tax-category'
@@ -27,7 +28,10 @@ export type CommercetoolsMockOptions = {
   defaultProjectKey: string | undefined
   apiHost: RegExp | string
   authHost: RegExp | string
+  silent: boolean
 }
+
+type AppOptions = { silent?: boolean }
 
 const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
   enableAuthentication: false,
@@ -35,6 +39,7 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
   defaultProjectKey: undefined,
   apiHost: DEFAULT_API_HOSTNAME,
   authHost: DEFAULT_AUTH_HOSTNAME,
+  silent: false,
 }
 
 export class CommercetoolsMock {
@@ -59,7 +64,7 @@ export class CommercetoolsMock {
       validate: this.options.validateCredentials,
     })
 
-    this.app = this.createApp()
+    this.app = this.createApp({ silent: this.options.silent })
   }
 
   start() {
@@ -92,20 +97,22 @@ export class CommercetoolsMock {
     )
   }
 
-  runServer(port: number = 3000) {
-    const app = this.createApp()
+  runServer(port: number = 3000, options?: AppOptions) {
+    const app = this.createApp(options)
     app.listen(port, () => {
       console.log(`Mock server listening at http://localhost:${port}`)
     })
   }
 
-  private createApp(): express.Express {
+  private createApp(options?: AppOptions): express.Express {
     const app = express()
 
     const projectRouter = express.Router({ mergeParams: true })
     projectRouter.use(express.json())
 
-    app.use(morgan('tiny'))
+    if (!options?.silent) {
+      app.use(morgan('tiny'))
+    }
     app.use('/oauth', this._oauth2.createRouter())
 
     // Only enable auth middleware if we have enabled this
@@ -132,6 +139,7 @@ export class CommercetoolsMock {
         projectRouter,
         this._storage
       ),
+      'product-type': new ProductTypeService(projectRouter, this._storage),
       state: new StateService(projectRouter, this._storage),
       store: new StoreService(projectRouter, this._storage),
       'tax-category': new TaxCategoryService(projectRouter, this._storage),

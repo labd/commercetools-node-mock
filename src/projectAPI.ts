@@ -21,6 +21,9 @@ export class ProjectAPI {
     typeId: ReferenceTypeId,
     resource: ResourceMap[ReferenceTypeId]
   ) {
+    // @ts-ignore
+    if (typeId === 'custom-object') typeId = 'key-value-document'
+
     const service = this._services[typeId]
     if (service) {
       this._storage.add(this.projectKey, typeId, {

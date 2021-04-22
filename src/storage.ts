@@ -17,6 +17,7 @@ import {
   State,
   TaxCategory,
   ShippingMethod,
+  ProductType,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from 'types'
@@ -96,6 +97,7 @@ export class InMemoryStorage extends AbstractStorage {
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
         payment: new Map<string, Payment>(),
+        'product-type': new Map<string, ProductType>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         state: new Map<string, State>(),
         store: new Map<string, Store>(),

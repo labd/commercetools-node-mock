@@ -25,6 +25,7 @@ export class CustomObjectService extends AbstractService {
       request.params.container,
       request.params.key
     )
+
     if (!result) {
       return response.status(404).send('Not Found')
     }
