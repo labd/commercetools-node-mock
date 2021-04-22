@@ -34,7 +34,7 @@ import {
 } from './helpers'
 import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
-import { CommercetoolsError } from 'exceptions'
+import { CommercetoolsError } from '../exceptions'
 
 export class OrderRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {

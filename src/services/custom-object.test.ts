@@ -1,5 +1,5 @@
 import { CustomObject } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from 'helpers'
+import { getBaseResourceProperties } from '../helpers'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 

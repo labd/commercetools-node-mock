@@ -13,7 +13,7 @@ import {
   Type,
   TypedMoney,
 } from '@commercetools/platform-sdk'
-import { AbstractStorage } from 'storage'
+import { AbstractStorage } from '../storage'
 
 export const createCustomFields = (
   draft: CustomFieldsDraft | undefined,
