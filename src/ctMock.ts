@@ -14,14 +14,14 @@ import { CustomerService } from './services/customer'
 import { CartService } from './services/cart'
 import { InventoryEntryService } from './services/inventory-entry'
 import { OrderService } from './services/order'
-import { Services } from 'types'
+import { Services } from './types'
 import { StoreService } from './services/store'
 import { CommercetoolsError } from './exceptions'
 import { OAuth2Server } from './oauth/server'
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 import { ProjectAPI } from './projectAPI'
 import { copyHeaders } from './lib/proxy'
-import { ProductService } from 'services/product'
+import { ProductService } from './services/product'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean

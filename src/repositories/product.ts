@@ -1,10 +1,7 @@
-import { v4 as uuidv4 } from 'uuid'
 import {
   Product,
   ProductDraft,
   ReferenceTypeId,
-  State,
-  StateDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import AbstractRepository from './abstract'

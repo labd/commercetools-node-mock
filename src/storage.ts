@@ -21,7 +21,7 @@ import {
   ProductType,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
-import { ResourceMap, Writable } from 'types'
+import { ResourceMap, Writable } from './types'
 import { matchesPredicate } from './lib/predicateParser'
 
 type GetParams = {

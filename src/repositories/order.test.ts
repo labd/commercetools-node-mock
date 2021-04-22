@@ -1,9 +1,6 @@
-import assert from 'assert'
-import { Order, OrderImportDraft } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { OrderImportDraft } from '@commercetools/platform-sdk'
 import { OrderRepository } from './order'
-import { InMemoryStorage } from 'storage'
+import { InMemoryStorage } from '../storage'
 
 describe('Order Import', () => {
   const storage = new InMemoryStorage()
