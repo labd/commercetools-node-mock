@@ -1,4 +1,5 @@
 import { CustomObject } from '@commercetools/platform-sdk'
+import { getBaseResourceProperties } from 'helpers'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 
@@ -113,6 +114,31 @@ describe('CustomObject retrieve', () => {
           message: `Object ${customObject.id} has a different version than expected. Expected: 2 - Actual: 1.`,
         },
       ],
+    })
+  })
+
+  test('can use the add function with the custom object name', async () => {
+    ctMock.project('dummy').add('custom-object', {
+      ...getBaseResourceProperties(),
+      container: 'my-container',
+      key: 'my-key',
+      value: 'my-value',
+      version: 2,
+    })
+
+    const response = await supertest(ctMock.app)
+      .get('/dummy/custom-objects/my-container/my-key')
+      .send()
+
+    expect(response.status).toEqual(200)
+    expect(response.body).toEqual({
+      container: 'my-container',
+      createdAt: expect.anything(),
+      id: expect.anything(),
+      key: 'my-key',
+      lastModifiedAt: expect.anything(),
+      value: 'my-value',
+      version: 1,
     })
   })
 })

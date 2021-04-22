@@ -18,15 +18,17 @@ export class ProjectAPI {
   }
 
   add<ReferenceTypeId extends keyof ResourceMap>(
-    typeId: ReferenceTypeId,
+    typeId: ReferenceTypeId | 'custom-object',
     resource: ResourceMap[ReferenceTypeId]
   ) {
-    // @ts-ignore
+    //@ts-ignore
     if (typeId === 'custom-object') typeId = 'key-value-document'
 
-    const service = this._services[typeId]
+    const parsedTypeId = typeId as ReferenceTypeId
+
+    const service = this._services[parsedTypeId]
     if (service) {
-      this._storage.add(this.projectKey, typeId, {
+      this._storage.add(this.projectKey, parsedTypeId, {
         ...getBaseResourceProperties(),
         ...resource,
       })
