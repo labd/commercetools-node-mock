@@ -5,7 +5,6 @@ import { InMemoryStorage } from '../storage'
 describe('Order Import', () => {
   const storage = new InMemoryStorage()
   const repository = new OrderRepository(storage)
-
   test('import exiting product', async () => {
     storage.add('dummy', 'product', {
       id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',

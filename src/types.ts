@@ -1,17 +1,17 @@
-import * as ctp from '@commercetools/platform-sdk';
-import { ReferenceTypeId } from '@commercetools/platform-sdk';
-import AbstractService from './services/abstract';
-import { CartRepository } from './repositories/cart';
-import { CustomerRepository } from './repositories/customer';
-import { CustomObjectRepository } from './repositories/custom-object';
-import { InventoryEntryRepository } from './repositories/inventory-entry';
-import { OrderRepository } from './repositories/order';
-import { PaymentRepository } from './repositories/payment';
-import { ProductRepository } from './repositories/product';
-import { ProductTypeRepository } from './repositories/product-type';
-import { ShippingMethodRepository } from './repositories/shipping-method';
-import { StateRepository } from './repositories/state';
-import { TaxCategoryRepository } from './repositories/tax-category';
+import * as ctp from '@commercetools/platform-sdk'
+import { ReferenceTypeId } from '@commercetools/platform-sdk'
+import AbstractService from './services/abstract'
+import { CartRepository } from './repositories/cart'
+import { CustomerRepository } from './repositories/customer'
+import { CustomObjectRepository } from './repositories/custom-object'
+import { InventoryEntryRepository } from './repositories/inventory-entry'
+import { OrderRepository } from './repositories/order'
+import { PaymentRepository } from './repositories/payment'
+import { ProductRepository } from './repositories/product'
+import { ProductTypeRepository } from './repositories/product-type'
+import { ShippingMethodRepository } from './repositories/shipping-method'
+import { StateRepository } from './repositories/state'
+import { TaxCategoryRepository } from './repositories/tax-category'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 

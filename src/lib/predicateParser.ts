@@ -40,7 +40,6 @@ const getLexer = (value: string) => {
 }
 
 const generateMatchFunc = (predicate: string): MatchFunc => {
-
   // const debugLexer = getLexer(predicate)
   // for (let i = 0; i < 10; i++) {
   //   const token = debugLexer.next()
@@ -60,14 +59,14 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       // @ts-ignore
       return t.token.groups[1]
     })
-    .led('AND', 5 , ({left, bp}) => {
-      const expr = parser.parse({ terminals: [bp - 1]})
+    .led('AND', 5, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any) => {
         return left(obj) && expr(obj)
       }
     })
-    .led('OR', 5 , ({left, token, bp}) => {
-      const expr = parser.parse({ terminals: [bp - 1]})
+    .led('OR', 5, ({ left, token, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any) => {
         return left(obj) || expr(obj)
       }
@@ -77,7 +76,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       lexer.expect(')')
       return expr
     })
-    .led('(', 100, ({left, bp}) => {
+    .led('(', 100, ({ left, bp }) => {
       const expr = parser.parse()
       lexer.expect(')')
       return (obj: any) => {
@@ -88,21 +87,21 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       }
     })
     .bp(')', 0)
-    .led('=', 20, ({left, bp}) => {
-      const expr = parser.parse({terminals: [bp - 1]})
+    .led('=', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any) => {
         // eslint-disable-next-line eqeqeq
         return obj[left] == expr
       }
     })
-    .led('>', 20, ({left , bp}) => {
-      const expr = parser.parse({terminals: [bp - 1]})
+    .led('>', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any) => {
         return obj[left] > expr
       }
     })
-    .led('<', 20, ({left, bp}) => {
-      const expr = parser.parse({terminals: [bp - 1]})
+    .led('<', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any) => {
         return obj[left] < expr
       }

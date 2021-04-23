@@ -67,7 +67,10 @@ describe('Predicate filter', () => {
       matchesPredicate(`numberProperty=1231 or (numberProperty=1234)`, object)
     ).toBeTruthy()
     expect(
-      matchesPredicate(`numberProperty=1234 and (numberProperty=1230 or (numberProperty=1234 or numberProperty=1235))`, object)
+      matchesPredicate(
+        `numberProperty=1234 and (numberProperty=1230 or (numberProperty=1234 or numberProperty=1235))`,
+        object
+      )
     ).toBeTruthy()
     expect(
       matchesPredicate(`numberProperty=1233 or numberProperty=1235`, object)
