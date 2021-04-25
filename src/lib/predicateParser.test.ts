@@ -1,8 +1,5 @@
 import { VariableMap } from '@commercetools/platform-sdk'
-import {
-  parseQueryExpression,
-  PredicateError,
-} from './predicateParser'
+import { parseQueryExpression, PredicateError } from './predicateParser'
 
 describe('Predicate filter', () => {
   const exampleObject = {
@@ -37,7 +34,9 @@ describe('Predicate filter', () => {
   test('stringProperty matches ignore case "foobar"', async () => {
     expect(match(`stringProperty="FOObar"`)).toBeFalsy()
     expect(match(`stringProperty matches ignore case "FOObar"`)).toBeTruthy()
-    expect(match(`stringProperty matches ignore case :val`, { val: 'fooBar' })).toBeTruthy()
+    expect(
+      match(`stringProperty matches ignore case :val`, { val: 'fooBar' })
+    ).toBeTruthy()
   })
 
   test('numberProperty = 1234', async () => {
@@ -186,9 +185,8 @@ describe('Predicate filter', () => {
   })
 })
 
-
-describe("Report parse errors", () => {
-  test("unexpect input", () => {
-    expect(() => parseQueryExpression("foo=bar")).toThrow(PredicateError)
+describe('Report parse errors', () => {
+  test('unexpect input', () => {
+    expect(() => parseQueryExpression('foo=bar')).toThrow(PredicateError)
   })
 })

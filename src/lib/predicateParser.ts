@@ -337,11 +337,13 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       validateSymbol(expr)
 
       return (obj: any, vars: VariableMap) => {
-        const value =resolveValue(obj, left)
+        const value = resolveValue(obj, left)
         const other = resolveSymbol(expr, vars)
 
-        if (typeof value != "string") {
-          throw new PredicateError(`The field '${left.value}' does not support this expression.`)
+        if (typeof value != 'string') {
+          throw new PredicateError(
+            `The field '${left.value}' does not support this expression.`
+          )
         }
         return value.toLowerCase() === other.toLowerCase()
       }
