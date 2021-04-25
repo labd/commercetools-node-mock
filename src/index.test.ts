@@ -187,7 +187,7 @@ test('apiHost mock proxy: querystring', async () => {
   const response = await got.get('http://api.localhost/my-project/orders', {
     responseType: 'json',
     searchParams: {
-      where: 'orderNumber=foobar',
+      where: 'orderNumber="foobar"',
       expand: 'custom.type',
     },
   })

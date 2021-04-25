@@ -1,5 +1,11 @@
-// TODO: implement support for multi-dimensional array
-
+/**
+ * This module implements the reference expansion as imeplemented by
+ * commercetools.
+ *
+ * See https://docs.commercetools.com/api/general-concepts#reference-expansion
+ *
+ * TODO: implement support for multi-dimensional array
+ */
 type ExpandResult = {
   element: string
   index?: string | number

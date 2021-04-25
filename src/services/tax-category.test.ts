@@ -65,7 +65,7 @@ describe('Tax Category', () => {
 
     const response = await supertest(ctMock.app)
       .get(`/dummy/tax-categories/`)
-      .query({ where: `key=${createResponse.body.key}` })
+      .query({ where: `key="${createResponse.body.key}"` })
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({

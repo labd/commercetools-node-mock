@@ -19,10 +19,12 @@ import {
   TaxCategory,
   ShippingMethod,
   ProductType,
+  InvalidInputError,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { ResourceMap, Writable } from './types'
-import { matchesPredicate } from './lib/predicateParser'
+import { parseQueryExpression } from './lib/predicateParser'
+import { CommercetoolsError } from './exceptions'
 
 type GetParams = {
   expand?: string[]
@@ -190,9 +192,18 @@ export class InMemoryStorage extends AbstractStorage {
 
     // Apply predicates
     if (params.where) {
-      resources = resources.filter(resource =>
-        matchesPredicate(params.where, resource)
-      )
+      try {
+        const filterFunc = parseQueryExpression(params.where)
+        resources = resources.filter(resource => filterFunc(resource, {}))
+      } catch (err) {
+        throw new CommercetoolsError<InvalidInputError>(
+          {
+            code: 'InvalidInput',
+            message: err.message,
+          },
+          400
+        )
+      }
     }
 
     // Get the total before slicing the array

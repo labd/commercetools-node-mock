@@ -1,64 +1,202 @@
-import perplex, { EOF } from 'perplex'
-import { Parser } from 'pratt'
+/**
+ * This module implements the commercetools query predicate filter expression.
+ * Support should be 100% complete.
+ *
+ * See https://docs.commercetools.com/api/predicates/query
+ */
+import perplex from 'perplex'
+import { ITokenPosition, Parser } from 'pratt'
+import { haversineDistance } from './haversine'
 
-type MatchFunc = (target: any) => boolean
+export class PredicateError {
+  message: string
+
+  constructor(message: string) {
+    this.message = message
+  }
+}
+
+type MatchFunc = (target: any, variables: VariableMap) => boolean
+type VariableMap = {
+  [key: string]: any
+}
 
 export const matchesPredicate = (
   predicate: string | string[] | undefined,
-  target: any
+  target: any,
+  variables?: VariableMap
 ): boolean => {
   if (!predicate) {
     return true
   }
-  // TODO: the `or` handling is temporary. a complete error-prone hack
+
   if (Array.isArray(predicate)) {
     return predicate.every(item => {
       const func = generateMatchFunc(item)
-      return func(target)
+      return func(target, variables || {})
     })
   } else {
     const func = generateMatchFunc(predicate)
-    return func(target)
+    return func(target, variables || {})
   }
+}
+
+export const parseQueryExpression = (
+  predicate: string | string[]
+): MatchFunc => {
+  if (Array.isArray(predicate)) {
+    const callbacks = predicate.map(item => generateMatchFunc(item))
+    return (target: any, variables: VariableMap) => {
+      return callbacks.every(callback => callback(target, variables))
+    }
+  } else {
+    return generateMatchFunc(predicate)
+  }
+}
+
+type Symbol = {
+  type: 'var' | 'boolean' | 'string' | 'float' | 'int' | 'identifier'
+  value: any
+  pos?: ITokenPosition
+}
+
+const validateSymbol = (val: Symbol) => {
+  if (!val.type) {
+    throw new PredicateError('Internal error')
+  }
+
+  if (val.type == 'identifier') {
+    const char = val.value.charAt(0)
+    const line = val.pos?.start.line
+    const column = val.pos?.start.column
+
+    throw new PredicateError(
+      `Invalid input '${char}', expected input parameter or primitive value (line ${line}, column ${column})`
+    )
+  }
+}
+
+const resolveSymbol = (val: Symbol, vars: VariableMap): any => {
+  if (val.type == 'var') {
+    if (!(val.value in vars)) {
+      throw new PredicateError(`Missing parameter value for ${val.value}`)
+    }
+    return vars[val.value]
+  }
+
+  return val.value
+}
+
+const resolveValue = (obj: any, val: Symbol): any => {
+  if (val.type != 'identifier') {
+    throw new PredicateError('Internal error')
+  }
+
+  if (!(val.value in obj)) {
+    throw new PredicateError(`The field '${val.value}' does not exist.`)
+  }
+
+  return obj[val.value]
 }
 
 const getLexer = (value: string) => {
   return new perplex(value)
-    .token('AND', /and(?![-_A-Za-z0-9]+)/)
-    .token('OR', /or(?![-_A-Za-z0-9]+)/)
+
+    .token('AND', /and(?![-_a-z0-9]+)/i)
+    .token('OR', /or(?![-_a-z0-9]+)/i)
+    .token('NOT', /not(?![-_a-z0-9]+)/i)
+
+    .token('WITHIN', /within(?![-_a-z0-9]+)/i)
+    .token('IN', /in(?![-_a-z0-9]+)/i)
+    .token('MATCHES_IGNORE_CASE', /matches\s+ignore\s+case(?![-_a-z0-9]+)/i)
+    .token('CONTAINS', /contains(?![-_a-z0-9]+)/i)
+    .token('ALL', /all(?![-_a-z0-9]+)/i)
+    .token('ANY', /any(?![-_a-z0-9]+)/i)
+    .token('EMPTY', /empty(?![-_a-z0-9]+)/i)
+    .token('IS', /is(?![-_a-z0-9]+)/i)
+    .token('DEFINED', /defined(?![-_a-z0-9]+)/i)
+
+    .token('FLOAT', /\d+\.\d+/)
+    .token('INT', /\d+/)
+    .token('VARIABLE', /:([-_A-Za-z0-9]+)/)
     .token('IDENTIFIER', /[-_A-Za-z0-9]+/)
-    .token('LITERAL', /"((?:\\.|[^"\\])*)"/)
-    .token('LITERAL', /'((?:\\.|[^'\\])*)'/)
-    .token('LITERAL', /(\d+)/)
-    .token('(', /\(/)
-    .token(')', /\)/)
-    .token('>', />/)
-    .token('<', /</)
-    .token('=', /=/)
-    .token('"', /"/)
+    .token('STRING', /"((?:\\.|[^"\\])*)"/)
+    .token('STRING', /'((?:\\.|[^'\\])*)'/)
+
+    .token('COMMA', ',')
+    .token('(', '(')
+    .token(')', ')')
+    .token('>=', '>=')
+    .token('<=', '<=')
+    .token('>', '>')
+    .token('<', '<')
+    .token('!=', '!=')
+    .token('=', '=')
+    .token('"', '"')
     .token('WS', /\s+/, true) // skip
 }
 
+/**
+ * This function converts a query expression in to a callable which returns a
+ * boolean to indicate if the given object matches or not.
+ *
+ * This currently parses the predicate each time it is called, but it should be
+ * straight-forward to add a query cache (lru-cache)
+ */
 const generateMatchFunc = (predicate: string): MatchFunc => {
-  // const debugLexer = getLexer(predicate)
-  // for (let i = 0; i < 10; i++) {
-  //   const token = debugLexer.next()
-  //   console.log(token)
-  //   if (token.type == null){
-  //     break
-  //   }
-  // }
-
   const lexer = getLexer(predicate)
   const parser = new Parser(lexer)
     .builder()
     .nud('IDENTIFIER', 100, t => {
-      return t.token.match
+      return <Symbol>{
+        type: 'identifier',
+        value: t.token.match,
+        pos: t.token.strpos(),
+      }
     })
-    .nud('LITERAL', 100, t => {
-      // @ts-ignore
-      return t.token.groups[1]
+    .nud('VARIABLE', 100, t => {
+      return <Symbol>{
+        type: 'var',
+        // @ts-ignore
+        value: t.token.groups[1],
+        pos: t.token.strpos(),
+      }
     })
+    .nud('STRING', 100, t => {
+      return <Symbol>{
+        type: 'string',
+        // @ts-ignore
+        value: t.token.groups[1],
+        pos: t.token.strpos(),
+      }
+    })
+    .nud('INT', 1, t => {
+      return <Symbol>{
+        type: 'int',
+        value: parseInt(t.token.match, 10),
+        pos: t.token.strpos(),
+      }
+    })
+    .nud('FLOAT', 1, t => {
+      return <Symbol>{
+        type: 'float',
+        value: parseFloat(t.token.match),
+        pos: t.token.strpos(),
+      }
+    })
+    .nud('NOT', 100, ({ bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
+      return (obj: any) => {
+        return !expr(obj)
+      }
+    })
+    .nud('EMPTY', 10, ({ bp }) => {
+      return 'empty'
+    })
+    .nud('DEFINED', 10, ({ bp }) => {
+      return 'defined'
+    })
+
     .led('AND', 5, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any) => {
@@ -67,21 +205,29 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     })
     .led('OR', 5, ({ left, token, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any) => {
-        return left(obj) || expr(obj)
+      return (obj: any, vars: object) => {
+        return left(obj, vars) || expr(obj, vars)
+      }
+    })
+    .led('COMMA', 1, ({ left, token, bp }) => {
+      const expr: any = parser.parse({ terminals: [bp - 1] })
+      if (Array.isArray(expr)) {
+        return [left, ...expr]
+      } else {
+        return [left, expr]
       }
     })
     .nud('(', 100, t => {
-      const expr: any = parser.parse()
-      lexer.expect(')')
+      const expr: any = parser.parse({ terminals: [')'] })
       return expr
     })
     .led('(', 100, ({ left, bp }) => {
       const expr = parser.parse()
       lexer.expect(')')
-      return (obj: any) => {
-        if (obj[left]) {
-          return expr(obj[left])
+      return (obj: any, vars: object) => {
+        const value = resolveValue(obj, left)
+        if (value) {
+          return expr(value)
         }
         return false
       }
@@ -89,24 +235,186 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .bp(')', 0)
     .led('=', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any) => {
-        // eslint-disable-next-line eqeqeq
-        return obj[left] == expr
+      validateSymbol(expr)
+
+      return (obj: any, vars: VariableMap) => {
+        return resolveValue(obj, left) === resolveSymbol(expr, vars)
+      }
+    })
+    .led('!=', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
+      validateSymbol(expr)
+
+      return (obj: any, vars: VariableMap) => {
+        return resolveValue(obj, left) !== resolveSymbol(expr, vars)
       }
     })
     .led('>', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any) => {
-        return obj[left] > expr
+      validateSymbol(expr)
+
+      return (obj: any, vars: object) => {
+        return resolveValue(obj, left) > resolveSymbol(expr, vars)
+      }
+    })
+    .led('>=', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
+      validateSymbol(expr)
+
+      return (obj: any, vars: object) => {
+        return resolveValue(obj, left) >= resolveSymbol(expr, vars)
       }
     })
     .led('<', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any) => {
-        return obj[left] < expr
+      validateSymbol(expr)
+
+      return (obj: any, vars: object) => {
+        return resolveValue(obj, left) < resolveSymbol(expr, vars)
       }
     })
+    .led('<=', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
+      validateSymbol(expr)
+
+      return (obj: any, vars: object) => {
+        return resolveValue(obj, left) <= resolveSymbol(expr, vars)
+      }
+    })
+    .led('IS', 20, ({ left, bp }) => {
+      let invert = false
+
+      // Peek if this is a `is not` statement
+      const next = lexer.peek()
+      if (next.type == 'NOT') {
+        invert = true
+        lexer.next()
+      }
+
+      const expr: any = parser.parse({ terminals: [bp - 1] })
+
+      switch (expr) {
+        case 'empty': {
+          if (!invert) {
+            return (obj: any, vars: VariableMap) => {
+              const val = resolveValue(obj, left)
+              return val.length == 0
+            }
+          } else {
+            return (obj: any, vars: VariableMap) => {
+              const val = resolveValue(obj, left)
+              return val.length != 0
+            }
+          }
+        }
+        case 'defined': {
+          if (!invert) {
+            return (obj: any, vars: VariableMap) => {
+              const val = resolveValue(obj, left)
+              return val !== undefined
+            }
+          } else {
+            return (obj: any, vars: VariableMap) => {
+              const val = resolveValue(obj, left)
+              return val === undefined
+            }
+          }
+        }
+        default: {
+          throw new Error('Unexpected')
+        }
+      }
+    })
+    .led('IN', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
+      return (obj: any, vars: object) => {
+        const array = expr.map((item: Symbol) => resolveSymbol(item, vars))
+        return array.includes(resolveValue(obj, left))
+      }
+    })
+    .led('MATCHES_IGNORE_CASE', 20, ({ left, bp }) => {
+      const expr = parser.parse({ terminals: [bp - 1] })
+      validateSymbol(expr)
+
+      return (obj: any, vars: VariableMap) => {
+        const value =resolveValue(obj, left)
+        const other = resolveSymbol(expr, vars)
+
+        if (typeof value != "string") {
+          throw new PredicateError(`The field '${left.value}' does not support this expression.`)
+        }
+        return value.toLowerCase() === other.toLowerCase()
+      }
+    })
+    .led('WITHIN', 20, ({ left, bp }) => {
+      const type = lexer.next()
+
+      if (type.match != 'circle') {
+        throw new PredicateError(
+          `Invalid input '${type.match}', expected circle`
+        )
+      }
+
+      lexer.expect('(')
+      const expr = parser.parse({ terminals: [')'] })
+
+      return (obj: any, vars: object) => {
+        const value = resolveValue(obj, left)
+        if (!value) return false
+
+        const maxDistance = resolveSymbol(expr[2], vars)
+        const distance = haversineDistance(
+          {
+            longitude: value[0],
+            latitude: value[1],
+          },
+          {
+            longitude: resolveSymbol(expr[0], vars),
+            latitude: resolveSymbol(expr[1], vars),
+          }
+        )
+        return distance <= maxDistance
+      }
+    })
+    .led('CONTAINS', 20, ({ left, bp }) => {
+      const keyword = lexer.next()
+
+      let expr = parser.parse()
+      if (!Array.isArray(expr)) {
+        expr = [expr]
+      }
+
+      return (obj: any, vars: object) => {
+        const value = resolveValue(obj, left)
+
+        if (!Array.isArray(value)) {
+          throw new PredicateError(
+            `The field '${left.value}' does not support this expression.`
+          )
+        }
+
+        const array = expr.map((item: Symbol) => resolveSymbol(item, vars))
+        if (keyword.type == 'ALL') {
+          return array.every((item: any) => value.includes(item))
+        } else {
+          return array.some((item: any) => value.includes(item))
+        }
+      }
+    })
+
     .build()
 
-  return parser.parse()
+  const result = parser.parse()
+
+  if (typeof result !== 'function') {
+    const lines = predicate.split('\n')
+    const column = lines[lines.length - 1].length
+
+    throw new PredicateError(
+      `Unexpected end of input, expected SphereIdentifierChar, comparison ` +
+        `operator, not, in, contains, is, within or matches` +
+        ` (line ${lines.length}, column ${column})`
+    )
+  }
+  return result
 }

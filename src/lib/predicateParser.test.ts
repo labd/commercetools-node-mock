@@ -1,98 +1,194 @@
-import { matchesPredicate } from './predicateParser'
+import { VariableMap } from '@commercetools/platform-sdk'
+import {
+  parseQueryExpression,
+  PredicateError,
+} from './predicateParser'
 
 describe('Predicate filter', () => {
-  const object = {
+  const exampleObject = {
     stringProperty: 'foobar',
     numberProperty: 1234,
-    myNestedValue: {
+    arrayProperty: ['foo', 'bar', 'nar'],
+    notDefined: undefined,
+    emptyArrayProperty: [],
+    nested: {
+      numberProperty: 1234,
       objectProperty: {
         stringProperty: 'foobar',
       },
     },
+
+    // Longitude, latitude
+    geoLocation: [5.110230209615395, 52.06969591642097],
   }
-  test('string value', async () => {
-    expect(matchesPredicate(`stringProperty="foobar"`, object)).toBeTruthy()
+
+  const match = (pattern: string | string[], vars?: VariableMap) => {
+    const matchFunc = parseQueryExpression(pattern)
+    return matchFunc(exampleObject, vars || {})
+  }
+
+  test('stringProperty = "foobar"', async () => {
+    expect(match(`stringProperty="foobar"`)).toBeTruthy()
+    expect(match(`stringProperty!="foobar"`)).toBeFalsy()
+
+    expect(match(`stringProperty=:val`, { val: 'foobar' })).toBeTruthy()
   })
 
-  test('lexer confusion', async () => {
-    expect(matchesPredicate(`orSomething="foobar"`, object)).toBeFalsy()
-    expect(matchesPredicate(`andSomething="foobar"`, object)).toBeFalsy()
+  test('stringProperty matches ignore case "foobar"', async () => {
+    expect(match(`stringProperty="FOObar"`)).toBeFalsy()
+    expect(match(`stringProperty matches ignore case "FOObar"`)).toBeTruthy()
+    expect(match(`stringProperty matches ignore case :val`, { val: 'fooBar' })).toBeTruthy()
   })
 
-  test('invalid predicate', async () => {
-    expect(matchesPredicate(`nonExisting=nomatch`, object)).toBeFalsy()
+  test('numberProperty = 1234', async () => {
+    expect(match(`numberProperty=1234`)).toBeTruthy()
+    expect(match(`numberProperty = 1234`)).toBeTruthy()
+    expect(match(`numberProperty=1230`)).toBeFalsy()
+    expect(match(`numberProperty = 1230`)).toBeFalsy()
+
+    expect(match(`numberProperty=:val`, { val: 1234 })).toBeTruthy()
   })
 
-  test('multiple string value', async () => {
+  test('numberProperty > ...', async () => {
+    expect(match(`numberProperty > 1233`)).toBeTruthy()
+    expect(match(`numberProperty > 1234`)).toBeFalsy()
+  })
+
+  test('numberProperty >= ...', async () => {
+    expect(match(`numberProperty >= 1234`)).toBeTruthy()
+    expect(match(`numberProperty >= 1235`)).toBeFalsy()
+  })
+  test('numberProperty < ...', async () => {
+    expect(match(`numberProperty < 1235`)).toBeTruthy()
+    expect(match(`numberProperty < 1234`)).toBeFalsy()
+  })
+
+  test('numberProperty <= ...', async () => {
+    expect(match(`numberProperty <= 1235`)).toBeTruthy()
+    expect(match(`numberProperty <= 1234`)).toBeTruthy()
+    expect(match(`numberProperty <= 1233`)).toBeFalsy()
+  })
+
+  test('numberPropery in (...)', async () => {
+    expect(match(`numberProperty in (1233, 1234, 1235)`)).toBeTruthy()
+  })
+
+  test('arrayProperty contains all (...)', async () => {
+    expect(match(`arrayProperty contains all ("foo", "bar")`)).toBeTruthy()
     expect(
-      matchesPredicate(
-        [`stringProperty="foobar"`, `numberProperty=1234`],
-        object
+      match(`arrayProperty contains all ("foo", "bar", "no!")`)
+    ).toBeFalsy()
+  })
+
+  test('arrayProperty is empty', async () => {
+    expect(match(`arrayProperty is empty`)).toBeFalsy()
+    expect(match(`arrayProperty is not empty`)).toBeTruthy()
+    expect(match(`emptyArrayProperty is empty`)).toBeTruthy()
+  })
+
+  test('property is defined', async () => {
+    expect(match(`notDefined is defined`)).toBeFalsy()
+    expect(match(`notDefined is not defined`)).toBeTruthy()
+
+    expect(match(`arrayProperty is defined`)).toBeTruthy()
+    expect(match(`arrayProperty is not defined`)).toBeFalsy()
+  })
+
+  test('arrayProperty contains any (...)', async () => {
+    expect(match(`arrayProperty contains any ("NO!")`)).toBeFalsy()
+    expect(match(`arrayProperty contains any ("foo", "bar")`)).toBeTruthy()
+    expect(
+      match(`arrayProperty contains any ("foo", "bar", "no!")`)
+    ).toBeTruthy()
+  })
+
+  test('geolocation within circle (...)', async () => {
+    expect(
+      match(
+        `geoLocation within circle(5.121310867198959, 52.09068804569714, 2500)`
       )
     ).toBeTruthy()
-
     expect(
-      matchesPredicate(
-        [`stringProperty="foobar"`, `numberProperty=1111`],
-        object
+      match(
+        `geoLocation within circle(5.121310867198959, 52.09068804569714, 2400)`
       )
     ).toBeFalsy()
   })
 
-  test('number value equals', async () => {
-    expect(matchesPredicate(`numberProperty=1234`, object)).toBeTruthy()
-    expect(matchesPredicate(`numberProperty = 1234`, object)).toBeTruthy()
+  test('negate any other conditional expression', async () => {
+    expect(match(`numberProperty = 1234`)).toBeTruthy()
+    expect(match(`not (numberProperty = 1234)`)).toBeFalsy()
+    expect(match(`not (numberProperty = 1235)`)).toBeTruthy()
+    expect(match(`not (numberProperty = 1235)`)).toBeTruthy()
+
+    expect(match(`nested(numberProperty=1234))`)).toBeTruthy()
+    expect(match(`nested(not(numberProperty=1230)))`)).toBeTruthy()
+    expect(match(`nested(not(numberProperty=1234)))`)).toBeFalsy()
   })
 
-  test('and clause', async () => {
+  test('and clause (implicit)', async () => {
     expect(
-      matchesPredicate(`numberProperty>1233 and numberProperty<1235`, object)
+      match([`stringProperty="foobar"`, `numberProperty=1234`])
     ).toBeTruthy()
+
     expect(
-      matchesPredicate(`numberProperty>1233 and numberProperty<1234`, object)
+      match([`stringProperty="foobar"`, `numberProperty=1111`])
     ).toBeFalsy()
+  })
+
+  test('and clause (explicit)', async () => {
+    expect(match(`numberProperty>1233 and numberProperty<1235`)).toBeTruthy()
+    expect(match(`numberProperty>1233 and numberProperty<1234`)).toBeFalsy()
   })
 
   test('or clause', async () => {
     expect(
-      matchesPredicate(
-        `numberProperty=1231 or numberProperty>54312 or numberProperty=1234`,
-        object
+      match(
+        `numberProperty=1231 or numberProperty>54312 or numberProperty=1234`
       )
     ).toBeTruthy()
+    expect(match(`numberProperty=1231 or numberProperty=1234`)).toBeTruthy()
+    expect(match(`numberProperty=1231 or (numberProperty=1234)`)).toBeTruthy()
+    expect(match(`numberProperty=1233 or numberProperty=1235`)).toBeFalsy()
+  })
+
+  test('or / and clause mixed', async () => {
     expect(
-      matchesPredicate(`numberProperty=1231 or numberProperty=1234`, object)
-    ).toBeTruthy()
-    expect(
-      matchesPredicate(`numberProperty=1231 or (numberProperty=1234)`, object)
-    ).toBeTruthy()
-    expect(
-      matchesPredicate(
-        `numberProperty=1234 and (numberProperty=1230 or (numberProperty=1234 or numberProperty=1235))`,
-        object
+      match(
+        `numberProperty=1234 and (numberProperty=1230 or (numberProperty=1234 or numberProperty=1235))`
       )
     ).toBeTruthy()
+  })
+  test('nested attribute access', async () => {
     expect(
-      matchesPredicate(`numberProperty=1233 or numberProperty=1235`, object)
-    ).toBeFalsy()
-  })
-
-  test('number value greater then', async () => {
-    expect(matchesPredicate(`numberProperty > 1233`, object)).toBeTruthy()
-    expect(matchesPredicate(`numberProperty > 1234`, object)).toBeFalsy()
-  })
-
-  test('number value lesser then', async () => {
-    expect(matchesPredicate(`numberProperty < 1235`, object)).toBeTruthy()
-    expect(matchesPredicate(`numberProperty < 1234`, object)).toBeFalsy()
-  })
-
-  test('nested string value', async () => {
-    expect(
-      matchesPredicate(
-        `myNestedValue(objectProperty(stringProperty="foobar"))`,
-        object
-      )
+      match(`nested(objectProperty(stringProperty="foobar"))`)
     ).toBeTruthy()
+  })
+
+  test('lexer confusion', async () => {
+    expect(() => match(`orSomething="foobar"`)).toThrow(PredicateError)
+    expect(() => match(`orSomething="foobar"`)).toThrow(
+      "The field 'orSomething' does not exist."
+    )
+
+    expect(() => match(`andSomething="foobar"`)).toThrow(PredicateError)
+    expect(() => match(`andSomething="foobar"`)).toThrow(
+      "The field 'andSomething' does not exist."
+    )
+  })
+
+  test('invalid predicate', async () => {
+    expect(() => match(`stringProperty=nomatch`)).toThrow(PredicateError)
+    expect(() => match(`stringProperty=nomatch`)).toThrow(
+      "Invalid input 'n', expected input parameter or primitive value (line 1, column 16)"
+    )
+    expect(() => match(`stringProperty`)).toThrow(PredicateError)
+  })
+})
+
+
+describe("Report parse errors", () => {
+  test("unexpect input", () => {
+    expect(() => parseQueryExpression("foo=bar")).toThrow(PredicateError)
   })
 })

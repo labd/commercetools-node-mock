@@ -58,14 +58,14 @@ describe('Order Query', () => {
     {
       const response = await supertest(ctMock.app)
         .get(`/dummy/orders`)
-        .query({ where: 'orderNumber=nomatch' })
+        .query({ where: 'orderNumber="nomatch"' })
       expect(response.status).toBe(200)
       expect(response.body.count).toBe(0)
     }
     {
       const response = await supertest(ctMock.app)
         .get(`/dummy/orders`)
-        .query({ where: 'orderNumber=foobar' })
+        .query({ where: 'orderNumber="foobar"' })
       expect(response.status).toBe(200)
       expect(response.body.count).toBe(1)
     }

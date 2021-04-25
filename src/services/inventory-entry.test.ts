@@ -39,7 +39,7 @@ describe('Inventory Entry Query', () => {
     {
       const response = await supertest(ctMock.app)
         .get(`/dummy/inventory`)
-        .query({ where: 'sku=unknown' })
+        .query({ where: 'sku="unknown"' })
       expect(response.status).toBe(200)
       expect(response.body.count).toBe(0)
     }
