@@ -23,6 +23,8 @@ export const matchesPredicate = (
 
 const generateMatchFunc = (predicate: string): MatchFunc => {
   const lexer = new perplex(predicate)
+    .token('is not', /is not/)
+    .token('is', /is/)
     .token('IDENTIFIER', /[-_A-Za-z0-9]+/)
     .token('LITERAL', /"((?:\\.|[^"\\])*)"/)
     .token('LITERAL', /'((?:\\.|[^'\\])*)'/)
@@ -70,6 +72,29 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       const expr = parser.parse()
       return (obj: any) => {
         return obj[left.left] < expr
+      }
+    })
+    .led('is not', 20, left => {
+      const expr = parser.parse()
+      return (obj: any) => {
+        switch(expr) {
+          case 'defined':
+            // eslint-disable-next-line eqeqeq
+            return !(left.left in obj) || obj[left.left] == undefined
+          default:
+            throw new Error(`Failed to parse is expression ${expr}, expected 'defined' or 'not defined'`)
+        }
+      }
+    })
+    .led('is', 20, left => {
+      const expr = parser.parse()
+      return (obj: any) => {
+        switch(expr) {
+          case 'defined':
+            return (left.left in obj) && obj[left.left] != undefined
+          default:
+            throw new Error(`Failed to parse is expression ${expr}, expected 'defined' or 'not defined'`)
+        }
       }
     })
     .bp(')', 0)

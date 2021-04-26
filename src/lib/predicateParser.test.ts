@@ -53,4 +53,41 @@ describe('Predicate filter', () => {
       )
     ).toBeTruthy()
   })
+
+  test('is defined known property', async () => {
+    expect(
+      matchesPredicate(
+        `numberProperty is defined`,
+        object
+      )
+    ).toBeTruthy()
+  })
+
+  test('is defined unknown property', async () => {
+   expect(
+      matchesPredicate(
+        `unknownProperty is defined`,
+        object
+      )
+    ).toBeFalsy()
+  })
+
+  test('is not defined known property', async () => {
+    expect(
+      matchesPredicate(
+        `numberProperty is not defined`,
+        object
+      )
+    ).toBeFalsy()
+
+  })
+
+  test('is not defined unknown property', async () => {
+   expect(
+      matchesPredicate(
+        `unknownProperty is not defined`,
+        object
+      )
+    ).toBeTruthy()
+  })
 })
