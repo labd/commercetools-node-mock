@@ -93,7 +93,7 @@ const resolveValue = (obj: any, val: Symbol): any => {
   }
 
   if (!(val.value in obj)) {
-    throw new PredicateError(`The field '${val.value}' does not exist.`)
+    return undefined
   }
 
   return obj[val.value]

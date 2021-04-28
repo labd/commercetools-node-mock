@@ -164,16 +164,8 @@ describe('Predicate filter', () => {
     ).toBeTruthy()
   })
 
-  test('lexer confusion', async () => {
-    expect(() => match(`orSomething="foobar"`)).toThrow(PredicateError)
-    expect(() => match(`orSomething="foobar"`)).toThrow(
-      "The field 'orSomething' does not exist."
-    )
-
-    expect(() => match(`andSomething="foobar"`)).toThrow(PredicateError)
-    expect(() => match(`andSomething="foobar"`)).toThrow(
-      "The field 'andSomething' does not exist."
-    )
+  test('unknown attributes are not matched', async () => {
+    expect(match(`orSomething="foobar"`)).toBeFalsy()
   })
 
   test('invalid predicate', async () => {
@@ -182,6 +174,14 @@ describe('Predicate filter', () => {
       "Invalid input 'n', expected input parameter or primitive value (line 1, column 16)"
     )
     expect(() => match(`stringProperty`)).toThrow(PredicateError)
+  })
+
+  test('nested unknown attributes are not matched', async () => {
+    expect(match('unknownNested(fields(someProperty is defined))')).toBeFalsy()
+    // unknownNested does not exist
+    expect(
+      match('unknownNested(fields(someProperty is not defined))')
+    ).toBeFalsy()
   })
 })
 
