@@ -328,8 +328,15 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .led('IN', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       return (obj: any, vars: object) => {
-        const array = expr.map((item: Symbol) => resolveSymbol(item, vars))
-        return array.includes(resolveValue(obj, left))
+        let symbols = expr
+        if (!Array.isArray(symbols)) {
+          symbols = [expr]
+        }
+
+        const inValues = symbols.map((item: Symbol) =>
+          resolveSymbol(item, vars)
+        )
+        return inValues.includes(resolveValue(obj, left))
       }
     })
     .led('MATCHES_IGNORE_CASE', 20, ({ left, bp }) => {

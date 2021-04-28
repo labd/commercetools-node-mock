@@ -72,6 +72,10 @@ describe('Predicate filter', () => {
     expect(match(`numberProperty in (1233, 1234, 1235)`)).toBeTruthy()
   })
 
+  test('numberPropery in (...) single value', async () => {
+    expect(match(`numberProperty in (1234)`)).toBeTruthy()
+  })
+
   test('arrayProperty contains all (...)', async () => {
     expect(match(`arrayProperty contains all ("foo", "bar")`)).toBeTruthy()
     expect(
