@@ -4,14 +4,13 @@ import {
   ProductDraft,
   ProductPublishAction,
   ProductSetAttributeAction,
-  ProductVariant, ProductVariantDraft,
+  ProductVariant,
+  ProductVariantDraft,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import AbstractRepository from './abstract'
 import { Writable } from '../types'
-
-
 
 export class ProductRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -23,10 +22,13 @@ export class ProductRepository extends AbstractRepository {
       name: draft.name,
       slug: draft.slug,
       categories: [],
-      masterVariant: draft.masterVariant && variantFromDraft(0, draft.masterVariant!),
-      variants: draft.variants && draft.variants.map((variant, index) => {
-        return variantFromDraft(index + 1, variant)
-      }),
+      masterVariant:
+        draft.masterVariant && variantFromDraft(0, draft.masterVariant!),
+      variants:
+        draft.variants &&
+        draft.variants.map((variant, index) => {
+          return variantFromDraft(index + 1, variant)
+        }),
 
       // @ts-ignore
       searchKeywords: draft.searchKeywords,
@@ -70,7 +72,11 @@ export class ProductRepository extends AbstractRepository {
     ) => {
       const isStaged = staged !== undefined ? staged : false
       const productData = getProductData(resource, isStaged)
-      const [variant, isMasterVariant, variantIndex] = getVariant(productData, variantId, sku)
+      const { variant, isMasterVariant, variantIndex } = getVariant(
+        productData,
+        variantId,
+        sku
+      )
       if (!variant) {
         throw new Error(
           `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
@@ -160,11 +166,17 @@ const getProductData = (product: Product, staged: boolean) => {
   return product.masterData.staged
 }
 
+interface VariantResult {
+  variant: Writable<ProductVariant> | undefined
+  isMasterVariant: boolean
+  variantIndex: number
+}
+
 const getVariant = (
   productData: ProductData,
   variantId?: number,
   sku?: string
-): [Writable<ProductVariant | undefined>, boolean, number] => {
+): VariantResult => {
   const variants = [productData.masterVariant, ...productData.variants]
   const foundVariant = variants.find((variant: ProductVariant) => {
     if (variantId) {
@@ -177,10 +189,20 @@ const getVariant = (
   })
 
   const isMasterVariant = foundVariant === productData.masterVariant
-  return [foundVariant, isMasterVariant, !isMasterVariant && foundVariant ? productData.variants.indexOf(foundVariant) : -1]
+  return {
+    variant: foundVariant,
+    isMasterVariant,
+    variantIndex:
+      !isMasterVariant && foundVariant
+        ? productData.variants.indexOf(foundVariant)
+        : -1,
+  }
 }
 
-const variantFromDraft = (variantId: number, variant: ProductVariantDraft): ProductVariant => {
+const variantFromDraft = (
+  variantId: number,
+  variant: ProductVariantDraft
+): ProductVariant => {
   return {
     id: variantId,
     sku: variant?.sku,
