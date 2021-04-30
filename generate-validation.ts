@@ -14,14 +14,14 @@ addFormats(ajv)
 
 const modules = []
 
-const files = fs.readdirSync('./src/json-schemas')
+const files = fs.readdirSync('./json-schemas')
 files.forEach(file => {
-  const schema = require(`./src/json-schemas/${file}`)
+  const schema = require(`./json-schemas/${file}`)
   const [name] = file.split('.', 1)
   ajv.addSchema(schema, name + 'Schema')
 })
 
 ajv.getSchema("FieldTypeSchema")
 
-// let moduleCode = standaloneCode(ajv)
-// fs.writeFileSync(path.join(__dirname, 'src/validate.js'), moduleCode)
+let moduleCode = standaloneCode(ajv)
+fs.writeFileSync(path.join(__dirname, 'src/validate.js'), moduleCode)
