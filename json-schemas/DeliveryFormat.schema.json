@@ -1,0 +1,14 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/DeliveryCloudEventsFormat.schema.json"},
+    {"$ref": "https://example.com/DeliveryPlatformFormat.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DeliveryFormat",
+  "type": "object",
+  "properties": {"type": {"type": "string"}},
+  "required": ["type"],
+  "$id": "https://example.com/DeliveryFormat.schema.json",
+  "discriminator": {"propertyName": "type"}
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SubscriptionHealthStatus",
+  "type": "string",
+  "enum": [
+    "Healthy",
+    "ConfigurationError",
+    "ConfigurationErrorDeliveryStopped",
+    "TemporaryError"
+  ],
+  "$id": "https://example.com/SubscriptionHealthStatusEnum.schema.json"
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "SubRate",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "amount": {"type": "number"}
+  },
+  "required": [
+    "name",
+    "amount"
+  ],
+  "$id": "https://example.com/SubRate.schema.json"
+}

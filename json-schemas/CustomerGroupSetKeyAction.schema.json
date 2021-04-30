@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerGroupSetKeyAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setKey"]},
+    "key": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CustomerGroupSetKeyAction.schema.json"
+}

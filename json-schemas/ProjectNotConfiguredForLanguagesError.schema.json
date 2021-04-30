@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProjectNotConfiguredForLanguagesError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "languages": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "code": {"enum": ["ProjectNotConfiguredForLanguages"]}
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "$id": "https://example.com/ProjectNotConfiguredForLanguagesError.schema.json"
+}

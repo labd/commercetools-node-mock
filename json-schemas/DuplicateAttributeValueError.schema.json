@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DuplicateAttributeValueError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "code": {"enum": ["DuplicateAttributeValue"]},
+    "attribute": {"$ref": "Attribute.schema.json"}
+  },
+  "required": [
+    "code",
+    "message",
+    "attribute"
+  ],
+  "$id": "https://example.com/DuplicateAttributeValueError.schema.json"
+}

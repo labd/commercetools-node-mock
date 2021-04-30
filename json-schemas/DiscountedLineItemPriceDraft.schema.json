@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DiscountedLineItemPriceDraft",
+  "type": "object",
+  "properties": {
+    "includedDiscounts": {
+      "type": "array",
+      "items": {"$ref": "DiscountedLineItemPortion.schema.json"}
+    },
+    "value": {"$ref": "Money.schema.json"}
+  },
+  "required": [
+    "value",
+    "includedDiscounts"
+  ],
+  "$id": "https://example.com/DiscountedLineItemPriceDraft.schema.json"
+}

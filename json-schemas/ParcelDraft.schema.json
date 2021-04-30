@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ParcelDraft",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {"$ref": "DeliveryItem.schema.json"}
+    },
+    "measurements": {"$ref": "ParcelMeasurements.schema.json"},
+    "trackingData": {"$ref": "TrackingData.schema.json"}
+  },
+  "$id": "https://example.com/ParcelDraft.schema.json"
+}

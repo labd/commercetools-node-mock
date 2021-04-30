@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StateSetTransitionsAction",
+  "type": "object",
+  "properties": {
+    "transitions": {
+      "type": "array",
+      "items": {"$ref": "StateResourceIdentifier.schema.json"}
+    },
+    "action": {"enum": ["setTransitions"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/StateSetTransitionsAction.schema.json"
+}

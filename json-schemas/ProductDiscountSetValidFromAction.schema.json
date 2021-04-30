@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDiscountSetValidFromAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setValidFrom"]},
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ProductDiscountSetValidFromAction.schema.json"
+}

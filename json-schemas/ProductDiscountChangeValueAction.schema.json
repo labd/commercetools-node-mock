@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDiscountChangeValueAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeValue"]},
+    "value": {"$ref": "ProductDiscountValueDraft.schema.json"}
+  },
+  "required": [
+    "action",
+    "value"
+  ],
+  "$id": "https://example.com/ProductDiscountChangeValueAction.schema.json"
+}

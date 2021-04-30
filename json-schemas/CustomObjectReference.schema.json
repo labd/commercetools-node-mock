@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomObjectReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["key-value-document"]},
+    "obj": {"$ref": "CustomObject.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://example.com/CustomObjectReference.schema.json"
+}

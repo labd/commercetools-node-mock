@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetLineItemTotalPriceAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setLineItemTotalPrice"]},
+    "lineItemId": {"type": "string"},
+    "externalTotalPrice": {"$ref": "ExternalLineItemTotalPrice.schema.json"}
+  },
+  "required": [
+    "action",
+    "lineItemId"
+  ],
+  "$id": "https://example.com/StagedOrderSetLineItemTotalPriceAction.schema.json"
+}

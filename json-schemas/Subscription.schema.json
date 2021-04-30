@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Subscription",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "changes": {
+      "type": "array",
+      "items": {"$ref": "ChangeSubscription.schema.json"}
+    },
+    "destination": {"$ref": "Destination.schema.json"},
+    "format": {"$ref": "DeliveryFormat.schema.json"},
+    "messages": {
+      "type": "array",
+      "items": {"$ref": "MessageSubscription.schema.json"}
+    },
+    "id": {"type": "string"},
+    "version": {"type": "number"},
+    "key": {"type": "string"},
+    "status": {"$ref": "SubscriptionHealthStatusEnum.schema.json"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "changes",
+    "destination",
+    "messages",
+    "format",
+    "status"
+  ],
+  "$id": "https://example.com/Subscription.schema.json"
+}

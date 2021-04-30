@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerSetLastNameAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setLastName"]},
+    "lastName": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CustomerSetLastNameAction.schema.json"
+}

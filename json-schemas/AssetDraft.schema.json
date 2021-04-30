@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "AssetDraft",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "sources": {
+      "type": "array",
+      "items": {"$ref": "AssetSource.schema.json"}
+    },
+    "key": {"type": "string"},
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": [
+    "sources",
+    "name"
+  ],
+  "$id": "https://example.com/AssetDraft.schema.json"
+}

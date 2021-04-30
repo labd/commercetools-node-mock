@@ -1,0 +1,13 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ParcelMeasurements",
+  "type": "object",
+  "properties": {
+    "weightInGram": {"type": "number"},
+    "widthInMillimeter": {"type": "number"},
+    "lengthInMillimeter": {"type": "number"},
+    "heightInMillimeter": {"type": "number"}
+  },
+  "$id": "https://example.com/ParcelMeasurements.schema.json"
+}

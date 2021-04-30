@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductRevertStagedVariantChangesAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["revertStagedVariantChanges"]},
+    "variantId": {"type": "number"}
+  },
+  "required": [
+    "action",
+    "variantId"
+  ],
+  "$id": "https://example.com/ProductRevertStagedVariantChangesAction.schema.json"
+}

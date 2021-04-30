@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategorySlugChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["CategorySlugChanged"]},
+    "oldSlug": {"$ref": "LocalizedString.schema.json"},
+    "slug": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "type",
+    "slug"
+  ],
+  "$id": "https://example.com/CategorySlugChangedMessagePayload.schema.json"
+}

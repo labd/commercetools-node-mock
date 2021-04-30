@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Store",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "supplyChannels": {
+      "type": "array",
+      "items": {"$ref": "ChannelReference.schema.json"}
+    },
+    "languages": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "distributionChannels": {
+      "type": "array",
+      "items": {"$ref": "ChannelReference.schema.json"}
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "id": {"type": "string"},
+    "version": {"type": "number"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "key",
+    "distributionChannels"
+  ],
+  "$id": "https://example.com/Store.schema.json"
+}

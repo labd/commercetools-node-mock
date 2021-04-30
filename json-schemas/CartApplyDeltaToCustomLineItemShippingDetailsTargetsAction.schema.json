@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartApplyDeltaToCustomLineItemShippingDetailsTargetsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["applyDeltaToCustomLineItemShippingDetailsTargets"]},
+    "customLineItemId": {"type": "string"},
+    "targetsDelta": {
+      "type": "array",
+      "items": {"$ref": "ItemShippingTarget.schema.json"}
+    }
+  },
+  "required": [
+    "action",
+    "customLineItemId",
+    "targetsDelta"
+  ],
+  "$id": "https://example.com/CartApplyDeltaToCustomLineItemShippingDetailsTargetsAction.schema.json"
+}

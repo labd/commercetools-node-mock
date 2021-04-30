@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ChannelDraft",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "Address.schema.json"},
+    "geoLocation": {"$ref": "GeoJson.schema.json"},
+    "roles": {
+      "type": "array",
+      "items": {"$ref": "ChannelRoleEnumEnum.schema.json"}
+    },
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "key": {"type": "string"}
+  },
+  "required": ["key"],
+  "$id": "https://example.com/ChannelDraft.schema.json"
+}

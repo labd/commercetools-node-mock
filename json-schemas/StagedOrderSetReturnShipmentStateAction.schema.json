@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetReturnShipmentStateAction",
+  "type": "object",
+  "properties": {
+    "shipmentState": {"$ref": "ReturnShipmentStateEnum.schema.json"},
+    "action": {"enum": ["setReturnShipmentState"]},
+    "returnItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "returnItemId",
+    "shipmentState"
+  ],
+  "$id": "https://example.com/StagedOrderSetReturnShipmentStateAction.schema.json"
+}

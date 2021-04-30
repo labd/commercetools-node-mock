@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExternalOAuth",
+  "type": "object",
+  "properties": {
+    "url": {"type": "string"},
+    "authorizationHeader": {"type": "string"}
+  },
+  "required": [
+    "url",
+    "authorizationHeader"
+  ],
+  "$id": "https://example.com/ExternalOAuth.schema.json"
+}

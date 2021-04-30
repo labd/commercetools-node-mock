@@ -1,0 +1,27 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReviewDraft",
+  "type": "object",
+  "properties": {
+    "uniquenessValue": {"type": "string"},
+    "authorName": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "rating": {"type": "number"},
+    "text": {"type": "string"},
+    "state": {"$ref": "StateResourceIdentifier.schema.json"},
+    "locale": {"type": "string"},
+    "title": {"type": "string"},
+    "key": {"type": "string"},
+    "target": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "customer": {"$ref": "CustomerResourceIdentifier.schema.json"}
+  },
+  "$id": "https://example.com/ReviewDraft.schema.json"
+}

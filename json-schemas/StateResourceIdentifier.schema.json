@@ -1,0 +1,12 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StateResourceIdentifier",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["state"]},
+    "key": {"type": "string"},
+    "id": {"type": "string"}
+  },
+  "$id": "https://example.com/StateResourceIdentifier.schema.json"
+}

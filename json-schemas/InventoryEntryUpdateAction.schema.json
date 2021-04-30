@@ -1,0 +1,20 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/InventoryEntryAddQuantityAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntryChangeQuantityAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntryRemoveQuantityAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntrySetCustomFieldAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntrySetCustomTypeAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntrySetExpectedDeliveryAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntrySetRestockableInDaysAction.schema.json"},
+    {"$ref": "https://example.com/InventoryEntrySetSupplyChannelAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "InventoryEntryUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/InventoryEntryUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

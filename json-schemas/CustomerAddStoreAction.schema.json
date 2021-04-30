@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerAddStoreAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addStore"]},
+    "store": {"$ref": "StoreResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "store"
+  ],
+  "$id": "https://example.com/CustomerAddStoreAction.schema.json"
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeAddPlainEnumValueAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addPlainEnumValue"]},
+    "value": {"$ref": "AttributePlainEnumValue.schema.json"},
+    "attributeName": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "value"
+  ],
+  "$id": "https://example.com/ProductTypeAddPlainEnumValueAction.schema.json"
+}

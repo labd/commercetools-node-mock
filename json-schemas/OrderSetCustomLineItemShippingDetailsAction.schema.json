@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetCustomLineItemShippingDetailsAction",
+  "type": "object",
+  "properties": {
+    "shippingDetails": {"$ref": "ItemShippingDetailsDraft.schema.json"},
+    "action": {"enum": ["setCustomLineItemShippingDetails"]},
+    "customLineItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "customLineItemId"
+  ],
+  "$id": "https://example.com/OrderSetCustomLineItemShippingDetailsAction.schema.json"
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DuplicatePriceScopeError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "conflictingPrices": {
+      "type": "array",
+      "items": {"$ref": "Price.schema.json"}
+    },
+    "code": {"enum": ["DuplicatePriceScope"]}
+  },
+  "required": [
+    "code",
+    "message",
+    "conflictingPrices"
+  ],
+  "$id": "https://example.com/DuplicatePriceScopeError.schema.json"
+}

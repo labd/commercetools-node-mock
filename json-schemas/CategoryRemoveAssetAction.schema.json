@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategoryRemoveAssetAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeAsset"]},
+    "assetId": {"type": "string"},
+    "assetKey": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CategoryRemoveAssetAction.schema.json"
+}

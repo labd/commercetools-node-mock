@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderChangePaymentStateAction",
+  "type": "object",
+  "properties": {
+    "paymentState": {"$ref": "PaymentStateEnum.schema.json"},
+    "action": {"enum": ["changePaymentState"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/OrderChangePaymentStateAction.schema.json"
+}

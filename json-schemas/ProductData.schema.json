@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductData",
+  "type": "object",
+  "properties": {
+    "categoryOrderHints": {"$ref": "CategoryOrderHints.schema.json"},
+    "metaKeywords": {"$ref": "LocalizedString.schema.json"},
+    "searchKeywords": {"$ref": "SearchKeywords.schema.json"},
+    "metaTitle": {"$ref": "LocalizedString.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "categories": {
+      "type": "array",
+      "items": {"$ref": "CategoryReference.schema.json"}
+    },
+    "masterVariant": {"$ref": "ProductVariant.schema.json"},
+    "variants": {
+      "type": "array",
+      "items": {"$ref": "ProductVariant.schema.json"}
+    },
+    "metaDescription": {"$ref": "LocalizedString.schema.json"},
+    "slug": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "name",
+    "categories",
+    "slug",
+    "masterVariant",
+    "variants",
+    "searchKeywords"
+  ],
+  "$id": "https://example.com/ProductData.schema.json"
+}

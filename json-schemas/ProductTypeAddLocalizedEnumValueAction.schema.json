@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeAddLocalizedEnumValueAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addLocalizedEnumValue"]},
+    "value": {"$ref": "AttributeLocalizedEnumValue.schema.json"},
+    "attributeName": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "value"
+  ],
+  "$id": "https://example.com/ProductTypeAddLocalizedEnumValueAction.schema.json"
+}

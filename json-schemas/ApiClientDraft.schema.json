@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ApiClientDraft",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "deleteDaysAfterCreation": {"type": "number"},
+    "scope": {"type": "string"}
+  },
+  "required": [
+    "name",
+    "scope"
+  ],
+  "$id": "https://example.com/ApiClientDraft.schema.json"
+}

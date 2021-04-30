@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderCreatedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderCreated"]},
+    "order": {"$ref": "Order.schema.json"}
+  },
+  "required": [
+    "type",
+    "order"
+  ],
+  "$id": "https://example.com/OrderCreatedMessagePayload.schema.json"
+}

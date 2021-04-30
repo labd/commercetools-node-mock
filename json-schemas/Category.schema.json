@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Category",
+  "type": "object",
+  "properties": {
+    "parent": {"$ref": "CategoryReference.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "externalId": {"type": "string"},
+    "version": {"type": "number"},
+    "metaDescription": {"$ref": "LocalizedString.schema.json"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metaKeywords": {"$ref": "LocalizedString.schema.json"},
+    "assets": {
+      "type": "array",
+      "items": {"$ref": "Asset.schema.json"}
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "orderHint": {"type": "string"},
+    "metaTitle": {"$ref": "LocalizedString.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "id": {"type": "string"},
+    "ancestors": {
+      "type": "array",
+      "items": {"$ref": "CategoryReference.schema.json"}
+    },
+    "slug": {"$ref": "LocalizedString.schema.json"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "name",
+    "slug",
+    "ancestors",
+    "orderHint"
+  ],
+  "$id": "https://example.com/Category.schema.json"
+}

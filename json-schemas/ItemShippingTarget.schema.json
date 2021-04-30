@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ItemShippingTarget",
+  "type": "object",
+  "properties": {
+    "addressKey": {"type": "string"},
+    "quantity": {"type": "number"}
+  },
+  "required": [
+    "addressKey",
+    "quantity"
+  ],
+  "$id": "https://example.com/ItemShippingTarget.schema.json"
+}

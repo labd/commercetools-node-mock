@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "AttributeDefinitionDraft",
+  "type": "object",
+  "properties": {
+    "isRequired": {"type": "boolean"},
+    "name": {"type": "string"},
+    "attributeConstraint": {"$ref": "AttributeConstraintEnumEnum.schema.json"},
+    "inputHint": {"$ref": "TextInputHintEnum.schema.json"},
+    "label": {"$ref": "LocalizedString.schema.json"},
+    "isSearchable": {"type": "boolean"},
+    "type": {"$ref": "AttributeType.schema.json"},
+    "inputTip": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "type",
+    "name",
+    "label",
+    "isRequired"
+  ],
+  "$id": "https://example.com/AttributeDefinitionDraft.schema.json"
+}

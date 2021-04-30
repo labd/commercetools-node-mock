@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "GraphQLErrorLocation",
+  "type": "object",
+  "properties": {
+    "column": {
+      "type": "number",
+      "format": "integer"
+    },
+    "line": {
+      "type": "number",
+      "format": "integer"
+    }
+  },
+  "required": [
+    "line",
+    "column"
+  ],
+  "$id": "https://example.com/GraphQLErrorLocation.schema.json"
+}

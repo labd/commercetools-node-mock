@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeSetInputTipAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setInputTip"]},
+    "attributeName": {"type": "string"},
+    "inputTip": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "action",
+    "attributeName"
+  ],
+  "$id": "https://example.com/ProductTypeSetInputTipAction.schema.json"
+}

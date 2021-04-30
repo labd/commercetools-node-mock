@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentDraft",
+  "type": "object",
+  "properties": {
+    "anonymousId": {"type": "string"},
+    "amountAuthorized": {"$ref": "Money.schema.json"},
+    "paymentMethodInfo": {"$ref": "PaymentMethodInfo.schema.json"},
+    "authorizedUntil": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "externalId": {"type": "string"},
+    "transactions": {
+      "type": "array",
+      "items": {"$ref": "TransactionDraft.schema.json"}
+    },
+    "amountPaid": {"$ref": "Money.schema.json"},
+    "amountPlanned": {"$ref": "Money.schema.json"},
+    "amountRefunded": {"$ref": "Money.schema.json"},
+    "interfaceInteractions": {
+      "type": "array",
+      "items": {"$ref": "CustomFieldsDraft.schema.json"}
+    },
+    "interfaceId": {"type": "string"},
+    "paymentStatus": {"$ref": "PaymentStatusDraft.schema.json"},
+    "key": {"type": "string"},
+    "customer": {"$ref": "CustomerResourceIdentifier.schema.json"}
+  },
+  "required": ["amountPlanned"],
+  "$id": "https://example.com/PaymentDraft.schema.json"
+}

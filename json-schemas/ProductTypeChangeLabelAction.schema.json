@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeChangeLabelAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeLabel"]},
+    "attributeName": {"type": "string"},
+    "label": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "label"
+  ],
+  "$id": "https://example.com/ProductTypeChangeLabelAction.schema.json"
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StateTypeEnum",
+  "type": "string",
+  "enum": [
+    "OrderState",
+    "LineItemState",
+    "ProductState",
+    "ReviewState",
+    "PaymentState"
+  ],
+  "$id": "https://example.com/StateTypeEnumEnum.schema.json"
+}

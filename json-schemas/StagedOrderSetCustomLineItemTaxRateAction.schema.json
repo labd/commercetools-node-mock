@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetCustomLineItemTaxRateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setCustomLineItemTaxRate"]},
+    "customLineItemId": {"type": "string"},
+    "externalTaxRate": {"$ref": "ExternalTaxRateDraft.schema.json"}
+  },
+  "required": [
+    "action",
+    "customLineItemId"
+  ],
+  "$id": "https://example.com/StagedOrderSetCustomLineItemTaxRateAction.schema.json"
+}

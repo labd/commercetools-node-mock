@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerChangeAddressAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeAddress"]},
+    "address": {"$ref": "Address.schema.json"},
+    "addressKey": {"type": "string"},
+    "addressId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "address"
+  ],
+  "$id": "https://example.com/CustomerChangeAddressAction.schema.json"
+}

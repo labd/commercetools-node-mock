@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDeletedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ProductDeleted"]},
+    "currentProjection": {"$ref": "ProductProjection.schema.json"},
+    "removedImageUrls": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "type",
+    "removedImageUrls",
+    "currentProjection"
+  ],
+  "$id": "https://example.com/ProductDeletedMessagePayload.schema.json"
+}

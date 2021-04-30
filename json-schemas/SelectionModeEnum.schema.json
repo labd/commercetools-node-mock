@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SelectionMode",
+  "type": "string",
+  "enum": [
+    "Cheapest",
+    "MostExpensive"
+  ],
+  "$id": "https://example.com/SelectionModeEnum.schema.json"
+}

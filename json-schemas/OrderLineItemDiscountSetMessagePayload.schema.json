@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderLineItemDiscountSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderLineItemDiscountSet"]},
+    "lineItemId": {"type": "string"},
+    "discountedPricePerQuantity": {
+      "type": "array",
+      "items": {"$ref": "DiscountedLineItemPriceForQuantity.schema.json"}
+    },
+    "totalPrice": {"$ref": "Money.schema.json"},
+    "taxedPrice": {"$ref": "TaxedItemPrice.schema.json"}
+  },
+  "required": [
+    "type",
+    "lineItemId",
+    "discountedPricePerQuantity",
+    "totalPrice"
+  ],
+  "$id": "https://example.com/OrderLineItemDiscountSetMessagePayload.schema.json"
+}

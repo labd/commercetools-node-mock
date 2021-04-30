@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCustomerChangeEmailAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeEmail"]},
+    "email": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "email"
+  ],
+  "$id": "https://example.com/MyCustomerChangeEmailAction.schema.json"
+}

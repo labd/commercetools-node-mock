@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetOrderNumberAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setOrderNumber"]},
+    "orderNumber": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/OrderSetOrderNumberAction.schema.json"
+}

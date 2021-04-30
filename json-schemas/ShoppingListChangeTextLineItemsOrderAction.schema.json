@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListChangeTextLineItemsOrderAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeTextLineItemsOrder"]},
+    "textLineItemOrder": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "action",
+    "textLineItemOrder"
+  ],
+  "$id": "https://example.com/ShoppingListChangeTextLineItemsOrderAction.schema.json"
+}

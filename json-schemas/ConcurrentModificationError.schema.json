@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ConcurrentModificationError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "currentVersion": {"type": "number"},
+    "code": {"enum": ["ConcurrentModification"]}
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "$id": "https://example.com/ConcurrentModificationError.schema.json"
+}

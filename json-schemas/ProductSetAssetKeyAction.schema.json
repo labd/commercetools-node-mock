@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductSetAssetKeyAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setAssetKey"]},
+    "variantId": {"type": "number"},
+    "staged": {"type": "boolean"},
+    "sku": {"type": "string"},
+    "assetId": {"type": "string"},
+    "assetKey": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "assetId"
+  ],
+  "$id": "https://example.com/ProductSetAssetKeyAction.schema.json"
+}

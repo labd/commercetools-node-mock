@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExtensionAWSLambdaDestination",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["AWSLambda"]},
+    "arn": {"type": "string"},
+    "accessKey": {"type": "string"},
+    "accessSecret": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "arn",
+    "accessKey",
+    "accessSecret"
+  ],
+  "$id": "https://example.com/ExtensionAWSLambdaDestination.schema.json"
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductSetProductPriceCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setProductPriceCustomField"]},
+    "staged": {"type": "boolean"},
+    "priceId": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
+  },
+  "required": [
+    "action",
+    "priceId",
+    "name"
+  ],
+  "$id": "https://example.com/ProductSetProductPriceCustomFieldAction.schema.json"
+}

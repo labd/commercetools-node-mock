@@ -1,0 +1,41 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/CartDiscountReference.schema.json"},
+    {"$ref": "https://example.com/CartReference.schema.json"},
+    {"$ref": "https://example.com/CategoryReference.schema.json"},
+    {"$ref": "https://example.com/ChannelReference.schema.json"},
+    {"$ref": "https://example.com/CustomObjectReference.schema.json"},
+    {"$ref": "https://example.com/CustomerGroupReference.schema.json"},
+    {"$ref": "https://example.com/CustomerReference.schema.json"},
+    {"$ref": "https://example.com/DiscountCodeReference.schema.json"},
+    {"$ref": "https://example.com/InventoryEntryReference.schema.json"},
+    {"$ref": "https://example.com/OrderEditReference.schema.json"},
+    {"$ref": "https://example.com/OrderReference.schema.json"},
+    {"$ref": "https://example.com/PaymentReference.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountReference.schema.json"},
+    {"$ref": "https://example.com/ProductTypeReference.schema.json"},
+    {"$ref": "https://example.com/ProductReference.schema.json"},
+    {"$ref": "https://example.com/ReviewReference.schema.json"},
+    {"$ref": "https://example.com/ShippingMethodReference.schema.json"},
+    {"$ref": "https://example.com/ShoppingListReference.schema.json"},
+    {"$ref": "https://example.com/StateReference.schema.json"},
+    {"$ref": "https://example.com/StoreReference.schema.json"},
+    {"$ref": "https://example.com/TaxCategoryReference.schema.json"},
+    {"$ref": "https://example.com/TypeReference.schema.json"},
+    {"$ref": "https://example.com/ZoneReference.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Reference",
+  "type": "object",
+  "properties": {
+    "typeId": {"$ref": "ReferenceTypeIdEnum.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://example.com/Reference.schema.json",
+  "discriminator": {"propertyName": "typeId"}
+}

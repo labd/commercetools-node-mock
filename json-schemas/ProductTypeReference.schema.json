@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["product-type"]},
+    "obj": {"$ref": "ProductType.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://example.com/ProductTypeReference.schema.json"
+}

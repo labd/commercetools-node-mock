@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StateSetRolesAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setRoles"]},
+    "roles": {
+      "type": "array",
+      "items": {"$ref": "StateRoleEnumEnum.schema.json"}
+    }
+  },
+  "required": [
+    "action",
+    "roles"
+  ],
+  "$id": "https://example.com/StateSetRolesAction.schema.json"
+}

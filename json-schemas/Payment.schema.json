@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Payment",
+  "type": "object",
+  "properties": {
+    "anonymousId": {"type": "string"},
+    "amountAuthorized": {"$ref": "TypedMoney.schema.json"},
+    "paymentMethodInfo": {"$ref": "PaymentMethodInfo.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "authorizedUntil": {"type": "string"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "externalId": {"type": "string"},
+    "transactions": {
+      "type": "array",
+      "items": {"$ref": "Transaction.schema.json"}
+    },
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "amountPaid": {"$ref": "TypedMoney.schema.json"},
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "amountPlanned": {"$ref": "TypedMoney.schema.json"},
+    "amountRefunded": {"$ref": "TypedMoney.schema.json"},
+    "interfaceInteractions": {
+      "type": "array",
+      "items": {"$ref": "CustomFields.schema.json"}
+    },
+    "id": {"type": "string"},
+    "interfaceId": {"type": "string"},
+    "paymentStatus": {"$ref": "PaymentStatus.schema.json"},
+    "key": {"type": "string"},
+    "customer": {"$ref": "CustomerReference.schema.json"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "amountPlanned",
+    "paymentMethodInfo",
+    "paymentStatus",
+    "transactions",
+    "interfaceInteractions"
+  ],
+  "$id": "https://example.com/Payment.schema.json"
+}

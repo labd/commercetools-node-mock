@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderStateChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderStateChanged"]},
+    "orderState": {"$ref": "OrderStateEnum.schema.json"},
+    "oldOrderState": {"$ref": "OrderStateEnum.schema.json"}
+  },
+  "required": [
+    "type",
+    "orderState",
+    "oldOrderState"
+  ],
+  "$id": "https://example.com/OrderStateChangedMessagePayload.schema.json"
+}

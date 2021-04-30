@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderReturnShipmentStateChangedMessage",
+  "type": "object",
+  "properties": {
+    "sequenceNumber": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "returnItemId": {"type": "string"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "type": {"enum": ["OrderReturnShipmentStateChanged"]},
+    "version": {"type": "number"},
+    "returnShipmentState": {"$ref": "ReturnShipmentStateEnum.schema.json"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "returnItemId",
+    "returnShipmentState"
+  ],
+  "$id": "https://example.com/OrderReturnShipmentStateChangedMessage.schema.json"
+}

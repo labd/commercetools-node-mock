@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductChangeMasterVariantAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeMasterVariant"]},
+    "variantId": {"type": "number"},
+    "staged": {"type": "boolean"},
+    "sku": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ProductChangeMasterVariantAction.schema.json"
+}

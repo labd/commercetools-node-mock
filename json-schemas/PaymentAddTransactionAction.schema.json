@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentAddTransactionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addTransaction"]},
+    "transaction": {"$ref": "TransactionDraft.schema.json"}
+  },
+  "required": [
+    "action",
+    "transaction"
+  ],
+  "$id": "https://example.com/PaymentAddTransactionAction.schema.json"
+}

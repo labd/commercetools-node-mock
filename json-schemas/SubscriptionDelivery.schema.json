@@ -1,0 +1,25 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/MessageDelivery.schema.json"},
+    {"$ref": "https://example.com/ResourceCreatedDelivery.schema.json"},
+    {"$ref": "https://example.com/ResourceDeletedDelivery.schema.json"},
+    {"$ref": "https://example.com/ResourceUpdatedDelivery.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "SubscriptionDelivery",
+  "type": "object",
+  "properties": {
+    "projectKey": {"type": "string"},
+    "notificationType": {"type": "string"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"}
+  },
+  "required": [
+    "projectKey",
+    "notificationType",
+    "resource"
+  ],
+  "$id": "https://example.com/SubscriptionDelivery.schema.json",
+  "discriminator": {"propertyName": "notificationType"}
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ShipmentState",
+  "type": "string",
+  "enum": [
+    "Shipped",
+    "Ready",
+    "Pending",
+    "Delayed",
+    "Partial",
+    "Backorder"
+  ],
+  "$id": "https://example.com/ShipmentStateEnum.schema.json"
+}

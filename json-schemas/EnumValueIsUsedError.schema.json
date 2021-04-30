@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "EnumValueIsUsedError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "code": {"enum": ["EnumValueIsUsed"]}
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "$id": "https://example.com/EnumValueIsUsedError.schema.json"
+}

@@ -1,0 +1,24 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/ChannelAddRolesAction.schema.json"},
+    {"$ref": "https://example.com/ChannelChangeDescriptionAction.schema.json"},
+    {"$ref": "https://example.com/ChannelChangeKeyAction.schema.json"},
+    {"$ref": "https://example.com/ChannelChangeNameAction.schema.json"},
+    {"$ref": "https://example.com/ChannelRemoveRolesAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetAddressAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetAddressCustomFieldAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetAddressCustomTypeAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetCustomFieldAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetCustomTypeAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetGeoLocationAction.schema.json"},
+    {"$ref": "https://example.com/ChannelSetRolesAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ChannelUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/ChannelUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

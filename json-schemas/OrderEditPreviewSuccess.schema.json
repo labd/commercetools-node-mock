@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditPreviewSuccess",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["PreviewSuccess"]},
+    "preview": {"$ref": "StagedOrder.schema.json"},
+    "messagePayloads": {
+      "type": "array",
+      "items": {"$ref": "MessagePayload.schema.json"}
+    }
+  },
+  "required": [
+    "type",
+    "preview",
+    "messagePayloads"
+  ],
+  "$id": "https://example.com/OrderEditPreviewSuccess.schema.json"
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyPaymentDraft",
+  "type": "object",
+  "properties": {
+    "paymentMethodInfo": {"$ref": "PaymentMethodInfo.schema.json"},
+    "transaction": {"$ref": "MyTransactionDraft.schema.json"},
+    "amountPlanned": {"$ref": "Money.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": ["amountPlanned"],
+  "$id": "https://example.com/MyPaymentDraft.schema.json"
+}

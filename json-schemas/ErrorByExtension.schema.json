@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ErrorByExtension",
+  "type": "object",
+  "properties": {
+    "key": {"type": "string"},
+    "id": {"type": "string"}
+  },
+  "required": ["id"],
+  "$id": "https://example.com/ErrorByExtension.schema.json"
+}

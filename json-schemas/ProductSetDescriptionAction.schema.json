@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductSetDescriptionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setDescription"]},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "staged": {"type": "boolean"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ProductSetDescriptionAction.schema.json"
+}

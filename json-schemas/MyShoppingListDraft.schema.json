@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyShoppingListDraft",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "lineItems": {
+      "type": "array",
+      "items": {"$ref": "ShoppingListLineItemDraft.schema.json"}
+    },
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "textLineItems": {
+      "type": "array",
+      "items": {"$ref": "TextLineItemDraft.schema.json"}
+    },
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "deleteDaysAfterLastModification": {"type": "number"}
+  },
+  "required": ["name"],
+  "$id": "https://example.com/MyShoppingListDraft.schema.json"
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetLocaleAction",
+  "type": "object",
+  "properties": {
+    "locale": {"type": "string"},
+    "action": {"enum": ["setLocale"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/OrderSetLocaleAction.schema.json"
+}

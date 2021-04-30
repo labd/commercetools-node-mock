@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "TypeAddFieldDefinitionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addFieldDefinition"]},
+    "fieldDefinition": {"$ref": "FieldDefinition.schema.json"}
+  },
+  "required": [
+    "action",
+    "fieldDefinition"
+  ],
+  "$id": "https://example.com/TypeAddFieldDefinitionAction.schema.json"
+}

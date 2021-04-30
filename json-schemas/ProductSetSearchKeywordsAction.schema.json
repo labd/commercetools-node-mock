@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductSetSearchKeywordsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setSearchKeywords"]},
+    "searchKeywords": {"$ref": "SearchKeywords.schema.json"},
+    "staged": {"type": "boolean"}
+  },
+  "required": [
+    "action",
+    "searchKeywords"
+  ],
+  "$id": "https://example.com/ProductSetSearchKeywordsAction.schema.json"
+}

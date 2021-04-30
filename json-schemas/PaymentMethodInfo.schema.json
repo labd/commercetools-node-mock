@@ -1,0 +1,12 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaymentMethodInfo",
+  "type": "object",
+  "properties": {
+    "method": {"type": "string"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "paymentInterface": {"type": "string"}
+  },
+  "$id": "https://example.com/PaymentMethodInfo.schema.json"
+}

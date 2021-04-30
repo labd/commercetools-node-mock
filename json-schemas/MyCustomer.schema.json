@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCustomer",
+  "type": "object",
+  "properties": {
+    "lastName": {"type": "string"},
+    "addresses": {
+      "type": "array",
+      "items": {"$ref": "Address.schema.json"}
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "companyName": {"type": "string"},
+    "vatId": {"type": "string"},
+    "title": {"type": "string"},
+    "locale": {"type": "string"},
+    "shippingAddressIds": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "isEmailVerified": {"type": "boolean"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "password": {"type": "string"},
+    "id": {"type": "string"},
+    "email": {"type": "string"},
+    "key": {"type": "string"},
+    "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
+    "stores": {
+      "type": "array",
+      "items": {"$ref": "StoreKeyReference.schema.json"}
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "externalId": {"type": "string"},
+    "dateOfBirth": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "customerNumber": {"type": "string"},
+    "defaultShippingAddressId": {"type": "string"},
+    "billingAddressIds": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "version": {"type": "number"},
+    "defaultBillingAddressId": {"type": "string"},
+    "firstName": {"type": "string"},
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "middleName": {"type": "string"},
+    "salutation": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "email",
+    "password",
+    "addresses",
+    "isEmailVerified"
+  ],
+  "$id": "https://example.com/MyCustomer.schema.json"
+}

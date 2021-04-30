@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "InvalidItemShippingDetailsError",
+  "type": "object",
+  "properties": {
+    "itemId": {"type": "string"},
+    "code": {"enum": ["InvalidItemShippingDetails"]},
+    "message": {"type": "string"},
+    "subject": {"type": "string"}
+  },
+  "required": [
+    "code",
+    "message",
+    "subject",
+    "itemId"
+  ],
+  "$id": "https://example.com/InvalidItemShippingDetailsError.schema.json"
+}

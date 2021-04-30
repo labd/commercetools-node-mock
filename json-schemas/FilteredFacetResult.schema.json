@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "FilteredFacetResult",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["filter"]},
+    "count": {"type": "number"},
+    "productCount": {"type": "number"}
+  },
+  "required": [
+    "type",
+    "count"
+  ],
+  "$id": "https://example.com/FilteredFacetResult.schema.json"
+}

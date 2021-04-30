@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerEmailChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["CustomerEmailChanged"]},
+    "email": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "email"
+  ],
+  "$id": "https://example.com/CustomerEmailChangedMessagePayload.schema.json"
+}

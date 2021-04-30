@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditDraft",
+  "type": "object",
+  "properties": {
+    "stagedActions": {
+      "type": "array",
+      "items": {"$ref": "StagedOrderUpdateAction.schema.json"}
+    },
+    "comment": {"type": "string"},
+    "dryRun": {"type": "boolean"},
+    "resource": {"$ref": "OrderReference.schema.json"},
+    "key": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": ["resource"],
+  "$id": "https://example.com/OrderEditDraft.schema.json"
+}

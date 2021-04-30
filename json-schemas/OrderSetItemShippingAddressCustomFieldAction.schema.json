@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetItemShippingAddressCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setItemShippingAddressCustomField"]},
+    "addressKey": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
+  },
+  "required": [
+    "action",
+    "addressKey",
+    "name"
+  ],
+  "$id": "https://example.com/OrderSetItemShippingAddressCustomFieldAction.schema.json"
+}

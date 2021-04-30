@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartValueTier",
+  "type": "object",
+  "properties": {
+    "minimumCentAmount": {
+      "type": "number",
+      "format": "integer"
+    },
+    "type": {"enum": ["CartValue"]},
+    "isMatching": {"type": "boolean"},
+    "price": {"$ref": "Money.schema.json"}
+  },
+  "required": [
+    "type",
+    "minimumCentAmount",
+    "price"
+  ],
+  "$id": "https://example.com/CartValueTier.schema.json"
+}

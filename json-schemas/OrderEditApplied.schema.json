@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditApplied",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["Applied"]},
+    "excerptAfterEdit": {"$ref": "OrderExcerpt.schema.json"},
+    "appliedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "excerptBeforeEdit": {"$ref": "OrderExcerpt.schema.json"}
+  },
+  "required": [
+    "type",
+    "appliedAt",
+    "excerptBeforeEdit",
+    "excerptAfterEdit"
+  ],
+  "$id": "https://example.com/OrderEditApplied.schema.json"
+}

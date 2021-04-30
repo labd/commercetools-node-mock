@@ -1,0 +1,22 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/ProductDiscountChangeIsActiveAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountChangeNameAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountChangePredicateAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountChangeSortOrderAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountChangeValueAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountSetDescriptionAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountSetKeyAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountSetValidFromAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountSetValidFromAndUntilAction.schema.json"},
+    {"$ref": "https://example.com/ProductDiscountSetValidUntilAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDiscountUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/ProductDiscountUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

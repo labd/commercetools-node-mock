@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyPayment",
+  "type": "object",
+  "properties": {
+    "anonymousId": {"type": "string"},
+    "paymentMethodInfo": {"$ref": "PaymentMethodInfo.schema.json"},
+    "amountPlanned": {"$ref": "TypedMoney.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "id": {"type": "string"},
+    "transactions": {
+      "type": "array",
+      "items": {"$ref": "Transaction.schema.json"}
+    },
+    "version": {"type": "number"},
+    "customer": {"$ref": "CustomerReference.schema.json"}
+  },
+  "required": [
+    "id",
+    "version",
+    "amountPlanned",
+    "paymentMethodInfo",
+    "transactions"
+  ],
+  "$id": "https://example.com/MyPayment.schema.json"
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ScoreShippingRateInput",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["Score"]},
+    "score": {"type": "number"}
+  },
+  "required": [
+    "type",
+    "score"
+  ],
+  "$id": "https://example.com/ScoreShippingRateInput.schema.json"
+}

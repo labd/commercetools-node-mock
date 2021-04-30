@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DiscountCodeInfo",
+  "type": "object",
+  "properties": {
+    "discountCode": {"$ref": "DiscountCodeReference.schema.json"},
+    "state": {"$ref": "DiscountCodeStateEnum.schema.json"}
+  },
+  "required": [
+    "discountCode",
+    "state"
+  ],
+  "$id": "https://example.com/DiscountCodeInfo.schema.json"
+}

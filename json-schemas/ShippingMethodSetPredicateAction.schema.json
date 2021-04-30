@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingMethodSetPredicateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setPredicate"]},
+    "predicate": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ShippingMethodSetPredicateAction.schema.json"
+}

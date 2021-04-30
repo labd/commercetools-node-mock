@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PriceTierDraft",
+  "type": "object",
+  "properties": {
+    "minimumQuantity": {"type": "number"},
+    "value": {"$ref": "Money.schema.json"}
+  },
+  "required": [
+    "minimumQuantity",
+    "value"
+  ],
+  "$id": "https://example.com/PriceTierDraft.schema.json"
+}

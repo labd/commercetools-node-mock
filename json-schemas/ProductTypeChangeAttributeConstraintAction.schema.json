@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeChangeAttributeConstraintAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeAttributeConstraint"]},
+    "newValue": {"$ref": "AttributeConstraintEnumDraftEnum.schema.json"},
+    "attributeName": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "newValue"
+  ],
+  "$id": "https://example.com/ProductTypeChangeAttributeConstraintAction.schema.json"
+}

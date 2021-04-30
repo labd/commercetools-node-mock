@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StoreAddDistributionChannelAction",
+  "type": "object",
+  "properties": {
+    "distributionChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "action": {"enum": ["addDistributionChannel"]}
+  },
+  "required": [
+    "action",
+    "distributionChannel"
+  ],
+  "$id": "https://example.com/StoreAddDistributionChannelAction.schema.json"
+}

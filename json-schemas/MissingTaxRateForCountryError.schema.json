@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MissingTaxRateForCountryError",
+  "type": "object",
+  "properties": {
+    "country": {"type": "string"},
+    "code": {"enum": ["MissingTaxRateForCountry"]},
+    "state": {"type": "string"},
+    "message": {"type": "string"},
+    "taxCategoryId": {"type": "string"}
+  },
+  "required": [
+    "code",
+    "message",
+    "taxCategoryId"
+  ],
+  "$id": "https://example.com/MissingTaxRateForCountryError.schema.json"
+}

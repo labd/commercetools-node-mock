@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingMethodChangeTaxCategoryAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeTaxCategory"]},
+    "taxCategory": {"$ref": "TaxCategoryResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "taxCategory"
+  ],
+  "$id": "https://example.com/ShippingMethodChangeTaxCategoryAction.schema.json"
+}

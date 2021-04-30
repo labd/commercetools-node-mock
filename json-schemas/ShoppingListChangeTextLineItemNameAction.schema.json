@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListChangeTextLineItemNameAction",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "action": {"enum": ["changeTextLineItemName"]},
+    "textLineItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "textLineItemId",
+    "name"
+  ],
+  "$id": "https://example.com/ShoppingListChangeTextLineItemNameAction.schema.json"
+}

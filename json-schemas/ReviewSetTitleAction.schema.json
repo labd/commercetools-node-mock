@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ReviewSetTitleAction",
+  "type": "object",
+  "properties": {
+    "title": {"type": "string"},
+    "action": {"enum": ["setTitle"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ReviewSetTitleAction.schema.json"
+}

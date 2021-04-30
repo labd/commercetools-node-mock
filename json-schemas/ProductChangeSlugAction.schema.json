@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductChangeSlugAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeSlug"]},
+    "slug": {"$ref": "LocalizedString.schema.json"},
+    "staged": {"type": "boolean"}
+  },
+  "required": [
+    "action",
+    "slug"
+  ],
+  "$id": "https://example.com/ProductChangeSlugAction.schema.json"
+}

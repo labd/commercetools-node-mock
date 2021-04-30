@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyShoppingListAddLineItemAction",
+  "type": "object",
+  "properties": {
+    "addedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "quantity": {"type": "number"},
+    "productId": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "action": {"enum": ["addLineItem"]},
+    "variantId": {"type": "number"},
+    "sku": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/MyShoppingListAddLineItemAction.schema.json"
+}

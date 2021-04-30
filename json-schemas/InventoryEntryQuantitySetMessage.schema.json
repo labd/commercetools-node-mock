@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "InventoryEntryQuantitySetMessage",
+  "type": "object",
+  "properties": {
+    "sequenceNumber": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "oldQuantityOnStock": {"type": "number"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "type": {"enum": ["InventoryEntryQuantitySet"]},
+    "newQuantityOnStock": {"type": "number"},
+    "version": {"type": "number"},
+    "oldAvailableQuantity": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "newAvailableQuantity": {"type": "number"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "oldQuantityOnStock",
+    "newQuantityOnStock",
+    "oldAvailableQuantity",
+    "newAvailableQuantity"
+  ],
+  "$id": "https://example.com/InventoryEntryQuantitySetMessage.schema.json"
+}

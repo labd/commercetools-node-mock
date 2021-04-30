@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDiscountValueGiftLineItem",
+  "type": "object",
+  "properties": {
+    "supplyChannel": {"$ref": "ChannelReference.schema.json"},
+    "product": {"$ref": "ProductReference.schema.json"},
+    "variantId": {"type": "number"},
+    "type": {"enum": ["giftLineItem"]},
+    "distributionChannel": {"$ref": "ChannelReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "product",
+    "variantId"
+  ],
+  "$id": "https://example.com/CartDiscountValueGiftLineItem.schema.json"
+}

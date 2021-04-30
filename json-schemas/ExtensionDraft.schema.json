@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExtensionDraft",
+  "type": "object",
+  "properties": {
+    "destination": {"$ref": "ExtensionDestination.schema.json"},
+    "triggers": {
+      "type": "array",
+      "items": {"$ref": "ExtensionTrigger.schema.json"}
+    },
+    "key": {"type": "string"},
+    "timeoutInMs": {
+      "type": "number",
+      "format": "integer"
+    }
+  },
+  "required": [
+    "destination",
+    "triggers"
+  ],
+  "$id": "https://example.com/ExtensionDraft.schema.json"
+}

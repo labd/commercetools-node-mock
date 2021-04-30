@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerSetExternalIdAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setExternalId"]},
+    "externalId": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CustomerSetExternalIdAction.schema.json"
+}

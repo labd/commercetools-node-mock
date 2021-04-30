@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListSetDeleteDaysAfterLastModificationAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setDeleteDaysAfterLastModification"]},
+    "deleteDaysAfterLastModification": {"type": "number"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ShoppingListSetDeleteDaysAfterLastModificationAction.schema.json"
+}

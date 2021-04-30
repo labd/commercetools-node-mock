@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DeliveryItem",
+  "type": "object",
+  "properties": {
+    "id": {"type": "string"},
+    "quantity": {"type": "number"}
+  },
+  "required": [
+    "id",
+    "quantity"
+  ],
+  "$id": "https://example.com/DeliveryItem.schema.json"
+}

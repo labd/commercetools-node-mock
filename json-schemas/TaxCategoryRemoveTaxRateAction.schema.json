@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "TaxCategoryRemoveTaxRateAction",
+  "type": "object",
+  "properties": {
+    "taxRateId": {"type": "string"},
+    "action": {"enum": ["removeTaxRate"]}
+  },
+  "required": [
+    "action",
+    "taxRateId"
+  ],
+  "$id": "https://example.com/TaxCategoryRemoveTaxRateAction.schema.json"
+}

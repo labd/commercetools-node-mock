@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderReturnInfoAddedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ReturnInfoAdded"]},
+    "returnInfo": {"$ref": "ReturnInfo.schema.json"}
+  },
+  "required": [
+    "type",
+    "returnInfo"
+  ],
+  "$id": "https://example.com/OrderReturnInfoAddedMessagePayload.schema.json"
+}

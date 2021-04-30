@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDiscountValueRelative",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["relative"]},
+    "permyriad": {"type": "number"}
+  },
+  "required": [
+    "type",
+    "permyriad"
+  ],
+  "$id": "https://example.com/CartDiscountValueRelative.schema.json"
+}

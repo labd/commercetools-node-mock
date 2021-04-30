@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCartSetCountryAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setCountry"]},
+    "country": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/MyCartSetCountryAction.schema.json"
+}

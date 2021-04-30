@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeChangeAttributeNameAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeAttributeName"]},
+    "attributeName": {"type": "string"},
+    "newAttributeName": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "newAttributeName"
+  ],
+  "$id": "https://example.com/ProductTypeChangeAttributeNameAction.schema.json"
+}

@@ -1,0 +1,33 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/ProductTypeAddAttributeDefinitionAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeAddLocalizedEnumValueAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeAddPlainEnumValueAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeAttributeConstraintAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeAttributeNameAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeAttributeOrderAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeAttributeOrderByNameAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeDescriptionAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeEnumKeyAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeInputHintAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeIsSearchableAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeLabelAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeLocalizedEnumValueLabelAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeLocalizedEnumValueOrderAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangeNameAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangePlainEnumValueLabelAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeChangePlainEnumValueOrderAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeRemoveAttributeDefinitionAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeRemoveEnumValuesAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeSetInputTipAction.schema.json"},
+    {"$ref": "https://example.com/ProductTypeSetKeyAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/ProductTypeUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeChangeIsSearchableAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeIsSearchable"]},
+    "attributeName": {"type": "string"},
+    "isSearchable": {"type": "boolean"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "isSearchable"
+  ],
+  "$id": "https://example.com/ProductTypeChangeIsSearchableAction.schema.json"
+}

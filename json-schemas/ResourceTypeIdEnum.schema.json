@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResourceTypeId",
+  "type": "string",
+  "enum": [
+    "address",
+    "asset",
+    "category",
+    "channel",
+    "customer",
+    "order",
+    "order-edit",
+    "inventory-entry",
+    "line-item",
+    "custom-line-item",
+    "product-price",
+    "payment",
+    "payment-interface-interaction",
+    "review",
+    "shipping-method",
+    "shopping-list",
+    "shopping-list-text-line-item",
+    "discount-code",
+    "cart-discount",
+    "customer-group"
+  ],
+  "$id": "https://example.com/ResourceTypeIdEnum.schema.json"
+}

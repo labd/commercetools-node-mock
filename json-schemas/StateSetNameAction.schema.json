@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StateSetNameAction",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "action": {"enum": ["setName"]}
+  },
+  "required": [
+    "action",
+    "name"
+  ],
+  "$id": "https://example.com/StateSetNameAction.schema.json"
+}

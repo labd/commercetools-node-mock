@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "TaxPortion",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "rate": {"type": "number"},
+    "amount": {"$ref": "TypedMoney.schema.json"}
+  },
+  "required": [
+    "rate",
+    "amount"
+  ],
+  "$id": "https://example.com/TaxPortion.schema.json"
+}

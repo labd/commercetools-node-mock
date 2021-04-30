@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductPriceDiscountsSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ProductPriceDiscountsSet"]},
+    "updatedPrices": {
+      "type": "array",
+      "items": {"$ref": "ProductPriceDiscountsSetUpdatedPrice.schema.json"}
+    }
+  },
+  "required": [
+    "type",
+    "updatedPrices"
+  ],
+  "$id": "https://example.com/ProductPriceDiscountsSetMessagePayload.schema.json"
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductSetAssetCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "assetId": {"type": "string"},
+    "name": {"type": "string"},
+    "action": {"enum": ["setAssetCustomField"]},
+    "variantId": {"type": "number"},
+    "staged": {"type": "boolean"},
+    "sku": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "assetKey": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "name"
+  ],
+  "$id": "https://example.com/ProductSetAssetCustomFieldAction.schema.json"
+}

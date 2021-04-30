@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomFieldNumberType",
+  "type": "object",
+  "properties": {"name": {"enum": ["Number"]}},
+  "required": ["name"],
+  "$id": "https://example.com/CustomFieldNumberType.schema.json"
+}

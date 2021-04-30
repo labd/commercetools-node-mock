@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Zone",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "name": {"type": "string"},
+    "description": {"type": "string"},
+    "locations": {
+      "type": "array",
+      "items": {"$ref": "Location.schema.json"}
+    },
+    "id": {"type": "string"},
+    "version": {"type": "number"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "name",
+    "locations"
+  ],
+  "$id": "https://example.com/Zone.schema.json"
+}

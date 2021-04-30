@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentStatusStateTransitionMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["PaymentStatusStateTransition"]},
+    "force": {"type": "boolean"},
+    "state": {"$ref": "StateReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "state",
+    "force"
+  ],
+  "$id": "https://example.com/PaymentStatusStateTransitionMessagePayload.schema.json"
+}

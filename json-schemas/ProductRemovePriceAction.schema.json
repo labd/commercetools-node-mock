@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductRemovePriceAction",
+  "type": "object",
+  "properties": {
+    "priceId": {"type": "string"},
+    "action": {"enum": ["removePrice"]},
+    "staged": {"type": "boolean"}
+  },
+  "required": [
+    "action",
+    "priceId"
+  ],
+  "$id": "https://example.com/ProductRemovePriceAction.schema.json"
+}

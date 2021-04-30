@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCustomerSetSalutationAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setSalutation"]},
+    "salutation": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/MyCustomerSetSalutationAction.schema.json"
+}

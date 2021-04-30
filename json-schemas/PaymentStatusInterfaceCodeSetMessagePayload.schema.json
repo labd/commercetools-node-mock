@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentStatusInterfaceCodeSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["PaymentStatusInterfaceCodeSet"]},
+    "interfaceCode": {"type": "string"},
+    "paymentId": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "paymentId",
+    "interfaceCode"
+  ],
+  "$id": "https://example.com/PaymentStatusInterfaceCodeSetMessagePayload.schema.json"
+}

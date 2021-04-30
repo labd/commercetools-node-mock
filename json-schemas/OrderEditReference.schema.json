@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["order-edit"]},
+    "obj": {"$ref": "OrderEdit.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://example.com/OrderEditReference.schema.json"
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCustomerAddShippingAddressIdAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addShippingAddressId"]},
+    "addressKey": {"type": "string"},
+    "addressId": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/MyCustomerAddShippingAddressIdAction.schema.json"
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetCustomLineItemCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setCustomLineItemCustomField"]},
+    "customLineItemId": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
+  },
+  "required": [
+    "action",
+    "customLineItemId",
+    "name"
+  ],
+  "$id": "https://example.com/StagedOrderSetCustomLineItemCustomFieldAction.schema.json"
+}

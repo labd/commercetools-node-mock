@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DiscountCodeSetMaxApplicationsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setMaxApplications"]},
+    "maxApplications": {"type": "number"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/DiscountCodeSetMaxApplicationsAction.schema.json"
+}

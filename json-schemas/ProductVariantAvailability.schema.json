@@ -1,0 +1,13 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProductVariantAvailability",
+  "type": "object",
+  "properties": {
+    "availableQuantity": {"type": "number"},
+    "restockableInDays": {"type": "number"},
+    "channels": {"$ref": "ProductVariantChannelAvailabilityMap.schema.json"},
+    "isOnStock": {"type": "boolean"}
+  },
+  "$id": "https://example.com/ProductVariantAvailability.schema.json"
+}

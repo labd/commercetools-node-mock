@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingMethodReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["shipping-method"]},
+    "obj": {"$ref": "ShippingMethod.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://example.com/ShippingMethodReference.schema.json"
+}

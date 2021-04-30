@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartSetBillingAddressAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setBillingAddress"]},
+    "address": {"$ref": "Address.schema.json"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CartSetBillingAddressAction.schema.json"
+}

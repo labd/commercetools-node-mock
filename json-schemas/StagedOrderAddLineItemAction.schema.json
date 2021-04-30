@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderAddLineItemAction",
+  "type": "object",
+  "properties": {
+    "addedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "externalTaxRate": {"$ref": "ExternalTaxRateDraft.schema.json"},
+    "quantity": {"type": "number"},
+    "productId": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "externalPrice": {"$ref": "Money.schema.json"},
+    "shippingDetails": {"$ref": "ItemShippingDetailsDraft.schema.json"},
+    "externalTotalPrice": {"$ref": "ExternalLineItemTotalPrice.schema.json"},
+    "action": {"enum": ["addLineItem"]},
+    "supplyChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "variantId": {"type": "number"},
+    "distributionChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "sku": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/StagedOrderAddLineItemAction.schema.json"
+}

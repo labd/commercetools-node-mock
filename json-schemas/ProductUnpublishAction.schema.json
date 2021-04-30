@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductUnpublishAction",
+  "type": "object",
+  "properties": {"action": {"enum": ["unpublish"]}},
+  "required": ["action"],
+  "$id": "https://example.com/ProductUnpublishAction.schema.json"
+}

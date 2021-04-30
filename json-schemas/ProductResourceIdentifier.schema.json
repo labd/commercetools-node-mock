@@ -1,0 +1,12 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProductResourceIdentifier",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["product"]},
+    "key": {"type": "string"},
+    "id": {"type": "string"}
+  },
+  "$id": "https://example.com/ProductResourceIdentifier.schema.json"
+}

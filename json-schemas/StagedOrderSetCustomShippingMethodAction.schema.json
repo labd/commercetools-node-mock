@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetCustomShippingMethodAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setCustomShippingMethod"]},
+    "shippingMethodName": {"type": "string"},
+    "shippingRate": {"$ref": "ShippingRateDraft.schema.json"},
+    "externalTaxRate": {"$ref": "ExternalTaxRateDraft.schema.json"},
+    "taxCategory": {"$ref": "TaxCategoryResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "shippingMethodName",
+    "shippingRate"
+  ],
+  "$id": "https://example.com/StagedOrderSetCustomShippingMethodAction.schema.json"
+}

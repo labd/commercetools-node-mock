@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCartDraft",
+  "type": "object",
+  "properties": {
+    "country": {"type": "string"},
+    "discountCodes": {
+      "type": "array",
+      "items": {"$ref": "DiscountCodeInfo.schema.json"}
+    },
+    "shippingMethod": {"$ref": "ShippingMethodResourceIdentifier.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "deleteDaysAfterLastModification": {"type": "number"},
+    "store": {"$ref": "StoreKeyReference.schema.json"},
+    "locale": {"type": "string"},
+    "inventoryMode": {"$ref": "InventoryModeEnum.schema.json"},
+    "lineItems": {
+      "type": "array",
+      "items": {"$ref": "MyLineItemDraft.schema.json"}
+    },
+    "taxMode": {"$ref": "TaxModeEnum.schema.json"},
+    "itemShippingAddresses": {
+      "type": "array",
+      "items": {"$ref": "Address.schema.json"}
+    },
+    "customerEmail": {"type": "string"},
+    "shippingAddress": {"$ref": "Address.schema.json"},
+    "currency": {"type": "string"},
+    "billingAddress": {"$ref": "Address.schema.json"}
+  },
+  "required": ["currency"],
+  "$id": "https://example.com/MyCartDraft.schema.json"
+}

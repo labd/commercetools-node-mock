@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerGroupUpdate",
+  "type": "object",
+  "properties": {
+    "version": {"type": "number"},
+    "actions": {
+      "type": "array",
+      "items": {"$ref": "CustomerGroupUpdateAction.schema.json"}
+    }
+  },
+  "required": [
+    "version",
+    "actions"
+  ],
+  "$id": "https://example.com/CustomerGroupUpdate.schema.json"
+}

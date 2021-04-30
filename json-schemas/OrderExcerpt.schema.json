@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderExcerpt",
+  "type": "object",
+  "properties": {
+    "totalPrice": {"$ref": "TypedMoney.schema.json"},
+    "version": {
+      "type": "number",
+      "format": "integer"
+    },
+    "taxedPrice": {"$ref": "TaxedPrice.schema.json"}
+  },
+  "required": [
+    "totalPrice",
+    "version"
+  ],
+  "$id": "https://example.com/OrderExcerpt.schema.json"
+}

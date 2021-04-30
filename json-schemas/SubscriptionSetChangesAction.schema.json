@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "SubscriptionSetChangesAction",
+  "type": "object",
+  "properties": {
+    "changes": {
+      "type": "array",
+      "items": {"$ref": "ChangeSubscription.schema.json"}
+    },
+    "action": {"enum": ["setChanges"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/SubscriptionSetChangesAction.schema.json"
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "AttributeNestedType",
+  "type": "object",
+  "properties": {
+    "name": {"enum": ["nested"]},
+    "typeReference": {"$ref": "ProductTypeReference.schema.json"}
+  },
+  "required": [
+    "name",
+    "typeReference"
+  ],
+  "$id": "https://example.com/AttributeNestedType.schema.json"
+}

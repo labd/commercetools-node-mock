@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExtensionInput",
+  "type": "object",
+  "properties": {
+    "action": {"$ref": "ExtensionActionEnum.schema.json"},
+    "resource": {"$ref": "Reference.schema.json"}
+  },
+  "required": [
+    "action",
+    "resource"
+  ],
+  "$id": "https://example.com/ExtensionInput.schema.json"
+}

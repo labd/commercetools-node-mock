@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ParcelTrackingDataUpdatedMessage",
+  "type": "object",
+  "properties": {
+    "sequenceNumber": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "type": {"enum": ["ParcelTrackingDataUpdated"]},
+    "version": {"type": "number"},
+    "parcelId": {"type": "string"},
+    "trackingData": {"$ref": "TrackingData.schema.json"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deliveryId": {"type": "string"},
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "deliveryId",
+    "parcelId"
+  ],
+  "$id": "https://example.com/ParcelTrackingDataUpdatedMessage.schema.json"
+}

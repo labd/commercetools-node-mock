@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderDiscountCodeStateSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "state": {"$ref": "DiscountCodeStateEnum.schema.json"},
+    "type": {"enum": ["OrderDiscountCodeStateSet"]},
+    "discountCode": {"$ref": "DiscountCodeReference.schema.json"},
+    "oldState": {"$ref": "DiscountCodeStateEnum.schema.json"}
+  },
+  "required": [
+    "type",
+    "discountCode",
+    "state"
+  ],
+  "$id": "https://example.com/OrderDiscountCodeStateSetMessagePayload.schema.json"
+}

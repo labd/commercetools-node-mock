@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerPagedQueryResponse",
+  "type": "object",
+  "properties": {
+    "limit": {"type": "number"},
+    "count": {"type": "number"},
+    "total": {"type": "number"},
+    "offset": {"type": "number"},
+    "results": {
+      "type": "array",
+      "items": {"$ref": "Customer.schema.json"}
+    }
+  },
+  "required": [
+    "limit",
+    "count",
+    "offset",
+    "results"
+  ],
+  "$id": "https://example.com/CustomerPagedQueryResponse.schema.json"
+}

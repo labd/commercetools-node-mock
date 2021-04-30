@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductAddToCategoryAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addToCategory"]},
+    "staged": {"type": "boolean"},
+    "category": {"$ref": "CategoryResourceIdentifier.schema.json"},
+    "orderHint": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "category"
+  ],
+  "$id": "https://example.com/ProductAddToCategoryAction.schema.json"
+}

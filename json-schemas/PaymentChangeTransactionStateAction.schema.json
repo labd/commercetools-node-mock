@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentChangeTransactionStateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeTransactionState"]},
+    "transactionId": {"type": "string"},
+    "state": {"$ref": "TransactionStateEnum.schema.json"}
+  },
+  "required": [
+    "action",
+    "transactionId",
+    "state"
+  ],
+  "$id": "https://example.com/PaymentChangeTransactionStateAction.schema.json"
+}

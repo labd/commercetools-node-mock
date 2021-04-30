@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingInfoImportDraft",
+  "type": "object",
+  "properties": {
+    "shippingRate": {"$ref": "ShippingRateDraft.schema.json"},
+    "taxRate": {"$ref": "TaxRate.schema.json"},
+    "discountedPrice": {"$ref": "DiscountedLineItemPriceDraft.schema.json"},
+    "shippingMethodState": {"$ref": "ShippingMethodStateEnum.schema.json"},
+    "price": {"$ref": "Money.schema.json"},
+    "shippingMethod": {"$ref": "ShippingMethodResourceIdentifier.schema.json"},
+    "shippingMethodName": {"type": "string"},
+    "taxCategory": {"$ref": "TaxCategoryResourceIdentifier.schema.json"},
+    "deliveries": {
+      "type": "array",
+      "items": {"$ref": "Delivery.schema.json"}
+    }
+  },
+  "required": [
+    "shippingMethodName",
+    "price",
+    "shippingRate"
+  ],
+  "$id": "https://example.com/ShippingInfoImportDraft.schema.json"
+}

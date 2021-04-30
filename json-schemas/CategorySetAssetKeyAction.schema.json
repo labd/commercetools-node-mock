@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategorySetAssetKeyAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setAssetKey"]},
+    "assetId": {"type": "string"},
+    "assetKey": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "assetId"
+  ],
+  "$id": "https://example.com/CategorySetAssetKeyAction.schema.json"
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingMethod",
+  "type": "object",
+  "properties": {
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "description": {"type": "string"},
+    "version": {"type": "number"},
+    "taxCategory": {"$ref": "TaxCategoryReference.schema.json"},
+    "zoneRates": {
+      "type": "array",
+      "items": {"$ref": "ZoneRate.schema.json"}
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "predicate": {"type": "string"},
+    "isDefault": {"type": "boolean"},
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "name": {"type": "string"},
+    "id": {"type": "string"},
+    "localizedDescription": {"$ref": "LocalizedString.schema.json"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "name",
+    "taxCategory",
+    "zoneRates",
+    "isDefault"
+  ],
+  "$id": "https://example.com/ShippingMethod.schema.json"
+}

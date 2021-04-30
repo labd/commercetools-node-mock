@@ -1,0 +1,16 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/CustomerGroupChangeNameAction.schema.json"},
+    {"$ref": "https://example.com/CustomerGroupSetCustomFieldAction.schema.json"},
+    {"$ref": "https://example.com/CustomerGroupSetCustomTypeAction.schema.json"},
+    {"$ref": "https://example.com/CustomerGroupSetKeyAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerGroupUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/CustomerGroupUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListSetLineItemCustomTypeAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setLineItemCustomType"]},
+    "type": {"$ref": "TypeResourceIdentifier.schema.json"},
+    "fields": {"$ref": "FieldContainer.schema.json"},
+    "lineItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "lineItemId"
+  ],
+  "$id": "https://example.com/ShoppingListSetLineItemCustomTypeAction.schema.json"
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StateUpdate",
+  "type": "object",
+  "properties": {
+    "version": {"type": "number"},
+    "actions": {
+      "type": "array",
+      "items": {"$ref": "StateUpdateAction.schema.json"}
+    }
+  },
+  "required": [
+    "version",
+    "actions"
+  ],
+  "$id": "https://example.com/StateUpdate.schema.json"
+}

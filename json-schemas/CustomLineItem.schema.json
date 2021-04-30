@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomLineItem",
+  "type": "object",
+  "properties": {
+    "quantity": {"type": "number"},
+    "totalPrice": {"$ref": "TypedMoney.schema.json"},
+    "taxedPrice": {"$ref": "TaxedItemPrice.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "discountedPricePerQuantity": {
+      "type": "array",
+      "items": {"$ref": "DiscountedLineItemPriceForQuantity.schema.json"}
+    },
+    "taxCategory": {"$ref": "TaxCategoryReference.schema.json"},
+    "taxRate": {"$ref": "TaxRate.schema.json"},
+    "money": {"$ref": "TypedMoney.schema.json"},
+    "shippingDetails": {"$ref": "ItemShippingDetails.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "id": {"type": "string"},
+    "state": {
+      "type": "array",
+      "items": {"$ref": "ItemState.schema.json"}
+    },
+    "slug": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "name",
+    "money",
+    "totalPrice",
+    "slug",
+    "quantity",
+    "state",
+    "discountedPricePerQuantity"
+  ],
+  "$id": "https://example.com/CustomLineItem.schema.json"
+}

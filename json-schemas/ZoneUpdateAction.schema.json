@@ -1,0 +1,17 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/ZoneAddLocationAction.schema.json"},
+    {"$ref": "https://example.com/ZoneChangeNameAction.schema.json"},
+    {"$ref": "https://example.com/ZoneRemoveLocationAction.schema.json"},
+    {"$ref": "https://example.com/ZoneSetDescriptionAction.schema.json"},
+    {"$ref": "https://example.com/ZoneSetKeyAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ZoneUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/ZoneUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

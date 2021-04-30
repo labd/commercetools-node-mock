@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerSignin",
+  "type": "object",
+  "properties": {
+    "anonymousId": {"type": "string"},
+    "updateProductData": {"type": "boolean"},
+    "password": {"type": "string"},
+    "anonymousCart": {"$ref": "CartResourceIdentifier.schema.json"},
+    "anonymousCartId": {"type": "string"},
+    "anonymousCartSignInMode": {"$ref": "AnonymousCartSignInModeEnum.schema.json"},
+    "email": {"type": "string"}
+  },
+  "required": [
+    "email",
+    "password"
+  ],
+  "$id": "https://example.com/CustomerSignin.schema.json"
+}

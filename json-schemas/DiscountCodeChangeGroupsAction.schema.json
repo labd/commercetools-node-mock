@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DiscountCodeChangeGroupsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeGroups"]},
+    "groups": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "action",
+    "groups"
+  ],
+  "$id": "https://example.com/DiscountCodeChangeGroupsAction.schema.json"
+}

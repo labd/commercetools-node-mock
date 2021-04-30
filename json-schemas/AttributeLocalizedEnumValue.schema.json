@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "AttributeLocalizedEnumValue",
+  "type": "object",
+  "properties": {
+    "key": {"type": "string"},
+    "label": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "key",
+    "label"
+  ],
+  "$id": "https://example.com/AttributeLocalizedEnumValue.schema.json"
+}

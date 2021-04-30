@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ReplicaCartDraft",
+  "type": "object",
+  "properties": {
+    "reference": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "key": {"type": "string"}
+  },
+  "required": ["reference"],
+  "$id": "https://example.com/ReplicaCartDraft.schema.json"
+}

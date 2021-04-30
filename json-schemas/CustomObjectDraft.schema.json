@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomObjectDraft",
+  "type": "object",
+  "properties": {
+    "container": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "version": {"type": "number"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "container",
+    "key",
+    "value"
+  ],
+  "$id": "https://example.com/CustomObjectDraft.schema.json"
+}

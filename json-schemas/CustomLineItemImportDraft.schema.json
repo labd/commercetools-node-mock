@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomLineItemImportDraft",
+  "type": "object",
+  "properties": {
+    "taxRate": {"$ref": "TaxRate.schema.json"},
+    "quantity": {"type": "number"},
+    "money": {"$ref": "Money.schema.json"},
+    "shippingDetails": {"$ref": "ItemShippingDetailsDraft.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "state": {
+      "type": "array",
+      "items": {"$ref": "ItemState.schema.json"}
+    },
+    "slug": {"type": "string"},
+    "taxCategory": {"$ref": "TaxCategoryResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "name",
+    "quantity",
+    "money",
+    "slug"
+  ],
+  "$id": "https://example.com/CustomLineItemImportDraft.schema.json"
+}

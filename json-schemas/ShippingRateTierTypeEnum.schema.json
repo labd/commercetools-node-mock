@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ShippingRateTierType",
+  "type": "string",
+  "enum": [
+    "CartValue",
+    "CartClassification",
+    "CartScore"
+  ],
+  "$id": "https://example.com/ShippingRateTierTypeEnum.schema.json"
+}

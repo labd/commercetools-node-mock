@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListRemoveTextLineItemAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeTextLineItem"]},
+    "textLineItemId": {"type": "string"},
+    "quantity": {"type": "number"}
+  },
+  "required": [
+    "action",
+    "textLineItemId"
+  ],
+  "$id": "https://example.com/ShoppingListRemoveTextLineItemAction.schema.json"
+}

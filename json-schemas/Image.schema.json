@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Image",
+  "type": "object",
+  "properties": {
+    "url": {"type": "string"},
+    "dimensions": {"$ref": "ImageDimensions.schema.json"},
+    "label": {"type": "string"}
+  },
+  "required": [
+    "url",
+    "dimensions"
+  ],
+  "$id": "https://example.com/Image.schema.json"
+}

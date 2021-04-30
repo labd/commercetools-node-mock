@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDiscountCustomLineItemsTarget",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["customLineItems"]},
+    "predicate": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "predicate"
+  ],
+  "$id": "https://example.com/CartDiscountCustomLineItemsTarget.schema.json"
+}

@@ -1,0 +1,15 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/CartClassificationTier.schema.json"},
+    {"$ref": "https://example.com/CartScoreTier.schema.json"},
+    {"$ref": "https://example.com/CartValueTier.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingRatePriceTier",
+  "type": "object",
+  "properties": {"type": {"$ref": "ShippingRateTierTypeEnum.schema.json"}},
+  "required": ["type"],
+  "$id": "https://example.com/ShippingRatePriceTier.schema.json",
+  "discriminator": {"propertyName": "type"}
+}

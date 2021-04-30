@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "SubscriptionChangeDestinationAction",
+  "type": "object",
+  "properties": {
+    "destination": {"$ref": "Destination.schema.json"},
+    "action": {"enum": ["changeDestination"]}
+  },
+  "required": [
+    "action",
+    "destination"
+  ],
+  "$id": "https://example.com/SubscriptionChangeDestinationAction.schema.json"
+}

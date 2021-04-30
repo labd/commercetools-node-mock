@@ -1,0 +1,12 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TaxCategoryResourceIdentifier",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["tax-category"]},
+    "key": {"type": "string"},
+    "id": {"type": "string"}
+  },
+  "$id": "https://example.com/TaxCategoryResourceIdentifier.schema.json"
+}

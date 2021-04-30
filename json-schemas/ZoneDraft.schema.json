@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ZoneDraft",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "description": {"type": "string"},
+    "locations": {
+      "type": "array",
+      "items": {"$ref": "Location.schema.json"}
+    },
+    "key": {"type": "string"}
+  },
+  "required": [
+    "name",
+    "locations"
+  ],
+  "$id": "https://example.com/ZoneDraft.schema.json"
+}

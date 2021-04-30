@@ -1,0 +1,27 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/CartDiscountChangeCartPredicateAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeIsActiveAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeNameAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeRequiresDiscountCodeAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeSortOrderAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeStackingModeAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeTargetAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountChangeValueAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetCustomFieldAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetCustomTypeAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetDescriptionAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetKeyAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetValidFromAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetValidFromAndUntilAction.schema.json"},
+    {"$ref": "https://example.com/CartDiscountSetValidUntilAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDiscountUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/CartDiscountUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

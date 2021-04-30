@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentChangeTransactionInteractionIdAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeTransactionInteractionId"]},
+    "transactionId": {"type": "string"},
+    "interactionId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "transactionId",
+    "interactionId"
+  ],
+  "$id": "https://example.com/PaymentChangeTransactionInteractionIdAction.schema.json"
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "AttributeEnumType",
+  "type": "object",
+  "properties": {
+    "name": {"enum": ["enum"]},
+    "values": {
+      "type": "array",
+      "items": {"$ref": "AttributePlainEnumValue.schema.json"}
+    }
+  },
+  "required": [
+    "name",
+    "values"
+  ],
+  "$id": "https://example.com/AttributeEnumType.schema.json"
+}

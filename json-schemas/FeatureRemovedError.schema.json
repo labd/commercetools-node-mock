@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "FeatureRemovedError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "code": {"enum": ["FeatureRemoved"]}
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "$id": "https://example.com/FeatureRemovedError.schema.json"
+}

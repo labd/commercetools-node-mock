@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductPriceDiscountsSetUpdatedPrice",
+  "type": "object",
+  "properties": {
+    "discounted": {"$ref": "DiscountedPrice.schema.json"},
+    "variantId": {
+      "type": "number",
+      "format": "integer"
+    },
+    "staged": {"type": "boolean"},
+    "variantKey": {"type": "string"},
+    "sku": {"type": "string"},
+    "priceId": {"type": "string"}
+  },
+  "required": [
+    "variantId",
+    "priceId",
+    "staged"
+  ],
+  "$id": "https://example.com/ProductPriceDiscountsSetUpdatedPrice.schema.json"
+}

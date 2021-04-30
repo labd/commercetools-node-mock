@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEdit",
+  "type": "object",
+  "properties": {
+    "result": {"$ref": "OrderEditResult.schema.json"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "resource": {"$ref": "OrderReference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "stagedActions": {
+      "type": "array",
+      "items": {"$ref": "StagedOrderUpdateAction.schema.json"}
+    },
+    "comment": {"type": "string"},
+    "id": {"type": "string"},
+    "version": {"type": "number"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "resource",
+    "stagedActions",
+    "result"
+  ],
+  "$id": "https://example.com/OrderEdit.schema.json"
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ReviewSetRatingAction",
+  "type": "object",
+  "properties": {
+    "rating": {"type": "number"},
+    "action": {"enum": ["setRating"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ReviewSetRatingAction.schema.json"
+}

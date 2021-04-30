@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderBillingAddressSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderBillingAddressSet"]},
+    "oldAddress": {"$ref": "Address.schema.json"},
+    "address": {"$ref": "Address.schema.json"}
+  },
+  "required": ["type"],
+  "$id": "https://example.com/OrderBillingAddressSetMessagePayload.schema.json"
+}

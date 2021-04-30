@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomerGroupSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["CustomerGroupSet"]},
+    "customerGroup": {"$ref": "CustomerGroupReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "customerGroup"
+  ],
+  "$id": "https://example.com/CustomerGroupSetMessagePayload.schema.json"
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDraft",
+  "type": "object",
+  "properties": {
+    "country": {"type": "string"},
+    "shippingRateInput": {"$ref": "ShippingRateInputDraft.schema.json"},
+    "deleteDaysAfterLastModification": {"type": "number"},
+    "origin": {"$ref": "CartOriginEnum.schema.json"},
+    "externalTaxRateForShippingMethod": {"$ref": "ExternalTaxRateDraft.schema.json"},
+    "locale": {"type": "string"},
+    "inventoryMode": {"$ref": "InventoryModeEnum.schema.json"},
+    "lineItems": {
+      "type": "array",
+      "items": {"$ref": "LineItemDraft.schema.json"}
+    },
+    "customLineItems": {
+      "type": "array",
+      "items": {"$ref": "CustomLineItemDraft.schema.json"}
+    },
+    "itemShippingAddresses": {
+      "type": "array",
+      "items": {"$ref": "Address.schema.json"}
+    },
+    "customerEmail": {"type": "string"},
+    "customerId": {"type": "string"},
+    "currency": {"type": "string"},
+    "key": {"type": "string"},
+    "anonymousId": {"type": "string"},
+    "discountCodes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "customerGroup": {"$ref": "CustomerGroupResourceIdentifier.schema.json"},
+    "shippingMethod": {"$ref": "ShippingMethodResourceIdentifier.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "store": {"$ref": "StoreResourceIdentifier.schema.json"},
+    "taxCalculationMode": {"$ref": "TaxCalculationModeEnum.schema.json"},
+    "taxRoundingMode": {"$ref": "RoundingModeEnum.schema.json"},
+    "taxMode": {"$ref": "TaxModeEnum.schema.json"},
+    "shippingAddress": {"$ref": "Address.schema.json"},
+    "billingAddress": {"$ref": "Address.schema.json"}
+  },
+  "required": ["currency"],
+  "$id": "https://example.com/CartDraft.schema.json"
+}

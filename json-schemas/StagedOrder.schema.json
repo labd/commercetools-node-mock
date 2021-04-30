@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrder",
+  "type": "object",
+  "properties": {
+    "shipmentState": {"$ref": "ShipmentStateEnum.schema.json"},
+    "country": {"type": "string"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "orderNumber": {"type": "string"},
+    "totalPrice": {"$ref": "TypedMoney.schema.json"},
+    "taxedPrice": {"$ref": "TaxedPrice.schema.json"},
+    "shippingRateInput": {"$ref": "ShippingRateInput.schema.json"},
+    "shippingInfo": {"$ref": "ShippingInfo.schema.json"},
+    "origin": {"$ref": "CartOriginEnum.schema.json"},
+    "refusedGifts": {
+      "type": "array",
+      "items": {"$ref": "CartDiscountReference.schema.json"}
+    },
+    "locale": {"type": "string"},
+    "cart": {"$ref": "CartReference.schema.json"},
+    "orderState": {"$ref": "OrderStateEnum.schema.json"},
+    "inventoryMode": {"$ref": "InventoryModeEnum.schema.json"},
+    "lineItems": {
+      "type": "array",
+      "items": {"$ref": "LineItem.schema.json"}
+    },
+    "returnInfo": {
+      "type": "array",
+      "items": {"$ref": "ReturnInfo.schema.json"}
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "customLineItems": {
+      "type": "array",
+      "items": {"$ref": "CustomLineItem.schema.json"}
+    },
+    "itemShippingAddresses": {
+      "type": "array",
+      "items": {"$ref": "Address.schema.json"}
+    },
+    "customerEmail": {"type": "string"},
+    "customerId": {"type": "string"},
+    "id": {"type": "string"},
+    "state": {"$ref": "StateReference.schema.json"},
+    "paymentState": {"$ref": "PaymentStateEnum.schema.json"},
+    "anonymousId": {"type": "string"},
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "discountCodes": {
+      "type": "array",
+      "items": {"$ref": "DiscountCodeInfo.schema.json"}
+    },
+    "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "store": {"$ref": "StoreKeyReference.schema.json"},
+    "taxCalculationMode": {"$ref": "TaxCalculationModeEnum.schema.json"},
+    "version": {"type": "number"},
+    "syncInfo": {
+      "type": "array",
+      "items": {"$ref": "SyncInfo.schema.json"}
+    },
+    "lastMessageSequenceNumber": {"type": "number"},
+    "taxRoundingMode": {"$ref": "RoundingModeEnum.schema.json"},
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "taxMode": {"$ref": "TaxModeEnum.schema.json"},
+    "shippingAddress": {"$ref": "Address.schema.json"},
+    "billingAddress": {"$ref": "Address.schema.json"},
+    "paymentInfo": {"$ref": "PaymentInfo.schema.json"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "lineItems",
+    "customLineItems",
+    "totalPrice",
+    "orderState",
+    "syncInfo",
+    "lastMessageSequenceNumber",
+    "origin",
+    "refusedGifts"
+  ],
+  "$id": "https://example.com/StagedOrder.schema.json"
+}

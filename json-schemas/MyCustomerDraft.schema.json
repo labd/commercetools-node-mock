@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyCustomerDraft",
+  "type": "object",
+  "properties": {
+    "lastName": {"type": "string"},
+    "addresses": {
+      "type": "array",
+      "items": {"$ref": "Address.schema.json"}
+    },
+    "defaultShippingAddress": {"type": "number"},
+    "stores": {
+      "type": "array",
+      "items": {"$ref": "StoreResourceIdentifier.schema.json"}
+    },
+    "companyName": {"type": "string"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "vatId": {"type": "string"},
+    "dateOfBirth": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "title": {"type": "string"},
+    "locale": {"type": "string"},
+    "firstName": {"type": "string"},
+    "password": {"type": "string"},
+    "middleName": {"type": "string"},
+    "email": {"type": "string"},
+    "defaultBillingAddress": {"type": "number"}
+  },
+  "required": [
+    "email",
+    "password"
+  ],
+  "$id": "https://example.com/MyCustomerDraft.schema.json"
+}

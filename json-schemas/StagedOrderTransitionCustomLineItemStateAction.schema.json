@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderTransitionCustomLineItemStateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["transitionCustomLineItemState"]},
+    "customLineItemId": {"type": "string"},
+    "fromState": {"$ref": "StateResourceIdentifier.schema.json"},
+    "toState": {"$ref": "StateResourceIdentifier.schema.json"},
+    "quantity": {"type": "number"},
+    "actualTransitionDate": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "action",
+    "customLineItemId",
+    "quantity",
+    "fromState",
+    "toState"
+  ],
+  "$id": "https://example.com/StagedOrderTransitionCustomLineItemStateAction.schema.json"
+}

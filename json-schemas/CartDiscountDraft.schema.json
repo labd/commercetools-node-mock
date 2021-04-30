@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDiscountDraft",
+  "type": "object",
+  "properties": {
+    "requiresDiscountCode": {"type": "boolean"},
+    "cartPredicate": {"type": "string"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "isActive": {"type": "boolean"},
+    "target": {"$ref": "CartDiscountTarget.schema.json"},
+    "sortOrder": {"type": "string"},
+    "stackingMode": {"$ref": "StackingModeEnum.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "value": {"$ref": "CartDiscountValueDraft.schema.json"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "name",
+    "value",
+    "cartPredicate",
+    "sortOrder",
+    "requiresDiscountCode"
+  ],
+  "$id": "https://example.com/CartDiscountDraft.schema.json"
+}

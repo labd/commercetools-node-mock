@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShippingMethodDraft",
+  "type": "object",
+  "properties": {
+    "zoneRates": {
+      "type": "array",
+      "items": {"$ref": "ZoneRateDraft.schema.json"}
+    },
+    "predicate": {"type": "string"},
+    "isDefault": {"type": "boolean"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "name": {"type": "string"},
+    "description": {"type": "string"},
+    "localizedDescription": {"$ref": "LocalizedString.schema.json"},
+    "key": {"type": "string"},
+    "taxCategory": {"$ref": "TaxCategoryResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "name",
+    "taxCategory",
+    "zoneRates",
+    "isDefault"
+  ],
+  "$id": "https://example.com/ShippingMethodDraft.schema.json"
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyShoppingListAddTextLineItemAction",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "action": {"enum": ["addTextLineItem"]},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "addedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "quantity": {"type": "number"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": [
+    "action",
+    "name"
+  ],
+  "$id": "https://example.com/MyShoppingListAddTextLineItemAction.schema.json"
+}

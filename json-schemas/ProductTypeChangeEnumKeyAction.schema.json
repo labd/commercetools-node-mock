@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductTypeChangeEnumKeyAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeEnumKey"]},
+    "attributeName": {"type": "string"},
+    "newKey": {"type": "string"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "attributeName",
+    "key",
+    "newKey"
+  ],
+  "$id": "https://example.com/ProductTypeChangeEnumKeyAction.schema.json"
+}

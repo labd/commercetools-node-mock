@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditSetDeliveryAddressCustomTypeAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setDeliveryAddressCustomType"]},
+    "deliveryId": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
+  },
+  "required": [
+    "action",
+    "deliveryId",
+    "name"
+  ],
+  "$id": "https://example.com/OrderEditSetDeliveryAddressCustomTypeAction.schema.json"
+}

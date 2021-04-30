@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "TypeChangeLabelAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeLabel"]},
+    "fieldName": {"type": "string"},
+    "label": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "action",
+    "fieldName",
+    "label"
+  ],
+  "$id": "https://example.com/TypeChangeLabelAction.schema.json"
+}

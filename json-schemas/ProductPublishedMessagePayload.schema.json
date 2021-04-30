@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductPublishedMessagePayload",
+  "type": "object",
+  "properties": {
+    "removedImageUrls": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "type": {"enum": ["ProductPublished"]},
+    "productProjection": {"$ref": "ProductProjection.schema.json"},
+    "scope": {"$ref": "ProductPublishScopeEnum.schema.json"}
+  },
+  "required": [
+    "type",
+    "removedImageUrls",
+    "productProjection",
+    "scope"
+  ],
+  "$id": "https://example.com/ProductPublishedMessagePayload.schema.json"
+}

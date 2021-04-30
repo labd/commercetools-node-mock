@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductRemovedFromCategoryMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ProductRemovedFromCategory"]},
+    "category": {"$ref": "CategoryReference.schema.json"},
+    "staged": {"type": "boolean"}
+  },
+  "required": [
+    "type",
+    "category",
+    "staged"
+  ],
+  "$id": "https://example.com/ProductRemovedFromCategoryMessagePayload.schema.json"
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ReviewStateTransitionMessagePayload",
+  "type": "object",
+  "properties": {
+    "newIncludedInStatistics": {"type": "boolean"},
+    "oldState": {"$ref": "StateReference.schema.json"},
+    "force": {"type": "boolean"},
+    "type": {"enum": ["ReviewStateTransition"]},
+    "oldIncludedInStatistics": {"type": "boolean"},
+    "newState": {"$ref": "StateReference.schema.json"},
+    "target": {"$ref": "Reference.schema.json"}
+  },
+  "required": [
+    "type",
+    "oldState",
+    "newState",
+    "oldIncludedInStatistics",
+    "newIncludedInStatistics",
+    "target",
+    "force"
+  ],
+  "$id": "https://example.com/ReviewStateTransitionMessagePayload.schema.json"
+}

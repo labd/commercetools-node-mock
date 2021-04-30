@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductVariantAddedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ProductVariantAdded"]},
+    "variant": {"$ref": "ProductVariant.schema.json"},
+    "staged": {"type": "boolean"}
+  },
+  "required": [
+    "type",
+    "variant",
+    "staged"
+  ],
+  "$id": "https://example.com/ProductVariantAddedMessagePayload.schema.json"
+}

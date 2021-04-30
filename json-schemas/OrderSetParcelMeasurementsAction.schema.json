@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetParcelMeasurementsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setParcelMeasurements"]},
+    "parcelId": {"type": "string"},
+    "measurements": {"$ref": "ParcelMeasurements.schema.json"}
+  },
+  "required": [
+    "action",
+    "parcelId"
+  ],
+  "$id": "https://example.com/OrderSetParcelMeasurementsAction.schema.json"
+}

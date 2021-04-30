@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProjectSetExternalOAuthAction",
+  "type": "object",
+  "properties": {
+    "externalOAuth": {"$ref": "ExternalOAuth.schema.json"},
+    "action": {"enum": ["setExternalOAuth"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ProjectSetExternalOAuthAction.schema.json"
+}

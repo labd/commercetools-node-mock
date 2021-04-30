@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaymentState",
+  "type": "string",
+  "enum": [
+    "BalanceDue",
+    "Failed",
+    "Pending",
+    "CreditOwed",
+    "Paid"
+  ],
+  "$id": "https://example.com/PaymentStateEnum.schema.json"
+}

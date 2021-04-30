@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDiscountSetValidUntilAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setValidUntil"]},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ProductDiscountSetValidUntilAction.schema.json"
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderRemoveParcelFromDeliveryAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeParcelFromDelivery"]},
+    "parcelId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "parcelId"
+  ],
+  "$id": "https://example.com/StagedOrderRemoveParcelFromDeliveryAction.schema.json"
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DiscountCode",
+  "type": "object",
+  "properties": {
+    "cartDiscounts": {
+      "type": "array",
+      "items": {"$ref": "CartDiscountReference.schema.json"}
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "code": {"type": "string"},
+    "references": {
+      "type": "array",
+      "items": {"$ref": "Reference.schema.json"}
+    },
+    "cartPredicate": {"type": "string"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "groups": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "isActive": {"type": "boolean"},
+    "version": {"type": "number"},
+    "maxApplications": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "id": {"type": "string"},
+    "maxApplicationsPerCustomer": {"type": "number"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "code",
+    "cartDiscounts",
+    "isActive",
+    "references",
+    "groups"
+  ],
+  "$id": "https://example.com/DiscountCode.schema.json"
+}

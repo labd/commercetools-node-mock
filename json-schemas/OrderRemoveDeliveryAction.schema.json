@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderRemoveDeliveryAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeDelivery"]},
+    "deliveryId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "deliveryId"
+  ],
+  "$id": "https://example.com/OrderRemoveDeliveryAction.schema.json"
+}

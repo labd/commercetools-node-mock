@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ScopedPrice",
+  "type": "object",
+  "properties": {
+    "discounted": {"$ref": "DiscountedPrice.schema.json"},
+    "country": {"type": "string"},
+    "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "channel": {"$ref": "ChannelReference.schema.json"},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "id": {"type": "string"},
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "value": {"$ref": "TypedMoney.schema.json"},
+    "currentValue": {"$ref": "TypedMoney.schema.json"}
+  },
+  "required": [
+    "id",
+    "value",
+    "currentValue"
+  ],
+  "$id": "https://example.com/ScopedPrice.schema.json"
+}

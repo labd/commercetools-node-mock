@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "LineItem",
+  "type": "object",
+  "properties": {
+    "addedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "quantity": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "productId": {"type": "string"},
+    "priceMode": {"$ref": "LineItemPriceModeEnum.schema.json"},
+    "totalPrice": {"$ref": "TypedMoney.schema.json"},
+    "taxedPrice": {"$ref": "TaxedItemPrice.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "productSlug": {"$ref": "LocalizedString.schema.json"},
+    "discountedPricePerQuantity": {
+      "type": "array",
+      "items": {"$ref": "DiscountedLineItemPriceForQuantity.schema.json"}
+    },
+    "taxRate": {"$ref": "TaxRate.schema.json"},
+    "shippingDetails": {"$ref": "ItemShippingDetails.schema.json"},
+    "price": {"$ref": "Price.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "variant": {"$ref": "ProductVariant.schema.json"},
+    "supplyChannel": {"$ref": "ChannelReference.schema.json"},
+    "id": {"type": "string"},
+    "state": {
+      "type": "array",
+      "items": {"$ref": "ItemState.schema.json"}
+    },
+    "distributionChannel": {"$ref": "ChannelReference.schema.json"},
+    "productType": {"$ref": "ProductTypeReference.schema.json"},
+    "lineItemMode": {"$ref": "LineItemModeEnum.schema.json"}
+  },
+  "required": [
+    "id",
+    "productId",
+    "name",
+    "productType",
+    "variant",
+    "price",
+    "totalPrice",
+    "quantity",
+    "state",
+    "discountedPricePerQuantity",
+    "priceMode",
+    "lineItemMode"
+  ],
+  "$id": "https://example.com/LineItem.schema.json"
+}

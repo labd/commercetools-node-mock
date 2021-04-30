@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExtensionBadResponseError",
+  "type": "object",
+  "properties": {
+    "code": {"enum": ["ExtensionBadResponse"]},
+    "localizedMessage": {"$ref": "LocalizedString.schema.json"},
+    "message": {"type": "string"},
+    "errorByExtension": {"$ref": "ErrorByExtension.schema.json"},
+    "extensionExtraInfo": {"type": "object"}
+  },
+  "required": [
+    "code",
+    "message",
+    "errorByExtension"
+  ],
+  "$id": "https://example.com/ExtensionBadResponseError.schema.json"
+}

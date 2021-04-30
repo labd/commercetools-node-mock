@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListSetKeyAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setKey"]},
+    "key": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ShoppingListSetKeyAction.schema.json"
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategoryUpdate",
+  "type": "object",
+  "properties": {
+    "version": {"type": "number"},
+    "actions": {
+      "type": "array",
+      "items": {"$ref": "CategoryUpdateAction.schema.json"}
+    }
+  },
+  "required": [
+    "version",
+    "actions"
+  ],
+  "$id": "https://example.com/CategoryUpdate.schema.json"
+}

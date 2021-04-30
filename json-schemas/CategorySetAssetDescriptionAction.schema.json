@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategorySetAssetDescriptionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setAssetDescription"]},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "assetId": {"type": "string"},
+    "assetKey": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CategorySetAssetDescriptionAction.schema.json"
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CustomFieldMoneyType",
+  "type": "object",
+  "properties": {"name": {"enum": ["Money"]}},
+  "required": ["name"],
+  "$id": "https://example.com/CustomFieldMoneyType.schema.json"
+}

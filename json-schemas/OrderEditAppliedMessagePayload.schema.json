@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditAppliedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderEditApplied"]},
+    "result": {"$ref": "OrderEditApplied.schema.json"},
+    "edit": {"$ref": "OrderEditReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "edit",
+    "result"
+  ],
+  "$id": "https://example.com/OrderEditAppliedMessagePayload.schema.json"
+}

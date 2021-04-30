@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ChannelSetCustomTypeAction",
+  "type": "object",
+  "properties": {
+    "type": {"$ref": "TypeResourceIdentifier.schema.json"},
+    "fields": {"$ref": "FieldContainer.schema.json"},
+    "action": {"enum": ["setCustomType"]}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ChannelSetCustomTypeAction.schema.json"
+}

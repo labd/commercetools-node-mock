@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "PaymentAddInterfaceInteractionAction",
+  "type": "object",
+  "properties": {
+    "type": {"$ref": "TypeResourceIdentifier.schema.json"},
+    "fields": {"$ref": "FieldContainer.schema.json"},
+    "action": {"enum": ["addInterfaceInteraction"]}
+  },
+  "required": [
+    "action",
+    "type"
+  ],
+  "$id": "https://example.com/PaymentAddInterfaceInteractionAction.schema.json"
+}

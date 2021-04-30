@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "InvalidInputError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "code": {"enum": ["InvalidInput"]}
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "$id": "https://example.com/InvalidInputError.schema.json"
+}

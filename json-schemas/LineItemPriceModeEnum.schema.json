@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LineItemPriceMode",
+  "type": "string",
+  "enum": [
+    "Platform",
+    "ExternalTotal",
+    "ExternalPrice"
+  ],
+  "$id": "https://example.com/LineItemPriceModeEnum.schema.json"
+}

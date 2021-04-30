@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "InventoryEntryCreatedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["InventoryEntryCreated"]},
+    "inventoryEntry": {"$ref": "InventoryEntry.schema.json"}
+  },
+  "required": [
+    "type",
+    "inventoryEntry"
+  ],
+  "$id": "https://example.com/InventoryEntryCreatedMessagePayload.schema.json"
+}

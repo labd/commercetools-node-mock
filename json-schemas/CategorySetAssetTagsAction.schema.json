@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategorySetAssetTagsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setAssetTags"]},
+    "assetId": {"type": "string"},
+    "assetKey": {"type": "string"},
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CategorySetAssetTagsAction.schema.json"
+}

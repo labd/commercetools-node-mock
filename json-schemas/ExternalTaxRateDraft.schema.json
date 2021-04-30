@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExternalTaxRateDraft",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "country": {"type": "string"},
+    "amount": {"type": "number"},
+    "state": {"type": "string"},
+    "includedInPrice": {"type": "boolean"},
+    "subRates": {
+      "type": "array",
+      "items": {"$ref": "SubRate.schema.json"}
+    }
+  },
+  "required": [
+    "name",
+    "country"
+  ],
+  "$id": "https://example.com/ExternalTaxRateDraft.schema.json"
+}

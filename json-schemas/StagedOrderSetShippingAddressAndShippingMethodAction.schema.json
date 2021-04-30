@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetShippingAddressAndShippingMethodAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setShippingAddressAndShippingMethod"]},
+    "address": {"$ref": "Address.schema.json"},
+    "externalTaxRate": {"$ref": "ExternalTaxRateDraft.schema.json"},
+    "shippingMethod": {"$ref": "ShippingMethodResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "address"
+  ],
+  "$id": "https://example.com/StagedOrderSetShippingAddressAndShippingMethodAction.schema.json"
+}

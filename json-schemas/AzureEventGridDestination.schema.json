@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "AzureEventGridDestination",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["EventGrid"]},
+    "uri": {"type": "string"},
+    "accessKey": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "uri",
+    "accessKey"
+  ],
+  "$id": "https://example.com/AzureEventGridDestination.schema.json"
+}

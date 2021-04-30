@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategoryChangeParentAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeParent"]},
+    "parent": {"$ref": "CategoryResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "parent"
+  ],
+  "$id": "https://example.com/CategoryChangeParentAction.schema.json"
+}

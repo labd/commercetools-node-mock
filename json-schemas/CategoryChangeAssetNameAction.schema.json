@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CategoryChangeAssetNameAction",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "action": {"enum": ["changeAssetName"]},
+    "assetId": {"type": "string"},
+    "assetKey": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "name"
+  ],
+  "$id": "https://example.com/CategoryChangeAssetNameAction.schema.json"
+}

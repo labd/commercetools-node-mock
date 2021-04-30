@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "Channel",
+  "type": "object",
+  "properties": {
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "address": {"$ref": "Address.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "roles": {
+      "type": "array",
+      "items": {"$ref": "ChannelRoleEnumEnum.schema.json"}
+    },
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "geoLocation": {"$ref": "GeoJson.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "id": {"type": "string"},
+    "key": {"type": "string"},
+    "reviewRatingStatistics": {"$ref": "ReviewRatingStatistics.schema.json"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "key",
+    "roles"
+  ],
+  "$id": "https://example.com/Channel.schema.json"
+}

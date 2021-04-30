@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MissingRoleOnChannelError",
+  "type": "object",
+  "properties": {
+    "channel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "code": {"enum": ["MissingRoleOnChannel"]},
+    "message": {"type": "string"},
+    "missingRole": {"$ref": "ChannelRoleEnumEnum.schema.json"}
+  },
+  "required": [
+    "code",
+    "message",
+    "missingRole"
+  ],
+  "$id": "https://example.com/MissingRoleOnChannelError.schema.json"
+}

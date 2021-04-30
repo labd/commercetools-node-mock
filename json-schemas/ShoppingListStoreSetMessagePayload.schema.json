@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ShoppingListStoreSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ShoppingListStoreSet"]},
+    "store": {"$ref": "StoreKeyReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "store"
+  ],
+  "$id": "https://example.com/ShoppingListStoreSetMessagePayload.schema.json"
+}

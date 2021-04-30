@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ZoneSetDescriptionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setDescription"]},
+    "description": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/ZoneSetDescriptionAction.schema.json"
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartSetAnonymousIdAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setAnonymousId"]},
+    "anonymousId": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://example.com/CartSetAnonymousIdAction.schema.json"
+}

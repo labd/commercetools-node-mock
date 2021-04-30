@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "LineItemStateTransitionMessagePayload",
+  "type": "object",
+  "properties": {
+    "transitionDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "fromState": {"$ref": "StateReference.schema.json"},
+    "toState": {"$ref": "StateReference.schema.json"},
+    "quantity": {"type": "number"},
+    "type": {"enum": ["LineItemStateTransition"]},
+    "lineItemId": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "lineItemId",
+    "transitionDate",
+    "quantity",
+    "fromState",
+    "toState"
+  ],
+  "$id": "https://example.com/LineItemStateTransitionMessagePayload.schema.json"
+}

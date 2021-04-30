@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StoreRemoveSupplyChannelAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeSupplyChannel"]},
+    "supplyChannel": {"$ref": "ChannelResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "supplyChannel"
+  ],
+  "$id": "https://example.com/StoreRemoveSupplyChannelAction.schema.json"
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MyShoppingListSetTextLineItemCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setTextLineItemCustomField"]},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "textLineItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "textLineItemId",
+    "name"
+  ],
+  "$id": "https://example.com/MyShoppingListSetTextLineItemCustomFieldAction.schema.json"
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderCustomLineItemDiscountSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "customLineItemId": {"type": "string"},
+    "type": {"enum": ["OrderCustomLineItemDiscountSet"]},
+    "discountedPricePerQuantity": {
+      "type": "array",
+      "items": {"$ref": "DiscountedLineItemPriceForQuantity.schema.json"}
+    },
+    "taxedPrice": {"$ref": "TaxedItemPrice.schema.json"}
+  },
+  "required": [
+    "type",
+    "customLineItemId",
+    "discountedPricePerQuantity"
+  ],
+  "$id": "https://example.com/OrderCustomLineItemDiscountSetMessagePayload.schema.json"
+}

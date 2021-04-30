@@ -1,0 +1,16 @@
+{
+  "oneOf": [
+    {"$ref": "https://example.com/ExtensionChangeDestinationAction.schema.json"},
+    {"$ref": "https://example.com/ExtensionChangeTriggersAction.schema.json"},
+    {"$ref": "https://example.com/ExtensionSetKeyAction.schema.json"},
+    {"$ref": "https://example.com/ExtensionSetTimeoutInMsAction.schema.json"}
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExtensionUpdateAction",
+  "type": "object",
+  "properties": {"action": {"type": "string"}},
+  "required": ["action"],
+  "$id": "https://example.com/ExtensionUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

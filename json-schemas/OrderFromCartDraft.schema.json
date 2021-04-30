@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderFromCartDraft",
+  "type": "object",
+  "properties": {
+    "shipmentState": {"$ref": "ShipmentStateEnum.schema.json"},
+    "orderNumber": {"type": "string"},
+    "id": {"type": "string"},
+    "state": {"$ref": "StateResourceIdentifier.schema.json"},
+    "paymentState": {"$ref": "PaymentStateEnum.schema.json"},
+    "version": {"type": "number"},
+    "cart": {"$ref": "CartResourceIdentifier.schema.json"},
+    "orderState": {"$ref": "OrderStateEnum.schema.json"}
+  },
+  "required": ["version"],
+  "$id": "https://example.com/OrderFromCartDraft.schema.json"
+}

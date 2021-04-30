@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderRemoveCustomLineItemAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeCustomLineItem"]},
+    "customLineItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "customLineItemId"
+  ],
+  "$id": "https://example.com/StagedOrderRemoveCustomLineItemAction.schema.json"
+}

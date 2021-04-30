@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "DeliveryAddedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["DeliveryAdded"]},
+    "delivery": {"$ref": "Delivery.schema.json"}
+  },
+  "required": [
+    "type",
+    "delivery"
+  ],
+  "$id": "https://example.com/DeliveryAddedMessagePayload.schema.json"
+}

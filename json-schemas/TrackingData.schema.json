@@ -1,0 +1,14 @@
+{
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TrackingData",
+  "type": "object",
+  "properties": {
+    "isReturn": {"type": "boolean"},
+    "carrier": {"type": "string"},
+    "providerTransaction": {"type": "string"},
+    "provider": {"type": "string"},
+    "trackingId": {"type": "string"}
+  },
+  "$id": "https://example.com/TrackingData.schema.json"
+}

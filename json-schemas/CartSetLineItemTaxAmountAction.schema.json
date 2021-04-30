@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartSetLineItemTaxAmountAction",
+  "type": "object",
+  "properties": {
+    "externalTaxAmount": {"$ref": "ExternalTaxAmountDraft.schema.json"},
+    "action": {"enum": ["setLineItemTaxAmount"]},
+    "lineItemId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "lineItemId"
+  ],
+  "$id": "https://example.com/CartSetLineItemTaxAmountAction.schema.json"
+}

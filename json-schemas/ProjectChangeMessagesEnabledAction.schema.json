@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProjectChangeMessagesEnabledAction",
+  "type": "object",
+  "properties": {
+    "messagesEnabled": {"type": "boolean"},
+    "action": {"enum": ["changeMessagesEnabled"]}
+  },
+  "required": [
+    "action",
+    "messagesEnabled"
+  ],
+  "$id": "https://example.com/ProjectChangeMessagesEnabledAction.schema.json"
+}

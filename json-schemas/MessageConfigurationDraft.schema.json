@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "MessageConfigurationDraft",
+  "type": "object",
+  "properties": {
+    "deleteDaysAfterCreation": {"type": "number"},
+    "enabled": {"type": "boolean"}
+  },
+  "required": [
+    "enabled",
+    "deleteDaysAfterCreation"
+  ],
+  "$id": "https://example.com/MessageConfigurationDraft.schema.json"
+}

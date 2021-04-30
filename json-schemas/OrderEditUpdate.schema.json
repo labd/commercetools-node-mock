@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "OrderEditUpdate",
+  "type": "object",
+  "properties": {
+    "version": {"type": "number"},
+    "actions": {
+      "type": "array",
+      "items": {"$ref": "OrderEditUpdateAction.schema.json"}
+    },
+    "dryRun": {"type": "boolean"}
+  },
+  "required": [
+    "version",
+    "actions"
+  ],
+  "$id": "https://example.com/OrderEditUpdate.schema.json"
+}

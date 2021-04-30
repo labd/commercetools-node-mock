@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDiscountChangeIsActiveAction",
+  "type": "object",
+  "properties": {
+    "isActive": {"type": "boolean"},
+    "action": {"enum": ["changeIsActive"]}
+  },
+  "required": [
+    "action",
+    "isActive"
+  ],
+  "$id": "https://example.com/ProductDiscountChangeIsActiveAction.schema.json"
+}

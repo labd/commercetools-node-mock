@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ExternalLineItemTotalPrice",
+  "type": "object",
+  "properties": {
+    "totalPrice": {"$ref": "Money.schema.json"},
+    "price": {"$ref": "Money.schema.json"}
+  },
+  "required": [
+    "price",
+    "totalPrice"
+  ],
+  "$id": "https://example.com/ExternalLineItemTotalPrice.schema.json"
+}

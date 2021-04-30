@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "CartDiscountChangeStackingModeAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeStackingMode"]},
+    "stackingMode": {"$ref": "StackingModeEnum.schema.json"}
+  },
+  "required": [
+    "action",
+    "stackingMode"
+  ],
+  "$id": "https://example.com/CartDiscountChangeStackingModeAction.schema.json"
+}

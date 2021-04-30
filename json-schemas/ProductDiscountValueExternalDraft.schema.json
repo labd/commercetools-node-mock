@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "title": "ProductDiscountValueExternalDraft",
+  "type": "object",
+  "properties": {"type": {"enum": ["external"]}},
+  "required": ["type"],
+  "$id": "https://example.com/ProductDiscountValueExternalDraft.schema.json"
+}
