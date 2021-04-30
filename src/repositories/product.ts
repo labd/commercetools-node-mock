@@ -4,12 +4,14 @@ import {
   ProductDraft,
   ProductPublishAction,
   ProductSetAttributeAction,
-  ProductVariant,
+  ProductVariant, ProductVariantDraft,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import AbstractRepository from './abstract'
 import { Writable } from '../types'
+
+
 
 export class ProductRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -21,12 +23,10 @@ export class ProductRepository extends AbstractRepository {
       name: draft.name,
       slug: draft.slug,
       categories: [],
-      masterVariant: {
-        id: 0,
-        sku: draft.masterVariant?.sku,
-        attributes: draft.masterVariant?.attributes,
-      },
-      variants: [],
+      masterVariant: draft.masterVariant && variantFromDraft(0, draft.masterVariant!),
+      variants: draft.variants && draft.variants.map((variant, index) => {
+        return variantFromDraft(index + 1, variant)
+      }),
 
       // @ts-ignore
       searchKeywords: draft.searchKeywords,
@@ -70,9 +70,9 @@ export class ProductRepository extends AbstractRepository {
     ) => {
       const isStaged = staged !== undefined ? staged : false
       const productData = getProductData(resource, isStaged)
-      const variant = getVariant(productData, variantId, sku)
+      const [variant, isMasterVariant, variantIndex] = getVariant(productData, variantId, sku)
       if (!variant) {
-        throw Error(
+        throw new Error(
           `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
         )
       }
@@ -91,10 +91,22 @@ export class ProductRepository extends AbstractRepository {
         })
       }
       if (isStaged) {
+        resource.masterData.staged = productData
+        if (isMasterVariant) {
+          resource.masterData.staged.masterVariant = variant
+        } else {
+          resource.masterData.staged.variants[variantIndex] = variant
+        }
         resource.masterData.hasStagedChanges = true
+      } else {
+        resource.masterData.current = productData
+        if (isMasterVariant) {
+          resource.masterData.current.masterVariant = variant
+        } else {
+          resource.masterData.current.variants[variantIndex] = variant
+        }
       }
     },
-    // 'setAttribute': () => {},
     // 'setKey': () => {},
     // 'changeName': () => {},
     // 'setDescription': () => {},
@@ -152,9 +164,9 @@ const getVariant = (
   productData: ProductData,
   variantId?: number,
   sku?: string
-): Writable<ProductVariant> | undefined => {
+): [Writable<ProductVariant | undefined>, boolean, number] => {
   const variants = [productData.masterVariant, ...productData.variants]
-  return variants.find(variant => {
+  const foundVariant = variants.find((variant: ProductVariant) => {
     if (variantId) {
       return variant.id === variantId
     }
@@ -163,4 +175,15 @@ const getVariant = (
     }
     return false
   })
+
+  const isMasterVariant = foundVariant === productData.masterVariant
+  return [foundVariant, isMasterVariant, !isMasterVariant && foundVariant ? productData.variants.indexOf(foundVariant) : -1]
+}
+
+const variantFromDraft = (variantId: number, variant: ProductVariantDraft): ProductVariant => {
+  return {
+    id: variantId,
+    sku: variant?.sku,
+    attributes: variant?.attributes,
+  }
 }
