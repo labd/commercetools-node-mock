@@ -42,8 +42,6 @@ describe('Product', () => {
             'nl-NL': 'test-product',
           },
           categories: [],
-          masterVariant: expect.anything(),
-          variants: [],
         },
         hasStagedChanges: true,
         published: false,
@@ -75,6 +73,17 @@ describe('Product update actions', () => {
           },
         ],
       },
+      variants: [
+        {
+          sku: '1338',
+          attributes: [
+            {
+              name: 'test2',
+              value: 'test2',
+            },
+          ],
+        },
+      ],
       slug: {
         'nl-NL': 'test-product',
       },
@@ -88,7 +97,7 @@ describe('Product update actions', () => {
     product = response.body
   })
 
-  test('setAttribute', async () => {
+  test('setAttribute masterVariant', async () => {
     assert(product)
 
     const response = await supertest(ctMock.app)
@@ -105,6 +114,47 @@ describe('Product update actions', () => {
       response.body.masterData.current.masterVariant.attributes
     ).toHaveLength(2)
     const attr = response.body.masterData.current.masterVariant.attributes[1]
+    expect(attr).toEqual({ name: 'foo', value: 'bar' })
+  })
+
+  test('setAttribute variant', async () => {
+    assert(product)
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${product.id}`)
+      .send({
+        version: 1,
+        actions: [
+          { action: 'setAttribute', sku: '1338', name: 'foo', value: 'bar' },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(
+      response.body.masterData.current.variants[0].attributes
+    ).toHaveLength(2)
+    const attr = response.body.masterData.current.variants[0].attributes[1]
+    expect(attr).toEqual({ name: 'foo', value: 'bar' })
+  })
+
+  test('setAttribute variant and publish', async () => {
+    assert(product)
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${product.id}`)
+      .send({
+        version: 1,
+        actions: [
+          { action: 'setAttribute', sku: '1338', name: 'foo', value: 'bar' },
+          { action: 'publish' },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(
+      response.body.masterData.current.variants[0].attributes
+    ).toHaveLength(2)
+    const attr = response.body.masterData.current.variants[0].attributes[1]
     expect(attr).toEqual({ name: 'foo', value: 'bar' })
   })
 
