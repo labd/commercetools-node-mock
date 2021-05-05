@@ -160,4 +160,17 @@ describe('Inventory Entry Update Actions', () => {
     expect(response.body.version).toBe(3)
     expect(response.body.custom.fields['foo']).toBe('bar')
   })
+
+  test('set restockable in days', async () => {
+    assert(inventoryEntry)
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/inventory/${inventoryEntry.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'setRestockableInDays', restockableInDays: 0 }],
+      })
+    expect(response.status).toEqual(200)
+    expect(response.body.version).toEqual(2)
+    expect(response.body.restockableInDays).toEqual(0)
+  })
 })

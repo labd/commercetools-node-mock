@@ -5,6 +5,7 @@ import {
   InventoryEntrySetCustomFieldAction,
   InventoryEntrySetCustomTypeAction,
   InventoryEntrySetExpectedDeliveryAction,
+  InventoryEntrySetRestockableInDaysAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
@@ -84,5 +85,12 @@ export class InventoryEntryRepository extends AbstractRepository {
         }
       }
     },
+    setRestockableInDays: (
+      projectKey: string,
+      resource: Writable<InventoryEntry>,
+      { restockableInDays }:InventoryEntrySetRestockableInDaysAction
+    ) => {
+      resource.restockableInDays = restockableInDays
+    }
   }
 }
