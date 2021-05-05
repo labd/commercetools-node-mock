@@ -42,7 +42,7 @@ export class OrderRepository extends AbstractRepository {
   }
 
   create(projectKey: string, draft: OrderFromCartDraft): Order {
-    assert(draft.cart)
+    assert(draft.cart, 'draft.cart is missing')
 
     const cart = this._storage.getByResourceIdentifier(
       projectKey,
@@ -70,7 +70,7 @@ export class OrderRepository extends AbstractRepository {
 
   import(projectKey: string, draft: OrderImportDraft): Order {
     // TODO: Check if order with given orderNumber already exists
-    assert(this)
+    assert(this, 'OrderRepository not valid')
     const resource: Order = {
       ...getBaseResourceProperties(),
 

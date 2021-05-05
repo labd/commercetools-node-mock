@@ -42,7 +42,7 @@ describe('Order Query', () => {
   })
 
   test('no filter', async () => {
-    assert(order)
+    assert(order, 'order not created')
 
     const response = await supertest(ctMock.app).get(`/dummy/orders`)
     expect(response.status).toBe(200)
@@ -53,7 +53,7 @@ describe('Order Query', () => {
   })
 
   test('filter orderNumber', async () => {
-    assert(order)
+    assert(order, 'order not created')
 
     {
       const response = await supertest(ctMock.app)
@@ -98,7 +98,7 @@ describe('Order Update Actions', () => {
   })
 
   test('no update', async () => {
-    assert(order)
+    assert(order, 'order not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
@@ -122,7 +122,7 @@ describe('Order Update Actions', () => {
   })
 
   test('setOrderNumber', async () => {
-    assert(order)
+    assert(order, 'order not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
@@ -136,7 +136,7 @@ describe('Order Update Actions', () => {
   })
 
   test('changeOrderState', async () => {
-    assert(order)
+    assert(order, 'order not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
@@ -150,7 +150,7 @@ describe('Order Update Actions', () => {
   })
 
   test('changePaymentState | changeOrderState', async () => {
-    assert(order)
+    assert(order, 'order not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/orders/${order.id}`)
