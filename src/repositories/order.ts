@@ -25,7 +25,7 @@ import {
   ReferenceTypeId,
   Store,
 } from '@commercetools/platform-sdk'
-import AbstractRepository from './abstract'
+import AbstractRepository, { QueryParams } from './abstract'
 import {
   createCustomFields,
   createPrice,
@@ -42,7 +42,7 @@ export class OrderRepository extends AbstractRepository {
   }
 
   create(projectKey: string, draft: OrderFromCartDraft): Order {
-    assert(draft.cart)
+    assert(draft.cart, 'draft.cart is missing')
 
     const cart = this._storage.getByResourceIdentifier(
       projectKey,
@@ -70,7 +70,7 @@ export class OrderRepository extends AbstractRepository {
 
   import(projectKey: string, draft: OrderImportDraft): Order {
     // TODO: Check if order with given orderNumber already exists
-    assert(this)
+    assert(this, 'OrderRepository not valid')
     const resource: Order = {
       ...getBaseResourceProperties(),
 
@@ -192,9 +192,11 @@ export class OrderRepository extends AbstractRepository {
 
   getWithOrderNumber(
     projectKey: string,
-    orderNumber: string
+    orderNumber: string,
+    params: QueryParams = {}
   ): Order | undefined {
     const result = this._storage.query(projectKey, this.getTypeId(), {
+      ...params,
       where: [`orderNumber="${orderNumber}"`],
     })
     if (result.count === 1) {

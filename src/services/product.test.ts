@@ -98,7 +98,7 @@ describe('Product update actions', () => {
   })
 
   test('setAttribute masterVariant', async () => {
-    assert(product)
+    assert(product, 'product not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/products/${product.id}`)
@@ -118,7 +118,7 @@ describe('Product update actions', () => {
   })
 
   test('setAttribute variant', async () => {
-    assert(product)
+    assert(product, 'product not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/products/${product.id}`)
@@ -138,7 +138,7 @@ describe('Product update actions', () => {
   })
 
   test('setAttribute variant and publish', async () => {
-    assert(product)
+    assert(product, 'product not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/products/${product.id}`)
@@ -159,7 +159,7 @@ describe('Product update actions', () => {
   })
 
   test('setAttribute overwrite', async () => {
-    assert(product)
+    assert(product, 'product not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/products/${product.id}`)

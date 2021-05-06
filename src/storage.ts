@@ -139,7 +139,7 @@ export class InMemoryStorage extends AbstractStorage {
     this.forProjectKey(projectKey)[typeId]?.set(obj.id, obj)
 
     const resource = this.get(projectKey, typeId, obj.id, params)
-    assert(resource)
+    assert(resource, `resource of type ${typeId} with id ${obj.id} not created`)
     return resource
   }
 

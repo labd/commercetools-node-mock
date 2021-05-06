@@ -23,7 +23,7 @@ describe('Inventory Entry Query', () => {
   })
 
   test('no filter', async () => {
-    assert(inventoryEntry)
+    assert(inventoryEntry, 'inventory entry not created')
 
     const response = await supertest(ctMock.app).get(`/dummy/inventory`)
     expect(response.status).toBe(200)
@@ -34,7 +34,7 @@ describe('Inventory Entry Query', () => {
   })
 
   test('filter sku', async () => {
-    assert(inventoryEntry)
+    assert(inventoryEntry, 'inventory entry not created')
 
     {
       const response = await supertest(ctMock.app)
@@ -82,7 +82,7 @@ describe('Inventory Entry Update Actions', () => {
   })
 
   test('changeQuantity', async () => {
-    assert(inventoryEntry)
+    assert(inventoryEntry, 'inventory entry not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/inventory/${inventoryEntry.id}`)
@@ -97,8 +97,8 @@ describe('Inventory Entry Update Actions', () => {
   })
 
   test('set custom type', async () => {
-    assert(inventoryEntry)
-    assert(customType)
+    assert(inventoryEntry, 'inventory entry not created')
+    assert(customType, 'custom type not created')
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/inventory/${inventoryEntry.id}`)
@@ -117,7 +117,7 @@ describe('Inventory Entry Update Actions', () => {
   })
 
   test('set expected delivery', async () => {
-    assert(inventoryEntry)
+    assert(inventoryEntry, 'inventory entry not created')
     const expectedDelivery = '2021-04-02T15:06:19.700Z'
     const response = await supertest(ctMock.app)
       .post(`/dummy/inventory/${inventoryEntry.id}`)
@@ -131,8 +131,8 @@ describe('Inventory Entry Update Actions', () => {
   })
 
   test('set custom field', async () => {
-    assert(inventoryEntry)
-    assert(customType)
+    assert(inventoryEntry, 'inventory entry not created')
+    assert(customType, 'custom type not created')
 
     const setCustomTypeResponse = await supertest(ctMock.app)
       .post(`/dummy/inventory/${inventoryEntry.id}`)
@@ -159,5 +159,18 @@ describe('Inventory Entry Update Actions', () => {
     expect(response.status).toBe(200)
     expect(response.body.version).toBe(3)
     expect(response.body.custom.fields['foo']).toBe('bar')
+  })
+
+  test('set restockable in days', async () => {
+    assert(inventoryEntry, 'inventory entry not created')
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/inventory/${inventoryEntry.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'setRestockableInDays', restockableInDays: 0 }],
+      })
+    expect(response.status).toEqual(200)
+    expect(response.body.version).toEqual(2)
+    expect(response.body.restockableInDays).toEqual(0)
   })
 })
