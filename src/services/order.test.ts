@@ -83,9 +83,104 @@ describe('Order Query', () => {
   })
 })
 
-describe('Order expand', () => {
+describe('Order payment tests', () => {
   const ctMock = new CommercetoolsMock({
     defaultProjectKey: 'dummy',
+  })
+
+  afterEach(() => {
+    ctMock.clear()
+  })
+
+  test('query payment id', async () => {
+    const state: State = {
+      ...getBaseResourceProperties(),
+      builtIn: false,
+      initial: false,
+      key: 'PaymentSuccess',
+      type: 'PaymentState',
+    }
+
+    const payment: Payment = {
+      ...getBaseResourceProperties(),
+      interfaceInteractions: [],
+      paymentStatus: {
+        state: {
+          typeId: 'state',
+          id: state.id,
+        },
+      },
+      amountPlanned: {
+        type: 'centPrecision',
+        fractionDigits: 2,
+        centAmount: 1234,
+        currencyCode: 'EUR',
+      },
+      paymentMethodInfo: {
+        paymentInterface: 'buckaroo',
+        method: 'mastercard',
+      },
+      version: 2,
+      transactions: [
+        {
+          id: 'fake-transaction-id',
+          type: 'Charge',
+          amount: {
+            centAmount: 1234,
+            currencyCode: 'EUR',
+            type: 'centPrecision',
+            fractionDigits: 2,
+          },
+          state: 'Success',
+        },
+      ],
+    }
+
+    const order: Order = {
+      customLineItems: [],
+      lastMessageSequenceNumber: 0,
+      lineItems: [],
+      orderState: 'Open',
+      origin: 'Customer',
+      refusedGifts: [],
+      syncInfo: [],
+      totalPrice: {
+        type: 'centPrecision',
+        fractionDigits: 2,
+        centAmount: 2000,
+        currencyCode: 'EUR',
+      },
+      ...getBaseResourceProperties(),
+      orderNumber: '1337',
+      paymentInfo: {
+        payments: [
+          {
+            typeId: 'payment',
+            id: payment.id,
+          },
+        ],
+      },
+    }
+
+    ctMock.project().add('state', state)
+    ctMock.project().add('payment', payment)
+    ctMock.project().add('order', order)
+
+    const response = await supertest(ctMock.app)
+      .get(`/dummy/orders`)
+      .query({ where: `paymentInfo(payments(id="${payment.id}"))` })
+
+    expect(response.status).toBe(200)
+    expect(response.body.results[0].id).toBe(order.id)
+
+    {
+      const response = await supertest(ctMock.app)
+        .get(`/dummy/orders`)
+        .query({ where: `paymentInfo(payments(id is defined))` })
+
+      expect(response.status).toBe(200)
+      expect(response.body.results[0].id).toBe(order.id)
+    }
   })
 
   test('expand payment states', async () => {
