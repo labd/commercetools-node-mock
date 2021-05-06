@@ -93,6 +93,11 @@ const resolveValue = (obj: any, val: Symbol): any => {
   }
 
   if (!(val.value in obj)) {
+    if (Array.isArray(obj)) {
+      return Object.values(obj)
+        .filter(v => val.value in v)
+        .map(v => v[val.value])
+    }
     throw new PredicateError(`The field '${val.value}' does not exist.`)
   }
 
@@ -238,7 +243,12 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       validateSymbol(expr)
 
       return (obj: any, vars: VariableMap) => {
-        return resolveValue(obj, left) === resolveSymbol(expr, vars)
+        const resolvedValue = resolveValue(obj, left)
+        const resolvedSymbol = resolveSymbol(expr, vars)
+        if (Array.isArray(resolvedValue)) {
+          return !!resolvedValue.some(elem => elem === resolvedSymbol)
+        }
+        return resolvedValue === resolvedSymbol
       }
     })
     .led('!=', 20, ({ left, bp }) => {
