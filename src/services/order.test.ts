@@ -1,7 +1,7 @@
 import assert from 'assert'
-import { Order } from '@commercetools/platform-sdk'
+import { Order, Payment, State } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { CommercetoolsMock, getBaseResourceProperties } from '../index'
 
 describe('Order Query', () => {
   const ctMock = new CommercetoolsMock()
@@ -69,6 +69,104 @@ describe('Order Query', () => {
       expect(response.status).toBe(200)
       expect(response.body.count).toBe(1)
     }
+  })
+
+  test('expand payment without payments', async () => {
+    assert(order, 'order not created')
+
+    const response = await supertest(ctMock.app)
+      .get(`/dummy/orders/${order.id}`)
+      .query({ expand: 'paymentInfo.payments[*].paymentStatus.state' })
+
+    expect(response.status).toBe(200)
+    expect(response.body.id).toBe(order.id)
+  })
+})
+
+describe('Order expand', () => {
+  const ctMock = new CommercetoolsMock({
+    defaultProjectKey: 'dummy'
+  })
+
+  test('expand payment states', async () => {
+    const state: State = {
+      ...getBaseResourceProperties(),
+      builtIn: false,
+      initial: false,
+      key: 'PaymentSuccess',
+      type: 'PaymentState',
+    }
+
+    const payment: Payment = {
+      ...getBaseResourceProperties(),
+      interfaceInteractions: [],
+      paymentStatus: {
+        state: {
+          typeId: 'state',
+          id: state.id,
+        },
+      },
+      amountPlanned: {
+        type: 'centPrecision',
+        fractionDigits: 2,
+        centAmount: 1234,
+        currencyCode: 'EUR',
+      },
+      paymentMethodInfo: {
+        paymentInterface: 'buckaroo',
+        method: 'mastercard',
+      },
+      version: 2,
+      transactions: [
+        {
+          id: 'fake-transaction-id',
+          type: 'Charge',
+          amount: { centAmount: 1234, currencyCode: 'EUR', type: 'centPrecision', fractionDigits: 2 },
+          state: 'Success',
+        },
+      ],
+    }
+
+    const order: Order = {
+      customLineItems: [],
+      lastMessageSequenceNumber: 0,
+      lineItems: [],
+      orderState: 'Open',
+      origin: 'Customer',
+      refusedGifts: [],
+      syncInfo: [],
+      totalPrice: {
+        type: 'centPrecision',
+        fractionDigits: 2,
+        centAmount: 2000,
+        currencyCode: 'EUR'
+      },
+      ...getBaseResourceProperties(),
+      orderNumber: '1337',
+      paymentInfo: {
+        payments: [
+          {
+            typeId: 'payment',
+            id: payment.id
+          }
+
+        ],
+      }
+    }
+
+    ctMock.project().add('state', state)
+    ctMock.project().add('payment', payment)
+    ctMock.project().add('order', order)
+
+    const response = await supertest(ctMock.app)
+      .get(`/dummy/orders/order-number=${order.orderNumber}`)
+      .query({ expand: 'paymentInfo.payments[*].paymentStatus.state' })
+
+    expect(response.status).toBe(200)
+    expect(response.body.id).toBe(order.id)
+    const maybePayment = response.body.paymentInfo.payments[0].obj
+    expect(maybePayment).toBeDefined()
+    expect(maybePayment.paymentStatus.state.obj).toBeDefined()
   })
 })
 

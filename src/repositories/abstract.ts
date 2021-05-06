@@ -10,12 +10,12 @@ import { AbstractStorage } from '../storage'
 import { checkConcurrentModification } from './errors'
 import { CommercetoolsError } from '../exceptions'
 
-type QueryParams = {
+export type QueryParams = {
   expand?: string[]
   where?: string[]
 }
 
-type GetParams = {
+export type GetParams = {
   expand?: string[]
 }
 
