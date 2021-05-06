@@ -85,7 +85,7 @@ describe('Order Query', () => {
 
 describe('Order expand', () => {
   const ctMock = new CommercetoolsMock({
-    defaultProjectKey: 'dummy'
+    defaultProjectKey: 'dummy',
   })
 
   test('expand payment states', async () => {
@@ -121,7 +121,12 @@ describe('Order expand', () => {
         {
           id: 'fake-transaction-id',
           type: 'Charge',
-          amount: { centAmount: 1234, currencyCode: 'EUR', type: 'centPrecision', fractionDigits: 2 },
+          amount: {
+            centAmount: 1234,
+            currencyCode: 'EUR',
+            type: 'centPrecision',
+            fractionDigits: 2,
+          },
           state: 'Success',
         },
       ],
@@ -139,7 +144,7 @@ describe('Order expand', () => {
         type: 'centPrecision',
         fractionDigits: 2,
         centAmount: 2000,
-        currencyCode: 'EUR'
+        currencyCode: 'EUR',
       },
       ...getBaseResourceProperties(),
       orderNumber: '1337',
@@ -147,11 +152,10 @@ describe('Order expand', () => {
         payments: [
           {
             typeId: 'payment',
-            id: payment.id
-          }
-
+            id: payment.id,
+          },
         ],
-      }
+      },
     }
 
     ctMock.project().add('state', state)

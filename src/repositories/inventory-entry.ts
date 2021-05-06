@@ -88,9 +88,9 @@ export class InventoryEntryRepository extends AbstractRepository {
     setRestockableInDays: (
       projectKey: string,
       resource: Writable<InventoryEntry>,
-      { restockableInDays }:InventoryEntrySetRestockableInDaysAction
+      { restockableInDays }: InventoryEntrySetRestockableInDaysAction
     ) => {
       resource.restockableInDays = restockableInDays
-    }
+    },
   }
 }

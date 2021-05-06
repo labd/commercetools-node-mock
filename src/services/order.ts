@@ -33,7 +33,7 @@ export class OrderService extends AbstractService {
     const resource = this.repository.getWithOrderNumber(
       request.params.projectKey,
       request.params.orderNumber,
-      request.query,
+      request.query
     )
     if (resource) {
       return response.status(200).send(resource)
