@@ -1,5 +1,4 @@
 import { ShippingMethodRepository } from '../repositories/shipping-method'
-import { StateRepository } from '../repositories/state'
 import AbstractService from './abstract'
 import { Router } from 'express'
 import { AbstractStorage } from '../storage'

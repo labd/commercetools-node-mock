@@ -65,7 +65,7 @@ const validateSymbol = (val: Symbol) => {
     throw new PredicateError('Internal error')
   }
 
-  if (val.type == 'identifier') {
+  if (val.type === 'identifier') {
     const char = val.value.charAt(0)
     const line = val.pos?.start.line
     const column = val.pos?.start.column
@@ -77,7 +77,7 @@ const validateSymbol = (val: Symbol) => {
 }
 
 const resolveSymbol = (val: Symbol, vars: VariableMap): any => {
-  if (val.type == 'var') {
+  if (val.type === 'var') {
     if (!(val.value in vars)) {
       throw new PredicateError(`Missing parameter value for ${val.value}`)
     }
@@ -88,7 +88,7 @@ const resolveSymbol = (val: Symbol, vars: VariableMap): any => {
 }
 
 const resolveValue = (obj: any, val: Symbol): any => {
-  if (val.type != 'identifier') {
+  if (val.type !== 'identifier') {
     throw new PredicateError('Internal error')
   }
 
@@ -153,41 +153,41 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
   const parser = new Parser(lexer)
     .builder()
     .nud('IDENTIFIER', 100, t => {
-      return <Symbol>{
+      return {
         type: 'identifier',
         value: t.token.match,
         pos: t.token.strpos(),
-      }
+      } as Symbol
     })
     .nud('VARIABLE', 100, t => {
-      return <Symbol>{
+      return {
         type: 'var',
         // @ts-ignore
         value: t.token.groups[1],
         pos: t.token.strpos(),
-      }
+      } as Symbol
     })
     .nud('STRING', 100, t => {
-      return <Symbol>{
+      return {
         type: 'string',
         // @ts-ignore
         value: t.token.groups[1],
         pos: t.token.strpos(),
-      }
+      } as Symbol
     })
     .nud('INT', 1, t => {
-      return <Symbol>{
+      return {
         type: 'int',
         value: parseInt(t.token.match, 10),
         pos: t.token.strpos(),
-      }
+      } as Symbol
     })
     .nud('FLOAT', 1, t => {
-      return <Symbol>{
+      return {
         type: 'float',
         value: parseFloat(t.token.match),
         pos: t.token.strpos(),
-      }
+      } as Symbol
     })
     .nud('NOT', 100, ({ bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
@@ -296,7 +296,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 
       // Peek if this is a `is not` statement
       const next = lexer.peek()
-      if (next.type == 'NOT') {
+      if (next.type === 'NOT') {
         invert = true
         lexer.next()
       }
@@ -308,12 +308,12 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
           if (!invert) {
             return (obj: any, vars: VariableMap) => {
               const val = resolveValue(obj, left)
-              return val.length == 0
+              return val.length === 0
             }
           } else {
             return (obj: any, vars: VariableMap) => {
               const val = resolveValue(obj, left)
-              return val.length != 0
+              return val.length !== 0
             }
           }
         }
@@ -368,7 +368,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .led('WITHIN', 20, ({ left, bp }) => {
       const type = lexer.next()
 
-      if (type.match != 'circle') {
+      if (type.match !== 'circle') {
         throw new PredicateError(
           `Invalid input '${type.match}', expected circle`
         )
@@ -413,7 +413,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
         }
 
         const array = expr.map((item: Symbol) => resolveSymbol(item, vars))
-        if (keyword.type == 'ALL') {
+        if (keyword.type === 'ALL') {
           return array.every((item: any) => value.includes(item))
         } else {
           return array.some((item: any) => value.includes(item))

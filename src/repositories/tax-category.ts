@@ -1,4 +1,3 @@
-import { getReferenceFromResourceIdentifier } from './helpers'
 import {
   ReferenceTypeId,
   TaxCategory,

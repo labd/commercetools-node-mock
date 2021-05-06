@@ -1,9 +1,4 @@
-import {
-  InventoryEntry,
-  Product,
-  ProductDraft,
-  Type,
-} from '@commercetools/platform-sdk'
+import { Product, ProductDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 import assert from 'assert'

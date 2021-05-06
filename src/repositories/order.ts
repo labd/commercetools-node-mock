@@ -126,7 +126,7 @@ export class OrderRepository extends AbstractRepository {
         ],
       }) as ProductPagedQueryResponse
 
-      if (items.count != 1) {
+      if (items.count !== 1) {
         throw new CommercetoolsError<GeneralError>({
           code: 'General',
           message: `A product containing a variant with SKU '${draft.variant.sku}' not found.`,
@@ -134,11 +134,11 @@ export class OrderRepository extends AbstractRepository {
       }
 
       product = items.results[0]
-      if (product.masterData.current.masterVariant.sku == draft.variant.sku) {
+      if (product.masterData.current.masterVariant.sku === draft.variant.sku) {
         variant = product.masterData.current.masterVariant
       } else {
         variant = product.masterData.current.variants.find(
-          v => v.sku == draft.variant.sku
+          v => v.sku === draft.variant.sku
         )
       }
       if (!variant) {
