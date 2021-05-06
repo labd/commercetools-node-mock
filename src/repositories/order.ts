@@ -7,6 +7,7 @@ import {
   LineItem,
   LineItemImportDraft,
   Order,
+  OrderAddPaymentAction,
   OrderChangeOrderStateAction,
   OrderChangePaymentStateAction,
   OrderFromCartDraft,
@@ -212,6 +213,30 @@ export class OrderRepository extends AbstractRepository {
   }
 
   actions = {
+    addPayment: (
+      projectKey: string,
+      resource: Writable<Order>,
+      { payment }: OrderAddPaymentAction
+    ) => {
+      const resolvedPayment = this._storage.getByResourceIdentifier(
+        projectKey,
+        payment
+      )
+      if (!resolvedPayment) {
+        throw new Error(`Payment ${payment.id} not found`)
+      }
+
+      if (!resource.paymentInfo) {
+        resource.paymentInfo = {
+          payments: [],
+        }
+      }
+
+      resource.paymentInfo.payments.push({
+        typeId: 'payment',
+        id: payment.id!,
+      })
+    },
     changeOrderState: (
       projectKey: string,
       resource: Writable<Order>,
