@@ -1,9 +1,10 @@
 import {
   Payment,
   PaymentDraft,
+  PaymentSetCustomFieldAction,
+  PaymentSetCustomTypeAction,
   ReferenceTypeId,
   StateReference,
-  Transaction,
   TransactionDraft,
 } from '@commercetools/platform-sdk'
 import AbstractRepository from './abstract'
@@ -14,6 +15,7 @@ import {
 } from './helpers'
 import { getBaseResourceProperties } from '../helpers'
 import { v4 as uuidv4 } from 'uuid'
+import { Writable } from '../types'
 
 export class PaymentRepository extends AbstractRepository {
   getTypeId(): ReferenceTypeId {
@@ -58,6 +60,41 @@ export class PaymentRepository extends AbstractRepository {
   })
 
   actions = {
+    setCustomField: (
+      projectKey: string,
+      resource: Payment,
+      { name, value }: PaymentSetCustomFieldAction
+    ) => {
+      if (!resource.custom) {
+        throw new Error('Resource has no custom field')
+      }
+      resource.custom.fields[name] = value
+    },
+    setCustomType: (
+      projectKey: string,
+      resource: Writable<Payment>,
+      { type, fields }: PaymentSetCustomTypeAction
+    ) => {
+      if (!type) {
+        resource.custom = undefined
+      } else {
+        const resolvedType = this._storage.getByResourceIdentifier(
+          projectKey,
+          type
+        )
+        if (!resolvedType) {
+          throw new Error(`Type ${type} not found`)
+        }
+
+        resource.custom = {
+          type: {
+            typeId: 'type',
+            id: resolvedType.id,
+          },
+          fields: fields || [],
+        }
+      }
+    },
     // addInterfaceInteraction: () => {},
     // addTransaction: () => {},
     // changeAmountPlanned: () => {},
@@ -68,8 +105,6 @@ export class PaymentRepository extends AbstractRepository {
     // setAmountRefunded: () => {},
     // setAnonymousId: () => {},
     // setAuthorization: () => {},
-    // setCustomField: () => {},
-    // setCustomType: () => {},
     // setCustomer: () => {},
     // setExternalId: () => {},
     // setInterfaceId: () => {},
