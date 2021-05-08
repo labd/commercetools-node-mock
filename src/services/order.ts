@@ -2,6 +2,9 @@ import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
 import { OrderRepository } from '../repositories/order'
 import { AbstractStorage } from '../storage'
+import { OrderImportDraftSchema } from '../validate'
+import { CommercetoolsError } from 'exceptions'
+import { InvalidInputError } from '@commercetools/platform-sdk'
 
 export class OrderService extends AbstractService {
   public repository: OrderRepository
@@ -10,6 +13,7 @@ export class OrderService extends AbstractService {
     super(parent)
     this.repository = new OrderRepository(storage)
   }
+
 
   getBasePath() {
     return 'orders'
@@ -22,6 +26,12 @@ export class OrderService extends AbstractService {
 
   import(request: Request, response: Response) {
     const importDraft = request.body
+    if (!OrderImportDraftSchema(importDraft)) {
+      // @ts-ignore
+      const errors = OrderImportDraftSchema.errors
+      throw new CommercetoolsError<InvalidInputError>(errors)
+    }
+
     const resource = this.repository.import(
       request.params.projectKey,
       importDraft
