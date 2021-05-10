@@ -30,6 +30,7 @@ describe('Order Import', () => {
         centAmount: 1000,
         currencyCode: 'EUR',
       },
+      paymentState: 'Paid',
       customLineItems: [],
       lineItems: [
         {

@@ -84,6 +84,7 @@ export class OrderRepository extends AbstractRepository {
       orderNumber: draft.orderNumber,
       orderState: draft.orderState || 'Open',
       origin: draft.origin || 'Customer',
+      paymentState: draft.paymentState,
       refusedGifts: [],
       store: resolveStoreReference(draft.store, projectKey, this._storage),
       syncInfo: [],
