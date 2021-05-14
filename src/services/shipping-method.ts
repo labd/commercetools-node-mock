@@ -1,6 +1,6 @@
 import { ShippingMethodRepository } from '../repositories/shipping-method'
 import AbstractService from './abstract'
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { AbstractStorage } from '../storage'
 
 export class ShippingMethodService extends AbstractService {
@@ -13,5 +13,17 @@ export class ShippingMethodService extends AbstractService {
 
   getBasePath() {
     return 'shipping-methods'
+  }
+
+  extraRoutes(router: Router) {
+    router.get('/matching-cart', this.matchingCart.bind(this))
+  }
+
+  matchingCart(request: Request, response: Response) {
+    const resources = this.repository.all(request.params.projectKey)
+    if (resources) {
+      return response.status(200).send({ results: resources })
+    }
+    return response.status(404).send('Not found')
   }
 }

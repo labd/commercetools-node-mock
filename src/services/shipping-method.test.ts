@@ -72,4 +72,25 @@ describe('Shipping method', () => {
     expect(response.status).toBe(200)
     expect(response.body).toEqual(createResponse.body)
   })
+
+  test('Get shipping methods mmatching cart', async () => {
+    const draft: ShippingMethodDraft = {
+      name: 'foo',
+      taxCategory: { typeId: 'tax-category', key: 'standard' },
+      isDefault: true,
+      zoneRates: [],
+    }
+    const createResponse = await supertest(ctMock.app)
+      .post('/dummy/shipping-methods')
+      .send(draft)
+
+    expect(createResponse.status).toBe(200)
+
+    const response = await supertest(ctMock.app).get(
+      `/dummy/shipping-methods/matching-cart`
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ results: [createResponse.body] })
+  })
 })
