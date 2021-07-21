@@ -22,6 +22,7 @@ import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 import { ProjectAPI } from './projectAPI'
 import { copyHeaders } from './lib/proxy'
 import { ProductService } from './services/product'
+import { MyPaymentService } from './services/my-payment'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
@@ -136,6 +137,7 @@ export class CommercetoolsMock {
       ),
       order: new OrderService(projectRouter, this._storage),
       payment: new PaymentService(projectRouter, this._storage),
+      'my-payment': new MyPaymentService(projectRouter, this._storage),
       'shipping-method': new ShippingMethodService(
         projectRouter,
         this._storage

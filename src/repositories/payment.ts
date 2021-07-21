@@ -1,5 +1,6 @@
 import {
   Payment,
+  PaymentAddTransactionAction,
   PaymentDraft,
   PaymentSetCustomFieldAction,
   PaymentSetCustomTypeAction,
@@ -68,6 +69,7 @@ export class PaymentRepository extends AbstractRepository {
       if (!resource.custom) {
         throw new Error('Resource has no custom field')
       }
+
       resource.custom.fields[name] = value
     },
     setCustomType: (
@@ -95,8 +97,17 @@ export class PaymentRepository extends AbstractRepository {
         }
       }
     },
+    addTransaction: (
+      projectKey: string,
+      resource: Writable<Payment>,
+      { transaction }: PaymentAddTransactionAction
+    ) => {
+      resource.transactions = [
+        ...resource.transactions,
+        this.transactionFromTransactionDraft(transaction),
+      ]
+    },
     // addInterfaceInteraction: () => {},
-    // addTransaction: () => {},
     // changeAmountPlanned: () => {},
     // changeTransactionInteractionId: () => {},
     // changeTransactionState: () => {},
