@@ -26,7 +26,11 @@ export class InventoryEntryRepository extends AbstractRepository {
       availableQuantity: draft.quantityOnStock,
       expectedDelivery: draft.expectedDelivery,
       restockableInDays: draft.restockableInDays,
-      supplyChannel: draft.supplyChannel,
+      supplyChannel: {
+        ...draft.supplyChannel,
+        typeId: 'channel',
+        id: draft.supplyChannel?.id ?? '',
+      },
       custom: createCustomFields(draft.custom, projectKey, this._storage),
     }
     this.save(projectKey, resource)
