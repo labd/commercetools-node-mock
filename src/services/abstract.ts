@@ -1,3 +1,4 @@
+import { QueryParams } from './../repositories/abstract'
 import { Update } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'
@@ -21,15 +22,15 @@ export default abstract class AbstractService {
     this.extraRoutes(router)
 
     router.get('/', this.get.bind(this))
+    router.get('/key=:key', this.getWithKey.bind(this)) // same thing goes for the key routes
     router.get('/:id', this.getWithId.bind(this))
-    router.get('/key=:key', this.getWithKey.bind(this))
 
-    router.delete('/:id', this.deletewithId.bind(this))
     router.delete('/key=:key', this.deletewithKey.bind(this))
+    router.delete('/:id', this.deletewithId.bind(this))
 
     router.post('/', this.post.bind(this))
-    router.post('/:id', this.postWithId.bind(this))
     router.post('/key=:key', this.postWithKey.bind(this))
+    router.post('/:id', this.postWithId.bind(this))
 
     parent.use(`/${basePath}`, router)
   }
@@ -47,7 +48,13 @@ export default abstract class AbstractService {
   }
 
   getWithKey(request: Request, response: Response) {
-    return response.status(500).send('Not implemented')
+    const result = this.repository.getByKey(
+      request.params.projectKey,
+      request.params['key'],
+      { expand: this._parseParam(request.query.expand) }
+    )
+    if (!result) return response.status(404).send()
+    return response.status(200).send(result)
   }
 
   deletewithId(request: Request, response: Response) {

@@ -49,6 +49,14 @@ export default abstract class AbstractRepository {
     return this._storage.get(projectKey, this.getTypeId(), id, params)
   }
 
+  getByKey(
+    projectKey: string,
+    key: string,
+    params: GetParams = {}
+  ): BaseResource | null {
+    return this._storage.getByKey(projectKey, this.getTypeId(), key, params)
+  }
+
   delete(
     projectKey: string,
     id: string,
