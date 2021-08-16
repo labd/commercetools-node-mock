@@ -27,22 +27,32 @@ const ctMock = new CommercetoolsMock({
   silent: true,
 })
 
-beforeAll(() => {
-  ctMock.start()
+describe('A module', () => {
+  beforeAll(() => {
+    ctMock.start()
 
-  ctMock.project().add('type', {
-    ...getBaseResourceProperties()
-    key: 'my-customt-type',
-    fieldDefinitions: [],
+    ctMock.project().add('type', {
+      ...getBaseResourceProperties()
+      key: 'my-customt-type',
+      fieldDefinitions: [],
+    })
   })
-})
 
-afterAll(() => {
-  ctMock.stop()
-})
+  afterAll(() => {
+    ctMock.stop()
+  })
 
-afterEach(() => {
-  ctMock.clear()
+  afterEach(() => {
+    ctMock.clear()
+  })
+
+  test('my function', async () => {
+    ctMock.project().add('customer',customerFixture)
+
+    const res = await myFunction()
+
+    expect(res).toEqua;(true)
+  })
 })
 ```
 
