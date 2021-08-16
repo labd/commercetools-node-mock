@@ -1,9 +1,9 @@
+import { RepositoryTypes } from './../types'
 import deepEqual from 'deep-equal'
 
 import {
   BaseResource,
   InvalidOperationError,
-  ReferenceTypeId,
   UpdateAction,
 } from '@commercetools/platform-sdk'
 import { AbstractStorage } from '../storage'
@@ -31,7 +31,7 @@ export default abstract class AbstractRepository {
     this._storage.assertStorage(this.getTypeId())
   }
 
-  abstract getTypeId(): ReferenceTypeId
+  abstract getTypeId(): RepositoryTypes
   abstract create(projectKey: string, draft: any): BaseResource
 
   query(projectKey: string, params: QueryParams = {}) {
@@ -61,6 +61,7 @@ export default abstract class AbstractRepository {
     const typeId = this.getTypeId()
 
     const current = this.get(projectKey, resource.id)
+
     if (current) {
       checkConcurrentModification(current, resource.version)
     } else {

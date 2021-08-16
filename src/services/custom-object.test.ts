@@ -141,4 +141,54 @@ describe('CustomObject retrieve', () => {
       version: 1,
     })
   })
+
+  test('update with container and key', async () => {
+    ctMock.project('dummy').add('custom-object', {
+      ...getBaseResourceProperties(),
+      container: 'my-container',
+      key: 'my-key',
+      value: 'my-value',
+      version: 2,
+    })
+
+    const response = await supertest(ctMock.app)
+      .post('/dummy/custom-objects/my-container/my-key')
+      .send({
+        value: 'new-value',
+      })
+
+    expect(response.status).toEqual(200)
+    expect(response.body).toEqual({
+      container: 'my-container',
+      createdAt: expect.anything(),
+      id: expect.anything(),
+      key: 'my-key',
+      lastModifiedAt: expect.anything(),
+      value: 'new-value',
+      version: 2,
+    })
+  })
+
+  test('delete with container and key', async () => {
+    const response = await supertest(ctMock.app)
+      .delete('/dummy/custom-objects/my-container/my-key')
+      .send()
+
+    expect(response.status).toEqual(200)
+    expect(response.body).toEqual({
+      container: 'my-container',
+      createdAt: expect.anything(),
+      id: expect.anything(),
+      key: 'my-key',
+      lastModifiedAt: expect.anything(),
+      value: 'my-value',
+      version: 1,
+    })
+
+    const fetchRes = await supertest(ctMock.app)
+      .get('/dummy/custom-objects/my-container/my-key')
+      .send()
+
+    expect(fetchRes.status).toEqual(404)
+  })
 })

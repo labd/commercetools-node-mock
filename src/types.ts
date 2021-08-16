@@ -1,3 +1,5 @@
+import { ProductProjectionRepository } from './repositories/product-projection'
+import { ShoppingListRepository } from './repositories/shopping-list'
 import * as ctp from '@commercetools/platform-sdk'
 import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import AbstractService from './services/abstract'
@@ -15,11 +17,12 @@ import { TaxCategoryRepository } from './repositories/tax-category'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
-type serviceTypes = ReferenceTypeId | 'my-payment'
+export type RepositoryTypes = ReferenceTypeId | 'product-projection'
+export type ServiceTypes = RepositoryTypes | 'my-payment'
 
 export type Services = Partial<
   {
-    [index in serviceTypes]: AbstractService
+    [index in ServiceTypes]: AbstractService
   }
 >
 
@@ -39,6 +42,7 @@ export type ResourceMap = {
   payment: ctp.Payment
   product: ctp.Product
   'product-discount': ctp.ProductDiscount
+  'product-projection': ctp.ProductProjection
   'product-type': ctp.ProductType
   review: ctp.Review
   'shipping-method': ctp.ShippingMethod
@@ -94,11 +98,12 @@ export type RepositoryMap = {
   'order-edit': never
   payment: PaymentRepository
   product: ProductRepository
+  'product-projection': ProductProjectionRepository
   'product-discount': never
   'product-type': ProductTypeRepository
   review: never
   'shipping-method': ShippingMethodRepository
-  'shopping-list': never
+  'shopping-list': ShoppingListRepository
   state: StateRepository
   store: never
   subscription: never

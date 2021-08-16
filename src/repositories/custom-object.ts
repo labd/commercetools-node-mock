@@ -22,6 +22,8 @@ export class CustomObjectRepository extends AbstractRepository {
 
     const baseProperties = getBaseResourceProperties()
     if (current) {
+      baseProperties.id = current.id
+
       if (!draft.version) {
         draft.version = current.version
       }
@@ -44,6 +46,7 @@ export class CustomObjectRepository extends AbstractRepository {
       key: draft.key,
       value: draft.value,
     }
+
     this.save(projectKey, resource)
     return resource
   }

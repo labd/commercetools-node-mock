@@ -9,7 +9,6 @@ import {
   PagedQueryResponse,
   QueryParam,
   Reference,
-  ReferenceTypeId,
   ResourceIdentifier,
   Product,
   Store,
@@ -20,9 +19,11 @@ import {
   ShippingMethod,
   ProductType,
   InvalidInputError,
+  ProductProjection,
+  ShoppingList,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
-import { ResourceMap, Writable } from './types'
+import { RepositoryTypes, ResourceMap, Writable } from './types'
 import { parseQueryExpression } from './lib/predicateParser'
 import { CommercetoolsError } from './exceptions'
 
@@ -43,33 +44,33 @@ type QueryParams = {
 export abstract class AbstractStorage {
   abstract clear(): void
 
-  abstract assertStorage(typeId: ReferenceTypeId): void
+  abstract assertStorage(typeId: RepositoryTypes): void
 
-  abstract all(projectKey: string, typeId: ReferenceTypeId): Array<BaseResource>
+  abstract all(projectKey: string, typeId: RepositoryTypes): Array<BaseResource>
 
-  abstract add<ReferenceTypeId extends keyof ResourceMap>(
+  abstract add<RepositoryTypes extends keyof ResourceMap>(
     projectKey: string,
-    typeId: ReferenceTypeId,
-    obj: ResourceMap[ReferenceTypeId]
+    typeId: RepositoryTypes,
+    obj: ResourceMap[RepositoryTypes]
   ): void
 
-  abstract get<ReferenceTypeId extends keyof ResourceMap>(
+  abstract get<RepositoryTypes extends keyof ResourceMap>(
     projectKey: string,
-    typeId: ReferenceTypeId,
+    typeId: RepositoryTypes,
     id: string,
     params: GetParams
-  ): ResourceMap[ReferenceTypeId] | null
+  ): ResourceMap[RepositoryTypes] | null
 
   abstract delete(
     projectKey: string,
-    typeId: ReferenceTypeId,
+    typeId: RepositoryTypes,
     id: string,
     params: GetParams
   ): BaseResource | null
 
   abstract query(
     projectKey: string,
-    typeId: ReferenceTypeId,
+    typeId: RepositoryTypes,
     params: QueryParams
   ): PagedQueryResponse
 
@@ -81,7 +82,7 @@ export abstract class AbstractStorage {
 
 type ProjectStorage = Partial<
   {
-    [index in ReferenceTypeId]: Map<string, BaseResource>
+    [index in RepositoryTypes]: Map<string, BaseResource>
   }
 >
 
@@ -102,9 +103,11 @@ export class InMemoryStorage extends AbstractStorage {
         payment: new Map<string, Payment>(),
         'product-type': new Map<string, ProductType>(),
         product: new Map<string, Product>(),
+        'product-projection': new Map<string, ProductProjection>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         state: new Map<string, State>(),
         store: new Map<string, Store>(),
+        'shopping-list': new Map<string, ShoppingList>(),
         'tax-category': new Map<string, TaxCategory>(),
         type: new Map<string, Type>(),
       }
@@ -120,9 +123,9 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  assertStorage(typeId: ReferenceTypeId) {}
+  assertStorage(typeId: RepositoryTypes) {}
 
-  all(projectKey: string, typeId: ReferenceTypeId) {
+  all(projectKey: string, typeId: RepositoryTypes) {
     const store = this.forProjectKey(projectKey)[typeId]
     if (store) {
       return Array.from(store.values())
@@ -130,12 +133,12 @@ export class InMemoryStorage extends AbstractStorage {
     return []
   }
 
-  add<ReferenceTypeId extends keyof ResourceMap>(
+  add<RepositoryTypes extends keyof ResourceMap>(
     projectKey: string,
-    typeId: ReferenceTypeId,
-    obj: ResourceMap[ReferenceTypeId],
+    typeId: RepositoryTypes,
+    obj: ResourceMap[RepositoryTypes],
     params: GetParams = {}
-  ): ResourceMap[ReferenceTypeId] {
+  ): ResourceMap[RepositoryTypes] {
     this.forProjectKey(projectKey)[typeId]?.set(obj.id, obj)
 
     const resource = this.get(projectKey, typeId, obj.id, params)
@@ -143,44 +146,45 @@ export class InMemoryStorage extends AbstractStorage {
     return resource
   }
 
-  get<ReferenceTypeId extends keyof ResourceMap>(
+  get<RepositoryTypes extends keyof ResourceMap>(
     projectKey: string,
-    typeId: ReferenceTypeId,
+    typeId: RepositoryTypes,
     id: string,
     params: GetParams = {}
-  ): ResourceMap[ReferenceTypeId] | null {
+  ): ResourceMap[RepositoryTypes] | null {
     const resource = this.forProjectKey(projectKey)[typeId]?.get(id)
     if (resource) {
       return this.expand(
         projectKey,
         resource,
         params.expand
-      ) as ResourceMap[ReferenceTypeId]
+      ) as ResourceMap[RepositoryTypes]
     }
     return null
   }
 
   delete(
     projectKey: string,
-    typeId: ReferenceTypeId,
+    typeId: RepositoryTypes,
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
     const resource = this.get(projectKey, typeId, id)
+
     if (resource) {
       this.forProjectKey(projectKey)[typeId]?.delete(id)
       return this.expand(
         projectKey,
         resource,
         params.expand
-      ) as ResourceMap[ReferenceTypeId]
+      ) as ResourceMap[RepositoryTypes]
     }
     return resource
   }
 
   query(
     projectKey: string,
-    typeId: ReferenceTypeId,
+    typeId: RepositoryTypes,
     params: QueryParams
   ): PagedQueryResponse {
     const store = this.forProjectKey(projectKey)[typeId]
@@ -230,14 +234,14 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  getByResourceIdentifier<ReferenceTypeId extends keyof ResourceMap>(
+  getByResourceIdentifier<RepositoryTypes extends keyof ResourceMap>(
     projectKey: string,
     identifier: ResourceIdentifier
-  ): ResourceMap[ReferenceTypeId] | undefined {
+  ): ResourceMap[RepositoryTypes] | undefined {
     if (identifier.id) {
       const resource = this.get(projectKey, identifier.typeId, identifier.id)
       if (resource) {
-        return resource as ResourceMap[ReferenceTypeId]
+        return resource as ResourceMap[RepositoryTypes]
       }
       console.error(
         `No resource found with typeId=${identifier.typeId}, id=${identifier.id}`
@@ -256,7 +260,7 @@ export class InMemoryStorage extends AbstractStorage {
           r => r.key === identifier.key
         )
         if (resource) {
-          return resource as ResourceMap[ReferenceTypeId]
+          return resource as ResourceMap[RepositoryTypes]
         }
       } else {
         throw new Error(

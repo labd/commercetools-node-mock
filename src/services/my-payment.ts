@@ -4,7 +4,7 @@ import { AbstractStorage } from '../storage'
 import { PaymentRepository } from '../repositories/payment'
 
 export class MyPaymentService extends AbstractService {
-  public repository: PaymentRepository //TODO: MyPaymentRepository?
+  public repository: PaymentRepository
 
   constructor(parent: Router, storage: AbstractStorage) {
     super(parent)

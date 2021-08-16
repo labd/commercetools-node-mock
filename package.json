@@ -60,7 +60,7 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@commercetools/platform-sdk": "1.16.0",
+    "@commercetools/platform-sdk": "1.17.1",
     "ajv": "^8.1.0",
     "ajv-formats": "^2.0.2",
     "basic-auth": "^2.0.1",

@@ -1,3 +1,5 @@
+import { ShoppingListService } from './services/shopping-list'
+import { ProductProjectionService } from './services/product-projection'
 import { ProductTypeService } from './services/product-type'
 import { ShippingMethodService } from './services/shipping-method'
 import { StateService } from './services/state'
@@ -144,6 +146,11 @@ export class CommercetoolsMock {
       ),
       'product-type': new ProductTypeService(projectRouter, this._storage),
       product: new ProductService(projectRouter, this._storage),
+      'product-projection': new ProductProjectionService(
+        projectRouter,
+        this._storage
+      ),
+      'shopping-list': new ShoppingListService(projectRouter, this._storage),
       state: new StateService(projectRouter, this._storage),
       store: new StoreService(projectRouter, this._storage),
       'tax-category': new TaxCategoryService(projectRouter, this._storage),

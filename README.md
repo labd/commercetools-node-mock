@@ -19,14 +19,18 @@ yarn add --dev @labdigital/commercetools-mock
 import { CommercetoolsMock, getBaseResourceProperties } from '@labdigital/commercetools-mock'
 
 const ctMock = new CommercetoolsMock({
+  apiHost: 'https://localhost',
+  authHost: 'https://localhost',
   enableAuthentication: false,
   validateCredentials: false,
+  defaultProjectKey: 'my-project',
+  silent: true,
 })
 
 beforeAll(() => {
   ctMock.start()
 
-  ctMock.project('my-project').add('type', {
+  ctMock.project().add('type', {
     ...getBaseResourceProperties()
     key: 'my-customt-type',
     fieldDefinitions: [],

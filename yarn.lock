@@ -905,10 +905,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@commercetools/platform-sdk@1.16.0":
-  version "1.16.0"
-  resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-1.16.0.tgz#901eff31742bf21aaae74194d288d1a391711ce9"
-  integrity sha512-44+NjlGzFX4kLTw11PEbSL6nuIYKxdM+n/bJ/LVpGQf3aS1xBRotrzp8I/nz3tMhH++6i9GWbidQX5bg7gteow==
+"@commercetools/platform-sdk@1.17.1":
+  version "1.17.1"
+  resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-1.17.1.tgz#bb874125111e7ebde0b0fa90e7de693084ca275a"
+  integrity sha512-Pad1VEkIwE2PGJimX8/ioS15Q0mqZvOodaxp2/V+p7P8KArlpFjLgV2vKkz3retDT3oTm7RXMX3CqQ/gPoK2Vw==
   dependencies:
     "@commercetools/sdk-client" "^2.1.1"
     "@commercetools/sdk-middleware-auth" "^6.0.4"
