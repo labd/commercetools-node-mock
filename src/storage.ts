@@ -2,6 +2,7 @@ import assert from 'assert'
 import {
   BaseResource,
   Cart,
+  Category,
   Customer,
   CustomObject,
   InventoryEntry,
@@ -21,6 +22,11 @@ import {
   InvalidInputError,
   ProductProjection,
   ShoppingList,
+  Extension,
+  CartDiscount,
+  CustomerGroup,
+  DiscountCode,
+  Zone,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { RepositoryTypes, ResourceMap, Writable } from './types'
@@ -103,7 +109,12 @@ export class InMemoryStorage extends AbstractStorage {
     if (!projectStorage) {
       projectStorage = this.resources[projectKey] = {
         cart: new Map<string, Cart>(),
+        'cart-discount': new Map<string, CartDiscount>(),
+        category: new Map<string, Category>(),
         customer: new Map<string, Customer>(),
+        'customer-group': new Map<string, CustomerGroup>(),
+        'discount-code': new Map<string, DiscountCode>(),
+        extension: new Map<string, Extension>(),
         'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
@@ -117,6 +128,7 @@ export class InMemoryStorage extends AbstractStorage {
         'shopping-list': new Map<string, ShoppingList>(),
         'tax-category': new Map<string, TaxCategory>(),
         type: new Map<string, Type>(),
+        zone: new Map<string, Zone>(),
       }
     }
     return projectStorage

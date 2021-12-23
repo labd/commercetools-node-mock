@@ -1,4 +1,5 @@
 import auth from 'basic-auth'
+import bodyParser from 'body-parser'
 import express, { NextFunction, Request, Response } from 'express'
 import {
   AccessDeniedError,
@@ -9,6 +10,7 @@ import { InvalidClientError, UnsupportedGrantType } from './errors'
 import { OAuth2Store } from './store'
 import { getBearerToken } from './helpers'
 
+
 export class OAuth2Server {
   store: OAuth2Store
 
@@ -18,6 +20,7 @@ export class OAuth2Server {
 
   createRouter() {
     const router = express.Router()
+    router.use(bodyParser.urlencoded({ extended: true }))
     router.post('/token', this.tokenHandler.bind(this))
     return router
   }
@@ -81,7 +84,7 @@ export class OAuth2Server {
       )
     }
 
-    const grantType = request.query.grant_type
+    const grantType = request.query.grant_type || request.body.grant_type
     if (!grantType) {
       return next(
         new CommercetoolsError<InvalidRequestError>(

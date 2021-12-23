@@ -25,6 +25,12 @@ import { ProjectAPI } from './projectAPI'
 import { copyHeaders } from './lib/proxy'
 import { ProductService } from './services/product'
 import { MyPaymentService } from './services/my-payment'
+import { CategoryServices } from './services/category'
+import { ExtensionServices } from './services/extension'
+import { CartDiscountService } from './services/cart-discount'
+import { CustomerGroupService } from './services/customer-group'
+import { DiscountCodeService } from './services/discount-code'
+import { ZoneService } from './services/zone'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
@@ -127,8 +133,13 @@ export class CommercetoolsMock {
     }
 
     this._services = {
+      category: new CategoryServices(projectRouter, this._storage),
       cart: new CartService(projectRouter, this._storage),
+      'cart-discount': new CartDiscountService(projectRouter, this._storage),
       customer: new CustomerService(projectRouter, this._storage),
+      'customer-group': new CustomerGroupService(projectRouter, this._storage),
+      'discount-code': new DiscountCodeService(projectRouter, this._storage),
+      extension: new ExtensionServices(projectRouter, this._storage),
       'inventory-entry': new InventoryEntryService(
         projectRouter,
         this._storage
@@ -155,6 +166,7 @@ export class CommercetoolsMock {
       store: new StoreService(projectRouter, this._storage),
       'tax-category': new TaxCategoryService(projectRouter, this._storage),
       type: new TypeService(projectRouter, this._storage),
+      zone: new ZoneService(projectRouter, this._storage),
     }
 
     app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {

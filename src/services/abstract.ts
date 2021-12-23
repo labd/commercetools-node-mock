@@ -44,7 +44,11 @@ export default abstract class AbstractService {
   }
 
   getWithId(request: Request, response: Response) {
-    return this._expandWithId(request, response, request.params['id'])
+    const result = this._expandWithId(request, request.params['id'])
+    if (!result) {
+      return response.status(404).send()
+    }
+    return response.status(200).send(result)
   }
 
   getWithKey(request: Request, response: Response) {
@@ -78,7 +82,8 @@ export default abstract class AbstractService {
   post(request: Request, response: Response) {
     const draft = request.body
     const resource = this.repository.create(request.params.projectKey, draft)
-    return this._expandWithId(request, response, resource.id)
+    const result = this._expandWithId(request, resource.id)
+    return response.status(201).send(result)
   }
 
   postWithId(request: Request, response: Response) {
@@ -101,7 +106,8 @@ export default abstract class AbstractService {
       updateRequest.actions
     )
 
-    return this._expandWithId(request, response, updatedResource.id)
+    const result = this._expandWithId(request, updatedResource.id)
+    return response.status(201).send(result)
   }
 
   postWithKey(request: Request, response: Response) {
@@ -110,16 +116,12 @@ export default abstract class AbstractService {
 
   protected _expandWithId(
     request: Request,
-    response: Response,
     resourceId: string
   ) {
     const result = this.repository.get(request.params.projectKey, resourceId, {
       expand: this._parseParam(request.query.expand),
     })
-    if (!result) {
-      return response.status(404).send('Not found')
-    }
-    return response.status(200).send(result)
+    return result
   }
 
   // No idea what i'm doing
