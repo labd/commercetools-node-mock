@@ -2,11 +2,11 @@ import { QueryParams } from './../repositories/abstract'
 import { Update } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'
-import AbstractRepository from '../repositories/abstract'
+import { AbstractResourceRepository } from '../repositories/abstract'
 
 export default abstract class AbstractService {
   protected abstract getBasePath(): string
-  public abstract repository: AbstractRepository
+  public abstract repository: AbstractResourceRepository
 
   createStatusCode = 201
 

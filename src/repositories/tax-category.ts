@@ -2,12 +2,14 @@ import {
   ReferenceTypeId,
   TaxCategory,
   TaxCategoryDraft,
+  TaxCategoryUpdateAction,
   TaxRate,
   TaxRateDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
 import { v4 as uuidv4 } from 'uuid'
+import { Writable } from 'types'
 
 export class TaxCategoryRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -18,7 +20,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
     const resource: TaxCategory = {
       ...getBaseResourceProperties(),
       ...draft,
-      rates: draft.rates.map(this.taxRateFromTaxRateDraft),
+      rates: draft.rates?.map(this.taxRateFromTaxRateDraft),
     }
     this.save(projectKey, resource)
     return resource
@@ -46,5 +48,15 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
     return
   }
 
-  actions = {}
+  actions: Partial<
+    Record<
+      TaxCategoryUpdateAction['action'],
+      (
+        projectKey: string,
+        resource: Writable<TaxCategory>,
+        action: any
+      ) => void
+    >
+  > = {
+  }
 }
