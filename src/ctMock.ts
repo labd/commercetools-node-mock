@@ -66,11 +66,12 @@ export class CommercetoolsMock {
     api: nock.Scope | undefined
   } = { auth: undefined, api: undefined }
   private _services: Services
-  private _projectService: ProjectService
+  private _projectService?: ProjectService
 
   constructor(options: Partial<CommercetoolsMockOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options }
     this._services = {}
+    this._projectService = undefined
 
     this._storage = new InMemoryStorage()
     this._oauth2 = new OAuth2Server({
