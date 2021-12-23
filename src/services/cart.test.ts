@@ -32,7 +32,7 @@ describe('Carts Query', () => {
           },
         ],
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
 
     response = await supertest(ctMock.app)
       .post('/dummy/carts')
@@ -48,7 +48,7 @@ describe('Carts Query', () => {
           },
         },
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
   })
 
   test('no filter', async () => {

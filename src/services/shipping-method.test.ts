@@ -17,7 +17,7 @@ describe('Shipping method', () => {
     const createResponse = await supertest(ctMock.app)
       .post('/dummy/tax-categories')
       .send(draft)
-    expect(createResponse.status).toEqual(200)
+    expect(createResponse.status).toEqual(201)
   })
 
   afterEach(async () => {
@@ -35,7 +35,7 @@ describe('Shipping method', () => {
       .post('/dummy/shipping-methods')
       .send(draft)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
 
     expect(response.body).toEqual({
       createdAt: expect.anything(),
@@ -63,7 +63,7 @@ describe('Shipping method', () => {
       .post('/dummy/shipping-methods')
       .send(draft)
 
-    expect(createResponse.status).toBe(200)
+    expect(createResponse.status).toBe(201)
 
     const response = await supertest(ctMock.app).get(
       `/dummy/shipping-methods/${createResponse.body.id}`

@@ -22,7 +22,7 @@ describe('Product type', () => {
       .post('/dummy/product-types')
       .send(draft)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
 
     expect(response.body).toEqual({
       attributes: [
@@ -58,7 +58,7 @@ describe('Product type', () => {
       .post('/dummy/product-types')
       .send(draft)
 
-    expect(createResponse.status).toBe(200)
+    expect(createResponse.status).toBe(201)
 
     const response = await supertest(ctMock.app).get(
       `/dummy/product-types/${createResponse.body.id}`

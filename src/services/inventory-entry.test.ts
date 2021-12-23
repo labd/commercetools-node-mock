@@ -14,7 +14,7 @@ describe('Inventory Entry Query', () => {
         sku: '1337',
         quantityOnStock: 100,
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     inventoryEntry = response.body
   })
 
@@ -65,7 +65,7 @@ describe('Inventory Entry Update Actions', () => {
         sku: '1337',
         quantityOnStock: 100,
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     inventoryEntry = response.body
 
     response = await supertest(ctMock.app)
@@ -77,7 +77,7 @@ describe('Inventory Entry Update Actions', () => {
         },
         resourceTypeIds: ['inventory-entry'],
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     customType = response.body
   })
 

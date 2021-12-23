@@ -18,7 +18,7 @@ describe('Tax Category', () => {
       .post('/dummy/tax-categories')
       .send(draft)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
 
     expect(response.body).toEqual({
       createdAt: expect.anything(),
@@ -41,7 +41,7 @@ describe('Tax Category', () => {
       .post('/dummy/tax-categories')
       .send(draft)
 
-    expect(createResponse.status).toBe(200)
+    expect(createResponse.status).toBe(201)
 
     const response = await supertest(ctMock.app).get(
       `/dummy/tax-categories/${createResponse.body.id}`
@@ -61,7 +61,7 @@ describe('Tax Category', () => {
       .post('/dummy/tax-categories')
       .send(draft)
 
-    expect(createResponse.status).toBe(200)
+    expect(createResponse.status).toBe(201)
 
     const response = await supertest(ctMock.app)
       .get(`/dummy/tax-categories/`)

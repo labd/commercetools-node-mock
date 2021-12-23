@@ -88,7 +88,7 @@ describe('Product update actions', () => {
       .post('/dummy/products')
       .send(draft)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     product = response.body
   })
 

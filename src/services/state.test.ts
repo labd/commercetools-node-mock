@@ -14,7 +14,7 @@ describe('State', () => {
       .post('/dummy/states')
       .send(draft)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
 
     expect(response.body).toEqual({
       builtIn: false,
@@ -38,7 +38,7 @@ describe('State', () => {
       .post('/dummy/states')
       .send(draft)
 
-    expect(createResponse.status).toBe(200)
+    expect(createResponse.status).toBe(201)
 
     const response = await supertest(ctMock.app).get(
       `/dummy/states/${createResponse.body.id}`

@@ -15,7 +15,7 @@ describe('Payment', () => {
         },
         resourceTypeIds: ['payment'],
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
   })
 
   test('Create payment', async () => {
@@ -32,7 +32,7 @@ describe('Payment', () => {
       .post('/dummy/payments')
       .send(draft)
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     expect(response.body).toEqual({
       id: expect.anything(),
       createdAt: expect.anything(),

@@ -15,7 +15,7 @@ describe('CustomObject create', () => {
         value: 'my-value',
       })
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     const customObject = response.body
     expect(customObject.container).toBe('my-container')
     expect(customObject.key).toBe('my-key')
@@ -36,7 +36,7 @@ describe('CustomObject retrieve', () => {
         value: 'my-value',
       })
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     customObject = response.body
     expect(customObject.container).toBe('my-container')
     expect(customObject.key).toBe('my-key')
@@ -67,7 +67,7 @@ describe('CustomObject retrieve', () => {
         value: 'my-value',
       })
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
   })
 
   test('New with version (errors)', async () => {

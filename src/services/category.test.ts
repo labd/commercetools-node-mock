@@ -18,7 +18,7 @@ describe('Categories Query', () => {
             },
             "orderHint" : "0.1"
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
   })
 
   test('no filter', async () => {

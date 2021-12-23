@@ -21,7 +21,7 @@ describe('Order Query', () => {
           },
         },
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     const cart = response.body
 
     response = await supertest(ctMock.app)
@@ -33,7 +33,7 @@ describe('Order Query', () => {
         },
         orderNumber: 'foobar',
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     order = response.body
   })
 
@@ -279,7 +279,7 @@ describe('Order Update Actions', () => {
       .send({
         currency: 'EUR',
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     const cart = response.body
 
     response = await supertest(ctMock.app)
@@ -290,7 +290,7 @@ describe('Order Update Actions', () => {
           id: cart.id,
         },
       })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(201)
     order = response.body
   })
 
