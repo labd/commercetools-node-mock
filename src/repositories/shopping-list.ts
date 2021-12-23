@@ -5,13 +5,13 @@ import {
   ShoppingListDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import {  AbstractResourceRepository } from './abstract'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,
 } from './helpers'
 
-export class ShoppingListRepository extends AbstractRepository {
+export class ShoppingListRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'shopping-list'
   }

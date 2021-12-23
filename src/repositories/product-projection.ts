@@ -6,11 +6,11 @@ import {
   ProductVariantDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { RepositoryTypes } from '../types'
 import { parseFilterExpression } from '../lib/filterParser'
 
-export class ProductProjectionRepository extends AbstractRepository {
+export class ProductProjectionRepository extends AbstractResourceRepository {
   getTypeId(): RepositoryTypes {
     return 'product-projection'
   }

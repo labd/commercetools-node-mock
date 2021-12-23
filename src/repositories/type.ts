@@ -1,8 +1,8 @@
 import { Type, TypeDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 
-export class TypeRepository extends AbstractRepository {
+export class TypeRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'type'
   }

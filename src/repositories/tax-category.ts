@@ -6,10 +6,10 @@ import {
   TaxRateDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { v4 as uuidv4 } from 'uuid'
 
-export class TaxCategoryRepository extends AbstractRepository {
+export class TaxCategoryRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'tax-category'
   }

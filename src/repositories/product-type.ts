@@ -2,13 +2,18 @@ import { getBaseResourceProperties } from '../helpers'
 import {
   AttributeDefinition,
   AttributeDefinitionDraft,
+  AttributeType,
   ProductType,
+  ProductTypeChangeLabelAction,
+  ProductTypeChangeLocalizedEnumValueLabelAction,
   ProductTypeDraft,
+  ProductTypeUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
-import AbstractRepository from './abstract'
+import {  AbstractResourceRepository } from './abstract'
+import { Writable } from 'types'
 
-export class ProductTypeRepository extends AbstractRepository {
+export class ProductTypeRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'product-type'
   }
@@ -16,7 +21,9 @@ export class ProductTypeRepository extends AbstractRepository {
   create(projectKey: string, draft: ProductTypeDraft): ProductType {
     const resource: ProductType = {
       ...getBaseResourceProperties(),
-      ...draft,
+      key: draft.key,
+      name: draft.name,
+      description: draft.description,
       attributes: (draft.attributes ?? []).map(a =>
         this.attributeDefinitionFromAttributeDefinitionDraft(projectKey, a)
       ),
@@ -52,5 +59,51 @@ export class ProductTypeRepository extends AbstractRepository {
     return
   }
 
-  actions = {}
+  actions: Partial<
+    Record<
+      ProductTypeUpdateAction['action'],
+      (projectKey: string, resource: Writable<ProductType>, action: any) => void
+    >
+  > = {
+    changeLocalizedEnumValueLabel: (
+      projectKey: string,
+      resource: Writable<ProductType>,
+      {
+        attributeName,
+        newValue,
+      }: ProductTypeChangeLocalizedEnumValueLabelAction
+    ) => {
+      const updateAttributeType = (type: Writable<AttributeType>) => {
+        switch (type.name) {
+          case 'lenum':
+            type.values.forEach(v => {
+              if (v.key == newValue.key) {
+                v.label = newValue.label
+              }
+            })
+            return
+          case 'set':
+            updateAttributeType(type.elementType)
+            return
+        }
+      }
+
+      resource.attributes?.forEach(value => {
+        if (value.name == attributeName) {
+          updateAttributeType(value.type)
+        }
+      })
+    },
+    changeLabel: (
+      projectKey: string,
+      resource: Writable<ProductType>,
+      { attributeName, label }: ProductTypeChangeLabelAction
+    ) => {
+      resource.attributes?.forEach(value => {
+        if (value.name == attributeName) {
+          value.label = label
+        }
+      })
+    },
+  }
 }

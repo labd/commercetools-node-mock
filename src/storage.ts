@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { v4 as uuidv4 } from 'uuid'
 import {
   BaseResource,
   Cart,
@@ -15,6 +16,7 @@ import {
   Store,
   Type,
   Payment,
+  Project,
   State,
   TaxCategory,
   ShippingMethod,
@@ -74,6 +76,10 @@ export abstract class AbstractStorage {
     params: GetParams
   ): ResourceMap[RepositoryTypes] | null
 
+  abstract addProject(projectKey: string): Project
+  abstract getProject(projectKey: string): Project
+  abstract saveProject(project: Project): Project
+
   abstract delete(
     projectKey: string,
     typeId: RepositoryTypes,
@@ -104,7 +110,13 @@ export class InMemoryStorage extends AbstractStorage {
     [projectKey: string]: ProjectStorage
   } = {}
 
+  protected projects: {
+    [projectKey: string]: Project
+  } = {}
+
   private forProjectKey(projectKey: string) {
+    this.addProject(projectKey)
+
     let projectStorage = this.resources[projectKey]
     if (!projectStorage) {
       projectStorage = this.resources[projectKey] = {
@@ -305,6 +317,38 @@ export class InMemoryStorage extends AbstractStorage {
       }
     }
     return undefined
+  }
+
+  addProject = (projectKey: string): Project => {
+    if (!this.projects[projectKey]) {
+      this.projects[projectKey] = {
+        key: projectKey,
+        name: '',
+        countries: [],
+        currencies: [],
+        languages: [],
+        createdAt: '2018-10-04T11:32:12.603Z',
+        trialUntil: '2018-12',
+        carts: {
+          countryTaxRateFallbackEnabled: false,
+          deleteDaysAfterLastModification: 90,
+        },
+        messages: { enabled: false, deleteDaysAfterCreation: 15 },
+        shippingRateInputType: undefined,
+        externalOAuth: undefined,
+        version: 1,
+      }
+    }
+    return this.projects[projectKey]
+  }
+
+  saveProject = (project: Project): Project => {
+    this.projects[project.key] = project
+    return project
+  }
+
+  getProject = (projectKey: string): Project => {
+    return this.addProject(projectKey)
   }
 
   private expand = <T>(

@@ -11,9 +11,9 @@ import {
   ZoneRateDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 
-export class ShippingMethodRepository extends AbstractRepository {
+export class ShippingMethodRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'shipping-method'
   }

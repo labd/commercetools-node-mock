@@ -1,9 +1,9 @@
 import { Cart, CartDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { createCustomFields } from './helpers'
 
-export class CartRepository extends AbstractRepository {
+export class CartRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'cart'
   }

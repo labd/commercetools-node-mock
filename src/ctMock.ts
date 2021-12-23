@@ -1,35 +1,38 @@
-import { ShoppingListService } from './services/shopping-list'
-import { ProductProjectionService } from './services/product-projection'
-import { ProductTypeService } from './services/product-type'
-import { ShippingMethodService } from './services/shipping-method'
-import { StateService } from './services/state'
-import { TaxCategoryService } from './services/tax-category'
-import { PaymentService } from './services/payment'
 import nock from 'nock'
 import express, { NextFunction, Request, Response } from 'express'
 import supertest from 'supertest'
 import morgan from 'morgan'
 import { AbstractStorage, InMemoryStorage } from './storage'
-import { TypeService } from './services/type'
-import { CustomObjectService } from './services/custom-object'
-import { CustomerService } from './services/customer'
-import { CartService } from './services/cart'
-import { InventoryEntryService } from './services/inventory-entry'
-import { OrderService } from './services/order'
 import { Services } from './types'
-import { StoreService } from './services/store'
 import { CommercetoolsError } from './exceptions'
 import { OAuth2Server } from './oauth/server'
-import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 import { ProjectAPI } from './projectAPI'
 import { copyHeaders } from './lib/proxy'
-import { ProductService } from './services/product'
-import { MyPaymentService } from './services/my-payment'
-import { CategoryServices } from './services/category'
-import { ExtensionServices } from './services/extension'
+import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
+
+// Services
 import { CartDiscountService } from './services/cart-discount'
+import { CartService } from './services/cart'
+import { CategoryServices } from './services/category'
 import { CustomerGroupService } from './services/customer-group'
+import { CustomerService } from './services/customer'
+import { CustomObjectService } from './services/custom-object'
 import { DiscountCodeService } from './services/discount-code'
+import { ExtensionServices } from './services/extension'
+import { InventoryEntryService } from './services/inventory-entry'
+import { MyPaymentService } from './services/my-payment'
+import { OrderService } from './services/order'
+import { PaymentService } from './services/payment'
+import { ProductProjectionService } from './services/product-projection'
+import { ProductService } from './services/product'
+import { ProductTypeService } from './services/product-type'
+import { ProjectService } from './services/project'
+import { ShippingMethodService } from './services/shipping-method'
+import { ShoppingListService } from './services/shopping-list'
+import { StateService } from './services/state'
+import { StoreService } from './services/store'
+import { TaxCategoryService } from './services/tax-category'
+import { TypeService } from './services/type'
 import { ZoneService } from './services/zone'
 
 export type CommercetoolsMockOptions = {
@@ -63,6 +66,7 @@ export class CommercetoolsMock {
     api: nock.Scope | undefined
   } = { auth: undefined, api: undefined }
   private _services: Services
+  private _projectService: ProjectService
 
   constructor(options: Partial<CommercetoolsMockOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options }
@@ -131,6 +135,8 @@ export class CommercetoolsMock {
     } else {
       app.use('/:projectKey', projectRouter)
     }
+
+    this._projectService = new ProjectService(projectRouter, this._storage)
 
     this._services = {
       category: new CategoryServices(projectRouter, this._storage),

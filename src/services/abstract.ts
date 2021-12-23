@@ -8,6 +8,8 @@ export default abstract class AbstractService {
   protected abstract getBasePath(): string
   public abstract repository: AbstractRepository
 
+  createStatusCode = 201
+
   constructor(parent: Router) {
     this.registerRoutes(parent)
   }
@@ -83,7 +85,7 @@ export default abstract class AbstractService {
     const draft = request.body
     const resource = this.repository.create(request.params.projectKey, draft)
     const result = this._expandWithId(request, resource.id)
-    return response.status(201).send(result)
+    return response.status(this.createStatusCode).send(result)
   }
 
   postWithId(request: Request, response: Response) {
@@ -107,7 +109,7 @@ export default abstract class AbstractService {
     )
 
     const result = this._expandWithId(request, updatedResource.id)
-    return response.status(201).send(result)
+    return response.status(200).send(result)
   }
 
   postWithKey(request: Request, response: Response) {

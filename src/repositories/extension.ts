@@ -1,8 +1,8 @@
 import { Extension, ExtensionDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 
-export class ExtensionRepository extends AbstractRepository {
+export class ExtensionRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'extension'
   }
@@ -10,6 +10,8 @@ export class ExtensionRepository extends AbstractRepository {
   create(projectKey: string, draft: ExtensionDraft): Extension {
     const resource: Extension = {
       ...getBaseResourceProperties(),
+      key: draft.key,
+      timeoutInMs: draft.timeoutInMs,
       destination: draft.destination,
       triggers: draft.triggers,
     }

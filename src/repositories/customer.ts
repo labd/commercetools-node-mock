@@ -4,9 +4,9 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 
-export class CustomerRepository extends AbstractRepository {
+export class CustomerRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'customer'
   }

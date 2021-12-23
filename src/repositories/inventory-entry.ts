@@ -9,11 +9,11 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { createCustomFields } from './helpers'
 import { Writable } from '../types'
 
-export class InventoryEntryRepository extends AbstractRepository {
+export class InventoryEntryRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'inventory-entry'
   }

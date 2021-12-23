@@ -4,11 +4,11 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { checkConcurrentModification } from './errors'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 
-export class CustomObjectRepository extends AbstractRepository {
+export class CustomObjectRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'key-value-document'
   }

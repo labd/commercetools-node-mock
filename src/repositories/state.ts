@@ -1,9 +1,9 @@
 import { getBaseResourceProperties } from '../helpers'
 import { getReferenceFromResourceIdentifier } from './helpers'
 import { ReferenceTypeId, State, StateDraft } from '@commercetools/platform-sdk'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 
-export class StateRepository extends AbstractRepository {
+export class StateRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'state'
   }

@@ -8,7 +8,7 @@ import {
   StateReference,
   TransactionDraft,
 } from '@commercetools/platform-sdk'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import {
   createCustomFields,
   createTypedMoney,
@@ -18,7 +18,7 @@ import { getBaseResourceProperties } from '../helpers'
 import { v4 as uuidv4 } from 'uuid'
 import { Writable } from '../types'
 
-export class PaymentRepository extends AbstractRepository {
+export class PaymentRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'payment'
   }

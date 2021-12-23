@@ -4,6 +4,7 @@ import deepEqual from 'deep-equal'
 import {
   BaseResource,
   InvalidOperationError,
+  Project,
   UpdateAction,
 } from '@commercetools/platform-sdk'
 import { AbstractStorage } from '../storage'
@@ -19,7 +20,7 @@ export type GetParams = {
   expand?: string[]
 }
 
-export default abstract class AbstractRepository {
+export abstract class AbstractRepository {
   protected _storage: AbstractStorage
 
   protected actions: {
@@ -28,11 +29,43 @@ export default abstract class AbstractRepository {
 
   constructor(storage: AbstractStorage) {
     this._storage = storage
-    this._storage.assertStorage(this.getTypeId())
   }
 
-  abstract getTypeId(): RepositoryTypes
+  abstract save(projectKey: string, resource: BaseResource | Project): void
+
+
+  processUpdateActions(
+    projectKey: string,
+    resource: BaseResource | Project,
+    actions: UpdateAction[]
+  ): BaseResource {
+    // Deep-copy
+    const modifiedResource = JSON.parse(JSON.stringify(resource))
+
+    actions.forEach(action => {
+      const updateFunc = this.actions[action.action]
+      if (!updateFunc) {
+        console.error(`No mock implemented for update action ${action.action}`)
+        return
+      }
+      updateFunc(projectKey, modifiedResource, action)
+    })
+
+    if (!deepEqual(modifiedResource, resource)) {
+      this.save(projectKey, modifiedResource)
+    }
+    return modifiedResource
+  }
+}
+
+export abstract class AbstractResourceRepository extends AbstractRepository {
   abstract create(projectKey: string, draft: any): BaseResource
+  abstract getTypeId(): RepositoryTypes
+
+  constructor(storage: AbstractStorage) {
+    super(storage)
+    this._storage.assertStorage(this.getTypeId())
+  }
 
   query(projectKey: string, params: QueryParams = {}) {
     return this._storage.query(projectKey, this.getTypeId(), {
@@ -66,8 +99,6 @@ export default abstract class AbstractRepository {
   }
 
   save(projectKey: string, resource: BaseResource) {
-    const typeId = this.getTypeId()
-
     const current = this.get(projectKey, resource.id)
 
     if (current) {
@@ -86,29 +117,6 @@ export default abstract class AbstractRepository {
 
     // @ts-ignore
     resource.version += 1
-    this._storage.add(projectKey, typeId, resource as any)
-  }
-
-  processUpdateActions(
-    projectKey: string,
-    resource: BaseResource,
-    actions: UpdateAction[]
-  ): BaseResource {
-    // Deep-copy
-    const modifiedResource = JSON.parse(JSON.stringify(resource))
-
-    actions.forEach(action => {
-      const updateFunc = this.actions[action.action]
-      if (!updateFunc) {
-        console.error(`No mock implemented for update action ${action.action}`)
-        return
-      }
-      updateFunc(projectKey, modifiedResource, action)
-    })
-
-    if (!deepEqual(modifiedResource, resource)) {
-      this.save(projectKey, modifiedResource)
-    }
-    return modifiedResource
+    this._storage.add(projectKey, this.getTypeId(), resource as any)
   }
 }

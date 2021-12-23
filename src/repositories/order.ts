@@ -26,7 +26,7 @@ import {
   ReferenceTypeId,
   Store,
 } from '@commercetools/platform-sdk'
-import AbstractRepository, { QueryParams } from './abstract'
+import { AbstractResourceRepository, QueryParams } from './abstract'
 import {
   createCustomFields,
   createPrice,
@@ -37,7 +37,7 @@ import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 import { CommercetoolsError } from '../exceptions'
 
-export class OrderRepository extends AbstractRepository {
+export class OrderRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'order'
   }

@@ -1,8 +1,8 @@
 import { ReferenceTypeId, Zone, ZoneDraft } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import AbstractRepository from './abstract'
+import { AbstractResourceRepository } from './abstract'
 
-export class ZoneRepository extends AbstractRepository {
+export class ZoneRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'zone'
   }
