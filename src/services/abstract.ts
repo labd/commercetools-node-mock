@@ -116,10 +116,7 @@ export default abstract class AbstractService {
     return response.status(500).send('Not implemented')
   }
 
-  protected _expandWithId(
-    request: Request,
-    resourceId: string
-  ) {
+  protected _expandWithId(request: Request, resourceId: string) {
     const result = this.repository.get(request.params.projectKey, resourceId, {
       expand: this._parseParam(request.query.expand),
     })

@@ -28,7 +28,7 @@ export class ProjectService {
     const project = this.repository.get(request.params.projectKey)
 
     if (!project) {
-        return response.status(404).send({})
+      return response.status(404).send({})
     }
 
     const updatedResource = this.repository.processUpdateActions(

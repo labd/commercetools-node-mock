@@ -1,4 +1,3 @@
-
 import { Router } from 'express'
 import AbstractService from './abstract'
 import { AbstractStorage } from '../storage'

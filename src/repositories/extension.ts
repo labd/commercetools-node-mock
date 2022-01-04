@@ -1,4 +1,8 @@
-import { Extension, ExtensionDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
+import {
+  Extension,
+  ExtensionDraft,
+  ReferenceTypeId,
+} from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
 

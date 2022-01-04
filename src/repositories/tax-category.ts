@@ -51,12 +51,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
   actions: Partial<
     Record<
       TaxCategoryUpdateAction['action'],
-      (
-        projectKey: string,
-        resource: Writable<TaxCategory>,
-        action: any
-      ) => void
+      (projectKey: string, resource: Writable<TaxCategory>, action: any) => void
     >
-  > = {
-  }
+  > = {}
 }

@@ -5,7 +5,7 @@ import {
   ShoppingListDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import {  AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,

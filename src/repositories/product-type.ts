@@ -10,7 +10,7 @@ import {
   ProductTypeUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
-import {  AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { Writable } from 'types'
 
 export class ProductTypeRepository extends AbstractResourceRepository {

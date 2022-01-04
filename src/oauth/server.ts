@@ -10,7 +10,6 @@ import { InvalidClientError, UnsupportedGrantType } from './errors'
 import { OAuth2Store } from './store'
 import { getBearerToken } from './helpers'
 
-
 export class OAuth2Server {
   store: OAuth2Store
 

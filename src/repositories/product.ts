@@ -9,7 +9,7 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import {  AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository } from './abstract'
 import { Writable } from '../types'
 
 export class ProductRepository extends AbstractResourceRepository {

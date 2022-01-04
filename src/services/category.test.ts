@@ -10,13 +10,13 @@ describe('Categories Query', () => {
     response = await supertest(ctMock.app)
       .post('/dummy/categories')
       .send({
-            "name" : {
-              "en" : "Top hat"
-            },
-            "slug" : {
-              "en" : "top-hat"
-            },
-            "orderHint" : "0.1"
+        name: {
+          en: 'Top hat',
+        },
+        slug: {
+          en: 'top-hat',
+        },
+        orderHint: '0.1',
       })
     expect(response.status).toBe(201)
   })
@@ -32,6 +32,6 @@ describe('Categories Query', () => {
 
     const category = response.body.results[0] as Category
 
-    expect(category.name.en).toBe("Top hat")
+    expect(category.name.en).toBe('Top hat')
   })
 })
