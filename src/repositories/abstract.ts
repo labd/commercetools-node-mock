@@ -22,17 +22,16 @@ export type GetParams = {
 
 export abstract class AbstractRepository {
   protected _storage: AbstractStorage
-
-  protected actions: {
-    [key: string]: (projectKey: string, resource: any, actions: any) => void
-  } = {}
+  protected actions: Record<
+    any,
+    (projectKey: string, resource: any, action: any) => void
+  > = {}
 
   constructor(storage: AbstractStorage) {
     this._storage = storage
   }
 
   abstract save(projectKey: string, resource: BaseResource | Project): void
-
 
   processUpdateActions(
     projectKey: string,
