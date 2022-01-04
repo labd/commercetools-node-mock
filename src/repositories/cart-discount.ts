@@ -1,4 +1,12 @@
-import { CartDiscount, CartDiscountChangeIsActiveAction, CartDiscountChangeSortOrderAction, CartDiscountDraft, CartDiscountSetDescriptionAction, CartDiscountSetKeyAction, CartDiscountSetValidFromAction, ReferenceTypeId } from '@commercetools/platform-sdk'
+import {
+  CartDiscount,
+  CartDiscountChangeIsActiveAction,
+  CartDiscountChangeSortOrderAction,
+  CartDiscountDraft,
+  CartDiscountSetDescriptionAction,
+  CartDiscountSetKeyAction,
+  ReferenceTypeId,
+} from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
@@ -20,7 +28,7 @@ export class CartDiscountRepository extends AbstractResourceRepository {
       target: draft.target,
       requiresDiscountCode: draft.requiresDiscountCode,
       sortOrder: draft.sortOrder,
-      stackingMode: draft.stackingMode || "Stacking",
+      stackingMode: draft.stackingMode || 'Stacking',
       validFrom: draft.validFrom,
       validUntil: draft.validUntil,
       value: draft.value,
@@ -30,16 +38,32 @@ export class CartDiscountRepository extends AbstractResourceRepository {
   }
 
   actions = {
-    setKey: (projectKey: string, resource: Writable<CartDiscount>, { key }: CartDiscountSetKeyAction) => {
+    setKey: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { key }: CartDiscountSetKeyAction
+    ) => {
       resource.key = key
     },
-    setDescription: (projectKey: string, resource: Writable<CartDiscount>, { description }: CartDiscountSetDescriptionAction) => {
+    setDescription: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { description }: CartDiscountSetDescriptionAction
+    ) => {
       resource.description = description
     },
-    changeSortOrder: (projectKey: string, resource: Writable<CartDiscount>, { sortOrder }: CartDiscountChangeSortOrderAction) => {
+    changeSortOrder: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { sortOrder }: CartDiscountChangeSortOrderAction
+    ) => {
       resource.sortOrder = sortOrder
     },
-    changeIsActive: (projectKey: string, resource: Writable<CartDiscount>, { isActive }: CartDiscountChangeIsActiveAction) => {
+    changeIsActive: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { isActive }: CartDiscountChangeIsActiveAction
+    ) => {
       resource.isActive = isActive
     },
   }

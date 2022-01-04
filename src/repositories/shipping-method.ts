@@ -22,14 +22,12 @@ import {
   ZoneRate,
   ZoneRateDraft,
   ZoneReference,
-  ZoneResourceIdentifier,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
 import { Writable } from 'types'
 import { _ } from 'ajv'
 import deepEqual from 'deep-equal'
-import { ZoneService } from 'services/zone'
 
 export class ShippingMethodRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
