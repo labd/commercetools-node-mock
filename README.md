@@ -51,11 +51,11 @@ describe('A module', () => {
   })
 
   test('my function', async () => {
-    ctMock.project().add('customer',customerFixture)
+    ctMock.project().add('customer', customerFixture)
 
     const res = await myFunction()
 
-    expect(res).toEqua;(true)
+    expect(res).toEqual(true)
   })
 })
 ```
