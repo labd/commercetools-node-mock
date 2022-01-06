@@ -1,7 +1,13 @@
 import {
   ReferenceTypeId,
   TaxCategory,
+  TaxCategoryAddTaxRateAction,
+  TaxCategoryChangeNameAction,
   TaxCategoryDraft,
+  TaxCategoryRemoveTaxRateAction,
+  TaxCategoryReplaceTaxRateAction,
+  TaxCategorySetDescriptionAction,
+  TaxCategorySetKeyAction,
   TaxCategoryUpdateAction,
   TaxRate,
   TaxRateDraft,
@@ -26,7 +32,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
     return resource
   }
 
-  taxRateFromTaxRateDraft = (draft: TaxRateDraft): TaxRate => ({
+  private taxRateFromTaxRateDraft = (draft: TaxRateDraft): TaxRate => ({
     ...draft,
     id: uuidv4(),
     amount: draft.amount || 0,
@@ -42,7 +48,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
 
     // Catch this for now, should be checked when creating/updating
     if (result.count > 1) {
-      throw new Error('Duplicate tax categorie key')
+      throw new Error('Duplicate tax category key')
     }
 
     return
@@ -53,5 +59,66 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       TaxCategoryUpdateAction['action'],
       (projectKey: string, resource: Writable<TaxCategory>, action: any) => void
     >
-  > = {}
+  > = {
+    addTaxRate: (
+      projectKey: string,
+      resource: Writable<TaxCategory>,
+      { taxRate }: TaxCategoryAddTaxRateAction
+    ) => {
+      if (resource.rates === undefined) {
+        resource.rates = []
+      }
+      resource.rates.push(this.taxRateFromTaxRateDraft(taxRate))
+    },
+    removeTaxRate: (
+      projectKey: string,
+      resource: Writable<TaxCategory>,
+      { taxRateId }: TaxCategoryRemoveTaxRateAction
+    ) => {
+      if (resource.rates === undefined) {
+        resource.rates = []
+      }
+      resource.rates = resource.rates.filter(taxRate => {
+        return taxRate.id !== taxRateId
+      })
+    },
+    replaceTaxRate: (
+      projectKey: string,
+      resource: Writable<TaxCategory>,
+      { taxRateId, taxRate }: TaxCategoryReplaceTaxRateAction
+    ) => {
+      if (resource.rates === undefined) {
+        resource.rates = []
+      }
+
+      const taxRateObj = this.taxRateFromTaxRateDraft(taxRate)
+      for (let i = 0; i < resource.rates.length; i++) {
+        const rate = resource.rates[i]
+        if (rate.id == taxRateId) {
+          resource.rates[i] = taxRateObj
+        }
+      }
+    },
+    setDescription: (
+      projectKey: string,
+      resource: Writable<TaxCategory>,
+      { description }: TaxCategorySetDescriptionAction
+    ) => {
+      resource.description = description
+    },
+    setKey: (
+      projectKey: string,
+      resource: Writable<TaxCategory>,
+      { key }: TaxCategorySetKeyAction
+    ) => {
+      resource.key = key
+    },
+    changeName: (
+      projectKey: string,
+      resource: Writable<TaxCategory>,
+      { name }: TaxCategoryChangeNameAction
+    ) => {
+      resource.name = name
+    },
+  }
 }

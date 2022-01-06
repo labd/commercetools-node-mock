@@ -1,8 +1,4 @@
-import {
-  Product,
-  ProductDraft,
-  ProductProjection,
-} from '@commercetools/platform-sdk'
+import { ProductDraft, ProductProjection } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 import * as qs from 'querystring'

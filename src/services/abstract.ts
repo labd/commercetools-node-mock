@@ -1,4 +1,3 @@
-import { QueryParams } from './../repositories/abstract'
 import { Update } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'

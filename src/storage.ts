@@ -1,5 +1,4 @@
 import assert from 'assert'
-import { v4 as uuidv4 } from 'uuid'
 import {
   BaseResource,
   Cart,
@@ -29,6 +28,8 @@ import {
   CustomerGroup,
   DiscountCode,
   Zone,
+  Channel,
+  Subscription,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { RepositoryTypes, ResourceMap, Writable } from './types'
@@ -123,6 +124,7 @@ export class InMemoryStorage extends AbstractStorage {
         cart: new Map<string, Cart>(),
         'cart-discount': new Map<string, CartDiscount>(),
         category: new Map<string, Category>(),
+        channel: new Map<string, Channel>(),
         customer: new Map<string, Customer>(),
         'customer-group': new Map<string, CustomerGroup>(),
         'discount-code': new Map<string, DiscountCode>(),
@@ -138,6 +140,7 @@ export class InMemoryStorage extends AbstractStorage {
         state: new Map<string, State>(),
         store: new Map<string, Store>(),
         'shopping-list': new Map<string, ShoppingList>(),
+        subscription: new Map<string, Subscription>(),
         'tax-category': new Map<string, TaxCategory>(),
         type: new Map<string, Type>(),
         zone: new Map<string, Zone>(),

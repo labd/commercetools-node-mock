@@ -1,4 +1,4 @@
-import { Cart, Category } from '@commercetools/platform-sdk'
+import { Category } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 

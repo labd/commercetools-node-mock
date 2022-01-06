@@ -14,6 +14,7 @@ import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 import { CartDiscountService } from './services/cart-discount'
 import { CartService } from './services/cart'
 import { CategoryServices } from './services/category'
+import { ChannelService } from './services/channel'
 import { CustomerGroupService } from './services/customer-group'
 import { CustomerService } from './services/customer'
 import { CustomObjectService } from './services/custom-object'
@@ -31,6 +32,7 @@ import { ShippingMethodService } from './services/shipping-method'
 import { ShoppingListService } from './services/shopping-list'
 import { StateService } from './services/state'
 import { StoreService } from './services/store'
+import { SubscriptionService } from './services/subscription'
 import { TaxCategoryService } from './services/tax-category'
 import { TypeService } from './services/type'
 import { ZoneService } from './services/zone'
@@ -144,6 +146,7 @@ export class CommercetoolsMock {
       cart: new CartService(projectRouter, this._storage),
       'cart-discount': new CartDiscountService(projectRouter, this._storage),
       customer: new CustomerService(projectRouter, this._storage),
+      channel: new ChannelService(projectRouter, this._storage),
       'customer-group': new CustomerGroupService(projectRouter, this._storage),
       'discount-code': new DiscountCodeService(projectRouter, this._storage),
       extension: new ExtensionServices(projectRouter, this._storage),
@@ -171,6 +174,7 @@ export class CommercetoolsMock {
       'shopping-list': new ShoppingListService(projectRouter, this._storage),
       state: new StateService(projectRouter, this._storage),
       store: new StoreService(projectRouter, this._storage),
+      subscription: new SubscriptionService(projectRouter, this._storage),
       'tax-category': new TaxCategoryService(projectRouter, this._storage),
       type: new TypeService(projectRouter, this._storage),
       zone: new ZoneService(projectRouter, this._storage),
@@ -184,6 +188,7 @@ export class CommercetoolsMock {
           errors: [err.info],
         })
       } else {
+        console.error(err)
         return resp.status(500).send({
           error: err.message,
         })

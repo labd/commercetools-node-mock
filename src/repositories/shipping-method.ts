@@ -130,6 +130,10 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
         this._storage
       )
 
+      if (resource.zoneRates === undefined) {
+        resource.zoneRates = []
+      }
+
       resource.zoneRates.push({
         zone: zoneReference,
         shippingRates: [],

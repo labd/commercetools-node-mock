@@ -1,7 +1,16 @@
 import { getBaseResourceProperties } from '../helpers'
 import { getReferenceFromResourceIdentifier } from './helpers'
-import { ReferenceTypeId, State, StateDraft } from '@commercetools/platform-sdk'
+import {
+  ReferenceTypeId,
+  State,
+  StateChangeKeyAction,
+  StateDraft,
+  StateSetDescriptionAction,
+  StateSetNameAction,
+  StateUpdateAction,
+} from '@commercetools/platform-sdk'
 import { AbstractResourceRepository } from './abstract'
+import { Writable } from 'types'
 
 export class StateRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -23,5 +32,32 @@ export class StateRepository extends AbstractResourceRepository {
     return resource
   }
 
-  actions = {}
+  actions: Partial<
+    Record<
+      StateUpdateAction['action'],
+      (projectKey: string, resource: Writable<State>, action: any) => void
+    >
+  > = {
+    changeKey: (
+      projectKey: string,
+      resource: Writable<State>,
+      { key }: StateChangeKeyAction
+    ) => {
+      resource.key = key
+    },
+    setDescription: (
+      projectKey: string,
+      resource: Writable<State>,
+      { description }: StateSetDescriptionAction
+    ) => {
+      resource.description = description
+    },
+    setName: (
+      projectKey: string,
+      resource: Writable<State>,
+      { name }: StateSetNameAction
+    ) => {
+      resource.name = name
+    },
+  }
 }
