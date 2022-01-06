@@ -13,6 +13,10 @@ as our testing module in the [commercetools Python SDK](https://github.com/labd/
 yarn add --dev @labdigital/commercetools-mock
 ```
 
+## Docker image
+This codebase is also available as a docker image where it provides a runnable http server exposing the mocked endpoints. See 
+https://github.com/labd/commercetools-mock-server
+
 ## Example
 
 ```typescript
