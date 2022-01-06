@@ -20,7 +20,7 @@ export class ZoneRepository extends AbstractResourceRepository {
     const resource: Zone = {
       ...getBaseResourceProperties(),
       key: draft.key,
-      locations: draft.locations,
+      locations: draft.locations || [],
       name: draft.name,
       description: draft.description,
     }

@@ -26,7 +26,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
     const resource: TaxCategory = {
       ...getBaseResourceProperties(),
       ...draft,
-      rates: draft.rates?.map(this.taxRateFromTaxRateDraft),
+      rates: draft.rates?.map(this.taxRateFromTaxRateDraft) || [],
     }
     this.save(projectKey, resource)
     return resource

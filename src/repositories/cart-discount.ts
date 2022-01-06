@@ -5,11 +5,17 @@ import {
   CartDiscountDraft,
   CartDiscountSetDescriptionAction,
   CartDiscountSetKeyAction,
+  CartDiscountValueAbsolute,
+  CartDiscountValueDraft,
+  CartDiscountValueFixed,
+  CartDiscountValueGiftLineItem,
+  CartDiscountValueRelative,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
+import { createTypedMoney } from './helpers'
 
 export class CartDiscountRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -26,15 +32,44 @@ export class CartDiscountRepository extends AbstractResourceRepository {
       name: draft.name,
       references: [],
       target: draft.target,
-      requiresDiscountCode: draft.requiresDiscountCode,
+      requiresDiscountCode: draft.requiresDiscountCode || false,
       sortOrder: draft.sortOrder,
       stackingMode: draft.stackingMode || 'Stacking',
       validFrom: draft.validFrom,
       validUntil: draft.validUntil,
-      value: draft.value,
+      value: this.transformValueDraft(draft.value),
     }
     this.save(projectKey, resource)
     return resource
+  }
+
+  private transformValueDraft(value: CartDiscountValueDraft) {
+    switch (value.type) {
+      case 'absolute': {
+        return {
+          type: 'absolute',
+          money: value.money.map(createTypedMoney),
+        } as CartDiscountValueAbsolute
+      }
+      case 'fixed': {
+        return {
+          type: 'fixed',
+          money: value.money.map(createTypedMoney),
+        } as CartDiscountValueFixed
+      }
+      case 'giftLineItem': {
+        return {
+          ...value,
+        } as CartDiscountValueGiftLineItem
+      }
+      case 'relative': {
+        return {
+          ...value,
+        } as CartDiscountValueRelative
+      }
+    }
+
+    return value
   }
 
   actions = {

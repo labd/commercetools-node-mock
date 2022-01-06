@@ -254,7 +254,7 @@ export class InMemoryStorage extends AbstractStorage {
         throw new CommercetoolsError<InvalidInputError>(
           {
             code: 'InvalidInput',
-            message: err.message,
+            message: (err as any).message,
           },
           400
         )
