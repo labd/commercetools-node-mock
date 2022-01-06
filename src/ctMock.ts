@@ -116,9 +116,10 @@ export class CommercetoolsMock {
 
   runServer(port: number = 3000, options?: AppOptions) {
     const app = this.createApp(options)
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
       console.log(`Mock server listening at http://localhost:${port}`)
     })
+    server.keepAliveTimeout = 60 * 1000;
   }
 
   private createApp(options?: AppOptions): express.Express {
