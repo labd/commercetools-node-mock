@@ -5,6 +5,10 @@ import {
   CartDiscountDraft,
   CartDiscountSetDescriptionAction,
   CartDiscountSetKeyAction,
+  CartDiscountSetValidFromAction,
+  CartDiscountSetValidFromAndUntilAction,
+  CartDiscountSetValidUntilAction,
+  CartDiscountUpdateAction,
   CartDiscountValueAbsolute,
   CartDiscountValueDraft,
   CartDiscountValueFixed,
@@ -72,7 +76,12 @@ export class CartDiscountRepository extends AbstractResourceRepository {
     return value
   }
 
-  actions = {
+  actions: Partial<
+    Record<
+      CartDiscountUpdateAction['action'],
+      (projectKey: string, resource: Writable<CartDiscount>, action: any) => void
+    >
+  > = {
     setKey: (
       projectKey: string,
       resource: Writable<CartDiscount>,
@@ -86,6 +95,28 @@ export class CartDiscountRepository extends AbstractResourceRepository {
       { description }: CartDiscountSetDescriptionAction
     ) => {
       resource.description = description
+    },
+    setValidFrom: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { validFrom }: CartDiscountSetValidFromAction
+    ) => {
+      resource.validFrom = validFrom
+    },
+    setValidUntil: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { validUntil }: CartDiscountSetValidUntilAction
+    ) => {
+      resource.validUntil = validUntil
+    },
+    setValidFromAndUntil: (
+      projectKey: string,
+      resource: Writable<CartDiscount>,
+      { validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction
+    ) => {
+      resource.validFrom = validFrom
+      resource.validUntil = validUntil
     },
     changeSortOrder: (
       projectKey: string,
