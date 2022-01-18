@@ -1,8 +1,10 @@
 import {
   ReferenceTypeId,
   Zone,
+  ZoneAddLocationAction,
   ZoneChangeNameAction,
   ZoneDraft,
+  ZoneRemoveLocationAction,
   ZoneSetDescriptionAction,
   ZoneSetKeyAction,
   ZoneUpdateAction,
@@ -34,6 +36,22 @@ export class ZoneRepository extends AbstractResourceRepository {
       (projectKey: string, resource: Writable<Zone>, action: any) => void
     >
   > = {
+    addLocation: (
+      projectKey: string,
+      resource: Writable<Zone>,
+      { location }: ZoneAddLocationAction
+    ) => {
+      resource.locations.push(location)
+    },
+    removeLocation: (
+      projectKey: string,
+      resource: Writable<Zone>,
+      { location }: ZoneRemoveLocationAction
+    ) => {
+      resource.locations = resource.locations.filter(loc => {
+        return !(loc.country == location.country && loc.state == location.state)
+      })
+    },
     changeName: (
       projectKey: string,
       resource: Writable<Zone>,
