@@ -1,6 +1,7 @@
 import {
   CartDiscountReference,
   DiscountCode,
+  DiscountCodeChangeCartDiscountsAction,
   DiscountCodeChangeIsActiveAction,
   DiscountCodeDraft,
   DiscountCodeSetCartPredicateAction,
@@ -8,6 +9,9 @@ import {
   DiscountCodeSetMaxApplicationsAction,
   DiscountCodeSetMaxApplicationsPerCustomerAction,
   DiscountCodeSetNameAction,
+  DiscountCodeSetValidFromAction,
+  DiscountCodeSetValidFromAndUntilAction,
+  DiscountCodeSetValidUntilAction,
   DiscountCodeUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
@@ -21,6 +25,7 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
   }
 
   create(projectKey: string, draft: DiscountCodeDraft): DiscountCode {
+    console.log(draft)
     const resource: DiscountCode = {
       ...getBaseResourceProperties(),
       applicationVersion: 1,
@@ -56,20 +61,6 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
       ) => void
     >
   > = {
-    setDescription: (
-      projectKey: string,
-      resource: Writable<DiscountCode>,
-      { description }: DiscountCodeSetDescriptionAction
-    ) => {
-      resource.description = description
-    },
-    setName: (
-      projectKey: string,
-      resource: Writable<DiscountCode>,
-      { name }: DiscountCodeSetNameAction
-    ) => {
-      resource.name = name
-    },
     changeIsActive: (
       projectKey: string,
       resource: Writable<DiscountCode>,
@@ -77,12 +68,38 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
     ) => {
       resource.isActive = isActive
     },
+    changeCartDiscounts: (
+      projectKey: string,
+      resource: Writable<DiscountCode>,
+      { cartDiscounts }: DiscountCodeChangeCartDiscountsAction
+    ) => {
+      resource.cartDiscounts = cartDiscounts.map(
+        (obj): CartDiscountReference => ({
+          typeId: 'cart-discount',
+          id: obj.id!,
+        })
+      )
+    },
+    setDescription: (
+      projectKey: string,
+      resource: Writable<DiscountCode>,
+      { description }: DiscountCodeSetDescriptionAction
+    ) => {
+      resource.description = description
+    },
     setCartPredicate: (
       projectKey: string,
       resource: Writable<DiscountCode>,
       { cartPredicate }: DiscountCodeSetCartPredicateAction
     ) => {
       resource.cartPredicate = cartPredicate
+    },
+    setName: (
+      projectKey: string,
+      resource: Writable<DiscountCode>,
+      { name }: DiscountCodeSetNameAction
+    ) => {
+      resource.name = name
     },
     setMaxApplications: (
       projectKey: string,
@@ -99,6 +116,28 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
       }: DiscountCodeSetMaxApplicationsPerCustomerAction
     ) => {
       resource.maxApplicationsPerCustomer = maxApplicationsPerCustomer
+    },
+    setValidFrom: (
+      projectKey: string,
+      resource: Writable<DiscountCode>,
+      { validFrom }: DiscountCodeSetValidFromAction
+    ) => {
+      resource.validFrom = validFrom
+    },
+    setValidUntil: (
+      projectKey: string,
+      resource: Writable<DiscountCode>,
+      { validUntil }: DiscountCodeSetValidUntilAction
+    ) => {
+      resource.validUntil = validUntil
+    },
+    setValidFromAndUntil: (
+      projectKey: string,
+      resource: Writable<DiscountCode>,
+      { validFrom, validUntil }: DiscountCodeSetValidFromAndUntilAction
+    ) => {
+      resource.validFrom = validFrom
+      resource.validUntil = validUntil
     },
   }
 }
