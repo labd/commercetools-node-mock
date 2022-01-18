@@ -79,7 +79,11 @@ export class CartDiscountRepository extends AbstractResourceRepository {
   actions: Partial<
     Record<
       CartDiscountUpdateAction['action'],
-      (projectKey: string, resource: Writable<CartDiscount>, action: any) => void
+      (
+        projectKey: string,
+        resource: Writable<CartDiscount>,
+        action: any
+      ) => void
     >
   > = {
     setKey: (
