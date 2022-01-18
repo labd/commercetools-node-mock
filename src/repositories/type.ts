@@ -62,14 +62,50 @@ export class TypeRepository extends AbstractResourceRepository {
       resource: Writable<Type>,
       { fieldName, value }: TypeAddEnumValueAction
     ) => {
-      // TODO
+      resource.fieldDefinitions.forEach(field => {
+        if (field.name == fieldName) {
+          // TODO, should be done better i suppose
+          if (field.type.name == 'Enum') {
+            field.type.values.push(value)
+          } else if (
+            field.type.name == 'Set' &&
+            field.type.elementType.name == 'Enum'
+          ) {
+            field.type.elementType.values.push(value)
+          } else {
+            throw new Error("Type is not a Enum (or Set of Enum)")
+          }
+        }
+      })
     },
     changeEnumValueLabel: (
       projectKey: string,
       resource: Writable<Type>,
       { fieldName, value }: TypeChangeEnumValueLabelAction
     ) => {
-      // TODO
+      resource.fieldDefinitions.forEach(field => {
+        if (field.name == fieldName) {
+          // TODO, should be done better i suppose
+          if (field.type.name == 'Enum') {
+            field.type.values.forEach(v => {
+              if (v.key == value.key) {
+                v.label = value.label
+              }
+            })
+          } else if (
+            field.type.name == 'Set' &&
+            field.type.elementType.name == 'Enum'
+          ) {
+            field.type.elementType.values.forEach(v => {
+              if (v.key == value.key) {
+                v.label = value.label
+              }
+            })
+          } else {
+            throw new Error("Type is not a Enum (or Set of Enum)")
+          }
+        }
+      })
     },
   }
 }
