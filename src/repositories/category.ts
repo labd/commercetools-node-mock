@@ -1,8 +1,15 @@
 import {
   Category,
+  CategoryChangeAssetNameAction,
+  CategoryChangeSlugAction,
   CategoryDraft,
+  CategorySetAssetDescriptionAction,
+  CategorySetAssetSourcesAction,
   CategorySetDescriptionAction,
   CategorySetKeyAction,
+  CategorySetMetaDescriptionAction,
+  CategorySetMetaKeywordsAction,
+  CategorySetMetaTitleAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
@@ -31,6 +38,27 @@ export class CategoryRepository extends AbstractResourceRepository {
   }
 
   actions = {
+    changeAssetName: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { assetId, assetKey, name }: CategoryChangeAssetNameAction
+    ) => {
+      resource.assets?.forEach(asset => {
+        if (assetId && assetId == asset.id) {
+          asset.name = name
+        }
+        if (assetKey && assetKey == asset.key) {
+          asset.name = name
+        }
+      })
+    },
+    changeSlug: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { slug }: CategoryChangeSlugAction
+    ) => {
+      resource.slug = slug
+    },
     setKey: (
       projectKey: string,
       resource: Writable<Category>,
@@ -38,12 +66,61 @@ export class CategoryRepository extends AbstractResourceRepository {
     ) => {
       resource.key = key
     },
+    setAssetDescription: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { assetId, assetKey, description }: CategorySetAssetDescriptionAction
+    ) => {
+      resource.assets?.forEach(asset => {
+        if (assetId && assetId == asset.id) {
+          asset.description = description
+        }
+        if (assetKey && assetKey == asset.key) {
+          asset.description = description
+        }
+      })
+    },
+    setAssetSources: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { assetId, assetKey, sources }: CategorySetAssetSourcesAction
+    ) => {
+      resource.assets?.forEach(asset => {
+        if (assetId && assetId == asset.id) {
+          asset.sources = sources
+        }
+        if (assetKey && assetKey == asset.key) {
+          asset.sources = sources
+        }
+      })
+    },
     setDescription: (
       projectKey: string,
       resource: Writable<Category>,
       { description }: CategorySetDescriptionAction
     ) => {
       resource.description = description
+    },
+    setMetaDescription: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { metaDescription }: CategorySetMetaDescriptionAction
+    ) => {
+      resource.metaDescription = metaDescription
+    },
+    setMetaKeywords: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { metaKeywords }: CategorySetMetaKeywordsAction
+    ) => {
+      resource.metaKeywords = metaKeywords
+    },
+    setMetaTitle: (
+      projectKey: string,
+      resource: Writable<Category>,
+      { metaTitle }: CategorySetMetaTitleAction
+    ) => {
+      resource.metaTitle = metaTitle
     },
   }
 }
