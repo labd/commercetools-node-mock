@@ -22,9 +22,15 @@ export class StoreRepository extends AbstractResourceRepository {
     const resource: Store = {
       ...getBaseResourceProperties(),
       key: draft.key,
+      name: draft.name,
+      languages: draft.languages,
       distributionChannels: this.transformChannels(
         projectKey,
         draft.distributionChannels
+      ),
+      supplyChannels: this.transformChannels(
+        projectKey,
+        draft.supplyChannels
       ),
     }
     this.save(projectKey, resource)
