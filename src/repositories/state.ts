@@ -7,6 +7,7 @@ import {
   StateDraft,
   StateSetDescriptionAction,
   StateSetNameAction,
+  StateSetRolesAction,
   StateUpdateAction,
 } from '@commercetools/platform-sdk'
 import { AbstractResourceRepository } from './abstract'
@@ -58,6 +59,13 @@ export class StateRepository extends AbstractResourceRepository {
       { name }: StateSetNameAction
     ) => {
       resource.name = name
+    },
+    setRoles: (
+      projectKey: string,
+      resource: Writable<State>,
+      { roles }: StateSetRolesAction
+    ) => {
+      resource.roles = roles
     },
   }
 }
