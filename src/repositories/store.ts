@@ -7,6 +7,7 @@ import {
   ChannelReference,
   StoreSetDistributionChannelsAction,
   ChannelResourceIdentifier,
+  StoreSetLanguagesAction,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
@@ -74,6 +75,13 @@ export class StoreRepository extends AbstractResourceRepository {
         projectKey,
         distributionChannels
       )
+    },
+    setLanguages: (
+      projectKey: string,
+      resource: Writable<Store>,
+      { languages }: StoreSetLanguagesAction
+    ) => {
+      resource.languages = languages
     },
   }
 }
