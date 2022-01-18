@@ -29,10 +29,7 @@ export class StoreRepository extends AbstractResourceRepository {
         projectKey,
         draft.distributionChannels
       ),
-      supplyChannels: this.transformChannels(
-        projectKey,
-        draft.supplyChannels
-      ),
+      supplyChannels: this.transformChannels(projectKey, draft.supplyChannels),
     }
     this.save(projectKey, resource)
     return resource

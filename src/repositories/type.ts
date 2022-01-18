@@ -73,7 +73,7 @@ export class TypeRepository extends AbstractResourceRepository {
           ) {
             field.type.elementType.values.push(value)
           } else {
-            throw new Error("Type is not a Enum (or Set of Enum)")
+            throw new Error('Type is not a Enum (or Set of Enum)')
           }
         }
       })
@@ -102,7 +102,7 @@ export class TypeRepository extends AbstractResourceRepository {
               }
             })
           } else {
-            throw new Error("Type is not a Enum (or Set of Enum)")
+            throw new Error('Type is not a Enum (or Set of Enum)')
           }
         }
       })
