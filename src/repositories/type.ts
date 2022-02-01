@@ -51,7 +51,7 @@ export class TypeRepository extends AbstractResourceRepository {
       resource: Writable<Type>,
       { fieldName }: TypeRemoveFieldDefinitionAction
     ) => {
-      resource.fieldDefinitions = resource.fieldDefinitions.filter((f) => {
+      resource.fieldDefinitions = resource.fieldDefinitions.filter(f => {
         return f.name !== fieldName
       })
     },
@@ -69,28 +69,29 @@ export class TypeRepository extends AbstractResourceRepository {
     ) => {
       resource.name = name
     },
-    changeFieldDefinitionOrder:(
+    changeFieldDefinitionOrder: (
       projectKey: string,
       resource: Writable<Type>,
       { fieldNames }: TypeChangeFieldDefinitionOrderAction
     ) => {
-      const fields = new Map(resource.fieldDefinitions.map(item => [item.name, item]))
+      const fields = new Map(
+        resource.fieldDefinitions.map(item => [item.name, item])
+      )
       const result: FieldDefinition[] = []
       let current = resource.fieldDefinitions
 
-      fieldNames.forEach((fieldName) => {
+      fieldNames.forEach(fieldName => {
         const field = fields.get(fieldName)
         if (field === undefined) {
-          throw new Error("New field")
+          throw new Error('New field')
         }
         result.push(field)
 
         // Remove from current items
-        current = current.filter((f) => {
+        current = current.filter(f => {
           return f.name !== fieldName
         })
       })
-
 
       resource.fieldDefinitions = result
       // Add fields which were not specified in the order as last items. Not
