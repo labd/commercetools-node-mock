@@ -40,8 +40,8 @@ export class PaymentRepository extends AbstractResourceRepository {
               : undefined,
           }
         : {},
-      transactions: (draft.transactions || []).map(
-        this.transactionFromTransactionDraft
+      transactions: (draft.transactions || []).map(t =>
+        this.transactionFromTransactionDraft(t, projectKey)
       ),
       interfaceInteractions: (draft.interfaceInteractions || []).map(
         interaction =>
@@ -54,10 +54,11 @@ export class PaymentRepository extends AbstractResourceRepository {
     return resource
   }
 
-  transactionFromTransactionDraft = (draft: TransactionDraft) => ({
+  transactionFromTransactionDraft = (draft: TransactionDraft, projectKey: string) => ({
     ...draft,
     id: uuidv4(),
     amount: createTypedMoney(draft.amount),
+    custom: createCustomFields(draft.custom, projectKey, this._storage),
   })
 
   actions = {
@@ -104,7 +105,7 @@ export class PaymentRepository extends AbstractResourceRepository {
     ) => {
       resource.transactions = [
         ...resource.transactions,
-        this.transactionFromTransactionDraft(transaction),
+        this.transactionFromTransactionDraft(transaction, projectKey),
       ]
     },
     // addInterfaceInteraction: () => {},
