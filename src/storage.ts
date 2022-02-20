@@ -135,6 +135,7 @@ export class InMemoryStorage extends AbstractStorage {
         payment: new Map<string, Payment>(),
         'product-type': new Map<string, ProductType>(),
         product: new Map<string, Product>(),
+        'product-selection': new Map<string, any>(),
         'product-projection': new Map<string, ProductProjection>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         state: new Map<string, State>(),
