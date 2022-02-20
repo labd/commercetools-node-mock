@@ -54,7 +54,10 @@ export class PaymentRepository extends AbstractResourceRepository {
     return resource
   }
 
-  transactionFromTransactionDraft = (draft: TransactionDraft, projectKey: string) => ({
+  transactionFromTransactionDraft = (
+    draft: TransactionDraft,
+    projectKey: string
+  ) => ({
     ...draft,
     id: uuidv4(),
     amount: createTypedMoney(draft.amount),
