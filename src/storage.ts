@@ -342,11 +342,11 @@ export class InMemoryStorage extends AbstractStorage {
         externalOAuth: undefined,
         searchIndexing: {
           products: {
-            status: "Deactivated",
+            status: 'Deactivated',
           },
           orders: {
-            status: "Deactivated",
-          }
+            status: 'Deactivated',
+          },
         },
         version: 1,
       }

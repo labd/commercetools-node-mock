@@ -94,9 +94,11 @@ export class ProjectRepository extends AbstractRepository {
       { enabled }: ProjectChangeProductSearchIndexingEnabledAction
     ) => {
       if (!resource.searchIndexing?.products) {
-        throw new Error("Invalid project state")
+        throw new Error('Invalid project state')
       }
-      resource.searchIndexing.products.status = enabled ? "Activated" : "Deactivated"
+      resource.searchIndexing.products.status = enabled
+        ? 'Activated'
+        : 'Deactivated'
       resource.searchIndexing.products.lastModifiedAt = new Date().toISOString()
     },
     changeOrderSearchStatus: (
@@ -105,7 +107,7 @@ export class ProjectRepository extends AbstractRepository {
       { status }: ProjectChangeOrderSearchStatusAction
     ) => {
       if (!resource.searchIndexing?.orders) {
-        throw new Error("Invalid project state")
+        throw new Error('Invalid project state')
       }
       resource.searchIndexing.orders.status = status
       resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString()

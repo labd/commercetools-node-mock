@@ -43,7 +43,7 @@ export type ResourceMap = {
   product: ctp.Product
   'product-discount': ctp.ProductDiscount
   'product-projection': ctp.ProductProjection
-  'product-selection': ctp.ProductSelection,
+  'product-selection': ctp.ProductSelection
   'product-type': ctp.ProductType
   review: ctp.Review
   'shipping-method': ctp.ShippingMethod
