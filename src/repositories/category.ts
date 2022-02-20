@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid'
 import {
   Category,
   CategoryChangeAssetNameAction,
@@ -14,6 +15,7 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
+import { createCustomFields } from './helpers'
 import { AbstractResourceRepository } from './abstract'
 
 export class CategoryRepository extends AbstractResourceRepository {
@@ -32,6 +34,18 @@ export class CategoryRepository extends AbstractResourceRepository {
         ? { typeId: 'category', id: draft.parent.id! }
         : undefined,
       ancestors: [], // TODO
+      assets:
+        draft.assets?.map(d => {
+          return {
+            id: uuidv4(),
+            name: d.name,
+            description: d.description,
+            sources: d.sources,
+            tags: d.tags,
+            key: d.key,
+            custom: createCustomFields(draft.custom, projectKey, this._storage),
+          }
+        }) || [],
     }
     this.save(projectKey, resource)
     return resource
