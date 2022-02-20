@@ -1,12 +1,14 @@
 import {
   Project,
-  ProjectChangeCartsConfiguration,
+  ProjectChangeCartsConfigurationAction,
   ProjectChangeCountriesAction,
   ProjectChangeCountryTaxRateFallbackEnabledAction,
   ProjectChangeCurrenciesAction,
   ProjectChangeLanguagesAction,
   ProjectChangeMessagesEnabledAction,
   ProjectChangeNameAction,
+  ProjectChangeOrderSearchStatusAction,
+  ProjectChangeProductSearchIndexingEnabledAction,
   ProjectSetExternalOAuthAction,
   ProjectSetShippingRateInputTypeAction,
   ProjectUpdateAction,
@@ -86,6 +88,28 @@ export class ProjectRepository extends AbstractRepository {
     ) => {
       resource.messages.enabled = messagesEnabled
     },
+    changeProductSearchIndexingEnabled: (
+      projectKey: string,
+      resource: Writable<Project>,
+      { enabled }: ProjectChangeProductSearchIndexingEnabledAction
+    ) => {
+      if (!resource.searchIndexing?.products) {
+        throw new Error("Invalid project state")
+      }
+      resource.searchIndexing.products.status = enabled ? "Activated" : "Deactivated"
+      resource.searchIndexing.products.lastModifiedAt = new Date().toISOString()
+    },
+    changeOrderSearchStatus: (
+      projectKey: string,
+      resource: Writable<Project>,
+      { status }: ProjectChangeOrderSearchStatusAction
+    ) => {
+      if (!resource.searchIndexing?.orders) {
+        throw new Error("Invalid project state")
+      }
+      resource.searchIndexing.orders.status = status
+      resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString()
+    },
     setShippingRateInputType: (
       projectKey: string,
       resource: Writable<Project>,
@@ -112,8 +136,9 @@ export class ProjectRepository extends AbstractRepository {
     changeCartsConfiguration: (
       projectKey: string,
       resource: Writable<Project>,
-      { cartsConfiguration }: ProjectChangeCartsConfiguration
+      { cartsConfiguration }: ProjectChangeCartsConfigurationAction
     ) => {
+      console.log(cartsConfiguration)
       resource.carts = cartsConfiguration || {
         countryTaxRateFallbackEnabled: false,
         deleteDaysAfterLastModification: 90,

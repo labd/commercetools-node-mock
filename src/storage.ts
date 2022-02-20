@@ -340,6 +340,14 @@ export class InMemoryStorage extends AbstractStorage {
         messages: { enabled: false, deleteDaysAfterCreation: 15 },
         shippingRateInputType: undefined,
         externalOAuth: undefined,
+        searchIndexing: {
+          products: {
+            status: "Deactivated",
+          },
+          orders: {
+            status: "Deactivated",
+          }
+        },
         version: 1,
       }
     }
