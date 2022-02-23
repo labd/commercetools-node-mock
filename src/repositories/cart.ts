@@ -2,6 +2,8 @@ import { Cart, CartDraft, ReferenceTypeId } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
 import { createCustomFields } from './helpers'
+import { ParsedQs } from 'qs'
+import { parseFilterExpression } from '../lib/filterParser'
 
 export class CartRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -29,5 +31,17 @@ export class CartRepository extends AbstractResourceRepository {
     }
     this.save(projectKey, resource)
     return resource
+  }
+
+  getActiveCart(projectKey: string): Cart | undefined {
+    // Get first active cart
+    const results = this._storage.query(projectKey, this.getTypeId(), {
+      where: [`cartState="Active"`],
+    })
+    if (results.count > 0) {
+      return results.results[0] as Cart
+    }
+
+    return
   }
 }

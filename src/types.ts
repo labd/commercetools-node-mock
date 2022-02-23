@@ -18,7 +18,7 @@ import { TaxCategoryRepository } from './repositories/tax-category'
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
 export type RepositoryTypes = ReferenceTypeId | 'product-projection'
-export type ServiceTypes = RepositoryTypes | 'my-payment'
+export type ServiceTypes = RepositoryTypes | 'my-cart' | 'my-payment'
 
 export type Services = Partial<
   {
