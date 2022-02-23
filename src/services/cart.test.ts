@@ -1,4 +1,9 @@
-import { Address, Cart } from '@commercetools/platform-sdk'
+import {
+  Address,
+  Cart,
+  CentPrecisionMoney,
+  ProductDraft,
+} from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 import assert from 'assert'
@@ -74,6 +79,60 @@ describe('Carts Query', () => {
 describe('Order Update Actions', () => {
   const ctMock = new CommercetoolsMock()
   let cart: Cart | undefined
+  const productDraft: ProductDraft = {
+    name: {
+      'nl-NL': 'test product',
+    },
+    productType: {
+      typeId: 'product-type',
+      id: 'some-uuid',
+    },
+    masterVariant: {
+      sku: '1337',
+      prices: [
+        {
+          value: {
+            type: 'centPrecision',
+            currencyCode: 'EUR',
+            centAmount: 14900,
+            fractionDigits: 2,
+          } as CentPrecisionMoney,
+        },
+      ],
+
+      attributes: [
+        {
+          name: 'test',
+          value: 'test',
+        },
+      ],
+    },
+    variants: [
+      {
+        sku: '1338',
+        prices: [
+          {
+            value: {
+              type: 'centPrecision',
+              currencyCode: 'EUR',
+              centAmount: 14900,
+              fractionDigits: 2,
+            } as CentPrecisionMoney,
+          },
+        ],
+        attributes: [
+          {
+            name: 'test2',
+            value: 'test2',
+          },
+        ],
+      },
+    ],
+    slug: {
+      'nl-NL': 'test-product',
+    },
+    publish: true,
+  }
 
   beforeEach(async () => {
     let response = await supertest(ctMock.app).post('/dummy/carts').send({
@@ -81,6 +140,10 @@ describe('Order Update Actions', () => {
     })
     expect(response.status).toBe(201)
     cart = response.body
+  })
+
+  afterEach(() => {
+    ctMock.clear()
   })
 
   test('no update', async () => {
@@ -105,6 +168,67 @@ describe('Order Update Actions', () => {
     expect(responseAgain.status).toBe(200)
     expect(responseAgain.body.version).toBe(2)
     expect(responseAgain.body.locale).toBe('nl-NL')
+  })
+
+  test('addLineItem', async () => {
+    const product = await supertest(ctMock.app)
+      .post(`/dummy/products`)
+      .send(productDraft)
+      .then((x) => x.body)
+
+    assert(cart, 'cart not created')
+    assert(product, 'product not created')
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: 1,
+        actions: [
+          {
+            action: 'addLineItem',
+            productId: product.id,
+            variantId: product.masterData.current.variants[0].id,
+          },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.lineItems).toHaveLength(1)
+    expect(response.body.totalPrice.centAmount).toEqual(14900)
+  })
+
+  test('addLineItem by SKU', async () => {
+    const product = await supertest(ctMock.app)
+      .post(`/dummy/products`)
+      .send(productDraft)
+      .then((x) => x.body)
+
+    assert(cart, 'cart not created')
+    assert(product, 'product not created')
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'addLineItem', sku: '1337', quantity: 2 }],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.lineItems).toHaveLength(1)
+    expect(response.body.totalPrice.centAmount).toEqual(29800)
+  })
+
+  test('addLineItem unknown product', async () => {
+    assert(cart, 'cart not created')
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'addLineItem', productId: '123', variantId: 1 }],
+      })
+    expect(response.status).toBe(400)
+    expect(response.body.message).toBe("A product with ID '123' not found.")
   })
 
   test('setBillingAddress', async () => {

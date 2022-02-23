@@ -1,4 +1,5 @@
 import {
+  Price,
   Product,
   ProductData,
   ProductDraft,
@@ -87,7 +88,7 @@ export class ProductRepository extends AbstractResourceRepository {
         variant.attributes = []
       }
 
-      const existingAttr = variant.attributes.find(attr => attr.name === name)
+      const existingAttr = variant.attributes.find((attr) => attr.name === name)
       if (existingAttr) {
         existingAttr.value = value
       } else {
@@ -207,5 +208,6 @@ const variantFromDraft = (
     id: variantId,
     sku: variant?.sku,
     attributes: variant?.attributes,
+    prices: variant?.prices as Price[],
   }
 }
