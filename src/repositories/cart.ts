@@ -103,7 +103,7 @@ export class CartRepository extends AbstractResourceRepository {
       variant = [
         product.masterData.current.masterVariant,
         ...product.masterData.current.variants,
-      ].find((x) => {
+      ].find(x => {
         if (sku) return x.sku === sku
         if (variantId) return x.id === variantId
         return false
@@ -120,11 +120,11 @@ export class CartRepository extends AbstractResourceRepository {
       }
 
       const alreadyAdded = resource.lineItems.some(
-        (x) => x.productId === product?.id && x.variant.id === variant?.id
+        x => x.productId === product?.id && x.variant.id === variant?.id
       )
       if (alreadyAdded) {
         // increase quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.map(x => {
           if (x.productId === product?.id && x.variant.id === variant?.id) {
             x.quantity += quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
@@ -170,7 +170,7 @@ export class CartRepository extends AbstractResourceRepository {
       resource: Writable<Cart>,
       { lineItemId, quantity }: CartRemoveLineItemAction
     ) => {
-      const lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+      const lineItem = resource.lineItems.find(x => x.id === lineItemId)
       if (!lineItem) {
         // Check if product is found
         throw new CommercetoolsError<GeneralError>({
@@ -182,12 +182,10 @@ export class CartRepository extends AbstractResourceRepository {
       const shouldDelete = !quantity || quantity >= lineItem.quantity
       if (shouldDelete) {
         // delete line item
-        resource.lineItems = resource.lineItems.filter(
-          (x) => x.id !== lineItemId
-        )
+        resource.lineItems = resource.lineItems.filter(x => x.id !== lineItemId)
       } else {
         // decrease quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.map(x => {
           if (x.id === lineItemId && quantity) {
             x.quantity -= quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)

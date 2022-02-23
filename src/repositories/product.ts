@@ -88,7 +88,7 @@ export class ProductRepository extends AbstractResourceRepository {
         variant.attributes = []
       }
 
-      const existingAttr = variant.attributes.find((attr) => attr.name === name)
+      const existingAttr = variant.attributes.find(attr => attr.name === name)
       if (existingAttr) {
         existingAttr.value = value
       } else {
