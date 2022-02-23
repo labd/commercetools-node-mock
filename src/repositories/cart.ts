@@ -2,6 +2,7 @@ import {
   Cart,
   CartAddLineItemAction,
   CartDraft,
+  CartRemoveLineItemAction,
   CartSetBillingAddressAction,
   CartSetCountryAction,
   CartSetCustomerEmailAction,
@@ -10,6 +11,7 @@ import {
   CartSetLocaleAction,
   CartSetShippingAddressAction,
   GeneralError,
+  LineItem,
   Product,
   ProductPagedQueryResponse,
   ProductVariant,
@@ -121,12 +123,11 @@ export class CartRepository extends AbstractResourceRepository {
         (x) => x.productId === product?.id && x.variant.id === variant?.id
       )
       if (alreadyAdded) {
-        // increase quantity
+        // increase quantity and update total price
         resource.lineItems.map((x) => {
           if (x.productId === product?.id && x.variant.id === variant?.id) {
-            // update quantity and total price
             x.quantity += quantity
-            x.totalPrice.centAmount = x.price!.value.centAmount * x.quantity
+            x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
           return x
         })
@@ -162,10 +163,41 @@ export class CartRepository extends AbstractResourceRepository {
       }
 
       // Update cart total price
-      resource.totalPrice.centAmount = resource.lineItems.reduce(
-        (cur, item) => cur + item.totalPrice.centAmount,
-        0
-      )
+      resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
+    },
+    removeLineItem: (
+      projectKey: string,
+      resource: Writable<Cart>,
+      { lineItemId, quantity }: CartRemoveLineItemAction
+    ) => {
+      const lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+      if (!lineItem) {
+        // Check if product is found
+        throw new CommercetoolsError<GeneralError>({
+          code: 'General',
+          message: `A line item with ID '${lineItemId}' not found.`,
+        })
+      }
+
+      const shouldDelete = !quantity || quantity >= lineItem.quantity
+      if (shouldDelete) {
+        // delete line item
+        resource.lineItems = resource.lineItems.filter(
+          (x) => x.id !== lineItemId
+        )
+      } else {
+        // decrease quantity and update total price
+        resource.lineItems.map((x) => {
+          if (x.id === lineItemId) {
+            x.quantity -= quantity
+            x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
+          }
+          return x
+        })
+      }
+
+      // Update cart total price
+      resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
     },
     setBillingAddress: (
       projectKey: string,
@@ -239,3 +271,9 @@ export class CartRepository extends AbstractResourceRepository {
     },
   }
 }
+
+const calculateLineItemTotalPrice = (lineItem: LineItem): number =>
+  lineItem.price!.value.centAmount * lineItem.quantity
+
+const calculateCartTotalPrice = (cart: Cart): number =>
+  cart.lineItems.reduce((cur, item) => cur + item.totalPrice.centAmount, 0)

@@ -231,6 +231,85 @@ describe('Order Update Actions', () => {
     expect(response.body.message).toBe("A product with ID '123' not found.")
   })
 
+  test('removeLineItem', async () => {
+    const product = await supertest(ctMock.app)
+      .post(`/dummy/products`)
+      .send(productDraft)
+      .then((x) => x.body)
+
+    assert(cart, 'cart not created')
+    assert(product, 'product not created')
+
+    const updatedCart = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: 1,
+        actions: [
+          {
+            action: 'addLineItem',
+            productId: product.id,
+            variantId: product.masterData.current.variants[0].id,
+          },
+        ],
+      })
+    const lineItem = updatedCart.body.lineItems[0]
+    assert(lineItem, 'lineItem not created')
+
+    expect(updatedCart.body.lineItems).toHaveLength(1)
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: updatedCart.body.version,
+        actions: [{ action: 'removeLineItem', lineItemId: lineItem.id }],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(3)
+    expect(response.body.lineItems).toHaveLength(0)
+  })
+
+  test('removeLineItem decrease quantity', async () => {
+    const product = await supertest(ctMock.app)
+      .post(`/dummy/products`)
+      .send(productDraft)
+      .then((x) => x.body)
+
+    assert(cart, 'cart not created')
+    assert(product, 'product not created')
+
+    const updatedCart = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: 1,
+        actions: [
+          {
+            action: 'addLineItem',
+            productId: product.id,
+            variantId: product.masterData.current.variants[0].id,
+            quantity: 2,
+          },
+        ],
+      })
+    const lineItem = updatedCart.body.lineItems[0]
+    assert(lineItem, 'lineItem not created')
+
+    expect(updatedCart.body.lineItems).toHaveLength(1)
+    expect(updatedCart.body.lineItems[0].quantity).toBe(2)
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: updatedCart.body.version,
+        actions: [
+          { action: 'removeLineItem', lineItemId: lineItem.id, quantity: 1 },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(3)
+    expect(response.body.lineItems).toHaveLength(1)
+    expect(response.body.lineItems[0].quantity).toBe(1)
+  })
+
   test('setBillingAddress', async () => {
     assert(cart, 'cart not created')
 
