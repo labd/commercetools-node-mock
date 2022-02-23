@@ -21,6 +21,7 @@ import { CustomObjectService } from './services/custom-object'
 import { DiscountCodeService } from './services/discount-code'
 import { ExtensionServices } from './services/extension'
 import { InventoryEntryService } from './services/inventory-entry'
+import { MyCartService } from './services/my-cart'
 import { MyPaymentService } from './services/my-payment'
 import { OrderService } from './services/order'
 import { PaymentService } from './services/payment'
@@ -161,6 +162,7 @@ export class CommercetoolsMock {
       ),
       order: new OrderService(projectRouter, this._storage),
       payment: new PaymentService(projectRouter, this._storage),
+      'my-cart': new MyCartService(projectRouter, this._storage),
       'my-payment': new MyPaymentService(projectRouter, this._storage),
       'shipping-method': new ShippingMethodService(
         projectRouter,
