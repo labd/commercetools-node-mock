@@ -188,7 +188,7 @@ export class CartRepository extends AbstractResourceRepository {
       } else {
         // decrease quantity and update total price
         resource.lineItems.map((x) => {
-          if (x.id === lineItemId) {
+          if (x.id === lineItemId && quantity) {
             x.quantity -= quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
