@@ -24,7 +24,10 @@ export class ProjectRepository extends AbstractRepository {
   get(projectKey: string): Project | null {
     const data = this._storage.getProject(projectKey)
     const resource = this._storage.getProject(projectKey)
-    const masked = maskSecretValue<Project>(resource, "externalOAuth.authorizationHeader")
+    const masked = maskSecretValue<Project>(
+      resource,
+      'externalOAuth.authorizationHeader'
+    )
     return masked
   }
 
