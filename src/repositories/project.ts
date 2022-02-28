@@ -18,11 +18,14 @@ import { Writable } from 'types'
 import { checkConcurrentModification } from './errors'
 import { CommercetoolsError } from '../exceptions'
 import { AbstractRepository } from './abstract'
+import { maskSecretValue } from '../lib/masking'
 
 export class ProjectRepository extends AbstractRepository {
   get(projectKey: string): Project | null {
     const data = this._storage.getProject(projectKey)
-    return this._storage.getProject(projectKey)
+    const resource = this._storage.getProject(projectKey)
+    const masked = maskSecretValue<Project>(resource, "externalOAuth.authorizationHeader")
+    return masked
   }
 
   save(projectKey: string, resource: Project) {
