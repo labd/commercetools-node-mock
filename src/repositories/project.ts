@@ -146,7 +146,6 @@ export class ProjectRepository extends AbstractRepository {
       resource: Writable<Project>,
       { cartsConfiguration }: ProjectChangeCartsConfigurationAction
     ) => {
-      console.log(cartsConfiguration)
       resource.carts = cartsConfiguration || {
         countryTaxRateFallbackEnabled: false,
         deleteDaysAfterLastModification: 90,

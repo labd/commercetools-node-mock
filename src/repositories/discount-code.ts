@@ -25,7 +25,6 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
   }
 
   create(projectKey: string, draft: DiscountCodeDraft): DiscountCode {
-    console.log(draft)
     const resource: DiscountCode = {
       ...getBaseResourceProperties(),
       applicationVersion: 1,

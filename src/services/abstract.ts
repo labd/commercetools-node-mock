@@ -49,7 +49,6 @@ export default abstract class AbstractService {
     if (!result) {
       return response.status(404).send()
     }
-    console.log(JSON.stringify(result, null, 4))
     return response.status(200).send(result)
   }
 
