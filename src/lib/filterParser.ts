@@ -8,12 +8,20 @@ export const parseFilterExpression = (filter: string | string[]) => {
 
 const parse = (filter: string) => {
   let parsed = filter
-      .replace(/subtree\("(.*)"\)/, '"$1"')
       .replace(/:/g, '=')
 
   do {
     parsed = parsed.replace(/(.*)\.(.*)=(.*)$/g, '$1($2=$3)')
   } while (parsed.includes('.'))
+
+  parsed = parsed
+      // variants(price=exists) => variants(price is defined)
+      .replace(/=exists/g, ' is defined')
+      // variants(price=missing) => variants(price is not defined)
+      .replace(/=missing/g, ' is not defined')
+      // category(id=subtree("abc", "def")) => category(id contains any("abc", "def"))
+      .replace(/=subtree\("(.*)"\)/, ' contains any ("$1")')
+
 
   return parsed
 }

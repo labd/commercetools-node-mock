@@ -14,8 +14,20 @@ describe('filter parser', () => {
   })
 
   test('removes subtree', () => {
-    expect(parseFilterExpression('categories.id:subtree("ff1e045b-458f-4a17-ae32-38a23e1118fa")')).toEqual(
-      'categories(id="ff1e045b-458f-4a17-ae32-38a23e1118fa")'
+    expect(parseFilterExpression('categories.id:subtree("ff1e045b-458f-4a17-ae32-38a23e1118fa", "7506526c-ee63-4140-93aa-55bed833b4cf")')).toEqual(
+      'categories(id contains any ("ff1e045b-458f-4a17-ae32-38a23e1118fa", "7506526c-ee63-4140-93aa-55bed833b4cf"))'
+    )
+  })
+
+  test('replace exists for is defined', () => {
+    expect(parseFilterExpression('variants.prices:exists')).toEqual(
+      'variants(prices is defined)'
+    )
+  })
+
+  test('replace missing for is not defined', () => {
+    expect(parseFilterExpression('variants.prices:missing')).toEqual(
+      'variants(prices is not defined)'
     )
   })
 })
