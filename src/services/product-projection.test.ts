@@ -1,4 +1,4 @@
-import { ProductDraft, ProductProjection } from '@commercetools/platform-sdk'
+import { ProductDraft, ProductProjection, ProductProjectionPagedQueryResponse } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 import * as qs from 'querystring'
@@ -80,8 +80,8 @@ describe('Product Projection', () => {
         })
     )
 
-    const projection: ProductProjection = response.body
-    expect(projection).toEqual({
+    const result: ProductProjectionPagedQueryResponse = response.body
+    expect(result).toEqual({
       count: 1,
       limit: 20,
       offset: 0,
@@ -101,5 +101,43 @@ describe('Product Projection', () => {
         },
       ],
     })
+  })
+
+  test('Search product projection with non-supported filters', async () => {
+    ctMock.project('dummy').add('product-projection', {
+      id: '',
+      version: 1,
+      productType: {
+        id: 'fake',
+        typeId: 'product-type',
+      },
+      name: { 'nl-NL': 'test-prod' },
+      slug: {},
+      variants: [],
+      masterVariant: {
+        id: 1,
+        sku: '1337',
+        attributes: [{ name: 'size', value: 'M' }],
+      },
+      createdAt: '',
+      lastModifiedAt: '',
+      categories: [
+        { id: '44c6b290-2df5-48c4-8e78-38fb58225550', typeId: 'category' },
+      ],
+    })
+
+    const response = await supertest(ctMock.app).get(
+      '/dummy/product-projections/search?' +
+        qs.stringify({
+          filter: [
+            `masterVariant.attributes.size:"S","M"`,
+            'variants.prices:exists',
+            'categories.id:subtree("44c6b290-2df5-48c4-8e78-38fb58225550")',
+          ],
+        })
+    )
+
+    const result: ProductProjectionPagedQueryResponse = response.body
+    expect(result).toMatchObject({ total: 1 })
   })
 })
