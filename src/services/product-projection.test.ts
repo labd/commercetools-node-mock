@@ -56,6 +56,17 @@ describe('Product Projection', () => {
     })
   })
 
+  test('Get product projection by 404 when not found by key with expand', async () => {
+    const response = await supertest(ctMock.app).get(
+      '/dummy/product-projections/key=DOESNOTEXIST?' +
+        qs.stringify({
+          expand: ['categories[*]'],
+        })
+    )
+
+    expect(response.status).toBe(404)
+  })
+
   test('Search product projection', async () => {
     ctMock.project('dummy').add('product-projection', {
       id: '',
