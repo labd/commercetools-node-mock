@@ -30,4 +30,18 @@ describe('filter parser', () => {
       'variants(prices is not defined)'
     )
   })
+
+  test('wrap multiple values into contains any', () => {
+    expect(parseFilterExpression('variants.attributes.country:"NL"')).toEqual(
+      'variants(attributes(country="NL"))'
+    )
+
+    expect(parseFilterExpression('variants.attributes.country:"NL","BE"')).toEqual(
+      'variants(attributes(country contains any ("NL","BE")))'
+    )
+
+    expect(parseFilterExpression('variants.attributes.uuid:"4acf91d5-aebc-4dc3-b134-2260380b446b", "44c6b290-2df5-48c4-8e78-38fb58225550"')).toEqual(
+      'variants(attributes(uuid contains any ("4acf91d5-aebc-4dc3-b134-2260380b446b", "44c6b290-2df5-48c4-8e78-38fb58225550")))'
+    )
+  })
 })

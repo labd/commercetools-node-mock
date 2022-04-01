@@ -21,6 +21,8 @@ const parse = (filter: string) => {
       .replace(/=missing/g, ' is not defined')
       // category(id=subtree("abc", "def")) => category(id contains any("abc", "def"))
       .replace(/=subtree\("(.*)"\)/, ' contains any ("$1")')
+      // variants(attributes(name:"NL","EN")) => variants(attributes(name contains any ("NL","EN")))
+      .replace(/=("([\w\s-"]+),([\w\s-,"]+)")/, " contains any ($1)")
 
 
   return parsed

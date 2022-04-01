@@ -95,8 +95,14 @@ const resolveValue = (obj: any, val: Symbol): any => {
   if (!(val.value in obj)) {
     if (Array.isArray(obj)) {
       return Object.values(obj)
-        .filter(v => val.value in v)
-        .map(v => v[val.value])
+        .filter(v => val.value in v || ('name' in v && v.name === val.value))
+        .map(v => {
+          if (val.value in v) {
+            return v[val.value]
+          } else if ('value' in v) {
+            return v['value']
+          }
+        })
     }
     throw new PredicateError(`The field '${val.value}' does not exist.`)
   }
