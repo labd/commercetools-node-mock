@@ -211,8 +211,14 @@ export class InMemoryStorage extends AbstractStorage {
 
     const resources: any[] = Array.from(store.values())
     const resource = resources.find(e => e.key === key)
-    if (params.expand) return this.expand(projectKey, resource, params.expand)
-    return resource
+    if (resource) {
+      return this.expand(
+        projectKey,
+        resource,
+        params.expand
+      ) as ResourceMap[RepositoryTypes]
+    }
+    return null
   }
 
   delete(
