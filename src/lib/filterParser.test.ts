@@ -12,4 +12,10 @@ describe('filter parser', () => {
       'variant(something(sku="123"))'
     )
   })
+
+  test('removes subtree', () => {
+    expect(parseFilterExpression('categories.id:subtree("ff1e045b-458f-4a17-ae32-38a23e1118fa")')).toEqual(
+      'categories(id="ff1e045b-458f-4a17-ae32-38a23e1118fa")'
+    )
+  })
 })

@@ -7,7 +7,9 @@ export const parseFilterExpression = (filter: string | string[]) => {
 }
 
 const parse = (filter: string) => {
-  let parsed = filter.replace(/:/g, '=')
+  let parsed = filter
+      .replace(/subtree\("(.*)"\)/, '"$1"')
+      .replace(/:/g, '=')
 
   do {
     parsed = parsed.replace(/(.*)\.(.*)=(.*)$/g, '$1($2=$3)')
