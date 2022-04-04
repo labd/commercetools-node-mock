@@ -14,7 +14,11 @@ describe('filter parser', () => {
   })
 
   test('removes subtree', () => {
-    expect(parseFilterExpression('categories.id:subtree("ff1e045b-458f-4a17-ae32-38a23e1118fa", "7506526c-ee63-4140-93aa-55bed833b4cf")')).toEqual(
+    expect(
+      parseFilterExpression(
+        'categories.id:subtree("ff1e045b-458f-4a17-ae32-38a23e1118fa", "7506526c-ee63-4140-93aa-55bed833b4cf")'
+      )
+    ).toEqual(
       'categories(id contains any ("ff1e045b-458f-4a17-ae32-38a23e1118fa", "7506526c-ee63-4140-93aa-55bed833b4cf"))'
     )
   })
@@ -36,11 +40,15 @@ describe('filter parser', () => {
       'variants(attributes(country="NL"))'
     )
 
-    expect(parseFilterExpression('variants.attributes.country:"NL","BE"')).toEqual(
-      'variants(attributes(country contains any ("NL","BE")))'
-    )
+    expect(
+      parseFilterExpression('variants.attributes.country:"NL","BE"')
+    ).toEqual('variants(attributes(country contains any ("NL","BE")))')
 
-    expect(parseFilterExpression('variants.attributes.uuid:"4acf91d5-aebc-4dc3-b134-2260380b446b", "44c6b290-2df5-48c4-8e78-38fb58225550"')).toEqual(
+    expect(
+      parseFilterExpression(
+        'variants.attributes.uuid:"4acf91d5-aebc-4dc3-b134-2260380b446b", "44c6b290-2df5-48c4-8e78-38fb58225550"'
+      )
+    ).toEqual(
       'variants(attributes(uuid contains any ("4acf91d5-aebc-4dc3-b134-2260380b446b", "44c6b290-2df5-48c4-8e78-38fb58225550")))'
     )
   })
