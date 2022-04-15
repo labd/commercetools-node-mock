@@ -58,7 +58,7 @@ describe('Product Projection', () => {
 
   test('Get product projection by 404 when not found by key with expand', async () => {
     const response = await supertest(ctMock.app).get(
-      '/dummy/product-projections/key=DOESNOTEXIST?' +
+        '/dummy/product-projections/key=DOESNOTEXIST?' +
         qs.stringify({
           expand: ['categories[*]'],
         })
@@ -66,8 +66,10 @@ describe('Product Projection', () => {
 
     expect(response.status).toBe(404)
   })
+})
 
-  test('Search product projection', async () => {
+describe('Product Projection Search', () => {
+  beforeAll(() => {
     ctMock.project('dummy').add('product-projection', {
       id: '',
       version: 1,
@@ -83,7 +85,9 @@ describe('Product Projection', () => {
       lastModifiedAt: '',
       categories: [],
     })
+  })
 
+  test('Search product projection', async () => {
     const response = await supertest(ctMock.app).get(
       '/dummy/product-projections/search?' +
         qs.stringify({
@@ -111,6 +115,33 @@ describe('Product Projection', () => {
           version: 1,
         },
       ],
+    })
+  })
+
+  test('Search product projection with query.filter', async () => {
+    const response = await supertest(ctMock.app).get(
+      '/dummy/product-projections/search?' +
+        qs.stringify({
+          'query.filter': ['masterVariant.sku:"1337"'],
+        })
+    )
+
+    const projection: ProductProjection = response.body
+    expect(projection).toMatchObject({
+      count: 1,
+      results: [{ masterVariant: { id: 1, sku: '1337' }}],
+    })
+  })
+
+  test('Search product projection without filter', async () => {
+    const response = await supertest(ctMock.app).get(
+      '/dummy/product-projections/search'
+    )
+
+    const projection: ProductProjection = response.body
+    expect(projection).toMatchObject({
+      count: 1,
+      results: [{ masterVariant: { id: 1, sku: '1337' }}],
     })
   })
 })
