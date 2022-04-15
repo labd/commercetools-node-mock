@@ -58,7 +58,7 @@ describe('Product Projection', () => {
 
   test('Get product projection by 404 when not found by key with expand', async () => {
     const response = await supertest(ctMock.app).get(
-        '/dummy/product-projections/key=DOESNOTEXIST?' +
+      '/dummy/product-projections/key=DOESNOTEXIST?' +
         qs.stringify({
           expand: ['categories[*]'],
         })
@@ -129,7 +129,7 @@ describe('Product Projection Search', () => {
     const projection: ProductProjection = response.body
     expect(projection).toMatchObject({
       count: 1,
-      results: [{ masterVariant: { id: 1, sku: '1337' }}],
+      results: [{ masterVariant: { id: 1, sku: '1337' } }],
     })
   })
 
@@ -141,7 +141,7 @@ describe('Product Projection Search', () => {
     const projection: ProductProjection = response.body
     expect(projection).toMatchObject({
       count: 1,
-      results: [{ masterVariant: { id: 1, sku: '1337' }}],
+      results: [{ masterVariant: { id: 1, sku: '1337' } }],
     })
   })
 })
