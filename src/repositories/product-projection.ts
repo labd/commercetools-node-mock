@@ -50,7 +50,8 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
   }
 
   search(projectKey: string, query: ParsedQs) {
-    const wherePredicate = parseFilterExpression(query.filter as any)
+    const filter = (query['filter.query'] ?? query.filter) as any
+    const wherePredicate = filter ? parseFilterExpression(filter) : undefined
 
     const results = this._storage.query(projectKey, this.getTypeId(), {
       where: wherePredicate,
