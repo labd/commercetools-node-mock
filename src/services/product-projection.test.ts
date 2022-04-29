@@ -118,6 +118,26 @@ describe('Product Projection Search', () => {
     })
   })
 
+  test('Search product projection page 2', async () => {
+    const response = await supertest(ctMock.app).get(
+      '/dummy/product-projections/search?' +
+        qs.stringify({
+          filter: ['masterVariant.sku:"1337"'],
+          limit: 50,
+          offset: 100
+        })
+    )
+
+    const projection: ProductProjection = response.body
+    expect(projection).toEqual({
+      count: 1,
+      limit: 50,
+      offset: 100,
+      total: 0,
+      results: [],
+    })
+  })
+
   test('Search product projection with query.filter', async () => {
     const response = await supertest(ctMock.app).get(
       '/dummy/product-projections/search?' +

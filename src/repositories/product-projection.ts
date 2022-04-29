@@ -55,6 +55,8 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
 
     const results = this._storage.query(projectKey, this.getTypeId(), {
       where: wherePredicate,
+      offset: query.offset ? Number(query.offset) : undefined,
+      limit: query.limit ? Number(query.limit) : undefined,
     }) //TODO: this is a partial implementation, but I don't really have the time to implement an actual search API right now
 
     return results

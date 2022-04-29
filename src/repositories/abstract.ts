@@ -14,6 +14,8 @@ import { CommercetoolsError } from '../exceptions'
 export type QueryParams = {
   expand?: string[]
   where?: string[]
+  offset?: number
+  limit?: number
 }
 
 export type GetParams = {
@@ -69,6 +71,8 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     return this._storage.query(projectKey, this.getTypeId(), {
       expand: params.expand,
       where: params.where,
+      offset: params.offset,
+      limit: params.limit,
     })
   }
 
