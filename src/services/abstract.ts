@@ -37,11 +37,14 @@ export default abstract class AbstractService {
   }
 
   get(request: Request, response: Response) {
+    const limit = this._parseParam(request.query.limit)
+    const offset = this._parseParam(request.query.offset)
+
     const result = this.repository.query(request.params.projectKey, {
       expand: this._parseParam(request.query.expand),
       where: this._parseParam(request.query.where),
-      limit: this._parseParam(request.query.limit),
-      offset: this._parseParam(request.query.offset),
+      limit: limit !== undefined ? Number(limit) : undefined,
+      offset: offset !== undefined ? Number(offset) : undefined,
     })
     return response.status(200).send(result)
   }

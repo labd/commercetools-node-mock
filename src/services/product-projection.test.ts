@@ -124,7 +124,7 @@ describe('Product Projection Search', () => {
         qs.stringify({
           filter: ['masterVariant.sku:"1337"'],
           limit: 50,
-          offset: 100
+          offset: 100,
         })
     )
 
