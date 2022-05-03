@@ -21,4 +21,13 @@ export class CustomerRepository extends AbstractResourceRepository {
     this.save(projectKey, resource)
     return resource
   }
+  getMe(projectKey: string): Customer | undefined {
+    // Get first active cart
+    const results = this._storage.query(projectKey, this.getTypeId(), {}) // grab the first customer you can find
+    if (results.count > 0) {
+      return results.results[0] as Customer
+    }
+
+    return
+  }
 }

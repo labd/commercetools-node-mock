@@ -37,6 +37,7 @@ import { SubscriptionService } from './services/subscription'
 import { TaxCategoryService } from './services/tax-category'
 import { TypeService } from './services/type'
 import { ZoneService } from './services/zone'
+import { MyCustomerService } from 'services/my-customer'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
@@ -163,6 +164,7 @@ export class CommercetoolsMock {
       order: new OrderService(projectRouter, this._storage),
       payment: new PaymentService(projectRouter, this._storage),
       'my-cart': new MyCartService(projectRouter, this._storage),
+      'my-customer': new MyCustomerService(projectRouter, this._storage),
       'my-payment': new MyPaymentService(projectRouter, this._storage),
       'shipping-method': new ShippingMethodService(
         projectRouter,
