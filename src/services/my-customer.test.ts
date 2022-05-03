@@ -23,6 +23,7 @@ describe('Me', () => {
     expect(response.body).toEqual({
       customer: {
         ...draft,
+        password: 'cDRzc3cwcmQ=',
         version: 1,
         isEmailVerified: false,
         addresses: [],

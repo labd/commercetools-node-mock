@@ -14,7 +14,7 @@ export class CustomerRepository extends AbstractResourceRepository {
     const resource: Customer = {
       ...getBaseResourceProperties(),
       email: draft.email,
-      password: draft.password,
+      password: Buffer.from(draft.password).toString('base64'),
       isEmailVerified: draft.isEmailVerified || false,
       addresses: [],
     }

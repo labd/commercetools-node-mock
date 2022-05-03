@@ -24,7 +24,7 @@ export class MyCustomerService extends AbstractService {
 
     router.get('', this.getMe.bind(this))
 
-    router.post('/signup/', this.signUp.bind(this))
+    router.post('/signup', this.signUp.bind(this))
 
     parent.use(`/${basePath}`, router)
   }
