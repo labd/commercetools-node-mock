@@ -37,7 +37,7 @@ import { SubscriptionService } from './services/subscription'
 import { TaxCategoryService } from './services/tax-category'
 import { TypeService } from './services/type'
 import { ZoneService } from './services/zone'
-import { MyCustomerService } from 'services/my-customer'
+import { MyCustomerService } from './services/my-customer'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
