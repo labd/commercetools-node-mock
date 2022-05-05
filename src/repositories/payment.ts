@@ -1,11 +1,15 @@
 import {
   Payment,
   PaymentAddTransactionAction,
+  PaymentChangeTransactionStateAction,
   PaymentDraft,
   PaymentSetCustomFieldAction,
   PaymentSetCustomTypeAction,
+  PaymentTransitionStateAction,
   ReferenceTypeId,
+  State,
   StateReference,
+  Transaction,
   TransactionDraft,
 } from '@commercetools/platform-sdk'
 import { AbstractResourceRepository } from './abstract'
@@ -111,10 +115,43 @@ export class PaymentRepository extends AbstractResourceRepository {
         this.transactionFromTransactionDraft(transaction, projectKey),
       ]
     },
+    changeTransactionState: (
+      _projectKey: string,
+      resource: Writable<Payment>,
+      { transactionId, state }: PaymentChangeTransactionStateAction
+    ) => {
+      const index = resource.transactions.findIndex(
+        (e: Transaction) => e.id === transactionId
+      )
+      const updatedTransaction: Transaction = {
+        ...resource.transactions[index],
+        state,
+      }
+      resource.transactions[index] = updatedTransaction
+    },
+    transitionState: (
+      projectKey: string,
+      resource: Writable<Payment>,
+      { state }: PaymentTransitionStateAction
+    ) => {
+      const stateObj = this._storage.getByResourceIdentifier(
+        projectKey,
+        state
+      ) as State | null
+
+      if (!stateObj) {
+        throw new Error(`State ${state} not found`)
+      }
+
+      resource.paymentStatus.state = {
+        typeId: 'state',
+        id: stateObj.id,
+        obj: stateObj,
+      }
+    },
     // addInterfaceInteraction: () => {},
     // changeAmountPlanned: () => {},
     // changeTransactionInteractionId: () => {},
-    // changeTransactionState: () => {},
     // changeTransactionTimestamp: () => {},
     // setAmountPaid: () => {},
     // setAmountRefunded: () => {},
@@ -129,6 +166,5 @@ export class PaymentRepository extends AbstractResourceRepository {
     // setMethodInfoName: () => {},
     // setStatusInterfaceCode: () => {},
     // setStatusInterfaceText: () => {},
-    // transitionState: () => {},
   }
 }
