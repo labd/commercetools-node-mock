@@ -30,6 +30,7 @@ export class CategoryRepository extends AbstractResourceRepository {
       name: draft.name,
       slug: draft.slug,
       orderHint: draft.orderHint || '',
+      externalId: draft.externalId || '',
       parent: draft.parent
         ? { typeId: 'category', id: draft.parent.id! }
         : undefined,
