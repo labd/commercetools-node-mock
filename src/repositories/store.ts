@@ -50,7 +50,7 @@ export class StoreRepository extends AbstractResourceRepository {
     )
   }
 
-    getWithKey(projectKey: string, key: string): Store | undefined {
+  getWithKey(projectKey: string, key: string): Store | undefined {
     const result = this._storage.query(projectKey, this.getTypeId(), {
       where: [`key="${key}"`],
     })
