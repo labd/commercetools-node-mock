@@ -1,8 +1,10 @@
 import {
   Customer,
+  CustomerChangeEmailAction,
   CustomerDraft,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
+import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
 
@@ -28,5 +30,15 @@ export class CustomerRepository extends AbstractResourceRepository {
     }
 
     return
+  }
+
+  actions = {
+    changeEmail: (
+      _projectKey: string,
+      resource: Writable<Customer>,
+      { email }: CustomerChangeEmailAction
+    ) => {
+      resource.email = email
+    },
   }
 }
