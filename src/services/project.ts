@@ -31,7 +31,7 @@ export class ProjectService {
       return response.status(404).send({})
     }
 
-    const updatedResource = this.repository.processUpdateActions(
+    this.repository.processUpdateActions(
       request.params.projectKey,
       project,
       updateRequest.actions

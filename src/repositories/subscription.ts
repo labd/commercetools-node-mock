@@ -15,10 +15,10 @@ export class SubscriptionRepository extends AbstractResourceRepository {
   create(projectKey: string, draft: SubscriptionDraft): Subscription {
     // TODO: We could actually test this here by using the aws sdk. For now
     // hardcode a failed check when account id is 0000000000
-    if (draft.destination.type == 'SQS') {
+    if (draft.destination.type === 'SQS') {
       const queueURL = new URL(draft.destination.queueUrl)
       const accountId = queueURL.pathname.split('/')[1]
-      if (accountId == '0000000000') {
+      if (accountId === '0000000000') {
         const dest = draft.destination
         throw new CommercetoolsError<InvalidInputError>(
           {

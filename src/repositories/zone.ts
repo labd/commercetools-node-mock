@@ -49,7 +49,9 @@ export class ZoneRepository extends AbstractResourceRepository {
       { location }: ZoneRemoveLocationAction
     ) => {
       resource.locations = resource.locations.filter(loc => {
-        return !(loc.country == location.country && loc.state == location.state)
+        return !(
+          loc.country === location.country && loc.state === location.state
+        )
       })
     },
     changeName: (

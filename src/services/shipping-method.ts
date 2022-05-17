@@ -1,7 +1,7 @@
 import { ShippingMethodRepository } from '../repositories/shipping-method'
 import AbstractService from './abstract'
 import { AbstractStorage } from '../storage'
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
 export class ShippingMethodService extends AbstractService {
   public repository: ShippingMethodRepository

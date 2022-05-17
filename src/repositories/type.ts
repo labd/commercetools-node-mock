@@ -104,13 +104,13 @@ export class TypeRepository extends AbstractResourceRepository {
       { fieldName, value }: TypeAddEnumValueAction
     ) => {
       resource.fieldDefinitions.forEach(field => {
-        if (field.name == fieldName) {
+        if (field.name === fieldName) {
           // TODO, should be done better i suppose
-          if (field.type.name == 'Enum') {
+          if (field.type.name === 'Enum') {
             field.type.values.push(value)
           } else if (
-            field.type.name == 'Set' &&
-            field.type.elementType.name == 'Enum'
+            field.type.name === 'Set' &&
+            field.type.elementType.name === 'Enum'
           ) {
             field.type.elementType.values.push(value)
           } else {
@@ -125,20 +125,20 @@ export class TypeRepository extends AbstractResourceRepository {
       { fieldName, value }: TypeChangeEnumValueLabelAction
     ) => {
       resource.fieldDefinitions.forEach(field => {
-        if (field.name == fieldName) {
+        if (field.name === fieldName) {
           // TODO, should be done better i suppose
-          if (field.type.name == 'Enum') {
+          if (field.type.name === 'Enum') {
             field.type.values.forEach(v => {
-              if (v.key == value.key) {
+              if (v.key === value.key) {
                 v.label = value.label
               }
             })
           } else if (
-            field.type.name == 'Set' &&
-            field.type.elementType.name == 'Enum'
+            field.type.name === 'Set' &&
+            field.type.elementType.name === 'Enum'
           ) {
             field.type.elementType.values.forEach(v => {
-              if (v.key == value.key) {
+              if (v.key === value.key) {
                 v.label = value.label
               }
             })
