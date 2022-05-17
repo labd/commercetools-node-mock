@@ -59,10 +59,10 @@ export class CategoryRepository extends AbstractResourceRepository {
       { assetId, assetKey, name }: CategoryChangeAssetNameAction
     ) => {
       resource.assets?.forEach(asset => {
-        if (assetId && assetId == asset.id) {
+        if (assetId && assetId === asset.id) {
           asset.name = name
         }
-        if (assetKey && assetKey == asset.key) {
+        if (assetKey && assetKey === asset.key) {
           asset.name = name
         }
       })
@@ -87,10 +87,10 @@ export class CategoryRepository extends AbstractResourceRepository {
       { assetId, assetKey, description }: CategorySetAssetDescriptionAction
     ) => {
       resource.assets?.forEach(asset => {
-        if (assetId && assetId == asset.id) {
+        if (assetId && assetId === asset.id) {
           asset.description = description
         }
-        if (assetKey && assetKey == asset.key) {
+        if (assetKey && assetKey === asset.key) {
           asset.description = description
         }
       })
@@ -101,10 +101,10 @@ export class CategoryRepository extends AbstractResourceRepository {
       { assetId, assetKey, sources }: CategorySetAssetSourcesAction
     ) => {
       resource.assets?.forEach(asset => {
-        if (assetId && assetId == asset.id) {
+        if (assetId && assetId === asset.id) {
           asset.sources = sources
         }
-        if (assetKey && assetKey == asset.key) {
+        if (assetKey && assetKey === asset.key) {
           asset.sources = sources
         }
       })

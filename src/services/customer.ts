@@ -17,7 +17,7 @@ export class CustomerService extends AbstractService {
     return 'customers'
   }
 
-    extraRoutes(parent: Router) {
+  extraRoutes(parent: Router) {
     parent.post('/password-token', (request, response) => {
       const customer = this.repository.query(request.params.projectKey, {
         where: [`email="${request.body.email}"`],

@@ -94,7 +94,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       const taxRateObj = this.taxRateFromTaxRateDraft(taxRate)
       for (let i = 0; i < resource.rates.length; i++) {
         const rate = resource.rates[i]
-        if (rate.id == taxRateId) {
+        if (rate.id === taxRateId) {
           resource.rates[i] = taxRateObj
         }
       }

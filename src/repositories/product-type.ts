@@ -77,7 +77,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
         switch (type.name) {
           case 'lenum':
             type.values.forEach(v => {
-              if (v.key == newValue.key) {
+              if (v.key === newValue.key) {
                 v.label = newValue.label
               }
             })
@@ -89,7 +89,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       }
 
       resource.attributes?.forEach(value => {
-        if (value.name == attributeName) {
+        if (value.name === attributeName) {
           updateAttributeType(value.type)
         }
       })
@@ -100,7 +100,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       { attributeName, label }: ProductTypeChangeLabelAction
     ) => {
       resource.attributes?.forEach(value => {
-        if (value.name == attributeName) {
+        if (value.name === attributeName) {
           value.label = label
         }
       })

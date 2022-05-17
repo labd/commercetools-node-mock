@@ -26,7 +26,6 @@ import {
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository } from './abstract'
 import { Writable } from 'types'
-import { _ } from 'ajv'
 import deepEqual from 'deep-equal'
 
 export class ShippingMethodRepository extends AbstractResourceRepository {
@@ -84,14 +83,14 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
     >
   > = {
     addShippingRate: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { shippingRate, zone }: ShippingMethodAddShippingRateAction
     ) => {
       const rate = this._transformShippingRate(shippingRate)
 
       resource.zoneRates.forEach(zoneRate => {
-        if (zoneRate.zone.id == zone.id) {
+        if (zoneRate.zone.id === zone.id) {
           zoneRate.shippingRates.push(rate)
           return
         }
@@ -105,14 +104,14 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     removeShippingRate: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { shippingRate, zone }: ShippingMethodAddShippingRateAction
     ) => {
       const rate = this._transformShippingRate(shippingRate)
 
       resource.zoneRates.forEach(zoneRate => {
-        if (zoneRate.zone.id == zone.id) {
+        if (zoneRate.zone.id === zone.id) {
           zoneRate.shippingRates = zoneRate.shippingRates.filter(otherRate => {
             return !deepEqual(rate, otherRate)
           })
@@ -140,7 +139,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     removeZone: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { zone }: ShippingMethodRemoveZoneAction
     ) => {
@@ -149,42 +148,42 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     setKey: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { key }: ShippingMethodSetKeyAction
     ) => {
       resource.key = key
     },
     setDescription: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { description }: ShippingMethodSetDescriptionAction
     ) => {
       resource.description = description
     },
     setLocalizedDescription: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { localizedDescription }: ShippingMethodSetLocalizedDescriptionAction
     ) => {
       resource.localizedDescription = localizedDescription
     },
     setPredicate: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { predicate }: ShippingMethodSetPredicateAction
     ) => {
       resource.predicate = predicate
     },
     changeIsDefault: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { isDefault }: ShippingMethodChangeIsDefaultAction
     ) => {
       resource.isDefault = isDefault
     },
     changeName: (
-      projectKey: string,
+      _projectKey: string,
       resource: Writable<ShippingMethod>,
       { name }: ShippingMethodChangeNameAction
     ) => {

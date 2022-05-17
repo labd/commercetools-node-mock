@@ -1,5 +1,3 @@
-import { json } from 'express'
-
 export const maskSecretValue = <T>(resource: T, path: string): T => {
   const parts = path.split('.')
   const clone = JSON.parse(JSON.stringify(resource))
@@ -10,7 +8,7 @@ export const maskSecretValue = <T>(resource: T, path: string): T => {
     const part = parts[i]
     val = val[part]
 
-    if (val == undefined) {
+    if (val === undefined) {
       return resource
     }
   }

@@ -15,7 +15,7 @@ export class StoreService extends AbstractService {
     return 'stores'
   }
 
-    extraRoutes(router: Router) {
+  extraRoutes(router: Router) {
     router.get('/key=:key', this.getWithKey.bind(this))
   }
 
