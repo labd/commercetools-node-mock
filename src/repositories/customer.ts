@@ -12,6 +12,7 @@ export class CustomerRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'customer'
   }
+
   create(projectKey: string, draft: CustomerDraft): Customer {
     const resource: Customer = {
       ...getBaseResourceProperties(),
@@ -23,6 +24,7 @@ export class CustomerRepository extends AbstractResourceRepository {
     this.save(projectKey, resource)
     return resource
   }
+
   getMe(projectKey: string): Customer | undefined {
     const results = this._storage.query(projectKey, this.getTypeId(), {}) // grab the first customer you can find
     if (results.count > 0) {
