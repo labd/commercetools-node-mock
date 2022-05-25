@@ -20,10 +20,14 @@ import {
   OrderSetOrderNumberAction,
   OrderSetShippingAddressAction,
   OrderSetStoreAction,
+  OrderState,
+  OrderStateTransitionMessage,
+  OrderTransitionStateAction,
   Product,
   ProductPagedQueryResponse,
   ProductVariant,
   ReferenceTypeId,
+  State,
   Store,
 } from '@commercetools/platform-sdk'
 import { AbstractResourceRepository, QueryParams } from './abstract'
@@ -251,6 +255,24 @@ export class OrderRepository extends AbstractResourceRepository {
       { paymentState }: OrderChangePaymentStateAction
     ) => {
       resource.paymentState = paymentState
+    },
+    transitionState: (
+      projectKey: string,
+      resource: Writable<Order>,
+      { state }: OrderTransitionStateAction
+    ) => {
+      const resolvedType = this._storage.getByResourceIdentifier(
+        projectKey,
+        state
+      ) as State | null
+
+      if (!resolvedType) {
+        throw new Error(
+          `No state found with key=${state.key} or id=${state.key}`
+        )
+      }
+
+      resource.state = { typeId: 'state', id: resolvedType.id }
     },
     setBillingAddress: (
       projectKey: string,

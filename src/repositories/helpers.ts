@@ -24,7 +24,6 @@ export const createCustomFields = (
   if (!draft.type) return undefined
   if (!draft.type.typeId) return undefined
   if (!draft.fields) return undefined
-
   const typeResource = storage.getByResourceIdentifier(
     projectKey,
     draft.type

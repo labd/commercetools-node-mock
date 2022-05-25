@@ -44,6 +44,7 @@ export abstract class AbstractRepository {
 
     actions.forEach(action => {
       const updateFunc = this.actions[action.action]
+
       if (!updateFunc) {
         console.error(`No mock implemented for update action ${action.action}`)
         return
