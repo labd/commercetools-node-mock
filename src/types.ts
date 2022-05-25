@@ -21,6 +21,7 @@ export type RepositoryTypes = ReferenceTypeId | 'product-projection'
 export type ServiceTypes =
   | RepositoryTypes
   | 'my-cart'
+  | 'my-order'
   | 'my-payment'
   | 'my-customer'
 
