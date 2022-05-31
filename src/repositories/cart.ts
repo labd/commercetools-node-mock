@@ -10,8 +10,10 @@ import {
   CartSetCustomTypeAction,
   CartSetLocaleAction,
   CartSetShippingAddressAction,
+  CartSetShippingMethodAction,
   GeneralError,
   LineItem,
+  LineItemDraft,
   Product,
   ProductPagedQueryResponse,
   ProductVariant,
@@ -30,10 +32,14 @@ export class CartRepository extends AbstractResourceRepository {
   }
 
   create(projectKey: string, draft: CartDraft): Cart {
+    const lineItems = draft.lineItems?.map(draftLineItem =>
+      this.draftLineItemtoLineItem(projectKey, draftLineItem)
+    )
+
     const resource: Cart = {
       ...getBaseResourceProperties(),
       cartState: 'Active',
-      lineItems: [],
+      lineItems: lineItems ?? [],
       customLineItems: [],
       totalPrice: {
         type: 'centPrecision',
@@ -48,6 +54,10 @@ export class CartRepository extends AbstractResourceRepository {
       origin: 'Customer',
       custom: createCustomFields(draft.custom, projectKey, this._storage),
     }
+
+    // @ts-ignore
+    resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
+
     this.save(projectKey, resource)
     return resource
   }
@@ -204,6 +214,28 @@ export class CartRepository extends AbstractResourceRepository {
     ) => {
       resource.billingAddress = address
     },
+    setShippingMethod: (
+      projectKey: string,
+      resource: Writable<Cart>,
+      { shippingMethod }: CartSetShippingMethodAction
+    ) => {
+      const resolvedType = this._storage.getByResourceIdentifier(
+        projectKey,
+        //@ts-ignore
+        shippingMethod
+      )
+
+      if (!resolvedType) {
+        throw new Error(`Type ${shippingMethod} not found`)
+      }
+      //@ts-ignore
+      resource.shippingInfo = {
+        shippingMethod: {
+          typeId: 'shipping-method',
+          id: resolvedType.id,
+        },
+      }
+    },
     setCountry: (
       projectKey: string,
       resource: Writable<Cart>,
@@ -267,6 +299,91 @@ export class CartRepository extends AbstractResourceRepository {
     ) => {
       resource.shippingAddress = address
     },
+  }
+  draftLineItemtoLineItem = (
+    projectKey: string,
+    draftLineItem: LineItemDraft
+  ): LineItem => {
+    const { productId, quantity } = draftLineItem
+    // @ts-ignore
+    let variantId = draftLineItem.variant.id
+    // @ts-ignore
+    let sku = draftLineItem.variant.sku
+    let product: Product | null = null
+    let variant: ProductVariant | undefined
+
+    if (productId && variantId) {
+      // Fetch product and variant by ID
+      product = this._storage.get(projectKey, 'product', productId, {})
+    } else if (sku) {
+      // Fetch product and variant by SKU
+      const items = this._storage.query(projectKey, 'product', {
+        where: [
+          `masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
+        ],
+      }) as ProductPagedQueryResponse
+
+      if (items.count === 1) {
+        product = items.results[0]
+      }
+    }
+
+    if (!product) {
+      // Check if product is found
+      throw new CommercetoolsError<GeneralError>({
+        code: 'General',
+        message: sku
+          ? `A product containing a variant with SKU '${sku}' not found.`
+          : `A product with ID '${productId}' not found.`,
+      })
+    }
+
+    // Find matching variant
+    variant = [
+      product.masterData.current.masterVariant,
+      ...product.masterData.current.variants,
+    ].find(x => {
+      if (sku) return x.sku === sku
+      if (variantId) return x.id === variantId
+      return false
+    })
+
+    if (!variant) {
+      // Check if variant is found
+      throw new Error(
+        sku
+          ? `A variant with SKU '${sku}' for product '${product.id}' not found.`
+          : `A variant with ID '${variantId}' for product '${product.id}' not found.`
+      )
+    }
+
+    const price = variant.prices?.[0]
+
+    const quant = quantity ?? 1
+
+    if (!price) {
+      throw new Error(`Price not set on ${productId}`)
+    }
+
+    return {
+      id: uuidv4(),
+      productId: product.id,
+      productKey: product.key,
+      name: product.masterData.current.name,
+      productSlug: product.masterData.current.slug,
+      productType: product.productType,
+      variant,
+      price: price,
+      totalPrice: {
+        ...price.value,
+        centAmount: price.value.centAmount * quant,
+      },
+      quantity: quant,
+      discountedPricePerQuantity: [],
+      lineItemMode: 'Standard',
+      priceMode: 'Platform',
+      state: [],
+    }
   }
 }
 

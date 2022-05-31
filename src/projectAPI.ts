@@ -1,3 +1,4 @@
+import { GetParams } from 'repositories/abstract'
 import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
 import { RepositoryMap, ResourceMap, Services } from './types'
@@ -39,13 +40,14 @@ export class ProjectAPI {
 
   get<ReferenceTypeId extends keyof ResourceMap>(
     typeId: ReferenceTypeId,
-    id: string
+    id: string,
+    params: GetParams
   ): ResourceMap[ReferenceTypeId] {
     return this._storage.get(
       this.projectKey,
       typeId,
       id,
-      {}
+      params
     ) as ResourceMap[ReferenceTypeId]
   }
 
