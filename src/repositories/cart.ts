@@ -33,9 +33,15 @@ export class CartRepository extends AbstractResourceRepository {
   }
 
   create(projectKey: string, draft: CartDraft): Cart {
-    const lineItems = draft.lineItems?.map(draftLineItem =>
-      this.draftLineItemtoLineItem(projectKey, draftLineItem, draft.currency, draft.country)
-    ) ?? []
+    const lineItems =
+      draft.lineItems?.map(draftLineItem =>
+        this.draftLineItemtoLineItem(
+          projectKey,
+          draftLineItem,
+          draft.currency,
+          draft.country
+        )
+      ) ?? []
 
     const resource: Cart = {
       ...getBaseResourceProperties(),
@@ -307,9 +313,8 @@ export class CartRepository extends AbstractResourceRepository {
     projectKey: string,
     draftLineItem: LineItemDraft,
     currency: string,
-    country: string | undefined,
+    country: string | undefined
   ): LineItem => {
-    
     const { productId, quantity, variantId, sku } = draftLineItem
 
     let product: Product | null = null
@@ -360,12 +365,13 @@ export class CartRepository extends AbstractResourceRepository {
       )
     }
 
-    
     const quant = quantity ?? 1
-    
-    const price = selectPrice({prices: variant.prices, currency, country})
+
+    const price = selectPrice({ prices: variant.prices, currency, country })
     if (!price) {
-      throw new Error(`No valid price found for ${productId} for country ${country} and currency ${currency}`)
+      throw new Error(
+        `No valid price found for ${productId} for country ${country} and currency ${currency}`
+      )
     }
 
     return {
@@ -395,8 +401,8 @@ const selectPrice = ({
   currency,
   country,
 }: {
-  prices: Price[] | undefined,
-  currency: string,
+  prices: Price[] | undefined
+  currency: string
   country: string | undefined
 }) => {
   if (!prices) {
