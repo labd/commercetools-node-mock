@@ -304,11 +304,9 @@ export class CartRepository extends AbstractResourceRepository {
     projectKey: string,
     draftLineItem: LineItemDraft
   ): LineItem => {
-    const { productId, quantity } = draftLineItem
-    // @ts-ignore
-    let variantId = draftLineItem.variant.id
-    // @ts-ignore
-    let sku = draftLineItem.variant.sku
+    
+    const { productId, quantity, variantId, sku } = draftLineItem
+
     let product: Product | null = null
     let variant: ProductVariant | undefined
 
