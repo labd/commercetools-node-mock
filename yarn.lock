@@ -1065,21 +1065,21 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@commercetools/platform-sdk@2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-2.4.1.tgz#cba87b3a9086bc11f811c6415935394c476ece7d"
-  integrity sha512-s6ppnIiw0fVcFyZ96yPTU2pKi4MtWG2nUWYPDKY+cjmm8rGSg5OfMsUNaY4wbO1IHWdY+XNliCon5HJTov14LQ==
+"@commercetools/platform-sdk@^2.4.1":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-2.7.0.tgz#206cd6821ff9c48c33e1b3a094dae41573768ff0"
+  integrity sha512-xm3IT0WP/5NL4vmB/9TSS19+z8ghkHmEmb9n5kXu5GC+wiR/Z6pcpt/BYUR2MuRTqjsq167MThH15jHgWypaQw==
   dependencies:
-    "@commercetools/sdk-client-v2" "^1.1.0"
+    "@commercetools/sdk-client-v2" "^1.4.0"
     "@commercetools/sdk-middleware-auth" "^6.0.4"
     "@commercetools/sdk-middleware-http" "^6.0.4"
     "@commercetools/sdk-middleware-logger" "^2.1.1"
     querystring "^0.2.1"
 
-"@commercetools/sdk-client-v2@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@commercetools/sdk-client-v2/-/sdk-client-v2-1.1.0.tgz#658e60f4a8a37465b2f29236e077af1a60887d34"
-  integrity sha512-5pZu/bIPKPoqPMLsUSYP2YgxBuAuY3kGB2rCWEel1HYyxfUDrFJqkOJnbIDE9PriEEIyLUa0vRJOc2ceIIvQIQ==
+"@commercetools/sdk-client-v2@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@commercetools/sdk-client-v2/-/sdk-client-v2-1.4.0.tgz#ac0a91814386c53914f2e9595461158835ca25ff"
+  integrity sha512-JYGDQVJtrPsU9keGM6HSIUAwTJtLqEWWEsaLJaDct3ciRc9orNLRn65pPhfXzZkg0kw2c6SkmG8HEEDQbOq0xg==
   dependencies:
     buffer "^6.0.3"
     node-fetch "^2.6.1"
