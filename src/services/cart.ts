@@ -2,7 +2,7 @@ import AbstractService from './abstract'
 import { Router } from 'express'
 import { CartRepository } from '../repositories/cart'
 import { AbstractStorage } from '../storage'
-import { Cart, Order } from '@commercetools/platform-sdk'
+import { Cart, CartDraft, Order } from '@commercetools/platform-sdk'
 import { OrderRepository } from '../repositories/order'
 
 export class CartService extends AbstractService {
@@ -37,11 +37,23 @@ export class CartService extends AbstractService {
         return response.status(400).send()
       }
 
-      const newCart = this.repository.create(request.params.projectKey, {
+      const cartDraft: CartDraft = {
         ...cartOrOrder,
         currency: cartOrOrder.totalPrice.currencyCode,
         discountCodes: [],
-      })
+        lineItems: cartOrOrder.lineItems.map(lineItem => {
+          return {
+            ...lineItem,
+            variantId: lineItem.variant.id,
+            sku: lineItem.variant.sku,
+          }
+        }),
+      }
+
+      const newCart = this.repository.create(
+        request.params.projectKey,
+        cartDraft
+      )
 
       return response.status(200).send(newCart)
     })
