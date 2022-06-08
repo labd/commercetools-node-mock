@@ -14,6 +14,8 @@ import {
   TypedMoney,
 } from '@commercetools/platform-sdk'
 import { AbstractStorage } from '../storage'
+import { RepositoryContext } from './abstract'
+import { Request } from 'express'
 
 export const createCustomFields = (
   draft: CustomFieldsDraft | undefined,
@@ -95,4 +97,11 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
     typeId: resourceIdentifier.typeId,
     id: resource?.id,
   } as unknown) as T
+}
+
+export const getRepositoryContext = (request: Request): RepositoryContext => {
+  return {
+    projectKey: request.params.projectKey,
+    storeKey: request.params.storeKey,
+  }
 }

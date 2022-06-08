@@ -4,20 +4,20 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ChannelRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'channel'
   }
 
-  create(projectKey: string, draft: ChannelDraft): Channel {
+  create(context: RepositoryContext, draft: ChannelDraft): Channel {
     const resource: Channel = {
       ...getBaseResourceProperties(),
       key: draft.key,
       roles: draft.roles || [],
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 }

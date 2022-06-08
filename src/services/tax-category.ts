@@ -2,6 +2,7 @@ import { TaxCategoryRepository } from '../repositories/tax-category'
 import AbstractService from './abstract'
 import { AbstractStorage } from '../storage'
 import { Request, Response, Router } from 'express'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class TaxCategoryService extends AbstractService {
   public repository: TaxCategoryRepository
@@ -21,7 +22,7 @@ export class TaxCategoryService extends AbstractService {
 
   getWithKey(request: Request, response: Response) {
     const resource = this.repository.getWithKey(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params.key
     )
     if (resource) {

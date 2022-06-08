@@ -24,7 +24,7 @@ import {
   ZoneReference,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from 'types'
 import deepEqual from 'deep-equal'
 
@@ -33,32 +33,39 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
     return 'shipping-method'
   }
 
-  create(projectKey: string, draft: ShippingMethodDraft): ShippingMethod {
+  create(
+    context: RepositoryContext,
+    draft: ShippingMethodDraft
+  ): ShippingMethod {
     const resource: ShippingMethod = {
       ...getBaseResourceProperties(),
       ...draft,
       taxCategory: getReferenceFromResourceIdentifier(
         draft.taxCategory,
-        projectKey,
+        context.projectKey,
         this._storage
       ),
       zoneRates: draft.zoneRates?.map(z =>
-        this._transformZoneRateDraft(projectKey, z)
+        this._transformZoneRateDraft(context, z)
       ),
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   private _transformZoneRateDraft = (
-    projectKey: string,
+    context: RepositoryContext,
     draft: ZoneRateDraft
   ): ZoneRate => ({
     ...draft,
     zone: getReferenceFromResourceIdentifier<ZoneReference>(
       draft.zone,
-      projectKey,
+      context.projectKey,
       this._storage
     ),
     shippingRates: draft.shippingRates?.map(this._transformShippingRate),
@@ -76,14 +83,14 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
     Record<
       ShippingMethodUpdateAction['action'],
       (
-        projectKey: string,
+        context: RepositoryContext,
         resource: Writable<ShippingMethod>,
         action: any
       ) => void
     >
   > = {
     addShippingRate: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { shippingRate, zone }: ShippingMethodAddShippingRateAction
     ) => {
@@ -104,7 +111,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     removeShippingRate: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { shippingRate, zone }: ShippingMethodAddShippingRateAction
     ) => {
@@ -119,13 +126,13 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     addZone: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { zone }: ShippingMethodAddZoneAction
     ) => {
       const zoneReference = getReferenceFromResourceIdentifier<ZoneReference>(
         zone,
-        projectKey,
+        context.projectKey,
         this._storage
       )
 
@@ -139,7 +146,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     removeZone: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { zone }: ShippingMethodRemoveZoneAction
     ) => {
@@ -148,42 +155,42 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       })
     },
     setKey: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { key }: ShippingMethodSetKeyAction
     ) => {
       resource.key = key
     },
     setDescription: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { description }: ShippingMethodSetDescriptionAction
     ) => {
       resource.description = description
     },
     setLocalizedDescription: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { localizedDescription }: ShippingMethodSetLocalizedDescriptionAction
     ) => {
       resource.localizedDescription = localizedDescription
     },
     setPredicate: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { predicate }: ShippingMethodSetPredicateAction
     ) => {
       resource.predicate = predicate
     },
     changeIsDefault: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { isDefault }: ShippingMethodChangeIsDefaultAction
     ) => {
       resource.isDefault = isDefault
     },
     changeName: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<ShippingMethod>,
       { name }: ShippingMethodChangeNameAction
     ) => {

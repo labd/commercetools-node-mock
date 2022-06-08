@@ -22,7 +22,7 @@ import {
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 import { Writable } from '../types'
 import { CommercetoolsError } from '../exceptions'
@@ -32,11 +32,11 @@ export class CartRepository extends AbstractResourceRepository {
     return 'cart'
   }
 
-  create(projectKey: string, draft: CartDraft): Cart {
+  create(context: RepositoryContext, draft: CartDraft): Cart {
     const lineItems =
       draft.lineItems?.map(draftLineItem =>
         this.draftLineItemtoLineItem(
-          projectKey,
+          context.projectKey,
           draftLineItem,
           draft.currency,
           draft.country
@@ -61,13 +61,17 @@ export class CartRepository extends AbstractResourceRepository {
       locale: draft.locale,
       country: draft.country,
       origin: draft.origin ?? 'Customer',
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
     }
 
     // @ts-ignore
     resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
@@ -85,7 +89,7 @@ export class CartRepository extends AbstractResourceRepository {
 
   actions = {
     addLineItem: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { productId, variantId, sku, quantity = 1 }: CartAddLineItemAction
     ) => {
@@ -94,10 +98,15 @@ export class CartRepository extends AbstractResourceRepository {
 
       if (productId && variantId) {
         // Fetch product and variant by ID
-        product = this._storage.get(projectKey, 'product', productId, {})
+        product = this._storage.get(
+          context.projectKey,
+          'product',
+          productId,
+          {}
+        )
       } else if (sku) {
         // Fetch product and variant by SKU
-        const items = this._storage.query(projectKey, 'product', {
+        const items = this._storage.query(context.projectKey, 'product', {
           where: [
             `masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
           ],
@@ -196,7 +205,7 @@ export class CartRepository extends AbstractResourceRepository {
       resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
     },
     removeLineItem: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { lineItemId, quantity }: CartRemoveLineItemAction
     ) => {
@@ -228,19 +237,19 @@ export class CartRepository extends AbstractResourceRepository {
       resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
     },
     setBillingAddress: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { address }: CartSetBillingAddressAction
     ) => {
       resource.billingAddress = address
     },
     setShippingMethod: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { shippingMethod }: CartSetShippingMethodAction
     ) => {
       const resolvedType = this._storage.getByResourceIdentifier(
-        projectKey,
+        context.projectKey,
         //@ts-ignore
         shippingMethod
       )
@@ -257,21 +266,21 @@ export class CartRepository extends AbstractResourceRepository {
       }
     },
     setCountry: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { country }: CartSetCountryAction
     ) => {
       resource.country = country
     },
     setCustomerEmail: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { email }: CartSetCustomerEmailAction
     ) => {
       resource.customerEmail = email
     },
     setCustomField: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Cart,
       { name, value }: CartSetCustomFieldAction
     ) => {
@@ -281,7 +290,7 @@ export class CartRepository extends AbstractResourceRepository {
       resource.custom.fields[name] = value
     },
     setCustomType: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { type, fields }: CartSetCustomTypeAction
     ) => {
@@ -289,7 +298,7 @@ export class CartRepository extends AbstractResourceRepository {
         resource.custom = undefined
       } else {
         const resolvedType = this._storage.getByResourceIdentifier(
-          projectKey,
+          context.projectKey,
           type
         )
         if (!resolvedType) {
@@ -306,14 +315,14 @@ export class CartRepository extends AbstractResourceRepository {
       }
     },
     setLocale: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { locale }: CartSetLocaleAction
     ) => {
       resource.locale = locale
     },
     setShippingAddress: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Cart>,
       { address }: CartSetShippingAddressAction
     ) => {

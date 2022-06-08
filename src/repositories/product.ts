@@ -10,7 +10,7 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from '../types'
 
 export class ProductRepository extends AbstractResourceRepository {
@@ -18,7 +18,7 @@ export class ProductRepository extends AbstractResourceRepository {
     return 'product'
   }
 
-  create(projectKey: string, draft: ProductDraft): Product {
+  create(context: RepositoryContext, draft: ProductDraft): Product {
     const productData = {
       name: draft.name,
       slug: draft.slug,
@@ -47,14 +47,14 @@ export class ProductRepository extends AbstractResourceRepository {
       },
     }
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
 
     return resource
   }
 
   actions = {
     publish: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Product>,
       { scope }: ProductPublishAction
     ) => {
@@ -67,7 +67,7 @@ export class ProductRepository extends AbstractResourceRepository {
       resource.masterData.published = true
     },
     setAttribute: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Product>,
       { variantId, sku, name, value, staged }: ProductSetAttributeAction
     ) => {

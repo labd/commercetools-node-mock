@@ -10,7 +10,7 @@ import {
   ProductTypeUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from 'types'
 
 export class ProductTypeRepository extends AbstractResourceRepository {
@@ -18,23 +18,23 @@ export class ProductTypeRepository extends AbstractResourceRepository {
     return 'product-type'
   }
 
-  create(projectKey: string, draft: ProductTypeDraft): ProductType {
+  create(context: RepositoryContext, draft: ProductTypeDraft): ProductType {
     const resource: ProductType = {
       ...getBaseResourceProperties(),
       key: draft.key,
       name: draft.name,
       description: draft.description,
       attributes: (draft.attributes ?? []).map(a =>
-        this.attributeDefinitionFromAttributeDefinitionDraft(projectKey, a)
+        this.attributeDefinitionFromAttributeDefinitionDraft(context, a)
       ),
     }
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   attributeDefinitionFromAttributeDefinitionDraft = (
-    _projectKey: string,
+    _context: RepositoryContext,
     draft: AttributeDefinitionDraft
   ): AttributeDefinition => ({
     ...draft,
@@ -43,8 +43,8 @@ export class ProductTypeRepository extends AbstractResourceRepository {
     isSearchable: draft.isSearchable ?? true,
   })
 
-  getWithKey(projectKey: string, key: string): ProductType | undefined {
-    const result = this._storage.query(projectKey, this.getTypeId(), {
+  getWithKey(context: RepositoryContext, key: string): ProductType | undefined {
+    const result = this._storage.query(context.projectKey, this.getTypeId(), {
       where: [`key="${key}"`],
     })
     if (result.count === 1) {
@@ -62,11 +62,15 @@ export class ProductTypeRepository extends AbstractResourceRepository {
   actions: Partial<
     Record<
       ProductTypeUpdateAction['action'],
-      (projectKey: string, resource: Writable<ProductType>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<ProductType>,
+        action: any
+      ) => void
     >
   > = {
     changeLocalizedEnumValueLabel: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<ProductType>,
       {
         attributeName,
@@ -95,7 +99,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       })
     },
     changeLabel: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<ProductType>,
       { attributeName, label }: ProductTypeChangeLabelAction
     ) => {

@@ -2,6 +2,7 @@ import { ProductProjectionRepository } from './../repositories/product-projectio
 import AbstractService from './abstract'
 import { AbstractStorage } from '../storage'
 import { Request, Response, Router } from 'express'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class ProductProjectionService extends AbstractService {
   public repository: ProductProjectionRepository
@@ -21,7 +22,7 @@ export class ProductProjectionService extends AbstractService {
 
   search(request: Request, response: Response) {
     const resource = this.repository.search(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.query
     )
     return response.status(200).send(resource)

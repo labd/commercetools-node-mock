@@ -4,6 +4,7 @@ import { CartRepository } from '../repositories/cart'
 import { AbstractStorage } from '../storage'
 import { Cart, CartDraft, Order } from '@commercetools/platform-sdk'
 import { OrderRepository } from '../repositories/order'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class CartService extends AbstractService {
   public repository: CartRepository
@@ -21,17 +22,13 @@ export class CartService extends AbstractService {
 
   extraRoutes(parent: Router) {
     parent.post('/replicate', (request, response) => {
+      const context = getRepositoryContext(request)
+
       // @ts-ignore
       const cartOrOrder: Cart | Order | null =
         request.body.reference.typeId === 'order'
-          ? this.orderRepository.get(
-              request.params.projectKey,
-              request.body.reference.id
-            )
-          : this.repository.get(
-              request.params.projectKey,
-              request.body.reference.id
-            )
+          ? this.orderRepository.get(context, request.body.reference.id)
+          : this.repository.get(context, request.body.reference.id)
 
       if (!cartOrOrder) {
         return response.status(400).send()
@@ -50,10 +47,7 @@ export class CartService extends AbstractService {
         }),
       }
 
-      const newCart = this.repository.create(
-        request.params.projectKey,
-        cartDraft
-      )
+      const newCart = this.repository.create(context, cartDraft)
 
       return response.status(200).send(newCart)
     })

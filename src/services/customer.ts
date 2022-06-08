@@ -4,6 +4,7 @@ import { CustomerRepository } from '../repositories/customer'
 import { AbstractStorage } from '../storage'
 import { getBaseResourceProperties } from '../helpers'
 import { v4 as uuidv4 } from 'uuid'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class CustomerService extends AbstractService {
   public repository: CustomerRepository
@@ -19,11 +20,13 @@ export class CustomerService extends AbstractService {
 
   extraRoutes(parent: Router) {
     parent.post('/password-token', (request, response) => {
-      const customer = this.repository.query(request.params.projectKey, {
+      const customer = this.repository.query(getRepositoryContext(request), {
         where: [`email="${request.body.email}"`],
       })
+      // @ts-ignore
       const ttlMinutes: number = request.params.ttlMinutes
-        ? +request.params.ttlMinutes
+        ? // @ts-ignore
+          +request.params.ttlMinutes
         : 34560
       const { version, ...rest } = getBaseResourceProperties()
 

@@ -11,7 +11,7 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { getReferenceFromResourceIdentifier } from './helpers'
 
 export class StoreRepository extends AbstractResourceRepository {
@@ -19,24 +19,24 @@ export class StoreRepository extends AbstractResourceRepository {
     return 'store'
   }
 
-  create(projectKey: string, draft: StoreDraft): Store {
+  create(context: RepositoryContext, draft: StoreDraft): Store {
     const resource: Store = {
       ...getBaseResourceProperties(),
       key: draft.key,
       name: draft.name,
       languages: draft.languages,
       distributionChannels: this.transformChannels(
-        projectKey,
+        context,
         draft.distributionChannels
       ),
-      supplyChannels: this.transformChannels(projectKey, draft.supplyChannels),
+      supplyChannels: this.transformChannels(context, draft.supplyChannels),
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   private transformChannels(
-    projectKey: string,
+    context: RepositoryContext,
     channels?: ChannelResourceIdentifier[]
   ) {
     if (!channels) return []
@@ -44,14 +44,14 @@ export class StoreRepository extends AbstractResourceRepository {
     return channels.map(ref =>
       getReferenceFromResourceIdentifier<ChannelReference>(
         ref,
-        projectKey,
+        context.projectKey,
         this._storage
       )
     )
   }
 
-  getWithKey(projectKey: string, key: string): Store | undefined {
-    const result = this._storage.query(projectKey, this.getTypeId(), {
+  getWithKey(context: RepositoryContext, key: string): Store | undefined {
+    const result = this._storage.query(context.projectKey, this.getTypeId(), {
       where: [`key="${key}"`],
     })
     if (result.count === 1) {
@@ -68,28 +68,32 @@ export class StoreRepository extends AbstractResourceRepository {
   actions: Partial<
     Record<
       StoreUpdateAction['action'],
-      (projectKey: string, resource: Writable<Store>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<Store>,
+        action: any
+      ) => void
     >
   > = {
     setName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Store>,
       { name }: StoreSetNameAction
     ) => {
       resource.name = name
     },
     setDistributionChannels: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Store>,
       { distributionChannels }: StoreSetDistributionChannelsAction
     ) => {
       resource.distributionChannels = this.transformChannels(
-        projectKey,
+        context,
         distributionChannels
       )
     },
     setLanguages: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Store>,
       { languages }: StoreSetLanguagesAction
     ) => {

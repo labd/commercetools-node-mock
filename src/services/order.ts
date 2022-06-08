@@ -2,6 +2,7 @@ import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
 import { OrderRepository } from '../repositories/order'
 import { AbstractStorage } from '../storage'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class OrderService extends AbstractService {
   public repository: OrderRepository
@@ -23,7 +24,7 @@ export class OrderService extends AbstractService {
   import(request: Request, response: Response) {
     const importDraft = request.body
     const resource = this.repository.import(
-      request.params.projectKey,
+      getRepositoryContext(request),
       importDraft
     )
     return response.status(200).send(resource)
@@ -31,7 +32,7 @@ export class OrderService extends AbstractService {
 
   getWithOrderNumber(request: Request, response: Response) {
     const resource = this.repository.getWithOrderNumber(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params.orderNumber,
       request.query
     )

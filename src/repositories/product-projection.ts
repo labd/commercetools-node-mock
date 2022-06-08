@@ -6,7 +6,7 @@ import {
   ProductVariantDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { RepositoryTypes } from '../types'
 import { parseFilterExpression } from '../lib/filterParser'
 
@@ -15,7 +15,7 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
     return 'product-projection'
   }
 
-  create(projectKey: string, draft: ProductDraft): ProductProjection {
+  create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
     if (!draft.masterVariant) {
       throw new Error(
         `must provider mastervariant for product projection with key ${draft.key}`
@@ -44,16 +44,16 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
       searchKeywords: draft.searchKeywords,
     }
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
 
     return resource
   }
 
-  search(projectKey: string, query: ParsedQs) {
+  search(context: RepositoryContext, query: ParsedQs) {
     const filter = (query['filter.query'] ?? query.filter) as any
     const wherePredicate = filter ? parseFilterExpression(filter) : undefined
 
-    const results = this._storage.query(projectKey, this.getTypeId(), {
+    const results = this._storage.query(context.projectKey, this.getTypeId(), {
       where: wherePredicate,
       offset: query.offset ? Number(query.offset) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,

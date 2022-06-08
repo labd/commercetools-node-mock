@@ -2,6 +2,7 @@ import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
 import { AbstractStorage } from '../storage'
 import { CustomerRepository } from '../repositories/customer'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class MyCustomerService extends AbstractService {
   public repository: CustomerRepository
@@ -32,7 +33,7 @@ export class MyCustomerService extends AbstractService {
   }
 
   getMe(request: Request, response: Response) {
-    const resource = this.repository.getMe(request.params.projectKey)
+    const resource = this.repository.getMe(getRepositoryContext(request))
     if (!resource) {
       return response.status(404).send('Not found')
     }
@@ -41,7 +42,10 @@ export class MyCustomerService extends AbstractService {
 
   signUp(request: Request, response: Response) {
     const draft = request.body
-    const resource = this.repository.create(request.params.projectKey, draft)
+    const resource = this.repository.create(
+      getRepositoryContext(request),
+      draft
+    )
     const result = this._expandWithId(request, resource.id)
     return response.status(this.createStatusCode).send({ customer: result })
   }
@@ -50,7 +54,7 @@ export class MyCustomerService extends AbstractService {
     const { email, password } = request.body
     const encodedPassword = Buffer.from(password).toString('base64')
 
-    const result = this.repository.query(request.params.projectKey, {
+    const result = this.repository.query(getRepositoryContext(request), {
       where: [`email = "${email}"`, `password = "${encodedPassword}"`],
     })
 

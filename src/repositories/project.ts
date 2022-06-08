@@ -17,12 +17,12 @@ import { InvalidOperationError } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { checkConcurrentModification } from './errors'
 import { CommercetoolsError } from '../exceptions'
-import { AbstractRepository } from './abstract'
+import { AbstractRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
 
 export class ProjectRepository extends AbstractRepository {
-  get(projectKey: string): Project | null {
-    const resource = this._storage.getProject(projectKey)
+  get(context: RepositoryContext): Project | null {
+    const resource = this._storage.getProject(context.projectKey)
     const masked = maskSecretValue<Project>(
       resource,
       'externalOAuth.authorizationHeader'
@@ -30,8 +30,8 @@ export class ProjectRepository extends AbstractRepository {
     return masked
   }
 
-  save(projectKey: string, resource: Project) {
-    const current = this.get(projectKey)
+  save(context: RepositoryContext, resource: Project) {
+    const current = this.get(context)
 
     if (current) {
       checkConcurrentModification(current, resource.version)
@@ -55,46 +55,50 @@ export class ProjectRepository extends AbstractRepository {
   actions: Partial<
     Record<
       ProjectUpdateAction['action'],
-      (projectKey: string, resource: Writable<Project>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<Project>,
+        action: any
+      ) => void
     >
   > = {
     changeName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { name }: ProjectChangeNameAction
     ) => {
       resource.name = name
     },
     changeCurrencies: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { currencies }: ProjectChangeCurrenciesAction
     ) => {
       resource.currencies = currencies
     },
     changeCountries: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { countries }: ProjectChangeCountriesAction
     ) => {
       resource.countries = countries
     },
     changeLanguages: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { languages }: ProjectChangeLanguagesAction
     ) => {
       resource.languages = languages
     },
     changeMessagesEnabled: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { messagesEnabled }: ProjectChangeMessagesEnabledAction
     ) => {
       resource.messages.enabled = messagesEnabled
     },
     changeProductSearchIndexingEnabled: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { enabled }: ProjectChangeProductSearchIndexingEnabledAction
     ) => {
@@ -107,7 +111,7 @@ export class ProjectRepository extends AbstractRepository {
       resource.searchIndexing.products.lastModifiedAt = new Date().toISOString()
     },
     changeOrderSearchStatus: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { status }: ProjectChangeOrderSearchStatusAction
     ) => {
@@ -118,21 +122,21 @@ export class ProjectRepository extends AbstractRepository {
       resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString()
     },
     setShippingRateInputType: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { shippingRateInputType }: ProjectSetShippingRateInputTypeAction
     ) => {
       resource.shippingRateInputType = shippingRateInputType
     },
     setExternalOAuth: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { externalOAuth }: ProjectSetExternalOAuthAction
     ) => {
       resource.externalOAuth = externalOAuth
     },
     changeCountryTaxRateFallbackEnabled: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       {
         countryTaxRateFallbackEnabled,
@@ -141,7 +145,7 @@ export class ProjectRepository extends AbstractRepository {
       resource.carts.countryTaxRateFallbackEnabled = countryTaxRateFallbackEnabled
     },
     changeCartsConfiguration: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Project>,
       { cartsConfiguration }: ProjectChangeCartsConfigurationAction
     ) => {

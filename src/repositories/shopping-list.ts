@@ -5,7 +5,7 @@ import {
   ShoppingListDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,
@@ -15,13 +15,17 @@ export class ShoppingListRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'shopping-list'
   }
-  create(projectKey: string, draft: ShoppingListDraft): ShoppingList {
+  create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {
     // const product =
 
     const resource: ShoppingList = {
       ...getBaseResourceProperties(),
       ...draft,
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
       textLineItems: [],
       lineItems: draft.lineItems?.map(e => ({
         ...getBaseResourceProperties(),
@@ -31,12 +35,12 @@ export class ShoppingListRepository extends AbstractResourceRepository {
         name: {},
         quantity: e.quantity ?? 1,
         productType: { typeId: 'product-type', id: '' },
-        custom: createCustomFields(e.custom, projectKey, this._storage),
+        custom: createCustomFields(e.custom, context.projectKey, this._storage),
       })),
       customer: draft.customer
         ? getReferenceFromResourceIdentifier<CustomerReference>(
             draft.customer,
-            projectKey,
+            context.projectKey,
             this._storage
           )
         : undefined,
@@ -44,7 +48,7 @@ export class ShoppingListRepository extends AbstractResourceRepository {
         ? { typeId: 'store', key: draft.store.key! }
         : undefined,
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 }

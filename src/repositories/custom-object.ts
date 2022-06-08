@@ -4,7 +4,7 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { checkConcurrentModification } from './errors'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 
@@ -13,9 +13,12 @@ export class CustomObjectRepository extends AbstractResourceRepository {
     return 'key-value-document'
   }
 
-  create(projectKey: string, draft: Writable<CustomObjectDraft>): CustomObject {
+  create(
+    context: RepositoryContext,
+    draft: Writable<CustomObjectDraft>
+  ): CustomObject {
     const current = this.getWithContainerAndKey(
-      projectKey,
+      context,
       draft.container,
       draft.key
     )
@@ -47,14 +50,19 @@ export class CustomObjectRepository extends AbstractResourceRepository {
       value: draft.value,
     }
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
-  getWithContainerAndKey(projectKey: string, container: string, key: string) {
-    const items = this._storage.all(projectKey, this.getTypeId()) as Array<
-      CustomObject
-    >
+  getWithContainerAndKey(
+    context: RepositoryContext,
+    container: string,
+    key: string
+  ) {
+    const items = this._storage.all(
+      context.projectKey,
+      this.getTypeId()
+    ) as Array<CustomObject>
     return items.find(item => item.container === container && item.key === key)
   }
 }

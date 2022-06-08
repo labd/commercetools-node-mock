@@ -16,14 +16,14 @@ import {
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { createCustomFields } from './helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class CategoryRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'category'
   }
 
-  create(projectKey: string, draft: CategoryDraft): Category {
+  create(context: RepositoryContext, draft: CategoryDraft): Category {
     const resource: Category = {
       ...getBaseResourceProperties(),
       key: draft.key,
@@ -44,17 +44,21 @@ export class CategoryRepository extends AbstractResourceRepository {
             sources: d.sources,
             tags: d.tags,
             key: d.key,
-            custom: createCustomFields(draft.custom, projectKey, this._storage),
+            custom: createCustomFields(
+              draft.custom,
+              context.projectKey,
+              this._storage
+            ),
           }
         }) || [],
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   actions = {
     changeAssetName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { assetId, assetKey, name }: CategoryChangeAssetNameAction
     ) => {
@@ -68,21 +72,21 @@ export class CategoryRepository extends AbstractResourceRepository {
       })
     },
     changeSlug: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { slug }: CategoryChangeSlugAction
     ) => {
       resource.slug = slug
     },
     setKey: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { key }: CategorySetKeyAction
     ) => {
       resource.key = key
     },
     setAssetDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { assetId, assetKey, description }: CategorySetAssetDescriptionAction
     ) => {
@@ -96,7 +100,7 @@ export class CategoryRepository extends AbstractResourceRepository {
       })
     },
     setAssetSources: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { assetId, assetKey, sources }: CategorySetAssetSourcesAction
     ) => {
@@ -110,28 +114,28 @@ export class CategoryRepository extends AbstractResourceRepository {
       })
     },
     setDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { description }: CategorySetDescriptionAction
     ) => {
       resource.description = description
     },
     setMetaDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { metaDescription }: CategorySetMetaDescriptionAction
     ) => {
       resource.metaDescription = metaDescription
     },
     setMetaKeywords: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { metaKeywords }: CategorySetMetaKeywordsAction
     ) => {
       resource.metaKeywords = metaKeywords
     },
     setMetaTitle: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Category>,
       { metaTitle }: CategorySetMetaTitleAction
     ) => {

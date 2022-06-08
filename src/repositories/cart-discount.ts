@@ -18,7 +18,7 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createTypedMoney } from './helpers'
 
 export class CartDiscountRepository extends AbstractResourceRepository {
@@ -26,7 +26,7 @@ export class CartDiscountRepository extends AbstractResourceRepository {
     return 'cart-discount'
   }
 
-  create(projectKey: string, draft: CartDiscountDraft): CartDiscount {
+  create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {
     const resource: CartDiscount = {
       ...getBaseResourceProperties(),
       key: draft.key,
@@ -43,7 +43,7 @@ export class CartDiscountRepository extends AbstractResourceRepository {
       validUntil: draft.validUntil,
       value: this.transformValueDraft(draft.value),
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
@@ -80,42 +80,42 @@ export class CartDiscountRepository extends AbstractResourceRepository {
     Record<
       CartDiscountUpdateAction['action'],
       (
-        projectKey: string,
+        context: RepositoryContext,
         resource: Writable<CartDiscount>,
         action: any
       ) => void
     >
   > = {
     setKey: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { key }: CartDiscountSetKeyAction
     ) => {
       resource.key = key
     },
     setDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { description }: CartDiscountSetDescriptionAction
     ) => {
       resource.description = description
     },
     setValidFrom: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { validFrom }: CartDiscountSetValidFromAction
     ) => {
       resource.validFrom = validFrom
     },
     setValidUntil: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { validUntil }: CartDiscountSetValidUntilAction
     ) => {
       resource.validUntil = validUntil
     },
     setValidFromAndUntil: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction
     ) => {
@@ -123,14 +123,14 @@ export class CartDiscountRepository extends AbstractResourceRepository {
       resource.validUntil = validUntil
     },
     changeSortOrder: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { sortOrder }: CartDiscountChangeSortOrderAction
     ) => {
       resource.sortOrder = sortOrder
     },
     changeIsActive: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<CartDiscount>,
       { isActive }: CartDiscountChangeIsActiveAction
     ) => {

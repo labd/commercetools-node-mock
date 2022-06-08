@@ -13,7 +13,7 @@ import {
   TaxRateDraft,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { v4 as uuidv4 } from 'uuid'
 import { Writable } from 'types'
 
@@ -22,13 +22,13 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
     return 'tax-category'
   }
 
-  create(projectKey: string, draft: TaxCategoryDraft): TaxCategory {
+  create(context: RepositoryContext, draft: TaxCategoryDraft): TaxCategory {
     const resource: TaxCategory = {
       ...getBaseResourceProperties(),
       ...draft,
       rates: draft.rates?.map(this.taxRateFromTaxRateDraft) || [],
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
@@ -38,8 +38,8 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
     amount: draft.amount || 0,
   })
 
-  getWithKey(projectKey: string, key: string): TaxCategory | undefined {
-    const result = this._storage.query(projectKey, this.getTypeId(), {
+  getWithKey(context: RepositoryContext, key: string): TaxCategory | undefined {
+    const result = this._storage.query(context.projectKey, this.getTypeId(), {
       where: [`key="${key}"`],
     })
     if (result.count === 1) {
@@ -57,11 +57,15 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
   actions: Partial<
     Record<
       TaxCategoryUpdateAction['action'],
-      (projectKey: string, resource: Writable<TaxCategory>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<TaxCategory>,
+        action: any
+      ) => void
     >
   > = {
     addTaxRate: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<TaxCategory>,
       { taxRate }: TaxCategoryAddTaxRateAction
     ) => {
@@ -71,7 +75,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       resource.rates.push(this.taxRateFromTaxRateDraft(taxRate))
     },
     removeTaxRate: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<TaxCategory>,
       { taxRateId }: TaxCategoryRemoveTaxRateAction
     ) => {
@@ -83,7 +87,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       })
     },
     replaceTaxRate: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<TaxCategory>,
       { taxRateId, taxRate }: TaxCategoryReplaceTaxRateAction
     ) => {
@@ -100,21 +104,21 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       }
     },
     setDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<TaxCategory>,
       { description }: TaxCategorySetDescriptionAction
     ) => {
       resource.description = description
     },
     setKey: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<TaxCategory>,
       { key }: TaxCategorySetKeyAction
     ) => {
       resource.key = key
     },
     changeName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<TaxCategory>,
       { name }: TaxCategoryChangeNameAction
     ) => {

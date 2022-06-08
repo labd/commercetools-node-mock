@@ -10,14 +10,14 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ExtensionRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'extension'
   }
 
-  create(projectKey: string, draft: ExtensionDraft): Extension {
+  create(context: RepositoryContext, draft: ExtensionDraft): Extension {
     const resource: Extension = {
       ...getBaseResourceProperties(),
       key: draft.key,
@@ -25,37 +25,41 @@ export class ExtensionRepository extends AbstractResourceRepository {
       destination: draft.destination,
       triggers: draft.triggers,
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   actions: Record<
     ExtensionUpdateAction['action'],
-    (projectKey: string, resource: Writable<Extension>, action: any) => void
+    (
+      context: RepositoryContext,
+      resource: Writable<Extension>,
+      action: any
+    ) => void
   > = {
     setKey: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Extension>,
       { key }: ExtensionSetKeyAction
     ) => {
       resource.key = key
     },
     setTimeoutInMs: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Extension>,
       { timeoutInMs }: ExtensionSetTimeoutInMsAction
     ) => {
       resource.timeoutInMs = timeoutInMs
     },
     changeTriggers: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Extension>,
       { triggers }: ExtensionChangeTriggersAction
     ) => {
       resource.triggers = triggers
     },
     changeDestination: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Extension>,
       { destination }: ExtensionChangeDestinationAction
     ) => {

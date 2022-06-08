@@ -22,20 +22,30 @@ export type GetParams = {
   expand?: string[]
 }
 
+export type RepositoryContext = {
+  projectKey: string
+  storeKey?: string
+}
 export abstract class AbstractRepository {
   protected _storage: AbstractStorage
   protected actions: Partial<
-    Record<any, (projectKey: string, resource: any, action: any) => void>
+    Record<
+      any,
+      (context: RepositoryContext, resource: any, action: any) => void
+    >
   > = {}
 
   constructor(storage: AbstractStorage) {
     this._storage = storage
   }
 
-  abstract save(projectKey: string, resource: BaseResource | Project): void
+  abstract save(
+    { projectKey }: RepositoryContext,
+    resource: BaseResource | Project
+  ): void
 
   processUpdateActions(
-    projectKey: string,
+    context: RepositoryContext,
     resource: BaseResource | Project,
     actions: UpdateAction[]
   ): BaseResource {
@@ -49,18 +59,18 @@ export abstract class AbstractRepository {
         console.error(`No mock implemented for update action ${action.action}`)
         return
       }
-      updateFunc(projectKey, modifiedResource, action)
+      updateFunc(context, modifiedResource, action)
     })
 
     if (!deepEqual(modifiedResource, resource)) {
-      this.save(projectKey, modifiedResource)
+      this.save(context, modifiedResource)
     }
     return modifiedResource
   }
 }
 
 export abstract class AbstractResourceRepository extends AbstractRepository {
-  abstract create(projectKey: string, draft: any): BaseResource
+  abstract create(context: RepositoryContext, draft: any): BaseResource
   abstract getTypeId(): RepositoryTypes
 
   constructor(storage: AbstractStorage) {
@@ -68,8 +78,8 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     this._storage.assertStorage(this.getTypeId())
   }
 
-  query(projectKey: string, params: QueryParams = {}) {
-    return this._storage.query(projectKey, this.getTypeId(), {
+  query(context: RepositoryContext, params: QueryParams = {}) {
+    return this._storage.query(context.projectKey, this.getTypeId(), {
       expand: params.expand,
       where: params.where,
       offset: params.offset,
@@ -78,31 +88,41 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
   }
 
   get(
-    projectKey: string,
+    context: RepositoryContext,
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
-    return this._storage.get(projectKey, this.getTypeId(), id, params)
+    return this._storage.get(context.projectKey, this.getTypeId(), id, params)
   }
 
   getByKey(
-    projectKey: string,
+    context: RepositoryContext,
     key: string,
     params: GetParams = {}
   ): BaseResource | null {
-    return this._storage.getByKey(projectKey, this.getTypeId(), key, params)
+    return this._storage.getByKey(
+      context.projectKey,
+      this.getTypeId(),
+      key,
+      params
+    )
   }
 
   delete(
-    projectKey: string,
+    context: RepositoryContext,
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
-    return this._storage.delete(projectKey, this.getTypeId(), id, params)
+    return this._storage.delete(
+      context.projectKey,
+      this.getTypeId(),
+      id,
+      params
+    )
   }
 
-  save(projectKey: string, resource: BaseResource) {
-    const current = this.get(projectKey, resource.id)
+  save(context: RepositoryContext, resource: BaseResource) {
+    const current = this.get(context, resource.id)
 
     if (current) {
       checkConcurrentModification(current, resource.version)
@@ -120,6 +140,6 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
 
     // @ts-ignore
     resource.version += 1
-    this._storage.add(projectKey, this.getTypeId(), resource as any)
+    this._storage.add(context.projectKey, this.getTypeId(), resource as any)
   }
 }
