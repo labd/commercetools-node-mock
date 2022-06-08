@@ -158,11 +158,11 @@ export class CartRepository extends AbstractResourceRepository {
             message: `A product with ID '${productId}' doesn't have any prices.`,
           })
         }
-        
+
         const currency = resource.totalPrice.currencyCode
 
         const price = selectPrice({
-          prices: variant.prices, 
+          prices: variant.prices,
           currency,
           country: resource.country,
         })

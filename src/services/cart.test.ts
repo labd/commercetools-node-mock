@@ -234,11 +234,11 @@ describe('Cart Update Actions', () => {
   })
 
   test.each([
-    ["EUR", 29800],
-    ["GBP", 37800],
+    ['EUR', 29800],
+    ['GBP', 37800],
   ])('addLineItem with price selection', async (currency, total) => {
     await createCart(currency)
-    
+
     const product = await supertest(ctMock.app)
       .post(`/dummy/products`)
       .send(productDraft)
