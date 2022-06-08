@@ -146,8 +146,6 @@ export class CommercetoolsMock {
       )
     } else {
       app.use('/:projectKey', projectRouter)
-      // TODO: Use request.params.storeKey to activate a store context for each repository
-      // so we can either set the store attribute or check against it
       app.use('/:projectKey/in-store/key=:storeKey', projectRouter)
     }
 
