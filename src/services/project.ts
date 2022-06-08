@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { AbstractStorage } from '../storage'
 import { ProjectRepository } from '../repositories/project'
 import { Update } from '@commercetools/platform-sdk'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class ProjectService {
   public repository: ProjectRepository
@@ -19,20 +20,20 @@ export class ProjectService {
 
   get(request: Request, response: Response) {
     const projectKey = request.params.projectKey
-    const project = this.repository.get(projectKey)
+    const project = this.repository.get(getRepositoryContext(request))
     return response.status(200).send(project)
   }
 
   post(request: Request, response: Response) {
     const updateRequest: Update = request.body
-    const project = this.repository.get(request.params.projectKey)
+    const project = this.repository.get(getRepositoryContext(request))
 
     if (!project) {
       return response.status(404).send({})
     }
 
     this.repository.processUpdateActions(
-      request.params.projectKey,
+      getRepositoryContext(request),
       project,
       updateRequest.actions
     )

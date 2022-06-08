@@ -139,7 +139,11 @@ export class CommercetoolsMock {
     // Only enable auth middleware if we have enabled this
     if (this.options.enableAuthentication) {
       app.use('/:projectKey', this._oauth2.createMiddleware(), projectRouter)
-      app.use('/:projectKey/in-store/key=:storeKey', this._oauth2.createMiddleware(), projectRouter)
+      app.use(
+        '/:projectKey/in-store/key=:storeKey',
+        this._oauth2.createMiddleware(),
+        projectRouter
+      )
     } else {
       app.use('/:projectKey', projectRouter)
       // TODO: Use request.params.storeKey to activate a store context for each repository

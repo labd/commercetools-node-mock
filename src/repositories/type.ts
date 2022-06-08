@@ -14,14 +14,14 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class TypeRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'type'
   }
 
-  create(projectKey: string, draft: TypeDraft): Type {
+  create(context: RepositoryContext, draft: TypeDraft): Type {
     const resource: Type = {
       ...getBaseResourceProperties(),
       key: draft.key,
@@ -30,24 +30,28 @@ export class TypeRepository extends AbstractResourceRepository {
       fieldDefinitions: draft.fieldDefinitions || [],
       description: draft.description,
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
   actions: Partial<
     Record<
       TypeUpdateAction['action'],
-      (projectKey: string, resource: Writable<Type>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<Type>,
+        action: any
+      ) => void
     >
   > = {
     addFieldDefinition: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { fieldDefinition }: TypeAddFieldDefinitionAction
     ) => {
       resource.fieldDefinitions.push(fieldDefinition)
     },
     removeFieldDefinition: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { fieldName }: TypeRemoveFieldDefinitionAction
     ) => {
@@ -56,21 +60,21 @@ export class TypeRepository extends AbstractResourceRepository {
       })
     },
     setDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { description }: TypeSetDescriptionAction
     ) => {
       resource.description = description
     },
     changeName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { name }: TypeChangeNameAction
     ) => {
       resource.name = name
     },
     changeFieldDefinitionOrder: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { fieldNames }: TypeChangeFieldDefinitionOrderAction
     ) => {
@@ -99,7 +103,7 @@ export class TypeRepository extends AbstractResourceRepository {
       resource.fieldDefinitions.push(...current)
     },
     addEnumValue: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { fieldName, value }: TypeAddEnumValueAction
     ) => {
@@ -120,7 +124,7 @@ export class TypeRepository extends AbstractResourceRepository {
       })
     },
     changeEnumValueLabel: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Type>,
       { fieldName, value }: TypeChangeEnumValueLabelAction
     ) => {

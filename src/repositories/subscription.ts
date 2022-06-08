@@ -6,13 +6,13 @@ import {
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class SubscriptionRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'subscription'
   }
-  create(projectKey: string, draft: SubscriptionDraft): Subscription {
+  create(context: RepositoryContext, draft: SubscriptionDraft): Subscription {
     // TODO: We could actually test this here by using the aws sdk. For now
     // hardcode a failed check when account id is 0000000000
     if (draft.destination.type === 'SQS') {
@@ -44,7 +44,7 @@ export class SubscriptionRepository extends AbstractResourceRepository {
       messages: draft.messages || [],
       status: 'Healthy',
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 }

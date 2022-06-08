@@ -1,10 +1,86 @@
-import { OrderImportDraft } from '@commercetools/platform-sdk'
+import { Cart, OrderImportDraft } from '@commercetools/platform-sdk'
 import { OrderRepository } from './order'
 import { InMemoryStorage } from '../storage'
 
-describe('Order Import', () => {
+describe('Order repository', () => {
   const storage = new InMemoryStorage()
   const repository = new OrderRepository(storage)
+
+  test('create from cart', async () => {
+    const cart: Cart = {
+      id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
+      version: 1,
+      createdAt: '2021-09-02T12:23:30.036Z',
+      lastModifiedAt: '2021-09-02T12:23:30.546Z',
+      lineItems: [],
+      customLineItems: [],
+      totalPrice: {
+        type: 'centPrecision',
+        currencyCode: 'EUR',
+        centAmount: 10000,
+        fractionDigits: 2,
+      },
+      cartState: 'Active',
+      taxMode: 'Platform',
+      taxRoundingMode: 'HalfEven',
+      taxCalculationMode: 'UnitPriceLevel',
+      refusedGifts: [],
+      origin: 'Customer',
+    }
+
+    storage.add('dummy', 'cart', cart)
+
+    const result = repository.create(
+      { projectKey: 'dummy' },
+      {
+        cart: {
+          id: cart.id,
+          typeId: 'cart',
+        },
+        version: cart.version,
+      }
+    )
+    expect(result.cart?.id).toBe(cart.id)
+  })
+
+  test('create from cart - in store', async () => {
+    const cart: Cart = {
+      id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
+      version: 1,
+      createdAt: '2021-09-02T12:23:30.036Z',
+      lastModifiedAt: '2021-09-02T12:23:30.546Z',
+      lineItems: [],
+      customLineItems: [],
+      totalPrice: {
+        type: 'centPrecision',
+        currencyCode: 'EUR',
+        centAmount: 10000,
+        fractionDigits: 2,
+      },
+      cartState: 'Active',
+      taxMode: 'Platform',
+      taxRoundingMode: 'HalfEven',
+      taxCalculationMode: 'UnitPriceLevel',
+      refusedGifts: [],
+      origin: 'Customer',
+    }
+
+    storage.add('dummy', 'cart', cart)
+
+    const result = repository.create(
+      { projectKey: 'dummy', storeKey: 'some-store' },
+      {
+        cart: {
+          id: cart.id,
+          typeId: 'cart',
+        },
+        version: cart.version,
+      }
+    )
+    expect(result.cart?.id).toBe(cart.id)
+    expect(result.store?.key).toBe('some-store')
+  })
+
   test('import exiting product', async () => {
     storage.add('dummy', 'product', {
       id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
@@ -150,7 +226,7 @@ describe('Order Import', () => {
       ],
     }
 
-    repository.import('dummy', draft)
+    repository.import({ projectKey: 'dummy' }, draft)
   })
   /*
   test('import non exiting product', async () => {

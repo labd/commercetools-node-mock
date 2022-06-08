@@ -1,7 +1,11 @@
 import { Update } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'
-import { AbstractResourceRepository } from '../repositories/abstract'
+import {
+  AbstractResourceRepository,
+  RepositoryContext,
+} from '../repositories/abstract'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export default abstract class AbstractService {
   protected abstract getBasePath(): string
@@ -40,7 +44,7 @@ export default abstract class AbstractService {
     const limit = this._parseParam(request.query.limit)
     const offset = this._parseParam(request.query.offset)
 
-    const result = this.repository.query(request.params.projectKey, {
+    const result = this.repository.query(getRepositoryContext(request), {
       expand: this._parseParam(request.query.expand),
       where: this._parseParam(request.query.where),
       limit: limit !== undefined ? Number(limit) : undefined,
@@ -59,7 +63,7 @@ export default abstract class AbstractService {
 
   getWithKey(request: Request, response: Response) {
     const result = this.repository.getByKey(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params['key'],
       { expand: this._parseParam(request.query.expand) }
     )
@@ -69,7 +73,7 @@ export default abstract class AbstractService {
 
   deletewithId(request: Request, response: Response) {
     const result = this.repository.delete(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params['id'],
       {
         expand: this._parseParam(request.query.expand),
@@ -87,7 +91,10 @@ export default abstract class AbstractService {
 
   post(request: Request, response: Response) {
     const draft = request.body
-    const resource = this.repository.create(request.params.projectKey, draft)
+    const resource = this.repository.create(
+      getRepositoryContext(request),
+      draft
+    )
     const result = this._expandWithId(request, resource.id)
     return response.status(this.createStatusCode).send(result)
   }
@@ -95,7 +102,7 @@ export default abstract class AbstractService {
   postWithId(request: Request, response: Response) {
     const updateRequest: Update = request.body
     const resource = this.repository.get(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params['id']
     )
     if (!resource) {
@@ -107,7 +114,7 @@ export default abstract class AbstractService {
     }
 
     const updatedResource = this.repository.processUpdateActions(
-      request.params.projectKey,
+      getRepositoryContext(request),
       resource,
       updateRequest.actions
     )
@@ -121,9 +128,13 @@ export default abstract class AbstractService {
   }
 
   protected _expandWithId(request: Request, resourceId: string) {
-    const result = this.repository.get(request.params.projectKey, resourceId, {
-      expand: this._parseParam(request.query.expand),
-    })
+    const result = this.repository.get(
+      getRepositoryContext(request),
+      resourceId,
+      {
+        expand: this._parseParam(request.query.expand),
+      }
+    )
     return result
   }
 

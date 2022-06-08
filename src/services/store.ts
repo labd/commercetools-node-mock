@@ -2,6 +2,7 @@ import AbstractService from './abstract'
 import { Router, Request, Response } from 'express'
 import { StoreRepository } from '../repositories/store'
 import { AbstractStorage } from '../storage'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class StoreService extends AbstractService {
   public repository: StoreRepository
@@ -21,7 +22,7 @@ export class StoreService extends AbstractService {
 
   getWithKey(request: Request, response: Response) {
     const resource = this.repository.getWithKey(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params.key
     )
     if (resource) {

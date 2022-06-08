@@ -9,7 +9,7 @@ import {
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 import { Writable } from '../types'
 
@@ -18,7 +18,10 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
     return 'inventory-entry'
   }
 
-  create(projectKey: string, draft: InventoryEntryDraft): InventoryEntry {
+  create(
+    context: RepositoryContext,
+    draft: InventoryEntryDraft
+  ): InventoryEntry {
     const resource: InventoryEntry = {
       ...getBaseResourceProperties(),
       sku: draft.sku,
@@ -31,15 +34,19 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
         typeId: 'channel',
         id: draft.supplyChannel?.id ?? '',
       },
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   actions = {
     changeQuantity: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<InventoryEntry>,
       { quantity }: InventoryEntryChangeQuantityAction
     ) => {
@@ -48,14 +55,14 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
       resource.availableQuantity = quantity
     },
     setExpectedDelivery: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<InventoryEntry>,
       { expectedDelivery }: InventoryEntrySetExpectedDeliveryAction
     ) => {
       resource.expectedDelivery = new Date(expectedDelivery!).toISOString()
     },
     setCustomField: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: InventoryEntry,
       { name, value }: InventoryEntrySetCustomFieldAction
     ) => {
@@ -65,7 +72,7 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
       resource.custom.fields[name] = value
     },
     setCustomType: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<InventoryEntry>,
       { type, fields }: InventoryEntrySetCustomTypeAction
     ) => {
@@ -73,7 +80,7 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
         resource.custom = undefined
       } else {
         const resolvedType = this._storage.getByResourceIdentifier(
-          projectKey,
+          context.projectKey,
           type
         )
         if (!resolvedType) {
@@ -90,7 +97,7 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
       }
     },
     setRestockableInDays: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<InventoryEntry>,
       { restockableInDays }: InventoryEntrySetRestockableInDaysAction
     ) => {

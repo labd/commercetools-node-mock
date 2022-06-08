@@ -11,14 +11,14 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ZoneRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'zone'
   }
 
-  create(projectKey: string, draft: ZoneDraft): Zone {
+  create(context: RepositoryContext, draft: ZoneDraft): Zone {
     const resource: Zone = {
       ...getBaseResourceProperties(),
       key: draft.key,
@@ -26,25 +26,29 @@ export class ZoneRepository extends AbstractResourceRepository {
       name: draft.name,
       description: draft.description,
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   actions: Partial<
     Record<
       ZoneUpdateAction['action'],
-      (projectKey: string, resource: Writable<Zone>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<Zone>,
+        action: any
+      ) => void
     >
   > = {
     addLocation: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Zone>,
       { location }: ZoneAddLocationAction
     ) => {
       resource.locations.push(location)
     },
     removeLocation: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Zone>,
       { location }: ZoneRemoveLocationAction
     ) => {
@@ -55,21 +59,21 @@ export class ZoneRepository extends AbstractResourceRepository {
       })
     },
     changeName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Zone>,
       { name }: ZoneChangeNameAction
     ) => {
       resource.name = name
     },
     setDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Zone>,
       { description }: ZoneSetDescriptionAction
     ) => {
       resource.description = description
     },
     setKey: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Zone>,
       { key }: ZoneSetKeyAction
     ) => {

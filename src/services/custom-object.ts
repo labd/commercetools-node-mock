@@ -3,6 +3,7 @@ import { Request, Response, Router } from 'express'
 import { CustomObjectRepository } from '../repositories/custom-object'
 import { AbstractStorage } from '../storage'
 import { CustomObjectDraft } from '@commercetools/platform-sdk'
+import { getRepositoryContext } from 'repositories/helpers'
 
 export class CustomObjectService extends AbstractService {
   public repository: CustomObjectRepository
@@ -24,7 +25,7 @@ export class CustomObjectService extends AbstractService {
 
   getWithContainerAndKey(request: Request, response: Response) {
     const result = this.repository.getWithContainerAndKey(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params.container,
       request.params.key
     )
@@ -42,13 +43,13 @@ export class CustomObjectService extends AbstractService {
       container: request.params.container,
     }
 
-    const result = this.repository.create(request.params.projectKey, draft)
+    const result = this.repository.create(getRepositoryContext(request), draft)
     return response.status(200).send(result)
   }
 
   deleteWithContainerAndKey(request: Request, response: Response) {
     const current = this.repository.getWithContainerAndKey(
-      request.params.projectKey,
+      getRepositoryContext(request),
       request.params.container,
       request.params.key
     )
@@ -57,7 +58,10 @@ export class CustomObjectService extends AbstractService {
       return response.status(404).send('Not Found')
     }
 
-    const result = this.repository.delete(request.params.projectKey, current.id)
+    const result = this.repository.delete(
+      getRepositoryContext(request),
+      current.id
+    )
 
     return response.status(200).send(result)
   }

@@ -12,7 +12,7 @@ import {
   Transaction,
   TransactionDraft,
 } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
   createCustomFields,
   createTypedMoney,
@@ -27,7 +27,7 @@ export class PaymentRepository extends AbstractResourceRepository {
     return 'payment'
   }
 
-  create(projectKey: string, draft: PaymentDraft): Payment {
+  create(context: RepositoryContext, draft: PaymentDraft): Payment {
     const resource: Payment = {
       ...getBaseResourceProperties(),
       amountPlanned: createTypedMoney(draft.amountPlanned),
@@ -38,39 +38,43 @@ export class PaymentRepository extends AbstractResourceRepository {
             state: draft.paymentStatus.state
               ? getReferenceFromResourceIdentifier<StateReference>(
                   draft.paymentStatus.state,
-                  projectKey,
+                  context.projectKey,
                   this._storage
                 )
               : undefined,
           }
         : {},
       transactions: (draft.transactions || []).map(t =>
-        this.transactionFromTransactionDraft(t, projectKey)
+        this.transactionFromTransactionDraft(t, context)
       ),
       interfaceInteractions: (draft.interfaceInteractions || []).map(
         interaction =>
-          createCustomFields(interaction, projectKey, this._storage)!
+          createCustomFields(interaction, context.projectKey, this._storage)!
       ),
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
     }
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   transactionFromTransactionDraft = (
     draft: TransactionDraft,
-    projectKey: string
+    context: RepositoryContext
   ) => ({
     ...draft,
     id: uuidv4(),
     amount: createTypedMoney(draft.amount),
-    custom: createCustomFields(draft.custom, projectKey, this._storage),
+    custom: createCustomFields(draft.custom, context.projectKey, this._storage),
   })
 
   actions = {
     setCustomField: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Payment,
       { name, value }: PaymentSetCustomFieldAction
     ) => {
@@ -81,7 +85,7 @@ export class PaymentRepository extends AbstractResourceRepository {
       resource.custom.fields[name] = value
     },
     setCustomType: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Payment>,
       { type, fields }: PaymentSetCustomTypeAction
     ) => {
@@ -89,7 +93,7 @@ export class PaymentRepository extends AbstractResourceRepository {
         resource.custom = undefined
       } else {
         const resolvedType = this._storage.getByResourceIdentifier(
-          projectKey,
+          context.projectKey,
           type
         )
         if (!resolvedType) {
@@ -106,17 +110,17 @@ export class PaymentRepository extends AbstractResourceRepository {
       }
     },
     addTransaction: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Payment>,
       { transaction }: PaymentAddTransactionAction
     ) => {
       resource.transactions = [
         ...resource.transactions,
-        this.transactionFromTransactionDraft(transaction, projectKey),
+        this.transactionFromTransactionDraft(transaction, context),
       ]
     },
     changeTransactionState: (
-      _projectKey: string,
+      _context: RepositoryContext,
       resource: Writable<Payment>,
       { transactionId, state }: PaymentChangeTransactionStateAction
     ) => {
@@ -130,12 +134,12 @@ export class PaymentRepository extends AbstractResourceRepository {
       resource.transactions[index] = updatedTransaction
     },
     transitionState: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Payment>,
       { state }: PaymentTransitionStateAction
     ) => {
       const stateObj = this._storage.getByResourceIdentifier(
-        projectKey,
+        context.projectKey,
         state
       ) as State | null
 

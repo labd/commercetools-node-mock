@@ -29,7 +29,11 @@ import {
   State,
   Store,
 } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository, QueryParams } from './abstract'
+import {
+  AbstractResourceRepository,
+  QueryParams,
+  RepositoryContext,
+} from './abstract'
 import {
   createCustomFields,
   createPrice,
@@ -45,10 +49,10 @@ export class OrderRepository extends AbstractResourceRepository {
     return 'order'
   }
 
-  create(projectKey: string, draft: OrderFromCartDraft): Order {
+  create(context: RepositoryContext, draft: OrderFromCartDraft): Order {
     assert(draft.cart, 'draft.cart is missing')
     return this.createFromCart(
-      projectKey,
+      context,
       {
         id: draft.cart.id!,
         typeId: 'cart',
@@ -57,8 +61,15 @@ export class OrderRepository extends AbstractResourceRepository {
     )
   }
 
-  createFromCart(projectKey: string, cartReference: CartReference, orderNumber?: string) {
-    const cart = this._storage.getByResourceIdentifier(projectKey, cartReference) as Cart | null
+  createFromCart(
+    context: RepositoryContext,
+    cartReference: CartReference,
+    orderNumber?: string
+  ) {
+    const cart = this._storage.getByResourceIdentifier(
+      context.projectKey,
+      cartReference
+    ) as Cart | null
     if (!cart) {
       throw new Error('Cannot find cart')
     }
@@ -74,13 +85,19 @@ export class OrderRepository extends AbstractResourceRepository {
       refusedGifts: [],
       origin: 'Customer',
       syncInfo: [],
+      store: context.storeKey
+        ? {
+            key: context.storeKey,
+            typeId: 'store',
+          }
+        : undefined,
       lastMessageSequenceNumber: 0,
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
-  import(projectKey: string, draft: OrderImportDraft): Order {
+  import(context: RepositoryContext, draft: OrderImportDraft): Order {
     // TODO: Check if order with given orderNumber already exists
     assert(this, 'OrderRepository not valid')
     const resource: Order = {
@@ -89,7 +106,11 @@ export class OrderRepository extends AbstractResourceRepository {
       billingAddress: draft.billingAddress,
       shippingAddress: draft.shippingAddress,
 
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
       customerEmail: draft.customerEmail,
       lastMessageSequenceNumber: 0,
       orderNumber: draft.orderNumber,
@@ -97,16 +118,20 @@ export class OrderRepository extends AbstractResourceRepository {
       origin: draft.origin || 'Customer',
       paymentState: draft.paymentState,
       refusedGifts: [],
-      store: resolveStoreReference(draft.store, projectKey, this._storage),
+      store: resolveStoreReference(
+        draft.store,
+        context.projectKey,
+        this._storage
+      ),
       syncInfo: [],
 
       lineItems:
         draft.lineItems?.map(item =>
-          this.lineItemFromImportDraft.bind(this)(projectKey, item)
+          this.lineItemFromImportDraft.bind(this)(context, item)
         ) || [],
       customLineItems:
         draft.customLineItems?.map(item =>
-          this.customLineItemFromImportDraft.bind(this)(projectKey, item)
+          this.customLineItemFromImportDraft.bind(this)(context, item)
         ) || [],
 
       totalPrice: {
@@ -115,12 +140,12 @@ export class OrderRepository extends AbstractResourceRepository {
         fractionDigits: 2,
       },
     }
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   private lineItemFromImportDraft(
-    projectKey: string,
+    context: RepositoryContext,
     draft: LineItemImportDraft
   ): LineItem {
     let product: Product
@@ -132,7 +157,7 @@ export class OrderRepository extends AbstractResourceRepository {
         sku: draft.variant.sku,
       }
 
-      var items = this._storage.query(projectKey, 'product', {
+      var items = this._storage.query(context.projectKey, 'product', {
         where: [
           `masterData(current(masterVariant(sku="${draft.variant.sku}"))) or masterData(current(variants(sku="${draft.variant.sku}")))`,
         ],
@@ -162,7 +187,11 @@ export class OrderRepository extends AbstractResourceRepository {
 
     const lineItem: LineItem = {
       ...getBaseResourceProperties(),
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
       discountedPricePerQuantity: [],
       lineItemMode: 'Standard',
       name: draft.name,
@@ -185,12 +214,16 @@ export class OrderRepository extends AbstractResourceRepository {
   }
 
   private customLineItemFromImportDraft(
-    projectKey: string,
+    context: RepositoryContext,
     draft: CustomLineItemDraft
   ): CustomLineItem {
     const lineItem: CustomLineItem = {
       ...getBaseResourceProperties(),
-      custom: createCustomFields(draft.custom, projectKey, this._storage),
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
       discountedPricePerQuantity: [],
       money: createTypedMoney(draft.money),
       name: draft.name,
@@ -204,11 +237,11 @@ export class OrderRepository extends AbstractResourceRepository {
   }
 
   getWithOrderNumber(
-    projectKey: string,
+    context: RepositoryContext,
     orderNumber: string,
     params: QueryParams = {}
   ): Order | undefined {
-    const result = this._storage.query(projectKey, this.getTypeId(), {
+    const result = this._storage.query(context.projectKey, this.getTypeId(), {
       ...params,
       where: [`orderNumber="${orderNumber}"`],
     })
@@ -226,12 +259,12 @@ export class OrderRepository extends AbstractResourceRepository {
 
   actions = {
     addPayment: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { payment }: OrderAddPaymentAction
     ) => {
       const resolvedPayment = this._storage.getByResourceIdentifier(
-        projectKey,
+        context.projectKey,
         payment
       )
       if (!resolvedPayment) {
@@ -250,26 +283,26 @@ export class OrderRepository extends AbstractResourceRepository {
       })
     },
     changeOrderState: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { orderState }: OrderChangeOrderStateAction
     ) => {
       resource.orderState = orderState
     },
     changePaymentState: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { paymentState }: OrderChangePaymentStateAction
     ) => {
       resource.paymentState = paymentState
     },
     transitionState: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { state }: OrderTransitionStateAction
     ) => {
       const resolvedType = this._storage.getByResourceIdentifier(
-        projectKey,
+        context.projectKey,
         state
       ) as State | null
 
@@ -282,21 +315,21 @@ export class OrderRepository extends AbstractResourceRepository {
       resource.state = { typeId: 'state', id: resolvedType.id }
     },
     setBillingAddress: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { address }: OrderSetBillingAddressAction
     ) => {
       resource.billingAddress = address
     },
     setCustomerEmail: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { email }: OrderSetCustomerEmailAction
     ) => {
       resource.customerEmail = email
     },
     setCustomField: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Order,
       { name, value }: OrderSetCustomFieldAction
     ) => {
@@ -306,7 +339,7 @@ export class OrderRepository extends AbstractResourceRepository {
       resource.custom.fields[name] = value
     },
     setCustomType: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { type, fields }: OrderSetCustomTypeAction
     ) => {
@@ -314,7 +347,7 @@ export class OrderRepository extends AbstractResourceRepository {
         resource.custom = undefined
       } else {
         const resolvedType = this._storage.getByResourceIdentifier(
-          projectKey,
+          context.projectKey,
           type
         )
         if (!resolvedType) {
@@ -331,34 +364,34 @@ export class OrderRepository extends AbstractResourceRepository {
       }
     },
     setLocale: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { locale }: OrderSetLocaleAction
     ) => {
       resource.locale = locale
     },
     setOrderNumber: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { orderNumber }: OrderSetOrderNumberAction
     ) => {
       resource.orderNumber = orderNumber
     },
     setShippingAddress: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { address }: OrderSetShippingAddressAction
     ) => {
       resource.shippingAddress = address
     },
     setStore: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<Order>,
       { store }: OrderSetStoreAction
     ) => {
       if (!store) return
       const resolvedType = this._storage.getByResourceIdentifier(
-        projectKey,
+        context.projectKey,
         store
       )
       if (!resolvedType) {

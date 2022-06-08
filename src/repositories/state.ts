@@ -10,7 +10,7 @@ import {
   StateSetRolesAction,
   StateUpdateAction,
 } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository } from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from 'types'
 
 export class StateRepository extends AbstractResourceRepository {
@@ -18,50 +18,54 @@ export class StateRepository extends AbstractResourceRepository {
     return 'state'
   }
 
-  create(projectKey: string, draft: StateDraft): State {
+  create(context: RepositoryContext, draft: StateDraft): State {
     const resource: State = {
       ...getBaseResourceProperties(),
       ...draft,
       builtIn: false,
       initial: draft.initial || false,
       transitions: (draft.transitions || []).map(t =>
-        getReferenceFromResourceIdentifier(t, projectKey, this._storage)
+        getReferenceFromResourceIdentifier(t, context.projectKey, this._storage)
       ),
     }
 
-    this.save(projectKey, resource)
+    this.save(context, resource)
     return resource
   }
 
   actions: Partial<
     Record<
       StateUpdateAction['action'],
-      (projectKey: string, resource: Writable<State>, action: any) => void
+      (
+        context: RepositoryContext,
+        resource: Writable<State>,
+        action: any
+      ) => void
     >
   > = {
     changeKey: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<State>,
       { key }: StateChangeKeyAction
     ) => {
       resource.key = key
     },
     setDescription: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<State>,
       { description }: StateSetDescriptionAction
     ) => {
       resource.description = description
     },
     setName: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<State>,
       { name }: StateSetNameAction
     ) => {
       resource.name = name
     },
     setRoles: (
-      projectKey: string,
+      context: RepositoryContext,
       resource: Writable<State>,
       { roles }: StateSetRolesAction
     ) => {
