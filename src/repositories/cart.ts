@@ -158,8 +158,19 @@ export class CartRepository extends AbstractResourceRepository {
             message: `A product with ID '${productId}' doesn't have any prices.`,
           })
         }
+        
+        const currency = resource.totalPrice.currencyCode
 
-        const price = variant.prices[0]
+        const price = selectPrice({
+          prices: variant.prices, 
+          currency,
+          country: resource.country,
+        })
+        if (!price) {
+          throw new Error(
+            `No valid price found for ${productId} for country ${resource.country} and currency ${currency}`
+          )
+        }
         resource.lineItems.push({
           id: uuidv4(),
           productId: product.id,
