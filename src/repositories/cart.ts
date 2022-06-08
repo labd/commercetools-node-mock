@@ -424,8 +424,8 @@ const selectPrice = ({
   // Can be improved later to give more priority to exact matches over
   // 'all country' matches, and include customer groups in the mix as well
   return prices.find(price => {
-    const countryMatch = !price.country || price.country == country
-    const currencyMatch = price.value.currencyCode == currency
+    const countryMatch = !price.country || price.country === country
+    const currencyMatch = price.value.currencyCode === currency
     return countryMatch && currencyMatch
   })
 }
