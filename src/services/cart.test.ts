@@ -76,9 +76,20 @@ describe('Carts Query', () => {
   })
 })
 
-describe('Order Update Actions', () => {
+describe('Cart Update Actions', () => {
   const ctMock = new CommercetoolsMock()
   let cart: Cart | undefined
+
+  const createCart = async (currency: string) => {
+    let response = await supertest(ctMock.app)
+      .post('/dummy/carts')
+      .send({
+        currency,
+      })
+    expect(response.status).toBe(201)
+    cart = response.body
+  }
+
   const productDraft: ProductDraft = {
     name: {
       'nl-NL': 'test product',
@@ -95,6 +106,14 @@ describe('Order Update Actions', () => {
             type: 'centPrecision',
             currencyCode: 'EUR',
             centAmount: 14900,
+            fractionDigits: 2,
+          } as CentPrecisionMoney,
+        },
+        {
+          value: {
+            type: 'centPrecision',
+            currencyCode: 'GBP',
+            centAmount: 18900,
             fractionDigits: 2,
           } as CentPrecisionMoney,
         },
@@ -135,13 +154,7 @@ describe('Order Update Actions', () => {
   }
 
   beforeEach(async () => {
-    let response = await supertest(ctMock.app)
-      .post('/dummy/carts')
-      .send({
-        currency: 'EUR',
-      })
-    expect(response.status).toBe(201)
-    cart = response.body
+    await createCart('EUR')
   })
 
   afterEach(() => {
@@ -218,6 +231,33 @@ describe('Order Update Actions', () => {
     expect(response.body.version).toBe(2)
     expect(response.body.lineItems).toHaveLength(1)
     expect(response.body.totalPrice.centAmount).toEqual(29800)
+  })
+
+  test.each([
+    ['EUR', 29800],
+    ['GBP', 37800],
+  ])('addLineItem with price selection', async (currency, total) => {
+    await createCart(currency)
+
+    const product = await supertest(ctMock.app)
+      .post(`/dummy/products`)
+      .send(productDraft)
+      .then(x => x.body)
+
+    assert(cart, 'cart not created')
+    assert(product, 'product not created')
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/carts/${cart.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'addLineItem', sku: '1337', quantity: 2 }],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.lineItems).toHaveLength(1)
+    expect(response.body.lineItems[0].price.value.currencyCode).toBe(currency)
+    expect(response.body.totalPrice.centAmount).toEqual(total)
   })
 
   test('addLineItem unknown product', async () => {

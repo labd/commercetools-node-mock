@@ -14,6 +14,7 @@ import {
   GeneralError,
   LineItem,
   LineItemDraft,
+  Price,
   Product,
   ProductPagedQueryResponse,
   ProductVariant,
@@ -32,14 +33,20 @@ export class CartRepository extends AbstractResourceRepository {
   }
 
   create(projectKey: string, draft: CartDraft): Cart {
-    const lineItems = draft.lineItems?.map(draftLineItem =>
-      this.draftLineItemtoLineItem(projectKey, draftLineItem)
-    )
+    const lineItems =
+      draft.lineItems?.map(draftLineItem =>
+        this.draftLineItemtoLineItem(
+          projectKey,
+          draftLineItem,
+          draft.currency,
+          draft.country
+        )
+      ) ?? []
 
     const resource: Cart = {
       ...getBaseResourceProperties(),
       cartState: 'Active',
-      lineItems: lineItems ?? [],
+      lineItems,
       customLineItems: [],
       totalPrice: {
         type: 'centPrecision',
@@ -47,11 +54,13 @@ export class CartRepository extends AbstractResourceRepository {
         currencyCode: draft.currency,
         fractionDigits: 0,
       },
-      taxMode: 'Platform',
-      taxRoundingMode: 'HalfEven',
-      taxCalculationMode: 'LineItemLevel',
+      taxMode: draft.taxMode ?? 'Platform',
+      taxRoundingMode: draft.taxRoundingMode ?? 'HalfEven',
+      taxCalculationMode: draft.taxCalculationMode ?? 'LineItemLevel',
       refusedGifts: [],
-      origin: 'Customer',
+      locale: draft.locale,
+      country: draft.country,
+      origin: draft.origin ?? 'Customer',
       custom: createCustomFields(draft.custom, projectKey, this._storage),
     }
 
@@ -150,7 +159,18 @@ export class CartRepository extends AbstractResourceRepository {
           })
         }
 
-        const price = variant.prices[0]
+        const currency = resource.totalPrice.currencyCode
+
+        const price = selectPrice({
+          prices: variant.prices,
+          currency,
+          country: resource.country,
+        })
+        if (!price) {
+          throw new Error(
+            `No valid price found for ${productId} for country ${resource.country} and currency ${currency}`
+          )
+        }
         resource.lineItems.push({
           id: uuidv4(),
           productId: product.id,
@@ -302,9 +322,10 @@ export class CartRepository extends AbstractResourceRepository {
   }
   draftLineItemtoLineItem = (
     projectKey: string,
-    draftLineItem: LineItemDraft
+    draftLineItem: LineItemDraft,
+    currency: string,
+    country: string | undefined
   ): LineItem => {
-    
     const { productId, quantity, variantId, sku } = draftLineItem
 
     let product: Product | null = null
@@ -355,12 +376,13 @@ export class CartRepository extends AbstractResourceRepository {
       )
     }
 
-    const price = variant.prices?.[0]
-
     const quant = quantity ?? 1
 
+    const price = selectPrice({ prices: variant.prices, currency, country })
     if (!price) {
-      throw new Error(`Price not set on ${productId}`)
+      throw new Error(
+        `No valid price found for ${productId} for country ${country} and currency ${currency}`
+      )
     }
 
     return {
@@ -383,6 +405,29 @@ export class CartRepository extends AbstractResourceRepository {
       state: [],
     }
   }
+}
+
+const selectPrice = ({
+  prices,
+  currency,
+  country,
+}: {
+  prices: Price[] | undefined
+  currency: string
+  country: string | undefined
+}) => {
+  if (!prices) {
+    return undefined
+  }
+
+  // Quick-and-dirty way of selecting price based on the given currency and country.
+  // Can be improved later to give more priority to exact matches over
+  // 'all country' matches, and include customer groups in the mix as well
+  return prices.find(price => {
+    const countryMatch = !price.country || price.country === country
+    const currencyMatch = price.value.currencyCode === currency
+    return countryMatch && currencyMatch
+  })
 }
 
 const calculateLineItemTotalPrice = (lineItem: LineItem): number =>
