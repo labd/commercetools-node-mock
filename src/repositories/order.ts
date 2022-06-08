@@ -1,6 +1,7 @@
 import assert from 'assert'
 import {
   Cart,
+  CartReference,
   CustomLineItem,
   CustomLineItemDraft,
   GeneralError,
@@ -20,8 +21,6 @@ import {
   OrderSetOrderNumberAction,
   OrderSetShippingAddressAction,
   OrderSetStoreAction,
-  OrderState,
-  OrderStateTransitionMessage,
   OrderTransitionStateAction,
   Product,
   ProductPagedQueryResponse,
@@ -48,18 +47,26 @@ export class OrderRepository extends AbstractResourceRepository {
 
   create(projectKey: string, draft: OrderFromCartDraft): Order {
     assert(draft.cart, 'draft.cart is missing')
-
-    const cart = this._storage.getByResourceIdentifier(
+    return this.createFromCart(
       projectKey,
-      draft.cart
-    ) as Cart | null
+      {
+        id: draft.cart.id!,
+        typeId: 'cart',
+      },
+      draft.orderNumber
+    )
+  }
+
+  createFromCart(projectKey: string, cartReference: CartReference, orderNumber?: string) {
+    const cart = this._storage.getByResourceIdentifier(projectKey, cartReference) as Cart | null
     if (!cart) {
       throw new Error('Cannot find cart')
     }
 
     const resource: Order = {
       ...getBaseResourceProperties(),
-      orderNumber: draft.orderNumber,
+      orderNumber,
+      cart: cartReference,
       orderState: 'Open',
       lineItems: [],
       customLineItems: [],
