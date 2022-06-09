@@ -3,7 +3,7 @@ import { Request, Response, Router } from 'express'
 import { CustomObjectRepository } from '../repositories/custom-object'
 import { AbstractStorage } from '../storage'
 import { CustomObjectDraft } from '@commercetools/platform-sdk'
-import { getRepositoryContext } from 'repositories/helpers'
+import { getRepositoryContext } from '../repositories/helpers'
 
 export class CustomObjectService extends AbstractService {
   public repository: CustomObjectRepository

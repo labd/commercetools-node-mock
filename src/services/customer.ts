@@ -4,7 +4,7 @@ import { CustomerRepository } from '../repositories/customer'
 import { AbstractStorage } from '../storage'
 import { getBaseResourceProperties } from '../helpers'
 import { v4 as uuidv4 } from 'uuid'
-import { getRepositoryContext } from 'repositories/helpers'
+import { getRepositoryContext } from '../repositories/helpers'
 
 export class CustomerService extends AbstractService {
   public repository: CustomerRepository

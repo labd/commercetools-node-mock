@@ -4,7 +4,7 @@ import { CartRepository } from '../repositories/cart'
 import { AbstractStorage } from '../storage'
 import { Cart, CartDraft, Order } from '@commercetools/platform-sdk'
 import { OrderRepository } from '../repositories/order'
-import { getRepositoryContext } from 'repositories/helpers'
+import { getRepositoryContext } from '../repositories/helpers'
 
 export class CartService extends AbstractService {
   public repository: CartRepository

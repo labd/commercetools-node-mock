@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { AbstractStorage } from '../storage'
 import { ProjectRepository } from '../repositories/project'
 import { Update } from '@commercetools/platform-sdk'
-import { getRepositoryContext } from 'repositories/helpers'
+import { getRepositoryContext } from '../repositories/helpers'
 
 export class ProjectService {
   public repository: ProjectRepository

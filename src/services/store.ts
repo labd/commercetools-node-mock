@@ -2,7 +2,7 @@ import AbstractService from './abstract'
 import { Router, Request, Response } from 'express'
 import { StoreRepository } from '../repositories/store'
 import { AbstractStorage } from '../storage'
-import { getRepositoryContext } from 'repositories/helpers'
+import { getRepositoryContext } from '../repositories/helpers'
 
 export class StoreService extends AbstractService {
   public repository: StoreRepository

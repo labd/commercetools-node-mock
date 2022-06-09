@@ -5,7 +5,7 @@ import {
   AbstractResourceRepository,
   RepositoryContext,
 } from '../repositories/abstract'
-import { getRepositoryContext } from 'repositories/helpers'
+import { getRepositoryContext } from '../repositories/helpers'
 
 export default abstract class AbstractService {
   protected abstract getBasePath(): string
