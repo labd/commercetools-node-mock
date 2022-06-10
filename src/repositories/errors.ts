@@ -11,9 +11,9 @@ export const checkConcurrentModification = (
 ) => {
   if (resource.version === expectedVersion) return
 
-  const identifier = (<BaseResource>resource).id
-    ? (<BaseResource>resource).id
-    : (<Project>resource).key
+  const identifier = (resource as BaseResource).id
+    ? (resource as BaseResource).id
+    : (resource as Project).key
 
   throw new CommercetoolsError<ConcurrentModificationError>(
     {

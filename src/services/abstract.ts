@@ -1,10 +1,7 @@
 import { Update } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'
-import {
-  AbstractResourceRepository,
-  RepositoryContext,
-} from '../repositories/abstract'
+import { AbstractResourceRepository } from '../repositories/abstract'
 import { getRepositoryContext } from '../repositories/helpers'
 
 export default abstract class AbstractService {

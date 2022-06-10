@@ -19,7 +19,6 @@ export class ProjectService {
   }
 
   get(request: Request, response: Response) {
-    const projectKey = request.params.projectKey
     const project = this.repository.get(getRepositoryContext(request))
     return response.status(200).send(project)
   }
