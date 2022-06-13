@@ -67,7 +67,7 @@ export abstract class AbstractStorage {
     projectKey: string,
     typeId: RepositoryTypes,
     id: string,
-    params: GetParams
+    params?: GetParams
   ): ResourceMap[RepositoryTypes] | null
 
   abstract getByKey<RepositoryTypes extends keyof ResourceMap>(

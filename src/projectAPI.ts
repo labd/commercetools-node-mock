@@ -41,7 +41,7 @@ export class ProjectAPI {
   get<ReferenceTypeId extends keyof ResourceMap>(
     typeId: ReferenceTypeId,
     id: string,
-    params: GetParams
+    params?: GetParams
   ): ResourceMap[ReferenceTypeId] {
     return this._storage.get(
       this.projectKey,
