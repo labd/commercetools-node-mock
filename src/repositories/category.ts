@@ -155,7 +155,7 @@ export class CategoryRepository extends AbstractResourceRepository {
     ) => {
       if (type) {
         resource.custom = createCustomFields(
-          { type, fields},
+          { type, fields },
           context.projectKey,
           this._storage
         )

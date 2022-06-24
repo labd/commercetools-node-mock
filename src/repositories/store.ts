@@ -14,7 +14,10 @@ import {
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { getReferenceFromResourceIdentifier, createCustomFields } from './helpers'
+import {
+  getReferenceFromResourceIdentifier,
+  createCustomFields,
+} from './helpers'
 
 export class StoreRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -113,7 +116,7 @@ export class StoreRepository extends AbstractResourceRepository {
     ) => {
       if (type) {
         resource.custom = createCustomFields(
-          { type, fields},
+          { type, fields },
           context.projectKey,
           this._storage
         )
