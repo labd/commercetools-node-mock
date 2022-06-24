@@ -12,6 +12,8 @@ import {
   ShippingMethodChangeNameAction,
   ShippingMethodDraft,
   ShippingMethodRemoveZoneAction,
+  ShippingMethodSetCustomFieldAction,
+  ShippingMethodSetCustomTypeAction,
   ShippingMethodSetDescriptionAction,
   ShippingMethodSetKeyAction,
   ShippingMethodSetLocalizedDescriptionAction,
@@ -195,6 +197,35 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       { name }: ShippingMethodChangeNameAction
     ) => {
       resource.name = name
+    },
+    setCustomType: (
+      context: RepositoryContext,
+      resource: Writable<ShippingMethod>,
+      { type, fields }: ShippingMethodSetCustomTypeAction
+    ) => {
+      if (type) {
+        resource.custom = createCustomFields(
+          { type, fields},
+          context.projectKey,
+          this._storage
+        )
+      } else {
+        resource.custom = undefined
+      }
+    },
+    setCustomField: (
+      context: RepositoryContext,
+      resource: Writable<ShippingMethod>,
+      { name, value }: ShippingMethodSetCustomFieldAction
+    ) => {
+      if (!resource.custom) {
+        return
+      }
+      if (value === null) {
+        delete resource.custom.fields[name]
+      } else {
+        resource.custom.fields[name] = value
+      }
     },
   }
 }

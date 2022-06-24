@@ -6,6 +6,8 @@ import {
   CategoryDraft,
   CategorySetAssetDescriptionAction,
   CategorySetAssetSourcesAction,
+  CategorySetCustomFieldAction,
+  CategorySetCustomTypeAction,
   CategorySetDescriptionAction,
   CategorySetKeyAction,
   CategorySetMetaDescriptionAction,
@@ -51,6 +53,11 @@ export class CategoryRepository extends AbstractResourceRepository {
             ),
           }
         }) || [],
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
     }
     this.save(context, resource)
     return resource
@@ -140,6 +147,35 @@ export class CategoryRepository extends AbstractResourceRepository {
       { metaTitle }: CategorySetMetaTitleAction
     ) => {
       resource.metaTitle = metaTitle
+    },
+    setCustomType: (
+      context: RepositoryContext,
+      resource: Writable<Category>,
+      { type, fields }: CategorySetCustomTypeAction
+    ) => {
+      if (type) {
+        resource.custom = createCustomFields(
+          { type, fields},
+          context.projectKey,
+          this._storage
+        )
+      } else {
+        resource.custom = undefined
+      }
+    },
+    setCustomField: (
+      context: RepositoryContext,
+      resource: Writable<Category>,
+      { name, value }: CategorySetCustomFieldAction
+    ) => {
+      if (!resource.custom) {
+        return
+      }
+      if (value === null) {
+        delete resource.custom.fields[name]
+      } else {
+        resource.custom.fields[name] = value
+      }
     },
   }
 }
