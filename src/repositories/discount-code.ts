@@ -5,6 +5,8 @@ import {
   DiscountCodeChangeIsActiveAction,
   DiscountCodeDraft,
   DiscountCodeSetCartPredicateAction,
+  DiscountCodeSetCustomFieldAction,
+  DiscountCodeSetCustomTypeAction,
   DiscountCodeSetDescriptionAction,
   DiscountCodeSetMaxApplicationsAction,
   DiscountCodeSetMaxApplicationsPerCustomerAction,
@@ -18,6 +20,7 @@ import {
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { createCustomFields } from './helpers'
 
 export class DiscountCodeRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -45,6 +48,11 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
       validUntil: draft.validUntil,
       maxApplications: draft.maxApplications,
       maxApplicationsPerCustomer: draft.maxApplicationsPerCustomer,
+      custom: createCustomFields(
+        draft.custom,
+        context.projectKey,
+        this._storage
+      ),
     }
     this.save(context, resource)
     return resource
@@ -137,6 +145,35 @@ export class DiscountCodeRepository extends AbstractResourceRepository {
     ) => {
       resource.validFrom = validFrom
       resource.validUntil = validUntil
+    },
+    setCustomType: (
+      context: RepositoryContext,
+      resource: Writable<DiscountCode>,
+      { type, fields }: DiscountCodeSetCustomTypeAction
+    ) => {
+      if (type) {
+        resource.custom = createCustomFields(
+          { type, fields },
+          context.projectKey,
+          this._storage
+        )
+      } else {
+        resource.custom = undefined
+      }
+    },
+    setCustomField: (
+      context: RepositoryContext,
+      resource: Writable<DiscountCode>,
+      { name, value }: DiscountCodeSetCustomFieldAction
+    ) => {
+      if (!resource.custom) {
+        return
+      }
+      if (value === null) {
+        delete resource.custom.fields[name]
+      } else {
+        resource.custom.fields[name] = value
+      }
     },
   }
 }
