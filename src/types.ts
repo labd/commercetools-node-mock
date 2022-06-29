@@ -14,6 +14,7 @@ import { ProductTypeRepository } from './repositories/product-type'
 import { ShippingMethodRepository } from './repositories/shipping-method'
 import { StateRepository } from './repositories/state'
 import { TaxCategoryRepository } from './repositories/tax-category'
+import { ProductDiscountRepository } from 'repositories/product-discount'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
@@ -105,7 +106,7 @@ export type RepositoryMap = {
   payment: PaymentRepository
   product: ProductRepository
   'product-projection': ProductProjectionRepository
-  'product-discount': never
+  'product-discount': ProductDiscountRepository
   'product-type': ProductTypeRepository
   review: never
   'shipping-method': ShippingMethodRepository

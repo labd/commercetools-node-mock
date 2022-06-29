@@ -30,6 +30,7 @@ import {
   Zone,
   Channel,
   Subscription,
+  ProductDiscount,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
 import { RepositoryTypes, ResourceMap, Writable } from './types'
@@ -133,6 +134,7 @@ export class InMemoryStorage extends AbstractStorage {
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
         payment: new Map<string, Payment>(),
+        'product-discount': new Map<string, ProductDiscount>(),
         'product-type': new Map<string, ProductType>(),
         product: new Map<string, Product>(),
         'product-selection': new Map<string, any>(),
