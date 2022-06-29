@@ -9,7 +9,7 @@ import {
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { createAddress, createCustomFields } from './helpers'
 
 export class ChannelRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -20,7 +20,15 @@ export class ChannelRepository extends AbstractResourceRepository {
     const resource: Channel = {
       ...getBaseResourceProperties(),
       key: draft.key,
+      name: draft.name,
+      description: draft.description,
       roles: draft.roles || [],
+      geoLocation: draft.geoLocation,
+      address: createAddress(
+        draft.address,
+        context.projectKey,
+        this._storage
+      ),
       custom: createCustomFields(
         draft.custom,
         context.projectKey,

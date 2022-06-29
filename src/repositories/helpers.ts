@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
+  Address,
+  BaseAddress,
   CustomFields,
   CustomFieldsDraft,
   Money,
@@ -16,6 +18,20 @@ import {
 import { AbstractStorage } from '../storage'
 import { RepositoryContext } from './abstract'
 import { Request } from 'express'
+
+export const createAddress = (
+  base: BaseAddress | undefined,
+  projectKey: string,
+  storage: AbstractStorage
+): Address | undefined => {
+  if (!base?.country) {
+    throw new Error("Country is required")
+  }
+
+  return {
+    ...base,
+  }
+}
 
 export const createCustomFields = (
   draft: CustomFieldsDraft | undefined,
