@@ -25,6 +25,7 @@ import { MyCartService } from './services/my-cart'
 import { MyPaymentService } from './services/my-payment'
 import { OrderService } from './services/order'
 import { PaymentService } from './services/payment'
+import { ProductDiscountService } from './services/product-discount'
 import { ProductProjectionService } from './services/product-projection'
 import { ProductService } from './services/product'
 import { ProductTypeService } from './services/product-type'
@@ -180,6 +181,10 @@ export class CommercetoolsMock {
       ),
       'product-type': new ProductTypeService(projectRouter, this._storage),
       product: new ProductService(projectRouter, this._storage),
+      'product-discount': new ProductDiscountService(
+        projectRouter,
+        this._storage
+      ),
       'product-projection': new ProductProjectionService(
         projectRouter,
         this._storage
