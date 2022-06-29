@@ -24,6 +24,8 @@ export const createAddress = (
   projectKey: string,
   storage: AbstractStorage
 ): Address | undefined => {
+  if (!base) return undefined
+
   if (!base?.country) {
     throw new Error("Country is required")
   }

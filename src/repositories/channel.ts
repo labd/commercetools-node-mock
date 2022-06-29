@@ -1,8 +1,13 @@
 import {
   Channel,
+  ChannelChangeDescriptionAction,
+  ChannelChangeKeyAction,
+  ChannelChangeNameAction,
   ChannelDraft,
+  ChannelSetAddressAction,
   ChannelSetCustomFieldAction,
   ChannelSetCustomTypeAction,
+  ChannelSetGeoLocationAction,
   ChannelUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
@@ -24,11 +29,7 @@ export class ChannelRepository extends AbstractResourceRepository {
       description: draft.description,
       roles: draft.roles || [],
       geoLocation: draft.geoLocation,
-      address: createAddress(
-        draft.address,
-        context.projectKey,
-        this._storage
-      ),
+      address: createAddress(draft.address, context.projectKey, this._storage),
       custom: createCustomFields(
         draft.custom,
         context.projectKey,
@@ -49,6 +50,50 @@ export class ChannelRepository extends AbstractResourceRepository {
       ) => void
     >
   > = {
+    changeKey: (
+      context: RepositoryContext,
+      resource: Writable<Channel>,
+      { key }: ChannelChangeKeyAction
+    ) => {
+      resource.key = key
+    },
+
+    changeName: (
+      context: RepositoryContext,
+      resource: Writable<Channel>,
+      { name }: ChannelChangeNameAction
+    ) => {
+      resource.name = name
+    },
+
+    changeDescription: (
+      context: RepositoryContext,
+      resource: Writable<Channel>,
+      { description }: ChannelChangeDescriptionAction
+    ) => {
+      resource.description = description
+    },
+
+    setAddress: (
+      context: RepositoryContext,
+      resource: Writable<Channel>,
+      { address }: ChannelSetAddressAction
+    ) => {
+      resource.address = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
+    },
+
+    setGeoLocation: (
+      context: RepositoryContext,
+      resource: Writable<Channel>,
+      { geoLocation }: ChannelSetGeoLocationAction
+    ) => {
+      resource.geoLocation = geoLocation
+    },
+
     setCustomType: (
       context: RepositoryContext,
       resource: Writable<Channel>,
