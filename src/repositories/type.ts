@@ -1,6 +1,7 @@
 import {
   Type,
   TypeDraft,
+  InvalidOperationError,
   ReferenceTypeId,
   TypeUpdateAction,
   FieldDefinition,
@@ -12,6 +13,8 @@ import {
   TypeChangeFieldDefinitionOrderAction,
   TypeRemoveFieldDefinitionAction,
 } from '@commercetools/platform-sdk'
+import { CommercetoolsError } from '../exceptions'
+import  { isEqual } from 'lodash'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
@@ -96,6 +99,17 @@ export class TypeRepository extends AbstractResourceRepository {
           return f.name !== fieldName
         })
       })
+
+      if (isEqual(fieldNames, resource.fieldDefinitions.map(item => item.name))) {
+        throw new CommercetoolsError<InvalidOperationError>({
+          code: "InvalidOperation",
+          message: "'fieldDefinitions' has no changes.",
+          action: {
+            action: "changeFieldDefinitionOrder",
+            fieldNames: fieldNames,
+          },
+        })
+      }
 
       resource.fieldDefinitions = result
       // Add fields which were not specified in the order as last items. Not

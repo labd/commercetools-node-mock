@@ -47,11 +47,13 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.182",
     "ajv": "^8.8.2",
     "ajv-formats": "^2.1.1",
     "basic-auth": "^2.0.1",
     "deep-equal": "^2.0.5",
     "express": "^4.17.2",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "nock": "^13.2.1",
     "perplex": "^0.11.0",
