@@ -25,6 +25,7 @@ export type ServiceTypes =
   | 'my-order'
   | 'my-payment'
   | 'my-customer'
+  | 'product-projection'
 
 export type Services = Partial<
   {
