@@ -35,6 +35,7 @@ export class StoreRepository extends AbstractResourceRepository {
         draft.distributionChannels
       ),
       supplyChannels: this.transformChannels(context, draft.supplyChannels),
+      productSelections: [],
       custom: createCustomFields(
         draft.custom,
         context.projectKey,
