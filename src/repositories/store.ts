@@ -29,7 +29,7 @@ export class StoreRepository extends AbstractResourceRepository {
       ...getBaseResourceProperties(),
       key: draft.key,
       name: draft.name,
-      languages: draft.languages,
+      languages: draft.languages ?? [],
       distributionChannels: this.transformChannels(
         context,
         draft.distributionChannels
@@ -107,7 +107,7 @@ export class StoreRepository extends AbstractResourceRepository {
       resource: Writable<Store>,
       { languages }: StoreSetLanguagesAction
     ) => {
-      resource.languages = languages
+      resource.languages = languages ?? []
     },
     setCustomType: (
       context: RepositoryContext,
