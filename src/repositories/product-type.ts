@@ -4,6 +4,7 @@ import {
   AttributeDefinitionDraft,
   AttributeType,
   ProductType,
+  ProductTypeAddAttributeDefinitionAction,
   ProductTypeChangeLabelAction,
   ProductTypeChangeLocalizedEnumValueLabelAction,
   ProductTypeDraft,
@@ -108,6 +109,13 @@ export class ProductTypeRepository extends AbstractResourceRepository {
           value.label = label
         }
       })
+    },
+    addAttributeDefinition: (
+      context: RepositoryContext,
+      resource: Writable<ProductType>,
+      { attribute }: ProductTypeAddAttributeDefinitionAction
+    ) => {
+      resource.attributes?.push(this.attributeDefinitionFromAttributeDefinitionDraft(context, attribute))
     },
   }
 }
