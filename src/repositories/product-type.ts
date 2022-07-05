@@ -9,6 +9,7 @@ import {
   ProductTypeChangeLabelAction,
   ProductTypeChangeLocalizedEnumValueLabelAction,
   ProductTypeDraft,
+  ProductTypeRemoveAttributeDefinitionAction,
   ProductTypeUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
@@ -148,6 +149,15 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       if (current) {
         resource.attributes.push(...current)
       }
+    },
+    removeAttributeDefinition: (
+      context: RepositoryContext,
+      resource: Writable<ProductType>,
+      { name }: ProductTypeRemoveAttributeDefinitionAction
+    ) => {
+      resource.attributes = resource.attributes?.filter(f => {
+        return f.name !== name
+      })
     },
   }
 }
