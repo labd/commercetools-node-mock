@@ -44,7 +44,10 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       ...draft,
       attributeConstraint: draft.attributeConstraint ?? 'None',
       inputHint: draft.inputHint ?? 'SingleLine',
-      inputTip: draft.inputTip && Object.keys(draft.inputTip).length > 0 ? draft.inputTip : undefined,
+      inputTip:
+        draft.inputTip && Object.keys(draft.inputTip).length > 0
+          ? draft.inputTip
+          : undefined,
       isSearchable: draft.isSearchable ?? true,
     }
   }
@@ -120,16 +123,16 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       resource: Writable<ProductType>,
       { attribute }: ProductTypeAddAttributeDefinitionAction
     ) => {
-      resource.attributes?.push(this.attributeDefinitionFromAttributeDefinitionDraft(context, attribute))
+      resource.attributes?.push(
+        this.attributeDefinitionFromAttributeDefinitionDraft(context, attribute)
+      )
     },
     changeAttributeOrder: (
       context: RepositoryContext,
       resource: Writable<ProductType>,
       { attributes }: ProductTypeChangeAttributeOrderAction
     ) => {
-      const attrs = new Map(
-        resource.attributes?.map(item => [item.name, item])
-      )
+      const attrs = new Map(resource.attributes?.map(item => [item.name, item]))
       const result: AttributeDefinition[] = []
       let current = resource.attributes
 
