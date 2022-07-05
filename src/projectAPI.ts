@@ -38,26 +38,26 @@ export class ProjectAPI {
     }
   }
 
-  get<ReferenceTypeId extends keyof ResourceMap>(
-    typeId: ReferenceTypeId,
+  get<RT extends RepositoryTypes>(
+    typeId: RT,
     id: string,
     params?: GetParams
-  ): ResourceMap[ReferenceTypeId] {
+  ): ResourceMap[RT] {
     return this._storage.get(
       this.projectKey,
       typeId,
       id,
       params
-    ) as ResourceMap[ReferenceTypeId]
+    ) as ResourceMap[RT]
   }
 
   // TODO: Not sure if we want to expose this...
-  getRepository<ReferenceTypeId extends keyof RepositoryMap>(
-    typeId: ReferenceTypeId
-  ): RepositoryMap[ReferenceTypeId] {
+  getRepository<RT extends keyof RepositoryMap>(
+    typeId: ServiceTypes
+  ): RepositoryMap[RT] {
     const service = this._services[typeId]
     if (service !== undefined) {
-      return service.repository as RepositoryMap[ReferenceTypeId]
+      return service.repository as RepositoryMap[RT]
     }
     throw new Error('No such repository')
   }
