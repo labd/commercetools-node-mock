@@ -102,7 +102,7 @@ export abstract class AbstractStorage {
 }
 
 type ProjectStorage = {
-  [index in RepositoryTypes]:  Map<string, BaseResource>
+  [index in RepositoryTypes]: Map<string, BaseResource>
 }
 
 export class InMemoryStorage extends AbstractStorage {
@@ -138,7 +138,7 @@ export class InMemoryStorage extends AbstractStorage {
         'product-price': new Map<string, any>(),
         'product-selection': new Map<string, any>(),
         'product-type': new Map<string, ProductType>(),
-        'review': new Map<string, any>(),
+        review: new Map<string, any>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         state: new Map<string, State>(),
         store: new Map<string, Store>(),
@@ -193,11 +193,7 @@ export class InMemoryStorage extends AbstractStorage {
   ): ResourceMap[RT] | null {
     const resource = this.forProjectKey(projectKey)[typeId]?.get(id)
     if (resource) {
-      return this.expand(
-        projectKey,
-        resource,
-        params.expand
-      ) as ResourceMap[RT]
+      return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
     }
     return null
   }
@@ -217,11 +213,7 @@ export class InMemoryStorage extends AbstractStorage {
     const resources: any[] = Array.from(resourceStore.values())
     const resource = resources.find(e => e.key === key)
     if (resource) {
-      return this.expand(
-        projectKey,
-        resource,
-        params.expand
-      ) as ResourceMap[RT]
+      return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
     }
     return null
   }
@@ -236,11 +228,7 @@ export class InMemoryStorage extends AbstractStorage {
 
     if (resource) {
       this.forProjectKey(projectKey)[typeId]?.delete(id)
-      return this.expand(
-        projectKey,
-        resource,
-        params.expand
-      ) as ResourceMap[RT]
+      return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
     }
     return resource
   }

@@ -2,7 +2,13 @@ import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import { GetParams } from 'repositories/abstract'
 import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
-import { RepositoryMap, RepositoryTypes, ResourceMap, Services, ServiceTypes } from './types'
+import {
+  RepositoryMap,
+  RepositoryTypes,
+  ResourceMap,
+  Services,
+  ServiceTypes,
+} from './types'
 
 export class ProjectAPI {
   private projectKey: string
@@ -19,10 +25,7 @@ export class ProjectAPI {
     this._services = services
   }
 
-  add(
-    typeId: ReferenceTypeId,
-    resource: ResourceMap[ReferenceTypeId]
-  ) {
+  add(typeId: ReferenceTypeId, resource: ResourceMap[ReferenceTypeId]) {
     const service = this._services[typeId]
     if (service) {
       this._storage.add(this.projectKey, typeId as ReferenceTypeId, {

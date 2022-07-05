@@ -29,7 +29,10 @@ export class ProductDiscountRepository extends AbstractResourceRepository {
     return 'product-discount'
   }
 
-  create(context: RepositoryContext, draft: ProductDiscountDraft): ProductDiscount {
+  create(
+    context: RepositoryContext,
+    draft: ProductDiscountDraft
+  ): ProductDiscount {
     const resource: ProductDiscount = {
       ...getBaseResourceProperties(),
       key: draft.key,
@@ -47,7 +50,9 @@ export class ProductDiscountRepository extends AbstractResourceRepository {
     return resource
   }
 
-  private transformValueDraft(value: ProductDiscountValueDraft): ProductDiscountValue {
+  private transformValueDraft(
+    value: ProductDiscountValueDraft
+  ): ProductDiscountValue {
     switch (value.type) {
       case 'absolute': {
         return {
@@ -68,7 +73,10 @@ export class ProductDiscountRepository extends AbstractResourceRepository {
     }
   }
 
-  getWithKey(context: RepositoryContext, key: string): ProductDiscount | undefined {
+  getWithKey(
+    context: RepositoryContext,
+    key: string
+  ): ProductDiscount | undefined {
     const result = this._storage.query(context.projectKey, this.getTypeId(), {
       where: [`key="${key}"`],
     })

@@ -27,7 +27,7 @@ export const createAddress = (
   if (!base) return undefined
 
   if (!base?.country) {
-    throw new Error("Country is required")
+    throw new Error('Country is required')
   }
 
   return {
