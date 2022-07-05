@@ -39,12 +39,15 @@ export class ProductTypeRepository extends AbstractResourceRepository {
   attributeDefinitionFromAttributeDefinitionDraft = (
     _context: RepositoryContext,
     draft: AttributeDefinitionDraft
-  ): AttributeDefinition => ({
-    ...draft,
-    attributeConstraint: draft.attributeConstraint ?? 'None',
-    inputHint: draft.inputHint ?? 'SingleLine',
-    isSearchable: draft.isSearchable ?? true,
-  })
+  ): AttributeDefinition => {
+    return {
+      ...draft,
+      attributeConstraint: draft.attributeConstraint ?? 'None',
+      inputHint: draft.inputHint ?? 'SingleLine',
+      inputTip: draft.inputTip && Object.keys(draft.inputTip).length > 0 ? draft.inputTip : undefined,
+      isSearchable: draft.isSearchable ?? true,
+    }
+  }
 
   getWithKey(context: RepositoryContext, key: string): ProductType | undefined {
     const result = this._storage.query(context.projectKey, this.getTypeId(), {
