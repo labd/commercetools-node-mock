@@ -14,7 +14,7 @@ import {
   TypeRemoveFieldDefinitionAction,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from '../exceptions'
-import  { isEqual } from 'lodash'
+import { isEqual } from 'lodash'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
@@ -100,12 +100,17 @@ export class TypeRepository extends AbstractResourceRepository {
         })
       })
 
-      if (isEqual(fieldNames, resource.fieldDefinitions.map(item => item.name))) {
+      if (
+        isEqual(
+          fieldNames,
+          resource.fieldDefinitions.map(item => item.name)
+        )
+      ) {
         throw new CommercetoolsError<InvalidOperationError>({
-          code: "InvalidOperation",
+          code: 'InvalidOperation',
           message: "'fieldDefinitions' has no changes.",
           action: {
-            action: "changeFieldDefinitionOrder",
+            action: 'changeFieldDefinitionOrder',
             fieldNames: fieldNames,
           },
         })
