@@ -5,6 +5,7 @@ import {
   AttributeType,
   ProductType,
   ProductTypeAddAttributeDefinitionAction,
+  ProductTypeChangeAttributeOrderAction,
   ProductTypeChangeLabelAction,
   ProductTypeChangeLocalizedEnumValueLabelAction,
   ProductTypeDraft,
@@ -116,6 +117,37 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       { attribute }: ProductTypeAddAttributeDefinitionAction
     ) => {
       resource.attributes?.push(this.attributeDefinitionFromAttributeDefinitionDraft(context, attribute))
+    },
+    changeAttributeOrder: (
+      context: RepositoryContext,
+      resource: Writable<ProductType>,
+      { attributes }: ProductTypeChangeAttributeOrderAction
+    ) => {
+      const attrs = new Map(
+        resource.attributes?.map(item => [item.name, item])
+      )
+      const result: AttributeDefinition[] = []
+      let current = resource.attributes
+
+      attributes.forEach(iAttr => {
+        const attr = attrs.get(iAttr.name)
+        if (attr === undefined) {
+          throw new Error('New attr')
+        }
+        result.push(attr)
+
+        // Remove from current items
+        current = current?.filter(f => {
+          return f.name !== iAttr.name
+        })
+      })
+
+      resource.attributes = result
+      // Add attrs which were not specified in the order as last items. Not
+      // sure if this follows commercetools
+      if (current) {
+        resource.attributes.push(...current)
+      }
     },
   }
 }
