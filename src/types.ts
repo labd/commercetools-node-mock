@@ -18,7 +18,7 @@ import { ProductDiscountRepository } from 'repositories/product-discount'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
-export type RepositoryTypes = ReferenceTypeId | 'product-projection'
+export type RepositoryTypes = ReferenceTypeId
 export type ServiceTypes =
   | RepositoryTypes
   | 'my-cart'
