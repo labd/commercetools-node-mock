@@ -1,7 +1,8 @@
+import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import { GetParams } from 'repositories/abstract'
 import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
-import { RepositoryMap, ResourceMap, Services } from './types'
+import { RepositoryMap, RepositoryTypes, ResourceMap, Services, ServiceTypes } from './types'
 
 export class ProjectAPI {
   private projectKey: string
@@ -18,18 +19,13 @@ export class ProjectAPI {
     this._services = services
   }
 
-  add<ReferenceTypeId extends keyof ResourceMap>(
-    typeId: ReferenceTypeId | 'custom-object',
+  add(
+    typeId: ReferenceTypeId,
     resource: ResourceMap[ReferenceTypeId]
   ) {
-    //@ts-ignore
-    if (typeId === 'custom-object') typeId = 'key-value-document'
-
-    const parsedTypeId = typeId as ReferenceTypeId
-
-    const service = this._services[parsedTypeId]
+    const service = this._services[typeId]
     if (service) {
-      this._storage.add(this.projectKey, parsedTypeId, {
+      this._storage.add(this.projectKey, typeId as ReferenceTypeId, {
         ...getBaseResourceProperties(),
         ...resource,
       })
