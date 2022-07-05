@@ -101,11 +101,9 @@ export abstract class AbstractStorage {
   ): BaseResource | undefined
 }
 
-type ProjectStorage = Partial<
-  {
-    [index in RepositoryTypes]: Map<string, BaseResource>
-  }
->
+type ProjectStorage = {
+  [index in RepositoryTypes]:  Map<string, BaseResource>
+}
 
 export class InMemoryStorage extends AbstractStorage {
   protected resources: {
@@ -133,16 +131,19 @@ export class InMemoryStorage extends AbstractStorage {
         'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
         order: new Map<string, Order>(),
+        'order-edit': new Map<string, any>(),
         payment: new Map<string, Payment>(),
-        'product-discount': new Map<string, ProductDiscount>(),
-        'product-type': new Map<string, ProductType>(),
         product: new Map<string, Product>(),
+        'product-discount': new Map<string, ProductDiscount>(),
+        'product-price': new Map<string, any>(),
         'product-selection': new Map<string, any>(),
-        'product-projection': new Map<string, ProductProjection>(),
+        'product-type': new Map<string, ProductType>(),
+        'review': new Map<string, any>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         state: new Map<string, State>(),
         store: new Map<string, Store>(),
         'shopping-list': new Map<string, ShoppingList>(),
+        'standalone-price': new Map<string, any>(),
         subscription: new Map<string, Subscription>(),
         'tax-category': new Map<string, TaxCategory>(),
         type: new Map<string, Type>(),

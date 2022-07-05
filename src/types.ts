@@ -18,7 +18,7 @@ import { ProductDiscountRepository } from 'repositories/product-discount'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
-export type RepositoryTypes = ReferenceTypeId
+export type RepositoryTypes = ReferenceTypeId | 'standalone-price'
 export type ServiceTypes =
   | RepositoryTypes
   | 'my-cart'
@@ -50,10 +50,12 @@ export type ResourceMap = {
   'product-discount': ctp.ProductDiscount
   'product-projection': ctp.ProductProjection
   'product-selection': ctp.ProductSelection
+  'product-price': ctp.StandalonePrice
   'product-type': ctp.ProductType
   review: ctp.Review
   'shipping-method': ctp.ShippingMethod
   'shopping-list': ctp.ShoppingList
+  'standalone-price': ctp.StandalonePrice
   state: ctp.State
   store: ctp.Store
   subscription: ctp.Subscription
