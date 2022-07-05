@@ -12,7 +12,7 @@ import { parseFilterExpression } from '../lib/filterParser'
 
 export class ProductProjectionRepository extends AbstractResourceRepository {
   getTypeId(): RepositoryTypes {
-    return 'product' // product-project is using products
+    return 'product-projection'
   }
 
   create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
