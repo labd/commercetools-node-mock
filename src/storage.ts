@@ -58,33 +58,33 @@ export abstract class AbstractStorage {
 
   abstract all(projectKey: string, typeId: RepositoryTypes): Array<BaseResource>
 
-  abstract add<RepositoryTypes extends keyof ResourceMap>(
+  abstract add<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
-    obj: ResourceMap[RepositoryTypes]
+    typeId: RT,
+    obj: ResourceMap[RT]
   ): void
 
-  abstract get<RepositoryTypes extends keyof ResourceMap>(
+  abstract get<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: RT,
     id: string,
     params?: GetParams
-  ): ResourceMap[RepositoryTypes] | null
+  ): ResourceMap[RT] | null
 
-  abstract getByKey<RepositoryTypes extends keyof ResourceMap>(
+  abstract getByKey<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: RT,
     key: string,
     params: GetParams
-  ): ResourceMap[RepositoryTypes] | null
+  ): ResourceMap[RT] | null
 
   abstract addProject(projectKey: string): Project
   abstract getProject(projectKey: string): Project
   abstract saveProject(project: Project): Project
 
-  abstract delete(
+  abstract delete<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: RT,
     id: string,
     params: GetParams
   ): BaseResource | null
@@ -116,7 +116,7 @@ export class InMemoryStorage extends AbstractStorage {
     [projectKey: string]: Project
   } = {}
 
-  private forProjectKey(projectKey: string) {
+  private forProjectKey(projectKey: string): ProjectStorage {
     this.addProject(projectKey)
 
     let projectStorage = this.resources[projectKey]
@@ -170,62 +170,64 @@ export class InMemoryStorage extends AbstractStorage {
     return []
   }
 
-  add<RepositoryTypes extends keyof ResourceMap>(
+  add<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
-    obj: ResourceMap[RepositoryTypes],
+    typeId: RT,
+    obj: ResourceMap[RT],
     params: GetParams = {}
-  ): ResourceMap[RepositoryTypes] {
-    this.forProjectKey(projectKey)[typeId]?.set(obj.id, obj)
+  ): ResourceMap[RT] {
+    const store = this.forProjectKey(projectKey)
+    store[typeId]?.set(obj.id, obj)
 
     const resource = this.get(projectKey, typeId, obj.id, params)
     assert(resource, `resource of type ${typeId} with id ${obj.id} not created`)
     return resource
   }
 
-  get<RepositoryTypes extends keyof ResourceMap>(
+  get<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: RT,
     id: string,
     params: GetParams = {}
-  ): ResourceMap[RepositoryTypes] | null {
+  ): ResourceMap[RT] | null {
     const resource = this.forProjectKey(projectKey)[typeId]?.get(id)
     if (resource) {
       return this.expand(
         projectKey,
         resource,
         params.expand
-      ) as ResourceMap[RepositoryTypes]
+      ) as ResourceMap[RT]
     }
     return null
   }
 
-  getByKey<RepositoryTypes extends keyof ResourceMap>(
+  getByKey<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: RT,
     key: string,
     params: GetParams = {}
-  ): ResourceMap[RepositoryTypes] | null {
-    const store = this.forProjectKey(projectKey)[typeId]
+  ): ResourceMap[RT] | null {
+    const store = this.forProjectKey(projectKey)
+    const resourceStore = store[typeId]
     if (!store) {
       throw new Error('No type')
     }
 
-    const resources: any[] = Array.from(store.values())
+    const resources: any[] = Array.from(resourceStore.values())
     const resource = resources.find(e => e.key === key)
     if (resource) {
       return this.expand(
         projectKey,
         resource,
         params.expand
-      ) as ResourceMap[RepositoryTypes]
+      ) as ResourceMap[RT]
     }
     return null
   }
 
-  delete(
+  delete<RT extends RepositoryTypes>(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: RT,
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
@@ -237,7 +239,7 @@ export class InMemoryStorage extends AbstractStorage {
         projectKey,
         resource,
         params.expand
-      ) as ResourceMap[RepositoryTypes]
+      ) as ResourceMap[RT]
     }
     return resource
   }
@@ -294,14 +296,14 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  getByResourceIdentifier<RepositoryTypes extends keyof ResourceMap>(
+  getByResourceIdentifier<RT extends RepositoryTypes>(
     projectKey: string,
     identifier: ResourceIdentifier
-  ): ResourceMap[RepositoryTypes] | undefined {
+  ): ResourceMap[RT] | undefined {
     if (identifier.id) {
       const resource = this.get(projectKey, identifier.typeId, identifier.id)
       if (resource) {
-        return resource as ResourceMap[RepositoryTypes]
+        return resource as ResourceMap[RT]
       }
       console.error(
         `No resource found with typeId=${identifier.typeId}, id=${identifier.id}`
@@ -320,7 +322,7 @@ export class InMemoryStorage extends AbstractStorage {
           r => r.key === identifier.key
         )
         if (resource) {
-          return resource as ResourceMap[RepositoryTypes]
+          return resource as ResourceMap[RT]
         }
       } else {
         throw new Error(
