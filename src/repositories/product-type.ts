@@ -10,6 +10,7 @@ import {
   ProductTypeChangeLocalizedEnumValueLabelAction,
   ProductTypeDraft,
   ProductTypeRemoveAttributeDefinitionAction,
+  ProductTypeRemoveEnumValuesAction,
   ProductTypeUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
@@ -163,6 +164,30 @@ export class ProductTypeRepository extends AbstractResourceRepository {
     ) => {
       resource.attributes = resource.attributes?.filter(f => {
         return f.name !== name
+      })
+    },
+    removeEnumValues: (
+      context: RepositoryContext,
+      resource: Writable<ProductType>,
+      { attributeName, keys }: ProductTypeRemoveEnumValuesAction
+    ) => {
+      resource.attributes?.forEach(attr => {
+        if (attr.name == attributeName) {
+          if (attr.type.name == "enum") {
+            attr.type.values = attr.type.values.filter(v => {
+              return !keys.includes(v.key)
+            })
+          }
+
+          if (attr.type.name == "set") {
+            if (attr.type.elementType.name == "enum") {
+              attr.type.elementType.values = attr.type.elementType.values.filter(v => {
+                return !keys.includes(v.key)
+              })
+            }
+          }
+
+        }
       })
     },
   }
