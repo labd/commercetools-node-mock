@@ -114,7 +114,11 @@ export class ProductDiscountRepository extends AbstractResourceRepository {
       resource: Writable<ProductDiscount>,
       { description }: ProductDiscountSetDescriptionAction
     ) => {
-      resource.description = description
+      if (description && Object.keys(description).length > 0) {
+        resource.description = description
+      } else {
+        resource.description = undefined
+      }
     },
     changeName: (
       context: RepositoryContext,
