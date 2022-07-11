@@ -50,7 +50,9 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
   }
 
   search(context: RepositoryContext, query: ParsedQs) {
-    const expand = query.expand ? query.expand as string | string[] : undefined
+    const expand = query.expand
+      ? (query.expand as string | string[])
+      : undefined
     const filter = (query['filter.query'] ?? query.filter) as any
     const wherePredicate = filter ? parseFilterExpression(filter) : undefined
 
