@@ -50,6 +50,9 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
   }
 
   search(context: RepositoryContext, query: ParsedQs) {
+    const expand = query.expand
+      ? (query.expand as string | string[])
+      : undefined
     const filter = (query['filter.query'] ?? query.filter) as any
     const wherePredicate = filter ? parseFilterExpression(filter) : undefined
 
@@ -57,6 +60,7 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
       where: wherePredicate,
       offset: query.offset ? Number(query.offset) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,
+      expand,
     }) //TODO: this is a partial implementation, but I don't really have the time to implement an actual search API right now
 
     return results
