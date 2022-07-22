@@ -1,81 +1,51 @@
 import { ParsedQs } from 'qs'
+import { ProductDraft, ProductProjection } from '@commercetools/platform-sdk'
 import {
-  ProductDraft,
-  ProductProjection,
-  ProductVariant,
-  ProductVariantDraft,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+  AbstractResourceRepository,
+  QueryParams,
+  RepositoryContext,
+} from './abstract'
 import { RepositoryTypes } from '../types'
-import { parseFilterExpression } from '../lib/filterParser'
+import { AbstractStorage } from '../storage'
+import { ProductProjectionSearch } from '../product-projection-search'
+import { QueryParamsAsArray } from '../helpers'
 
 export class ProductProjectionRepository extends AbstractResourceRepository {
+  protected _searchService: ProductProjectionSearch
+
+  constructor(storage: AbstractStorage) {
+    super(storage)
+    this._searchService = new ProductProjectionSearch(storage)
+  }
+
   getTypeId(): RepositoryTypes {
     return 'product-projection'
   }
 
   create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
-    if (!draft.masterVariant) {
-      throw new Error(
-        `must provider mastervariant for product projection with key ${draft.key}`
-      )
-    }
+    throw new Error('No valid action')
+  }
 
-    if (!draft.productType.id) {
-      throw new Error(
-        `must provider product type id for product projection with key ${draft.key}`
-      )
-    }
-
-    const resource: ProductProjection = {
-      ...getBaseResourceProperties(),
-      name: draft.name,
-      slug: draft.slug,
-      categories: [],
-      productType: { ...draft.productType, id: draft.productType.id! },
-      masterVariant: variantFromDraft(0, draft.masterVariant!),
-      variants:
-        draft.variants?.map((variant, index) => {
-          return variantFromDraft(index + 1, variant)
-        }) ?? [],
-
-      // @ts-ignore
-      searchKeywords: draft.searchKeywords,
-    }
-
-    this.save(context, resource)
-
-    return resource
+  query(context: RepositoryContext, params: QueryParams = {}) {
+    return this._storage.query(context.projectKey, 'product', {
+      expand: params.expand,
+      where: params.where,
+      offset: params.offset,
+      limit: params.limit,
+    })
   }
 
   search(context: RepositoryContext, query: ParsedQs) {
-    const expand = query.expand
-      ? (query.expand as string | string[])
-      : undefined
-    const filter = (query['filter.query'] ?? query.filter) as any
-    const wherePredicate = filter ? parseFilterExpression(filter) : undefined
-
-    const results = this._storage.query(context.projectKey, this.getTypeId(), {
-      where: wherePredicate,
+    const results = this._searchService.search(context.projectKey, {
+      filter: QueryParamsAsArray(query.filter),
+      'filter.query': QueryParamsAsArray(query['filter.query']),
       offset: query.offset ? Number(query.offset) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,
-      expand,
-    }) //TODO: this is a partial implementation, but I don't really have the time to implement an actual search API right now
+      expand: QueryParamsAsArray(query.expand),
+    })
 
     return results
   }
 
   actions = {}
-}
-
-const variantFromDraft = (
-  variantId: number,
-  variant: ProductVariantDraft
-): ProductVariant => {
-  return {
-    id: variantId,
-    sku: variant?.sku,
-    attributes: variant?.attributes,
-  }
 }

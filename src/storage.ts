@@ -56,7 +56,10 @@ export abstract class AbstractStorage {
 
   abstract assertStorage(typeId: RepositoryTypes): void
 
-  abstract all(projectKey: string, typeId: RepositoryTypes): Array<BaseResource>
+  abstract all<RT extends RepositoryTypes>(
+    projectKey: string,
+    typeId: RT
+  ): Array<ResourceMap[RT]>
 
   abstract add<RT extends RepositoryTypes>(
     projectKey: string,
@@ -95,10 +98,16 @@ export abstract class AbstractStorage {
     params: QueryParams
   ): PagedQueryResponse
 
-  abstract getByResourceIdentifier(
+  abstract getByResourceIdentifier<RT extends RepositoryTypes>(
     projectKey: string,
     identifier: ResourceIdentifier
-  ): BaseResource | undefined
+  ): ResourceMap[RT] | undefined
+
+  abstract expand<T>(
+    projectKey: string,
+    obj: T,
+    clause: undefined | string | string[]
+  ): T
 }
 
 type ProjectStorage = {
@@ -164,10 +173,13 @@ export class InMemoryStorage extends AbstractStorage {
 
   assertStorage(typeId: RepositoryTypes) {}
 
-  all(projectKey: string, typeId: RepositoryTypes) {
+  all<RT extends RepositoryTypes>(
+    projectKey: string,
+    typeId: RT
+  ): ResourceMap[RT][] {
     const store = this.forProjectKey(projectKey)[typeId]
     if (store) {
-      return Array.from(store.values())
+      return Array.from(store.values()) as ResourceMap[RT][]
     }
     return []
   }
@@ -235,6 +247,58 @@ export class InMemoryStorage extends AbstractStorage {
   }
 
   query(
+    projectKey: string,
+    typeId: RepositoryTypes,
+    params: QueryParams
+  ): PagedQueryResponse {
+    const store = this.forProjectKey(projectKey)[typeId]
+    if (!store) {
+      throw new Error('No type')
+    }
+
+    let resources = Array.from(store.values())
+
+    // Apply predicates
+    if (params.where) {
+      try {
+        const filterFunc = parseQueryExpression(params.where)
+        resources = resources.filter(resource => filterFunc(resource, {}))
+      } catch (err) {
+        throw new CommercetoolsError<InvalidInputError>(
+          {
+            code: 'InvalidInput',
+            message: (err as any).message,
+          },
+          400
+        )
+      }
+    }
+
+    // Get the total before slicing the array
+    const totalResources = resources.length
+
+    // Apply offset, limit
+    const offset = params.offset || 0
+    const limit = params.limit || 20
+    resources = resources.slice(offset, offset + limit)
+
+    // Expand the resources
+    if (params.expand !== undefined) {
+      resources = resources.map(resource => {
+        return this.expand(projectKey, resource, params.expand)
+      })
+    }
+
+    return {
+      count: totalResources,
+      total: resources.length,
+      offset: offset,
+      limit: limit,
+      results: resources,
+    }
+  }
+
+  search(
     projectKey: string,
     typeId: RepositoryTypes,
     params: QueryParams
@@ -363,7 +427,7 @@ export class InMemoryStorage extends AbstractStorage {
     return this.addProject(projectKey)
   }
 
-  private expand = <T>(
+  public expand = <T>(
     projectKey: string,
     obj: T,
     clause: undefined | string | string[]
