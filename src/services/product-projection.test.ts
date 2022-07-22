@@ -1,167 +1,222 @@
-import { ProductDraft, ProductProjection } from '@commercetools/platform-sdk'
+import {
+  ProductDraft,
+  ProductProjection,
+  ProductProjectionPagedSearchResponse,
+  ProductType,
+  ProductTypeDraft,
+} from '@commercetools/platform-sdk'
 import supertest from 'supertest'
+import * as timekeeper from 'timekeeper'
 import { CommercetoolsMock } from '../index'
-import * as qs from 'querystring'
+import { Writable } from 'types'
 
 const ctMock = new CommercetoolsMock()
 
-describe('Product Projection', () => {
-  afterEach(() => {
-    ctMock.clear()
-  })
+let productType: ProductType
+let productProjection: ProductProjection
 
-  test('Create product projection', async () => {
-    const draft: ProductDraft = {
-      key: '1337357',
+beforeEach(async () => {
+  timekeeper.freeze(new Date('2022-07-22T13:31:49.840Z'))
+
+  // Create the product type
+  {
+    const draft: ProductTypeDraft = {
+      name: 'Default Product Type',
+      description: 'Product type for testing',
+    }
+    const response = await supertest(ctMock.app)
+      .post('/dummy/product-types')
+      .send(draft)
+
+    expect(response.ok).toBe(true)
+    productType = response.body
+  }
+
+  // Create the product
+  {
+    const productDraft: Writable<ProductDraft> = {
+      publish: true,
+      key: 'my-product-key',
       masterVariant: {
-        sku: '1337',
+        sku: 'my-sku',
+        prices: [
+          {
+            value: {
+              currencyCode: 'EUR',
+              centAmount: 1789,
+            },
+          },
+        ],
+        attributes: [
+          {
+            name: "number",
+            value: "1" as any,
+          }
+        ]
       },
       name: {
         'nl-NL': 'test product',
       },
       productType: {
         typeId: 'product-type',
-        id: 'some-uuid',
+        id: productType.id,
       },
       slug: {
         'nl-NL': 'test-product',
       },
     }
-    const response = await supertest(ctMock.app)
-      .post('/dummy/product-projections')
-      .send(draft)
 
-    const projection: ProductProjection = response.body
-    expect(projection).toEqual({
-      createdAt: expect.anything(),
-      id: expect.anything(),
-      lastModifiedAt: expect.anything(),
-      name: {
-        'nl-NL': 'test product',
-      },
-      slug: {
-        'nl-NL': 'test-product',
-      },
-      categories: [],
+    const response = await supertest(ctMock.app)
+      .post('/dummy/products')
+      .send(productDraft)
+    expect(response.ok).toBe(true)
+    const product = response.body
+
+    // Create the expected ProductProjection object
+    productProjection = {
+      id: product.id,
+      createdAt: '2022-07-22T13:31:49.840Z',
+      lastModifiedAt: '2022-07-22T13:31:49.840Z',
       version: 1,
       masterVariant: {
-        id: 0,
-        sku: '1337',
-      },
-      productType: {
-        id: 'some-uuid',
-        typeId: 'product-type',
+        id: 1,
+        sku: 'my-sku',
+        prices: [
+          {
+            id: product.masterData.current.masterVariant.prices[0].id,
+            value: {
+              type: 'centPrecision',
+              currencyCode: 'EUR',
+              centAmount: 1789,
+              fractionDigits: 2,
+            },
+          },
+        ],
+        assets: [],
+        images: [],
+        attributes: productDraft.masterVariant?.attributes,
       },
       variants: [],
-    })
+      name: productDraft.name,
+      slug: productDraft.slug,
+      categories: [],
+      productType: {
+        typeId: 'product-type',
+        id: productType.id,
+      },
+    }
+  }
+})
+
+afterEach(async () => {
+  timekeeper.reset()
+
+  const response = await supertest(ctMock.app)
+    .delete(`/dummy/products/${productProjection.id}`)
+    .send()
+  expect(response.ok).toBe(true)
+  const product = response.body
+})
+
+// Test the general product projection implementation
+describe('Product Projection Search - Generic', () => {
+  test('Pagination', async () => {
+    {
+      const response = await supertest(ctMock.app)
+        .get('/dummy/product-projections/search')
+        .query({
+          limit: 50,
+        })
+
+      const result: ProductProjectionPagedSearchResponse = response.body
+      expect(result).toEqual({
+        count: 1,
+        limit: 50,
+        offset: 0,
+        total: 1,
+        facets: {},
+        results: [productProjection],
+      })
+    }
+    {
+      const response = await supertest(ctMock.app)
+        .get('/dummy/product-projections/search')
+        .query({
+          limit: 50,
+          offset: 50,
+        })
+
+      const projection: ProductProjection = response.body
+      expect(projection).toEqual({
+        count: 1,
+        limit: 50,
+        offset: 50,
+        total: 0,
+        facets: {},
+        results: [],
+      })
+    }
   })
 
-  test('Get product projection by 404 when not found by key with expand', async () => {
-    const response = await supertest(ctMock.app).get(
-      '/dummy/product-projections/key=DOESNOTEXIST?' +
-        qs.stringify({
-          expand: ['categories[*]'],
-        })
-    )
+  test('Get 404 when not found by key with expand', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/key=DOESNOTEXIST')
+      .query({
+        expand: ['categories[*]'],
+      })
 
     expect(response.status).toBe(404)
   })
 })
 
-describe('Product Projection Search', () => {
-  beforeAll(() => {
-    ctMock.project('dummy').add('product-projection', {
-      id: '',
-      version: 1,
-      productType: {
-        id: 'fake',
-        typeId: 'product-type',
-      },
-      name: { 'nl-NL': 'test-prod' },
-      slug: {},
-      variants: [],
-      masterVariant: { id: 1, sku: '1337' },
-      createdAt: '',
-      lastModifiedAt: '',
-      categories: [],
-    })
-  })
+describe('Product Projection Search - Filters', () => {
+  test('variants.sku', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        filter: ['variants.sku:"my-sku"'],
+      })
 
-  test('Search product projection', async () => {
-    const response = await supertest(ctMock.app).get(
-      '/dummy/product-projections/search?' +
-        qs.stringify({
-          filter: ['masterVariant.sku:"1337"'],
-        })
-    )
-
-    const projection: ProductProjection = response.body
-    expect(projection).toEqual({
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
       count: 1,
-      limit: 20,
-      offset: 0,
-      total: 1,
       results: [
         {
-          categories: [],
-          createdAt: '',
-          id: '',
-          lastModifiedAt: '',
-          masterVariant: { id: 1, sku: '1337' },
-          name: { 'nl-NL': 'test-prod' },
-          productType: { id: 'fake', typeId: 'product-type' },
-          slug: {},
-          variants: [],
-          version: 1,
+          masterVariant: { sku: 'my-sku' },
         },
       ],
     })
   })
 
-  test('Search product projection page 2', async () => {
-    const response = await supertest(ctMock.app).get(
-      '/dummy/product-projections/search?' +
-        qs.stringify({
-          filter: ['masterVariant.sku:"1337"'],
-          limit: 50,
-          offset: 100,
-        })
-    )
+  test('variants.attributes.range - match', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        filter: ['variants.attributes.number:range(0 TO 10)'],
+      })
 
-    const projection: ProductProjection = response.body
-    expect(projection).toEqual({
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
       count: 1,
-      limit: 50,
-      offset: 100,
-      total: 0,
-      results: [],
+      results: [
+        {
+          masterVariant: { sku: 'my-sku' },
+        },
+      ],
     })
   })
 
-  test('Search product projection with query.filter', async () => {
-    const response = await supertest(ctMock.app).get(
-      '/dummy/product-projections/search?' +
-        qs.stringify({
-          'query.filter': ['masterVariant.sku:"1337"'],
-        })
-    )
+  test('variants.attributes.range - mismatch', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        filter: ['variants.attributes.number:range(2 TO 10)'],
+      })
 
-    const projection: ProductProjection = response.body
-    expect(projection).toMatchObject({
-      count: 1,
-      results: [{ masterVariant: { id: 1, sku: '1337' } }],
-    })
-  })
-
-  test('Search product projection without filter', async () => {
-    const response = await supertest(ctMock.app).get(
-      '/dummy/product-projections/search'
-    )
-
-    const projection: ProductProjection = response.body
-    expect(projection).toMatchObject({
-      count: 1,
-      results: [{ masterVariant: { id: 1, sku: '1337' } }],
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
+      count: 0,
+      results: []
     })
   })
 })

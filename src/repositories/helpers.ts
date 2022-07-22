@@ -4,10 +4,12 @@ import {
   BaseAddress,
   CustomFields,
   CustomFieldsDraft,
+  InvalidJsonInputError,
   Money,
   Price,
   PriceDraft,
   Reference,
+  ReferencedResourceNotFoundError,
   ResourceIdentifier,
   Store,
   StoreKeyReference,
@@ -18,6 +20,7 @@ import {
 import { AbstractStorage } from '../storage'
 import { RepositoryContext } from './abstract'
 import { Request } from 'express'
+import { CommercetoolsError } from 'exceptions'
 
 export const createAddress = (
   base: BaseAddress | undefined,
@@ -102,14 +105,35 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
   projectKey: string,
   storage: AbstractStorage
 ): T => {
+  if (!resourceIdentifier.id && !resourceIdentifier.key) {
+    throw new CommercetoolsError<InvalidJsonInputError>(
+      {
+        code: 'InvalidJsonInput',
+        message: `${resourceIdentifier.typeId}: ResourceIdentifier requires an 'id' xor a 'key'`,
+      },
+      400
+    )
+  }
+
   const resource = storage.getByResourceIdentifier(
     projectKey,
     resourceIdentifier
   )
-  if (!resource)
-    throw new Error(
-      `resource type ${resourceIdentifier.typeId} with id ${resourceIdentifier.id} and key ${resourceIdentifier.key} not found`
+  if (!resource) {
+    const errIdentifier = resourceIdentifier.key
+      ? `key '${resourceIdentifier.key}'`
+      : `identifier '${resourceIdentifier.key}'`
+
+    throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+      {
+        code: 'ReferencedResourceNotFound',
+        // @ts-ignore
+        typeId: resourceIdentifier.typeId,
+        message: `The referenced object of type '${resourceIdentifier.typeId}' with '${errIdentifier}' was not found. It either doesn't exist, or it can't be accessed from this endpoint (e.g., if the endpoint filters by store or customer account).`,
+      },
+      400
     )
+  }
 
   return ({
     typeId: resourceIdentifier.typeId,

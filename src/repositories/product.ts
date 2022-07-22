@@ -1,17 +1,25 @@
 import {
+  InvalidJsonInputError,
   Price,
+  PriceDraft,
   Product,
   ProductData,
   ProductDraft,
   ProductPublishAction,
   ProductSetAttributeAction,
+  ProductType,
+  ProductTypeReference,
+  ProductTypeResourceIdentifier,
   ProductVariant,
   ProductVariantDraft,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
+import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from '../types'
+import { CommercetoolsError } from 'exceptions'
+import { getReferenceFromResourceIdentifier } from './helpers'
 
 export class ProductRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -19,17 +27,23 @@ export class ProductRepository extends AbstractResourceRepository {
   }
 
   create(context: RepositoryContext, draft: ProductDraft): Product {
-    const productData = {
+    if (!draft.masterVariant) {
+      throw new Error('Missing master variant')
+    }
+
+    const productType = getReferenceFromResourceIdentifier<
+      ProductTypeReference
+    >(draft.productType, context.projectKey, this._storage)
+
+    const productData: ProductData = {
       name: draft.name,
       slug: draft.slug,
       categories: [],
-      masterVariant:
-        draft.masterVariant && variantFromDraft(0, draft.masterVariant!),
+      masterVariant: variantFromDraft(1, draft.masterVariant),
       variants:
-        draft.variants &&
-        draft.variants.map((variant, index) => {
-          return variantFromDraft(index + 1, variant)
-        }),
+        draft.variants?.map((variant, index) => {
+          return variantFromDraft(index + 2, variant)
+        }) ?? [],
 
       // @ts-ignore
       searchKeywords: draft.searchKeywords,
@@ -37,6 +51,7 @@ export class ProductRepository extends AbstractResourceRepository {
 
     const resource: Product = {
       ...getBaseResourceProperties(),
+      productType: productType,
       masterData: {
         // @ts-ignore
         current: draft.publish ? productData : undefined,
@@ -207,7 +222,24 @@ const variantFromDraft = (
   return {
     id: variantId,
     sku: variant?.sku,
-    attributes: variant?.attributes,
-    prices: variant?.prices as Price[],
+    attributes: variant?.attributes ?? [],
+    prices: variant?.prices?.map(priceFromDraft),
+    assets: [],
+    images: [],
+  }
+}
+
+
+const priceFromDraft = (
+  draft: PriceDraft
+): Price => {
+  return {
+    id:  uuidv4(),
+    value: {
+      currencyCode: draft.value.currencyCode,
+      centAmount: draft.value.centAmount,
+      fractionDigits: 2,
+      type: 'centPrecision',
+    }
   }
 }
