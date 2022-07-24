@@ -6,6 +6,7 @@ import {
   QueryParam,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from 'exceptions'
+import { PriceSelector } from 'helpers'
 import { parseFilterExpression } from 'lib/projectionSearchFilter'
 import { AbstractStorage } from 'storage'
 
@@ -45,16 +46,28 @@ export class ProductProjectionSearch {
   ): ProductProjectionPagedSearchResponse {
     let resources = this._storage.all(projectKey, 'product')
     let markMatchingVariant = params.markMatchingVariants ?? false
+    this.validateParams(params)
+
+    const priceSelector: PriceSelector = {
+      country: params.priceCountry,
+      channel: params.priceChannel,
+      customerGroup: params.priceCustomerGroup,
+      currency: params.priceCurrency,
+    }
 
     // Apply filters pre facetting
     if (params.filter) {
       try {
         const filters = params.filter.map(f =>
-          parseFilterExpression(f, params.staged ?? false)
+          parseFilterExpression(f, params.staged ?? false, priceSelector)
         )
-        resources = resources.filter(resource =>
-          filters.every(f => f(resource, markMatchingVariant))
-        )
+
+        // Filters can modify the output. So clone the resources first.
+        resources = resources
+          .map(r => JSON.parse(JSON.stringify(r)))
+          .filter(resource =>
+            filters.every(f => f(resource, markMatchingVariant))
+          )
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
           {
@@ -70,14 +83,16 @@ export class ProductProjectionSearch {
     // TODO: Calculate facets
 
     // Apply filters post facetting
-    if (params["filter.query"]) {
+    if (params['filter.query']) {
       try {
-        const filters = params["filter.query"].map(f =>
-          parseFilterExpression(f, params.staged ?? false)
+        const filters = params['filter.query'].map(f =>
+          parseFilterExpression(f, params.staged ?? false, priceSelector)
         )
-        resources = resources.filter(resource =>
-          filters.every(f => f(resource, markMatchingVariant))
-        )
+        resources = resources
+          .map(r => JSON.parse(JSON.stringify(r)))
+          .filter(resource =>
+            filters.every(f => f(resource, markMatchingVariant))
+          )
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
           {
@@ -111,6 +126,23 @@ export class ProductProjectionSearch {
       limit: limit,
       results: resources.map(this.transform),
       facets: {},
+    }
+  }
+
+  validateParams(params: ProductProjectionSearchParams) {
+    if (
+      !params.priceCurrency &&
+      !(params.priceCountry || params.priceChannel || params.priceCustomerGroup)
+    ) {
+      throw new CommercetoolsError<InvalidInputError>(
+        {
+          code: 'InvalidInput',
+          message:
+            'The price selecting parameters country, channel and customerGroup ' +
+            'cannot be used without the currency.',
+        },
+        400
+      )
     }
   }
 
