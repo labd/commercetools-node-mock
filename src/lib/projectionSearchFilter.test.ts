@@ -3,6 +3,7 @@ import {
   ProductData,
   ProductProjection,
 } from '@commercetools/platform-sdk'
+import { PriceSelector } from 'helpers'
 import { parseFilterExpression } from './projectionSearchFilter'
 
 describe('Search filter', () => {
@@ -36,6 +37,17 @@ describe('Search filter', () => {
           value: 4,
         },
       ],
+      prices: [
+        {
+          id: 'dummy-uuid',
+          value: {
+            type: 'centPrecision',
+            currencyCode: 'EUR',
+            centAmount: 1789,
+            fractionDigits: 2,
+          },
+        },
+      ],
     },
   }
 
@@ -56,35 +68,94 @@ describe('Search filter', () => {
     },
   }
 
-  const match = (pattern: string) => {
-    const matchFunc = parseFilterExpression(pattern, false)
-    return matchFunc(exampleProduct, false)
+  const match = (pattern: string, priceSelector?: PriceSelector) => {
+    if (!priceSelector) priceSelector = {}
+    const matchFunc = parseFilterExpression(pattern, false, priceSelector)
+    const clone = JSON.parse(JSON.stringify(exampleProduct))
+    return {
+      isMatch: matchFunc(clone, false),
+      product: clone,
+    }
   }
 
   test('by SKU', async () => {
-    expect(match(`variants.sku:exists`)).toBeTruthy()
-    expect(match(`variants.sku:missing`)).toBeFalsy()
-    expect(match(`variants.sku:"MYSKU"`)).toBeTruthy()
+    expect(match(`variants.sku:exists`).isMatch).toBeTruthy()
+    expect(match(`variants.sku:missing`).isMatch).toBeFalsy()
+    expect(match(`variants.sku:"MYSKU"`).isMatch).toBeTruthy()
   })
 
   test('by attribute value', async () => {
-    expect(match(`variants.attributes.number:4`)).toBeTruthy()
-    expect(match(`variants.attributes.number:3,4`)).toBeTruthy()
-    expect(match(`variants.attributes.number:3,4,5`)).toBeTruthy()
-    expect(match(`variants.attributes.number:1,2,3,5`)).toBeFalsy()
+    expect(match(`variants.attributes.number:4`).isMatch).toBeTruthy()
+    expect(match(`variants.attributes.number:3,4`).isMatch).toBeTruthy()
+    expect(match(`variants.attributes.number:3,4,5`).isMatch).toBeTruthy()
+    expect(match(`variants.attributes.number:1,2,3,5`).isMatch).toBeFalsy()
   })
 
   test('by attribute range', async () => {
-    expect(match(`variants.attributes.number:range (0 TO 5)`)).toBeTruthy()
+    expect(
+      match(`variants.attributes.number:range (0 TO 5)`).isMatch
+    ).toBeTruthy()
   })
 
   test('by attribute enum key', async () => {
-    expect(match(`variants.attributes.Country.key:"NL"`)).toBeTruthy()
-    expect(match(`variants.attributes.Country.key:"DE"`)).toBeFalsy()
+    expect(match(`variants.attributes.Country.key:"NL"`).isMatch).toBeTruthy()
+    expect(match(`variants.attributes.Country.key:"DE"`).isMatch).toBeFalsy()
   })
 
   test('by attribute enum key', async () => {
-    expect(match(`variants.attributes.Country.key:"NL"`)).toBeTruthy()
-    expect(match(`variants.attributes.Country.key:"DE"`)).toBeFalsy()
+    expect(match(`variants.attributes.Country.key:"NL"`).isMatch).toBeTruthy()
+    expect(match(`variants.attributes.Country.key:"DE"`).isMatch).toBeFalsy()
+  })
+
+  test('by price range', async () => {
+    expect(
+      match(`variants.price.centAmount:range (1500 TO 2000)`).isMatch
+    ).toBeTruthy()
+  })
+
+  test('by scopedPrice range', async () => {
+    let result
+
+    // No currency given
+    result = match(`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`)
+    expect(result.isMatch).toBeFalsy()
+
+    // Currency match
+    result = match(
+      `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+      {
+        currency: 'EUR',
+      }
+    )
+    expect(result.isMatch).toBeTruthy()
+    expect(result.product).toMatchObject({
+      masterData: {
+        current: {
+          masterVariant: {
+            sku: 'MYSKU',
+            scopedPrice: { value: { centAmount: 1789 } },
+          },
+        },
+      },
+    })
+
+    // Currency mismatch
+    result = match(
+      `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+      {
+        currency: 'USD',
+      }
+    )
+    expect(result.isMatch).toBeFalsy()
+
+    // Price has no country so mismatch
+    result = match(
+      `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+      {
+        currency: 'EUR',
+        country: 'NL',
+      }
+    )
+    expect(result.isMatch).toBeFalsy()
   })
 })

@@ -2,20 +2,41 @@
  * This module implements the commercetools product projection filter expression.
  */
 
-import { Product } from '@commercetools/platform-sdk'
+import { Product, ProductVariant } from '@commercetools/platform-sdk'
 import perplex from 'perplex'
-import Parser, { ITokenPosition } from 'pratt'
+import Parser from 'pratt'
+import { Writable } from '../types'
+import { PriceSelector, priceSelectorFilter } from '../helpers'
 
 type MatchFunc = (target: any) => boolean
 
-type ProductFilter = (p: Product, markMatchingVariant: Boolean) => boolean
+type ProductFilter = (
+  p: Writable<Product>,
+  markMatchingVariant: boolean
+) => boolean
 
-export const parseFilterExpression = (filter: string, staged: boolean): ProductFilter => {
+/**
+ * Returns a function (ProductFilter).
+ * NOTE: The filter can alter the resources in-place (FIXME)
+ */
+export const parseFilterExpression = (
+  filter: string,
+  staged: boolean,
+  priceSelector: PriceSelector
+): ProductFilter => {
   const [source, expression] = filter.split(':', 2)
 
   const exprFunc = generateMatchFunc(filter)
   if (source.startsWith('variants.attributes')) {
     return filterAttribute(source, staged, exprFunc)
+  }
+
+  if (source.startsWith('variants.price')) {
+    return filterPrice(source, staged, exprFunc)
+  }
+
+  if (source.startsWith('variants.scopedPrice')) {
+    return filterScopedPrice(source, staged, priceSelector, exprFunc)
   }
 
   if (source.startsWith('variants.sku') || source.startsWith('variants.key')) {
@@ -24,7 +45,6 @@ export const parseFilterExpression = (filter: string, staged: boolean): ProductF
 
   return (product: Product) => false
 }
-
 
 const getLexer = (value: string) => {
   return new perplex(value)
@@ -121,7 +141,6 @@ const generateMatchFunc = (filter: string): MatchFunc => {
   return result
 }
 
-
 const resolveValue = (obj: any, path: string): any => {
   if (path === undefined) {
     return obj
@@ -136,15 +155,15 @@ const resolveValue = (obj: any, path: string): any => {
   return val
 }
 
-const filterVariant = (source: string, staged: boolean, exprFunc: MatchFunc): ProductFilter => {
-  return (p: Product, markMatchingVariant: Boolean): boolean => {
+const filterVariant = (
+  source: string,
+  staged: boolean,
+  exprFunc: MatchFunc
+): ProductFilter => {
+  return (p: Product, markMatchingVariant: boolean): boolean => {
     const [, path] = source.split('.', 2)
 
-    const variants = [
-      p.masterData.current.masterVariant,
-      ...p.masterData.current.variants,
-    ]
-
+    const variants = getVariants(p, staged)
     for (const variant of variants) {
       const value = resolveValue(variant, path)
 
@@ -162,14 +181,15 @@ const filterVariant = (source: string, staged: boolean, exprFunc: MatchFunc): Pr
   }
 }
 
-const filterAttribute = (source: string, staged: boolean, exprFunc: MatchFunc): ProductFilter => {
-  return (p: Product, markMatchingVariant: Boolean): boolean => {
+const filterAttribute = (
+  source: string,
+  staged: boolean,
+  exprFunc: MatchFunc
+): ProductFilter => {
+  return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
     const [, , attrName, path] = source.split('.', 4)
-    const variants = [
-      staged ? p.masterData.staged.masterVariant : p.masterData.current.masterVariant,
-      ...(staged ? p.masterData.staged.variants : p.masterData.current.variants),
-    ]
 
+    const variants = getVariants(p, staged)
     for (const variant of variants) {
       if (!variant.attributes) {
         continue
@@ -193,4 +213,86 @@ const filterAttribute = (source: string, staged: boolean, exprFunc: MatchFunc): 
     }
     return false
   }
+}
+
+const filterPrice = (
+  source: string,
+  staged: boolean,
+  exprFunc: MatchFunc
+): ProductFilter => {
+  return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
+    const variants = getVariants(p, staged)
+    for (const variant of variants) {
+      if (!variant.prices) continue
+
+      // According to the commercetools docs:
+      // Please note, that only the first price would be used for filtering if a
+      // product variant has several EmbeddedPrices
+      const price = variant.prices[0]
+      if (exprFunc(price.value.centAmount)) {
+        if (markMatchingVariant) {
+          // @ts-ignore
+          variant.isMatchingVariant = true
+        }
+        return true
+      }
+      return false
+    }
+
+    return false
+  }
+}
+
+const filterScopedPrice = (
+  source: string,
+  staged: boolean,
+  priceSelector: PriceSelector,
+  exprFunc: MatchFunc
+): ProductFilter => {
+  return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
+    if (source !== 'variants.scopedPrice.value.centAmount') {
+      throw new Error(
+        'Only scopedPrice.value.centAmount is currently supported in the mock'
+      )
+    }
+
+    const variants = getVariants(p, staged) as Writable<ProductVariant>[]
+    for (const variant of variants) {
+      // Filter prices
+      const prices = variant.prices?.filter(p =>
+        priceSelectorFilter(p, priceSelector)
+      )
+      if (!prices) continue
+
+      // According to the commercetools docs:
+      // Please note, that only the first price would be used for filtering if a
+      // product variant has several EmbeddedPrices
+      for (const price of prices) {
+        if (exprFunc(price.value.centAmount)) {
+          variant.scopedPrice = {
+            ...price,
+            currentValue: price.value,
+          }
+
+          if (markMatchingVariant) {
+            // @ts-ignore
+            variant.isMatchingVariant = true
+          }
+          return true
+        }
+      }
+      return false
+    }
+
+    return false
+  }
+}
+
+const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
+  return [
+    staged
+      ? p.masterData.staged.masterVariant
+      : p.masterData.current.masterVariant,
+    ...(staged ? p.masterData.staged.variants : p.masterData.current.variants),
+  ]
 }
