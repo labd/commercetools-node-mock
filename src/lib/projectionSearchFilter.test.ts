@@ -1,9 +1,5 @@
-import {
-  Product,
-  ProductData,
-  ProductProjection,
-} from '@commercetools/platform-sdk'
-import { PriceSelector } from 'helpers'
+import { Product, ProductData } from '@commercetools/platform-sdk'
+import { applyPriceSelector } from '../priceSelector'
 import { parseFilterExpression } from './projectionSearchFilter'
 
 describe('Search filter', () => {
@@ -68,10 +64,9 @@ describe('Search filter', () => {
     },
   }
 
-  const match = (pattern: string, priceSelector?: PriceSelector) => {
-    if (!priceSelector) priceSelector = {}
-    const matchFunc = parseFilterExpression(pattern, false, priceSelector)
-    const clone = JSON.parse(JSON.stringify(exampleProduct))
+  const match = (pattern: string, product?: Product) => {
+    const matchFunc = parseFilterExpression(pattern, false)
+    const clone = JSON.parse(JSON.stringify(product ?? exampleProduct))
     return {
       isMatch: matchFunc(clone, false),
       product: clone,
@@ -115,17 +110,19 @@ describe('Search filter', () => {
 
   test('by scopedPrice range', async () => {
     let result
+    let products: Product[]
 
     // No currency given
     result = match(`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`)
     expect(result.isMatch).toBeFalsy()
 
     // Currency match
+    products = [JSON.parse(JSON.stringify(exampleProduct))]
+    applyPriceSelector(products, { currency: 'EUR' })
+
     result = match(
       `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
-      {
-        currency: 'EUR',
-      }
+      products[0]
     )
     expect(result.isMatch).toBeTruthy()
     expect(result.product).toMatchObject({
@@ -140,21 +137,21 @@ describe('Search filter', () => {
     })
 
     // Currency mismatch
+    products = [JSON.parse(JSON.stringify(exampleProduct))]
+    applyPriceSelector(products, { currency: 'USD' })
+
     result = match(
       `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
-      {
-        currency: 'USD',
-      }
+      products[0]
     )
     expect(result.isMatch).toBeFalsy()
 
     // Price has no country so mismatch
+    products = [JSON.parse(JSON.stringify(exampleProduct))]
+    applyPriceSelector(products, { currency: 'EUR', country: 'NL' })
     result = match(
       `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
-      {
-        currency: 'EUR',
-        country: 'NL',
-      }
+      products[0]
     )
     expect(result.isMatch).toBeFalsy()
   })

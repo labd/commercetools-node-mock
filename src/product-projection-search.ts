@@ -5,10 +5,10 @@ import {
   ProductProjection,
   QueryParam,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from 'exceptions'
-import { PriceSelector } from 'helpers'
-import { parseFilterExpression } from 'lib/projectionSearchFilter'
-import { AbstractStorage } from 'storage'
+import { CommercetoolsError } from './exceptions'
+import { parseFilterExpression } from './lib/projectionSearchFilter'
+import { applyPriceSelector } from './priceSelector'
+import { AbstractStorage } from './storage'
 
 export type ProductProjectionSearchParams = {
   fuzzy?: boolean
@@ -44,22 +44,27 @@ export class ProductProjectionSearch {
     projectKey: string,
     params: ProductProjectionSearchParams
   ): ProductProjectionPagedSearchResponse {
-    let resources = this._storage.all(projectKey, 'product')
-    let markMatchingVariant = params.markMatchingVariants ?? false
-    this.validateParams(params)
+    // Get a copy of all the products in the storage engine. We need a copy
+    // since we will be modifying the data.
+    let resources = this._storage
+      .all(projectKey, 'product')
+      .map(r => JSON.parse(JSON.stringify(r)))
 
-    const priceSelector: PriceSelector = {
+    let markMatchingVariant = params.markMatchingVariants ?? false
+
+    // Apply the priceSelector
+    applyPriceSelector(resources, {
       country: params.priceCountry,
       channel: params.priceChannel,
       customerGroup: params.priceCustomerGroup,
       currency: params.priceCurrency,
-    }
+    })
 
     // Apply filters pre facetting
     if (params.filter) {
       try {
         const filters = params.filter.map(f =>
-          parseFilterExpression(f, params.staged ?? false, priceSelector)
+          parseFilterExpression(f, params.staged ?? false)
         )
 
         // Filters can modify the output. So clone the resources first.
@@ -78,7 +83,6 @@ export class ProductProjectionSearch {
         )
       }
     }
-    console.log(resources)
 
     // TODO: Calculate facets
 
@@ -86,7 +90,7 @@ export class ProductProjectionSearch {
     if (params['filter.query']) {
       try {
         const filters = params['filter.query'].map(f =>
-          parseFilterExpression(f, params.staged ?? false, priceSelector)
+          parseFilterExpression(f, params.staged ?? false)
         )
         resources = resources
           .map(r => JSON.parse(JSON.stringify(r)))
@@ -126,23 +130,6 @@ export class ProductProjectionSearch {
       limit: limit,
       results: resources.map(this.transform),
       facets: {},
-    }
-  }
-
-  validateParams(params: ProductProjectionSearchParams) {
-    if (
-      !params.priceCurrency &&
-      !(params.priceCountry || params.priceChannel || params.priceCustomerGroup)
-    ) {
-      throw new CommercetoolsError<InvalidInputError>(
-        {
-          code: 'InvalidInput',
-          message:
-            'The price selecting parameters country, channel and customerGroup ' +
-            'cannot be used without the currency.',
-        },
-        400
-      )
     }
   }
 
