@@ -6,7 +6,6 @@ import { Product, ProductVariant } from '@commercetools/platform-sdk'
 import perplex from 'perplex'
 import Parser from 'pratt'
 import { Writable } from '../types'
-import { PriceSelector, priceSelectorFilter } from '../helpers'
 
 type MatchFunc = (target: any) => boolean
 
@@ -21,8 +20,7 @@ type ProductFilter = (
  */
 export const parseFilterExpression = (
   filter: string,
-  staged: boolean,
-  priceSelector: PriceSelector
+  staged: boolean
 ): ProductFilter => {
   const [source, expression] = filter.split(':', 2)
 
@@ -36,7 +34,7 @@ export const parseFilterExpression = (
   }
 
   if (source.startsWith('variants.scopedPrice')) {
-    return filterScopedPrice(source, staged, priceSelector, exprFunc)
+    return filterScopedPrice(source, staged, exprFunc)
   }
 
   if (source.startsWith('variants.sku') || source.startsWith('variants.key')) {
@@ -246,7 +244,6 @@ const filterPrice = (
 const filterScopedPrice = (
   source: string,
   staged: boolean,
-  priceSelector: PriceSelector,
   exprFunc: MatchFunc
 ): ProductFilter => {
   return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
@@ -258,32 +255,15 @@ const filterScopedPrice = (
 
     const variants = getVariants(p, staged) as Writable<ProductVariant>[]
     for (const variant of variants) {
-      // Filter prices
-      const prices = variant.prices?.filter(p =>
-        priceSelectorFilter(p, priceSelector)
-      )
-      if (!prices) continue
-
-      // According to the commercetools docs:
-      // Please note, that only the first price would be used for filtering if a
-      // product variant has several EmbeddedPrices
-      for (const price of prices) {
-        if (exprFunc(price.value.centAmount)) {
-          variant.scopedPrice = {
-            ...price,
-            currentValue: price.value,
-          }
-
-          if (markMatchingVariant) {
-            // @ts-ignore
-            variant.isMatchingVariant = true
-          }
-          return true
+      if (exprFunc(variant.scopedPrice?.value.centAmount)) {
+        if (markMatchingVariant) {
+          // @ts-ignore
+          variant.isMatchingVariant = true
         }
+        return true
       }
       return false
     }
-
     return false
   }
 }
@@ -291,8 +271,8 @@ const filterScopedPrice = (
 const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
   return [
     staged
-      ? p.masterData.staged.masterVariant
-      : p.masterData.current.masterVariant,
-    ...(staged ? p.masterData.staged.variants : p.masterData.current.variants),
+      ? p.masterData.staged?.masterVariant
+      : p.masterData.current?.masterVariant,
+    ...(staged ? p.masterData.staged?.variants : p.masterData.current?.variants),
   ]
 }

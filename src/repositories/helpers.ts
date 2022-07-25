@@ -17,10 +17,10 @@ import {
   Type,
   TypedMoney,
 } from '@commercetools/platform-sdk'
+import { Request } from 'express'
 import { AbstractStorage } from '../storage'
 import { RepositoryContext } from './abstract'
-import { Request } from 'express'
-import { CommercetoolsError } from 'exceptions'
+import { CommercetoolsError } from '../exceptions'
 
 export const createAddress = (
   base: BaseAddress | undefined,
