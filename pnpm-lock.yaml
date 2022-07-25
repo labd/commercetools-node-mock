@@ -34,6 +34,7 @@ specifiers:
   perplex: ^0.11.0
   pratt: ^0.7.0
   supertest: ^6.1.6
+  timekeeper: ^2.2.0
   ts-node: ^10.4.0
   tsc: ^2.0.4
   tslib: ^2.3.1
@@ -78,6 +79,7 @@ devDependencies:
   husky: 7.0.4
   jest: 28.1.3_pq4lb27wczlmkje7q43vo4whau
   nodemon: 2.0.19
+  timekeeper: 2.2.0
   ts-node: 10.9.1_f6w67sjx3imwytyzb2qhabnzqe
   tsc: 2.0.4
   tslib: 2.4.0
@@ -5290,6 +5292,10 @@ packages:
     resolution: {integrity: sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==}
     dependencies:
       any-promise: 1.3.0
+    dev: true
+
+  /timekeeper/2.2.0:
+    resolution: {integrity: sha512-W3AmPTJWZkRwu+iSNxPIsLZ2ByADsOLbbLxe46UJyWj3mlYLlwucKiq+/dPm0l9wTzqoF3/2PH0AGFCebjq23A==}
     dev: true
 
   /tmpl/1.0.5:
