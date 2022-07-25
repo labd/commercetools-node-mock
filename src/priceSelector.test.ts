@@ -93,5 +93,4 @@ describe('priceSelector', () => {
     expect(product.masterData.current.masterVariant.scopedPrice).toBeUndefined()
     expect(product.masterData.staged.masterVariant.scopedPrice).toBeUndefined()
   })
-
 })

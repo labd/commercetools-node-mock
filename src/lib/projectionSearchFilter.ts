@@ -273,6 +273,8 @@ const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
     staged
       ? p.masterData.staged?.masterVariant
       : p.masterData.current?.masterVariant,
-    ...(staged ? p.masterData.staged?.variants : p.masterData.current?.variants),
+    ...(staged
+      ? p.masterData.staged?.variants
+      : p.masterData.current?.variants),
   ]
 }
