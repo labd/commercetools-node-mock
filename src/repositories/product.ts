@@ -229,17 +229,14 @@ const variantFromDraft = (
   }
 }
 
-
-const priceFromDraft = (
-  draft: PriceDraft
-): Price => {
+const priceFromDraft = (draft: PriceDraft): Price => {
   return {
-    id:  uuidv4(),
+    id: uuidv4(),
     value: {
       currencyCode: draft.value.currencyCode,
       centAmount: draft.value.centAmount,
       fractionDigits: 2,
       type: 'centPrecision',
-    }
+    },
   }
 }
