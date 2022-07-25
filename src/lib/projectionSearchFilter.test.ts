@@ -101,6 +101,14 @@ describe('Search filter', () => {
     expect(
       match(`variants.attributes.number:range (0 TO 5)`).isMatch
     ).toBeTruthy()
+
+    expect(
+      match(`variants.attributes.number:range (* TO 5)`).isMatch
+    ).toBeTruthy()
+
+    expect(
+      match(`variants.attributes.number:range (* TO *)`).isMatch
+    ).toBeTruthy()
   })
 
   test('by attribute enum key', async () => {
