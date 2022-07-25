@@ -69,7 +69,6 @@ export class ProductProjectionSearch {
 
         // Filters can modify the output. So clone the resources first.
         resources = resources
-          .map(r => JSON.parse(JSON.stringify(r)))
           .filter(resource =>
             filters.every(f => f(resource, markMatchingVariant))
           )
@@ -93,7 +92,6 @@ export class ProductProjectionSearch {
           parseFilterExpression(f, params.staged ?? false)
         )
         resources = resources
-          .map(r => JSON.parse(JSON.stringify(r)))
           .filter(resource =>
             filters.every(f => f(resource, markMatchingVariant))
           )

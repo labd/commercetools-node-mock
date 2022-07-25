@@ -52,6 +52,7 @@ describe('Search filter', () => {
     version: 2,
     createdAt: '2022-07-22T10:02:40.851Z',
     lastModifiedAt: '2022-07-22T10:02:44.427Z',
+    key: 'test-product',
     productType: {
       typeId: 'product-type',
       id: 'b9b4b426-938b-4ccb-9f36-c6f933e8446e',
@@ -72,6 +73,16 @@ describe('Search filter', () => {
       product: clone,
     }
   }
+
+  test('by product key', async () => {
+    expect(match(`key:exists`).isMatch).toBeTruthy()
+    expect(match(`key:missing`).isMatch).toBeFalsy()
+    expect(match(`key:"test-product"`).isMatch).toBeTruthy()
+  })
+
+  test('by product type id', async () => {
+    expect(match(`productType.id:"b9b4b426-938b-4ccb-9f36-c6f933e8446e"`).isMatch).toBeTruthy()
+  })
 
   test('by SKU', async () => {
     expect(match(`variants.sku:exists`).isMatch).toBeTruthy()
