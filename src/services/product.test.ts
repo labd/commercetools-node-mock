@@ -18,6 +18,7 @@ describe('Product', () => {
       slug: {
         'nl-NL': 'test-product',
       },
+      masterVariant: {},
     }
 
     const response = await supertest(ctMock.app)
@@ -37,9 +38,20 @@ describe('Product', () => {
             'nl-NL': 'test-product',
           },
           categories: [],
+          masterVariant: {
+            assets: [],
+            attributes: [],
+            id: 1,
+            images: [],
+          },
+          variants: [],
         },
         hasStagedChanges: true,
         published: false,
+      },
+      productType: {
+        typeId: 'product-type',
+        id: 'some-uuid',
       },
       version: 1,
     })
