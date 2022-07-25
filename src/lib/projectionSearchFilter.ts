@@ -11,7 +11,7 @@ type MatchFunc = (target: any) => boolean
 
 type ProductFilter = (
   p: Writable<Product>,
-  markMatchingVariant: boolean
+  markMatchingVariants: boolean
 ) => boolean
 
 /**
@@ -22,13 +22,12 @@ export const parseFilterExpression = (
   filter: string,
   staged: boolean
 ): ProductFilter => {
-  const [source, expression] = filter.split(':', 2)
-
   const exprFunc = generateMatchFunc(filter)
+  const [source] = filter.split(':', 1)
+
   if (source.startsWith('variants.')) {
     return filterVariants(source, staged, exprFunc)
   }
-
   return filterProduct(source, exprFunc)
 }
 
@@ -153,7 +152,7 @@ const filterProduct = (
   source: string,
   exprFunc: MatchFunc
 ): ProductFilter => {
-  return (p: Product, markMatchingVariant: boolean): boolean => {
+  return (p: Product, markMatchingVariants: boolean): boolean => {
     const value = nestedLookup(p, source)
     return exprFunc(value)
   }
@@ -164,22 +163,26 @@ const filterVariants = (
   staged: boolean,
   exprFunc: MatchFunc
 ): ProductFilter => {
-  return (p: Product, markMatchingVariant: boolean): boolean => {
+  return (p: Product, markMatchingVariants: boolean): boolean => {
     const [, ...paths] = source.split('.')
     const path = paths.join('.')
 
-    const variants = getVariants(p, staged)
+    const variants = getVariants(p, staged) as Writable<ProductVariant>[]
     for (const variant of variants) {
       const value = resolveVariantValue(variant, path)
 
       if (exprFunc(value)) {
-        if (markMatchingVariant) {
-          // @ts-ignore
+
+        // If markMatchingVariants parameter is true those ProductVariants that
+        // match the search query have the additional field isMatchingVariant
+        // set to true. For the other variants in the same product projection
+        // this field is set to false.
+        if (markMatchingVariants) {
+          variants.forEach(v => v.isMatchingVariant = false)
           variant.isMatchingVariant = true
         }
         return true
       }
-      return false
     }
 
     return false
