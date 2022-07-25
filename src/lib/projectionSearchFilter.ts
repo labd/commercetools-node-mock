@@ -46,6 +46,7 @@ const getLexer = (value: string) => {
     .token('STRING', /'((?:\\.|[^'\\])*)'/)
 
     .token('COMMA', ',')
+    .token('STAR', '*')
     .token('(', '(')
     .token(':', ':')
     .token(')', ')')
@@ -85,6 +86,9 @@ const generateMatchFunc = (filter: string): MatchFunc => {
       // @ts-ignore
       return parseInt(t.token.match, 10)
     })
+    .nud('STAR', 5, t => {
+      return null
+    })
     .nud('EXISTS', 10, ({ bp }) => {
       return (val: any) => {
         return val !== undefined
@@ -111,8 +115,26 @@ const generateMatchFunc = (filter: string): MatchFunc => {
     .nud('RANGE', 20, ({ bp }) => {
       lexer.next() // Skip over opening parthensis
       const [start, stop] = parser.parse()
-      return (obj: any) => {
-        return obj >= start && obj <= stop
+      console.log(start, stop)
+      if (start !== null && stop !== null ) {
+        return (obj: any): boolean => {
+          return obj >= start && obj <= stop
+        }
+      }
+      else if (start === null && stop !== null) {
+        return (obj: any): boolean => {
+          return obj <= stop
+        }
+      }
+      else if (start !== null && stop === null) {
+        return (obj: any): boolean => {
+          return obj >= start
+        }
+      } else {
+        return (obj: any): boolean => {
+          return true
+        }
+
       }
     })
     .build()
