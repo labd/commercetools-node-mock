@@ -25,23 +25,11 @@ export const parseFilterExpression = (
   const [source, expression] = filter.split(':', 2)
 
   const exprFunc = generateMatchFunc(filter)
-  if (source.startsWith('variants.attributes')) {
-    return filterAttribute(source, staged, exprFunc)
+  if (source.startsWith('variants.')) {
+    return filterVariants(source, staged, exprFunc)
   }
 
-  if (source.startsWith('variants.price')) {
-    return filterPrice(source, staged, exprFunc)
-  }
-
-  if (source.startsWith('variants.scopedPrice')) {
-    return filterScopedPrice(source, staged, exprFunc)
-  }
-
-  if (source.startsWith('variants.sku') || source.startsWith('variants.key')) {
-    return filterVariant(source, staged, exprFunc)
-  }
-
-  return (product: Product) => false
+  return filterProduct(source, exprFunc)
 }
 
 const getLexer = (value: string) => {
@@ -139,31 +127,28 @@ const generateMatchFunc = (filter: string): MatchFunc => {
   return result
 }
 
-const resolveValue = (obj: any, path: string): any => {
-  if (path === undefined) {
-    return obj
+const filterProduct = (
+  source: string,
+  exprFunc: MatchFunc
+): ProductFilter => {
+  return (p: Product, markMatchingVariant: boolean): boolean => {
+    const value = nestedLookup(p, source)
+    return exprFunc(value)
   }
-  const parts = path.split('.')
-  let val = obj
-
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i]
-    val = val[part]
-  }
-  return val
 }
 
-const filterVariant = (
+const filterVariants = (
   source: string,
   staged: boolean,
   exprFunc: MatchFunc
 ): ProductFilter => {
   return (p: Product, markMatchingVariant: boolean): boolean => {
-    const [, path] = source.split('.', 2)
+    const [, ...paths] = source.split('.')
+    const path = paths.join('.')
 
     const variants = getVariants(p, staged)
     for (const variant of variants) {
-      const value = resolveValue(variant, path)
+      const value = resolveVariantValue(variant, path)
 
       if (exprFunc(value)) {
         if (markMatchingVariant) {
@@ -179,93 +164,51 @@ const filterVariant = (
   }
 }
 
-const filterAttribute = (
-  source: string,
-  staged: boolean,
-  exprFunc: MatchFunc
-): ProductFilter => {
-  return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
-    const [, , attrName, path] = source.split('.', 4)
+const resolveVariantValue = (obj: ProductVariant, path: string): any => {
+  if (path === undefined) {
+    return obj
+  }
 
-    const variants = getVariants(p, staged)
-    for (const variant of variants) {
-      if (!variant.attributes) {
-        continue
-      }
+  if (path.startsWith('attributes.')) {
+    const [, attrName, ...rest] = path.split('.')
+    if (!obj.attributes) {
+      return undefined
+    }
 
-      for (const attr of variant.attributes) {
-        if (attr.name !== attrName) {
-          continue
-        }
-
-        const value = resolveValue(attr.value, path)
-        if (exprFunc(value)) {
-          if (markMatchingVariant) {
-            // @ts-ignore
-            variant.isMatchingVariant = true
-          }
-          return true
-        }
-        return false
+    for (const attr of obj.attributes) {
+      if (attr.name === attrName) {
+        return nestedLookup(attr.value, rest.join('.'))
       }
     }
-    return false
   }
+
+  if (path === 'price.centAmount') {
+    return obj.prices && obj.prices.length > 0
+      ? obj.prices[0].value.centAmount
+      : undefined
+  }
+
+  return nestedLookup(obj, path)
 }
 
-const filterPrice = (
-  source: string,
-  staged: boolean,
-  exprFunc: MatchFunc
-): ProductFilter => {
-  return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
-    const variants = getVariants(p, staged)
-    for (const variant of variants) {
-      if (!variant.prices) continue
-
-      // According to the commercetools docs:
-      // Please note, that only the first price would be used for filtering if a
-      // product variant has several EmbeddedPrices
-      const price = variant.prices[0]
-      if (exprFunc(price.value.centAmount)) {
-        if (markMatchingVariant) {
-          // @ts-ignore
-          variant.isMatchingVariant = true
-        }
-        return true
-      }
-      return false
-    }
-
-    return false
+const nestedLookup = (obj: any, path: string): any => {
+  if (!path || path === '') {
+    return obj
   }
-}
 
-const filterScopedPrice = (
-  source: string,
-  staged: boolean,
-  exprFunc: MatchFunc
-): ProductFilter => {
-  return (p: Writable<Product>, markMatchingVariant: boolean): boolean => {
-    if (source !== 'variants.scopedPrice.value.centAmount') {
-      throw new Error(
-        'Only scopedPrice.value.centAmount is currently supported in the mock'
-      )
+  const parts = path.split('.')
+  let val = obj
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i]
+    if (val == undefined) {
+      return undefined
     }
 
-    const variants = getVariants(p, staged) as Writable<ProductVariant>[]
-    for (const variant of variants) {
-      if (exprFunc(variant.scopedPrice?.value.centAmount)) {
-        if (markMatchingVariant) {
-          // @ts-ignore
-          variant.isMatchingVariant = true
-        }
-        return true
-      }
-      return false
-    }
-    return false
+    val = val[part]
   }
+
+  return val
 }
 
 const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
