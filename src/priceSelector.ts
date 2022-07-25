@@ -35,9 +35,8 @@ export const applyPriceSelector = (
     ].filter(x => x != undefined)
 
     for (const variant of variants) {
-      const scopedPrices = variant.prices?.filter(p =>
-        priceSelectorFilter(p, selector)
-      ) ?? []
+      const scopedPrices =
+        variant.prices?.filter(p => priceSelectorFilter(p, selector)) ?? []
 
       if (scopedPrices.length > 0) {
         const price = scopedPrices[0]

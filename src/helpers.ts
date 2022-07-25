@@ -2,8 +2,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { ParsedQs } from 'qs'
 import { Price } from '@commercetools/platform-sdk'
 
-
-
 export const getBaseResourceProperties = () => {
   return {
     id: uuidv4(),
