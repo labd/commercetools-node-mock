@@ -49,10 +49,10 @@ beforeEach(async () => {
         ],
         attributes: [
           {
-            name: "number",
-            value: "1" as any,
-          }
-        ]
+            name: 'number',
+            value: '1' as any,
+          },
+        ],
       },
       name: {
         'nl-NL': 'test product',
@@ -216,7 +216,7 @@ describe('Product Projection Search - Filters', () => {
     const result: ProductProjectionPagedSearchResponse = response.body
     expect(result).toMatchObject({
       count: 0,
-      results: []
+      results: [],
     })
   })
 })
