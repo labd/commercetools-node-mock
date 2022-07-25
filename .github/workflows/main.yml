@@ -14,11 +14,15 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install deps and build (with cache)
-        uses: bahmutov/npm-install@v1
+      - uses: pnpm/action-setup@v2.2.2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: true
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
   build:
     name: Build, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
@@ -38,14 +42,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install deps and build (with cache)
-        uses: bahmutov/npm-install@v1
+      - uses: pnpm/action-setup@v2.2.2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: true
 
       - name: Test
-        run: yarn test --ci --coverage --maxWorkers=2
+        run: pnpm run test --ci --coverage --maxWorkers=2
 
       - name: Build
-        run: yarn build
+        run: pnpm build
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

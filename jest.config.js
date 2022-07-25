@@ -1,6 +1,6 @@
 module.exports = {
   // coverageReporters: ['text', 'cobertura', 'lcov'],
-  moduleDirectories: ['./node_modules', './'],
+  moduleDirectories: ['./node_modules', __dirname],
   moduleFileExtensions: ['ts', 'tsx', 'js'],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
