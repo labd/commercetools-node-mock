@@ -1,5 +1,4 @@
 import {
-  InvalidJsonInputError,
   Price,
   PriceDraft,
   Product,
@@ -9,7 +8,6 @@ import {
   ProductSetAttributeAction,
   ProductType,
   ProductTypeReference,
-  ProductTypeResourceIdentifier,
   ProductVariant,
   ProductVariantDraft,
   ReferenceTypeId,
@@ -18,7 +16,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from '../types'
-import { CommercetoolsError } from 'exceptions'
 import { getReferenceFromResourceIdentifier } from './helpers'
 
 export class ProductRepository extends AbstractResourceRepository {
@@ -31,9 +28,23 @@ export class ProductRepository extends AbstractResourceRepository {
       throw new Error('Missing master variant')
     }
 
-    const productType = getReferenceFromResourceIdentifier<
-      ProductTypeReference
-    >(draft.productType, context.projectKey, this._storage)
+    let productType: ProductTypeReference | undefined = undefined
+    try {
+      productType = getReferenceFromResourceIdentifier<ProductTypeReference>(
+        draft.productType,
+        context.projectKey,
+        this._storage
+      )
+    } catch (err) {
+      // For now accept missing product types (but warn)
+      console.warn(
+        `Error resolving product-type '${draft.productType.id}'. This will be throw an error in later releases.`
+      )
+      productType = {
+        typeId: 'product-type',
+        id: draft.productType.id || '',
+      }
+    }
 
     const productData: ProductData = {
       name: draft.name,
