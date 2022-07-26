@@ -50,10 +50,29 @@ beforeEach(async () => {
         attributes: [
           {
             name: 'number',
-            value: '1' as any,
+            value: 4 as any,
           },
         ],
       },
+      variants: [
+        {
+          sku: 'my-other-sku',
+          prices: [
+            {
+              value: {
+                currencyCode: 'EUR',
+                centAmount: 91789,
+              },
+            },
+          ],
+          attributes: [
+            {
+              name: 'number',
+              value: 50 as any,
+            },
+          ],
+        },
+      ],
       name: {
         'nl-NL': 'test product',
       },
@@ -96,7 +115,26 @@ beforeEach(async () => {
         images: [],
         attributes: productDraft.masterVariant?.attributes,
       },
-      variants: [],
+      variants: [
+        {
+          id: 2,
+          sku: 'my-other-sku',
+          prices: [
+            {
+              id: product.masterData.current.variants[0].prices[0].id,
+              value: {
+                type: 'centPrecision',
+                currencyCode: 'EUR',
+                centAmount: 91789,
+                fractionDigits: 2,
+              },
+            },
+          ],
+          assets: [],
+          images: [],
+          attributes: productDraft.variants![0].attributes,
+        },
+      ],
       name: productDraft.name,
       slug: productDraft.slug,
       categories: [],
@@ -210,13 +248,51 @@ describe('Product Projection Search - Filters', () => {
     const response = await supertest(ctMock.app)
       .get('/dummy/product-projections/search')
       .query({
-        filter: ['variants.attributes.number:range(2 TO 10)'],
+        filter: ['variants.attributes.number:range(5 TO 10)'],
       })
 
     const result: ProductProjectionPagedSearchResponse = response.body
     expect(result).toMatchObject({
       count: 0,
       results: [],
+    })
+  })
+})
+
+describe('Product Projection Search - Facets', () => {
+  test('variants.attributes.number', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        facet: ['variants.attributes.number'],
+      })
+
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
+      count: 1,
+      facets: {
+        'variants.attributes.number': {
+          type: 'terms',
+          dataType: 'text',
+          missing: 0,
+          total: 2,
+          terms: [
+            {
+              term: '4.0',
+              count: 1,
+            },
+            {
+              term: '50.0',
+              count: 1,
+            },
+          ],
+        },
+      },
+      results: [
+        {
+          masterVariant: { sku: 'my-sku' },
+        },
+      ],
     })
   })
 })

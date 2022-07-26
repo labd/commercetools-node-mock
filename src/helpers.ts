@@ -11,6 +11,30 @@ export const getBaseResourceProperties = () => {
   }
 }
 
+/**
+ * Do a nested lookup by using a path. For example `foo.bar.value` will
+ * return obj['foo']['bar']['value']
+ */
+export const nestedLookup = (obj: any, path: string): any => {
+  if (!path || path === '') {
+    return obj
+  }
+
+  const parts = path.split('.')
+  let val = obj
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i]
+    if (val == undefined) {
+      return undefined
+    }
+
+    val = val[part]
+  }
+
+  return val
+}
+
 export const QueryParamsAsArray = (
   input: string | ParsedQs | string[] | ParsedQs[] | undefined
 ): string[] => {
