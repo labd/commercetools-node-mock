@@ -211,7 +211,7 @@ export class ProductProjectionSearch {
             result.missing++
           } else {
             if (typeof value === 'number') {
-              value = Number(4).toFixed(1)
+              value = Number(value).toFixed(1)
             }
             terms[value] = value in terms ? terms[value] + 1 : 1
           }
