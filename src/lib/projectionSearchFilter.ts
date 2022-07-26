@@ -118,32 +118,49 @@ const generateMatchFunc = (filter: string): MatchFunc => {
         return [left, expr]
       }
     })
+    .nud('(', 100, t => {
+      const expr: any = parser.parse({ terminals: [')'] })
+      lexer.expect(')')
+      return expr
+    })
     .bp(')', 0)
     .led('TO', 20, ({ left, bp }) => {
       const expr: any = parser.parse({ terminals: [bp - 1] })
-      return [left, expr]
+      return {
+        start: left,
+        stop: expr,
+      }
     })
     .nud('RANGE', 20, ({ bp }) => {
-      lexer.expect('(')
-      const [start, stop] = parser.parse()
-      lexer.expect(')')
-      if (start !== null && stop !== null) {
-        return (obj: any): boolean => {
-          return obj >= start && obj <= stop
-        }
-      } else if (start === null && stop !== null) {
-        return (obj: any): boolean => {
-          return obj <= stop
-        }
-      } else if (start !== null && stop === null) {
-        return (obj: any): boolean => {
-          return obj >= start
-        }
-      } else {
-        return (obj: any): boolean => {
-          return true
-        }
+      let ranges: any = parser.parse()
+
+      // If multiple ranges are defined we receive an array of ranges. So let's
+      // make sure we always have an array
+      if (!Array.isArray(ranges)) {
+        ranges = [ranges]
       }
+
+      // Return a list of functions which matches the ranges. These functions
+      // are processed as an OR clause
+      return ranges.map((range: any) => {
+        if (range.start !== null && range.stop !== null) {
+          return (obj: any): boolean => {
+            return obj >= range.start && obj <= range.stop
+          }
+        } else if (range.start === null && range.stop !== null) {
+          return (obj: any): boolean => {
+            return obj <= range.stop
+          }
+        } else if (range.start !== null && range.stop === null) {
+          return (obj: any): boolean => {
+            return obj >= range.start
+          }
+        } else {
+          return (obj: any): boolean => {
+            return true
+          }
+        }
+      })
     })
     .build()
 

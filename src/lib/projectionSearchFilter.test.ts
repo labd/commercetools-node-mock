@@ -129,7 +129,7 @@ describe('Search filter', () => {
 
   test('by price range - or', async () => {
     expect(
-      match(`variants.price.centAmount:range (2 TO 1500 ), range (1500 TO 3000)`).isMatch
+      match(`variants.price.centAmount:range (2 TO 1500 ), (1500 TO 3000), (3000 TO 6000)`).isMatch
     ).toBeTruthy()
   })
 
