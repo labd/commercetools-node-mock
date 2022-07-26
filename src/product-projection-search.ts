@@ -4,9 +4,20 @@ import {
   Product,
   ProductProjection,
   QueryParam,
+  FacetResults,
+  FacetTerm,
+  TermFacetResult,
 } from '@commercetools/platform-sdk'
+import { ByProjectKeyProductProjectionsSearchRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/search/by-project-key-product-projections-search-request-builder'
+import { nestedLookup } from './helpers'
+import { ProductService } from './services/product'
+import { Writable } from './types'
 import { CommercetoolsError } from './exceptions'
-import { parseFilterExpression } from './lib/projectionSearchFilter'
+import {
+  getVariants,
+  parseFilterExpression,
+  resolveVariantValue,
+} from './lib/projectionSearchFilter'
 import { applyPriceSelector } from './priceSelector'
 import { AbstractStorage } from './storage'
 
@@ -68,10 +79,9 @@ export class ProductProjectionSearch {
         )
 
         // Filters can modify the output. So clone the resources first.
-        resources = resources
-          .filter(resource =>
-            filters.every(f => f(resource, markMatchingVariant))
-          )
+        resources = resources.filter(resource =>
+          filters.every(f => f(resource, markMatchingVariant))
+        )
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
           {
@@ -84,6 +94,7 @@ export class ProductProjectionSearch {
     }
 
     // TODO: Calculate facets
+    const facets = this.getFacets(params, resources)
 
     // Apply filters post facetting
     if (params['filter.query']) {
@@ -91,10 +102,9 @@ export class ProductProjectionSearch {
         const filters = params['filter.query'].map(f =>
           parseFilterExpression(f, params.staged ?? false)
         )
-        resources = resources
-          .filter(resource =>
-            filters.every(f => f(resource, markMatchingVariant))
-          )
+        resources = resources.filter(resource =>
+          filters.every(f => f(resource, markMatchingVariant))
+        )
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
           {
@@ -127,8 +137,30 @@ export class ProductProjectionSearch {
       offset: offset,
       limit: limit,
       results: resources.map(this.transform),
-      facets: {},
+      facets: facets,
     }
+  }
+
+  getFacets(
+    params: ProductProjectionSearchParams,
+    products: Product[]
+  ): FacetResults {
+    if (!params.facet) return {}
+    const staged = false
+    const result: FacetResults = {}
+
+    for (const facet of params.facet) {
+      // Term Facet
+      if (!facet.includes(':')) {
+        result[facet] = this.termFacet(facet, products, staged)
+      }
+
+      // Range Facet
+
+      // FilteredFacet
+    }
+
+    return result
   }
 
   transform(product: Product): ProductProjection {
@@ -145,5 +177,63 @@ export class ProductProjectionSearch {
       variants: obj.variants,
       productType: product.productType,
     }
+  }
+
+  /**
+   * TODO: This implemention needs the following additional features:
+   *  - counting products
+   *  - correct dataType
+   */
+  termFacet(
+    facet: string,
+    products: Product[],
+    staged: boolean
+  ): TermFacetResult {
+    const result: Writable<TermFacetResult> = {
+      type: 'terms',
+      dataType: 'text',
+      missing: 0,
+      total: 0,
+      other: 0,
+      terms: [],
+    }
+    const terms: Record<any, number> = {}
+
+    if (facet.startsWith('variants.')) {
+      products.forEach(p => {
+        const variants = getVariants(p, staged)
+        variants.forEach(v => {
+          result.total++
+
+          const path = facet.substring(facet.indexOf(".") + 1)
+          let value = resolveVariantValue(v, path)
+          if (value === undefined) {
+            result.missing++
+          } else {
+            if (typeof value === 'number') {
+              value = Number(4).toFixed(1)
+            }
+            terms[value] = value in terms ? terms[value] + 1 : 1
+          }
+        })
+      })
+    } else {
+      products.forEach(p => {
+        const value = nestedLookup(p, facet)
+        result.total++
+        if (value === undefined) {
+          result.missing++
+        } else {
+          terms[value] = value in terms ? terms[value] + 1 : 1
+        }
+      })
+    }
+    for (const term in terms) {
+      result.terms.push({
+        term: term as any,
+        count: terms[term],
+      })
+    }
+    return result
   }
 }

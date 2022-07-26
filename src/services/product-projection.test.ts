@@ -50,7 +50,7 @@ beforeEach(async () => {
         attributes: [
           {
             name: 'number',
-            value: '1' as any,
+            value: 4 as any,
           },
         ],
       },
@@ -210,13 +210,47 @@ describe('Product Projection Search - Filters', () => {
     const response = await supertest(ctMock.app)
       .get('/dummy/product-projections/search')
       .query({
-        filter: ['variants.attributes.number:range(2 TO 10)'],
+        filter: ['variants.attributes.number:range(5 TO 10)'],
       })
 
     const result: ProductProjectionPagedSearchResponse = response.body
     expect(result).toMatchObject({
       count: 0,
       results: [],
+    })
+  })
+})
+
+describe('Product Projection Search - Facets', () => {
+  test('variants.attributes.number', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        facet: ['variants.attributes.number'],
+      })
+
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
+      count: 1,
+      facets: {
+        'variants.attributes.number': {
+          type: 'terms',
+          dataType: 'text',
+          missing: 0,
+          total: 1,
+          terms: [
+            {
+              term: '4.0',
+              count: 1,
+            },
+          ],
+        },
+      },
+      results: [
+        {
+          masterVariant: { sku: 'my-sku' },
+        },
+      ],
     })
   })
 })
