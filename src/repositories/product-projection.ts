@@ -39,6 +39,7 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
     const results = this._searchService.search(context.projectKey, {
       filter: QueryParamsAsArray(query.filter),
       'filter.query': QueryParamsAsArray(query['filter.query']),
+      facet: QueryParamsAsArray(query.facet),
       offset: query.offset ? Number(query.offset) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,
       expand: QueryParamsAsArray(query.expand),

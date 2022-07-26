@@ -5,6 +5,7 @@
 import { Product, ProductVariant } from '@commercetools/platform-sdk'
 import perplex from 'perplex'
 import Parser from 'pratt'
+import { nestedLookup } from '../helpers'
 import { Writable } from '../types'
 
 type MatchFunc = (target: any) => boolean
@@ -211,7 +212,7 @@ const filterVariants = (
   }
 }
 
-const resolveVariantValue = (obj: ProductVariant, path: string): any => {
+export const resolveVariantValue = (obj: ProductVariant, path: string): any => {
   if (path === undefined) {
     return obj
   }
@@ -238,27 +239,9 @@ const resolveVariantValue = (obj: ProductVariant, path: string): any => {
   return nestedLookup(obj, path)
 }
 
-const nestedLookup = (obj: any, path: string): any => {
-  if (!path || path === '') {
-    return obj
-  }
 
-  const parts = path.split('.')
-  let val = obj
 
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i]
-    if (val == undefined) {
-      return undefined
-    }
-
-    val = val[part]
-  }
-
-  return val
-}
-
-const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
+export const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
   return [
     staged
       ? p.masterData.staged?.masterVariant
