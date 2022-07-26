@@ -127,6 +127,12 @@ describe('Search filter', () => {
     ).toBeTruthy()
   })
 
+  test('by price range - or', async () => {
+    expect(
+      match(`variants.price.centAmount:range (2 TO 1500 ), range (1500 TO 3000)`).isMatch
+    ).toBeTruthy()
+  })
+
   test('by scopedPrice range', async () => {
     let result
     let products: Product[]

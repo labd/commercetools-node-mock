@@ -64,8 +64,20 @@ const generateMatchFunc = (filter: string): MatchFunc => {
       const expr = parser.parse({ terminals: [bp - 1] })
 
       if (Array.isArray(expr)) {
+        // An array means that this is an OR clause. So return true
+        // if any of the elements in the array match. Special handling is
+        // needed if one of the elements is an expression (range for example)
         return (obj: any): boolean => {
-          return expr.includes(obj)
+          for (const e of expr) {
+            if (typeof e === 'function') {
+              if (e(obj)) {
+                return true
+              }
+            } else if (e === obj) {
+              return true
+            }
+          }
+          return false
         }
       }
       if (typeof expr === 'function') {
@@ -112,20 +124,18 @@ const generateMatchFunc = (filter: string): MatchFunc => {
       return [left, expr]
     })
     .nud('RANGE', 20, ({ bp }) => {
-      lexer.next() // Skip over opening parthensis
+      lexer.expect('(')
       const [start, stop] = parser.parse()
-      console.log(start, stop)
-      if (start !== null && stop !== null ) {
+      lexer.expect(')')
+      if (start !== null && stop !== null) {
         return (obj: any): boolean => {
           return obj >= start && obj <= stop
         }
-      }
-      else if (start === null && stop !== null) {
+      } else if (start === null && stop !== null) {
         return (obj: any): boolean => {
           return obj <= stop
         }
-      }
-      else if (start !== null && stop === null) {
+      } else if (start !== null && stop === null) {
         return (obj: any): boolean => {
           return obj >= start
         }
@@ -133,7 +143,6 @@ const generateMatchFunc = (filter: string): MatchFunc => {
         return (obj: any): boolean => {
           return true
         }
-
       }
     })
     .build()
@@ -148,10 +157,7 @@ const generateMatchFunc = (filter: string): MatchFunc => {
   return result
 }
 
-const filterProduct = (
-  source: string,
-  exprFunc: MatchFunc
-): ProductFilter => {
+const filterProduct = (source: string, exprFunc: MatchFunc): ProductFilter => {
   return (p: Product, markMatchingVariants: boolean): boolean => {
     const value = nestedLookup(p, source)
     return exprFunc(value)
@@ -172,13 +178,12 @@ const filterVariants = (
       const value = resolveVariantValue(variant, path)
 
       if (exprFunc(value)) {
-
         // If markMatchingVariants parameter is true those ProductVariants that
         // match the search query have the additional field isMatchingVariant
         // set to true. For the other variants in the same product projection
         // this field is set to false.
         if (markMatchingVariants) {
-          variants.forEach(v => v.isMatchingVariant = false)
+          variants.forEach(v => (v.isMatchingVariant = false))
           variant.isMatchingVariant = true
         }
         return true
