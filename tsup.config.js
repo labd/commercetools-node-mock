@@ -1,16 +1,12 @@
 import { defineConfig } from 'tsup'
 
-const commonConfig = {
-  clean: true,
-  splitting: false,
-  dts: true,
-  sourcemap: true,
-}
-
 export default defineConfig([
   {
     entry: ['src/index.ts'],
-    ...commonConfig,
+    clean: true,
+    splitting: false,
+    dts: true,
+    sourcemap: true,
     format: ['cjs', 'esm', 'iife'],
     outDir: 'dist',
   },
