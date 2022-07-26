@@ -15,6 +15,30 @@ type ProductFilter = (
   markMatchingVariants: boolean
 ) => boolean
 
+type Symbol = {
+  type: 'Symbol'
+  kind: 'int' | 'string' | 'any'
+  value: any
+}
+
+type MatchExpression = {
+  source: string
+  type: 'RangeExpression' | 'FilterExpression' | 'TermExpression'
+  children?: RangeExpression[] | FilterExpression[]
+}
+
+export type RangeExpression = {
+  type: 'RangeExpression'
+  start?: number
+  stop?: number
+  match: (obj: any) => boolean
+}
+
+type FilterExpression = {
+  type: 'FilterExpression'
+  match: (obj: any) => boolean
+}
+
 /**
  * Returns a function (ProductFilter).
  * NOTE: The filter can alter the resources in-place (FIXME)
@@ -54,7 +78,7 @@ const getLexer = (value: string) => {
     .token('WS', /\s+/, true) // skip
 }
 
-const generateMatchFunc = (filter: string): MatchFunc => {
+const parseFilter = (filter: string): MatchExpression => {
   const lexer = getLexer(filter)
   const parser = new Parser(lexer)
     .builder()
@@ -62,54 +86,81 @@ const generateMatchFunc = (filter: string): MatchFunc => {
       return t.token.match
     })
     .led(':', 100, ({ left, bp }) => {
-      const expr = parser.parse({ terminals: [bp - 1] })
+      let parsed: any = parser.parse({ terminals: [bp - 1] })
+      let expressions: RangeExpression[] | FilterExpression[] | Symbol[]
+      expressions = !Array.isArray(parsed) ? [parsed] : parsed
 
-      if (Array.isArray(expr)) {
-        // An array means that this is an OR clause. So return true
-        // if any of the elements in the array match. Special handling is
-        // needed if one of the elements is an expression (range for example)
-        return (obj: any): boolean => {
-          for (const e of expr) {
-            if (typeof e === 'function') {
-              if (e(obj)) {
-                return true
-              }
-            } else if (e === obj) {
-              return true
+      // Make sure we only have one type of expression (cannot mix)
+      const unique = new Set(expressions.map(expr => expr.type))
+      if (unique.size > 1) {
+        throw new Error('Invalid expression')
+      }
+
+      // Convert plain symbols to a filter expression. For example
+      // variants.attribute.foobar:4 where 4 is a Symbol should result
+      // in a comparison
+      if (expressions.some(expr => expr.type == 'Symbol')) {
+        return {
+          source: left as string,
+          type: 'FilterExpression',
+          children: expressions.map(e => {
+            if (e.type != 'Symbol') {
+              throw new Error('Invalid expression')
             }
-          }
-          return false
-        }
+
+            return {
+              type: 'FilterExpression',
+              match: (obj: any): boolean => {
+                return obj === e.value
+              },
+            } as FilterExpression
+          }),
+        } as MatchExpression
       }
-      if (typeof expr === 'function') {
-        return (obj: any): boolean => {
-          return expr(obj)
-        }
-      }
-      return (obj: any): boolean => {
-        return obj === expr
+
+      return {
+        source: left,
+        type: expressions[0].type,
+        children: expressions,
       }
     })
     .nud('STRING', 20, t => {
-      // @ts-ignore
-      return t.token.groups[1]
+      return {
+        type: 'Symbol',
+        kind: 'string',
+        // @ts-ignore
+        value: t.token.groups[1],
+      } as Symbol
     })
     .nud('INT', 5, t => {
-      // @ts-ignore
-      return parseInt(t.token.match, 10)
+      return {
+        type: 'Symbol',
+        kind: 'int',
+        value: parseInt(t.token.match, 10),
+      } as Symbol
     })
     .nud('STAR', 5, t => {
-      return null
+      return {
+        type: 'Symbol',
+        kind: 'any',
+        value: null,
+      }
     })
     .nud('EXISTS', 10, ({ bp }) => {
-      return (val: any) => {
-        return val !== undefined
-      }
+      return {
+        type: 'FilterExpression',
+        match: (obj: any): boolean => {
+          return obj !== undefined
+        },
+      } as FilterExpression
     })
     .nud('MISSING', 10, ({ bp }) => {
-      return (val: any) => {
-        return val === undefined
-      }
+      return {
+        type: 'FilterExpression',
+        match: (obj: any): boolean => {
+          return obj === undefined
+        },
+      } as FilterExpression
     })
     .led('COMMA', 200, ({ left, token, bp }) => {
       const expr: any = parser.parse({ terminals: [bp - 1] })
@@ -128,8 +179,8 @@ const generateMatchFunc = (filter: string): MatchFunc => {
     .led('TO', 20, ({ left, bp }) => {
       const expr: any = parser.parse({ terminals: [bp - 1] })
       return {
-        start: left,
-        stop: expr,
+        start: left.value,
+        stop: expr.value,
       }
     })
     .nud('RANGE', 20, ({ bp }) => {
@@ -144,35 +195,60 @@ const generateMatchFunc = (filter: string): MatchFunc => {
       // Return a list of functions which matches the ranges. These functions
       // are processed as an OR clause
       return ranges.map((range: any) => {
+        let func = undefined
+
         if (range.start !== null && range.stop !== null) {
-          return (obj: any): boolean => {
+          func = (obj: any): boolean => {
             return obj >= range.start && obj <= range.stop
           }
         } else if (range.start === null && range.stop !== null) {
-          return (obj: any): boolean => {
+          func = (obj: any): boolean => {
             return obj <= range.stop
           }
         } else if (range.start !== null && range.stop === null) {
-          return (obj: any): boolean => {
+          func = (obj: any): boolean => {
             return obj >= range.start
           }
         } else {
-          return (obj: any): boolean => {
+          func = (obj: any): boolean => {
             return true
           }
         }
+
+        return {
+          type: 'RangeExpression',
+          start: range.start,
+          stop: range.stop,
+          match: func,
+        } as RangeExpression
       })
     })
     .build()
 
-  const result = parser.parse()
+  return parser.parse()
+}
 
-  if (typeof result !== 'function') {
+const generateMatchFunc = (filter: string) => {
+  const result = parseFilter(filter)
+  if (!result?.children) {
     const lines = filter.split('\n')
     const column = lines[lines.length - 1].length
     throw new Error(`Syntax error while parsing '${filter}'.`)
   }
-  return result
+  return (obj: any) => {
+    if (!result.children) return false
+    return result.children.some(c => c.match(obj))
+  }
+}
+
+export const generateFacetFunc = (filter: string): MatchExpression => {
+  if (!filter.includes(':')) {
+    return {
+      source: filter,
+      type: 'TermExpression',
+    }
+  }
+  return parseFilter(filter)
 }
 
 const filterProduct = (source: string, exprFunc: MatchFunc): ProductFilter => {
@@ -216,6 +292,9 @@ export const resolveVariantValue = (obj: ProductVariant, path: string): any => {
   if (path === undefined) {
     return obj
   }
+  if (path.startsWith('variants.')) {
+    path = path.substring(path.indexOf('.') + 1)
+  }
 
   if (path.startsWith('attributes.')) {
     const [, attrName, ...rest] = path.split('.')
@@ -238,8 +317,6 @@ export const resolveVariantValue = (obj: ProductVariant, path: string): any => {
 
   return nestedLookup(obj, path)
 }
-
-
 
 export const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
   return [

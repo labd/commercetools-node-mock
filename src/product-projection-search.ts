@@ -7,6 +7,7 @@ import {
   FacetResults,
   FacetTerm,
   TermFacetResult,
+  RangeFacetResult,
 } from '@commercetools/platform-sdk'
 import { ByProjectKeyProductProjectionsSearchRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/search/by-project-key-product-projections-search-request-builder'
 import { nestedLookup } from './helpers'
@@ -14,8 +15,10 @@ import { ProductService } from './services/product'
 import { Writable } from './types'
 import { CommercetoolsError } from './exceptions'
 import {
+  generateFacetFunc,
   getVariants,
   parseFilterExpression,
+  RangeExpression,
   resolveVariantValue,
 } from './lib/projectionSearchFilter'
 import { applyPriceSelector } from './priceSelector'
@@ -150,12 +153,22 @@ export class ProductProjectionSearch {
     const result: FacetResults = {}
 
     for (const facet of params.facet) {
+      const expression = generateFacetFunc(facet)
+
       // Term Facet
-      if (!facet.includes(':')) {
-        result[facet] = this.termFacet(facet, products, staged)
+      if (expression.type === 'TermExpression') {
+        result[facet] = this.termFacet(expression.source, products, staged)
       }
 
       // Range Facet
+      if (expression.type === 'RangeExpression') {
+        result[expression.source] = this.rangeFacet(
+          expression.source,
+          expression.children,
+          products,
+          staged
+        )
+      }
 
       // FilteredFacet
     }
@@ -205,8 +218,7 @@ export class ProductProjectionSearch {
         variants.forEach(v => {
           result.total++
 
-          const path = facet.substring(facet.indexOf(".") + 1)
-          let value = resolveVariantValue(v, path)
+          let value = resolveVariantValue(v, facet)
           if (value === undefined) {
             result.missing++
           } else {
@@ -236,4 +248,64 @@ export class ProductProjectionSearch {
     }
     return result
   }
+
+  rangeFacet(
+    source: string,
+    ranges: RangeExpression[] | undefined,
+    products: Product[],
+    staged: boolean
+  ): RangeFacetResult {
+
+    const counts = ranges?.map(range => {
+      if (source.startsWith('variants.')) {
+        const matches = products.filter(range.match)
+        const values = []
+        const total = 0
+        for (const p of products) {
+          for (const v of getVariants(p, staged)) {
+            const val = resolveVariantValue(v, source)
+            if (val === undefined) {
+              continue
+            }
+
+            if (range.match(val)) {
+              values.push(val)
+            }
+          }
+        }
+
+        const numValues = values.length
+        return {
+          type: 'double',
+          from: range.start || 0,
+          fromStr: range.start !== null ? Number(range.start).toFixed(1) : "",
+          to: range.stop || 0,
+          toStr: range.stop !== null ? Number(range.stop).toFixed(1) : "",
+          count: numValues,
+          // totalCount: 0,
+          total: values.reduce((a, b) => a + b, 0),
+          min: numValues > 0 ? Math.min(...values) : 0,
+          max: numValues > 0 ? Math.max(...values) : 0,
+          mean: numValues > 0 ? mean(values) : 0,
+        }
+      } else {
+        throw new Error('not supported')
+      }
+    }) || []
+    const data: RangeFacetResult = {
+      type: 'range',
+      // @ts-ignore
+      dataType: 'number',
+      ranges: counts,
+    }
+    return data
+  }
+}
+
+const mean = (arr: number[]) => {
+  let total = 0
+  for (let i = 0; i < arr.length; i++) {
+    total += arr[i]
+  }
+  return total / arr.length
 }
