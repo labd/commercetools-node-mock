@@ -260,7 +260,7 @@ describe('Product Projection Search - Filters', () => {
 })
 
 describe('Product Projection Search - Facets', () => {
-  test('variants.attributes.number', async () => {
+  test('termExpr - variants.attributes.number', async () => {
     const response = await supertest(ctMock.app)
       .get('/dummy/product-projections/search')
       .query({
@@ -284,6 +284,73 @@ describe('Product Projection Search - Facets', () => {
             {
               term: '50.0',
               count: 1,
+            },
+          ],
+        },
+      },
+      results: [
+        {
+          masterVariant: { sku: 'my-sku' },
+        },
+      ],
+    })
+  })
+
+  test('rangeExpr - variants.attributes.number', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        facet: [
+          'variants.attributes.number:range(* TO 5), (5 TO 25), (25 TO 100)',
+        ],
+      })
+
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
+      count: 1,
+      facets: {
+        'variants.attributes.number': {
+          type: 'range',
+          dataType: 'number',
+          ranges: [
+            {
+              type: 'double',
+              from: 0.0,
+              fromStr: '',
+              to: 5.0,
+              toStr: '5.0',
+              count: 1,
+              // totalCount: 1,
+              total: 4.0,
+              min: 4.0,
+              max: 4.0,
+              mean: 4.0,
+            },
+            {
+              type: 'double',
+              from: 5.0,
+              fromStr: '5.0',
+              to: 25.0,
+              toStr: '25.0',
+              count: 0,
+              // totalCount: 0,
+              total: 0.0,
+              min: 0.0,
+              max: 0.0,
+              mean: 0.0,
+            },
+            {
+              type: 'double',
+              from: 25.0,
+              fromStr: '25.0',
+              to: 100.0,
+              toStr: '100.0',
+              count: 1,
+              // totalCount: 1,
+              total: 50,
+              min: 50.0,
+              max: 50.0,
+              mean: 50.0,
             },
           ],
         },
