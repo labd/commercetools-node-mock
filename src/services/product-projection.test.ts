@@ -296,6 +296,30 @@ describe('Product Projection Search - Facets', () => {
     })
   })
 
+  test('filterExpr - variants.attributes.number', async () => {
+    const response = await supertest(ctMock.app)
+      .get('/dummy/product-projections/search')
+      .query({
+        facet: ['variants.attributes.number:3,4'],
+      })
+
+    const result: ProductProjectionPagedSearchResponse = response.body
+    expect(result).toMatchObject({
+      count: 1,
+      facets: {
+        'variants.attributes.number': {
+          type: 'filter',
+          count: 1,
+        },
+      },
+      results: [
+        {
+          masterVariant: { sku: 'my-sku' },
+        },
+      ],
+    })
+  })
+
   test('rangeExpr - variants.attributes.number', async () => {
     const response = await supertest(ctMock.app)
       .get('/dummy/product-projections/search')

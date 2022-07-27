@@ -21,11 +21,24 @@ type Symbol = {
   value: any
 }
 
-type MatchExpression = {
+type RangeExpressionSet = {
   source: string
-  type: 'RangeExpression' | 'FilterExpression' | 'TermExpression'
-  children?: RangeExpression[] | FilterExpression[]
+  type: 'RangeExpression'
+  children?: RangeExpression[]
 }
+
+type FilterExpressionSet = {
+  source: string
+  type: 'FilterExpression'
+  children?: FilterExpression[]
+}
+
+type TermExpressionSet = {
+  source: string
+  type: 'TermExpression'
+}
+
+type ExpressionSet = RangeExpressionSet | FilterExpressionSet | TermExpressionSet
 
 export type RangeExpression = {
   type: 'RangeExpression'
@@ -34,7 +47,7 @@ export type RangeExpression = {
   match: (obj: any) => boolean
 }
 
-type FilterExpression = {
+export type FilterExpression = {
   type: 'FilterExpression'
   match: (obj: any) => boolean
 }
@@ -78,7 +91,7 @@ const getLexer = (value: string) => {
     .token('WS', /\s+/, true) // skip
 }
 
-const parseFilter = (filter: string): MatchExpression => {
+const parseFilter = (filter: string): ExpressionSet => {
   const lexer = getLexer(filter)
   const parser = new Parser(lexer)
     .builder()
@@ -103,7 +116,7 @@ const parseFilter = (filter: string): MatchExpression => {
         return {
           source: left as string,
           type: 'FilterExpression',
-          children: expressions.map(e => {
+          children: expressions.map((e): FilterExpression => {
             if (e.type != 'Symbol') {
               throw new Error('Invalid expression')
             }
@@ -113,9 +126,9 @@ const parseFilter = (filter: string): MatchExpression => {
               match: (obj: any): boolean => {
                 return obj === e.value
               },
-            } as FilterExpression
-          }),
-        } as MatchExpression
+            }
+          })
+        }
       }
 
       return {
@@ -230,18 +243,22 @@ const parseFilter = (filter: string): MatchExpression => {
 
 const generateMatchFunc = (filter: string) => {
   const result = parseFilter(filter)
-  if (!result?.children) {
+  if (!result) {
     const lines = filter.split('\n')
     const column = lines[lines.length - 1].length
     throw new Error(`Syntax error while parsing '${filter}'.`)
   }
+  if (result.type == 'TermExpression') {
+    throw new Error(`Syntax error while parsing '${filter}'.`)
+  }
+
   return (obj: any) => {
     if (!result.children) return false
     return result.children.some(c => c.match(obj))
   }
 }
 
-export const generateFacetFunc = (filter: string): MatchExpression => {
+export const generateFacetFunc = (filter: string): ExpressionSet => {
   if (!filter.includes(':')) {
     return {
       source: filter,

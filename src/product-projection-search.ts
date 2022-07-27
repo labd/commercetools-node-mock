@@ -8,6 +8,7 @@ import {
   FacetTerm,
   TermFacetResult,
   RangeFacetResult,
+  FilteredFacetResult,
 } from '@commercetools/platform-sdk'
 import { ByProjectKeyProductProjectionsSearchRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/search/by-project-key-product-projections-search-request-builder'
 import { nestedLookup } from './helpers'
@@ -15,6 +16,7 @@ import { ProductService } from './services/product'
 import { Writable } from './types'
 import { CommercetoolsError } from './exceptions'
 import {
+  FilterExpression,
   generateFacetFunc,
   getVariants,
   parseFilterExpression,
@@ -144,6 +146,22 @@ export class ProductProjectionSearch {
     }
   }
 
+  transform(product: Product): ProductProjection {
+    const obj = product.masterData.current
+    return {
+      id: product.id,
+      createdAt: product.createdAt,
+      lastModifiedAt: product.lastModifiedAt,
+      version: product.version,
+      name: obj.name,
+      slug: obj.slug,
+      categories: obj.categories,
+      masterVariant: obj.masterVariant,
+      variants: obj.variants,
+      productType: product.productType,
+    }
+  }
+
   getFacets(
     params: ProductProjectionSearchParams,
     products: Product[]
@@ -171,25 +189,17 @@ export class ProductProjectionSearch {
       }
 
       // FilteredFacet
+      if (expression.type === 'FilterExpression') {
+        result[expression.source] = this.filterFacet(
+          expression.source,
+          expression.children,
+          products,
+          staged
+        )
+      }
     }
 
     return result
-  }
-
-  transform(product: Product): ProductProjection {
-    const obj = product.masterData.current
-    return {
-      id: product.id,
-      createdAt: product.createdAt,
-      lastModifiedAt: product.lastModifiedAt,
-      version: product.version,
-      name: obj.name,
-      slug: obj.slug,
-      categories: obj.categories,
-      masterVariant: obj.masterVariant,
-      variants: obj.variants,
-      productType: product.productType,
-    }
   }
 
   /**
@@ -249,49 +259,73 @@ export class ProductProjectionSearch {
     return result
   }
 
+  filterFacet(
+    source: string,
+    filters: FilterExpression[] | undefined,
+    products: Product[],
+    staged: boolean
+  ): FilteredFacetResult {
+    let count = 0
+    if (source.startsWith('variants.')) {
+      for (const p of products) {
+        for (const v of getVariants(p, staged)) {
+          const val = resolveVariantValue(v, source)
+          if (filters?.some(f => f.match(val))) {
+            count++
+          }
+        }
+      }
+    } else {
+      throw new Error('not supported')
+    }
+
+    return {
+      type: 'filter',
+      count: count,
+    }
+  }
+
   rangeFacet(
     source: string,
     ranges: RangeExpression[] | undefined,
     products: Product[],
     staged: boolean
   ): RangeFacetResult {
+    const counts =
+      ranges?.map(range => {
+        if (source.startsWith('variants.')) {
+          const values = []
+          for (const p of products) {
+            for (const v of getVariants(p, staged)) {
+              const val = resolveVariantValue(v, source)
+              if (val === undefined) {
+                continue
+              }
 
-    const counts = ranges?.map(range => {
-      if (source.startsWith('variants.')) {
-        const matches = products.filter(range.match)
-        const values = []
-        const total = 0
-        for (const p of products) {
-          for (const v of getVariants(p, staged)) {
-            const val = resolveVariantValue(v, source)
-            if (val === undefined) {
-              continue
-            }
-
-            if (range.match(val)) {
-              values.push(val)
+              if (range.match(val)) {
+                values.push(val)
+              }
             }
           }
-        }
 
-        const numValues = values.length
-        return {
-          type: 'double',
-          from: range.start || 0,
-          fromStr: range.start !== null ? Number(range.start).toFixed(1) : "",
-          to: range.stop || 0,
-          toStr: range.stop !== null ? Number(range.stop).toFixed(1) : "",
-          count: numValues,
-          // totalCount: 0,
-          total: values.reduce((a, b) => a + b, 0),
-          min: numValues > 0 ? Math.min(...values) : 0,
-          max: numValues > 0 ? Math.max(...values) : 0,
-          mean: numValues > 0 ? mean(values) : 0,
+          const numValues = values.length
+          return {
+            type: 'double',
+            from: range.start || 0,
+            fromStr: range.start !== null ? Number(range.start).toFixed(1) : '',
+            to: range.stop || 0,
+            toStr: range.stop !== null ? Number(range.stop).toFixed(1) : '',
+            count: numValues,
+            // totalCount: 0,
+            total: values.reduce((a, b) => a + b, 0),
+            min: numValues > 0 ? Math.min(...values) : 0,
+            max: numValues > 0 ? Math.max(...values) : 0,
+            mean: numValues > 0 ? mean(values) : 0,
+          }
+        } else {
+          throw new Error('not supported')
         }
-      } else {
-        throw new Error('not supported')
-      }
-    }) || []
+      }) || []
     const data: RangeFacetResult = {
       type: 'range',
       // @ts-ignore
