@@ -1,3 +1,6 @@
+0.8.0 (27-07-2022)
+==================
+- Implement experimental support for facets in the product projection search.
 
 0.7.2 (26-07-2022)
 ==================
