@@ -135,6 +135,7 @@ describe('Product update actions', () => {
           { action: 'setAttribute', sku: '1338', name: 'foo', value: 'bar' },
         ],
       })
+      console.log(JSON.stringify(response.body, null, 4))
     expect(response.status).toBe(200)
     expect(response.body.version).toBe(2)
     expect(

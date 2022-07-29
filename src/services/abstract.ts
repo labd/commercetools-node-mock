@@ -3,10 +3,20 @@ import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'
 import { AbstractResourceRepository } from '../repositories/abstract'
 import { getRepositoryContext } from '../repositories/helpers'
+import { validateWithSchema } from '../helpers'
 
+export type ValidationSchemas = {
+  update?: any
+  create?: any
+
+}
 export default abstract class AbstractService {
   protected abstract getBasePath(): string
   public abstract repository: AbstractResourceRepository
+  protected validationSchemas: ValidationSchemas = {
+    update: undefined,
+    create: undefined,
+  }
 
   createStatusCode = 201
 
@@ -88,6 +98,9 @@ export default abstract class AbstractService {
 
   post(request: Request, response: Response) {
     const draft = request.body
+    console.log(this.validationSchemas.create)
+    validateWithSchema(draft, this.validationSchemas.create)
+
     const resource = this.repository.create(
       getRepositoryContext(request),
       draft
@@ -98,6 +111,8 @@ export default abstract class AbstractService {
 
   postWithId(request: Request, response: Response) {
     const updateRequest: Update = request.body
+    validateWithSchema(updateRequest, this.validationSchemas.update)
+
     const resource = this.repository.get(
       getRepositoryContext(request),
       request.params['id']
