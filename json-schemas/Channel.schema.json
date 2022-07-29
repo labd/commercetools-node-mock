@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Channel",
   "type": "object",
@@ -36,5 +36,5 @@
     "key",
     "roles"
   ],
-  "$id": "https://example.com/Channel.schema.json"
+  "$id": "https://api.commercetools.com/Channel.schema.json"
 }

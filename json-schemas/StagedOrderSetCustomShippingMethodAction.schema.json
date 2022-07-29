@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderSetCustomShippingMethodAction",
   "type": "object",
@@ -15,5 +15,5 @@
     "shippingMethodName",
     "shippingRate"
   ],
-  "$id": "https://example.com/StagedOrderSetCustomShippingMethodAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderSetCustomShippingMethodAction.schema.json"
 }

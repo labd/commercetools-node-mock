@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyTransactionDraft",
   "type": "object",
@@ -10,11 +10,12 @@
     "timestamp": {
       "type": "string",
       "format": "date-time"
-    }
+    },
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
   },
   "required": [
     "type",
     "amount"
   ],
-  "$id": "https://example.com/MyTransactionDraft.schema.json"
+  "$id": "https://api.commercetools.com/MyTransactionDraft.schema.json"
 }

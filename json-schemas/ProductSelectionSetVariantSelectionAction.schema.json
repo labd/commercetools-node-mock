@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates the Product Variant Selection of an existing [Product Selection Assignment](ctp:api:type:ProductSelectionAssignment).\nIf the given Product is not assigned to the Product Selection [ProductAssignmentMissing](/errors#product-selections) error is raised.",
+  "additionalProperties": false,
+  "title": "ProductSelectionSetVariantSelectionAction",
+  "type": "object",
+  "properties": {
+    "variantSelection": {"$ref": "ProductVariantSelection.schema.json"},
+    "action": {"enum": ["setVariantSelection"]},
+    "product": {"$ref": "ProductResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionSetVariantSelectionAction.schema.json"
+}

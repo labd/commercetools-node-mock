@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Defines a [Custom Field](/../api/projects/custom-fields) and its meta-information.\nThis FieldDefinition is similar to an [AttributeDefinition](ctp:api:type:AttributeDefinition) of [Product Types](/../api/projects/productTypes).",
   "additionalProperties": false,
   "title": "FieldDefinition",
   "type": "object",
@@ -16,5 +17,5 @@
     "label",
     "required"
   ],
-  "$id": "https://example.com/FieldDefinition.schema.json"
+  "$id": "https://api.commercetools.com/FieldDefinition.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShippingMethodRemoveZoneAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "zone"
   ],
-  "$id": "https://example.com/ShippingMethodRemoveZoneAction.schema.json"
+  "$id": "https://api.commercetools.com/ShippingMethodRemoveZoneAction.schema.json"
 }

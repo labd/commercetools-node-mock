@@ -1,16 +1,16 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderSetDeliveryAddressAction",
   "type": "object",
   "properties": {
     "action": {"enum": ["setDeliveryAddress"]},
     "deliveryId": {"type": "string"},
-    "address": {"$ref": "Address.schema.json"}
+    "address": {"$ref": "BaseAddress.schema.json"}
   },
   "required": [
     "action",
     "deliveryId"
   ],
-  "$id": "https://example.com/StagedOrderSetDeliveryAddressAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderSetDeliveryAddressAction.schema.json"
 }

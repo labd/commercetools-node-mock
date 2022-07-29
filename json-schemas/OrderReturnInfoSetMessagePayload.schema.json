@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderReturnInfoSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ReturnInfoSet"]},
+    "returnInfo": {
+      "type": "array",
+      "items": {"$ref": "ReturnInfo.schema.json"}
+    }
+  },
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/OrderReturnInfoSetMessagePayload.schema.json"
+}

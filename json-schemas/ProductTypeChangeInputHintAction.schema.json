@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates the `inputHint` of an [AttributeDefinition](ctp:api:type:AttributeDefinition).",
   "additionalProperties": false,
   "title": "ProductTypeChangeInputHintAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "newValue"
   ],
-  "$id": "https://example.com/ProductTypeChangeInputHintAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangeInputHintAction.schema.json"
 }

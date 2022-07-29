@@ -1,10 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "PriceDraft",
   "type": "object",
   "properties": {
-    "discounted": {"$ref": "DiscountedPrice.schema.json"},
+    "discounted": {"$ref": "DiscountedPriceDraft.schema.json"},
     "country": {"type": "string"},
     "tiers": {
       "type": "array",
@@ -24,5 +24,5 @@
     "value": {"$ref": "Money.schema.json"}
   },
   "required": ["value"],
-  "$id": "https://example.com/PriceDraft.schema.json"
+  "$id": "https://api.commercetools.com/PriceDraft.schema.json"
 }

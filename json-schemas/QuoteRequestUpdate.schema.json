@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteRequestUpdate",
+  "type": "object",
+  "properties": {
+    "version": {"type": "number"},
+    "actions": {
+      "type": "array",
+      "items": {"$ref": "QuoteRequestUpdateAction.schema.json"}
+    }
+  },
+  "required": [
+    "version",
+    "actions"
+  ],
+  "$id": "https://api.commercetools.com/QuoteRequestUpdate.schema.json"
+}

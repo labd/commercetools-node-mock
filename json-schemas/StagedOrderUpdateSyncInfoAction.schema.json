@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderUpdateSyncInfoAction",
   "type": "object",
@@ -16,5 +16,5 @@
     "action",
     "channel"
   ],
-  "$id": "https://example.com/StagedOrderUpdateSyncInfoAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderUpdateSyncInfoAction.schema.json"
 }

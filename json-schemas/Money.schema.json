@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Draft type that stores amounts in cent precision for the specified currency.\n\nFor storing money values in fractions of the minor unit in a currency, use [HighPrecisionMoneyDraft](ctp:api:type:HighPrecisionMoneyDraft) instead.",
   "additionalProperties": false,
   "title": "Money",
   "type": "object",
@@ -11,5 +12,5 @@
     "centAmount",
     "currencyCode"
   ],
-  "$id": "https://example.com/Money.schema.json"
+  "$id": "https://api.commercetools.com/Money.schema.json"
 }

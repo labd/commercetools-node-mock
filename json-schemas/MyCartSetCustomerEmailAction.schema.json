@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "MyCartSetCustomerEmailAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setCustomerEmail"]},
+    "email": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/MyCartSetCustomerEmailAction.schema.json"
+}

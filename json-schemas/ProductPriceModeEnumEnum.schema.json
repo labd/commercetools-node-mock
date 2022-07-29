@@ -1,0 +1,11 @@
+{
+  "description": "This mode specifies which type of prices should be used when looking up the price of a product.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "ProductPriceModeEnum",
+  "type": "string",
+  "enum": [
+    "Embedded",
+    "Standalone"
+  ],
+  "$id": "https://api.commercetools.com/ProductPriceModeEnumEnum.schema.json"
+}

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Dimensions of the Asset source specified by the number of pixels.",
   "additionalProperties": false,
   "title": "AssetDimensions",
   "type": "object",
@@ -11,5 +12,5 @@
     "w",
     "h"
   ],
-  "$id": "https://example.com/AssetDimensions.schema.json"
+  "$id": "https://api.commercetools.com/AssetDimensions.schema.json"
 }

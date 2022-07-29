@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Defines an allowed value of a [CustomFieldLocalizedEnumType](ctp:api:type:CustomFieldLocalizedEnumType) field.",
   "additionalProperties": false,
   "title": "CustomFieldLocalizedEnumValue",
   "type": "object",
@@ -11,5 +12,5 @@
     "key",
     "label"
   ],
-  "$id": "https://example.com/CustomFieldLocalizedEnumValue.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldLocalizedEnumValue.schema.json"
 }

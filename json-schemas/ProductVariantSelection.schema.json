@@ -1,0 +1,18 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/ProductVariantSelectionExclusion.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductVariantSelectionInclusion.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Polymorphic base type for Product Variant Selections. The actual type is determined by the `type` field.",
+  "additionalProperties": false,
+  "title": "ProductVariantSelection",
+  "type": "object",
+  "properties": {"type": {"enum": [
+    "exclusion",
+    "inclusion"
+  ]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/ProductVariantSelection.schema.json",
+  "discriminator": {"propertyName": "type"}
+}

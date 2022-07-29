@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderSetDeliveryItemsAction",
   "type": "object",
@@ -16,5 +16,5 @@
     "deliveryId",
     "items"
   ],
-  "$id": "https://example.com/OrderSetDeliveryItemsAction.schema.json"
+  "$id": "https://api.commercetools.com/OrderSetDeliveryItemsAction.schema.json"
 }

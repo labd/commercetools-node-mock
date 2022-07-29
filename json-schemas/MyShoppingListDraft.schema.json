@@ -1,22 +1,23 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyShoppingListDraft",
   "type": "object",
   "properties": {
-    "name": {"$ref": "LocalizedString.schema.json"},
     "lineItems": {
       "type": "array",
       "items": {"$ref": "ShoppingListLineItemDraft.schema.json"}
     },
-    "description": {"$ref": "LocalizedString.schema.json"},
     "textLineItems": {
       "type": "array",
       "items": {"$ref": "TextLineItemDraft.schema.json"}
     },
     "custom": {"$ref": "CustomFieldsDraft.schema.json"},
-    "deleteDaysAfterLastModification": {"type": "number"}
+    "deleteDaysAfterLastModification": {"type": "number"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "description": {"$ref": "LocalizedString.schema.json"},
+    "store": {"$ref": "StoreResourceIdentifier.schema.json"}
   },
   "required": ["name"],
-  "$id": "https://example.com/MyShoppingListDraft.schema.json"
+  "$id": "https://api.commercetools.com/MyShoppingListDraft.schema.json"
 }

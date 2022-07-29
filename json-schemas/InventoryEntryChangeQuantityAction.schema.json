@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates `availableQuantity` based on the new `quantityOnStock` and amount of active reservations.",
   "additionalProperties": false,
   "title": "InventoryEntryChangeQuantityAction",
   "type": "object",
@@ -11,5 +12,5 @@
     "action",
     "quantity"
   ],
-  "$id": "https://example.com/InventoryEntryChangeQuantityAction.schema.json"
+  "$id": "https://api.commercetools.com/InventoryEntryChangeQuantityAction.schema.json"
 }

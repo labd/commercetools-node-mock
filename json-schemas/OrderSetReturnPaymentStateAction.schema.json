@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderSetReturnPaymentStateAction",
   "type": "object",
@@ -13,5 +13,5 @@
     "returnItemId",
     "paymentState"
   ],
-  "$id": "https://example.com/OrderSetReturnPaymentStateAction.schema.json"
+  "$id": "https://api.commercetools.com/OrderSetReturnPaymentStateAction.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "DiscountedLineItemPriceForQuantity",
   "type": "object",
@@ -11,5 +11,5 @@
     "quantity",
     "discountedPrice"
   ],
-  "$id": "https://example.com/DiscountedLineItemPriceForQuantity.schema.json"
+  "$id": "https://api.commercetools.com/DiscountedLineItemPriceForQuantity.schema.json"
 }

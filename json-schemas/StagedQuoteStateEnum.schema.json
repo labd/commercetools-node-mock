@@ -1,0 +1,12 @@
+{
+  "description": "Predefined states tracking the status of the Staged Quote.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "StagedQuoteState",
+  "type": "string",
+  "enum": [
+    "InProgress",
+    "Sent",
+    "Closed"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuoteStateEnum.schema.json"
+}

@@ -1,18 +1,27 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/AzureEventGridDestination.schema.json"},
-    {"$ref": "https://example.com/AzureServiceBusDestination.schema.json"},
-    {"$ref": "https://example.com/GoogleCloudPubSubDestination.schema.json"},
-    {"$ref": "https://example.com/IronMqDestination.schema.json"},
-    {"$ref": "https://example.com/SnsDestination.schema.json"},
-    {"$ref": "https://example.com/SqsDestination.schema.json"}
+    {"$ref": "https://api.commercetools.com/AzureEventGridDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/AzureServiceBusDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/EventBridgeDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/GoogleCloudPubSubDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/IronMqDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/SnsDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/SqsDestination.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Destination",
   "type": "object",
-  "properties": {"type": {"type": "string"}},
+  "properties": {"type": {"enum": [
+    "EventGrid",
+    "AzureServiceBus",
+    "EventBridge",
+    "GoogleCloudPubSub",
+    "IronMQ",
+    "SNS",
+    "SQS"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/Destination.schema.json",
+  "$id": "https://api.commercetools.com/Destination.schema.json",
   "discriminator": {"propertyName": "type"}
 }

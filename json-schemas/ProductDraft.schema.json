@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductDraft",
   "type": "object",
   "properties": {
+    "priceMode": {"$ref": "ProductPriceModeEnumEnum.schema.json"},
     "searchKeywords": {"$ref": "SearchKeywords.schema.json"},
     "description": {"$ref": "LocalizedString.schema.json"},
     "variants": {
@@ -32,5 +33,5 @@
     "name",
     "slug"
   ],
-  "$id": "https://example.com/ProductDraft.schema.json"
+  "$id": "https://api.commercetools.com/ProductDraft.schema.json"
 }

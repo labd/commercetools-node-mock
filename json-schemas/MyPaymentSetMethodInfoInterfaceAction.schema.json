@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyPaymentSetMethodInfoInterfaceAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "interface"
   ],
-  "$id": "https://example.com/MyPaymentSetMethodInfoInterfaceAction.schema.json"
+  "$id": "https://api.commercetools.com/MyPaymentSetMethodInfoInterfaceAction.schema.json"
 }

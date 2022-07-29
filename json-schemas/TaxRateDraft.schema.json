@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TaxRateDraft",
   "type": "object",
@@ -19,5 +19,5 @@
     "includedInPrice",
     "country"
   ],
-  "$id": "https://example.com/TaxRateDraft.schema.json"
+  "$id": "https://api.commercetools.com/TaxRateDraft.schema.json"
 }

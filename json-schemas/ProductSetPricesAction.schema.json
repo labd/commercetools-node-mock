@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductSetPricesAction",
   "type": "object",
@@ -17,5 +17,5 @@
     "action",
     "prices"
   ],
-  "$id": "https://example.com/ProductSetPricesAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductSetPricesAction.schema.json"
 }

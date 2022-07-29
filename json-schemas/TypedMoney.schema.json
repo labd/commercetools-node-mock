@@ -1,24 +1,28 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/CentPrecisionMoney.schema.json"},
-    {"$ref": "https://example.com/HighPrecisionMoney.schema.json"}
+    {"$ref": "https://api.commercetools.com/CentPrecisionMoney.schema.json"},
+    {"$ref": "https://api.commercetools.com/HighPrecisionMoney.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Base polymorphic read-only Money type which is stored in cent precision or high precision. The actual type is determined by the `type` field.",
   "additionalProperties": false,
   "title": "TypedMoney",
   "type": "object",
   "properties": {
     "centAmount": {"type": "number"},
     "fractionDigits": {"type": "number"},
-    "type": {"$ref": "MoneyTypeEnum.schema.json"},
+    "type": {"enum": [
+      "centPrecision",
+      "highPrecision"
+    ]},
     "currencyCode": {"type": "string"}
   },
   "required": [
-    "type",
-    "fractionDigits",
     "centAmount",
-    "currencyCode"
+    "currencyCode",
+    "type",
+    "fractionDigits"
   ],
-  "$id": "https://example.com/TypedMoney.schema.json",
+  "$id": "https://api.commercetools.com/TypedMoney.schema.json",
   "discriminator": {"propertyName": "type"}
 }

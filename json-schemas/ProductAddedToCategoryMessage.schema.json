@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductAddedToCategoryMessage",
   "type": "object",
@@ -36,5 +36,5 @@
     "category",
     "staged"
   ],
-  "$id": "https://example.com/ProductAddedToCategoryMessage.schema.json"
+  "$id": "https://api.commercetools.com/ProductAddedToCategoryMessage.schema.json"
 }

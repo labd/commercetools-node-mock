@@ -1,6 +1,7 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Product](ctp:api:type:Product).",
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ProductResourceIdentifier",
   "type": "object",
   "properties": {
@@ -8,5 +9,6 @@
     "key": {"type": "string"},
     "id": {"type": "string"}
   },
-  "$id": "https://example.com/ProductResourceIdentifier.schema.json"
+  "required": ["typeId"],
+  "$id": "https://api.commercetools.com/ProductResourceIdentifier.schema.json"
 }

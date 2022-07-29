@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteRequestDraft",
+  "type": "object",
+  "properties": {
+    "comment": {"type": "string"},
+    "cartVersion": {"type": "number"},
+    "cart": {"$ref": "CartResourceIdentifier.schema.json"},
+    "key": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": [
+    "cart",
+    "cartVersion",
+    "comment"
+  ],
+  "$id": "https://api.commercetools.com/QuoteRequestDraft.schema.json"
+}

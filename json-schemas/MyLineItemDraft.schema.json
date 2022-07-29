@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyLineItemDraft",
   "type": "object",
@@ -17,10 +17,6 @@
     "distributionChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
     "sku": {"type": "string"}
   },
-  "required": [
-    "productId",
-    "variantId",
-    "quantity"
-  ],
-  "$id": "https://example.com/MyLineItemDraft.schema.json"
+  "required": ["quantity"],
+  "$id": "https://api.commercetools.com/MyLineItemDraft.schema.json"
 }

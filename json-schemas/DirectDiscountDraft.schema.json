@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "DirectDiscountDraft",
+  "type": "object",
+  "properties": {
+    "value": {"$ref": "CartDiscountValue.schema.json"},
+    "target": {"$ref": "CartDiscountTarget.schema.json"}
+  },
+  "required": ["value"],
+  "$id": "https://api.commercetools.com/DirectDiscountDraft.schema.json"
+}

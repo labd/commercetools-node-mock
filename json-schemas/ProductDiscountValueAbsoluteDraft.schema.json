@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Discounts the Product Price by a fixed amount, defined by the `money` field.",
   "additionalProperties": false,
   "title": "ProductDiscountValueAbsoluteDraft",
   "type": "object",
@@ -7,12 +8,12 @@
     "type": {"enum": ["absolute"]},
     "money": {
       "type": "array",
-      "items": {"$ref": "Money.schema.json"}
+      "items": {"$ref": "CentPrecisionMoneyDraft.schema.json"}
     }
   },
   "required": [
     "type",
     "money"
   ],
-  "$id": "https://example.com/ProductDiscountValueAbsoluteDraft.schema.json"
+  "$id": "https://api.commercetools.com/ProductDiscountValueAbsoluteDraft.schema.json"
 }

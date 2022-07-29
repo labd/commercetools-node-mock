@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [StagedQuote](ctp:api:type:StagedQuote).",
+  "additionalProperties": false,
+  "title": "StagedQuoteResourceIdentifier",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["staged-quote"]},
+    "key": {"type": "string"},
+    "id": {"type": "string"}
+  },
+  "required": ["typeId"],
+  "$id": "https://api.commercetools.com/StagedQuoteResourceIdentifier.schema.json"
+}

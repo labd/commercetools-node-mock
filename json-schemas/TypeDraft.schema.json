@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TypeDraft",
   "type": "object",
@@ -21,5 +21,5 @@
     "name",
     "resourceTypeIds"
   ],
-  "$id": "https://example.com/TypeDraft.schema.json"
+  "$id": "https://api.commercetools.com/TypeDraft.schema.json"
 }

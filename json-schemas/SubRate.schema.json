@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "It is used to calculate the [taxPortions](/../api/projects/carts#taxedprice) field in a Cart or Order.",
   "additionalProperties": false,
   "title": "SubRate",
   "type": "object",
@@ -11,5 +12,5 @@
     "name",
     "amount"
   ],
-  "$id": "https://example.com/SubRate.schema.json"
+  "$id": "https://api.commercetools.com/SubRate.schema.json"
 }

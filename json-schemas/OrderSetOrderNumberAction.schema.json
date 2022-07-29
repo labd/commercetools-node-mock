@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderSetOrderNumberAction",
   "type": "object",
@@ -8,5 +8,5 @@
     "orderNumber": {"type": "string"}
   },
   "required": ["action"],
-  "$id": "https://example.com/OrderSetOrderNumberAction.schema.json"
+  "$id": "https://api.commercetools.com/OrderSetOrderNumberAction.schema.json"
 }

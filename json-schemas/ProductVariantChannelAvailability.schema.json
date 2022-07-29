@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "ProductVariantChannelAvailability",
   "type": "object",
   "properties": {
@@ -8,5 +8,5 @@
     "availableQuantity": {"type": "number"},
     "isOnStock": {"type": "boolean"}
   },
-  "$id": "https://example.com/ProductVariantChannelAvailability.schema.json"
+  "$id": "https://api.commercetools.com/ProductVariantChannelAvailability.schema.json"
 }

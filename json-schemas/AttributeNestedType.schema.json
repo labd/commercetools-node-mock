@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Attribute type for nesting Attributes based on some existing ProductType. It does not support `isSearchable` and is not supported in queries. The only supported AttributeConstraint is `None`.",
   "additionalProperties": false,
   "title": "AttributeNestedType",
   "type": "object",
@@ -11,5 +12,5 @@
     "name",
     "typeReference"
   ],
-  "$id": "https://example.com/AttributeNestedType.schema.json"
+  "$id": "https://api.commercetools.com/AttributeNestedType.schema.json"
 }

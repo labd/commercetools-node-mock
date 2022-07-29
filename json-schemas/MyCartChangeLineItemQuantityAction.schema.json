@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyCartChangeLineItemQuantityAction",
   "type": "object",
@@ -15,5 +15,5 @@
     "lineItemId",
     "quantity"
   ],
-  "$id": "https://example.com/MyCartChangeLineItemQuantityAction.schema.json"
+  "$id": "https://api.commercetools.com/MyCartChangeLineItemQuantityAction.schema.json"
 }

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates the label of a single enum `value` in an [AttributeLocalizedEnumType](ctp:api:type:AttributeLocalizedEnumType) AttributeDefinition, or [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeLocalizedEnumType AttributeDefinition.\n\nAll Products will be updated to the new label in an [eventually consistent](/general-concepts#eventual-consistency) way.",
   "additionalProperties": false,
   "title": "ProductTypeChangeLocalizedEnumValueLabelAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "newValue"
   ],
-  "$id": "https://example.com/ProductTypeChangeLocalizedEnumValueLabelAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangeLocalizedEnumValueLabelAction.schema.json"
 }

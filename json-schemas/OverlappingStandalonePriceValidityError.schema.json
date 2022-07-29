@@ -1,0 +1,48 @@
+{
+  "patternProperties": {"": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OverlappingStandalonePriceValidityError",
+  "type": "object",
+  "properties": {
+    "country": {"type": "string"},
+    "code": {"enum": ["OverlappingStandalonePriceValidity"]},
+    "customerGroup": {"$ref": "CustomerGroupResourceIdentifier.schema.json"},
+    "conflictingValidUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "channel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "conflictingValidFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currency": {"type": "string"},
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "message": {"type": "string"},
+    "sku": {"type": "string"},
+    "conflictingStandalonePrice": {"$ref": "StandalonePriceReference.schema.json"}
+  },
+  "required": [
+    "code",
+    "message",
+    "conflictingStandalonePrice",
+    "sku",
+    "currency"
+  ],
+  "$id": "https://api.commercetools.com/OverlappingStandalonePriceValidityError.schema.json"
+}

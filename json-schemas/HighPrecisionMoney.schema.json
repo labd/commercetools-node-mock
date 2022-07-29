@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Money object that stores an amount of a fraction of the smallest indivisible unit of the specified currency.",
   "additionalProperties": false,
   "title": "HighPrecisionMoney",
   "type": "object",
@@ -11,11 +12,11 @@
     "preciseAmount": {"type": "number"}
   },
   "required": [
-    "type",
-    "fractionDigits",
     "centAmount",
     "currencyCode",
+    "type",
+    "fractionDigits",
     "preciseAmount"
   ],
-  "$id": "https://example.com/HighPrecisionMoney.schema.json"
+  "$id": "https://api.commercetools.com/HighPrecisionMoney.schema.json"
 }

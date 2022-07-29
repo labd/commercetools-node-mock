@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "A geographical location representing a country and optionally a state within this country.  A location can only be assigned to one Zone.",
   "additionalProperties": false,
   "title": "Location",
   "type": "object",
@@ -8,5 +9,5 @@
     "state": {"type": "string"}
   },
   "required": ["country"],
-  "$id": "https://example.com/Location.schema.json"
+  "$id": "https://api.commercetools.com/Location.schema.json"
 }

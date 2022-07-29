@@ -1,0 +1,11 @@
+{
+  "description": "Specifies the status of the [Order Search](/../api/projects/order-search) index.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "OrderSearchStatus",
+  "type": "string",
+  "enum": [
+    "Activated",
+    "Deactivated"
+  ],
+  "$id": "https://api.commercetools.com/OrderSearchStatusEnum.schema.json"
+}

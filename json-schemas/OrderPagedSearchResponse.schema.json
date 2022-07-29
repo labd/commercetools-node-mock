@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderPagedSearchResponse",
+  "type": "object",
+  "properties": {
+    "limit": {"type": "number"},
+    "hits": {
+      "type": "array",
+      "items": {"$ref": "Hit.schema.json"}
+    },
+    "total": {"type": "number"},
+    "offset": {"type": "number"}
+  },
+  "required": [
+    "total",
+    "hits"
+  ],
+  "$id": "https://api.commercetools.com/OrderPagedSearchResponse.schema.json"
+}

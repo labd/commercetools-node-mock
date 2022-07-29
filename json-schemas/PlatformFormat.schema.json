@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "PlatformFormat",
+  "type": "object",
+  "properties": {"type": {"enum": ["Platform"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/PlatformFormat.schema.json"
+}

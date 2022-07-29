@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Defines which matching items are to be discounted.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "SelectionMode",
   "type": "string",
   "enum": [
     "Cheapest",
     "MostExpensive"
   ],
-  "$id": "https://example.com/SelectionModeEnum.schema.json"
+  "$id": "https://api.commercetools.com/SelectionModeEnum.schema.json"
 }

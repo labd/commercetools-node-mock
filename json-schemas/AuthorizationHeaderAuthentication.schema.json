@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "The `Authorization` header will be set to the content of `headerValue`. The authentication scheme (such as `Basic` or `Bearer`) should be included in the `headerValue`.\n\nFor example, the `headerValue` for [Basic Authentication](https://datatracker.ietf.org/doc/html/rfc7617) should be set to `Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==`.",
+  "additionalProperties": false,
+  "title": "AuthorizationHeaderAuthentication",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["AuthorizationHeader"]},
+    "headerValue": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "headerValue"
+  ],
+  "$id": "https://api.commercetools.com/AuthorizationHeaderAuthentication.schema.json"
+}

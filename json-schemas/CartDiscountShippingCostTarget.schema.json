@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Discount is applied to the shipping costs of the [Cart](ctp:api:type:Cart).",
   "additionalProperties": false,
   "title": "CartDiscountShippingCostTarget",
   "type": "object",
   "properties": {"type": {"enum": ["shipping"]}},
   "required": ["type"],
-  "$id": "https://example.com/CartDiscountShippingCostTarget.schema.json"
+  "$id": "https://api.commercetools.com/CartDiscountShippingCostTarget.schema.json"
 }

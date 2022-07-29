@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "TrackingData",
   "type": "object",
   "properties": {
@@ -10,5 +10,5 @@
     "provider": {"type": "string"},
     "trackingId": {"type": "string"}
   },
-  "$id": "https://example.com/TrackingData.schema.json"
+  "$id": "https://api.commercetools.com/TrackingData.schema.json"
 }

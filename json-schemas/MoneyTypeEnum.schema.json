@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "MoneyType supports two different values, one for amounts in cent precision and another one for sub-cent amounts up to 20 fraction digits.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "MoneyType",
   "type": "string",
   "enum": [
     "centPrecision",
     "highPrecision"
   ],
-  "$id": "https://example.com/MoneyTypeEnum.schema.json"
+  "$id": "https://api.commercetools.com/MoneyTypeEnum.schema.json"
 }

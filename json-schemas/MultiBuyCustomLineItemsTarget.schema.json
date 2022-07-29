@@ -1,23 +1,15 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This Discount target is similar to `MultiBuyLineItems`, but is applied on Custom Line Items instead of Line Items.",
   "additionalProperties": false,
   "title": "MultiBuyCustomLineItemsTarget",
   "type": "object",
   "properties": {
-    "discountedQuantity": {
-      "type": "number",
-      "format": "integer"
-    },
+    "discountedQuantity": {"type": "number"},
     "predicate": {"type": "string"},
-    "triggerQuantity": {
-      "type": "number",
-      "format": "integer"
-    },
+    "triggerQuantity": {"type": "number"},
     "type": {"enum": ["multiBuyCustomLineItems"]},
-    "maxOccurrence": {
-      "type": "number",
-      "format": "integer"
-    },
+    "maxOccurrence": {"type": "number"},
     "selectionMode": {"$ref": "SelectionModeEnum.schema.json"}
   },
   "required": [
@@ -27,5 +19,5 @@
     "discountedQuantity",
     "selectionMode"
   ],
-  "$id": "https://example.com/MultiBuyCustomLineItemsTarget.schema.json"
+  "$id": "https://api.commercetools.com/MultiBuyCustomLineItemsTarget.schema.json"
 }

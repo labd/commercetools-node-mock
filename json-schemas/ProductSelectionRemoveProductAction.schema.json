@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionRemoveProductAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeProduct"]},
+    "product": {"$ref": "ProductResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionRemoveProductAction.schema.json"
+}

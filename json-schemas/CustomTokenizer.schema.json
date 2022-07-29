@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomTokenizer",
   "type": "object",
@@ -14,5 +14,5 @@
     "type",
     "inputs"
   ],
-  "$id": "https://example.com/CustomTokenizer.schema.json"
+  "$id": "https://api.commercetools.com/CustomTokenizer.schema.json"
 }

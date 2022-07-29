@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderEditPreviewFailure",
   "type": "object",
@@ -14,5 +14,5 @@
     "type",
     "errors"
   ],
-  "$id": "https://example.com/OrderEditPreviewFailure.schema.json"
+  "$id": "https://api.commercetools.com/OrderEditPreviewFailure.schema.json"
 }

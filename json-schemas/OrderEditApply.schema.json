@@ -1,21 +1,15 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderEditApply",
   "type": "object",
   "properties": {
-    "editVersion": {
-      "type": "number",
-      "format": "integer"
-    },
-    "resourceVersion": {
-      "type": "number",
-      "format": "integer"
-    }
+    "editVersion": {"type": "number"},
+    "resourceVersion": {"type": "number"}
   },
   "required": [
     "editVersion",
     "resourceVersion"
   ],
-  "$id": "https://example.com/OrderEditApply.schema.json"
+  "$id": "https://api.commercetools.com/OrderEditApply.schema.json"
 }

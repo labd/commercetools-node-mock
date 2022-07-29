@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Attribute type for localized enum values. Useful for predefined language-specific values selectable in drop-down menus if only one value can be selected. Use [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeLocalizedEnumValue instead if multiple values can be selected.",
   "additionalProperties": false,
   "title": "AttributeLocalizedEnumValue",
   "type": "object",
@@ -11,5 +12,5 @@
     "key",
     "label"
   ],
-  "$id": "https://example.com/AttributeLocalizedEnumValue.schema.json"
+  "$id": "https://api.commercetools.com/AttributeLocalizedEnumValue.schema.json"
 }

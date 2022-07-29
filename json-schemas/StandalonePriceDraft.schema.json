@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Standalone Prices are defined with a scope consisting of `currency` and optionally `country`, `customerGroup`, and `channel` and/or a validity period (`validFrom` and/or `validTo`). For more information see [price selection](/../api/projects/products#price-selection).\nCreating a Standalone Price is rejected if there already exists a Standalone Price for the same SKU with exactly the same price scope, or with overlapping validity periods within the same price scope. A Price without validity period does not conflict with a Price defined for a time period.",
+  "additionalProperties": false,
+  "title": "StandalonePriceDraft",
+  "type": "object",
+  "properties": {
+    "discounted": {"$ref": "DiscountedPriceDraft.schema.json"},
+    "country": {"type": "string"},
+    "tiers": {
+      "type": "array",
+      "items": {"$ref": "PriceTierDraft.schema.json"}
+    },
+    "customerGroup": {"$ref": "CustomerGroupResourceIdentifier.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "channel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sku": {"type": "string"},
+    "value": {"$ref": "Money.schema.json"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "sku",
+    "value"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePriceDraft.schema.json"
+}

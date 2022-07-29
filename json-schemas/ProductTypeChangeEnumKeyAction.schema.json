@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates the key of a single enum `value` in an [AttributeEnumType](ctp:api:type:AttributeEnumType) AttributeDefinition, [AttributeLocalizedEnumType](ctp:api:type:AttributeLocalizedEnumType) AttributeDefinition, [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeEnumType AttributeDefinition, or AttributeSetType of AttributeLocalizedEnumType AttributeDefinition.\n\nAll Products will be updated to the new key in an [eventually consistent](/general-concepts#eventual-consistency) way.",
   "additionalProperties": false,
   "title": "ProductTypeChangeEnumKeyAction",
   "type": "object",
@@ -15,5 +16,5 @@
     "key",
     "newKey"
   ],
-  "$id": "https://example.com/ProductTypeChangeEnumKeyAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangeEnumKeyAction.schema.json"
 }

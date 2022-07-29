@@ -1,15 +1,15 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyCustomerAddAddressAction",
   "type": "object",
   "properties": {
     "action": {"enum": ["addAddress"]},
-    "address": {"$ref": "Address.schema.json"}
+    "address": {"$ref": "BaseAddress.schema.json"}
   },
   "required": [
     "action",
     "address"
   ],
-  "$id": "https://example.com/MyCustomerAddAddressAction.schema.json"
+  "$id": "https://api.commercetools.com/MyCustomerAddAddressAction.schema.json"
 }

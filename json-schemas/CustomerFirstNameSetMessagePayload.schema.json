@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "CustomerFirstNameSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["CustomerFirstNameSet"]},
+    "firstName": {"type": "string"}
+  },
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/CustomerFirstNameSetMessagePayload.schema.json"
+}

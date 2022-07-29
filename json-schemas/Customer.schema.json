@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Customer",
   "type": "object",
@@ -28,6 +28,7 @@
     },
     "password": {"type": "string"},
     "id": {"type": "string"},
+    "authenticationMode": {"$ref": "AuthenticationModeEnum.schema.json"},
     "email": {"type": "string"},
     "key": {"type": "string"},
     "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
@@ -65,9 +66,8 @@
     "createdAt",
     "lastModifiedAt",
     "email",
-    "password",
     "addresses",
     "isEmailVerified"
   ],
-  "$id": "https://example.com/Customer.schema.json"
+  "$id": "https://api.commercetools.com/Customer.schema.json"
 }

@@ -1,9 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductRevertStagedChangesAction",
   "type": "object",
   "properties": {"action": {"enum": ["revertStagedChanges"]}},
   "required": ["action"],
-  "$id": "https://example.com/ProductRevertStagedChangesAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductRevertStagedChangesAction.schema.json"
 }

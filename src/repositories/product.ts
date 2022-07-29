@@ -6,7 +6,6 @@ import {
   ProductDraft,
   ProductPublishAction,
   ProductSetAttributeAction,
-  ProductType,
   ProductTypeReference,
   ProductVariant,
   ProductVariantDraft,
@@ -19,11 +18,13 @@ import { Writable } from '../types'
 import { getReferenceFromResourceIdentifier } from './helpers'
 
 export class ProductRepository extends AbstractResourceRepository {
+
   getTypeId(): ReferenceTypeId {
     return 'product'
   }
 
   create(context: RepositoryContext, draft: ProductDraft): Product {
+
     if (!draft.masterVariant) {
       throw new Error('Missing master variant')
     }

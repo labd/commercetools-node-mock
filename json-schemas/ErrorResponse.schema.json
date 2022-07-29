@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ErrorResponse",
   "type": "object",
@@ -11,14 +11,11 @@
       "type": "array",
       "items": {"$ref": "ErrorObject.schema.json"}
     },
-    "statusCode": {
-      "type": "number",
-      "format": "integer"
-    }
+    "statusCode": {"type": "number"}
   },
   "required": [
     "statusCode",
     "message"
   ],
-  "$id": "https://example.com/ErrorResponse.schema.json"
+  "$id": "https://api.commercetools.com/ErrorResponse.schema.json"
 }

@@ -1,19 +1,16 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductLegacySetSkuAction",
   "type": "object",
   "properties": {
     "sku": {"type": "string"},
     "action": {"enum": ["legacySetSku"]},
-    "variantId": {
-      "type": "number",
-      "format": "integer"
-    }
+    "variantId": {"type": "number"}
   },
   "required": [
     "action",
     "variantId"
   ],
-  "$id": "https://example.com/ProductLegacySetSkuAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductLegacySetSkuAction.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ExtensionTrigger",
   "type": "object",
@@ -8,11 +8,12 @@
       "type": "array",
       "items": {"$ref": "ExtensionActionEnum.schema.json"}
     },
+    "condition": {"type": "string"},
     "resourceTypeId": {"$ref": "ExtensionResourceTypeIdEnum.schema.json"}
   },
   "required": [
     "resourceTypeId",
     "actions"
   ],
-  "$id": "https://example.com/ExtensionTrigger.schema.json"
+  "$id": "https://api.commercetools.com/ExtensionTrigger.schema.json"
 }

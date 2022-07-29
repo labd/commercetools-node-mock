@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[Reference](ctp:api:type:Reference) to a [ProductSelection](ctp:api:type:ProductSelection).",
+  "additionalProperties": false,
+  "title": "ProductSelectionReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["product-selection"]},
+    "obj": {"$ref": "ProductSelection.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionReference.schema.json"
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteStateChangedMessage",
+  "type": "object",
+  "properties": {
+    "sequenceNumber": {"type": "number"},
+    "stagedQuoteState": {"$ref": "StagedQuoteStateEnum.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "oldStagedQuoteState": {"$ref": "StagedQuoteStateEnum.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "type": {"enum": ["StagedQuoteStateChanged"]},
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "stagedQuoteState",
+    "oldStagedQuoteState"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuoteStateChangedMessage.schema.json"
+}

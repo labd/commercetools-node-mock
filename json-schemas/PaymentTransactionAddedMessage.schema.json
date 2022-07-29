@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "PaymentTransactionAddedMessage",
   "type": "object",
@@ -34,5 +34,5 @@
     "type",
     "transaction"
   ],
-  "$id": "https://example.com/PaymentTransactionAddedMessage.schema.json"
+  "$id": "https://api.commercetools.com/PaymentTransactionAddedMessage.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderSetItemShippingAddressCustomTypeAction",
   "type": "object",
@@ -13,5 +13,5 @@
     "action",
     "addressKey"
   ],
-  "$id": "https://example.com/OrderSetItemShippingAddressCustomTypeAction.schema.json"
+  "$id": "https://api.commercetools.com/OrderSetItemShippingAddressCustomTypeAction.schema.json"
 }

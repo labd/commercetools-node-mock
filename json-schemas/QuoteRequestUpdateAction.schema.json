@@ -1,0 +1,19 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/QuoteRequestChangeQuoteRequestStateAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/QuoteRequestSetCustomFieldAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/QuoteRequestSetCustomTypeAction.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteRequestUpdateAction",
+  "type": "object",
+  "properties": {"action": {"enum": [
+    "changeQuoteRequestState",
+    "setCustomField",
+    "setCustomType"
+  ]}},
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/QuoteRequestUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

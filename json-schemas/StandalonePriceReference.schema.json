@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[Reference](/../api/types#reference) to a [StandalonePrice](ctp:api:type:StandalonePrice).",
+  "additionalProperties": false,
+  "title": "StandalonePriceReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["standalone-price"]},
+    "obj": {"$ref": "StandalonePrice.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePriceReference.schema.json"
+}

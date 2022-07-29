@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Type of resource the value should reference. Supported resource type identifiers are:",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "ReferenceTypeId",
   "type": "string",
   "enum": [
@@ -8,9 +9,7 @@
     "category",
     "channel",
     "customer",
-    "customer-email-token",
     "customer-group",
-    "customer-password-token",
     "discount-code",
     "extension",
     "inventory-entry",
@@ -20,10 +19,15 @@
     "payment",
     "product",
     "product-discount",
+    "product-price",
+    "product-selection",
     "product-type",
+    "quote",
+    "quote-request",
     "review",
     "shipping-method",
     "shopping-list",
+    "staged-quote",
     "state",
     "store",
     "subscription",
@@ -31,5 +35,5 @@
     "type",
     "zone"
   ],
-  "$id": "https://example.com/ReferenceTypeIdEnum.schema.json"
+  "$id": "https://api.commercetools.com/ReferenceTypeIdEnum.schema.json"
 }

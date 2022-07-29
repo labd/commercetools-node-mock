@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "A text input hint is a string with one of the following values:",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "TextInputHint",
   "type": "string",
   "enum": [
     "SingleLine",
     "MultiLine"
   ],
-  "$id": "https://example.com/TextInputHintEnum.schema.json"
+  "$id": "https://api.commercetools.com/TextInputHintEnum.schema.json"
 }

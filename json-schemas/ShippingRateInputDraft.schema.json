@@ -1,14 +1,17 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/ClassificationShippingRateInputDraft.schema.json"},
-    {"$ref": "https://example.com/ScoreShippingRateInputDraft.schema.json"}
+    {"$ref": "https://api.commercetools.com/ClassificationShippingRateInputDraft.schema.json"},
+    {"$ref": "https://api.commercetools.com/ScoreShippingRateInputDraft.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShippingRateInputDraft",
   "type": "object",
-  "properties": {"type": {"type": "string"}},
+  "properties": {"type": {"enum": [
+    "Classification",
+    "Score"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/ShippingRateInputDraft.schema.json",
+  "$id": "https://api.commercetools.com/ShippingRateInputDraft.schema.json",
   "discriminator": {"propertyName": "type"}
 }

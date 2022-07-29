@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerCompanyNameSetMessage",
   "type": "object",
@@ -31,8 +31,7 @@
     "sequenceNumber",
     "resource",
     "resourceVersion",
-    "type",
-    "companyName"
+    "type"
   ],
-  "$id": "https://example.com/CustomerCompanyNameSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/CustomerCompanyNameSetMessage.schema.json"
 }

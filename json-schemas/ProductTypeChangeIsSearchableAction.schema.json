@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Following this update the Products are reindexed asynchronously to reflect this change on the search endpoint. When enabling search on an existing Attribute type definition, the constraint regarding the maximum size of a searchable Attribute will not be enforced. Instead, Product AttributeDefinitions exceeding this limit will be treated as not searchable and will not be available for full-text search.",
   "additionalProperties": false,
   "title": "ProductTypeChangeIsSearchableAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "isSearchable"
   ],
-  "$id": "https://example.com/ProductTypeChangeIsSearchableAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangeIsSearchableAction.schema.json"
 }

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderLineItemRemovedMessagePayload",
+  "type": "object",
+  "properties": {
+    "newTotalPrice": {"$ref": "TypedMoney.schema.json"},
+    "newTaxedPrice": {"$ref": "TaxedItemPrice.schema.json"},
+    "removedQuantity": {"type": "number"},
+    "newShippingDetail": {"$ref": "ItemShippingDetails.schema.json"},
+    "lineItemId": {"type": "string"},
+    "newQuantity": {"type": "number"},
+    "type": {"enum": ["OrderLineItemRemoved"]},
+    "newPrice": {"$ref": "Price.schema.json"},
+    "newState": {
+      "type": "array",
+      "items": {"$ref": "ItemState.schema.json"}
+    }
+  },
+  "required": [
+    "type",
+    "lineItemId",
+    "removedQuantity",
+    "newQuantity",
+    "newState",
+    "newTotalPrice"
+  ],
+  "$id": "https://api.commercetools.com/OrderLineItemRemovedMessagePayload.schema.json"
+}

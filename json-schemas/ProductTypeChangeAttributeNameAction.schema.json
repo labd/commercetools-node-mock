@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Renames an AttributeDefinition and also renames all corresponding Attributes on all [Products](/projects/products) with this ProductType. The renaming of the Attributes is [eventually consistent](/general-concepts#eventual-consistency).",
   "additionalProperties": false,
   "title": "ProductTypeChangeAttributeNameAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "newAttributeName"
   ],
-  "$id": "https://example.com/ProductTypeChangeAttributeNameAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangeAttributeNameAction.schema.json"
 }

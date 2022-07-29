@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Specifies how an Attribute (or a set of Attributes) should be validated across all variants of a Product:",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "AttributeConstraintEnum",
   "type": "string",
   "enum": [
@@ -8,5 +9,5 @@
     "CombinationUnique",
     "SameForAll"
   ],
-  "$id": "https://example.com/AttributeConstraintEnumEnum.schema.json"
+  "$id": "https://api.commercetools.com/AttributeConstraintEnumEnum.schema.json"
 }

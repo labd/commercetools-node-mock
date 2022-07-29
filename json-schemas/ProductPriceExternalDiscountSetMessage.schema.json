@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductPriceExternalDiscountSetMessage",
   "type": "object",
@@ -23,10 +23,7 @@
     },
     "createdBy": {"$ref": "CreatedBy.schema.json"},
     "id": {"type": "string"},
-    "variantId": {
-      "type": "number",
-      "format": "integer"
-    },
+    "variantId": {"type": "number"},
     "variantKey": {"type": "string"},
     "sku": {"type": "string"},
     "priceId": {"type": "string"}
@@ -44,5 +41,5 @@
     "priceId",
     "staged"
   ],
-  "$id": "https://example.com/ProductPriceExternalDiscountSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/ProductPriceExternalDiscountSetMessage.schema.json"
 }

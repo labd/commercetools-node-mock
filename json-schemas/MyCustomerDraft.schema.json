@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyCustomerDraft",
   "type": "object",
@@ -7,7 +7,7 @@
     "lastName": {"type": "string"},
     "addresses": {
       "type": "array",
-      "items": {"$ref": "Address.schema.json"}
+      "items": {"$ref": "BaseAddress.schema.json"}
     },
     "defaultShippingAddress": {"type": "number"},
     "stores": {
@@ -15,7 +15,7 @@
       "items": {"$ref": "StoreResourceIdentifier.schema.json"}
     },
     "companyName": {"type": "string"},
-    "custom": {"$ref": "CustomFields.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
     "vatId": {"type": "string"},
     "dateOfBirth": {"type": [
       "number",
@@ -37,5 +37,5 @@
     "email",
     "password"
   ],
-  "$id": "https://example.com/MyCustomerDraft.schema.json"
+  "$id": "https://api.commercetools.com/MyCustomerDraft.schema.json"
 }

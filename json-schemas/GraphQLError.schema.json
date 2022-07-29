@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "GraphQLError",
   "type": "object",
@@ -26,5 +26,5 @@
     "locations",
     "path"
   ],
-  "$id": "https://example.com/GraphQLError.schema.json"
+  "$id": "https://api.commercetools.com/GraphQLError.schema.json"
 }

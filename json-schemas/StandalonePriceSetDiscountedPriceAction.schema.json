@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Discounts a Standalone Price. The referenced [ProductDiscount](ctp:api:type:ProductDiscount) in the discounted field must be of type external, active, and its predicate must match the referenced Price. Produces the [StandalonePriceExternalDiscountSet](ctp:api:type:StandalonePriceExternalDiscountSetMessage) Message.",
+  "additionalProperties": false,
+  "title": "StandalonePriceSetDiscountedPriceAction",
+  "type": "object",
+  "properties": {
+    "discounted": {"$ref": "DiscountedPriceDraft.schema.json"},
+    "action": {"enum": ["setDiscountedPrice"]}
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/StandalonePriceSetDiscountedPriceAction.schema.json"
+}

@@ -1,0 +1,14 @@
+{
+  "description": "Predefined states tracking the status of the Quote Request in the negotiation process.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "QuoteRequestState",
+  "type": "string",
+  "enum": [
+    "Submitted",
+    "Accepted",
+    "Closed",
+    "Rejected",
+    "Cancelled"
+  ],
+  "$id": "https://api.commercetools.com/QuoteRequestStateEnum.schema.json"
+}

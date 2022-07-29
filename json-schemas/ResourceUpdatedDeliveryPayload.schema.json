@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ResourceUpdatedDeliveryPayload",
+  "type": "object",
+  "properties": {
+    "projectKey": {"type": "string"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "modifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "notificationType": {"enum": ["ResourceUpdated"]},
+    "oldVersion": {"type": "number"},
+    "version": {"type": "number"}
+  },
+  "required": [
+    "projectKey",
+    "notificationType",
+    "resource",
+    "version",
+    "oldVersion",
+    "modifiedAt"
+  ],
+  "$id": "https://api.commercetools.com/ResourceUpdatedDeliveryPayload.schema.json"
+}

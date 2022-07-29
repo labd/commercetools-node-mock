@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "AuthenticationMode",
+  "type": "string",
+  "enum": [
+    "Password",
+    "ExternalAuth"
+  ],
+  "$id": "https://api.commercetools.com/AuthenticationModeEnum.schema.json"
+}

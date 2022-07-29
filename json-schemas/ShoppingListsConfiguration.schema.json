@@ -1,0 +1,8 @@
+{
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "ShoppingListsConfiguration",
+  "type": "object",
+  "properties": {"deleteDaysAfterLastModification": {"type": "number"}},
+  "$id": "https://api.commercetools.com/ShoppingListsConfiguration.schema.json"
+}

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Defines shipping rates in different currencies for a specific [Zone](ctp:api:type:Zone).",
   "additionalProperties": false,
   "title": "ZoneRate",
   "type": "object",
@@ -14,5 +15,5 @@
     "zone",
     "shippingRates"
   ],
-  "$id": "https://example.com/ZoneRate.schema.json"
+  "$id": "https://api.commercetools.com/ZoneRate.schema.json"
 }

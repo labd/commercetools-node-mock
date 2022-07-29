@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductImageAddedMessagePayload",
   "type": "object",
@@ -15,5 +15,5 @@
     "image",
     "staged"
   ],
-  "$id": "https://example.com/ProductImageAddedMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/ProductImageAddedMessagePayload.schema.json"
 }

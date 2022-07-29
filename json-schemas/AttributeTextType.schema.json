@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Attribute type for plain text values.",
   "additionalProperties": false,
   "title": "AttributeTextType",
   "type": "object",
   "properties": {"name": {"enum": ["text"]}},
   "required": ["name"],
-  "$id": "https://example.com/AttributeTextType.schema.json"
+  "$id": "https://api.commercetools.com/AttributeTextType.schema.json"
 }

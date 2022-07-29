@@ -1,6 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
 import { ParsedQs } from 'qs'
-import { Price } from '@commercetools/platform-sdk'
+import { InvalidInputError } from '@commercetools/platform-sdk'
+import { CommercetoolsError } from './exceptions'
+
+export const validateWithSchema = (obj: any, schema: any) => {
+  if (!schema(obj)) {
+    // @ts-ignore
+    const errors = schema.errors
+    throw new CommercetoolsError<InvalidInputError>(errors)
+  }
+}
 
 export const getBaseResourceProperties = () => {
   return {

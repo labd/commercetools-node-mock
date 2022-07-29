@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShippingMethod",
   "type": "object",
   "properties": {
+    "localizedName": {"$ref": "LocalizedString.schema.json"},
     "lastModifiedAt": {
       "type": "string",
       "format": "date-time"
@@ -39,5 +40,5 @@
     "zoneRates",
     "isDefault"
   ],
-  "$id": "https://example.com/ShippingMethod.schema.json"
+  "$id": "https://api.commercetools.com/ShippingMethod.schema.json"
 }

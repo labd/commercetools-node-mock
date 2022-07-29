@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ReviewRatingSetMessagePayload",
   "type": "object",
@@ -14,5 +14,5 @@
     "type",
     "includedInStatistics"
   ],
-  "$id": "https://example.com/ReviewRatingSetMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/ReviewRatingSetMessagePayload.schema.json"
 }

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteSetCustomTypeAction",
+  "type": "object",
+  "properties": {
+    "type": {"$ref": "TypeResourceIdentifier.schema.json"},
+    "fields": {"$ref": "FieldContainer.schema.json"},
+    "action": {"enum": ["setCustomType"]}
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/StagedQuoteSetCustomTypeAction.schema.json"
+}

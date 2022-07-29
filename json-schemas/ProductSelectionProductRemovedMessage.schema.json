@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionProductRemovedMessage",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sequenceNumber": {"type": "number"},
+    "product": {"$ref": "ProductReference.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "id": {"type": "string"},
+    "type": {"enum": ["ProductSelectionProductRemoved"]},
+    "version": {"type": "number"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionProductRemovedMessage.schema.json"
+}

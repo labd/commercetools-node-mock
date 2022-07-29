@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Quote](ctp:api:type:Quote).",
+  "additionalProperties": false,
+  "title": "QuoteResourceIdentifier",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["quote"]},
+    "key": {"type": "string"},
+    "id": {"type": "string"}
+  },
+  "required": ["typeId"],
+  "$id": "https://api.commercetools.com/QuoteResourceIdentifier.schema.json"
+}

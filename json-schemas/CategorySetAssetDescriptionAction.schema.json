@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CategorySetAssetDescriptionAction",
   "type": "object",
@@ -10,5 +10,5 @@
     "assetKey": {"type": "string"}
   },
   "required": ["action"],
-  "$id": "https://example.com/CategorySetAssetDescriptionAction.schema.json"
+  "$id": "https://api.commercetools.com/CategorySetAssetDescriptionAction.schema.json"
 }

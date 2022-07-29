@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "CartSetDirectDiscountsAction",
+  "type": "object",
+  "properties": {
+    "discounts": {
+      "type": "array",
+      "items": {"$ref": "DirectDiscountDraft.schema.json"}
+    },
+    "action": {"enum": ["setDirectDiscounts"]}
+  },
+  "required": [
+    "action",
+    "discounts"
+  ],
+  "$id": "https://api.commercetools.com/CartSetDirectDiscountsAction.schema.json"
+}

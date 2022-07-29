@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StoreProductSelectionsChangedMessage",
+  "type": "object",
+  "properties": {
+    "sequenceNumber": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "updatedProductSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    },
+    "type": {"enum": ["StoreProductSelectionsChanged"]},
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "addedProductSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "removedProductSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    },
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type"
+  ],
+  "$id": "https://api.commercetools.com/StoreProductSelectionsChangedMessage.schema.json"
+}

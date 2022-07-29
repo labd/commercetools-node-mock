@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ChannelSetAddressCustomTypeAction",
   "type": "object",
@@ -9,5 +9,5 @@
     "action": {"enum": ["setAddressCustomType"]}
   },
   "required": ["action"],
-  "$id": "https://example.com/ChannelSetAddressCustomTypeAction.schema.json"
+  "$id": "https://api.commercetools.com/ChannelSetAddressCustomTypeAction.schema.json"
 }

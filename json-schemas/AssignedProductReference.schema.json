@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "AssignedProductReference",
+  "type": "object",
+  "properties": {
+    "variantSelection": {"$ref": "ProductVariantSelection.schema.json"},
+    "product": {"$ref": "ProductReference.schema.json"}
+  },
+  "required": ["product"],
+  "$id": "https://api.commercetools.com/AssignedProductReference.schema.json"
+}

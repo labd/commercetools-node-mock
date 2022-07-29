@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[ProductSelection](ctp:api:type:ProductSelection) in a Store can be activated or deactivated using this update action.",
+  "additionalProperties": false,
+  "title": "StoreChangeProductSelectionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeProductSelectionActive"]},
+    "active": {"type": "boolean"},
+    "productSelection": {"$ref": "ProductSelectionResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "productSelection"
+  ],
+  "$id": "https://api.commercetools.com/StoreChangeProductSelectionAction.schema.json"
+}

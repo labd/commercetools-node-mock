@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionProductAddedMessage",
+  "type": "object",
+  "properties": {
+    "variantSelection": {"$ref": "ProductVariantSelection.schema.json"},
+    "sequenceNumber": {"type": "number"},
+    "product": {"$ref": "ProductReference.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "type": {"enum": ["ProductSelectionProductAdded"]},
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionProductAddedMessage.schema.json"
+}

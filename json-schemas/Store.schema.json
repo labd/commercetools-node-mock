@@ -1,13 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Store",
   "type": "object",
   "properties": {
-    "createdAt": {
-      "type": "string",
-      "format": "date-time"
-    },
     "lastModifiedAt": {
       "type": "string",
       "format": "date-time"
@@ -20,17 +16,25 @@
       "type": "array",
       "items": {"type": "string"}
     },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
     "createdBy": {"$ref": "CreatedBy.schema.json"},
     "distributionChannels": {
       "type": "array",
       "items": {"$ref": "ChannelReference.schema.json"}
     },
-    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
-    "custom": {"$ref": "CustomFields.schema.json"},
     "name": {"$ref": "LocalizedString.schema.json"},
     "id": {"type": "string"},
-    "version": {"type": "number"},
-    "key": {"type": "string"}
+    "key": {"type": "string"},
+    "productSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    }
   },
   "required": [
     "id",
@@ -38,7 +42,10 @@
     "createdAt",
     "lastModifiedAt",
     "key",
-    "distributionChannels"
+    "languages",
+    "distributionChannels",
+    "supplyChannels",
+    "productSelections"
   ],
-  "$id": "https://example.com/Store.schema.json"
+  "$id": "https://api.commercetools.com/Store.schema.json"
 }

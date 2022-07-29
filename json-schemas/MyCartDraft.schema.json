@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyCartDraft",
   "type": "object",
@@ -22,13 +22,13 @@
     "taxMode": {"$ref": "TaxModeEnum.schema.json"},
     "itemShippingAddresses": {
       "type": "array",
-      "items": {"$ref": "Address.schema.json"}
+      "items": {"$ref": "BaseAddress.schema.json"}
     },
     "customerEmail": {"type": "string"},
-    "shippingAddress": {"$ref": "Address.schema.json"},
+    "shippingAddress": {"$ref": "BaseAddress.schema.json"},
     "currency": {"type": "string"},
-    "billingAddress": {"$ref": "Address.schema.json"}
+    "billingAddress": {"$ref": "BaseAddress.schema.json"}
   },
   "required": ["currency"],
-  "$id": "https://example.com/MyCartDraft.schema.json"
+  "$id": "https://api.commercetools.com/MyCartDraft.schema.json"
 }

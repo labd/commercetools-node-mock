@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Adds a value to a [LocalizedEnumType](ctp:api:type:CustomFieldLocalizedEnumType).\nThis update action can be used to update a [LocalizedEnumType](ctp:api:type:CustomFieldLocalizedEnumType) FieldDefinition and a [SetType](ctp:api:type:CustomFieldSetType) FieldDefinition of [CustomFieldLocalizedEnumType](ctp:api:type:CustomFieldLocalizedEnumType).",
   "additionalProperties": false,
   "title": "TypeAddLocalizedEnumValueAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "fieldName",
     "value"
   ],
-  "$id": "https://example.com/TypeAddLocalizedEnumValueAction.schema.json"
+  "$id": "https://api.commercetools.com/TypeAddLocalizedEnumValueAction.schema.json"
 }

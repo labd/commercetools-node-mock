@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderAddLineItemAction",
   "type": "object",
@@ -22,5 +22,5 @@
     "sku": {"type": "string"}
   },
   "required": ["action"],
-  "$id": "https://example.com/StagedOrderAddLineItemAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderAddLineItemAction.schema.json"
 }

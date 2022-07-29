@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderStoreSetMessage",
   "type": "object",
@@ -34,5 +34,5 @@
     "type",
     "store"
   ],
-  "$id": "https://example.com/OrderStoreSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/OrderStoreSetMessage.schema.json"
 }

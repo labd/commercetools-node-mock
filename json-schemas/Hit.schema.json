@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "Hit",
+  "type": "object",
+  "properties": {
+    "version": {"type": "number"},
+    "relevance": {"type": "number"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "relevance"
+  ],
+  "$id": "https://api.commercetools.com/Hit.schema.json"
+}

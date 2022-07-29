@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TaxCategoryChangeNameAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "name"
   ],
-  "$id": "https://example.com/TaxCategoryChangeNameAction.schema.json"
+  "$id": "https://api.commercetools.com/TaxCategoryChangeNameAction.schema.json"
 }

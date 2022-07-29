@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelection",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "id": {"type": "string"},
+    "productCount": {"type": "number"},
+    "type": {"$ref": "ProductSelectionTypeEnumEnum.schema.json"},
+    "version": {"type": "number"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "name",
+    "productCount",
+    "type"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelection.schema.json"
+}

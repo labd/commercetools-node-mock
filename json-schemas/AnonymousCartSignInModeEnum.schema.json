@@ -1,10 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "AnonymousCartSignInMode",
   "type": "string",
   "enum": [
     "MergeWithExistingCustomerCart",
     "UseAsNewActiveCustomerCart"
   ],
-  "$id": "https://example.com/AnonymousCartSignInModeEnum.schema.json"
+  "$id": "https://api.commercetools.com/AnonymousCartSignInModeEnum.schema.json"
 }

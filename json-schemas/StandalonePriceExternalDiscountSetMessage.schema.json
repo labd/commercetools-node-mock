@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This Message is the result of the Standalone Price [SetDiscountedPrice](/../api/projects/standalone-prices#set-discounted-price) update action.",
+  "additionalProperties": false,
+  "title": "StandalonePriceExternalDiscountSetMessage",
+  "type": "object",
+  "properties": {
+    "discounted": {"$ref": "DiscountedPrice.schema.json"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sequenceNumber": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "id": {"type": "string"},
+    "type": {"enum": ["StandalonePriceExternalDiscountSet"]},
+    "version": {"type": "number"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePriceExternalDiscountSetMessage.schema.json"
+}

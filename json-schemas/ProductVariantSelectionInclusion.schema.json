@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Only Product Variants with explicitly stated SKUs are part of the Product Selection.",
+  "additionalProperties": false,
+  "title": "ProductVariantSelectionInclusion",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["inclusion"]},
+    "skus": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "type",
+    "skus"
+  ],
+  "$id": "https://api.commercetools.com/ProductVariantSelectionInclusion.schema.json"
+}

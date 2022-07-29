@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Attribute",
   "type": "object",
@@ -18,5 +18,5 @@
     "name",
     "value"
   ],
-  "$id": "https://example.com/Attribute.schema.json"
+  "$id": "https://api.commercetools.com/Attribute.schema.json"
 }

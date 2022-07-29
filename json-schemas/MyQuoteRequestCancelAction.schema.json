@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Transitions the `quoteRequestState` of the Quote Request to `Cancelled`. Can only be used when the Quote Request is in state `Submitted`.",
+  "additionalProperties": false,
+  "title": "MyQuoteRequestCancelAction",
+  "type": "object",
+  "properties": {"action": {"enum": ["cancelQuoteRequest"]}},
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/MyQuoteRequestCancelAction.schema.json"
+}

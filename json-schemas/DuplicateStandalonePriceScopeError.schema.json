@@ -1,0 +1,40 @@
+{
+  "patternProperties": {"": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "DuplicateStandalonePriceScopeError",
+  "type": "object",
+  "properties": {
+    "country": {"type": "string"},
+    "code": {"enum": ["DuplicateStandalonePriceScope"]},
+    "customerGroup": {"$ref": "CustomerGroupResourceIdentifier.schema.json"},
+    "channel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currency": {"type": "string"},
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "message": {"type": "string"},
+    "sku": {"type": "string"},
+    "conflictingStandalonePrice": {"$ref": "StandalonePriceReference.schema.json"}
+  },
+  "required": [
+    "code",
+    "message",
+    "conflictingStandalonePrice",
+    "sku",
+    "currency"
+  ],
+  "$id": "https://api.commercetools.com/DuplicateStandalonePriceScopeError.schema.json"
+}

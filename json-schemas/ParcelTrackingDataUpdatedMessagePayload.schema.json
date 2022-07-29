@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ParcelTrackingDataUpdatedMessagePayload",
   "type": "object",
@@ -14,5 +14,5 @@
     "deliveryId",
     "parcelId"
   ],
-  "$id": "https://example.com/ParcelTrackingDataUpdatedMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/ParcelTrackingDataUpdatedMessagePayload.schema.json"
 }

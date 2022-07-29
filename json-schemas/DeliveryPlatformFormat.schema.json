@@ -1,9 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "additionalProperties": false,
-  "title": "DeliveryPlatformFormat",
-  "type": "object",
-  "properties": {"type": {"enum": ["Platform"]}},
-  "required": ["type"],
-  "$id": "https://example.com/DeliveryPlatformFormat.schema.json"
-}

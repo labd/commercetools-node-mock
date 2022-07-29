@@ -1,22 +1,23 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "InventoryEntryDraft",
   "type": "object",
   "properties": {
-    "supplyChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
-    "sku": {"type": "string"},
-    "restockableInDays": {"type": "number"},
     "expectedDelivery": {
       "type": "string",
       "format": "date-time"
     },
     "quantityOnStock": {"type": "number"},
-    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
+    "supplyChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "sku": {"type": "string"},
+    "restockableInDays": {"type": "number"},
+    "key": {"type": "string"}
   },
   "required": [
     "sku",
     "quantityOnStock"
   ],
-  "$id": "https://example.com/InventoryEntryDraft.schema.json"
+  "$id": "https://api.commercetools.com/InventoryEntryDraft.schema.json"
 }

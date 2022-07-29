@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "LineItemStateTransitionMessage",
   "type": "object",
@@ -45,5 +45,5 @@
     "fromState",
     "toState"
   ],
-  "$id": "https://example.com/LineItemStateTransitionMessage.schema.json"
+  "$id": "https://api.commercetools.com/LineItemStateTransitionMessage.schema.json"
 }

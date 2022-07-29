@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartAddCustomLineItemAction",
   "type": "object",
@@ -20,5 +20,5 @@
     "quantity",
     "slug"
   ],
-  "$id": "https://example.com/CartAddCustomLineItemAction.schema.json"
+  "$id": "https://api.commercetools.com/CartAddCustomLineItemAction.schema.json"
 }

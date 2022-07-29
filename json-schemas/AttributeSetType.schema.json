@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "AttributeType that defines a set (without duplicate elements) with values of the given `elementType`. It does not support `isRequired`. Since this type itself is an AttributeType, it is possible to construct an AttributeSetType of an AttributeSetType of any AttributeType, and to continue with this iteration until terminating with any non-AttributeSetType. In case the AttributeSetType iteration terminates with an [AttributeNestedType](ctp:api:type:AttributeNestedType), the iteration can have 5 steps at maximum.",
   "additionalProperties": false,
   "title": "AttributeSetType",
   "type": "object",
@@ -11,5 +12,5 @@
     "name",
     "elementType"
   ],
-  "$id": "https://example.com/AttributeSetType.schema.json"
+  "$id": "https://api.commercetools.com/AttributeSetType.schema.json"
 }

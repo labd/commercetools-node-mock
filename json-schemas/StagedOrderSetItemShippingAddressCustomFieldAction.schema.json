@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetItemShippingAddressCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setItemShippingAddressCustomField"]},
+    "addressKey": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
+  },
+  "required": [
+    "action",
+    "addressKey",
+    "name"
+  ],
+  "$id": "https://api.commercetools.com/StagedOrderSetItemShippingAddressCustomFieldAction.schema.json"
+}

@@ -1,0 +1,27 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/ProductSelectionAddProductAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductSelectionChangeNameAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductSelectionRemoveProductAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductSelectionSetCustomFieldAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductSelectionSetCustomTypeAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductSelectionSetKeyAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductSelectionSetVariantSelectionAction.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionUpdateAction",
+  "type": "object",
+  "properties": {"action": {"enum": [
+    "addProduct",
+    "changeName",
+    "removeProduct",
+    "setCustomField",
+    "setCustomType",
+    "setKey",
+    "setVariantSelection"
+  ]}},
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/ProductSelectionUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

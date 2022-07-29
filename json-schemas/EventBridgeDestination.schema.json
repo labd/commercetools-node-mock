@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[AWS EventBridge](https://aws.amazon.com/eventbridge/) can be used to push events and messages to a serverless event bus that can forward them to AWS SQS, SNS, Lambda, and other AWS services based on forwarding rules.",
+  "additionalProperties": false,
+  "title": "EventBridgeDestination",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["EventBridge"]},
+    "region": {"type": "string"},
+    "accountId": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "region",
+    "accountId"
+  ],
+  "$id": "https://api.commercetools.com/EventBridgeDestination.schema.json"
+}

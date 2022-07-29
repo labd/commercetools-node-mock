@@ -1,19 +1,16 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderExcerpt",
   "type": "object",
   "properties": {
     "totalPrice": {"$ref": "TypedMoney.schema.json"},
-    "version": {
-      "type": "number",
-      "format": "integer"
-    },
+    "version": {"type": "number"},
     "taxedPrice": {"$ref": "TaxedPrice.schema.json"}
   },
   "required": [
     "totalPrice",
     "version"
   ],
-  "$id": "https://example.com/OrderExcerpt.schema.json"
+  "$id": "https://api.commercetools.com/OrderExcerpt.schema.json"
 }

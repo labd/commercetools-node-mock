@@ -1,0 +1,21 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/StandalonePriceChangeValueAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StandalonePriceSetCustomFieldAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StandalonePriceSetCustomTypeAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StandalonePriceSetDiscountedPriceAction.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StandalonePriceUpdateAction",
+  "type": "object",
+  "properties": {"action": {"enum": [
+    "changeValue",
+    "setCustomField",
+    "setCustomType",
+    "setDiscountedPrice"
+  ]}},
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/StandalonePriceUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

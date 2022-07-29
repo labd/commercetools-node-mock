@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Discounts the Product Price by allowing the client to explicitly [set a discounted value](/../api/projects/products#set-discounted-embedded-price).\nUse this when setting discounts using an external service.",
   "additionalProperties": false,
   "title": "ProductDiscountValueExternalDraft",
   "type": "object",
   "properties": {"type": {"enum": ["external"]}},
   "required": ["type"],
-  "$id": "https://example.com/ProductDiscountValueExternalDraft.schema.json"
+  "$id": "https://api.commercetools.com/ProductDiscountValueExternalDraft.schema.json"
 }

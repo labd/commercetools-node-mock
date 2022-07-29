@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderSetLineItemDistributionChannelAction",
   "type": "object",
@@ -12,5 +12,5 @@
     "action",
     "lineItemId"
   ],
-  "$id": "https://example.com/StagedOrderSetLineItemDistributionChannelAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderSetLineItemDistributionChannelAction.schema.json"
 }

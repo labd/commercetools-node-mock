@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Attribute type for Boolean values. Valid values for the Attribute are `true` and `false` (JSON Boolean).",
   "additionalProperties": false,
   "title": "AttributeBooleanType",
   "type": "object",
   "properties": {"name": {"enum": ["boolean"]}},
   "required": ["name"],
-  "$id": "https://example.com/AttributeBooleanType.schema.json"
+  "$id": "https://api.commercetools.com/AttributeBooleanType.schema.json"
 }

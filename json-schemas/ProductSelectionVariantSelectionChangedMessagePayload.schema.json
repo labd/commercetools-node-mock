@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionVariantSelectionChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "product": {"$ref": "ProductReference.schema.json"},
+    "newVariantSelection": {"$ref": "ProductVariantSelection.schema.json"},
+    "type": {"enum": ["ProductSelectionVariantSelectionChanged"]},
+    "oldVariantSelection": {"$ref": "ProductVariantSelection.schema.json"}
+  },
+  "required": [
+    "type",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionVariantSelectionChangedMessagePayload.schema.json"
+}

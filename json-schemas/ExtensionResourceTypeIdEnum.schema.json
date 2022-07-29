@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Extensions are available for:",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "ExtensionResourceTypeId",
   "type": "string",
   "enum": [
@@ -8,5 +9,5 @@
     "payment",
     "customer"
   ],
-  "$id": "https://example.com/ExtensionResourceTypeIdEnum.schema.json"
+  "$id": "https://api.commercetools.com/ExtensionResourceTypeIdEnum.schema.json"
 }

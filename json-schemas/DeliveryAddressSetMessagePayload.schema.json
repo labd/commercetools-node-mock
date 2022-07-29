@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "DeliveryAddressSetMessagePayload",
   "type": "object",
@@ -13,5 +13,5 @@
     "type",
     "deliveryId"
   ],
-  "$id": "https://example.com/DeliveryAddressSetMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/DeliveryAddressSetMessagePayload.schema.json"
 }

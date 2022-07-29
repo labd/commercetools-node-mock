@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StandalonePrice",
+  "type": "object",
+  "properties": {
+    "discounted": {"$ref": "DiscountedPrice.schema.json"},
+    "country": {"type": "string"},
+    "tiers": {
+      "type": "array",
+      "items": {"$ref": "PriceTier.schema.json"}
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "channel": {"$ref": "ChannelReference.schema.json"},
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "version": {"type": "number"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "id": {"type": "string"},
+    "sku": {"type": "string"},
+    "value": {"$ref": "TypedMoney.schema.json"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sku",
+    "value"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePrice.schema.json"
+}

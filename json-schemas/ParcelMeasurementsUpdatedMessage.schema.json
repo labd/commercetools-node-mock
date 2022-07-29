@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ParcelMeasurementsUpdatedMessage",
   "type": "object",
@@ -37,5 +37,5 @@
     "deliveryId",
     "parcelId"
   ],
-  "$id": "https://example.com/ParcelMeasurementsUpdatedMessage.schema.json"
+  "$id": "https://api.commercetools.com/ParcelMeasurementsUpdatedMessage.schema.json"
 }

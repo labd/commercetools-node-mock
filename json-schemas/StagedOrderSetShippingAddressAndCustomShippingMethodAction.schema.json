@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderSetShippingAddressAndCustomShippingMethodAction",
   "type": "object",
@@ -7,7 +7,7 @@
     "action": {"enum": ["setShippingAddressAndCustomShippingMethod"]},
     "shippingMethodName": {"type": "string"},
     "shippingRate": {"$ref": "ShippingRateDraft.schema.json"},
-    "address": {"$ref": "Address.schema.json"},
+    "address": {"$ref": "BaseAddress.schema.json"},
     "externalTaxRate": {"$ref": "ExternalTaxRateDraft.schema.json"},
     "taxCategory": {"$ref": "TaxCategoryResourceIdentifier.schema.json"}
   },
@@ -17,5 +17,5 @@
     "shippingMethodName",
     "shippingRate"
   ],
-  "$id": "https://example.com/StagedOrderSetShippingAddressAndCustomShippingMethodAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderSetShippingAddressAndCustomShippingMethodAction.schema.json"
 }

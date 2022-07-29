@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Field type for number values.",
   "additionalProperties": false,
   "title": "CustomFieldNumberType",
   "type": "object",
   "properties": {"name": {"enum": ["Number"]}},
   "required": ["name"],
-  "$id": "https://example.com/CustomFieldNumberType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldNumberType.schema.json"
 }

@@ -1,17 +1,25 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartSetDeliveryAddressCustomFieldAction",
   "type": "object",
   "properties": {
+    "name": {"type": "string"},
     "action": {"enum": ["setDeliveryAddressCustomField"]},
     "deliveryId": {"type": "string"},
-    "type": {"$ref": "TypeResourceIdentifier.schema.json"},
-    "fields": {"$ref": "FieldContainer.schema.json"}
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
   },
   "required": [
     "action",
-    "deliveryId"
+    "deliveryId",
+    "name"
   ],
-  "$id": "https://example.com/CartSetDeliveryAddressCustomFieldAction.schema.json"
+  "$id": "https://api.commercetools.com/CartSetDeliveryAddressCustomFieldAction.schema.json"
 }

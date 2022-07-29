@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Changes the `label` of an [EnumValue](ctp:api:type:CustomFieldEnumValue) of an [EnumType](ctp:api:type:CustomFieldEnumType) FieldDefinition.",
   "additionalProperties": false,
   "title": "TypeChangeEnumValueLabelAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "fieldName",
     "value"
   ],
-  "$id": "https://example.com/TypeChangeEnumValueLabelAction.schema.json"
+  "$id": "https://api.commercetools.com/TypeChangeEnumValueLabelAction.schema.json"
 }

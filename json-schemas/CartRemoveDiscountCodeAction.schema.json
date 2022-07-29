@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartRemoveDiscountCodeAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "discountCode"
   ],
-  "$id": "https://example.com/CartRemoveDiscountCodeAction.schema.json"
+  "$id": "https://api.commercetools.com/CartRemoveDiscountCodeAction.schema.json"
 }

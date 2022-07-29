@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Field type for [CentPrecisionMoney](ctp:api:type:CentPrecisionMoney) values.",
   "additionalProperties": false,
   "title": "CustomFieldMoneyType",
   "type": "object",
   "properties": {"name": {"enum": ["Money"]}},
   "required": ["name"],
-  "$id": "https://example.com/CustomFieldMoneyType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldMoneyType.schema.json"
 }

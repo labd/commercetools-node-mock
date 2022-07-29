@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "If a language is used by a [Store](ctp:api:type:Store), it cannot be deleted. Attempts to delete such language will lead to [LanguageUsedInStores](/../api/errors#projects-400-language-used-in-stores) errors.",
   "additionalProperties": false,
   "title": "ProjectChangeLanguagesAction",
   "type": "object",
@@ -14,5 +15,5 @@
     "action",
     "languages"
   ],
-  "$id": "https://example.com/ProjectChangeLanguagesAction.schema.json"
+  "$id": "https://api.commercetools.com/ProjectChangeLanguagesAction.schema.json"
 }

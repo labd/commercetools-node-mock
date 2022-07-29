@@ -1,21 +1,15 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "GraphQLErrorLocation",
   "type": "object",
   "properties": {
-    "column": {
-      "type": "number",
-      "format": "integer"
-    },
-    "line": {
-      "type": "number",
-      "format": "integer"
-    }
+    "column": {"type": "number"},
+    "line": {"type": "number"}
   },
   "required": [
     "line",
     "column"
   ],
-  "$id": "https://example.com/GraphQLErrorLocation.schema.json"
+  "$id": "https://api.commercetools.com/GraphQLErrorLocation.schema.json"
 }

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionSetting",
+  "type": "object",
+  "properties": {
+    "active": {"type": "boolean"},
+    "productSelection": {"$ref": "ProductSelectionReference.schema.json"}
+  },
+  "required": [
+    "productSelection",
+    "active"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionSetting.schema.json"
+}

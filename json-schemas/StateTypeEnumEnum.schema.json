@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Resource or object type the State can be assigned to.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "StateTypeEnum",
   "type": "string",
   "enum": [
@@ -9,5 +10,5 @@
     "ReviewState",
     "PaymentState"
   ],
-  "$id": "https://example.com/StateTypeEnumEnum.schema.json"
+  "$id": "https://api.commercetools.com/StateTypeEnumEnum.schema.json"
 }

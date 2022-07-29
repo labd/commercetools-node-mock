@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "CloudEventsFormat",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["CloudEvents"]},
+    "cloudEventsVersion": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "cloudEventsVersion"
+  ],
+  "$id": "https://api.commercetools.com/CloudEventsFormat.schema.json"
+}

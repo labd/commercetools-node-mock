@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Defines the configuration for the [Messages Query](/../api/projects/messages) feature for the Project.",
+  "additionalProperties": false,
+  "title": "MessagesConfigurationDraft",
+  "type": "object",
+  "properties": {
+    "deleteDaysAfterCreation": {"type": "number"},
+    "enabled": {"type": "boolean"}
+  },
+  "required": [
+    "enabled",
+    "deleteDaysAfterCreation"
+  ],
+  "$id": "https://api.commercetools.com/MessagesConfigurationDraft.schema.json"
+}

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This action sets or removes the custom type for an existing CustomerGroup.\nIf present, this action overwrites any existing [custom](/../api/projects/custom-fields) type and fields.",
   "additionalProperties": false,
   "title": "CustomerGroupSetCustomTypeAction",
   "type": "object",
@@ -9,5 +10,5 @@
     "action": {"enum": ["setCustomType"]}
   },
   "required": ["action"],
-  "$id": "https://example.com/CustomerGroupSetCustomTypeAction.schema.json"
+  "$id": "https://api.commercetools.com/CustomerGroupSetCustomTypeAction.schema.json"
 }

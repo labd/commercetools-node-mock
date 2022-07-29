@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CategorySlugChangedMessagePayload",
   "type": "object",
@@ -12,5 +12,5 @@
     "type",
     "slug"
   ],
-  "$id": "https://example.com/CategorySlugChangedMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/CategorySlugChangedMessagePayload.schema.json"
 }

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "MessageDeliveryPayload",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sequenceNumber": {"type": "number"},
+    "projectKey": {"type": "string"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource": {"$ref": "Reference.schema.json"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "payloadNotIncluded": {"$ref": "PayloadNotIncluded.schema.json"},
+    "notificationType": {"enum": ["Message"]},
+    "id": {"type": "string"},
+    "version": {"type": "number"}
+  },
+  "required": [
+    "projectKey",
+    "notificationType",
+    "resource",
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resourceVersion",
+    "payloadNotIncluded"
+  ],
+  "$id": "https://api.commercetools.com/MessageDeliveryPayload.schema.json"
+}

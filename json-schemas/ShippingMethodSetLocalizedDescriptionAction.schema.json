@@ -1,12 +1,12 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShippingMethodSetLocalizedDescriptionAction",
   "type": "object",
   "properties": {
-    "localizedDescription": {"type": "string"},
+    "localizedDescription": {"$ref": "LocalizedString.schema.json"},
     "action": {"enum": ["setLocalizedDescription"]}
   },
   "required": ["action"],
-  "$id": "https://example.com/ShippingMethodSetLocalizedDescriptionAction.schema.json"
+  "$id": "https://api.commercetools.com/ShippingMethodSetLocalizedDescriptionAction.schema.json"
 }

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[Reference](/../api/types#reference) to a [Store](ctp:api:type:Store).",
   "additionalProperties": false,
   "title": "StoreReference",
   "type": "object",
@@ -12,5 +13,5 @@
     "typeId",
     "id"
   ],
-  "$id": "https://example.com/StoreReference.schema.json"
+  "$id": "https://api.commercetools.com/StoreReference.schema.json"
 }

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Object that stores cent amounts in a specific currency.",
   "additionalProperties": false,
   "title": "CentPrecisionMoney",
   "type": "object",
@@ -10,10 +11,10 @@
     "currencyCode": {"type": "string"}
   },
   "required": [
-    "type",
-    "fractionDigits",
     "centAmount",
-    "currencyCode"
+    "currencyCode",
+    "type",
+    "fractionDigits"
   ],
-  "$id": "https://example.com/CentPrecisionMoney.schema.json"
+  "$id": "https://api.commercetools.com/CentPrecisionMoney.schema.json"
 }

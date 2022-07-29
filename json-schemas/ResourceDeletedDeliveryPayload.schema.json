@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ResourceDeletedDeliveryPayload",
+  "type": "object",
+  "properties": {
+    "projectKey": {"type": "string"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "modifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "notificationType": {"enum": ["ResourceDeleted"]},
+    "version": {"type": "number"},
+    "dataErasure": {"type": "boolean"}
+  },
+  "required": [
+    "projectKey",
+    "notificationType",
+    "resource",
+    "version",
+    "modifiedAt"
+  ],
+  "$id": "https://api.commercetools.com/ResourceDeletedDeliveryPayload.schema.json"
+}

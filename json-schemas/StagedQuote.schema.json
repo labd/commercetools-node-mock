@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuote",
+  "type": "object",
+  "properties": {
+    "stagedQuoteState": {"$ref": "StagedQuoteStateEnum.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "version": {"type": "number"},
+    "sellerComment": {"type": "string"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "id": {"type": "string"},
+    "quoteRequest": {"$ref": "QuoteRequestReference.schema.json"},
+    "key": {"type": "string"},
+    "customer": {"$ref": "CustomerReference.schema.json"},
+    "quotationCart": {"$ref": "CartReference.schema.json"},
+    "validTo": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "stagedQuoteState",
+    "quoteRequest",
+    "quotationCart"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuote.schema.json"
+}

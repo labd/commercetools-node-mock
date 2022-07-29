@@ -1,15 +1,19 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/CartClassificationTier.schema.json"},
-    {"$ref": "https://example.com/CartScoreTier.schema.json"},
-    {"$ref": "https://example.com/CartValueTier.schema.json"}
+    {"$ref": "https://api.commercetools.com/CartClassificationTier.schema.json"},
+    {"$ref": "https://api.commercetools.com/CartScoreTier.schema.json"},
+    {"$ref": "https://api.commercetools.com/CartValueTier.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShippingRatePriceTier",
   "type": "object",
-  "properties": {"type": {"$ref": "ShippingRateTierTypeEnum.schema.json"}},
+  "properties": {"type": {"enum": [
+    "CartClassification",
+    "CartScore",
+    "CartValue"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/ShippingRatePriceTier.schema.json",
+  "$id": "https://api.commercetools.com/ShippingRatePriceTier.schema.json",
   "discriminator": {"propertyName": "type"}
 }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteRequestCreatedMessagePayload",
+  "type": "object",
+  "properties": {"type": {"enum": ["QuoteRequestCreated"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/QuoteRequestCreatedMessagePayload.schema.json"
+}

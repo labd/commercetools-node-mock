@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "InventoryEntryQuantitySetMessage",
   "type": "object",
@@ -24,6 +24,7 @@
     },
     "createdBy": {"$ref": "CreatedBy.schema.json"},
     "newAvailableQuantity": {"type": "number"},
+    "supplyChannel": {"$ref": "ChannelReference.schema.json"},
     "id": {"type": "string"}
   },
   "required": [
@@ -40,5 +41,5 @@
     "oldAvailableQuantity",
     "newAvailableQuantity"
   ],
-  "$id": "https://example.com/InventoryEntryQuantitySetMessage.schema.json"
+  "$id": "https://api.commercetools.com/InventoryEntryQuantitySetMessage.schema.json"
 }

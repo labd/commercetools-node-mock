@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "InventoryEntry",
   "type": "object",
@@ -23,9 +23,10 @@
       "format": "date-time"
     },
     "createdBy": {"$ref": "CreatedBy.schema.json"},
-    "supplyChannel": {"$ref": "ChannelResourceIdentifier.schema.json"},
+    "supplyChannel": {"$ref": "ChannelReference.schema.json"},
     "id": {"type": "string"},
-    "sku": {"type": "string"}
+    "sku": {"type": "string"},
+    "key": {"type": "string"}
   },
   "required": [
     "id",
@@ -36,5 +37,5 @@
     "quantityOnStock",
     "availableQuantity"
   ],
-  "$id": "https://example.com/InventoryEntry.schema.json"
+  "$id": "https://api.commercetools.com/InventoryEntry.schema.json"
 }
