@@ -1,9 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "additionalProperties": false,
-  "title": "CustomerEmailVerifiedMessagePayload",
-  "type": "object",
-  "properties": {"type": {"enum": ["CustomerEmailVerified"]}},
-  "required": ["type"],
-  "$id": "https://example.com/CustomerEmailVerifiedMessagePayload.schema.json"
-}

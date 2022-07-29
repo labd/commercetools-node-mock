@@ -18,7 +18,6 @@
   },
   "scripts": {
     "start": "nodemon --watch src --exec 'node -r esbuild-register' src/server.ts",
-    "generate": "node -r esbuild-register generate-validation.ts",
     "build": "tsup",
     "test": "jest test --coverage",
     "lint": "eslint"
@@ -63,8 +62,6 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.182",
-    "ajv": "^8.8.2",
-    "ajv-formats": "^2.1.1",
     "basic-auth": "^2.0.1",
     "body-parser": "^1.20.0",
     "deep-equal": "^2.0.5",
