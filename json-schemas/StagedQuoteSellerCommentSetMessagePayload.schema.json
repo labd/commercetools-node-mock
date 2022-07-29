@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteSellerCommentSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["StagedQuoteSellerCommentSet"]},
+    "sellerComment": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "sellerComment"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuoteSellerCommentSetMessagePayload.schema.json"
+}

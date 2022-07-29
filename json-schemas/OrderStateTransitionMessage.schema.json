@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderStateTransitionMessage",
   "type": "object",
@@ -10,6 +10,7 @@
       "format": "date-time"
     },
     "resource": {"$ref": "Reference.schema.json"},
+    "oldState": {"$ref": "StateReference.schema.json"},
     "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
     "resourceVersion": {"type": "number"},
     "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
@@ -36,5 +37,5 @@
     "state",
     "force"
   ],
-  "$id": "https://example.com/OrderStateTransitionMessage.schema.json"
+  "$id": "https://api.commercetools.com/OrderStateTransitionMessage.schema.json"
 }

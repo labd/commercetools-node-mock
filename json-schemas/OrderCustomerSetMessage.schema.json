@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderCustomerSetMessage",
   "type": "object",
@@ -36,5 +36,5 @@
     "resourceVersion",
     "type"
   ],
-  "$id": "https://example.com/OrderCustomerSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/OrderCustomerSetMessage.schema.json"
 }

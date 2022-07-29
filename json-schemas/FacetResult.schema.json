@@ -1,15 +1,19 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/FilteredFacetResult.schema.json"},
-    {"$ref": "https://example.com/RangeFacetResult.schema.json"},
-    {"$ref": "https://example.com/TermFacetResult.schema.json"}
+    {"$ref": "https://api.commercetools.com/FilteredFacetResult.schema.json"},
+    {"$ref": "https://api.commercetools.com/RangeFacetResult.schema.json"},
+    {"$ref": "https://api.commercetools.com/TermFacetResult.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "FacetResult",
   "type": "object",
-  "properties": {"type": {"$ref": "FacetTypesEnum.schema.json"}},
+  "properties": {"type": {"enum": [
+    "filter",
+    "range",
+    "terms"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/FacetResult.schema.json",
+  "$id": "https://api.commercetools.com/FacetResult.schema.json",
   "discriminator": {"propertyName": "type"}
 }

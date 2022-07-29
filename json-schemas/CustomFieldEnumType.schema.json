@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Field type for enum values.",
   "additionalProperties": false,
   "title": "CustomFieldEnumType",
   "type": "object",
@@ -14,5 +15,5 @@
     "name",
     "values"
   ],
-  "$id": "https://example.com/CustomFieldEnumType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldEnumType.schema.json"
 }

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Adds a Product to the Product Selection.\nIf the given Product is already assigned to the Product Selection with the same Variant Selection nothing happens\nbut if the existing Assignment has a different Variant Selection [ProductPresentWithDifferentVariantSelection](/errors#product-selections) is raised.'",
+  "additionalProperties": false,
+  "title": "ProductSelectionAddProductAction",
+  "type": "object",
+  "properties": {
+    "variantSelection": {"$ref": "ProductVariantSelection.schema.json"},
+    "action": {"enum": ["addProduct"]},
+    "product": {"$ref": "ProductResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionAddProductAction.schema.json"
+}

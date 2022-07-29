@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteStateChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["StagedQuoteStateChanged"]},
+    "stagedQuoteState": {"$ref": "StagedQuoteStateEnum.schema.json"},
+    "oldStagedQuoteState": {"$ref": "StagedQuoteStateEnum.schema.json"}
+  },
+  "required": [
+    "type",
+    "stagedQuoteState",
+    "oldStagedQuoteState"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuoteStateChangedMessagePayload.schema.json"
+}

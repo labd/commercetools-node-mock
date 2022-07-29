@@ -1,0 +1,17 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/AuthorizationHeaderAuthentication.schema.json"},
+    {"$ref": "https://api.commercetools.com/AzureFunctionsAuthentication.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "HttpDestinationAuthentication",
+  "type": "object",
+  "properties": {"type": {"enum": [
+    "AuthorizationHeader",
+    "AzureFunctions"
+  ]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/HttpDestinationAuthentication.schema.json",
+  "discriminator": {"propertyName": "type"}
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Generated after a successful [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.",
+  "additionalProperties": false,
+  "title": "StandalonePriceCreatedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["StandalonePriceCreated"]},
+    "standalonePrice": {"$ref": "StandalonePrice.schema.json"}
+  },
+  "required": [
+    "type",
+    "standalonePrice"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePriceCreatedMessagePayload.schema.json"
+}

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Used when the ShippingRate maps to an abstract Cart categorization expressed by strings (for example, `Light`, `Medium`, or `Heavy`).\nOnly keys defined in the `values` array can be used to create a tier or to set a value of the `shippingRateInput` on the [Cart](ctp:api:type:Cart).\nKeys must be unique.",
   "additionalProperties": false,
   "title": "CartClassificationType",
   "type": "object",
@@ -14,5 +15,5 @@
     "type",
     "values"
   ],
-  "$id": "https://example.com/CartClassificationType.schema.json"
+  "$id": "https://api.commercetools.com/CartClassificationType.schema.json"
 }

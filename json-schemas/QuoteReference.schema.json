@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[Reference](ctp:api:type:Reference) to a [Quote](ctp:api:type:Quote).",
+  "additionalProperties": false,
+  "title": "QuoteReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["quote"]},
+    "obj": {"$ref": "Quote.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://api.commercetools.com/QuoteReference.schema.json"
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Generated after a successful [Delete StandalonePrice](/../api/projects/standalone-prices#delete-standaloneprice) request.",
+  "additionalProperties": false,
+  "title": "StandalonePriceDeletedMessagePayload",
+  "type": "object",
+  "properties": {"type": {"enum": ["StandalonePriceDeleted"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/StandalonePriceDeletedMessagePayload.schema.json"
+}

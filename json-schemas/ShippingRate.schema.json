@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShippingRate",
   "type": "object",
@@ -16,5 +16,5 @@
     "price",
     "tiers"
   ],
-  "$id": "https://example.com/ShippingRate.schema.json"
+  "$id": "https://api.commercetools.com/ShippingRate.schema.json"
 }

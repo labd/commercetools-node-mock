@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TaxedPrice",
   "type": "object",
@@ -8,6 +8,7 @@
       "type": "array",
       "items": {"$ref": "TaxPortion.schema.json"}
     },
+    "totalTax": {"$ref": "TypedMoney.schema.json"},
     "totalGross": {"$ref": "TypedMoney.schema.json"},
     "totalNet": {"$ref": "TypedMoney.schema.json"}
   },
@@ -16,5 +17,5 @@
     "totalGross",
     "taxPortions"
   ],
-  "$id": "https://example.com/TaxedPrice.schema.json"
+  "$id": "https://api.commercetools.com/TaxedPrice.schema.json"
 }

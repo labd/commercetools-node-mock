@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "All Product Variants except the explicitly stated SKUs are part of the Product Selection.",
+  "additionalProperties": false,
+  "title": "ProductVariantSelectionExclusion",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["exclusion"]},
+    "skus": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": [
+    "type",
+    "skus"
+  ],
+  "$id": "https://api.commercetools.com/ProductVariantSelectionExclusion.schema.json"
+}

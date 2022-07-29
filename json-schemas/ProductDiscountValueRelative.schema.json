@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Discounts the product price by a percentage, defined by the `permyriad` field.",
   "additionalProperties": false,
   "title": "ProductDiscountValueRelative",
   "type": "object",
@@ -11,5 +12,5 @@
     "type",
     "permyriad"
   ],
-  "$id": "https://example.com/ProductDiscountValueRelative.schema.json"
+  "$id": "https://api.commercetools.com/ProductDiscountValueRelative.schema.json"
 }

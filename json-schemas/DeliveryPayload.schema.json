@@ -1,0 +1,30 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/MessageDeliveryPayload.schema.json"},
+    {"$ref": "https://api.commercetools.com/ResourceCreatedDeliveryPayload.schema.json"},
+    {"$ref": "https://api.commercetools.com/ResourceDeletedDeliveryPayload.schema.json"},
+    {"$ref": "https://api.commercetools.com/ResourceUpdatedDeliveryPayload.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "DeliveryPayload",
+  "type": "object",
+  "properties": {
+    "projectKey": {"type": "string"},
+    "notificationType": {"enum": [
+      "Message",
+      "ResourceCreated",
+      "ResourceDeleted",
+      "ResourceUpdated"
+    ]},
+    "resource": {"$ref": "Reference.schema.json"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"}
+  },
+  "required": [
+    "projectKey",
+    "notificationType",
+    "resource"
+  ],
+  "$id": "https://api.commercetools.com/DeliveryPayload.schema.json",
+  "discriminator": {"propertyName": "notificationType"}
+}

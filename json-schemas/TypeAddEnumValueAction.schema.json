@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Adds a value to an [EnumType](ctp:api:type:CustomFieldEnumType).\nThis update action can be used to update an [EnumType](ctp:api:type:CustomFieldEnumType) FieldDefinition and a [SetType](ctp:api:type:CustomFieldSetType) FieldDefinition of [EnumType](ctp:api:type:CustomFieldEnumType).",
   "additionalProperties": false,
   "title": "TypeAddEnumValueAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "fieldName",
     "value"
   ],
-  "$id": "https://example.com/TypeAddEnumValueAction.schema.json"
+  "$id": "https://api.commercetools.com/TypeAddEnumValueAction.schema.json"
 }

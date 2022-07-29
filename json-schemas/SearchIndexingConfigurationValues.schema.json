@@ -1,8 +1,15 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "SearchIndexingConfigurationValues",
   "type": "object",
-  "properties": {"status": {"type": "string"}},
-  "$id": "https://example.com/SearchIndexingConfigurationValues.schema.json"
+  "properties": {
+    "status": {"$ref": "SearchIndexingConfigurationStatusEnum.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"}
+  },
+  "$id": "https://api.commercetools.com/SearchIndexingConfigurationValues.schema.json"
 }

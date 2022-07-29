@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Adds a localizable enum to the values of [AttributeLocalizedEnumType](ctp:api:type:AttributeLocalizedEnumType). It can update an AttributeLocalizedEnumType AttributeDefinition or an [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeLocalizedEnumType AttributeDefinition.",
   "additionalProperties": false,
   "title": "ProductTypeAddLocalizedEnumValueAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "value"
   ],
-  "$id": "https://example.com/ProductTypeAddLocalizedEnumValueAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeAddLocalizedEnumValueAction.schema.json"
 }

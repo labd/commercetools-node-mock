@@ -1,15 +1,15 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProjectChangeMessagesConfigurationAction",
   "type": "object",
   "properties": {
     "action": {"enum": ["changeMessagesConfiguration"]},
-    "messagesConfiguration": {"$ref": "MessageConfigurationDraft.schema.json"}
+    "messagesConfiguration": {"$ref": "MessagesConfigurationDraft.schema.json"}
   },
   "required": [
     "action",
     "messagesConfiguration"
   ],
-  "$id": "https://example.com/ProjectChangeMessagesConfigurationAction.schema.json"
+  "$id": "https://api.commercetools.com/ProjectChangeMessagesConfigurationAction.schema.json"
 }

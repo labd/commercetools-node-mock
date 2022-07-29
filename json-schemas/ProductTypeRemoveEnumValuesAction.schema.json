@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Removes enum values from an AttributeDefinition of [AttributeEnumType](ctp:api:type:AttributeEnumType), [AttributeLocalizedEnumType](ctp:api:type:AttributeLocalizedEnumType), [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeEnumType, or AttributeSetType of AttributeLocalizedEnumType.\n\nIf the Attribute is **not** required, the Attributes of all Products using those enum keys will also be removed in an [eventually consistent](/general-concepts#eventual-consistency) way. If the Attribute is required, the operation will fail with the [EnumValueIsUsed](/errors#product-types-400-enum-value-is-used) error code.",
   "additionalProperties": false,
   "title": "ProductTypeRemoveEnumValuesAction",
   "type": "object",
@@ -16,5 +17,5 @@
     "attributeName",
     "keys"
   ],
-  "$id": "https://example.com/ProductTypeRemoveEnumValuesAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeRemoveEnumValuesAction.schema.json"
 }

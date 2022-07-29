@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[Reference](ctp:api:type:Reference) to a [StagedQuote](ctp:api:type:StagedQuote).",
+  "additionalProperties": false,
+  "title": "StagedQuoteReference",
+  "type": "object",
+  "properties": {
+    "typeId": {"enum": ["staged-quote"]},
+    "obj": {"$ref": "StagedQuote.schema.json"},
+    "id": {"type": "string"}
+  },
+  "required": [
+    "typeId",
+    "id"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuoteReference.schema.json"
+}

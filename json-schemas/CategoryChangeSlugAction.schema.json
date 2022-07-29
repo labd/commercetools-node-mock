@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Changing the slug produces the [CategorySlugChangedMessage](ctp:api:type:CategorySlugChangedMessage).",
   "additionalProperties": false,
   "title": "CategoryChangeSlugAction",
   "type": "object",
@@ -11,5 +12,5 @@
     "action",
     "slug"
   ],
-  "$id": "https://example.com/CategoryChangeSlugAction.schema.json"
+  "$id": "https://api.commercetools.com/CategoryChangeSlugAction.schema.json"
 }

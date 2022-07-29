@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StateDraft",
   "type": "object",
@@ -22,5 +22,5 @@
     "key",
     "type"
   ],
-  "$id": "https://example.com/StateDraft.schema.json"
+  "$id": "https://api.commercetools.com/StateDraft.schema.json"
 }

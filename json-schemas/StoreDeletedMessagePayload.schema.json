@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StoreDeletedMessagePayload",
+  "type": "object",
+  "properties": {"type": {"enum": ["StoreDeleted"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/StoreDeletedMessagePayload.schema.json"
+}

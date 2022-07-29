@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductTypeSetKeyAction",
   "type": "object",
@@ -8,5 +8,5 @@
     "key": {"type": "string"}
   },
   "required": ["action"],
-  "$id": "https://example.com/ProductTypeSetKeyAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeSetKeyAction.schema.json"
 }

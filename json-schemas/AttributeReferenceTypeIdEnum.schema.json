@@ -1,0 +1,21 @@
+{
+  "description": "Name of the resource type that the value should reference. Supported resource type identifiers:",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "AttributeReferenceTypeId",
+  "type": "string",
+  "enum": [
+    "cart",
+    "category",
+    "channel",
+    "customer",
+    "key-value-document",
+    "order",
+    "product",
+    "product-type",
+    "review",
+    "shipping-method",
+    "state",
+    "zone"
+  ],
+  "$id": "https://api.commercetools.com/AttributeReferenceTypeIdEnum.schema.json"
+}

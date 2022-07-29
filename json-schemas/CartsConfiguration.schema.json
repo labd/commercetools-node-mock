@@ -1,8 +1,11 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "CartsConfiguration",
   "type": "object",
-  "properties": {"countryTaxRateFallbackEnabled": {"type": "boolean"}},
-  "$id": "https://example.com/CartsConfiguration.schema.json"
+  "properties": {
+    "countryTaxRateFallbackEnabled": {"type": "boolean"},
+    "deleteDaysAfterLastModification": {"type": "number"}
+  },
+  "$id": "https://api.commercetools.com/CartsConfiguration.schema.json"
 }

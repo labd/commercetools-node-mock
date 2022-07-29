@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProjectChangeShoppingListsConfigurationAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeShoppingListsConfiguration"]},
+    "shoppingListsConfiguration": {"$ref": "ShoppingListsConfiguration.schema.json"}
+  },
+  "required": [
+    "action",
+    "shoppingListsConfiguration"
+  ],
+  "$id": "https://api.commercetools.com/ProjectChangeShoppingListsConfigurationAction.schema.json"
+}

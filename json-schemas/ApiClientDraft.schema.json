@@ -1,16 +1,18 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ApiClientDraft",
   "type": "object",
   "properties": {
     "name": {"type": "string"},
+    "refreshTokenValiditySeconds": {"type": "number"},
     "deleteDaysAfterCreation": {"type": "number"},
-    "scope": {"type": "string"}
+    "scope": {"type": "string"},
+    "accessTokenValiditySeconds": {"type": "number"}
   },
   "required": [
     "name",
     "scope"
   ],
-  "$id": "https://example.com/ApiClientDraft.schema.json"
+  "$id": "https://api.commercetools.com/ApiClientDraft.schema.json"
 }

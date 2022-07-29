@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ApiClient",
   "type": "object",
@@ -21,14 +21,16 @@
       "format": "date-time"
     },
     "scope": {"type": "string"},
+    "accessTokenValiditySeconds": {"type": "number"},
     "name": {"type": "string"},
     "id": {"type": "string"},
-    "secret": {"type": "string"}
+    "secret": {"type": "string"},
+    "refreshTokenValiditySeconds": {"type": "number"}
   },
   "required": [
     "id",
     "name",
     "scope"
   ],
-  "$id": "https://example.com/ApiClient.schema.json"
+  "$id": "https://api.commercetools.com/ApiClient.schema.json"
 }

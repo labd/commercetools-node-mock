@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "SyncInfo",
   "type": "object",
@@ -15,5 +15,5 @@
     "channel",
     "syncedAt"
   ],
-  "$id": "https://example.com/SyncInfo.schema.json"
+  "$id": "https://api.commercetools.com/SyncInfo.schema.json"
 }

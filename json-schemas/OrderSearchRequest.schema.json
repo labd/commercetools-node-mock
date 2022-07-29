@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderSearchRequest",
+  "type": "object",
+  "properties": {
+    "limit": {"type": "number"},
+    "sort": {"type": "string"},
+    "offset": {"type": "number"},
+    "query": {"$ref": "OrderSearchQuery.schema.json"}
+  },
+  "required": ["query"],
+  "$id": "https://api.commercetools.com/OrderSearchRequest.schema.json"
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "MyCustomerSignin",
+  "type": "object",
+  "properties": {
+    "activeCartSignInMode": {"$ref": "AnonymousCartSignInModeEnum.schema.json"},
+    "updateProductData": {"type": "boolean"},
+    "password": {"type": "string"},
+    "email": {"type": "string"}
+  },
+  "required": [
+    "email",
+    "password"
+  ],
+  "$id": "https://api.commercetools.com/MyCustomerSignin.schema.json"
+}

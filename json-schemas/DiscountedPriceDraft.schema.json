@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "DiscountedPriceDraft",
+  "type": "object",
+  "properties": {
+    "value": {"$ref": "Money.schema.json"},
+    "discount": {"$ref": "ProductDiscountReference.schema.json"}
+  },
+  "required": [
+    "value",
+    "discount"
+  ],
+  "$id": "https://api.commercetools.com/DiscountedPriceDraft.schema.json"
+}

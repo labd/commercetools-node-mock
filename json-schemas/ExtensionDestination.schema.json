@@ -1,14 +1,18 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/ExtensionAWSLambdaDestination.schema.json"},
-    {"$ref": "https://example.com/ExtensionHttpDestination.schema.json"}
+    {"$ref": "https://api.commercetools.com/AWSLambdaDestination.schema.json"},
+    {"$ref": "https://api.commercetools.com/HttpDestination.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Generic type for destinations.",
   "additionalProperties": false,
   "title": "ExtensionDestination",
   "type": "object",
-  "properties": {"type": {"type": "string"}},
+  "properties": {"type": {"enum": [
+    "AWSLambda",
+    "HTTP"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/ExtensionDestination.schema.json",
+  "$id": "https://api.commercetools.com/ExtensionDestination.schema.json",
   "discriminator": {"propertyName": "type"}
 }

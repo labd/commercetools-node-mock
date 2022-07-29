@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductSetAssetSourcesAction",
   "type": "object",
@@ -19,5 +19,5 @@
     "action",
     "sources"
   ],
-  "$id": "https://example.com/ProductSetAssetSourcesAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductSetAssetSourcesAction.schema.json"
 }

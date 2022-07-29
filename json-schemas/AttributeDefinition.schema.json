@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Describes a Product Attribute and allows you to define meta-information associated with the Attribute (like whether it should be searchable, or its constraints).",
   "additionalProperties": false,
   "title": "AttributeDefinition",
   "type": "object",
@@ -22,5 +23,5 @@
     "inputHint",
     "isSearchable"
   ],
-  "$id": "https://example.com/AttributeDefinition.schema.json"
+  "$id": "https://api.commercetools.com/AttributeDefinition.schema.json"
 }

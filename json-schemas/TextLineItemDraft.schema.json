@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TextLineItemDraft",
   "type": "object",
@@ -14,5 +14,5 @@
     "custom": {"$ref": "CustomFieldsDraft.schema.json"}
   },
   "required": ["name"],
-  "$id": "https://example.com/TextLineItemDraft.schema.json"
+  "$id": "https://api.commercetools.com/TextLineItemDraft.schema.json"
 }

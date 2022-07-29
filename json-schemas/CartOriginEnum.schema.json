@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "CartOrigin",
   "type": "string",
   "enum": [
     "Customer",
-    "Merchant"
+    "Merchant",
+    "Quote"
   ],
-  "$id": "https://example.com/CartOriginEnum.schema.json"
+  "$id": "https://api.commercetools.com/CartOriginEnum.schema.json"
 }

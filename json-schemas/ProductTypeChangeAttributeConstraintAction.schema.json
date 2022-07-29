@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates the `attributeConstraint` of an [AttributeDefinition](ctp:api:type:AttributeDefinition). For now only following changes are supported: `SameForAll` to `None` and `Unique` to `None`.",
   "additionalProperties": false,
   "title": "ProductTypeChangeAttributeConstraintAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "newValue"
   ],
-  "$id": "https://example.com/ProductTypeChangeAttributeConstraintAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangeAttributeConstraintAction.schema.json"
 }

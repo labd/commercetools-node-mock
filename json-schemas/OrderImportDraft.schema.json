@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderImportDraft",
   "type": "object",
@@ -27,18 +27,20 @@
     "taxRoundingMode": {"$ref": "RoundingModeEnum.schema.json"},
     "customLineItems": {
       "type": "array",
-      "items": {"$ref": "CustomLineItemDraft.schema.json"}
+      "items": {"$ref": "CustomLineItemImportDraft.schema.json"}
     },
     "itemShippingAddresses": {
       "type": "array",
-      "items": {"$ref": "Address.schema.json"}
+      "items": {"$ref": "BaseAddress.schema.json"}
     },
     "customerEmail": {"type": "string"},
     "customerId": {"type": "string"},
-    "shippingAddress": {"$ref": "Address.schema.json"},
-    "billingAddress": {"$ref": "Address.schema.json"},
-    "paymentState": {"$ref": "PaymentStateEnum.schema.json"}
+    "shippingAddress": {"$ref": "BaseAddress.schema.json"},
+    "billingAddress": {"$ref": "BaseAddress.schema.json"},
+    "state": {"$ref": "StateReference.schema.json"},
+    "paymentState": {"$ref": "PaymentStateEnum.schema.json"},
+    "paymentInfo": {"$ref": "PaymentInfo.schema.json"}
   },
   "required": ["totalPrice"],
-  "$id": "https://example.com/OrderImportDraft.schema.json"
+  "$id": "https://api.commercetools.com/OrderImportDraft.schema.json"
 }

@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Sets the [DiscountedLineItemPrice](ctp:api:type:DiscountedLineItemPrice) of the [CartDiscountLineItemsTarget](ctp:api:type:CartDiscountLineItemsTarget) or [CartDiscountCustomLineItemsTarget](ctp:api:type:CartDiscountCustomLineItemsTarget) to the value specified in the `money` field, if it is lower than the current Line Item price for the same currency. If the Line Item price is already discounted to a price equal to or lower than the respective price in the `money` field, this Discount is not applied.",
   "additionalProperties": false,
   "title": "CartDiscountValueFixedDraft",
   "type": "object",
@@ -14,5 +15,5 @@
     "type",
     "money"
   ],
-  "$id": "https://example.com/CartDiscountValueFixedDraft.schema.json"
+  "$id": "https://api.commercetools.com/CartDiscountValueFixedDraft.schema.json"
 }

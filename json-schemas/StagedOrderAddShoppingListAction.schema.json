@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderAddShoppingListAction",
   "type": "object",
@@ -13,5 +13,5 @@
     "action",
     "shoppingList"
   ],
-  "$id": "https://example.com/StagedOrderAddShoppingListAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderAddShoppingListAction.schema.json"
 }

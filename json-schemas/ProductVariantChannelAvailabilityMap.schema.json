@@ -1,9 +1,9 @@
 {
   "patternProperties": {"": {"$ref": "ProductVariantChannelAvailability.schema.json"}},
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductVariantChannelAvailabilityMap",
   "type": "object",
   "properties": {},
-  "$id": "https://example.com/ProductVariantChannelAvailabilityMap.schema.json"
+  "$id": "https://api.commercetools.com/ProductVariantChannelAvailabilityMap.schema.json"
 }

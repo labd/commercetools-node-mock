@@ -1,15 +1,16 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Field type for [Reference](ctp:api:type:Reference) values.",
   "additionalProperties": false,
   "title": "CustomFieldReferenceType",
   "type": "object",
   "properties": {
     "name": {"enum": ["Reference"]},
-    "referenceTypeId": {"$ref": "ReferenceTypeIdEnum.schema.json"}
+    "referenceTypeId": {"$ref": "CustomFieldReferenceValueEnum.schema.json"}
   },
   "required": [
     "name",
     "referenceTypeId"
   ],
-  "$id": "https://example.com/CustomFieldReferenceType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldReferenceType.schema.json"
 }

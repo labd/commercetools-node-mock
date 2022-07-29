@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteDeletedMessagePayload",
+  "type": "object",
+  "properties": {"type": {"enum": ["StagedQuoteDeleted"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/StagedQuoteDeletedMessagePayload.schema.json"
+}

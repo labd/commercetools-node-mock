@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "CustomerSetAuthenticationModeAction",
+  "type": "object",
+  "properties": {
+    "authMode": {"$ref": "AuthenticationModeEnum.schema.json"},
+    "action": {"enum": ["setAuthenticationMode"]},
+    "password": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "authMode"
+  ],
+  "$id": "https://api.commercetools.com/CustomerSetAuthenticationModeAction.schema.json"
+}

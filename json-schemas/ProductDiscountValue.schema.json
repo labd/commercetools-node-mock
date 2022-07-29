@@ -1,15 +1,19 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/ProductDiscountValueAbsolute.schema.json"},
-    {"$ref": "https://example.com/ProductDiscountValueExternal.schema.json"},
-    {"$ref": "https://example.com/ProductDiscountValueRelative.schema.json"}
+    {"$ref": "https://api.commercetools.com/ProductDiscountValueAbsolute.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductDiscountValueExternal.schema.json"},
+    {"$ref": "https://api.commercetools.com/ProductDiscountValueRelative.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductDiscountValue",
   "type": "object",
-  "properties": {"type": {"type": "string"}},
+  "properties": {"type": {"enum": [
+    "absolute",
+    "external",
+    "relative"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/ProductDiscountValue.schema.json",
+  "$id": "https://api.commercetools.com/ProductDiscountValue.schema.json",
   "discriminator": {"propertyName": "type"}
 }

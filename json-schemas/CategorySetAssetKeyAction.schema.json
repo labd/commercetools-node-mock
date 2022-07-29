@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Set or remove the `key` of an [Asset](ctp:api:type:Asset).",
   "additionalProperties": false,
   "title": "CategorySetAssetKeyAction",
   "type": "object",
@@ -12,5 +13,5 @@
     "action",
     "assetId"
   ],
-  "$id": "https://example.com/CategorySetAssetKeyAction.schema.json"
+  "$id": "https://api.commercetools.com/CategorySetAssetKeyAction.schema.json"
 }

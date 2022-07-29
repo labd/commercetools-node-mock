@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartSetShippingRateInputAction",
   "type": "object",
@@ -8,5 +8,5 @@
     "shippingRateInput": {"$ref": "ShippingRateInputDraft.schema.json"}
   },
   "required": ["action"],
-  "$id": "https://example.com/CartSetShippingRateInputAction.schema.json"
+  "$id": "https://api.commercetools.com/CartSetShippingRateInputAction.schema.json"
 }

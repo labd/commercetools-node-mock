@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartDiscountChangeStackingModeAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "stackingMode"
   ],
-  "$id": "https://example.com/CartDiscountChangeStackingModeAction.schema.json"
+  "$id": "https://api.commercetools.com/CartDiscountChangeStackingModeAction.schema.json"
 }

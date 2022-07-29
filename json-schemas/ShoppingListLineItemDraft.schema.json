@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "ShoppingListLineItemDraft",
   "type": "object",
   "properties": {
@@ -14,5 +14,5 @@
     "productId": {"type": "string"},
     "custom": {"$ref": "CustomFieldsDraft.schema.json"}
   },
-  "$id": "https://example.com/ShoppingListLineItemDraft.schema.json"
+  "$id": "https://api.commercetools.com/ShoppingListLineItemDraft.schema.json"
 }

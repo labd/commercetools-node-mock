@@ -1,16 +1,19 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/CentPrecisionMoneyDraft.schema.json"},
-    {"$ref": "https://example.com/HighPrecisionMoneyDraft.schema.json"}
+    {"$ref": "https://api.commercetools.com/CentPrecisionMoneyDraft.schema.json"},
+    {"$ref": "https://api.commercetools.com/HighPrecisionMoneyDraft.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TypedMoneyDraft",
   "type": "object",
   "properties": {
     "centAmount": {"type": "number"},
     "fractionDigits": {"type": "number"},
-    "type": {"$ref": "MoneyTypeEnum.schema.json"},
+    "type": {"enum": [
+      "centPrecision",
+      "highPrecision"
+    ]},
     "currencyCode": {"type": "string"}
   },
   "required": [
@@ -18,6 +21,6 @@
     "currencyCode",
     "type"
   ],
-  "$id": "https://example.com/TypedMoneyDraft.schema.json",
+  "$id": "https://api.commercetools.com/TypedMoneyDraft.schema.json",
   "discriminator": {"propertyName": "type"}
 }

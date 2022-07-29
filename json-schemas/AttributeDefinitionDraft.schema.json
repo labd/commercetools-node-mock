@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Specify the Attribute to be created with the [ProductTypeDraft](ctp:api:type:ProductTypeDraft).",
   "additionalProperties": false,
   "title": "AttributeDefinitionDraft",
   "type": "object",
@@ -19,5 +20,5 @@
     "label",
     "isRequired"
   ],
-  "$id": "https://example.com/AttributeDefinitionDraft.schema.json"
+  "$id": "https://api.commercetools.com/AttributeDefinitionDraft.schema.json"
 }

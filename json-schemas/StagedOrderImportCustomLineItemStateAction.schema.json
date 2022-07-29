@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderImportCustomLineItemStateAction",
   "type": "object",
@@ -16,5 +16,5 @@
     "customLineItemId",
     "state"
   ],
-  "$id": "https://example.com/StagedOrderImportCustomLineItemStateAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderImportCustomLineItemStateAction.schema.json"
 }

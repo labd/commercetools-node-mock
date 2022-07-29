@@ -1,0 +1,21 @@
+{
+  "description": "Defines which resource type a [CustomFieldReferenceType](ctp:api:type:CustomFieldReferenceType) can reference.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "CustomFieldReferenceValue",
+  "type": "string",
+  "enum": [
+    "cart",
+    "category",
+    "channel",
+    "customer",
+    "key-value-document",
+    "order",
+    "product",
+    "product-type",
+    "review",
+    "state",
+    "shipping-method",
+    "zone"
+  ],
+  "$id": "https://api.commercetools.com/CustomFieldReferenceValueEnum.schema.json"
+}

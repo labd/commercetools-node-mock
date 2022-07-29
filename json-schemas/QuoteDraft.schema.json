@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteDraft",
+  "type": "object",
+  "properties": {
+    "stagedQuoteVersion": {"type": "number"},
+    "stagedQuote": {"$ref": "StagedQuoteResourceIdentifier.schema.json"},
+    "key": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": [
+    "stagedQuote",
+    "stagedQuoteVersion"
+  ],
+  "$id": "https://api.commercetools.com/QuoteDraft.schema.json"
+}

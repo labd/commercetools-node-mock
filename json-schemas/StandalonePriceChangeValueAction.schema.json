@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Produces the [StandalonePriceValueChangedMessage](ctp:api:type:StandalonePriceValueChangedMessage).",
+  "additionalProperties": false,
+  "title": "StandalonePriceChangeValueAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeValue"]},
+    "value": {"$ref": "Money.schema.json"}
+  },
+  "required": [
+    "action",
+    "value"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePriceChangeValueAction.schema.json"
+}

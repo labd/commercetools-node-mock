@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "PaymentSetTransactionCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setTransactionCustomField"]},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "transactionId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "transactionId",
+    "name"
+  ],
+  "$id": "https://api.commercetools.com/PaymentSetTransactionCustomFieldAction.schema.json"
+}

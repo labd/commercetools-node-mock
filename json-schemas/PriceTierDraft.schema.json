@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Specifies a Price tier that applies when the minimum quantity for the [LineItem](ctp:api:type:LineItem) of a ProductVariant with the related Price is reached in a Cart.",
   "additionalProperties": false,
   "title": "PriceTierDraft",
   "type": "object",
@@ -11,5 +12,5 @@
     "minimumQuantity",
     "value"
   ],
-  "$id": "https://example.com/PriceTierDraft.schema.json"
+  "$id": "https://api.commercetools.com/PriceTierDraft.schema.json"
 }

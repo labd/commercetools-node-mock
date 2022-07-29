@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Used when the ShippingRate maps to the sum of [LineItem](ctp:api:type:LineItem) Prices.\nThe value of the Cart is used to select a tier.\nIf chosen, it is not possible to set a value for the `shippingRateInput` on the [Cart](ctp:api:type:Cart).",
   "additionalProperties": false,
   "title": "CartValueType",
   "type": "object",
   "properties": {"type": {"enum": ["CartValue"]}},
   "required": ["type"],
-  "$id": "https://example.com/CartValueType.schema.json"
+  "$id": "https://api.commercetools.com/CartValueType.schema.json"
 }

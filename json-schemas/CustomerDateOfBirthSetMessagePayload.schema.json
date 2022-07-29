@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerDateOfBirthSetMessagePayload",
   "type": "object",
@@ -14,9 +14,6 @@
       "null"
     ]}
   },
-  "required": [
-    "type",
-    "dateOfBirth"
-  ],
-  "$id": "https://example.com/CustomerDateOfBirthSetMessagePayload.schema.json"
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/CustomerDateOfBirthSetMessagePayload.schema.json"
 }

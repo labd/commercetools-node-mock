@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[PagedQueryResult](/../api/general-concepts#pagedqueryresult) with results containing an array of [Category](ctp:api:type:Category).",
   "additionalProperties": false,
   "title": "CategoryPagedQueryResponse",
   "type": "object",
@@ -15,9 +16,9 @@
   },
   "required": [
     "limit",
-    "count",
     "offset",
+    "count",
     "results"
   ],
-  "$id": "https://example.com/CategoryPagedQueryResponse.schema.json"
+  "$id": "https://api.commercetools.com/CategoryPagedQueryResponse.schema.json"
 }

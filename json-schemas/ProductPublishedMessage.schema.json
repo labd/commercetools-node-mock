@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductPublishedMessage",
   "type": "object",
@@ -41,5 +41,5 @@
     "productProjection",
     "scope"
   ],
-  "$id": "https://example.com/ProductPublishedMessage.schema.json"
+  "$id": "https://api.commercetools.com/ProductPublishedMessage.schema.json"
 }

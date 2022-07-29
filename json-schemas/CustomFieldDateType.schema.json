@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Field type for [Date](ctp:api:type:Date) values.",
   "additionalProperties": false,
   "title": "CustomFieldDateType",
   "type": "object",
   "properties": {"name": {"enum": ["Date"]}},
   "required": ["name"],
-  "$id": "https://example.com/CustomFieldDateType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldDateType.schema.json"
 }

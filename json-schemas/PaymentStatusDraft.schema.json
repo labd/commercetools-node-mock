@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "PaymentStatusDraft",
   "type": "object",
   "properties": {
@@ -8,5 +8,5 @@
     "interfaceText": {"type": "string"},
     "state": {"$ref": "StateResourceIdentifier.schema.json"}
   },
-  "$id": "https://example.com/PaymentStatusDraft.schema.json"
+  "$id": "https://api.commercetools.com/PaymentStatusDraft.schema.json"
 }

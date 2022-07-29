@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Custom Objects are grouped into containers, which can be used like namespaces. Within a given container, a user-defined key can be used to uniquely identify resources.",
+  "additionalProperties": false,
+  "title": "ContainerAndKey",
+  "type": "object",
+  "properties": {
+    "container": {"type": "string"},
+    "key": {"type": "string"}
+  },
+  "required": [
+    "key",
+    "container"
+  ],
+  "$id": "https://api.commercetools.com/ContainerAndKey.schema.json"
+}

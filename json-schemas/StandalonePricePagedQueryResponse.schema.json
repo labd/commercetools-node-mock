@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StandalonePricePagedQueryResponse",
+  "type": "object",
+  "properties": {
+    "limit": {"type": "number"},
+    "count": {"type": "number"},
+    "total": {"type": "number"},
+    "offset": {"type": "number"},
+    "results": {
+      "type": "array",
+      "items": {"$ref": "StandalonePrice.schema.json"}
+    }
+  },
+  "required": [
+    "limit",
+    "offset",
+    "count",
+    "results"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePricePagedQueryResponse.schema.json"
+}

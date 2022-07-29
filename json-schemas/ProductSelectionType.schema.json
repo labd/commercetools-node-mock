@@ -1,0 +1,11 @@
+{
+  "oneOf": [{"$ref": "https://api.commercetools.com/IndividualProductSelectionType.schema.json"}],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionType",
+  "type": "object",
+  "properties": {"type": {"enum": ["individual"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/ProductSelectionType.schema.json",
+  "discriminator": {"propertyName": "type"}
+}

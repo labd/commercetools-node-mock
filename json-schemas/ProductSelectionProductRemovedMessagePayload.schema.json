@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionProductRemovedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ProductSelectionProductRemoved"]},
+    "product": {"$ref": "ProductReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "product"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionProductRemovedMessagePayload.schema.json"
+}

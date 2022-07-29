@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Values of a SetType Custom Field are sets of values of the specified `elementType` (without duplicate elements).",
   "additionalProperties": false,
   "title": "CustomFieldSetType",
   "type": "object",
@@ -11,5 +12,5 @@
     "name",
     "elementType"
   ],
-  "$id": "https://example.com/CustomFieldSetType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldSetType.schema.json"
 }

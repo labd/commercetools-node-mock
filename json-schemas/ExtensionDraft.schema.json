@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ExtensionDraft",
   "type": "object",
@@ -10,14 +10,11 @@
       "items": {"$ref": "ExtensionTrigger.schema.json"}
     },
     "key": {"type": "string"},
-    "timeoutInMs": {
-      "type": "number",
-      "format": "integer"
-    }
+    "timeoutInMs": {"type": "number"}
   },
   "required": [
     "destination",
     "triggers"
   ],
-  "$id": "https://example.com/ExtensionDraft.schema.json"
+  "$id": "https://api.commercetools.com/ExtensionDraft.schema.json"
 }

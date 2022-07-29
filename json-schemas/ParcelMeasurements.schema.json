@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "ParcelMeasurements",
   "type": "object",
   "properties": {
@@ -9,5 +9,5 @@
     "lengthInMillimeter": {"type": "number"},
     "heightInMillimeter": {"type": "number"}
   },
-  "$id": "https://example.com/ParcelMeasurements.schema.json"
+  "$id": "https://api.commercetools.com/ParcelMeasurements.schema.json"
 }

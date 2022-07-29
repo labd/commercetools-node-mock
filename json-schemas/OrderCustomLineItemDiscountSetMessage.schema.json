@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderCustomLineItemDiscountSetMessage",
   "type": "object",
@@ -40,5 +40,5 @@
     "customLineItemId",
     "discountedPricePerQuantity"
   ],
-  "$id": "https://example.com/OrderCustomLineItemDiscountSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/OrderCustomLineItemDiscountSetMessage.schema.json"
 }

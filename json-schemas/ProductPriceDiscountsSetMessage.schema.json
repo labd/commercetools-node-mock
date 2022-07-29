@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductPriceDiscountsSetMessage",
   "type": "object",
@@ -37,5 +37,5 @@
     "type",
     "updatedPrices"
   ],
-  "$id": "https://example.com/ProductPriceDiscountsSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/ProductPriceDiscountsSetMessage.schema.json"
 }

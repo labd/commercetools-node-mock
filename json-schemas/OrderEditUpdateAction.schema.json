@@ -1,26 +1,25 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/OrderEditAddStagedActionAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetBillingAddressCustomFieldAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetBillingAddressCustomTypeAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetCommentAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetCustomFieldAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetCustomTypeAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetDeliveryAddressCustomFieldAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetDeliveryAddressCustomTypeAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetItemShippingAddressCustomFieldAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetItemShippingAddressCustomTypeAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetKeyAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetShippingAddressCustomFieldAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetShippingAddressCustomTypeAction.schema.json"},
-    {"$ref": "https://example.com/OrderEditSetStagedActionsAction.schema.json"}
+    {"$ref": "https://api.commercetools.com/OrderEditAddStagedActionAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditSetCommentAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditSetCustomFieldAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditSetCustomTypeAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditSetKeyAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditSetStagedActionsAction.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderEditUpdateAction",
   "type": "object",
-  "properties": {"action": {"type": "string"}},
+  "properties": {"action": {"enum": [
+    "addStagedAction",
+    "setComment",
+    "setCustomField",
+    "setCustomType",
+    "setKey",
+    "setStagedActions"
+  ]}},
   "required": ["action"],
-  "$id": "https://example.com/OrderEditUpdateAction.schema.json",
+  "$id": "https://api.commercetools.com/OrderEditUpdateAction.schema.json",
   "discriminator": {"propertyName": "action"}
 }

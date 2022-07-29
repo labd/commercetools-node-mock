@@ -1,0 +1,8 @@
+{
+  "description": "The following type of Product Selections is supported:",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "ProductSelectionTypeEnum",
+  "type": "string",
+  "enum": ["individual"],
+  "$id": "https://api.commercetools.com/ProductSelectionTypeEnumEnum.schema.json"
+}

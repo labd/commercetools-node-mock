@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Attribute type for plain enum values. Useful for predefined language-agnostic values selectable in drop downs when only one value should be selected. Use [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeEnumType instead if multiple values can be selected from the list.",
   "additionalProperties": false,
   "title": "AttributeEnumType",
   "type": "object",
@@ -14,5 +15,5 @@
     "name",
     "values"
   ],
-  "$id": "https://example.com/AttributeEnumType.schema.json"
+  "$id": "https://api.commercetools.com/AttributeEnumType.schema.json"
 }

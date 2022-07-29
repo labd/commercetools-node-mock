@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This update action changes the order of the `assets` array. The new order is defined by listing the `id`s of the Assets.",
   "additionalProperties": false,
   "title": "CategoryChangeAssetOrderAction",
   "type": "object",
@@ -14,5 +15,5 @@
     "action",
     "assetOrder"
   ],
-  "$id": "https://example.com/CategoryChangeAssetOrderAction.schema.json"
+  "$id": "https://api.commercetools.com/CategoryChangeAssetOrderAction.schema.json"
 }

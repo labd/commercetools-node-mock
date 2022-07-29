@@ -1,12 +1,12 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartDiscountDraft",
   "type": "object",
   "properties": {
     "requiresDiscountCode": {"type": "boolean"},
     "cartPredicate": {"type": "string"},
-    "custom": {"$ref": "CustomFields.schema.json"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"},
     "description": {"$ref": "LocalizedString.schema.json"},
     "validFrom": {
       "type": "string",
@@ -28,8 +28,7 @@
     "name",
     "value",
     "cartPredicate",
-    "sortOrder",
-    "requiresDiscountCode"
+    "sortOrder"
   ],
-  "$id": "https://example.com/CartDiscountDraft.schema.json"
+  "$id": "https://api.commercetools.com/CartDiscountDraft.schema.json"
 }

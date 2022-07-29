@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductPublishAction",
   "type": "object",
@@ -8,5 +8,5 @@
     "scope": {"$ref": "ProductPublishScopeEnum.schema.json"}
   },
   "required": ["action"],
-  "$id": "https://example.com/ProductPublishAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductPublishAction.schema.json"
 }

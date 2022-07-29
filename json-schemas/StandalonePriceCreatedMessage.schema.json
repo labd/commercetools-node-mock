@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Generated after a successful [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.",
+  "additionalProperties": false,
+  "title": "StandalonePriceCreatedMessage",
+  "type": "object",
+  "properties": {
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sequenceNumber": {"type": "number"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "id": {"type": "string"},
+    "type": {"enum": ["StandalonePriceCreated"]},
+    "version": {"type": "number"},
+    "standalonePrice": {"$ref": "StandalonePrice.schema.json"}
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "standalonePrice"
+  ],
+  "$id": "https://api.commercetools.com/StandalonePriceCreatedMessage.schema.json"
+}

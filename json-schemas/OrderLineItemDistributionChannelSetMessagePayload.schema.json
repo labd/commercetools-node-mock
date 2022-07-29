@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderLineItemDistributionChannelSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderLineItemDistributionChannelSet"]},
+    "distributionChannel": {"$ref": "ChannelReference.schema.json"},
+    "lineItemId": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "lineItemId"
+  ],
+  "$id": "https://api.commercetools.com/OrderLineItemDistributionChannelSetMessagePayload.schema.json"
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[PagedQueryResult](/../api/general-concepts#pagedqueryresult) with results containing an array of [StagedQuote](ctp:api:type:StagedQuote).",
+  "additionalProperties": false,
+  "title": "StagedQuotePagedQueryResponse",
+  "type": "object",
+  "properties": {
+    "limit": {"type": "number"},
+    "count": {"type": "number"},
+    "total": {"type": "number"},
+    "offset": {"type": "number"},
+    "results": {
+      "type": "array",
+      "items": {"$ref": "StagedQuote.schema.json"}
+    }
+  },
+  "required": [
+    "limit",
+    "offset",
+    "count",
+    "results"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuotePagedQueryResponse.schema.json"
+}

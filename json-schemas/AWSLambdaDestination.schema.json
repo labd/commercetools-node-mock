@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "We recommend creating an Identify and Access Management (IAM) user with an `accessKey` and `accessSecret` pair, specifically for each Extension that only has the `lambda:InvokeFunction` permission on this function.",
+  "additionalProperties": false,
+  "title": "AWSLambdaDestination",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["AWSLambda"]},
+    "arn": {"type": "string"},
+    "accessKey": {"type": "string"},
+    "accessSecret": {"type": "string"}
+  },
+  "required": [
+    "type",
+    "arn",
+    "accessKey",
+    "accessSecret"
+  ],
+  "$id": "https://api.commercetools.com/AWSLambdaDestination.schema.json"
+}

@@ -1,5 +1,13 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "patternProperties": {"": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MatchingPriceNotFoundError",
   "type": "object",
@@ -10,10 +18,7 @@
     "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
     "channel": {"$ref": "ChannelReference.schema.json"},
     "currency": {"type": "string"},
-    "variantId": {
-      "type": "number",
-      "format": "integer"
-    },
+    "variantId": {"type": "number"},
     "message": {"type": "string"}
   },
   "required": [
@@ -22,5 +27,5 @@
     "productId",
     "variantId"
   ],
-  "$id": "https://example.com/MatchingPriceNotFoundError.schema.json"
+  "$id": "https://api.commercetools.com/MatchingPriceNotFoundError.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "TransactionType",
   "type": "string",
   "enum": [
@@ -9,5 +9,5 @@
     "Refund",
     "Chargeback"
   ],
-  "$id": "https://example.com/TransactionTypeEnum.schema.json"
+  "$id": "https://api.commercetools.com/TransactionTypeEnum.schema.json"
 }

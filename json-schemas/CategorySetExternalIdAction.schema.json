@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This update action sets a new ID that can be used as an additional identifier for external systems like Customer Relationship Management (CRM) or Enterprise Resource Planning (ERP).",
   "additionalProperties": false,
   "title": "CategorySetExternalIdAction",
   "type": "object",
@@ -8,5 +9,5 @@
     "externalId": {"type": "string"}
   },
   "required": ["action"],
-  "$id": "https://example.com/CategorySetExternalIdAction.schema.json"
+  "$id": "https://api.commercetools.com/CategorySetExternalIdAction.schema.json"
 }

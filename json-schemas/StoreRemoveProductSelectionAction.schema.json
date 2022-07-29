@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This action has no effect if the given Product Selection is not in the Store.",
+  "additionalProperties": false,
+  "title": "StoreRemoveProductSelectionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["removeProductSelection"]},
+    "productSelection": {"$ref": "ProductSelectionResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "productSelection"
+  ],
+  "$id": "https://api.commercetools.com/StoreRemoveProductSelectionAction.schema.json"
+}

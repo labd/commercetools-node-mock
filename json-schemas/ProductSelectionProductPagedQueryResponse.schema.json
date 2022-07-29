@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[PagedQueryResult](/general-concepts#pagedqueryresult) containing an array of [AssignedProductReference](ctp:api:type:AssignedProductReference).",
+  "additionalProperties": false,
+  "title": "ProductSelectionProductPagedQueryResponse",
+  "type": "object",
+  "properties": {
+    "limit": {"type": "number"},
+    "count": {"type": "number"},
+    "total": {"type": "number"},
+    "offset": {"type": "number"},
+    "results": {
+      "type": "array",
+      "items": {"$ref": "AssignedProductReference.schema.json"}
+    }
+  },
+  "required": [
+    "limit",
+    "offset",
+    "count",
+    "results"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionProductPagedQueryResponse.schema.json"
+}

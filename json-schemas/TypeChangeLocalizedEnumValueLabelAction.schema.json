@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Changes the `label` of a [LocalizedEnumValue](ctp:api:type:CustomFieldLocalizedEnumValue) of a [LocalizedEnumType](ctp:api:type:CustomFieldLocalizedEnumType) FieldDefinition.",
   "additionalProperties": false,
   "title": "TypeChangeLocalizedEnumValueLabelAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "fieldName",
     "value"
   ],
-  "$id": "https://example.com/TypeChangeLocalizedEnumValueLabelAction.schema.json"
+  "$id": "https://api.commercetools.com/TypeChangeLocalizedEnumValueLabelAction.schema.json"
 }

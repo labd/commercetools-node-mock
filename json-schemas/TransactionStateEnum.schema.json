@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "TransactionState",
   "type": "string",
   "enum": [
@@ -8,5 +8,5 @@
     "Success",
     "Failure"
   ],
-  "$id": "https://example.com/TransactionStateEnum.schema.json"
+  "$id": "https://api.commercetools.com/TransactionStateEnum.schema.json"
 }

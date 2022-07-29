@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetParcelCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setParcelCustomField"]},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]},
+    "parcelId": {"type": "string"}
+  },
+  "required": [
+    "action",
+    "parcelId",
+    "name"
+  ],
+  "$id": "https://api.commercetools.com/OrderSetParcelCustomFieldAction.schema.json"
+}

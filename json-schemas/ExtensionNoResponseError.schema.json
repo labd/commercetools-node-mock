@@ -1,5 +1,13 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "patternProperties": {"": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ExtensionNoResponseError",
   "type": "object",
@@ -14,5 +22,5 @@
     "message",
     "extensionId"
   ],
-  "$id": "https://example.com/ExtensionNoResponseError.schema.json"
+  "$id": "https://api.commercetools.com/ExtensionNoResponseError.schema.json"
 }

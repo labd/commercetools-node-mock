@@ -1,16 +1,21 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/OrderEditApplied.schema.json"},
-    {"$ref": "https://example.com/OrderEditNotProcessed.schema.json"},
-    {"$ref": "https://example.com/OrderEditPreviewFailure.schema.json"},
-    {"$ref": "https://example.com/OrderEditPreviewSuccess.schema.json"}
+    {"$ref": "https://api.commercetools.com/OrderEditApplied.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditNotProcessed.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditPreviewFailure.schema.json"},
+    {"$ref": "https://api.commercetools.com/OrderEditPreviewSuccess.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "OrderEditResult",
   "type": "object",
-  "properties": {"type": {"type": "string"}},
+  "properties": {"type": {"enum": [
+    "Applied",
+    "NotProcessed",
+    "PreviewFailure",
+    "PreviewSuccess"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/OrderEditResult.schema.json",
+  "$id": "https://api.commercetools.com/OrderEditResult.schema.json",
   "discriminator": {"propertyName": "type"}
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyPaymentSetMethodInfoMethodAction",
   "type": "object",
@@ -8,5 +8,5 @@
     "action": {"enum": ["setMethodInfoMethod"]}
   },
   "required": ["action"],
-  "$id": "https://example.com/MyPaymentSetMethodInfoMethodAction.schema.json"
+  "$id": "https://api.commercetools.com/MyPaymentSetMethodInfoMethodAction.schema.json"
 }

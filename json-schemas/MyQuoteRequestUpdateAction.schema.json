@@ -1,0 +1,11 @@
+{
+  "oneOf": [{"$ref": "https://api.commercetools.com/MyQuoteRequestCancelAction.schema.json"}],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "MyQuoteRequestUpdateAction",
+  "type": "object",
+  "properties": {"action": {"enum": ["cancelQuoteRequest"]}},
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/MyQuoteRequestUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

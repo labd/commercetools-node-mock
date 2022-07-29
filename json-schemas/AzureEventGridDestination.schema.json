@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "AzureEventGridDestination",
   "type": "object",
@@ -13,5 +13,5 @@
     "uri",
     "accessKey"
   ],
-  "$id": "https://example.com/AzureEventGridDestination.schema.json"
+  "$id": "https://api.commercetools.com/AzureEventGridDestination.schema.json"
 }

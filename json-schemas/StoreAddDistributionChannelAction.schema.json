@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "This action has no effect if a given distribution channel is already present in a Store.",
   "additionalProperties": false,
   "title": "StoreAddDistributionChannelAction",
   "type": "object",
@@ -11,5 +12,5 @@
     "action",
     "distributionChannel"
   ],
-  "$id": "https://example.com/StoreAddDistributionChannelAction.schema.json"
+  "$id": "https://api.commercetools.com/StoreAddDistributionChannelAction.schema.json"
 }

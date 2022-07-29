@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShoppingListDraft",
   "type": "object",
@@ -17,10 +17,11 @@
     "deleteDaysAfterLastModification": {"type": "number"},
     "name": {"$ref": "LocalizedString.schema.json"},
     "description": {"$ref": "LocalizedString.schema.json"},
+    "store": {"$ref": "StoreResourceIdentifier.schema.json"},
     "key": {"type": "string"},
     "slug": {"$ref": "LocalizedString.schema.json"},
     "customer": {"$ref": "CustomerResourceIdentifier.schema.json"}
   },
   "required": ["name"],
-  "$id": "https://example.com/ShoppingListDraft.schema.json"
+  "$id": "https://api.commercetools.com/ShoppingListDraft.schema.json"
 }

@@ -1,13 +1,13 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerGroupDraft",
   "type": "object",
   "properties": {
     "key": {"type": "string"},
     "groupName": {"type": "string"},
-    "custom": {"$ref": "CustomFields.schema.json"}
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
   },
   "required": ["groupName"],
-  "$id": "https://example.com/CustomerGroupDraft.schema.json"
+  "$id": "https://api.commercetools.com/CustomerGroupDraft.schema.json"
 }

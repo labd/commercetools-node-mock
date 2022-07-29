@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "PaymentDraft",
   "type": "object",
@@ -27,5 +27,5 @@
     "customer": {"$ref": "CustomerResourceIdentifier.schema.json"}
   },
   "required": ["amountPlanned"],
-  "$id": "https://example.com/PaymentDraft.schema.json"
+  "$id": "https://api.commercetools.com/PaymentDraft.schema.json"
 }

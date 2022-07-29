@@ -1,0 +1,23 @@
+{
+  "patternProperties": {"": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "BadGatewayError",
+  "type": "object",
+  "properties": {
+    "message": {"type": "string"},
+    "code": {"enum": ["BadGateway"]}
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "$id": "https://api.commercetools.com/BadGatewayError.schema.json"
+}

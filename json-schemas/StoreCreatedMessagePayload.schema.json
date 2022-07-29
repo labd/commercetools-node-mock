@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StoreCreatedMessagePayload",
+  "type": "object",
+  "properties": {
+    "supplyChannels": {
+      "type": "array",
+      "items": {"$ref": "ChannelReference.schema.json"}
+    },
+    "languages": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "distributionChannels": {
+      "type": "array",
+      "items": {"$ref": "ChannelReference.schema.json"}
+    },
+    "custom": {"$ref": "CustomFields.schema.json"},
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "type": {"enum": ["StoreCreated"]},
+    "productSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    }
+  },
+  "required": [
+    "type",
+    "languages",
+    "distributionChannels",
+    "supplyChannels",
+    "productSelections"
+  ],
+  "$id": "https://api.commercetools.com/StoreCreatedMessagePayload.schema.json"
+}

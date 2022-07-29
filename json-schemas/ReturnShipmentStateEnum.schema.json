@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "ReturnShipmentState",
   "type": "string",
   "enum": [
@@ -8,5 +8,5 @@
     "BackInStock",
     "Unusable"
   ],
-  "$id": "https://example.com/ReturnShipmentStateEnum.schema.json"
+  "$id": "https://api.commercetools.com/ReturnShipmentStateEnum.schema.json"
 }

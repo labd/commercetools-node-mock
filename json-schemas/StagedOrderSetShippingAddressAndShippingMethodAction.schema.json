@@ -1,11 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderSetShippingAddressAndShippingMethodAction",
   "type": "object",
   "properties": {
     "action": {"enum": ["setShippingAddressAndShippingMethod"]},
-    "address": {"$ref": "Address.schema.json"},
+    "address": {"$ref": "BaseAddress.schema.json"},
     "externalTaxRate": {"$ref": "ExternalTaxRateDraft.schema.json"},
     "shippingMethod": {"$ref": "ShippingMethodResourceIdentifier.schema.json"}
   },
@@ -13,5 +13,5 @@
     "action",
     "address"
   ],
-  "$id": "https://example.com/StagedOrderSetShippingAddressAndShippingMethodAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderSetShippingAddressAndShippingMethodAction.schema.json"
 }

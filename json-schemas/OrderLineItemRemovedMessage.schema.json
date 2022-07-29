@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderLineItemRemovedMessage",
+  "type": "object",
+  "properties": {
+    "sequenceNumber": {"type": "number"},
+    "newTotalPrice": {"$ref": "TypedMoney.schema.json"},
+    "newTaxedPrice": {"$ref": "TaxedItemPrice.schema.json"},
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "removedQuantity": {"type": "number"},
+    "newShippingDetail": {"$ref": "ItemShippingDetails.schema.json"},
+    "resource": {"$ref": "Reference.schema.json"},
+    "lineItemId": {"type": "string"},
+    "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
+    "resourceVersion": {"type": "number"},
+    "resourceUserProvidedIdentifiers": {"$ref": "UserProvidedIdentifiers.schema.json"},
+    "type": {"enum": ["OrderLineItemRemoved"]},
+    "version": {"type": "number"},
+    "newPrice": {"$ref": "Price.schema.json"},
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {"$ref": "CreatedBy.schema.json"},
+    "id": {"type": "string"},
+    "newQuantity": {"type": "number"},
+    "newState": {
+      "type": "array",
+      "items": {"$ref": "ItemState.schema.json"}
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "createdAt",
+    "lastModifiedAt",
+    "sequenceNumber",
+    "resource",
+    "resourceVersion",
+    "type",
+    "lineItemId",
+    "removedQuantity",
+    "newQuantity",
+    "newState",
+    "newTotalPrice"
+  ],
+  "$id": "https://api.commercetools.com/OrderLineItemRemovedMessage.schema.json"
+}

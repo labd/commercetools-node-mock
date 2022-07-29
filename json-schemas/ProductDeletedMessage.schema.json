@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductDeletedMessage",
   "type": "object",
@@ -39,5 +39,5 @@
     "removedImageUrls",
     "currentProjection"
   ],
-  "$id": "https://example.com/ProductDeletedMessage.schema.json"
+  "$id": "https://api.commercetools.com/ProductDeletedMessage.schema.json"
 }

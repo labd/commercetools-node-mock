@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Instead of adding or removing [Product Selections](/../api/projects/product-selections) individually, you can also change all the Store's Product Selections in one go using this update action. The Store will only contain the Product Selections specified in the request.",
+  "additionalProperties": false,
+  "title": "StoreSetProductSelectionsAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setProductSelections"]},
+    "productSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSettingDraft.schema.json"}
+    }
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/StoreSetProductSelectionsAction.schema.json"
+}

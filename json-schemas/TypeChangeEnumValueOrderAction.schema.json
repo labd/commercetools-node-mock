@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Changes the order of [EnumValues](ctp:api:type:CustomFieldEnumValue) in an [EnumType](ctp:api:type:CustomFieldEnumType) FieldDefinition.\nThis update action can be used to update an [EnumType](ctp:api:type:CustomFieldEnumType) FieldDefinition and a [SetType](ctp:api:type:CustomFieldSetType) FieldDefinition of [EnumType](ctp:api:type:CustomFieldEnumType).",
   "additionalProperties": false,
   "title": "TypeChangeEnumValueOrderAction",
   "type": "object",
@@ -16,5 +17,5 @@
     "fieldName",
     "keys"
   ],
-  "$id": "https://example.com/TypeChangeEnumValueOrderAction.schema.json"
+  "$id": "https://api.commercetools.com/TypeChangeEnumValueOrderAction.schema.json"
 }

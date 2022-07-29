@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetDeliveryCustomFieldAction",
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "action": {"enum": ["setDeliveryCustomField"]},
+    "deliveryId": {"type": "string"},
+    "value": {"type": [
+      "number",
+      "string",
+      "boolean",
+      "object",
+      "array",
+      "null"
+    ]}
+  },
+  "required": [
+    "action",
+    "deliveryId",
+    "name"
+  ],
+  "$id": "https://api.commercetools.com/OrderSetDeliveryCustomFieldAction.schema.json"
+}

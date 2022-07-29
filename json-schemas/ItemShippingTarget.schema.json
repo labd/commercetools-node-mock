@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ItemShippingTarget",
   "type": "object",
@@ -11,5 +11,5 @@
     "addressKey",
     "quantity"
   ],
-  "$id": "https://example.com/ItemShippingTarget.schema.json"
+  "$id": "https://api.commercetools.com/ItemShippingTarget.schema.json"
 }

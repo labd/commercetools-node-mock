@@ -1,8 +1,12 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Controls indexing of resources to be provided on high performance read-only search endpoints.",
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "SearchIndexingConfiguration",
   "type": "object",
-  "properties": {"products": {"$ref": "SearchIndexingConfigurationValues.schema.json"}},
-  "$id": "https://example.com/SearchIndexingConfiguration.schema.json"
+  "properties": {
+    "orders": {"$ref": "SearchIndexingConfigurationValues.schema.json"},
+    "products": {"$ref": "SearchIndexingConfigurationValues.schema.json"}
+  },
+  "$id": "https://api.commercetools.com/SearchIndexingConfiguration.schema.json"
 }

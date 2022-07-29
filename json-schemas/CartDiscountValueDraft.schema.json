@@ -1,16 +1,21 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/CartDiscountValueAbsoluteDraft.schema.json"},
-    {"$ref": "https://example.com/CartDiscountValueFixedDraft.schema.json"},
-    {"$ref": "https://example.com/CartDiscountValueGiftLineItemDraft.schema.json"},
-    {"$ref": "https://example.com/CartDiscountValueRelativeDraft.schema.json"}
+    {"$ref": "https://api.commercetools.com/CartDiscountValueAbsoluteDraft.schema.json"},
+    {"$ref": "https://api.commercetools.com/CartDiscountValueFixedDraft.schema.json"},
+    {"$ref": "https://api.commercetools.com/CartDiscountValueGiftLineItemDraft.schema.json"},
+    {"$ref": "https://api.commercetools.com/CartDiscountValueRelativeDraft.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartDiscountValueDraft",
   "type": "object",
-  "properties": {"type": {"type": "string"}},
+  "properties": {"type": {"enum": [
+    "absolute",
+    "fixed",
+    "giftLineItem",
+    "relative"
+  ]}},
   "required": ["type"],
-  "$id": "https://example.com/CartDiscountValueDraft.schema.json",
+  "$id": "https://api.commercetools.com/CartDiscountValueDraft.schema.json",
   "discriminator": {"propertyName": "type"}
 }

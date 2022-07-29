@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductSetAssetCustomFieldAction",
   "type": "object",
@@ -24,5 +24,5 @@
     "action",
     "name"
   ],
-  "$id": "https://example.com/ProductSetAssetCustomFieldAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductSetAssetCustomFieldAction.schema.json"
 }

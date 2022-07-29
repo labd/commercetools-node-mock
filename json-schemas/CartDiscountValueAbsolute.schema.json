@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Discounts the [CartDiscountTarget](ctp:api:type:CartDiscountTarget) by an absolute amount (not allowed for [MultiBuyLineItemsTarget](ctp:api:type:MultiBuyLineItemsTarget) and [MultiBuyCustomLineItemsTarget](ctp:api:type:MultiBuyCustomLineItemsTarget)).",
   "additionalProperties": false,
   "title": "CartDiscountValueAbsolute",
   "type": "object",
@@ -7,12 +8,12 @@
     "type": {"enum": ["absolute"]},
     "money": {
       "type": "array",
-      "items": {"$ref": "TypedMoney.schema.json"}
+      "items": {"$ref": "CentPrecisionMoney.schema.json"}
     }
   },
   "required": [
     "type",
     "money"
   ],
-  "$id": "https://example.com/CartDiscountValueAbsolute.schema.json"
+  "$id": "https://api.commercetools.com/CartDiscountValueAbsolute.schema.json"
 }

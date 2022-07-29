@@ -1,5 +1,5 @@
 {
-  "patternProperties": {"": {"type": [
+  "patternProperties": {"^[a-zA-Z0-9_-]{2,36}$": {"type": [
     "number",
     "string",
     "boolean",
@@ -7,10 +7,10 @@
     "array",
     "null"
   ]}},
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "FieldContainer",
   "type": "object",
   "properties": {},
-  "$id": "https://example.com/FieldContainer.schema.json"
+  "$id": "https://api.commercetools.com/FieldContainer.schema.json"
 }

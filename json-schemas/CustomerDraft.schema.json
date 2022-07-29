@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerDraft",
   "type": "object",
@@ -7,21 +7,19 @@
     "lastName": {"type": "string"},
     "addresses": {
       "type": "array",
-      "items": {"$ref": "Address.schema.json"}
+      "items": {"$ref": "BaseAddress.schema.json"}
     },
     "companyName": {"type": "string"},
     "vatId": {"type": "string"},
     "billingAddresses": {
       "type": "array",
-      "items": {
-        "type": "number",
-        "format": "integer"
-      }
+      "items": {"type": "number"}
     },
     "title": {"type": "string"},
     "locale": {"type": "string"},
     "isEmailVerified": {"type": "boolean"},
     "password": {"type": "string"},
+    "authenticationMode": {"$ref": "AuthenticationModeEnum.schema.json"},
     "email": {"type": "string"},
     "key": {"type": "string"},
     "anonymousId": {"type": "string"},
@@ -50,15 +48,9 @@
     "defaultBillingAddress": {"type": "number"},
     "shippingAddresses": {
       "type": "array",
-      "items": {
-        "type": "number",
-        "format": "integer"
-      }
+      "items": {"type": "number"}
     }
   },
-  "required": [
-    "email",
-    "password"
-  ],
-  "$id": "https://example.com/CustomerDraft.schema.json"
+  "required": ["email"],
+  "$id": "https://api.commercetools.com/CustomerDraft.schema.json"
 }

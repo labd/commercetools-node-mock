@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionChangeNameAction",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "action": {"enum": ["changeName"]}
+  },
+  "required": [
+    "action",
+    "name"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionChangeNameAction.schema.json"
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionCreatedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["ProductSelectionCreated"]},
+    "productSelection": {"$ref": "ProductSelectionType.schema.json"}
+  },
+  "required": [
+    "type",
+    "productSelection"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionCreatedMessagePayload.schema.json"
+}

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TaxPortion",
   "type": "object",
@@ -12,5 +12,5 @@
     "rate",
     "amount"
   ],
-  "$id": "https://example.com/TaxPortion.schema.json"
+  "$id": "https://api.commercetools.com/TaxPortion.schema.json"
 }

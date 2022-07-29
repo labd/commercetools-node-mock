@@ -1,16 +1,21 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/ExtensionChangeDestinationAction.schema.json"},
-    {"$ref": "https://example.com/ExtensionChangeTriggersAction.schema.json"},
-    {"$ref": "https://example.com/ExtensionSetKeyAction.schema.json"},
-    {"$ref": "https://example.com/ExtensionSetTimeoutInMsAction.schema.json"}
+    {"$ref": "https://api.commercetools.com/ExtensionChangeDestinationAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ExtensionChangeTriggersAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ExtensionSetKeyAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/ExtensionSetTimeoutInMsAction.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ExtensionUpdateAction",
   "type": "object",
-  "properties": {"action": {"type": "string"}},
+  "properties": {"action": {"enum": [
+    "changeDestination",
+    "changeTriggers",
+    "setKey",
+    "setTimeoutInMs"
+  ]}},
   "required": ["action"],
-  "$id": "https://example.com/ExtensionUpdateAction.schema.json",
+  "$id": "https://api.commercetools.com/ExtensionUpdateAction.schema.json",
   "discriminator": {"propertyName": "action"}
 }

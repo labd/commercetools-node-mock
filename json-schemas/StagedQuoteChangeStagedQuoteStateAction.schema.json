@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteChangeStagedQuoteStateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeStagedQuoteState"]},
+    "stagedQuoteState": {"$ref": "StagedQuoteStateEnum.schema.json"}
+  },
+  "required": [
+    "action",
+    "stagedQuoteState"
+  ],
+  "$id": "https://api.commercetools.com/StagedQuoteChangeStagedQuoteStateAction.schema.json"
+}

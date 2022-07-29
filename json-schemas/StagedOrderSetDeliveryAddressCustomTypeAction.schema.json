@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedOrderSetDeliveryAddressCustomTypeAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setDeliveryAddressCustomType"]},
+    "deliveryId": {"type": "string"},
+    "type": {"$ref": "TypeResourceIdentifier.schema.json"},
+    "fields": {"$ref": "FieldContainer.schema.json"}
+  },
+  "required": [
+    "action",
+    "deliveryId"
+  ],
+  "$id": "https://api.commercetools.com/StagedOrderSetDeliveryAddressCustomTypeAction.schema.json"
+}

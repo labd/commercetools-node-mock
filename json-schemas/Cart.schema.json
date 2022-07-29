@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Cart",
   "type": "object",
@@ -13,10 +13,7 @@
     "taxedPrice": {"$ref": "TaxedPrice.schema.json"},
     "shippingRateInput": {"$ref": "ShippingRateInput.schema.json"},
     "shippingInfo": {"$ref": "ShippingInfo.schema.json"},
-    "deleteDaysAfterLastModification": {
-      "type": "number",
-      "format": "integer"
-    },
+    "deleteDaysAfterLastModification": {"type": "number"},
     "origin": {"$ref": "CartOriginEnum.schema.json"},
     "refusedGifts": {
       "type": "array",
@@ -50,6 +47,11 @@
       "type": "array",
       "items": {"$ref": "DiscountCodeInfo.schema.json"}
     },
+    "directDiscounts": {
+      "type": "array",
+      "items": {"$ref": "DirectDiscount.schema.json"}
+    },
+    "totalLineItemQuantity": {"type": "number"},
     "customerGroup": {"$ref": "CustomerGroupReference.schema.json"},
     "lastModifiedBy": {"$ref": "LastModifiedBy.schema.json"},
     "custom": {"$ref": "CustomFields.schema.json"},
@@ -78,5 +80,5 @@
     "refusedGifts",
     "origin"
   ],
-  "$id": "https://example.com/Cart.schema.json"
+  "$id": "https://api.commercetools.com/Cart.schema.json"
 }

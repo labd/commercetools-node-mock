@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProjectChangeCartsConfigurationAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeCartsConfiguration"]},
+    "cartsConfiguration": {"$ref": "CartsConfiguration.schema.json"}
+  },
+  "required": [
+    "action",
+    "cartsConfiguration"
+  ],
+  "$id": "https://api.commercetools.com/ProjectChangeCartsConfigurationAction.schema.json"
+}

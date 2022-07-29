@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderPaymentAddedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["OrderPaymentAdded"]},
+    "payment": {"$ref": "PaymentReference.schema.json"}
+  },
+  "required": [
+    "type",
+    "payment"
+  ],
+  "$id": "https://api.commercetools.com/OrderPaymentAddedMessagePayload.schema.json"
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "We recommend an encrypted `HTTPS` connection for production setups. However, we also accept unencrypted `HTTP` connections for development purposes. HTTP redirects will not be followed and cache headers will be ignored.",
+  "additionalProperties": false,
+  "title": "HttpDestination",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["HTTP"]},
+    "url": {"type": "string"},
+    "authentication": {"$ref": "HttpDestinationAuthentication.schema.json"}
+  },
+  "required": [
+    "type",
+    "url"
+  ],
+  "$id": "https://api.commercetools.com/HttpDestination.schema.json"
+}

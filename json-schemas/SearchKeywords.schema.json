@@ -3,10 +3,10 @@
     "type": "array",
     "items": {"$ref": "SearchKeyword.schema.json"}
   }},
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "SearchKeywords",
   "type": "object",
   "properties": {},
-  "$id": "https://example.com/SearchKeywords.schema.json"
+  "$id": "https://api.commercetools.com/SearchKeywords.schema.json"
 }

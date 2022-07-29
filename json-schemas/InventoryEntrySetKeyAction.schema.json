@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "InventoryEntrySetKeyAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setKey"]},
+    "key": {"type": "string"}
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/InventoryEntrySetKeyAction.schema.json"
+}

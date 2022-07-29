@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderSetReturnInfoAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setReturnInfo"]},
+    "items": {
+      "type": "array",
+      "items": {"$ref": "ReturnInfoDraft.schema.json"}
+    }
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/OrderSetReturnInfoAction.schema.json"
+}

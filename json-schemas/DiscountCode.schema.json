@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "DiscountCode",
   "type": "object",
@@ -8,6 +8,7 @@
       "type": "array",
       "items": {"$ref": "CartDiscountReference.schema.json"}
     },
+    "applicationVersion": {"type": "number"},
     "lastModifiedAt": {
       "type": "string",
       "format": "date-time"
@@ -56,5 +57,5 @@
     "references",
     "groups"
   ],
-  "$id": "https://example.com/DiscountCode.schema.json"
+  "$id": "https://api.commercetools.com/DiscountCode.schema.json"
 }

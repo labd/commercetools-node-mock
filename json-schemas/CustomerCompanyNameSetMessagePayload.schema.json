@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerCompanyNameSetMessagePayload",
   "type": "object",
@@ -7,9 +7,6 @@
     "type": {"enum": ["CustomerCompanyNameSet"]},
     "companyName": {"type": "string"}
   },
-  "required": [
-    "type",
-    "companyName"
-  ],
-  "$id": "https://example.com/CustomerCompanyNameSetMessagePayload.schema.json"
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/CustomerCompanyNameSetMessagePayload.schema.json"
 }

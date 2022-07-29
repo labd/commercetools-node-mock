@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerDateOfBirthSetMessage",
   "type": "object",
@@ -38,8 +38,7 @@
     "sequenceNumber",
     "resource",
     "resourceVersion",
-    "type",
-    "dateOfBirth"
+    "type"
   ],
-  "$id": "https://example.com/CustomerDateOfBirthSetMessage.schema.json"
+  "$id": "https://api.commercetools.com/CustomerDateOfBirthSetMessage.schema.json"
 }

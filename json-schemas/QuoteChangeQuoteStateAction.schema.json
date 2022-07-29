@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteChangeQuoteStateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeQuoteState"]},
+    "quoteState": {"$ref": "QuoteStateEnum.schema.json"}
+  },
+  "required": [
+    "action",
+    "quoteState"
+  ],
+  "$id": "https://api.commercetools.com/QuoteChangeQuoteStateAction.schema.json"
+}

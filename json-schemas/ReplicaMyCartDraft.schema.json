@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ReplicaMyCartDraft",
+  "type": "object",
+  "properties": {"reference": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "required": ["reference"],
+  "$id": "https://api.commercetools.com/ReplicaMyCartDraft.schema.json"
+}

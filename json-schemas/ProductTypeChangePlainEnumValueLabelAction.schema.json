@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Updates the label of a single enum `value` in an [AttributeEnumType](ctp:api:type:AttributeEnumType) AttributeDefinition, or [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeEnumType AttributeDefinition.\n\nAll Products will be updated to the new label in an [eventually consistent](/general-concepts#eventual-consistency) way.",
   "additionalProperties": false,
   "title": "ProductTypeChangePlainEnumValueLabelAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "newValue"
   ],
-  "$id": "https://example.com/ProductTypeChangePlainEnumValueLabelAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeChangePlainEnumValueLabelAction.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyShoppingListChangeTextLineItemQuantityAction",
   "type": "object",
@@ -13,5 +13,5 @@
     "textLineItemId",
     "quantity"
   ],
-  "$id": "https://example.com/MyShoppingListChangeTextLineItemQuantityAction.schema.json"
+  "$id": "https://api.commercetools.com/MyShoppingListChangeTextLineItemQuantityAction.schema.json"
 }

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "IndividualProductSelectionType",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["individual"]},
+    "name": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": [
+    "type",
+    "name"
+  ],
+  "$id": "https://api.commercetools.com/IndividualProductSelectionType.schema.json"
+}

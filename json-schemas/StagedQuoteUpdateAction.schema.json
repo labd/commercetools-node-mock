@@ -1,0 +1,23 @@
+{
+  "oneOf": [
+    {"$ref": "https://api.commercetools.com/StagedQuoteChangeStagedQuoteStateAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StagedQuoteSetCustomFieldAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StagedQuoteSetCustomTypeAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StagedQuoteSetSellerCommentAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/StagedQuoteSetValidToAction.schema.json"}
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteUpdateAction",
+  "type": "object",
+  "properties": {"action": {"enum": [
+    "changeStagedQuoteState",
+    "setCustomField",
+    "setCustomType",
+    "setSellerComment",
+    "setValidTo"
+  ]}},
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/StagedQuoteUpdateAction.schema.json",
+  "discriminator": {"propertyName": "action"}
+}

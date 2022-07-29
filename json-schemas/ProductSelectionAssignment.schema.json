@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Specifies which Product is assigned to which ProductSelection.",
+  "additionalProperties": false,
+  "title": "ProductSelectionAssignment",
+  "type": "object",
+  "properties": {
+    "variantSelection": {"$ref": "ProductVariantSelection.schema.json"},
+    "product": {"$ref": "ProductReference.schema.json"},
+    "productSelection": {"$ref": "ProductSelectionReference.schema.json"}
+  },
+  "required": [
+    "product",
+    "productSelection"
+  ],
+  "$id": "https://api.commercetools.com/ProductSelectionAssignment.schema.json"
+}

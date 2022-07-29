@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Project",
   "type": "object",
   "properties": {
     "externalOAuth": {"$ref": "ExternalOAuth.schema.json"},
+    "shoppingLists": {"$ref": "ShoppingListsConfiguration.schema.json"},
     "languages": {
       "type": "array",
       "items": {"type": "string"}
@@ -23,7 +24,7 @@
     },
     "carts": {"$ref": "CartsConfiguration.schema.json"},
     "name": {"type": "string"},
-    "messages": {"$ref": "MessageConfiguration.schema.json"},
+    "messages": {"$ref": "MessagesConfiguration.schema.json"},
     "key": {"type": "string"},
     "currencies": {
       "type": "array",
@@ -41,5 +42,5 @@
     "messages",
     "carts"
   ],
-  "$id": "https://example.com/Project.schema.json"
+  "$id": "https://api.commercetools.com/Project.schema.json"
 }

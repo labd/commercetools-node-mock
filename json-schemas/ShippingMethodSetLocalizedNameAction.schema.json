@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ShippingMethodSetLocalizedNameAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setLocalizedName"]},
+    "localizedName": {"$ref": "LocalizedString.schema.json"}
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/ShippingMethodSetLocalizedNameAction.schema.json"
+}

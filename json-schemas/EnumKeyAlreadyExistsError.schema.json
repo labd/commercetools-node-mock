@@ -1,5 +1,13 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "patternProperties": {"": {"type": [
+    "number",
+    "string",
+    "boolean",
+    "object",
+    "array",
+    "null"
+  ]}},
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "EnumKeyAlreadyExistsError",
   "type": "object",
@@ -15,5 +23,5 @@
     "conflictingEnumKey",
     "conflictingAttributeName"
   ],
-  "$id": "https://example.com/EnumKeyAlreadyExistsError.schema.json"
+  "$id": "https://api.commercetools.com/EnumKeyAlreadyExistsError.schema.json"
 }

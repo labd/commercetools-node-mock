@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "To make all included Products available to your customers of a given Store, add the [Product Selections](/../api/projects/product-selections) to the respective Store. This action has no effect if the given Product Selection is already present in the Store and has the same `active` flag.",
+  "additionalProperties": false,
+  "title": "StoreAddProductSelectionAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["addProductSelection"]},
+    "active": {"type": "boolean"},
+    "productSelection": {"$ref": "ProductSelectionResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "productSelection"
+  ],
+  "$id": "https://api.commercetools.com/StoreAddProductSelectionAction.schema.json"
+}

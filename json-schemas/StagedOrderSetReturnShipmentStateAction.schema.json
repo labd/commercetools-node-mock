@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrderSetReturnShipmentStateAction",
   "type": "object",
@@ -13,5 +13,5 @@
     "returnItemId",
     "shipmentState"
   ],
-  "$id": "https://example.com/StagedOrderSetReturnShipmentStateAction.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrderSetReturnShipmentStateAction.schema.json"
 }

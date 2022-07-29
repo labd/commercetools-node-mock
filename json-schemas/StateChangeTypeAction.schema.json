@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StateChangeTypeAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "type"
   ],
-  "$id": "https://example.com/StateChangeTypeAction.schema.json"
+  "$id": "https://api.commercetools.com/StateChangeTypeAction.schema.json"
 }

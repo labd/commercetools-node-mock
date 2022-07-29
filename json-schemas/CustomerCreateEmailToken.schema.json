@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CustomerCreateEmailToken",
   "type": "object",
@@ -12,5 +12,5 @@
     "id",
     "ttlMinutes"
   ],
-  "$id": "https://example.com/CustomerCreateEmailToken.schema.json"
+  "$id": "https://api.commercetools.com/CustomerCreateEmailToken.schema.json"
 }

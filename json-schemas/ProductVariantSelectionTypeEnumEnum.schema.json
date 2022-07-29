@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "ProductVariantSelectionTypeEnum",
+  "type": "string",
+  "enum": [
+    "inclusion",
+    "exclusion"
+  ],
+  "$id": "https://api.commercetools.com/ProductVariantSelectionTypeEnumEnum.schema.json"
+}

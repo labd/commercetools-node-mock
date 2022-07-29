@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "[Reference](ctp:api:type:Reference) to an [OrderEdit](ctp:api:type:OrderEdit).",
   "additionalProperties": false,
   "title": "OrderEditReference",
   "type": "object",
@@ -12,5 +13,5 @@
     "typeId",
     "id"
   ],
-  "$id": "https://example.com/OrderEditReference.schema.json"
+  "$id": "https://api.commercetools.com/OrderEditReference.schema.json"
 }

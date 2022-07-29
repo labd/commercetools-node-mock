@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Adds an enum to the values of [AttributeEnumType](ctp:api:type:AttributeEnumType) AttributeDefinition, or [AttributeSetType](ctp:api:type:AttributeSetType) of AttributeEnumType AttributeDefinition.",
   "additionalProperties": false,
   "title": "ProductTypeAddPlainEnumValueAction",
   "type": "object",
@@ -13,5 +14,5 @@
     "attributeName",
     "value"
   ],
-  "$id": "https://example.com/ProductTypeAddPlainEnumValueAction.schema.json"
+  "$id": "https://api.commercetools.com/ProductTypeAddPlainEnumValueAction.schema.json"
 }

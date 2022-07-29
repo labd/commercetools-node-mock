@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartSetCustomerIdAction",
   "type": "object",
@@ -8,5 +8,5 @@
     "action": {"enum": ["setCustomerId"]}
   },
   "required": ["action"],
-  "$id": "https://example.com/CartSetCustomerIdAction.schema.json"
+  "$id": "https://api.commercetools.com/CartSetCustomerIdAction.schema.json"
 }

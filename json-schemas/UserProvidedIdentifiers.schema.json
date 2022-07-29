@@ -1,15 +1,16 @@
 {
   "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "UserProvidedIdentifiers",
   "type": "object",
   "properties": {
-    "externalId": {"type": "string"},
     "orderNumber": {"type": "string"},
+    "externalId": {"type": "string"},
+    "containerAndKey": {"$ref": "ContainerAndKey.schema.json"},
     "customerNumber": {"type": "string"},
     "sku": {"type": "string"},
     "key": {"type": "string"},
     "slug": {"$ref": "LocalizedString.schema.json"}
   },
-  "$id": "https://example.com/UserProvidedIdentifiers.schema.json"
+  "$id": "https://api.commercetools.com/UserProvidedIdentifiers.schema.json"
 }

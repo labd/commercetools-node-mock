@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Serves as value of the `custom` field on a resource or data type customized with a [Type](ctp:api:type:Type).",
   "additionalProperties": false,
   "title": "CustomFields",
   "type": "object",
@@ -11,5 +12,5 @@
     "type",
     "fields"
   ],
-  "$id": "https://example.com/CustomFields.schema.json"
+  "$id": "https://api.commercetools.com/CustomFields.schema.json"
 }

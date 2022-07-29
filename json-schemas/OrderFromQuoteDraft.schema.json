@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "OrderFromQuoteDraft",
+  "type": "object",
+  "properties": {
+    "shipmentState": {"$ref": "ShipmentStateEnum.schema.json"},
+    "quote": {"$ref": "QuoteResourceIdentifier.schema.json"},
+    "orderNumber": {"type": "string"},
+    "state": {"$ref": "StateResourceIdentifier.schema.json"},
+    "paymentState": {"$ref": "PaymentStateEnum.schema.json"},
+    "version": {"type": "number"},
+    "orderState": {"$ref": "OrderStateEnum.schema.json"}
+  },
+  "required": [
+    "quote",
+    "version"
+  ],
+  "$id": "https://api.commercetools.com/OrderFromQuoteDraft.schema.json"
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StoreProductSelectionsChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "updatedProductSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    },
+    "addedProductSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    },
+    "type": {"enum": ["StoreProductSelectionsChanged"]},
+    "removedProductSelections": {
+      "type": "array",
+      "items": {"$ref": "ProductSelectionSetting.schema.json"}
+    }
+  },
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/StoreProductSelectionsChangedMessagePayload.schema.json"
+}

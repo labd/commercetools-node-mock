@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "QuoteStateChangedMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["QuoteStateChanged"]},
+    "quoteState": {"$ref": "QuoteStateEnum.schema.json"},
+    "oldQuoteState": {"$ref": "QuoteStateEnum.schema.json"}
+  },
+  "required": [
+    "type",
+    "quoteState",
+    "oldQuoteState"
+  ],
+  "$id": "https://api.commercetools.com/QuoteStateChangedMessagePayload.schema.json"
+}

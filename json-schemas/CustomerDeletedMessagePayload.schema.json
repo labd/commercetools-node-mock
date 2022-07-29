@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "CustomerDeletedMessagePayload",
+  "type": "object",
+  "properties": {"type": {"enum": ["CustomerDeleted"]}},
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/CustomerDeletedMessagePayload.schema.json"
+}

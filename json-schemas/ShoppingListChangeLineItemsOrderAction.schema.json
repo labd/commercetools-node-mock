@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ShoppingListChangeLineItemsOrderAction",
   "type": "object",
@@ -14,5 +14,5 @@
     "action",
     "lineItemOrder"
   ],
-  "$id": "https://example.com/ShoppingListChangeLineItemsOrderAction.schema.json"
+  "$id": "https://api.commercetools.com/ShoppingListChangeLineItemsOrderAction.schema.json"
 }

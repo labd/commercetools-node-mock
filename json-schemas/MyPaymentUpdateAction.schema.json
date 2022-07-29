@@ -1,18 +1,27 @@
 {
   "oneOf": [
-    {"$ref": "https://example.com/MyPaymentAddTransactionAction.schema.json"},
-    {"$ref": "https://example.com/MyPaymentChangeAmountPlannedAction.schema.json"},
-    {"$ref": "https://example.com/MyPaymentSetCustomFieldAction.schema.json"},
-    {"$ref": "https://example.com/MyPaymentSetMethodInfoInterfaceAction.schema.json"},
-    {"$ref": "https://example.com/MyPaymentSetMethodInfoMethodAction.schema.json"},
-    {"$ref": "https://example.com/MyPaymentSetMethodInfoNameAction.schema.json"}
+    {"$ref": "https://api.commercetools.com/MyPaymentAddTransactionAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/MyPaymentChangeAmountPlannedAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/MyPaymentSetCustomFieldAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/MyPaymentSetMethodInfoInterfaceAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/MyPaymentSetMethodInfoMethodAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/MyPaymentSetMethodInfoNameAction.schema.json"},
+    {"$ref": "https://api.commercetools.com/MyPaymentSetTransactionCustomFieldAction.schema.json"}
   ],
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "MyPaymentUpdateAction",
   "type": "object",
-  "properties": {"action": {"type": "string"}},
+  "properties": {"action": {"enum": [
+    "addTransaction",
+    "changeAmountPlanned",
+    "setCustomField",
+    "setMethodInfoInterface",
+    "setMethodInfoMethod",
+    "setMethodInfoName",
+    "setTransactionCustomField"
+  ]}},
   "required": ["action"],
-  "$id": "https://example.com/MyPaymentUpdateAction.schema.json",
+  "$id": "https://api.commercetools.com/MyPaymentUpdateAction.schema.json",
   "discriminator": {"propertyName": "action"}
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "CartDiscountChangeCartPredicateAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action",
     "cartPredicate"
   ],
-  "$id": "https://example.com/CartDiscountChangeCartPredicateAction.schema.json"
+  "$id": "https://api.commercetools.com/CartDiscountChangeCartPredicateAction.schema.json"
 }

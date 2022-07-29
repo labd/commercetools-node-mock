@@ -1,14 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductPriceDiscountsSetUpdatedPrice",
   "type": "object",
   "properties": {
     "discounted": {"$ref": "DiscountedPrice.schema.json"},
-    "variantId": {
-      "type": "number",
-      "format": "integer"
-    },
+    "variantId": {"type": "number"},
     "staged": {"type": "boolean"},
     "variantKey": {"type": "string"},
     "sku": {"type": "string"},
@@ -19,5 +16,5 @@
     "priceId",
     "staged"
   ],
-  "$id": "https://example.com/ProductPriceDiscountsSetUpdatedPrice.schema.json"
+  "$id": "https://api.commercetools.com/ProductPriceDiscountsSetUpdatedPrice.schema.json"
 }

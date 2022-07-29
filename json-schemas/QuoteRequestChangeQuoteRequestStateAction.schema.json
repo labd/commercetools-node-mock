@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Transitions the Quote Request to a different state.",
+  "additionalProperties": false,
+  "title": "QuoteRequestChangeQuoteRequestStateAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeQuoteRequestState"]},
+    "quoteRequestState": {"$ref": "QuoteRequestStateEnum.schema.json"}
+  },
+  "required": [
+    "action",
+    "quoteRequestState"
+  ],
+  "$id": "https://api.commercetools.com/QuoteRequestChangeQuoteRequestStateAction.schema.json"
+}

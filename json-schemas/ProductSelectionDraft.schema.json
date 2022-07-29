@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProductSelectionDraft",
+  "type": "object",
+  "properties": {
+    "name": {"$ref": "LocalizedString.schema.json"},
+    "key": {"type": "string"},
+    "custom": {"$ref": "CustomFieldsDraft.schema.json"}
+  },
+  "required": ["name"],
+  "$id": "https://api.commercetools.com/ProductSelectionDraft.schema.json"
+}

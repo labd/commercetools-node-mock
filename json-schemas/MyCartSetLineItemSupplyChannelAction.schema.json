@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "MyCartSetLineItemSupplyChannelAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setLineItemSupplyChannel"]},
+    "lineItemId": {"type": "string"},
+    "supplyChannel": {"$ref": "ChannelResourceIdentifier.schema.json"}
+  },
+  "required": [
+    "action",
+    "lineItemId"
+  ],
+  "$id": "https://api.commercetools.com/MyCartSetLineItemSupplyChannelAction.schema.json"
+}

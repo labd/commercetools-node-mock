@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Describes how the Cart Discount interacts with other Discounts.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "StackingMode",
   "type": "string",
   "enum": [
     "Stacking",
     "StopAfterThisDiscount"
   ],
-  "$id": "https://example.com/StackingModeEnum.schema.json"
+  "$id": "https://api.commercetools.com/StackingModeEnum.schema.json"
 }

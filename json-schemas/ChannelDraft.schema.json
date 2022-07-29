@@ -1,10 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ChannelDraft",
   "type": "object",
   "properties": {
-    "address": {"$ref": "Address.schema.json"},
+    "address": {"$ref": "BaseAddress.schema.json"},
     "geoLocation": {"$ref": "GeoJson.schema.json"},
     "roles": {
       "type": "array",
@@ -16,5 +16,5 @@
     "key": {"type": "string"}
   },
   "required": ["key"],
-  "$id": "https://example.com/ChannelDraft.schema.json"
+  "$id": "https://api.commercetools.com/ChannelDraft.schema.json"
 }

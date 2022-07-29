@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "StagedQuoteSetValidToAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["setValidTo"]},
+    "validTo": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["action"],
+  "$id": "https://api.commercetools.com/StagedQuoteSetValidToAction.schema.json"
+}

@@ -1,9 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Field type for string values.",
   "additionalProperties": false,
   "title": "CustomFieldStringType",
   "type": "object",
   "properties": {"name": {"enum": ["String"]}},
   "required": ["name"],
-  "$id": "https://example.com/CustomFieldStringType.schema.json"
+  "$id": "https://api.commercetools.com/CustomFieldStringType.schema.json"
 }

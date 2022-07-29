@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Emitted when the affected StandalonePrice is updated based on a [Product Discount](ctp:api:type:ProductDiscount) being applied.",
+  "additionalProperties": false,
+  "title": "StandalonePriceDiscountSetMessagePayload",
+  "type": "object",
+  "properties": {
+    "type": {"enum": ["StandalonePriceDiscountSet"]},
+    "discounted": {"$ref": "DiscountedPrice.schema.json"}
+  },
+  "required": ["type"],
+  "$id": "https://api.commercetools.com/StandalonePriceDiscountSetMessagePayload.schema.json"
+}

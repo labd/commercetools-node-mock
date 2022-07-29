@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ReturnInfoDraft",
+  "type": "object",
+  "properties": {
+    "returnTrackingId": {"type": "string"},
+    "items": {
+      "type": "array",
+      "items": {"$ref": "ReturnItemDraft.schema.json"}
+    },
+    "returnDate": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["items"],
+  "$id": "https://api.commercetools.com/ReturnInfoDraft.schema.json"
+}

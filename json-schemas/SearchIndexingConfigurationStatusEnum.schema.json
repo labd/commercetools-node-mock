@@ -1,0 +1,12 @@
+{
+  "description": "Status of resource indexing.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "SearchIndexingConfigurationStatus",
+  "type": "string",
+  "enum": [
+    "Activated",
+    "Deactivated",
+    "Indexing"
+  ],
+  "$id": "https://api.commercetools.com/SearchIndexingConfigurationStatusEnum.schema.json"
+}

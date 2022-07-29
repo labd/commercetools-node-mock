@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "additionalProperties": false,
+  "title": "ProjectChangeOrderSearchStatusAction",
+  "type": "object",
+  "properties": {
+    "action": {"enum": ["changeOrderSearchStatus"]},
+    "status": {"$ref": "OrderSearchStatusEnum.schema.json"}
+  },
+  "required": [
+    "action",
+    "status"
+  ],
+  "$id": "https://api.commercetools.com/ProjectChangeOrderSearchStatusAction.schema.json"
+}

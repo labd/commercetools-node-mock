@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "Subscription",
   "type": "object",
@@ -40,5 +40,5 @@
     "format",
     "status"
   ],
-  "$id": "https://example.com/Subscription.schema.json"
+  "$id": "https://api.commercetools.com/Subscription.schema.json"
 }

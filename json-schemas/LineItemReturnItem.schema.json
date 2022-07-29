@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "LineItemReturnItem",
   "type": "object",
@@ -15,6 +15,7 @@
       "format": "date-time"
     },
     "lineItemId": {"type": "string"},
+    "custom": {"$ref": "CustomFields.schema.json"},
     "comment": {"type": "string"},
     "id": {"type": "string"},
     "type": {"enum": ["LineItemReturnItem"]},
@@ -30,5 +31,5 @@
     "createdAt",
     "lineItemId"
   ],
-  "$id": "https://example.com/LineItemReturnItem.schema.json"
+  "$id": "https://api.commercetools.com/LineItemReturnItem.schema.json"
 }

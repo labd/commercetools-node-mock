@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "TaxCategoryDraft",
   "type": "object",
@@ -12,9 +12,6 @@
       "items": {"$ref": "TaxRateDraft.schema.json"}
     }
   },
-  "required": [
-    "name",
-    "rates"
-  ],
-  "$id": "https://example.com/TaxCategoryDraft.schema.json"
+  "required": ["name"],
+  "$id": "https://api.commercetools.com/TaxCategoryDraft.schema.json"
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StagedOrder",
   "type": "object",
@@ -36,6 +36,7 @@
       "type": "string",
       "format": "date-time"
     },
+    "quote": {"$ref": "QuoteReference.schema.json"},
     "customLineItems": {
       "type": "array",
       "items": {"$ref": "CustomLineItem.schema.json"}
@@ -86,9 +87,8 @@
     "totalPrice",
     "orderState",
     "syncInfo",
-    "lastMessageSequenceNumber",
     "origin",
     "refusedGifts"
   ],
-  "$id": "https://example.com/StagedOrder.schema.json"
+  "$id": "https://api.commercetools.com/StagedOrder.schema.json"
 }

@@ -1,0 +1,14 @@
+{
+  "description": "Predefined states tracking the status of the Quote.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "QuoteState",
+  "type": "string",
+  "enum": [
+    "Pending",
+    "Declined",
+    "Accepted",
+    "Failed",
+    "Withdrawn"
+  ],
+  "$id": "https://api.commercetools.com/QuoteStateEnum.schema.json"
+}

@@ -1,14 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductPriceExternalDiscountSetMessagePayload",
   "type": "object",
   "properties": {
     "discounted": {"$ref": "DiscountedPrice.schema.json"},
-    "variantId": {
-      "type": "number",
-      "format": "integer"
-    },
+    "variantId": {"type": "number"},
     "staged": {"type": "boolean"},
     "type": {"enum": ["ProductPriceExternalDiscountSet"]},
     "variantKey": {"type": "string"},
@@ -21,5 +18,5 @@
     "priceId",
     "staged"
   ],
-  "$id": "https://example.com/ProductPriceExternalDiscountSetMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/ProductPriceExternalDiscountSetMessagePayload.schema.json"
 }

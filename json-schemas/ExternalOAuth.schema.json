@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "description": "Represents a RFC 7662 compliant [OAuth 2.0 Token Introspection](https://datatracker.ietf.org/doc/html/rfc7662) endpoint. For more information, see [Requesting an access token using an external OAuth 2.0 server](/../api/authorization#requesting-an-access-token-using-an-external-oauth-server).\n\nYou can only configure **one** external OAuth 2.0 endpoint per Project. To authenticate using multiple external services (such as social network logins), use a middle layer authentication service.",
   "additionalProperties": false,
   "title": "ExternalOAuth",
   "type": "object",
@@ -11,5 +12,5 @@
     "url",
     "authorizationHeader"
   ],
-  "$id": "https://example.com/ExternalOAuth.schema.json"
+  "$id": "https://api.commercetools.com/ExternalOAuth.schema.json"
 }

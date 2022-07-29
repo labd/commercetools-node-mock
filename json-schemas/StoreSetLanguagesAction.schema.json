@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "StoreSetLanguagesAction",
   "type": "object",
@@ -11,5 +11,5 @@
     "action": {"enum": ["setLanguages"]}
   },
   "required": ["action"],
-  "$id": "https://example.com/StoreSetLanguagesAction.schema.json"
+  "$id": "https://api.commercetools.com/StoreSetLanguagesAction.schema.json"
 }

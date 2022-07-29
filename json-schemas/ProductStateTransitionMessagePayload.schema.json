@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "additionalProperties": false,
   "title": "ProductStateTransitionMessagePayload",
   "type": "object",
@@ -13,5 +13,5 @@
     "state",
     "force"
   ],
-  "$id": "https://example.com/ProductStateTransitionMessagePayload.schema.json"
+  "$id": "https://api.commercetools.com/ProductStateTransitionMessagePayload.schema.json"
 }
