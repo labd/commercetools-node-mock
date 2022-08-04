@@ -10,11 +10,28 @@ import {
 } from '@commercetools/platform-sdk'
 import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { AbstractResourceRepository, GetParams, RepositoryContext } from './abstract'
+import { maskSecretValue } from '../lib/masking'
 
 export class ExtensionRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
     return 'extension'
+  }
+
+  postProcessResource(resource: Extension) {
+    if (resource) {
+      if (resource.destination.type === "HTTP" &&
+        resource.destination.authentication?.type === "AuthorizationHeader"
+      ) {
+        return maskSecretValue(
+          resource, 'destination.authentication.headerValue')
+      }
+      else if (resource.destination.type == "AWSLambda") {
+        return maskSecretValue(
+          resource, 'destination.accessSecret')
+      }
+    }
+    return resource
   }
 
   create(context: RepositoryContext, draft: ExtensionDraft): Extension {

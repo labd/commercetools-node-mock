@@ -23,11 +23,16 @@ import { maskSecretValue } from '../lib/masking'
 export class ProjectRepository extends AbstractRepository {
   get(context: RepositoryContext): Project | null {
     const resource = this._storage.getProject(context.projectKey)
-    const masked = maskSecretValue<Project>(
-      resource,
-      'externalOAuth.authorizationHeader'
-    )
-    return masked
+    return this.postProcessResource(resource)
+  }
+
+  postProcessResource(resource: any): any {
+    if (resource) {
+      return maskSecretValue(
+        resource, 'externalOAuth.authorizationHeader')
+    }
+    return resource
+
   }
 
   save(context: RepositoryContext, resource: Project) {

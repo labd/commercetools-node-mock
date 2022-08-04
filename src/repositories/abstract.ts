@@ -65,8 +65,18 @@ export abstract class AbstractRepository {
     if (!deepEqual(modifiedResource, resource)) {
       this.save(context, modifiedResource)
     }
-    return modifiedResource
+
+    const result = this.postProcessResource(modifiedResource)
+    if (!result) {
+      throw new Error("invalid post process action")
+    }
+    return result
   }
+
+  postProcessResource(resource: BaseResource | null): BaseResource | null {
+    return resource
+  }
+
 }
 
 export abstract class AbstractResourceRepository extends AbstractRepository {
@@ -79,12 +89,17 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
   }
 
   query(context: RepositoryContext, params: QueryParams = {}) {
-    return this._storage.query(context.projectKey, this.getTypeId(), {
+    const result = this._storage.query(context.projectKey, this.getTypeId(), {
       expand: params.expand,
       where: params.where,
       offset: params.offset,
       limit: params.limit,
     })
+
+    // @ts-ignore
+    result.results = result.results.map(this.postProcessResource)
+
+    return result
   }
 
   get(
@@ -92,7 +107,8 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
-    return this._storage.get(context.projectKey, this.getTypeId(), id, params)
+    const resource = this._storage.get(context.projectKey, this.getTypeId(), id, params)
+    return this.postProcessResource(resource)
   }
 
   getByKey(
@@ -100,12 +116,13 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     key: string,
     params: GetParams = {}
   ): BaseResource | null {
-    return this._storage.getByKey(
+    const resource = this._storage.getByKey(
       context.projectKey,
       this.getTypeId(),
       key,
       params
     )
+    return this.postProcessResource(resource)
   }
 
   delete(
@@ -113,12 +130,13 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
-    return this._storage.delete(
+    const resource = this._storage.delete(
       context.projectKey,
       this.getTypeId(),
       id,
       params
     )
+    return this.postProcessResource(resource)
   }
 
   save(context: RepositoryContext, resource: BaseResource) {
