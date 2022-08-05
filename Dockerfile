@@ -1,26 +1,25 @@
-FROM node:16-alpine
+FROM node:18-alpine
+ENV PNPM_VERSION=7.6.0
 
+RUN apk add --no-cache curl && \
+  curl -fsSL "https://github.com/pnpm/pnpm/releases/download/v${PNPM_VERSION}/pnpm-linuxstatic-x64" -o /bin/pnpm && chmod +x /bin/pnpm && \
+  apk del curl
 
 RUN adduser -D -u 8000 commercetools
-
+RUN wget https://get.pnpm.io/v6.34.js | node - add --global pnpm
 
 USER commercetools
-WORKDIR /home/commercetools
-
-RUN \
-    wget https://github.com/labd/commercetools-node-mock/archive/refs/heads/main.zip && \
-    unzip main.zip && \
-    mv commercetools-node-mock-main commercetools-node-mock && \
-    rm -rf *.zip
-
-
 WORKDIR /home/commercetools/commercetools-node-mock
 
-RUN npm install
+# Files required by pnpm install
+COPY package.json pnpm-lock.yaml tsup.config.js tsconfig.json ./
 
-CMD /bin/sh
+RUN pnpm install --frozen-lockfile
+
+# Bundle app source
+COPY src src
 
 EXPOSE 8989
 ENV HTTP_SERVER_PORT 8989
 
-CMD ["npm", "run", "server"]
+CMD ["pnpm", "start"]
