@@ -75,10 +75,44 @@ export const createPrice = (draft: PriceDraft): Price => {
 }
 
 export const createTypedMoney = (value: Money): TypedMoney => {
+
+  // Taken from https://docs.adyen.com/development-resources/currency-codes
+  let fractionDigits = 2
+  switch (value.currencyCode.toUpperCase()) {
+    case 'BHD':
+    case 'IQD':
+    case 'JOD':
+    case 'KWD':
+    case 'LYD':
+    case 'OMR':
+    case 'TND':
+      fractionDigits = 3
+      break
+    case 'CVE':
+    case 'DJF':
+    case 'GNF':
+    case 'IDR':
+    case 'JPY':
+    case 'KMF':
+    case 'KRW':
+    case 'PYG':
+    case 'RWF':
+    case 'UGX':
+    case 'VND':
+    case 'VUV':
+    case 'XAF':
+    case 'XOF':
+    case 'XPF':
+      fractionDigits = 0
+      break
+    default:
+      fractionDigits = 2
+  }
+
   return {
     type: 'centPrecision',
-    fractionDigits: 2,
     ...value,
+    fractionDigits: fractionDigits,
   }
 }
 
@@ -135,10 +169,10 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
     )
   }
 
-  return ({
+  return {
     typeId: resourceIdentifier.typeId,
     id: resource?.id,
-  } as unknown) as T
+  } as unknown as T
 }
 
 export const getRepositoryContext = (request: Request): RepositoryContext => {
