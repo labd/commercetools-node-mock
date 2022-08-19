@@ -2,12 +2,14 @@ import { getBaseResourceProperties } from '../helpers'
 import { getReferenceFromResourceIdentifier } from './helpers'
 import {
   ReferenceTypeId,
+  StateReference,
   State,
   StateChangeKeyAction,
   StateDraft,
   StateSetDescriptionAction,
   StateSetNameAction,
   StateSetRolesAction,
+  StateSetTransitionsAction,
   StateUpdateAction,
 } from '@commercetools/platform-sdk'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
@@ -71,5 +73,17 @@ export class StateRepository extends AbstractResourceRepository {
     ) => {
       resource.roles = roles
     },
+    setTransitions: (
+      context: RepositoryContext,
+      resource: Writable<State>,
+      { transitions }: StateSetTransitionsAction
+    ) => {
+      resource.transitions = transitions?.map((resourceId): StateReference => {
+        return {
+          id: resourceId.id || "",
+          typeId: "state",
+        }
+      })
+    }
   }
 }
