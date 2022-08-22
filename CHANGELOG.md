@@ -1,6 +1,10 @@
+0.8.1 (unreleased)
+==================
+ - Include `key`, `description` and `metaDescription` when converting product to product projection
+
 0.8.0 (27-07-2022)
 ==================
-- Implement experimental support for facets in the product projection search.
+ - Implement experimental support for facets in the product projection search.
 
 0.7.2 (26-07-2022)
 ==================
