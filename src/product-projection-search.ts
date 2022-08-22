@@ -107,6 +107,7 @@ export class ProductProjectionSearch {
         const filters = params['filter.query'].map(f =>
           parseFilterExpression(f, params.staged ?? false)
         )
+        
         resources = resources.filter(resource =>
           filters.every(f => f(resource, markMatchingVariant))
         )
@@ -154,6 +155,9 @@ export class ProductProjectionSearch {
       lastModifiedAt: product.lastModifiedAt,
       version: product.version,
       name: obj.name,
+      key: product.key,
+      description: obj.description,
+      metaDescription: obj.metaDescription,
       slug: obj.slug,
       categories: obj.categories,
       masterVariant: obj.masterVariant,
