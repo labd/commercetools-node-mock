@@ -1,6 +1,9 @@
-0.8.1 (unreleased)
+0.9.0 (23-08-2022)
 ==================
  - Include `key`, `description` and `metaDescription` when converting product to product projection
+ - Add support for updating transitions in state
+ - Set fractionDigits for money based on currency code
+ - Improve logic to mask secret values in resources
 
 0.8.0 (27-07-2022)
 ==================
