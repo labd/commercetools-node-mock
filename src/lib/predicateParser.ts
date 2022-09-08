@@ -124,6 +124,7 @@ const getLexer = (value: string) => {
     .token('FLOAT', /\d+\.\d+/)
     .token('INT', /\d+/)
     .token('VARIABLE', /:([-_A-Za-z0-9]+)/)
+    .token('BOOLEAN', /(true|false)/)
     .token('IDENTIFIER', /[-_A-Za-z0-9]+/)
     .token('STRING', /"((?:\\.|[^"\\])*)"/)
     .token('STRING', /'((?:\\.|[^'\\])*)'/)
@@ -156,6 +157,13 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       return {
         type: 'identifier',
         value: t.token.match,
+        pos: t.token.strpos(),
+      } as Symbol
+    })
+    .nud('BOOLEAN', 1, t => {
+      return {
+        type: 'boolean',
+        value: t.token.match === 'true' ? true : false,
         pos: t.token.strpos(),
       } as Symbol
     })
@@ -254,7 +262,6 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .led('!=', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
-
       return (obj: any, vars: VariableMap) => {
         return resolveValue(obj, left) !== resolveSymbol(expr, vars)
       }
