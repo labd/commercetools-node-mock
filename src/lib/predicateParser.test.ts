@@ -8,10 +8,12 @@ describe('Predicate filter', () => {
     arrayProperty: ['foo', 'bar', 'nar'],
     notDefined: undefined,
     emptyArrayProperty: [],
+    booleanProperty: true,
     nested: {
       numberProperty: 1234,
       objectProperty: {
         stringProperty: 'foobar',
+        booleanProperty: true,
       },
     },
 
@@ -29,6 +31,13 @@ describe('Predicate filter', () => {
     expect(match(`stringProperty!="foobar"`)).toBeFalsy()
 
     expect(match(`stringProperty=:val`, { val: 'foobar' })).toBeTruthy()
+  })
+
+  test('booleanProperty = true', async () => {
+    expect(match(`booleanProperty != true`)).toBeFalsy()
+    expect(match(`booleanProperty = true`)).toBeTruthy()
+
+    expect(match(`booleanProperty=:val`, { val: true })).toBeTruthy()
   })
 
   test('stringProperty matches ignore case "foobar"', async () => {
@@ -165,6 +174,13 @@ describe('Predicate filter', () => {
   test('nested attribute access', async () => {
     expect(
       match(`nested(objectProperty(stringProperty="foobar"))`)
+    ).toBeTruthy()
+  })
+
+  test('nested attribute access', async () => {
+    expect(match(`nested(objectProperty(booleanProperty != true))`)).toBeFalsy()
+    expect(
+      match(`nested(objectProperty(booleanProperty != false))`)
     ).toBeTruthy()
   })
 
