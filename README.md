@@ -69,3 +69,11 @@ Implement the following:
 - Add new service to src/ctMock.ts ctMock.\_services
 - Add new service to src/storage.ts InMemoryStorage
 - Adjust src/types.ts RepositoryMap and possibly serviceTypes
+
+## Releasing
+
+- Adjust the CHANGELOG.md
+- Adjust package.json with the new version
+- `git tag v1.2.3` and `git push --tags`
+- In Github create a release for the new tag (which will trigger a publish to NPM)
+
