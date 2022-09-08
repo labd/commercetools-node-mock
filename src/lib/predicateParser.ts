@@ -260,7 +260,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
       }
     })
     .led('!=', 20, ({ left, bp }) => {
-      let expr = parser.parse({ terminals: [bp - 1] })
+      const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
       return (obj: any, vars: VariableMap) => {
         return resolveValue(obj, left) !== resolveSymbol(expr, vars)
