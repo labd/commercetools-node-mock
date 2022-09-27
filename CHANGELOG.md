@@ -1,3 +1,6 @@
+# 0.9.2 (unreleased)
+- Added support for updating `authenticationMode` of a customer
+
 # 0.9.1 (08-09-2022)
 
 - Added boolean parsing logic for predicates.
