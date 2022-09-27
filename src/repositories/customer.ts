@@ -2,11 +2,15 @@ import {
   Customer,
   CustomerChangeEmailAction,
   CustomerDraft,
+  CustomerSetAuthenticationModeAction,
+  InvalidInputError,
+  InvalidJsonInputError,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { CommercetoolsError } from '../exceptions'
 
 export class CustomerRepository extends AbstractResourceRepository {
   getTypeId(): ReferenceTypeId {
@@ -47,6 +51,40 @@ export class CustomerRepository extends AbstractResourceRepository {
       { email }: CustomerChangeEmailAction
     ) => {
       resource.email = email
+    },
+    setAuthenticationMode: (
+      _context: RepositoryContext,
+      resource: Writable<Customer>,
+      { authMode, password }: CustomerSetAuthenticationModeAction
+    ) => {
+      if (resource.authenticationMode === authMode) {
+        throw new CommercetoolsError<InvalidInputError>(
+          {
+            code: 'InvalidInput',
+            message: `The customer is already using the '${resource.authenticationMode}' authentication mode.`,
+          },
+          400
+        )
+      }
+      resource.authenticationMode = authMode
+      if (authMode === "ExternalAuth") {
+        delete resource.password
+        return
+      }
+      if (authMode === "Password") {
+        resource.password = password
+          ? Buffer.from(password).toString('base64')
+          : undefined
+        return
+      }
+      throw new CommercetoolsError<InvalidJsonInputError>(
+        {
+          code: 'InvalidJsonInput',
+          message: 'Request body does not contain valid JSON.',
+          detailedErrorMessage: `actions -> authMode: Invalid enum value: '${authMode}'. Expected one of: 'Password','ExternalAuth'`
+        },
+        400
+      )
     },
   }
 }
