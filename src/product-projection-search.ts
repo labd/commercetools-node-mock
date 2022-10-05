@@ -107,7 +107,7 @@ export class ProductProjectionSearch {
         const filters = params['filter.query'].map(f =>
           parseFilterExpression(f, params.staged ?? false)
         )
-        
+
         resources = resources.filter(resource =>
           filters.every(f => f(resource, markMatchingVariant))
         )
@@ -137,18 +137,32 @@ export class ProductProjectionSearch {
       })
     }
 
+    var results = resources
+      .map(r => this.transform(r, params.staged ?? false))
+      .filter((p): p is ProductProjection => p !== null)
+      .filter(p => {
+        if (!params.staged ?? false) {
+          return (p.published)
+        }
+        return true
+      })
+
+
     return {
       count: totalResources,
       total: resources.length,
       offset: offset,
       limit: limit,
-      results: resources.map(this.transform),
+      results: results,
       facets: facets,
     }
   }
 
-  transform(product: Product): ProductProjection {
-    const obj = product.masterData.current
+  transform(product: Product, staged: boolean): ProductProjection | null {
+    const obj = !staged ? product.masterData.current : product.masterData.staged
+    console.log(staged)
+    if (!obj) return null
+
     return {
       id: product.id,
       createdAt: product.createdAt,
@@ -163,6 +177,8 @@ export class ProductProjectionSearch {
       masterVariant: obj.masterVariant,
       variants: obj.variants,
       productType: product.productType,
+      hasStagedChanges: product.masterData.hasStagedChanges,
+      published: product.masterData.published,
     }
   }
 

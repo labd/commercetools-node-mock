@@ -43,6 +43,7 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
       offset: query.offset ? Number(query.offset) : undefined,
       limit: query.limit ? Number(query.limit) : undefined,
       expand: QueryParamsAsArray(query.expand),
+      staged: query.staged === 'true',
     })
 
     return results

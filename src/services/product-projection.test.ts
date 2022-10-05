@@ -32,7 +32,47 @@ beforeEach(async () => {
     productType = response.body
   }
 
-  // Create the product
+ // Create an unpublished product
+ {
+  const productDraft: Writable<ProductDraft> = {
+    publish: false,
+    key: 'my-unpublished-product',
+    masterVariant: {
+      sku: 'my-unpub-sku',
+      prices: [
+        {
+          value: {
+            currencyCode: 'EUR',
+            centAmount: 189,
+          },
+        },
+      ],
+      attributes: [
+        {
+          name: 'number',
+          value: 1 as any,
+        },
+      ],
+    },
+    name: {
+      'nl-NL': 'test unpublished product',
+    },
+    productType: {
+      typeId: 'product-type',
+      id: productType.id,
+    },
+    slug: {
+      'nl-NL': 'test-unpublished-product',
+    },
+  }
+
+  const response = await supertest(ctMock.app)
+    .post('/dummy/products')
+    .send(productDraft)
+    expect(response.ok).toBe(true)
+  }
+
+  // Create a published product
   {
     const productDraft: Writable<ProductDraft> = {
       publish: true,
@@ -192,6 +232,28 @@ describe('Product Projection Search - Generic', () => {
         total: 0,
         facets: {},
         results: [],
+      })
+    }
+  })
+
+
+  test('Search - unpublished', async () => {
+    {
+      const response = await supertest(ctMock.app)
+        .get('/dummy/product-projections/search')
+        .query({
+          limit: 50,
+          staged: true,
+        })
+
+      const result: ProductProjectionPagedSearchResponse = response.body
+      expect(result).toEqual({
+        count: 1,
+        limit: 50,
+        offset: 0,
+        total: 1,
+        facets: {},
+        results: [productProjection],
       })
     }
   })
