@@ -48,7 +48,7 @@ export class ShoppingListRepository extends AbstractResourceRepository {
         ? { typeId: 'store', key: draft.store.key! }
         : undefined,
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 }

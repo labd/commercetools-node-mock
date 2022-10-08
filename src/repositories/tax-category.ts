@@ -28,7 +28,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       ...draft,
       rates: draft.rates?.map(this.taxRateFromTaxRateDraft) || [],
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

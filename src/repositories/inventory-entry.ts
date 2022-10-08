@@ -40,7 +40,7 @@ export class InventoryEntryRepository extends AbstractResourceRepository {
         this._storage
       ),
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

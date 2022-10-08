@@ -359,7 +359,7 @@ describe('Order Update Actions', () => {
         ],
       })
     expect(response.status).toBe(200)
-    expect(response.body.version).toBe(2)
+    expect(response.body.version).toBe(3)
     expect(response.body.orderState).toBe('Cancelled')
     expect(response.body.paymentState).toBe('Failed')
   })

@@ -93,7 +93,7 @@ export class OrderRepository extends AbstractResourceRepository {
         : undefined,
       lastMessageSequenceNumber: 0,
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 
@@ -140,7 +140,7 @@ export class OrderRepository extends AbstractResourceRepository {
         fractionDigits: 2,
       },
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

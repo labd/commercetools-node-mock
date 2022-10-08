@@ -26,7 +26,7 @@ export class ZoneRepository extends AbstractResourceRepository {
       name: draft.name,
       description: draft.description,
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

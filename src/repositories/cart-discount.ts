@@ -43,7 +43,7 @@ export class CartDiscountRepository extends AbstractResourceRepository {
       validUntil: draft.validUntil,
       value: this.transformValueDraft(draft.value),
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

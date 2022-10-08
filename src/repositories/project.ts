@@ -32,28 +32,14 @@ export class ProjectRepository extends AbstractRepository {
         resource, 'externalOAuth.authorizationHeader')
     }
     return resource
-
   }
 
-  save(context: RepositoryContext, resource: Project) {
-    const current = this.get(context)
+  saveNew(context: RepositoryContext, resource: Writable<Project>) {
+    resource.version = 1
+    this._storage.saveProject(resource)
+  }
 
-    if (current) {
-      checkConcurrentModification(current, resource.version)
-    } else {
-      if (resource.version !== 0) {
-        throw new CommercetoolsError<InvalidOperationError>(
-          {
-            code: 'InvalidOperation',
-            message: 'version on create must be 0',
-          },
-          400
-        )
-      }
-    }
-
-    // @ts-ignore
-    resource.version += 1
+  saveUpdate(context: RepositoryContext, version: number, resource: Project) {
     this._storage.saveProject(resource)
   }
 

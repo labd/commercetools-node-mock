@@ -6,19 +6,17 @@ import {
 import { CommercetoolsError } from '../exceptions'
 
 export const checkConcurrentModification = (
-  resource: BaseResource | Project,
-  expectedVersion: number
+  currentVersion: number,
+  expectedVersion: number,
+  identifier: string
 ) => {
-  if (resource.version === expectedVersion) return
-
-  const identifier = (resource as BaseResource).id
-    ? (resource as BaseResource).id
-    : (resource as Project).key
+  if (currentVersion === expectedVersion) return
+  console.error(`Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`)
 
   throw new CommercetoolsError<ConcurrentModificationError>(
     {
-      message: `Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${resource.version}.`,
-      currentVersion: resource.version,
+      message: `Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`,
+      currentVersion: currentVersion,
       code: 'ConcurrentModification',
     },
     409

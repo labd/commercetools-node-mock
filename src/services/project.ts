@@ -34,6 +34,7 @@ export class ProjectService {
     this.repository.processUpdateActions(
       getRepositoryContext(request),
       project,
+      updateRequest.version,
       updateRequest.actions
     )
 

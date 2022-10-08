@@ -27,7 +27,7 @@ export class CustomerRepository extends AbstractResourceRepository {
       isEmailVerified: draft.isEmailVerified || false,
       addresses: [],
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

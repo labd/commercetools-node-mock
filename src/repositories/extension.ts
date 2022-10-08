@@ -42,7 +42,7 @@ export class ExtensionRepository extends AbstractResourceRepository {
       destination: draft.destination,
       triggers: draft.triggers,
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

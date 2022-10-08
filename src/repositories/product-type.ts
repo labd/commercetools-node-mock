@@ -33,7 +33,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       ),
     }
 
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

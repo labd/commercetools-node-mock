@@ -71,7 +71,7 @@ export class CartRepository extends AbstractResourceRepository {
     // @ts-ignore
     resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
 
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

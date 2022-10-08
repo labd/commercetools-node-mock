@@ -44,7 +44,7 @@ export class SubscriptionRepository extends AbstractResourceRepository {
       messages: draft.messages || [],
       status: 'Healthy',
     }
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 }

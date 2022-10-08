@@ -58,7 +58,7 @@ export class PaymentRepository extends AbstractResourceRepository {
       ),
     }
 
-    this.save(context, resource)
+    this.saveNew(context, resource)
     return resource
   }
 

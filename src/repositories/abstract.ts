@@ -1,15 +1,16 @@
-import { RepositoryTypes } from './../types'
+import { RepositoryTypes, Writable } from './../types'
 import deepEqual from 'deep-equal'
 
 import {
   BaseResource,
-  InvalidOperationError,
   Project,
+  ResourceNotFoundError,
   UpdateAction,
 } from '@commercetools/platform-sdk'
 import { AbstractStorage } from '../storage'
 import { checkConcurrentModification } from './errors'
 import { CommercetoolsError } from '../exceptions'
+import { cloneObject } from '../helpers'
 
 export type QueryParams = {
   expand?: string[]
@@ -39,44 +40,76 @@ export abstract class AbstractRepository {
     this._storage = storage
   }
 
-  abstract save(
+  abstract saveNew(
     { projectKey }: RepositoryContext,
     resource: BaseResource | Project
   ): void
 
-  processUpdateActions(
-    context: RepositoryContext,
-    resource: BaseResource | Project,
-    actions: UpdateAction[]
-  ): BaseResource {
-    // Deep-copy
-    const modifiedResource = JSON.parse(JSON.stringify(resource))
+  abstract saveUpdate(
+    { projectKey }: RepositoryContext,
+    version: number,
+    resource: BaseResource | Project
+  ): void
 
-    actions.forEach(action => {
+  processUpdateActions<T extends BaseResource | Project>(
+    context: RepositoryContext,
+    resource: T,
+    version: number,
+    actions: UpdateAction[]
+  ): T {
+    // Deep-copy
+    const updatedResource = cloneObject(resource) as Writable<BaseResource | Project>
+    const identifier = (resource as BaseResource).id
+      ? (resource as BaseResource).id
+      : (resource as Project).key
+
+    actions.forEach((action) => {
       const updateFunc = this.actions[action.action]
 
       if (!updateFunc) {
         console.error(`No mock implemented for update action ${action.action}`)
-        return
+        throw new Error(
+          `No mock implemented for update action ${action.action}`
+        )
       }
-      updateFunc(context, modifiedResource, action)
+
+      const beforeUpdate = cloneObject(resource)
+      updateFunc(context, updatedResource, action)
+
+      // Check if the object is updated. We need to increase the version of
+      // an object per action which does an actual modification.
+      // This isn't the most performant method to do this (the update action
+      // should return a flag) but for now the easiest.
+      if (!deepEqual(beforeUpdate, updatedResource)) {
+
+        // We only check the version when there is an actual modification to
+        // be stored.
+        checkConcurrentModification(
+          version,
+          resource.version,
+          identifier
+        )
+
+        updatedResource.version += 1
+      }
     })
 
-    if (!deepEqual(modifiedResource, resource)) {
-      this.save(context, modifiedResource)
+    // If all actions succeeded we write the new version
+    // to the storage.
+    if (resource.version != updatedResource.version) {
+      this.saveUpdate(context, version, updatedResource)
     }
 
-    const result = this.postProcessResource(modifiedResource)
+    const result = this.postProcessResource(updatedResource)
     if (!result) {
-      throw new Error("invalid post process action")
+      throw new Error('invalid post process action')
     }
-    return result
+    return result as T
   }
 
-  postProcessResource(resource: BaseResource | null): BaseResource | null {
+  postProcessResource<T extends BaseResource | Project | null>(resource: T): T {
     return resource
   }
-
 }
 
 export abstract class AbstractResourceRepository extends AbstractRepository {
@@ -107,7 +140,12 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     id: string,
     params: GetParams = {}
   ): BaseResource | null {
-    const resource = this._storage.get(context.projectKey, this.getTypeId(), id, params)
+    const resource = this._storage.get(
+      context.projectKey,
+      this.getTypeId(),
+      id,
+      params
+    )
     return this.postProcessResource(resource)
   }
 
@@ -139,25 +177,34 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     return this.postProcessResource(resource)
   }
 
-  save(context: RepositoryContext, resource: BaseResource) {
-    const current = this.get(context, resource.id)
+  saveNew(context: RepositoryContext, resource: Writable<BaseResource>) {
+    resource.version = 1
+    this._storage.add(context.projectKey, this.getTypeId(), resource as any)
+  }
 
-    if (current) {
-      checkConcurrentModification(current, resource.version)
-    } else {
-      if (resource.version !== 0) {
-        throw new CommercetoolsError<InvalidOperationError>(
-          {
-            code: 'InvalidOperation',
-            message: 'version on create must be 0',
-          },
-          400
-        )
-      }
+  saveUpdate(context: RepositoryContext, version: number, resource: Writable<BaseResource>) {
+
+    // Check if the resource still exists.
+    const current = this._storage.get(context.projectKey, this.getTypeId(), resource.id)
+    if (!current) {
+      throw new CommercetoolsError<ResourceNotFoundError>(
+        {
+          code: 'ResourceNotFound',
+          message: "Resource not found while updating"
+        },
+        400
+      )
     }
 
-    // @ts-ignore
-    resource.version += 1
+    checkConcurrentModification(current.version, version, resource.id )
+
+    if (current.version === resource.version) {
+      throw new Error("Internal error: no changes to save")
+    }
+    resource.lastModifiedAt = new Date().toISOString()
+
     this._storage.add(context.projectKey, this.getTypeId(), resource as any)
+
+    return resource
   }
 }
