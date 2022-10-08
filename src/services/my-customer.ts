@@ -1,15 +1,14 @@
 import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
-import { AbstractStorage } from '../storage'
 import { CustomerRepository } from '../repositories/customer'
 import { getRepositoryContext } from '../repositories/helpers'
 
 export class MyCustomerService extends AbstractService {
   public repository: CustomerRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, repository: CustomerRepository) {
     super(parent)
-    this.repository = new CustomerRepository(storage)
+    this.repository = repository
   }
 
   getBasePath() {

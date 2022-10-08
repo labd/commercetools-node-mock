@@ -122,7 +122,6 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
 
     // @ts-ignore
     result.results = result.results.map(this.postProcessResource)
-
     return result
   }
 

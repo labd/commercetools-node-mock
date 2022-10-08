@@ -1,7 +1,6 @@
 import AbstractService from './abstract'
 import { Router } from 'express'
 import { CartRepository } from '../repositories/cart'
-import { AbstractStorage } from '../storage'
 import { Cart, CartDraft, Order } from '@commercetools/platform-sdk'
 import { OrderRepository } from '../repositories/order'
 import { getRepositoryContext } from '../repositories/helpers'
@@ -10,10 +9,10 @@ export class CartService extends AbstractService {
   public repository: CartRepository
   public orderRepository: OrderRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, cartRepository: CartRepository, orderRepository: OrderRepository) {
     super(parent)
-    this.repository = new CartRepository(storage)
-    this.orderRepository = new OrderRepository(storage)
+    this.repository = cartRepository
+    this.orderRepository = orderRepository
   }
 
   getBasePath() {

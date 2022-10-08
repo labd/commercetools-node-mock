@@ -17,6 +17,7 @@ import { ShippingMethodRepository } from './repositories/shipping-method'
 import { StateRepository } from './repositories/state'
 import { TaxCategoryRepository } from './repositories/tax-category'
 import { ProductDiscountRepository } from 'repositories/product-discount'
+import { AbstractRepository } from 'repositories/abstract'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 
@@ -24,6 +25,7 @@ export type RepositoryTypes =
   | ReferenceTypeId
   | 'standalone-price'
   | 'product-projection'
+
 export type ServiceTypes =
   | RepositoryTypes
   | 'my-cart'
@@ -35,6 +37,11 @@ export type ServiceTypes =
 export type Services = Partial<{
   [index in ServiceTypes]: AbstractService
 }>
+
+export type Repositories = Partial<{
+  [index in RepositoryTypes | 'project']: AbstractRepository
+}>
+
 
 export type Resource =
   | ctp.BaseResource

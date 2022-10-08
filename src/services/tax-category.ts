@@ -1,15 +1,14 @@
 import { TaxCategoryRepository } from '../repositories/tax-category'
 import AbstractService from './abstract'
-import { AbstractStorage } from '../storage'
 import { Request, Response, Router } from 'express'
 import { getRepositoryContext } from '../repositories/helpers'
 
 export class TaxCategoryService extends AbstractService {
   public repository: TaxCategoryRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, repository: TaxCategoryRepository) {
     super(parent)
-    this.repository = new TaxCategoryRepository(storage)
+    this.repository = repository
   }
 
   getBasePath() {

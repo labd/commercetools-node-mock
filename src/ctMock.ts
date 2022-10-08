@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express'
 import supertest from 'supertest'
 import morgan from 'morgan'
 import { AbstractStorage, InMemoryStorage } from './storage'
-import { Services } from './types'
+import { Repositories, Services } from './types'
 import { CommercetoolsError } from './exceptions'
 import { OAuth2Server } from './oauth/server'
 import { ProjectAPI } from './projectAPI'
@@ -11,35 +11,10 @@ import { copyHeaders } from './lib/proxy'
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 
 // Services
-import { CartDiscountService } from './services/cart-discount'
-import { CartService } from './services/cart'
-import { CategoryServices } from './services/category'
-import { ChannelService } from './services/channel'
-import { CustomerGroupService } from './services/customer-group'
-import { CustomerService } from './services/customer'
-import { CustomObjectService } from './services/custom-object'
-import { DiscountCodeService } from './services/discount-code'
-import { ExtensionServices } from './services/extension'
-import { InventoryEntryService } from './services/inventory-entry'
-import { MyCartService } from './services/my-cart'
-import { MyPaymentService } from './services/my-payment'
-import { OrderService } from './services/order'
-import { PaymentService } from './services/payment'
-import { ProductDiscountService } from './services/product-discount'
-import { ProductProjectionService } from './services/product-projection'
-import { ProductService } from './services/product'
-import { ProductTypeService } from './services/product-type'
 import { ProjectService } from './services/project'
-import { ShippingMethodService } from './services/shipping-method'
-import { ShoppingListService } from './services/shopping-list'
-import { StateService } from './services/state'
-import { StoreService } from './services/store'
-import { SubscriptionService } from './services/subscription'
-import { TaxCategoryService } from './services/tax-category'
-import { TypeService } from './services/type'
-import { ZoneService } from './services/zone'
-import { MyCustomerService } from './services/my-customer'
-import { MyOrderService } from './services/my-order'
+import { createRepositories } from './repositories'
+import { createServices } from './services'
+import { ProjectRepository } from 'repositories/project'
 
 export type CommercetoolsMockOptions = {
   validateCredentials: boolean
@@ -72,11 +47,13 @@ export class CommercetoolsMock {
     api: nock.Scope | undefined
   } = { auth: undefined, api: undefined }
   private _services: Services
+  private _repositories: Repositories
   private _projectService?: ProjectService
 
   constructor(options: Partial<CommercetoolsMockOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options }
     this._services = {}
+    this._repositories = {}
     this._projectService = undefined
 
     this._storage = new InMemoryStorage()
@@ -150,53 +127,12 @@ export class CommercetoolsMock {
       app.use('/:projectKey/in-store/key=:storeKey', projectRouter)
     }
 
-    this._projectService = new ProjectService(projectRouter, this._storage)
-
-    this._services = {
-      category: new CategoryServices(projectRouter, this._storage),
-      cart: new CartService(projectRouter, this._storage),
-      'cart-discount': new CartDiscountService(projectRouter, this._storage),
-      customer: new CustomerService(projectRouter, this._storage),
-      channel: new ChannelService(projectRouter, this._storage),
-      'customer-group': new CustomerGroupService(projectRouter, this._storage),
-      'discount-code': new DiscountCodeService(projectRouter, this._storage),
-      extension: new ExtensionServices(projectRouter, this._storage),
-      'inventory-entry': new InventoryEntryService(
-        projectRouter,
-        this._storage
-      ),
-      'key-value-document': new CustomObjectService(
-        projectRouter,
-        this._storage
-      ),
-      order: new OrderService(projectRouter, this._storage),
-      payment: new PaymentService(projectRouter, this._storage),
-      'my-cart': new MyCartService(projectRouter, this._storage),
-      'my-order': new MyOrderService(projectRouter, this._storage),
-      'my-customer': new MyCustomerService(projectRouter, this._storage),
-      'my-payment': new MyPaymentService(projectRouter, this._storage),
-      'shipping-method': new ShippingMethodService(
-        projectRouter,
-        this._storage
-      ),
-      'product-type': new ProductTypeService(projectRouter, this._storage),
-      product: new ProductService(projectRouter, this._storage),
-      'product-discount': new ProductDiscountService(
-        projectRouter,
-        this._storage
-      ),
-      'product-projection': new ProductProjectionService(
-        projectRouter,
-        this._storage
-      ),
-      'shopping-list': new ShoppingListService(projectRouter, this._storage),
-      state: new StateService(projectRouter, this._storage),
-      store: new StoreService(projectRouter, this._storage),
-      subscription: new SubscriptionService(projectRouter, this._storage),
-      'tax-category': new TaxCategoryService(projectRouter, this._storage),
-      type: new TypeService(projectRouter, this._storage),
-      zone: new ZoneService(projectRouter, this._storage),
-    }
+    this._repositories = createRepositories(this._storage)
+    this._projectService = new ProjectService(
+      projectRouter,
+      this._repositories.project as ProjectRepository
+    )
+    this._services = createServices(projectRouter, this._repositories)
 
     app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
       if (err instanceof CommercetoolsError) {

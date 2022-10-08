@@ -1,15 +1,14 @@
 import { ProductDiscountRepository } from '../repositories/product-discount'
 import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
-import { AbstractStorage } from '../storage'
 import { getRepositoryContext } from '../repositories/helpers'
 
 export class ProductDiscountService extends AbstractService {
   public repository: ProductDiscountRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, repository: ProductDiscountRepository) {
     super(parent)
-    this.repository = new ProductDiscountRepository(storage)
+    this.repository = repository
   }
 
   getBasePath() {

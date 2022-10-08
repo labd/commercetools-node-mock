@@ -1,16 +1,15 @@
 import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
 import { CustomObjectRepository } from '../repositories/custom-object'
-import { AbstractStorage } from '../storage'
 import { CustomObjectDraft } from '@commercetools/platform-sdk'
 import { getRepositoryContext } from '../repositories/helpers'
 
 export class CustomObjectService extends AbstractService {
   public repository: CustomObjectRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, repository: CustomObjectRepository) {
     super(parent)
-    this.repository = new CustomObjectRepository(storage)
+    this.repository = repository
   }
 
   getBasePath() {

@@ -1,7 +1,6 @@
 import AbstractService from './abstract'
 import { Router } from 'express'
 import { CustomerRepository } from '../repositories/customer'
-import { AbstractStorage } from '../storage'
 import { getBaseResourceProperties } from '../helpers'
 import { v4 as uuidv4 } from 'uuid'
 import { getRepositoryContext } from '../repositories/helpers'
@@ -9,9 +8,9 @@ import { getRepositoryContext } from '../repositories/helpers'
 export class CustomerService extends AbstractService {
   public repository: CustomerRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, repository: CustomerRepository) {
     super(parent)
-    this.repository = new CustomerRepository(storage)
+    this.repository = repository
   }
 
   getBasePath() {

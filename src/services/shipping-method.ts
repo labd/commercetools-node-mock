@@ -1,14 +1,13 @@
 import { ShippingMethodRepository } from '../repositories/shipping-method'
 import AbstractService from './abstract'
-import { AbstractStorage } from '../storage'
 import { Router } from 'express'
 
 export class ShippingMethodService extends AbstractService {
   public repository: ShippingMethodRepository
 
-  constructor(parent: Router, storage: AbstractStorage) {
+  constructor(parent: Router, repository: ShippingMethodRepository) {
     super(parent)
-    this.repository = new ShippingMethodRepository(storage)
+    this.repository = repository
     this.registerRoutes(parent)
   }
 

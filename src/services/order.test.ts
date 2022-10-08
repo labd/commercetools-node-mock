@@ -274,11 +274,9 @@ describe('Order Update Actions', () => {
   let order: Order | undefined
 
   beforeEach(async () => {
-    let response = await supertest(ctMock.app)
-      .post('/dummy/carts')
-      .send({
-        currency: 'EUR',
-      })
+    let response = await supertest(ctMock.app).post('/dummy/carts').send({
+      currency: 'EUR',
+    })
     expect(response.status).toBe(201)
     const cart = response.body
 
