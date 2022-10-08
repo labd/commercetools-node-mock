@@ -142,6 +142,7 @@ beforeEach(async () => {
       createdAt: '2022-07-22T13:31:49.840Z',
       lastModifiedAt: '2022-07-22T13:31:49.840Z',
       version: 1,
+      key: 'my-product-key',
       published: true,
       hasStagedChanges: false,
       masterVariant: {

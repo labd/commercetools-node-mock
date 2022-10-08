@@ -61,6 +61,7 @@ export class ProductRepository extends AbstractResourceRepository {
 
     const resource: Product = {
       ...getBaseResourceProperties(),
+      key: draft.key,
       productType: productType,
       masterData: {
         current: productData,
