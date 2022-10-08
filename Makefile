@@ -4,3 +4,5 @@ docker-build:
 docker-release:
 	docker push labdigital/commercetools-mock-server:latest
 
+test:
+	pnpm test
