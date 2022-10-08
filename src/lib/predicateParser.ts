@@ -31,7 +31,7 @@ export const matchesPredicate = (
   }
 
   if (Array.isArray(predicate)) {
-    return predicate.every(item => {
+    return predicate.every((item) => {
       const func = generateMatchFunc(item)
       return func(target, variables || {})
     })
@@ -45,22 +45,21 @@ export const parseQueryExpression = (
   predicate: string | string[]
 ): MatchFunc => {
   if (Array.isArray(predicate)) {
-    const callbacks = predicate.map(item => generateMatchFunc(item))
-    return (target: any, variables: VariableMap) => {
-      return callbacks.every(callback => callback(target, variables))
-    }
+    const callbacks = predicate.map((item) => generateMatchFunc(item))
+    return (target: any, variables: VariableMap) =>
+      callbacks.every((callback) => callback(target, variables))
   } else {
     return generateMatchFunc(predicate)
   }
 }
 
-type Symbol = {
+type TypeSymbol = {
   type: 'var' | 'boolean' | 'string' | 'float' | 'int' | 'identifier'
   value: any
   pos?: ITokenPosition
 }
 
-const validateSymbol = (val: Symbol) => {
+const validateSymbol = (val: TypeSymbol) => {
   if (!val.type) {
     throw new PredicateError('Internal error')
   }
@@ -76,7 +75,7 @@ const validateSymbol = (val: Symbol) => {
   }
 }
 
-const resolveSymbol = (val: Symbol, vars: VariableMap): any => {
+const resolveSymbol = (val: TypeSymbol, vars: VariableMap): any => {
   if (val.type === 'var') {
     if (!(val.value in vars)) {
       throw new PredicateError(`Missing parameter value for ${val.value}`)
@@ -87,7 +86,7 @@ const resolveSymbol = (val: Symbol, vars: VariableMap): any => {
   return val.value
 }
 
-const resolveValue = (obj: any, val: Symbol): any => {
+const resolveValue = (obj: any, val: TypeSymbol): any => {
   if (val.type !== 'identifier') {
     throw new PredicateError('Internal error')
   }
@@ -95,8 +94,8 @@ const resolveValue = (obj: any, val: Symbol): any => {
   if (!(val.value in obj)) {
     if (Array.isArray(obj)) {
       return Object.values(obj)
-        .filter(v => val.value in v)
-        .map(v => v[val.value])
+        .filter((v) => val.value in v)
+        .map((v) => v[val.value])
     }
     throw new PredicateError(`The field '${val.value}' does not exist.`)
   }
@@ -104,8 +103,8 @@ const resolveValue = (obj: any, val: Symbol): any => {
   return obj[val.value]
 }
 
-const getLexer = (value: string) => {
-  return new perplex(value)
+const getLexer = (value: string) =>
+  new perplex(value)
 
     .token('AND', /and(?![-_a-z0-9]+)/i)
     .token('OR', /or(?![-_a-z0-9]+)/i)
@@ -140,7 +139,6 @@ const getLexer = (value: string) => {
     .token('=', '=')
     .token('"', '"')
     .token('WS', /\s+/, true) // skip
-}
 
 /**
  * This function converts a query expression in to a callable which returns a
@@ -153,74 +151,82 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
   const lexer = getLexer(predicate)
   const parser = new Parser(lexer)
     .builder()
-    .nud('IDENTIFIER', 100, t => {
-      return {
-        type: 'identifier',
-        value: t.token.match,
-        pos: t.token.strpos(),
-      } as Symbol
-    })
-    .nud('BOOLEAN', 1, t => {
-      return {
-        type: 'boolean',
-        value: t.token.match === 'true' ? true : false,
-        pos: t.token.strpos(),
-      } as Symbol
-    })
-    .nud('VARIABLE', 100, t => {
-      return {
-        type: 'var',
-        // @ts-ignore
-        value: t.token.groups[1],
-        pos: t.token.strpos(),
-      } as Symbol
-    })
-    .nud('STRING', 100, t => {
-      return {
-        type: 'string',
-        // @ts-ignore
-        value: t.token.groups[1],
-        pos: t.token.strpos(),
-      } as Symbol
-    })
-    .nud('INT', 1, t => {
-      return {
-        type: 'int',
-        value: parseInt(t.token.match, 10),
-        pos: t.token.strpos(),
-      } as Symbol
-    })
-    .nud('FLOAT', 1, t => {
-      return {
-        type: 'float',
-        value: parseFloat(t.token.match),
-        pos: t.token.strpos(),
-      } as Symbol
-    })
+    .nud(
+      'IDENTIFIER',
+      100,
+      (t) =>
+        ({
+          type: 'identifier',
+          value: t.token.match,
+          pos: t.token.strpos(),
+        } as TypeSymbol)
+    )
+    .nud(
+      'BOOLEAN',
+      1,
+      (t) =>
+        ({
+          type: 'boolean',
+          value: t.token.match === 'true' ? true : false,
+          pos: t.token.strpos(),
+        } as TypeSymbol)
+    )
+    .nud(
+      'VARIABLE',
+      100,
+      (t) =>
+        ({
+          type: 'var',
+          // @ts-ignore
+          value: t.token.groups[1],
+          pos: t.token.strpos(),
+        } as TypeSymbol)
+    )
+    .nud(
+      'STRING',
+      100,
+      (t) =>
+        ({
+          type: 'string',
+          // @ts-ignore
+          value: t.token.groups[1],
+          pos: t.token.strpos(),
+        } as TypeSymbol)
+    )
+    .nud(
+      'INT',
+      1,
+      (t) =>
+        ({
+          type: 'int',
+          value: parseInt(t.token.match, 10),
+          pos: t.token.strpos(),
+        } as TypeSymbol)
+    )
+    .nud(
+      'FLOAT',
+      1,
+      (t) =>
+        ({
+          type: 'float',
+          value: parseFloat(t.token.match),
+          pos: t.token.strpos(),
+        } as TypeSymbol)
+    )
     .nud('NOT', 100, ({ bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any) => {
-        return !expr(obj)
-      }
+      return (obj: any) => !expr(obj)
     })
-    .nud('EMPTY', 10, ({ bp }) => {
-      return 'empty'
-    })
-    .nud('DEFINED', 10, ({ bp }) => {
-      return 'defined'
-    })
+    .nud('EMPTY', 10, ({ bp }) => 'empty')
+    .nud('DEFINED', 10, ({ bp }) => 'defined')
 
     .led('AND', 5, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any) => {
-        return left(obj) && expr(obj)
-      }
+      return (obj: any) => left(obj) && expr(obj)
     })
     .led('OR', 5, ({ left, token, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
-      return (obj: any, vars: object) => {
-        return left(obj, vars) || expr(obj, vars)
-      }
+      return (obj: any, vars: object) => left(obj, vars) || expr(obj, vars)
     })
     .led('COMMA', 1, ({ left, token, bp }) => {
       const expr: any = parser.parse({ terminals: [bp - 1] })
@@ -230,7 +236,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
         return [left, expr]
       }
     })
-    .nud('(', 100, t => {
+    .nud('(', 100, (t) => {
       const expr: any = parser.parse({ terminals: [')'] })
       return expr
     })
@@ -254,7 +260,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
         const resolvedValue = resolveValue(obj, left)
         const resolvedSymbol = resolveSymbol(expr, vars)
         if (Array.isArray(resolvedValue)) {
-          return !!resolvedValue.some(elem => elem === resolvedSymbol)
+          return !!resolvedValue.some((elem) => elem === resolvedSymbol)
         }
         return resolvedValue === resolvedSymbol
       }
@@ -262,41 +268,36 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
     .led('!=', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
-      return (obj: any, vars: VariableMap) => {
-        return resolveValue(obj, left) !== resolveSymbol(expr, vars)
-      }
+      return (obj: any, vars: VariableMap) =>
+        resolveValue(obj, left) !== resolveSymbol(expr, vars)
     })
     .led('>', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
 
-      return (obj: any, vars: object) => {
-        return resolveValue(obj, left) > resolveSymbol(expr, vars)
-      }
+      return (obj: any, vars: object) =>
+        resolveValue(obj, left) > resolveSymbol(expr, vars)
     })
     .led('>=', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
 
-      return (obj: any, vars: object) => {
-        return resolveValue(obj, left) >= resolveSymbol(expr, vars)
-      }
+      return (obj: any, vars: object) =>
+        resolveValue(obj, left) >= resolveSymbol(expr, vars)
     })
     .led('<', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
 
-      return (obj: any, vars: object) => {
-        return resolveValue(obj, left) < resolveSymbol(expr, vars)
-      }
+      return (obj: any, vars: object) =>
+        resolveValue(obj, left) < resolveSymbol(expr, vars)
     })
     .led('<=', 20, ({ left, bp }) => {
       const expr = parser.parse({ terminals: [bp - 1] })
       validateSymbol(expr)
 
-      return (obj: any, vars: object) => {
-        return resolveValue(obj, left) <= resolveSymbol(expr, vars)
-      }
+      return (obj: any, vars: object) =>
+        resolveValue(obj, left) <= resolveSymbol(expr, vars)
     })
     .led('IS', 20, ({ left, bp }) => {
       let invert = false
@@ -350,7 +351,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
           symbols = [expr]
         }
 
-        const inValues = symbols.map((item: Symbol) =>
+        const inValues = symbols.map((item: TypeSymbol) =>
           resolveSymbol(item, vars)
         )
         return inValues.includes(resolveValue(obj, left))
@@ -419,7 +420,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
           )
         }
 
-        const array = expr.map((item: Symbol) => resolveSymbol(item, vars))
+        const array = expr.map((item: TypeSymbol) => resolveSymbol(item, vars))
         if (keyword.type === 'ALL') {
           return array.every((item: any) => value.includes(item))
         } else {

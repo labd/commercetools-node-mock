@@ -1,4 +1,4 @@
-import { Product, ProductDraft } from '@commercetools/platform-sdk'
+import { Product, ProductData, ProductDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 import assert from 'assert'
@@ -79,46 +79,50 @@ describe('Product', () => {
       .post('/dummy/products')
       .send(unpublishedProductDraft)
 
+    const productData: ProductData = {
+      name: {
+        'nl-NL': 'test unpublished product',
+      },
+      slug: {
+        'nl-NL': 'test-unpublished-product',
+      },
+      categories: [],
+      masterVariant: {
+        sku: '2337',
+        assets: [],
+        attributes: [
+          {
+            name: 'test',
+            value: 'test',
+          },
+        ],
+        id: 1,
+        images: [],
+      },
+      variants: [
+        {
+          sku: '2338',
+          assets: [],
+          id: 2,
+          images: [],
+          attributes: [
+            {
+              name: 'test2',
+              value: 'test2',
+            },
+          ],
+        },
+      ],
+      searchKeywords: {},
+    }
+
     expect(response.body).toEqual({
       createdAt: expect.anything(),
       id: expect.anything(),
       lastModifiedAt: expect.anything(),
       masterData: {
-        staged: {
-          name: {
-            'nl-NL': 'test unpublished product',
-          },
-          slug: {
-            'nl-NL': 'test-unpublished-product',
-          },
-          categories: [],
-          masterVariant: {
-            sku: '2337',
-            assets: [],
-            attributes: [
-              {
-                name: 'test',
-                value: 'test',
-              },
-            ],
-            id: 1,
-            images: [],
-          },
-          variants: [
-            {
-              sku: '2338',
-              assets: [],
-              id: 2,
-              images: [],
-              attributes: [
-                {
-                  name: 'test2',
-                  value: 'test2',
-                },
-              ],
-            },
-          ],
-        },
+        staged: productData,
+        current: productData,
         hasStagedChanges: false,
         published: false,
       },
@@ -127,7 +131,7 @@ describe('Product', () => {
         id: 'some-uuid',
       },
       version: 1,
-    })
+    } as Product)
   })
 })
 
@@ -243,9 +247,9 @@ describe('Product update actions', () => {
       })
     expect(response.status).toBe(200)
     expect(response.body.version).toBe(2)
-    expect(
-      response.body.masterData.staged.variants[0].attributes
-    ).toHaveLength(2)
+    expect(response.body.masterData.staged.variants[0].attributes).toHaveLength(
+      2
+    )
     const attr = response.body.masterData.staged.variants[0].attributes[1]
     expect(attr).toEqual({ name: 'foo', value: 'bar' })
   })

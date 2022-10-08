@@ -34,7 +34,7 @@ export class CartRepository extends AbstractResourceRepository {
 
   create(context: RepositoryContext, draft: CartDraft): Cart {
     const lineItems =
-      draft.lineItems?.map(draftLineItem =>
+      draft.lineItems?.map((draftLineItem) =>
         this.draftLineItemtoLineItem(
           context.projectKey,
           draftLineItem,
@@ -43,7 +43,7 @@ export class CartRepository extends AbstractResourceRepository {
         )
       ) ?? []
 
-    const resource: Cart = {
+    const resource: Writable<Cart> = {
       ...getBaseResourceProperties(),
       cartState: 'Active',
       lineItems,
@@ -67,8 +67,6 @@ export class CartRepository extends AbstractResourceRepository {
         this._storage
       ),
     }
-
-    // @ts-ignore
     resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
 
     this.saveNew(context, resource)
@@ -94,7 +92,6 @@ export class CartRepository extends AbstractResourceRepository {
       { productId, variantId, sku, quantity = 1 }: CartAddLineItemAction
     ) => {
       let product: Product | null = null
-      let variant: ProductVariant | undefined
 
       if (productId && variantId) {
         // Fetch product and variant by ID
@@ -128,10 +125,10 @@ export class CartRepository extends AbstractResourceRepository {
       }
 
       // Find matching variant
-      variant = [
+      const variant: ProductVariant | undefined = [
         product.masterData.current.masterVariant,
         ...product.masterData.current.variants,
-      ].find(x => {
+      ].find((x) => {
         if (sku) return x.sku === sku
         if (variantId) return x.id === variantId
         return false
@@ -148,11 +145,11 @@ export class CartRepository extends AbstractResourceRepository {
       }
 
       const alreadyAdded = resource.lineItems.some(
-        x => x.productId === product?.id && x.variant.id === variant?.id
+        (x) => x.productId === product?.id && x.variant.id === variant?.id
       )
       if (alreadyAdded) {
         // increase quantity and update total price
-        resource.lineItems.map(x => {
+        resource.lineItems.map((x) => {
           if (x.productId === product?.id && x.variant.id === variant?.id) {
             x.quantity += quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
@@ -209,7 +206,7 @@ export class CartRepository extends AbstractResourceRepository {
       resource: Writable<Cart>,
       { lineItemId, quantity }: CartRemoveLineItemAction
     ) => {
-      const lineItem = resource.lineItems.find(x => x.id === lineItemId)
+      const lineItem = resource.lineItems.find((x) => x.id === lineItemId)
       if (!lineItem) {
         // Check if product is found
         throw new CommercetoolsError<GeneralError>({
@@ -221,10 +218,12 @@ export class CartRepository extends AbstractResourceRepository {
       const shouldDelete = !quantity || quantity >= lineItem.quantity
       if (shouldDelete) {
         // delete line item
-        resource.lineItems = resource.lineItems.filter(x => x.id !== lineItemId)
+        resource.lineItems = resource.lineItems.filter(
+          (x) => x.id !== lineItemId
+        )
       } else {
         // decrease quantity and update total price
-        resource.lineItems.map(x => {
+        resource.lineItems.map((x) => {
           if (x.id === lineItemId && quantity) {
             x.quantity -= quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
@@ -248,21 +247,28 @@ export class CartRepository extends AbstractResourceRepository {
       resource: Writable<Cart>,
       { shippingMethod }: CartSetShippingMethodAction
     ) => {
-      const resolvedType = this._storage.getByResourceIdentifier(
-        context.projectKey,
-        //@ts-ignore
-        shippingMethod
-      )
+      if (shippingMethod) {
+        const method = this._storage.getByResourceIdentifier<'shipping-method'>(
+          context.projectKey,
+          shippingMethod
+        )
 
-      if (!resolvedType) {
-        throw new Error(`Type ${shippingMethod} not found`)
-      }
-      //@ts-ignore
-      resource.shippingInfo = {
-        shippingMethod: {
-          typeId: 'shipping-method',
-          id: resolvedType.id,
-        },
+        if (!method) {
+          throw new Error(`Type ${shippingMethod} not found`)
+        }
+
+        // Based on the address we should select a shipping zone and
+        // use that to define the price.
+        // @ts-ignore
+        resource.shippingInfo = {
+          shippingMethod: {
+            typeId: 'shipping-method',
+            id: method.id,
+          },
+          shippingMethodName: method.name,
+        }
+      } else {
+        resource.shippingInfo = undefined
       }
     },
     setCountry: (
@@ -338,7 +344,6 @@ export class CartRepository extends AbstractResourceRepository {
     const { productId, quantity, variantId, sku } = draftLineItem
 
     let product: Product | null = null
-    let variant: ProductVariant | undefined
 
     if (productId && variantId) {
       // Fetch product and variant by ID
@@ -367,10 +372,10 @@ export class CartRepository extends AbstractResourceRepository {
     }
 
     // Find matching variant
-    variant = [
+    const variant = [
       product.masterData.current.masterVariant,
       ...product.masterData.current.variants,
-    ].find(x => {
+    ].find((x) => {
       if (sku) return x.sku === sku
       if (variantId) return x.id === variantId
       return false
@@ -432,7 +437,7 @@ const selectPrice = ({
   // Quick-and-dirty way of selecting price based on the given currency and country.
   // Can be improved later to give more priority to exact matches over
   // 'all country' matches, and include customer groups in the mix as well
-  return prices.find(price => {
+  return prices.find((price) => {
     const countryMatch = !price.country || price.country === country
     const currencyMatch = price.value.currencyCode === currency
     return countryMatch && currencyMatch

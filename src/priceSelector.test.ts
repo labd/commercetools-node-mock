@@ -1,6 +1,4 @@
 import {
-  ProductData,
-  Product,
   ProductProjection,
 } from '@commercetools/platform-sdk'
 import { applyPriceSelector } from './priceSelector'

@@ -1,7 +1,6 @@
 import {
   InvalidInputError,
   Price,
-  Product,
   ProductProjection,
   ProductVariant,
 } from '@commercetools/platform-sdk'
@@ -30,11 +29,11 @@ export const applyPriceSelector = (
     const variants: Writable<ProductVariant>[] = [
       product.masterVariant,
       ...(product.variants ?? []),
-    ].filter(x => x != undefined)
+    ].filter((x) => x != undefined)
 
     for (const variant of variants) {
       const scopedPrices =
-        variant.prices?.filter(p => priceSelectorFilter(p, selector)) ?? []
+        variant.prices?.filter((p) => priceSelectorFilter(p, selector)) ?? []
 
       if (scopedPrices.length > 0) {
         const price = scopedPrices[0]

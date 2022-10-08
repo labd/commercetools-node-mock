@@ -13,10 +13,7 @@ import {
   ProjectSetShippingRateInputTypeAction,
   ProjectUpdateAction,
 } from '@commercetools/platform-sdk'
-import { InvalidOperationError } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
-import { checkConcurrentModification } from './errors'
-import { CommercetoolsError } from '../exceptions'
 import { AbstractRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
 
@@ -28,8 +25,7 @@ export class ProjectRepository extends AbstractRepository {
 
   postProcessResource(resource: any): any {
     if (resource) {
-      return maskSecretValue(
-        resource, 'externalOAuth.authorizationHeader')
+      return maskSecretValue(resource, 'externalOAuth.authorizationHeader')
     }
     return resource
   }
@@ -133,7 +129,8 @@ export class ProjectRepository extends AbstractRepository {
         countryTaxRateFallbackEnabled,
       }: ProjectChangeCountryTaxRateFallbackEnabledAction
     ) => {
-      resource.carts.countryTaxRateFallbackEnabled = countryTaxRateFallbackEnabled
+      resource.carts.countryTaxRateFallbackEnabled =
+        countryTaxRateFallbackEnabled
     },
     changeCartsConfiguration: (
       context: RepositoryContext,

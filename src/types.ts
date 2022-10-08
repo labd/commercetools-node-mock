@@ -30,11 +30,9 @@ export type ServiceTypes =
   | 'my-customer'
   | 'product-projection'
 
-export type Services = Partial<
-  {
-    [index in ServiceTypes]: AbstractService
-  }
->
+export type Services = Partial<{
+  [index in ServiceTypes]: AbstractService
+}>
 
 export type ResourceMap = {
   cart: ctp.Cart

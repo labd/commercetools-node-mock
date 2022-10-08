@@ -82,9 +82,9 @@ export class TaxCategoryRepository extends AbstractResourceRepository {
       if (resource.rates === undefined) {
         resource.rates = []
       }
-      resource.rates = resource.rates.filter(taxRate => {
-        return taxRate.id !== taxRateId
-      })
+      resource.rates = resource.rates.filter(
+        (taxRate) => taxRate.id !== taxRateId
+      )
     },
     replaceTaxRate: (
       context: RepositoryContext,

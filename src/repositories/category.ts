@@ -38,21 +38,19 @@ export class CategoryRepository extends AbstractResourceRepository {
         : undefined,
       ancestors: [], // TODO
       assets:
-        draft.assets?.map(d => {
-          return {
-            id: uuidv4(),
-            name: d.name,
-            description: d.description,
-            sources: d.sources,
-            tags: d.tags,
-            key: d.key,
-            custom: createCustomFields(
-              draft.custom,
-              context.projectKey,
-              this._storage
-            ),
-          }
-        }) || [],
+        draft.assets?.map((d) => ({
+          id: uuidv4(),
+          name: d.name,
+          description: d.description,
+          sources: d.sources,
+          tags: d.tags,
+          key: d.key,
+          custom: createCustomFields(
+            draft.custom,
+            context.projectKey,
+            this._storage
+          ),
+        })) || [],
       custom: createCustomFields(
         draft.custom,
         context.projectKey,
@@ -69,7 +67,7 @@ export class CategoryRepository extends AbstractResourceRepository {
       resource: Writable<Category>,
       { assetId, assetKey, name }: CategoryChangeAssetNameAction
     ) => {
-      resource.assets?.forEach(asset => {
+      resource.assets?.forEach((asset) => {
         if (assetId && assetId === asset.id) {
           asset.name = name
         }
@@ -97,7 +95,7 @@ export class CategoryRepository extends AbstractResourceRepository {
       resource: Writable<Category>,
       { assetId, assetKey, description }: CategorySetAssetDescriptionAction
     ) => {
-      resource.assets?.forEach(asset => {
+      resource.assets?.forEach((asset) => {
         if (assetId && assetId === asset.id) {
           asset.description = description
         }
@@ -111,7 +109,7 @@ export class CategoryRepository extends AbstractResourceRepository {
       resource: Writable<Category>,
       { assetId, assetKey, sources }: CategorySetAssetSourcesAction
     ) => {
-      resource.assets?.forEach(asset => {
+      resource.assets?.forEach((asset) => {
         if (assetId && assetId === asset.id) {
           asset.sources = sources
         }

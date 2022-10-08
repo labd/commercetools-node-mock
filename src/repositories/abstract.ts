@@ -58,7 +58,9 @@ export abstract class AbstractRepository {
     actions: UpdateAction[]
   ): T {
     // Deep-copy
-    const updatedResource = cloneObject(resource) as Writable<BaseResource | Project>
+    const updatedResource = cloneObject(resource) as Writable<
+      BaseResource | Project
+    >
     const identifier = (resource as BaseResource).id
       ? (resource as BaseResource).id
       : (resource as Project).key
@@ -81,14 +83,9 @@ export abstract class AbstractRepository {
       // This isn't the most performant method to do this (the update action
       // should return a flag) but for now the easiest.
       if (!deepEqual(beforeUpdate, updatedResource)) {
-
         // We only check the version when there is an actual modification to
         // be stored.
-        checkConcurrentModification(
-          version,
-          resource.version,
-          identifier
-        )
+        checkConcurrentModification(version, resource.version, identifier)
 
         updatedResource.version += 1
       }
@@ -118,7 +115,6 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
 
   constructor(storage: AbstractStorage) {
     super(storage)
-    this._storage.assertStorage(this.getTypeId())
   }
 
   query(context: RepositoryContext, params: QueryParams = {}) {
@@ -182,24 +178,31 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     this._storage.add(context.projectKey, this.getTypeId(), resource as any)
   }
 
-  saveUpdate(context: RepositoryContext, version: number, resource: Writable<BaseResource>) {
-
+  saveUpdate(
+    context: RepositoryContext,
+    version: number,
+    resource: Writable<BaseResource>
+  ) {
     // Check if the resource still exists.
-    const current = this._storage.get(context.projectKey, this.getTypeId(), resource.id)
+    const current = this._storage.get(
+      context.projectKey,
+      this.getTypeId(),
+      resource.id
+    )
     if (!current) {
       throw new CommercetoolsError<ResourceNotFoundError>(
         {
           code: 'ResourceNotFound',
-          message: "Resource not found while updating"
+          message: 'Resource not found while updating',
         },
         400
       )
     }
 
-    checkConcurrentModification(current.version, version, resource.id )
+    checkConcurrentModification(current.version, version, resource.id)
 
     if (current.version === resource.version) {
-      throw new Error("Internal error: no changes to save")
+      throw new Error('Internal error: no changes to save')
     }
     resource.lastModifiedAt = new Date().toISOString()
 

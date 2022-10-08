@@ -7,7 +7,7 @@ describe('CustomObject create', () => {
   const ctMock = new CommercetoolsMock()
 
   test('Create new object', async () => {
-    let response = await supertest(ctMock.app)
+    const response = await supertest(ctMock.app)
       .post('/dummy/custom-objects')
       .send({
         container: 'my-container',

@@ -13,12 +13,12 @@ export const haversineDistance = (src: Location, dst: Location) => {
   const dLat = toRadian(dst.latitude - src.latitude)
   const dLon = toRadian(dst.longitude - src.longitude)
 
-  var a =
+  const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadian(src.latitude)) *
       Math.cos(toRadian(dst.latitude)) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2)
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return RADIUS_OF_EARTH_IN_KM * c * 1000
 }

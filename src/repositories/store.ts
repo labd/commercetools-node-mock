@@ -52,7 +52,7 @@ export class StoreRepository extends AbstractResourceRepository {
   ) {
     if (!channels) return []
 
-    return channels.map(ref =>
+    return channels.map((ref) =>
       getReferenceFromResourceIdentifier<ChannelReference>(
         ref,
         context.projectKey,

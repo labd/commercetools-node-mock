@@ -28,7 +28,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       key: draft.key,
       name: draft.name,
       description: draft.description,
-      attributes: (draft.attributes ?? []).map(a =>
+      attributes: (draft.attributes ?? []).map((a) =>
         this.attributeDefinitionFromAttributeDefinitionDraft(context, a)
       ),
     }
@@ -40,18 +40,16 @@ export class ProductTypeRepository extends AbstractResourceRepository {
   attributeDefinitionFromAttributeDefinitionDraft = (
     _context: RepositoryContext,
     draft: AttributeDefinitionDraft
-  ): AttributeDefinition => {
-    return {
-      ...draft,
-      attributeConstraint: draft.attributeConstraint ?? 'None',
-      inputHint: draft.inputHint ?? 'SingleLine',
-      inputTip:
-        draft.inputTip && Object.keys(draft.inputTip).length > 0
-          ? draft.inputTip
-          : undefined,
-      isSearchable: draft.isSearchable ?? true,
-    }
-  }
+  ): AttributeDefinition => ({
+    ...draft,
+    attributeConstraint: draft.attributeConstraint ?? 'None',
+    inputHint: draft.inputHint ?? 'SingleLine',
+    inputTip:
+      draft.inputTip && Object.keys(draft.inputTip).length > 0
+        ? draft.inputTip
+        : undefined,
+    isSearchable: draft.isSearchable ?? true,
+  })
 
   getWithKey(context: RepositoryContext, key: string): ProductType | undefined {
     const result = this._storage.query(context.projectKey, this.getTypeId(), {
@@ -90,7 +88,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       const updateAttributeType = (type: Writable<AttributeType>) => {
         switch (type.name) {
           case 'lenum':
-            type.values.forEach(v => {
+            type.values.forEach((v) => {
               if (v.key === newValue.key) {
                 v.label = newValue.label
               }
@@ -102,7 +100,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
         }
       }
 
-      resource.attributes?.forEach(value => {
+      resource.attributes?.forEach((value) => {
         if (value.name === attributeName) {
           updateAttributeType(value.type)
         }
@@ -113,7 +111,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       resource: Writable<ProductType>,
       { attributeName, label }: ProductTypeChangeLabelAction
     ) => {
-      resource.attributes?.forEach(value => {
+      resource.attributes?.forEach((value) => {
         if (value.name === attributeName) {
           value.label = label
         }
@@ -133,11 +131,13 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       resource: Writable<ProductType>,
       { attributes }: ProductTypeChangeAttributeOrderAction
     ) => {
-      const attrs = new Map(resource.attributes?.map(item => [item.name, item]))
+      const attrs = new Map(
+        resource.attributes?.map((item) => [item.name, item])
+      )
       const result: AttributeDefinition[] = []
       let current = resource.attributes
 
-      attributes.forEach(iAttr => {
+      attributes.forEach((iAttr) => {
         const attr = attrs.get(iAttr.name)
         if (attr === undefined) {
           throw new Error('New attr')
@@ -145,9 +145,7 @@ export class ProductTypeRepository extends AbstractResourceRepository {
         result.push(attr)
 
         // Remove from current items
-        current = current?.filter(f => {
-          return f.name !== iAttr.name
-        })
+        current = current?.filter((f) => f.name !== iAttr.name)
       })
 
       resource.attributes = result
@@ -162,30 +160,27 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       resource: Writable<ProductType>,
       { name }: ProductTypeRemoveAttributeDefinitionAction
     ) => {
-      resource.attributes = resource.attributes?.filter(f => {
-        return f.name !== name
-      })
+      resource.attributes = resource.attributes?.filter((f) => f.name !== name)
     },
     removeEnumValues: (
       context: RepositoryContext,
       resource: Writable<ProductType>,
       { attributeName, keys }: ProductTypeRemoveEnumValuesAction
     ) => {
-      resource.attributes?.forEach(attr => {
+      resource.attributes?.forEach((attr) => {
         if (attr.name == attributeName) {
           if (attr.type.name == 'enum') {
-            attr.type.values = attr.type.values.filter(v => {
-              return !keys.includes(v.key)
-            })
+            attr.type.values = attr.type.values.filter(
+              (v) => !keys.includes(v.key)
+            )
           }
 
           if (attr.type.name == 'set') {
             if (attr.type.elementType.name == 'enum') {
-              attr.type.elementType.values = attr.type.elementType.values.filter(
-                v => {
-                  return !keys.includes(v.key)
-                }
-              )
+              attr.type.elementType.values =
+                attr.type.elementType.values.filter(
+                  (v) => !keys.includes(v.key)
+                )
             }
           }
         }

@@ -67,15 +67,12 @@ export const createCustomFields = (
   }
 }
 
-export const createPrice = (draft: PriceDraft): Price => {
-  return {
-    id: uuidv4(),
-    value: createTypedMoney(draft.value),
-  }
-}
+export const createPrice = (draft: PriceDraft): Price => ({
+  id: uuidv4(),
+  value: createTypedMoney(draft.value),
+})
 
 export const createTypedMoney = (value: Money): TypedMoney => {
-
   // Taken from https://docs.adyen.com/development-resources/currency-codes
   let fractionDigits = 2
   switch (value.currencyCode.toUpperCase()) {
@@ -175,9 +172,7 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
   } as unknown as T
 }
 
-export const getRepositoryContext = (request: Request): RepositoryContext => {
-  return {
-    projectKey: request.params.projectKey,
-    storeKey: request.params.storeKey,
-  }
-}
+export const getRepositoryContext = (request: Request): RepositoryContext => ({
+  projectKey: request.params.projectKey,
+  storeKey: request.params.storeKey,
+})

@@ -10,7 +10,6 @@ import supertest from 'supertest'
 import * as timekeeper from 'timekeeper'
 import { CommercetoolsMock } from '../index'
 import { Writable } from '../types'
-import { cloneObject } from '../helpers'
 
 const ctMock = new CommercetoolsMock()
 
@@ -257,8 +256,8 @@ describe('Product Projection Search - Generic', () => {
         total: 2,
         facets: {},
         results: [
-          { id: unpublishedProduct.id, published: false},
-          { id: publishedProduct.id, published: true},
+          { id: unpublishedProduct.id, published: false },
+          { id: publishedProduct.id, published: true },
         ],
       })
     }

@@ -67,11 +67,11 @@ export class CustomerRepository extends AbstractResourceRepository {
         )
       }
       resource.authenticationMode = authMode
-      if (authMode === "ExternalAuth") {
+      if (authMode === 'ExternalAuth') {
         delete resource.password
         return
       }
-      if (authMode === "Password") {
+      if (authMode === 'Password') {
         resource.password = password
           ? Buffer.from(password).toString('base64')
           : undefined
@@ -81,7 +81,7 @@ export class CustomerRepository extends AbstractResourceRepository {
         {
           code: 'InvalidJsonInput',
           message: 'Request body does not contain valid JSON.',
-          detailedErrorMessage: `actions -> authMode: Invalid enum value: '${authMode}'. Expected one of: 'Password','ExternalAuth'`
+          detailedErrorMessage: `actions -> authMode: Invalid enum value: '${authMode}'. Expected one of: 'Password','ExternalAuth'`,
         },
         400
       )

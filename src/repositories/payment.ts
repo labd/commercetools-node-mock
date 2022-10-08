@@ -44,11 +44,11 @@ export class PaymentRepository extends AbstractResourceRepository {
               : undefined,
           }
         : {},
-      transactions: (draft.transactions || []).map(t =>
+      transactions: (draft.transactions || []).map((t) =>
         this.transactionFromTransactionDraft(t, context)
       ),
       interfaceInteractions: (draft.interfaceInteractions || []).map(
-        interaction =>
+        (interaction) =>
           createCustomFields(interaction, context.projectKey, this._storage)!
       ),
       custom: createCustomFields(

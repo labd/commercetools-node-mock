@@ -58,9 +58,9 @@ export class TypeRepository extends AbstractResourceRepository {
       resource: Writable<Type>,
       { fieldName }: TypeRemoveFieldDefinitionAction
     ) => {
-      resource.fieldDefinitions = resource.fieldDefinitions.filter(f => {
-        return f.name !== fieldName
-      })
+      resource.fieldDefinitions = resource.fieldDefinitions.filter(
+        (f) => f.name !== fieldName
+      )
     },
     setDescription: (
       context: RepositoryContext,
@@ -82,12 +82,12 @@ export class TypeRepository extends AbstractResourceRepository {
       { fieldNames }: TypeChangeFieldDefinitionOrderAction
     ) => {
       const fields = new Map(
-        resource.fieldDefinitions.map(item => [item.name, item])
+        resource.fieldDefinitions.map((item) => [item.name, item])
       )
       const result: FieldDefinition[] = []
       let current = resource.fieldDefinitions
 
-      fieldNames.forEach(fieldName => {
+      fieldNames.forEach((fieldName) => {
         const field = fields.get(fieldName)
         if (field === undefined) {
           throw new Error('New field')
@@ -95,15 +95,13 @@ export class TypeRepository extends AbstractResourceRepository {
         result.push(field)
 
         // Remove from current items
-        current = current.filter(f => {
-          return f.name !== fieldName
-        })
+        current = current.filter((f) => f.name !== fieldName)
       })
 
       if (
         isEqual(
           fieldNames,
-          resource.fieldDefinitions.map(item => item.name)
+          resource.fieldDefinitions.map((item) => item.name)
         )
       ) {
         throw new CommercetoolsError<InvalidOperationError>({
@@ -126,7 +124,7 @@ export class TypeRepository extends AbstractResourceRepository {
       resource: Writable<Type>,
       { fieldName, value }: TypeAddEnumValueAction
     ) => {
-      resource.fieldDefinitions.forEach(field => {
+      resource.fieldDefinitions.forEach((field) => {
         if (field.name === fieldName) {
           // TODO, should be done better i suppose
           if (field.type.name === 'Enum') {
@@ -147,11 +145,11 @@ export class TypeRepository extends AbstractResourceRepository {
       resource: Writable<Type>,
       { fieldName, value }: TypeChangeEnumValueLabelAction
     ) => {
-      resource.fieldDefinitions.forEach(field => {
+      resource.fieldDefinitions.forEach((field) => {
         if (field.name === fieldName) {
           // TODO, should be done better i suppose
           if (field.type.name === 'Enum') {
-            field.type.values.forEach(v => {
+            field.type.values.forEach((v) => {
               if (v.key === value.key) {
                 v.label = value.label
               }
@@ -160,7 +158,7 @@ export class TypeRepository extends AbstractResourceRepository {
             field.type.name === 'Set' &&
             field.type.elementType.name === 'Enum'
           ) {
-            field.type.elementType.values.forEach(v => {
+            field.type.elementType.values.forEach((v) => {
               if (v.key === value.key) {
                 v.label = value.label
               }

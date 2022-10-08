@@ -26,7 +26,6 @@ export class CustomObjectRepository extends AbstractResourceRepository {
     ) as Writable<CustomObject | undefined>
 
     if (current) {
-
       // Only check version if it is passed in the draft
       if (draft.version) {
         checkConcurrentModification(current.version, draft.version, current.id)
@@ -42,8 +41,7 @@ export class CustomObjectRepository extends AbstractResourceRepository {
         return updated
       }
       return current
-
-    } else  {
+    } else {
       // If the resource is new the only valid version is 0
       if (draft.version) {
         throw new CommercetoolsError<InvalidOperationError>(

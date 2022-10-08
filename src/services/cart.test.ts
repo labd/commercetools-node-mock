@@ -81,11 +81,9 @@ describe('Cart Update Actions', () => {
   let cart: Cart | undefined
 
   const createCart = async (currency: string) => {
-    let response = await supertest(ctMock.app)
-      .post('/dummy/carts')
-      .send({
-        currency,
-      })
+    const response = await supertest(ctMock.app).post('/dummy/carts').send({
+      currency,
+    })
     expect(response.status).toBe(201)
     cart = response.body
   }
@@ -189,7 +187,7 @@ describe('Cart Update Actions', () => {
     const product = await supertest(ctMock.app)
       .post(`/dummy/products`)
       .send(productDraft)
-      .then(x => x.body)
+      .then((x) => x.body)
 
     assert(cart, 'cart not created')
     assert(product, 'product not created')
@@ -216,7 +214,7 @@ describe('Cart Update Actions', () => {
     const product = await supertest(ctMock.app)
       .post(`/dummy/products`)
       .send(productDraft)
-      .then(x => x.body)
+      .then((x) => x.body)
 
     assert(cart, 'cart not created')
     assert(product, 'product not created')
@@ -242,7 +240,7 @@ describe('Cart Update Actions', () => {
     const product = await supertest(ctMock.app)
       .post(`/dummy/products`)
       .send(productDraft)
-      .then(x => x.body)
+      .then((x) => x.body)
 
     assert(cart, 'cart not created')
     assert(product, 'product not created')
@@ -277,7 +275,7 @@ describe('Cart Update Actions', () => {
     const product = await supertest(ctMock.app)
       .post(`/dummy/products`)
       .send(productDraft)
-      .then(x => x.body)
+      .then((x) => x.body)
 
     assert(cart, 'cart not created')
     assert(product, 'product not created')
@@ -314,7 +312,7 @@ describe('Cart Update Actions', () => {
     const product = await supertest(ctMock.app)
       .post(`/dummy/products`)
       .send(productDraft)
-      .then(x => x.body)
+      .then((x) => x.body)
 
     assert(cart, 'cart not created')
     assert(product, 'product not created')

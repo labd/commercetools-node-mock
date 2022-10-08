@@ -55,8 +55,6 @@ type QueryParams = {
 export abstract class AbstractStorage {
   abstract clear(): void
 
-  abstract assertStorage(typeId: RepositoryTypes): void
-
   abstract all<RT extends RepositoryTypes>(
     projectKey: string,
     typeId: RT
@@ -172,8 +170,6 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  assertStorage(typeId: RepositoryTypes) {}
-
   all<RT extends RepositoryTypes>(
     projectKey: string,
     typeId: RT
@@ -225,7 +221,7 @@ export class InMemoryStorage extends AbstractStorage {
     }
 
     const resources: any[] = Array.from(resourceStore.values())
-    const resource = resources.find(e => e.key === key)
+    const resource = resources.find((e) => e.key === key)
     if (resource) {
       return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
     }
@@ -263,7 +259,7 @@ export class InMemoryStorage extends AbstractStorage {
     if (params.where) {
       try {
         const filterFunc = parseQueryExpression(params.where)
-        resources = resources.filter(resource => filterFunc(resource, {}))
+        resources = resources.filter((resource) => filterFunc(resource, {}))
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
           {
@@ -285,9 +281,9 @@ export class InMemoryStorage extends AbstractStorage {
 
     // Expand the resources
     if (params.expand !== undefined) {
-      resources = resources.map(resource => {
-        return this.expand(projectKey, resource, params.expand)
-      })
+      resources = resources.map((resource) =>
+        this.expand(projectKey, resource, params.expand)
+      )
     }
 
     return {
@@ -315,7 +311,7 @@ export class InMemoryStorage extends AbstractStorage {
     if (params.where) {
       try {
         const filterFunc = parseQueryExpression(params.where)
-        resources = resources.filter(resource => filterFunc(resource, {}))
+        resources = resources.filter((resource) => filterFunc(resource, {}))
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
           {
@@ -337,9 +333,9 @@ export class InMemoryStorage extends AbstractStorage {
 
     // Expand the resources
     if (params.expand !== undefined) {
-      resources = resources.map(resource => {
-        return this.expand(projectKey, resource, params.expand)
-      })
+      resources = resources.map((resource) =>
+        this.expand(projectKey, resource, params.expand)
+      )
     }
 
     return {
@@ -374,7 +370,7 @@ export class InMemoryStorage extends AbstractStorage {
         // have them all.
         const resource = Array.from(store.values()).find(
           // @ts-ignore
-          r => r.key === identifier.key
+          (r) => r.key === identifier.key
         )
         if (resource) {
           return resource as ResourceMap[RT]
@@ -424,9 +420,7 @@ export class InMemoryStorage extends AbstractStorage {
     return project
   }
 
-  getProject = (projectKey: string): Project => {
-    return this.addProject(projectKey)
-  }
+  getProject = (projectKey: string): Project => this.addProject(projectKey)
 
   public expand = <T>(
     projectKey: string,
@@ -436,7 +430,7 @@ export class InMemoryStorage extends AbstractStorage {
     if (!clause) return obj
     const newObj = cloneObject(obj)
     if (Array.isArray(clause)) {
-      clause.forEach(c => {
+      clause.forEach((c) => {
         this._resolveResource(projectKey, newObj, c)
       })
     } else {

@@ -118,7 +118,7 @@ export class CommercetoolsMock {
     )
   }
 
-  runServer(port: number = 3000, options?: AppOptions) {
+  runServer(port = 3000, options?: AppOptions) {
     const app = this.createApp(options)
     const server = app.listen(port, () => {
       console.log(`Mock server listening at http://localhost:${port}`)
@@ -222,14 +222,14 @@ export class CommercetoolsMock {
     this._nockScopes.api = nock(this.options.apiHost)
       .persist()
       .get(/.*/)
-      .reply(async function(uri) {
+      .reply(async function (uri) {
         const response = await supertest(app)
           .get(uri)
           .set(copyHeaders(this.req.headers))
         return [response.status, response.body]
       })
       .post(/.*/)
-      .reply(async function(uri, body) {
+      .reply(async function (uri, body) {
         const response = await supertest(app)
           .post(uri)
           .set(copyHeaders(this.req.headers))
@@ -237,7 +237,7 @@ export class CommercetoolsMock {
         return [response.status, response.body]
       })
       .delete(/.*/)
-      .reply(async function(uri, body) {
+      .reply(async function (uri, body) {
         const response = await supertest(app)
           .delete(uri)
           .set(copyHeaders(this.req.headers))
@@ -252,7 +252,7 @@ export class CommercetoolsMock {
     this._nockScopes.auth = nock(this.options.authHost)
       .persist()
       .post(/^\/oauth\/.*/)
-      .reply(async function(uri, body) {
+      .reply(async function (uri, body) {
         const response = await supertest(app)
           .post(uri + '?' + body)
           .set(copyHeaders(this.req.headers))

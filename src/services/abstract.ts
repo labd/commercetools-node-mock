@@ -14,7 +14,9 @@ export default abstract class AbstractService {
     this.registerRoutes(parent)
   }
 
-  extraRoutes(router: Router) {}
+  extraRoutes(router: Router) {
+
+  }
 
   registerRoutes(parent: Router) {
     const basePath = this.getBasePath()

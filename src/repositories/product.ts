@@ -52,18 +52,18 @@ export class ProductRepository extends AbstractResourceRepository {
       categories: [],
       masterVariant: variantFromDraft(1, draft.masterVariant),
       variants:
-        draft.variants?.map((variant, index) => variantFromDraft(index + 2, variant)) ?? [],
+        draft.variants?.map((variant, index) =>
+          variantFromDraft(index + 2, variant)
+        ) ?? [],
 
-      // @ts-ignore
-      searchKeywords: draft.searchKeywords,
+      searchKeywords: draft.searchKeywords ?? {},
     }
 
     const resource: Product = {
       ...getBaseResourceProperties(),
       productType: productType,
       masterData: {
-        // @ts-ignore
-        current: draft.publish ? productData : undefined,
+        current: productData,
         staged: productData,
         hasStagedChanges: false,
         published: draft.publish ?? false,
@@ -90,7 +90,6 @@ export class ProductRepository extends AbstractResourceRepository {
       resource: Writable<Product>,
       { variantId, sku, name, value, staged }: ProductSetAttributeAction
     ) => {
-
       const setAttr = (data: Writable<ProductData>) => {
         const { variant, isMasterVariant, variantIndex } = getVariant(
           data,
@@ -107,7 +106,9 @@ export class ProductRepository extends AbstractResourceRepository {
           variant.attributes = []
         }
 
-        const existingAttr = variant.attributes.find(attr => attr.name === name)
+        const existingAttr = variant.attributes.find(
+          (attr) => attr.name === name
+        )
         if (existingAttr) {
           existingAttr.value = value
         } else {
@@ -119,7 +120,7 @@ export class ProductRepository extends AbstractResourceRepository {
         if (isMasterVariant) {
           data.masterVariant = variant
         } else {
-        data.variants[variantIndex] = variant
+          data.variants[variantIndex] = variant
         }
       }
 
@@ -187,7 +188,6 @@ export class ProductRepository extends AbstractResourceRepository {
   }
 }
 
-
 // Return staged data. If no staged data is set we copy the current data
 const getStagedData = (product: Writable<Product>) => {
   if (!product.masterData.staged) {
@@ -209,7 +209,6 @@ const checkForStagedChanges = (product: Writable<Product>) => {
     product.masterData.hasStagedChanges = true
   }
 }
-
 
 interface VariantResult {
   variant: Writable<ProductVariant> | undefined
@@ -248,20 +247,20 @@ const variantFromDraft = (
   variantId: number,
   variant: ProductVariantDraft
 ): ProductVariant => ({
-    id: variantId,
-    sku: variant?.sku,
-    attributes: variant?.attributes ?? [],
-    prices: variant?.prices?.map(priceFromDraft),
-    assets: [],
-    images: [],
-  })
+  id: variantId,
+  sku: variant?.sku,
+  attributes: variant?.attributes ?? [],
+  prices: variant?.prices?.map(priceFromDraft),
+  assets: [],
+  images: [],
+})
 
 const priceFromDraft = (draft: PriceDraft): Price => ({
-    id: uuidv4(),
-    value: {
-      currencyCode: draft.value.currencyCode,
-      centAmount: draft.value.centAmount,
-      fractionDigits: 2,
-      type: 'centPrecision',
-    },
-  })
+  id: uuidv4(),
+  value: {
+    currencyCode: draft.value.currencyCode,
+    centAmount: draft.value.centAmount,
+    fractionDigits: 2,
+    type: 'centPrecision',
+  },
+})

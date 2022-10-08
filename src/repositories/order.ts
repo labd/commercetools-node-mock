@@ -126,11 +126,11 @@ export class OrderRepository extends AbstractResourceRepository {
       syncInfo: [],
 
       lineItems:
-        draft.lineItems?.map(item =>
+        draft.lineItems?.map((item) =>
           this.lineItemFromImportDraft.bind(this)(context, item)
         ) || [],
       customLineItems:
-        draft.customLineItems?.map(item =>
+        draft.customLineItems?.map((item) =>
           this.customLineItemFromImportDraft.bind(this)(context, item)
         ) || [],
 
@@ -157,7 +157,7 @@ export class OrderRepository extends AbstractResourceRepository {
         sku: draft.variant.sku,
       }
 
-      var items = this._storage.query(context.projectKey, 'product', {
+      const items = this._storage.query(context.projectKey, 'product', {
         where: [
           `masterData(current(masterVariant(sku="${draft.variant.sku}"))) or masterData(current(variants(sku="${draft.variant.sku}")))`,
         ],
@@ -175,7 +175,7 @@ export class OrderRepository extends AbstractResourceRepository {
         variant = product.masterData.current.masterVariant
       } else {
         variant = product.masterData.current.variants.find(
-          v => v.sku === draft.variant.sku
+          (v) => v.sku === draft.variant.sku
         )
       }
       if (!variant) {

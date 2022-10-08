@@ -26,7 +26,7 @@ export class StateRepository extends AbstractResourceRepository {
       ...draft,
       builtIn: false,
       initial: draft.initial || false,
-      transitions: (draft.transitions || []).map(t =>
+      transitions: (draft.transitions || []).map((t) =>
         getReferenceFromResourceIdentifier(t, context.projectKey, this._storage)
       ),
     }
@@ -78,12 +78,12 @@ export class StateRepository extends AbstractResourceRepository {
       resource: Writable<State>,
       { transitions }: StateSetTransitionsAction
     ) => {
-      resource.transitions = transitions?.map((resourceId): StateReference => {
-        return {
-          id: resourceId.id || "",
-          typeId: "state",
-        }
-      })
-    }
+      resource.transitions = transitions?.map(
+        (resourceId): StateReference => ({
+          id: resourceId.id || '',
+          typeId: 'state',
+        })
+      )
+    },
   }
 }

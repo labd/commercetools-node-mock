@@ -47,7 +47,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
         context.projectKey,
         this._storage
       ),
-      zoneRates: draft.zoneRates?.map(z =>
+      zoneRates: draft.zoneRates?.map((z) =>
         this._transformZoneRateDraft(context, z)
       ),
       custom: createCustomFields(
@@ -73,13 +73,11 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
     shippingRates: draft.shippingRates?.map(this._transformShippingRate),
   })
 
-  private _transformShippingRate = (rate: ShippingRateDraft): ShippingRate => {
-    return {
-      price: createTypedMoney(rate.price),
-      freeAbove: rate.freeAbove && createTypedMoney(rate.freeAbove),
-      tiers: rate.tiers || [],
-    }
-  }
+  private _transformShippingRate = (rate: ShippingRateDraft): ShippingRate => ({
+    price: createTypedMoney(rate.price),
+    freeAbove: rate.freeAbove && createTypedMoney(rate.freeAbove),
+    tiers: rate.tiers || [],
+  })
 
   actions: Partial<
     Record<
@@ -98,7 +96,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
     ) => {
       const rate = this._transformShippingRate(shippingRate)
 
-      resource.zoneRates.forEach(zoneRate => {
+      resource.zoneRates.forEach((zoneRate) => {
         if (zoneRate.zone.id === zone.id) {
           zoneRate.shippingRates.push(rate)
           return
@@ -119,11 +117,11 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
     ) => {
       const rate = this._transformShippingRate(shippingRate)
 
-      resource.zoneRates.forEach(zoneRate => {
+      resource.zoneRates.forEach((zoneRate) => {
         if (zoneRate.zone.id === zone.id) {
-          zoneRate.shippingRates = zoneRate.shippingRates.filter(otherRate => {
-            return !deepEqual(rate, otherRate)
-          })
+          zoneRate.shippingRates = zoneRate.shippingRates.filter(
+            (otherRate) => !deepEqual(rate, otherRate)
+          )
         }
       })
     },
@@ -152,9 +150,9 @@ export class ShippingMethodRepository extends AbstractResourceRepository {
       resource: Writable<ShippingMethod>,
       { zone }: ShippingMethodRemoveZoneAction
     ) => {
-      resource.zoneRates = resource.zoneRates.filter(zoneRate => {
-        return zoneRate.zone.id !== zone.id
-      })
+      resource.zoneRates = resource.zoneRates.filter(
+        (zoneRate) => zoneRate.zone.id !== zone.id
+      )
     },
     setKey: (
       _context: RepositoryContext,

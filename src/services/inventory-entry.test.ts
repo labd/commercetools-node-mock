@@ -8,12 +8,10 @@ describe('Inventory Entry Query', () => {
   let inventoryEntry: InventoryEntry | undefined
 
   beforeEach(async () => {
-    let response = await supertest(ctMock.app)
-      .post('/dummy/inventory')
-      .send({
-        sku: '1337',
-        quantityOnStock: 100,
-      })
+    const response = await supertest(ctMock.app).post('/dummy/inventory').send({
+      sku: '1337',
+      quantityOnStock: 100,
+    })
     expect(response.status).toBe(201)
     inventoryEntry = response.body
   })
@@ -59,12 +57,10 @@ describe('Inventory Entry Update Actions', () => {
   let customType: Type | undefined
 
   beforeEach(async () => {
-    let response = await supertest(ctMock.app)
-      .post('/dummy/inventory')
-      .send({
-        sku: '1337',
-        quantityOnStock: 100,
-      })
+    let response = await supertest(ctMock.app).post('/dummy/inventory').send({
+      sku: '1337',
+      quantityOnStock: 100,
+    })
     expect(response.status).toBe(201)
     inventoryEntry = response.body
 

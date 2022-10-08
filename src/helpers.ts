@@ -1,15 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import { ParsedQs } from 'qs'
-import { Price } from '@commercetools/platform-sdk'
 
-export const getBaseResourceProperties = () => {
-  return {
-    id: uuidv4(),
-    createdAt: new Date().toISOString(),
-    lastModifiedAt: new Date().toISOString(),
-    version: 0,
-  }
-}
+export const getBaseResourceProperties = () => ({
+  id: uuidv4(),
+  createdAt: new Date().toISOString(),
+  lastModifiedAt: new Date().toISOString(),
+  version: 0,
+})
 
 /**
  * Do a nested lookup by using a path. For example `foo.bar.value` will
@@ -48,6 +45,4 @@ export const QueryParamsAsArray = (
   return [input] as string[]
 }
 
-export const cloneObject = <T>(o: T): T => {
-  return JSON.parse(JSON.stringify(o))
-}
+export const cloneObject = <T>(o: T): T => JSON.parse(JSON.stringify(o))

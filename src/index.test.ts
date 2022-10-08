@@ -158,7 +158,7 @@ test('Options.authHost: is set', async () => {
   })
   ctMock.start()
 
-  let response = await got.post<{ access_token: string }>(
+  const response = await got.post<{ access_token: string }>(
     'http://auth.localhost/oauth/token',
     {
       searchParams: {

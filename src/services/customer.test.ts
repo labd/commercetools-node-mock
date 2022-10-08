@@ -15,7 +15,7 @@ describe('Customer Update Actions', () => {
       password: 'supersecret',
       addresses: [],
       isEmailVerified: true,
-      authenticationMode: "Password", //default in Commercetools
+      authenticationMode: 'Password', //default in Commercetools
       version: 1,
     }
     ctMock.project('dummy').add('customer', customer)
@@ -49,11 +49,14 @@ describe('Customer Update Actions', () => {
         actions: [{ action: 'setAuthenticationMode', authMode: 'invalid' }],
       })
     expect(response.status).toBe(400)
-    expect(response.body.message).toBe('Request body does not contain valid JSON.')
+    expect(response.body.message).toBe(
+      'Request body does not contain valid JSON.'
+    )
     expect(response.body.errors[0].code).toBe('InvalidJsonInput')
-    expect(response.body.errors[0].detailedErrorMessage).toBe("actions -> authMode: Invalid enum value: 'invalid'. Expected one of: 'Password','ExternalAuth'")
+    expect(response.body.errors[0].detailedErrorMessage).toBe(
+      "actions -> authMode: Invalid enum value: 'invalid'. Expected one of: 'Password','ExternalAuth'"
+    )
   })
-
 
   test('setAuthenticationMode to ExternalAuth', async () => {
     assert(customer, 'customer not created')
@@ -62,7 +65,9 @@ describe('Customer Update Actions', () => {
       .post(`/dummy/customers/${customer.id}`)
       .send({
         version: 1,
-        actions: [{ action: 'setAuthenticationMode', authMode: 'ExternalAuth' }],
+        actions: [
+          { action: 'setAuthenticationMode', authMode: 'ExternalAuth' },
+        ],
       })
     expect(response.status).toBe(200)
     expect(response.body.version).toBe(2)
@@ -72,16 +77,27 @@ describe('Customer Update Actions', () => {
 
   test('setAuthenticationMode error when setting current authMode', async () => {
     assert(customer, 'customer not created')
-    assert(customer.authenticationMode == "Password", 'customer not in default state')
+    assert(
+      customer.authenticationMode == 'Password',
+      'customer not in default state'
+    )
 
     const response = await supertest(ctMock.app)
       .post(`/dummy/customers/${customer.id}`)
       .send({
         version: 1,
-        actions: [{ action: 'setAuthenticationMode', authMode: 'Password', password: "newpass" }],
+        actions: [
+          {
+            action: 'setAuthenticationMode',
+            authMode: 'Password',
+            password: 'newpass',
+          },
+        ],
       })
     expect(response.status).toBe(400)
-    expect(response.body.message).toBe("The customer is already using the 'Password' authentication mode.")
+    expect(response.body.message).toBe(
+      "The customer is already using the 'Password' authentication mode."
+    )
   })
 
   test('setAuthenticationMode to Password', async () => {
@@ -92,7 +108,9 @@ describe('Customer Update Actions', () => {
       .post(`/dummy/customers/${customer.id}`)
       .send({
         version: 1,
-        actions: [{ action: 'setAuthenticationMode', authMode: 'ExternalAuth' }],
+        actions: [
+          { action: 'setAuthenticationMode', authMode: 'ExternalAuth' },
+        ],
       })
 
     //change to Password authMode
@@ -100,11 +118,19 @@ describe('Customer Update Actions', () => {
       .post(`/dummy/customers/${customer.id}`)
       .send({
         version: 2,
-        actions: [{ action: 'setAuthenticationMode', authMode: 'Password', password: "newpass" }],
+        actions: [
+          {
+            action: 'setAuthenticationMode',
+            authMode: 'Password',
+            password: 'newpass',
+          },
+        ],
       })
     expect(response.status).toBe(200)
     expect(response.body.version).toBe(3)
     expect(response.body.authenticationMode).toBe('Password')
-    expect(response.body.password).toBe(Buffer.from('newpass').toString('base64'))
+    expect(response.body.password).toBe(
+      Buffer.from('newpass').toString('base64')
+    )
   })
 })

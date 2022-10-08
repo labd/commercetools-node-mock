@@ -52,11 +52,10 @@ export class ZoneRepository extends AbstractResourceRepository {
       resource: Writable<Zone>,
       { location }: ZoneRemoveLocationAction
     ) => {
-      resource.locations = resource.locations.filter(loc => {
-        return !(
-          loc.country === location.country && loc.state === location.state
-        )
-      })
+      resource.locations = resource.locations.filter(
+        (loc) =>
+          !(loc.country === location.country && loc.state === location.state)
+      )
     },
     changeName: (
       context: RepositoryContext,

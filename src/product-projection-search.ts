@@ -9,7 +9,7 @@ import {
   RangeFacetResult,
   FilteredFacetResult,
 } from '@commercetools/platform-sdk'
-import { cloneObject, nestedLookup } from './helpers'
+import { nestedLookup } from './helpers'
 import { Writable } from './types'
 import { CommercetoolsError } from './exceptions'
 import {
@@ -57,7 +57,6 @@ export class ProductProjectionSearch {
     projectKey: string,
     params: ProductProjectionSearchParams
   ): ProductProjectionPagedSearchResponse {
-
     let resources = this._storage
       .all(projectKey, 'product')
       .map((r) => this.transform(r, params.staged ?? false))
@@ -69,7 +68,7 @@ export class ProductProjectionSearch {
         return true
       })
 
-    let markMatchingVariant = params.markMatchingVariants ?? false
+    const markMatchingVariant = params.markMatchingVariants ?? false
 
     // Apply the priceSelector
     applyPriceSelector(resources, {
@@ -123,11 +122,10 @@ export class ProductProjectionSearch {
 
     // Expand the resources
     if (params.expand !== undefined) {
-      resources = resources.map((resource) => {
-        return this._storage.expand(projectKey, resource, params.expand)
-      })
+      resources = resources.map((resource) =>
+        this._storage.expand(projectKey, resource, params.expand)
+      )
     }
-
 
     // Create a slice for the pagination. If we were working with large datasets
     // then we should have done this before transforming. But that isn't the

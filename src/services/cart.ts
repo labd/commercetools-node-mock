@@ -38,13 +38,11 @@ export class CartService extends AbstractService {
         ...cartOrOrder,
         currency: cartOrOrder.totalPrice.currencyCode,
         discountCodes: [],
-        lineItems: cartOrOrder.lineItems.map(lineItem => {
-          return {
-            ...lineItem,
-            variantId: lineItem.variant.id,
-            sku: lineItem.variant.sku,
-          }
-        }),
+        lineItems: cartOrOrder.lineItems.map((lineItem) => ({
+          ...lineItem,
+          variantId: lineItem.variant.id,
+          sku: lineItem.variant.sku,
+        })),
       }
 
       const newCart = this.repository.create(context, cartDraft)

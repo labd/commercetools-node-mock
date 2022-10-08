@@ -27,7 +27,7 @@ export class ShoppingListRepository extends AbstractResourceRepository {
         this._storage
       ),
       textLineItems: [],
-      lineItems: draft.lineItems?.map(e => ({
+      lineItems: draft.lineItems?.map((e) => ({
         ...getBaseResourceProperties(),
         ...e,
         addedAt: e.addedAt ?? '',

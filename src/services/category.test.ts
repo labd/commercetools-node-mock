@@ -6,8 +6,7 @@ describe('Categories Query', () => {
   const ctMock = new CommercetoolsMock()
 
   beforeEach(async () => {
-    let response
-    response = await supertest(ctMock.app)
+    const response = await supertest(ctMock.app)
       .post('/dummy/categories')
       .send({
         name: {
