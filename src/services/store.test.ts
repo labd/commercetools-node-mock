@@ -35,12 +35,15 @@ describe('Store', () => {
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
+      version: 1,
       createdAt: '',
-      distributionChannels: [],
       id: 'fake-store',
       key: 'STOREKEY',
       lastModifiedAt: '',
-      version: 1,
+      languages: [],
+      distributionChannels: [],
+      supplyChannels: [],
+      productSelections: [],
     })
   })
 
