@@ -176,7 +176,7 @@ export class InMemoryStorage extends AbstractStorage {
   ): ResourceMap[RT][] {
     const store = this.forProjectKey(projectKey)[typeId]
     if (store) {
-      return Array.from(store.values()) as ResourceMap[RT][]
+      return Array.from(store.values()).map(cloneObject) as ResourceMap[RT][]
     }
     return []
   }
@@ -192,7 +192,7 @@ export class InMemoryStorage extends AbstractStorage {
 
     const resource = this.get(projectKey, typeId, obj.id, params)
     assert(resource, `resource of type ${typeId} with id ${obj.id} not created`)
-    return resource
+    return cloneObject(resource)
   }
 
   get<RT extends RepositoryTypes>(
@@ -203,7 +203,8 @@ export class InMemoryStorage extends AbstractStorage {
   ): ResourceMap[RT] | null {
     const resource = this.forProjectKey(projectKey)[typeId]?.get(id)
     if (resource) {
-      return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
+      const clone = cloneObject(resource)
+      return this.expand(projectKey, clone, params.expand) as ResourceMap[RT]
     }
     return null
   }
@@ -223,7 +224,8 @@ export class InMemoryStorage extends AbstractStorage {
     const resources: any[] = Array.from(resourceStore.values())
     const resource = resources.find((e) => e.key === key)
     if (resource) {
-      return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
+      const clone = cloneObject(resource)
+      return this.expand(projectKey, clone, params.expand) as ResourceMap[RT]
     }
     return null
   }
@@ -291,7 +293,7 @@ export class InMemoryStorage extends AbstractStorage {
       total: resources.length,
       offset: offset,
       limit: limit,
-      results: resources,
+      results: resources.map(cloneObject),
     }
   }
 
@@ -300,12 +302,7 @@ export class InMemoryStorage extends AbstractStorage {
     typeId: RepositoryTypes,
     params: QueryParams
   ): PagedQueryResponse {
-    const store = this.forProjectKey(projectKey)[typeId]
-    if (!store) {
-      throw new Error('No type')
-    }
-
-    let resources = Array.from(store.values())
+    let resources = this.all(projectKey, typeId)
 
     // Apply predicates
     if (params.where) {
@@ -422,6 +419,7 @@ export class InMemoryStorage extends AbstractStorage {
 
   getProject = (projectKey: string): Project => this.addProject(projectKey)
 
+  // Expand resolves a nested reference and injects the object in the given obj
   public expand = <T>(
     projectKey: string,
     obj: T,
