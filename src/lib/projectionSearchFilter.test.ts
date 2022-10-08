@@ -1,4 +1,5 @@
 import { Product, ProductData } from '@commercetools/platform-sdk'
+import { cloneObject } from '../helpers'
 import { applyPriceSelector } from '../priceSelector'
 import { parseFilterExpression } from './projectionSearchFilter'
 
@@ -67,7 +68,7 @@ describe('Search filter', () => {
 
   const match = (pattern: string, product?: Product) => {
     const matchFunc = parseFilterExpression(pattern, false)
-    const clone = JSON.parse(JSON.stringify(product ?? exampleProduct))
+    const clone = cloneObject(product ?? exampleProduct)
     return {
       isMatch: matchFunc(clone, false),
       product: clone,
@@ -142,7 +143,7 @@ describe('Search filter', () => {
     expect(result.isMatch).toBeFalsy()
 
     // Currency match
-    products = [JSON.parse(JSON.stringify(exampleProduct))]
+    products = [cloneObject(exampleProduct)]
     applyPriceSelector(products, { currency: 'EUR' })
 
     result = match(
@@ -162,7 +163,7 @@ describe('Search filter', () => {
     })
 
     // Currency mismatch
-    products = [JSON.parse(JSON.stringify(exampleProduct))]
+    products = [cloneObject(exampleProduct)]
     applyPriceSelector(products, { currency: 'USD' })
 
     result = match(
@@ -172,7 +173,7 @@ describe('Search filter', () => {
     expect(result.isMatch).toBeFalsy()
 
     // Price has no country so mismatch
-    products = [JSON.parse(JSON.stringify(exampleProduct))]
+    products = [cloneObject(exampleProduct)]
     applyPriceSelector(products, { currency: 'EUR', country: 'NL' })
     result = match(
       `variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,

@@ -11,7 +11,7 @@ import {
   FilteredFacetResult,
 } from '@commercetools/platform-sdk'
 import { ByProjectKeyProductProjectionsSearchRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/search/by-project-key-product-projections-search-request-builder'
-import { nestedLookup } from './helpers'
+import { cloneObject, nestedLookup } from './helpers'
 import { ProductService } from './services/product'
 import { Writable } from './types'
 import { CommercetoolsError } from './exceptions'
@@ -64,7 +64,7 @@ export class ProductProjectionSearch {
     // since we will be modifying the data.
     let resources = this._storage
       .all(projectKey, 'product')
-      .map(r => JSON.parse(JSON.stringify(r)))
+      .map(r => cloneObject(r))
 
     let markMatchingVariant = params.markMatchingVariants ?? false
 

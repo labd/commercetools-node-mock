@@ -47,3 +47,7 @@ export const QueryParamsAsArray = (
   }
   return [input] as string[]
 }
+
+export const cloneObject = <T>(o: T): T => {
+  return JSON.parse(JSON.stringify(o))
+}

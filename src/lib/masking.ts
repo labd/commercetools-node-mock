@@ -1,6 +1,8 @@
+import { cloneObject } from "../helpers"
+
 export const maskSecretValue = <T>(resource: T, path: string): T => {
   const parts = path.split('.')
-  const clone = JSON.parse(JSON.stringify(resource))
+  const clone = cloneObject(resource) as any
   let val = clone
 
   const target = parts.pop()

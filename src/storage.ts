@@ -36,6 +36,7 @@ import { parseExpandClause } from './lib/expandParser'
 import { RepositoryTypes, ResourceMap, Writable } from './types'
 import { parseQueryExpression } from './lib/predicateParser'
 import { CommercetoolsError } from './exceptions'
+import { cloneObject } from './helpers'
 
 type GetParams = {
   expand?: string[]
@@ -433,7 +434,7 @@ export class InMemoryStorage extends AbstractStorage {
     clause: undefined | string | string[]
   ): T => {
     if (!clause) return obj
-    const newObj = JSON.parse(JSON.stringify(obj))
+    const newObj = cloneObject(obj)
     if (Array.isArray(clause)) {
       clause.forEach(c => {
         this._resolveResource(projectKey, newObj, c)
