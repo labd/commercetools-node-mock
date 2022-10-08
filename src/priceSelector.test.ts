@@ -1,11 +1,23 @@
-import { ProductData, Product } from '@commercetools/platform-sdk'
+import {
+  ProductData,
+  Product,
+  ProductProjection,
+} from '@commercetools/platform-sdk'
 import { applyPriceSelector } from './priceSelector'
 
 describe('priceSelector', () => {
-  let product: Product
+  let product: ProductProjection
 
   beforeEach(() => {
-    const productData: ProductData = {
+    product = {
+      id: '7401d82f-1378-47ba-996a-85beeb87ac87',
+      version: 2,
+      createdAt: '2022-07-22T10:02:40.851Z',
+      lastModifiedAt: '2022-07-22T10:02:44.427Z',
+      productType: {
+        typeId: 'product-type',
+        id: 'b9b4b426-938b-4ccb-9f36-c6f933e8446e',
+      },
       name: {
         'nl-NL': 'test',
       },
@@ -48,49 +60,22 @@ describe('priceSelector', () => {
         ],
       },
     }
-
-    product = {
-      id: '7401d82f-1378-47ba-996a-85beeb87ac87',
-      version: 2,
-      createdAt: '2022-07-22T10:02:40.851Z',
-      lastModifiedAt: '2022-07-22T10:02:44.427Z',
-      productType: {
-        typeId: 'product-type',
-        id: 'b9b4b426-938b-4ccb-9f36-c6f933e8446e',
-      },
-      masterData: {
-        current: productData,
-        staged: productData,
-        published: true,
-        hasStagedChanges: false,
-      },
-    }
   })
 
   test('currency (match)', async () => {
     applyPriceSelector([product], { currency: 'EUR' })
 
     expect(product).toMatchObject({
-      masterData: {
-        current: {
-          masterVariant: {
-            sku: 'MYSKU',
-            scopedPrice: { value: { centAmount: 1789 } },
-          },
-        },
-        staged: {
-          masterVariant: {
-            sku: 'MYSKU',
-            scopedPrice: { value: { centAmount: 1789 } },
-          },
-        },
+      masterVariant: {
+        sku: 'MYSKU',
+        scopedPrice: { value: { centAmount: 1789 } },
       },
     })
   })
 
   test('currency, country (no match)', async () => {
     applyPriceSelector([product], { currency: 'EUR', country: 'US' })
-    expect(product.masterData.current.masterVariant.scopedPrice).toBeUndefined()
-    expect(product.masterData.staged.masterVariant.scopedPrice).toBeUndefined()
+    expect(product.masterVariant.scopedPrice).toBeUndefined()
+    expect(product.masterVariant.scopedPrice).toBeUndefined()
   })
 })

@@ -1,4 +1,5 @@
 import {
+  Product,
   ProductDraft,
   ProductProjection,
   ProductProjectionPagedSearchResponse,
@@ -8,12 +9,15 @@ import {
 import supertest from 'supertest'
 import * as timekeeper from 'timekeeper'
 import { CommercetoolsMock } from '../index'
-import { Writable } from 'types'
+import { Writable } from '../types'
+import { cloneObject } from '../helpers'
 
 const ctMock = new CommercetoolsMock()
 
 let productType: ProductType
 let productProjection: ProductProjection
+let publishedProduct: Product
+let unpublishedProduct: Product
 
 beforeEach(async () => {
   timekeeper.freeze(new Date('2022-07-22T13:31:49.840Z'))
@@ -32,7 +36,48 @@ beforeEach(async () => {
     productType = response.body
   }
 
-  // Create the product
+  // Create an unpublished product
+  {
+    const productDraft: Writable<ProductDraft> = {
+      publish: false,
+      key: 'my-unpublished-product',
+      masterVariant: {
+        sku: 'my-unpub-sku',
+        prices: [
+          {
+            value: {
+              currencyCode: 'EUR',
+              centAmount: 189,
+            },
+          },
+        ],
+        attributes: [
+          {
+            name: 'number',
+            value: 1 as any,
+          },
+        ],
+      },
+      name: {
+        'nl-NL': 'test unpublished product',
+      },
+      productType: {
+        typeId: 'product-type',
+        id: productType.id,
+      },
+      slug: {
+        'nl-NL': 'test-unpublished-product',
+      },
+    }
+
+    const response = await supertest(ctMock.app)
+      .post('/dummy/products')
+      .send(productDraft)
+    expect(response.ok).toBe(true)
+    unpublishedProduct = response.body
+  }
+
+  // Create a published product
   {
     const productDraft: Writable<ProductDraft> = {
       publish: true,
@@ -90,6 +135,7 @@ beforeEach(async () => {
       .send(productDraft)
     expect(response.ok).toBe(true)
     const product = response.body
+    publishedProduct = response.body
 
     // Create the expected ProductProjection object
     productProjection = {
@@ -97,6 +143,8 @@ beforeEach(async () => {
       createdAt: '2022-07-22T13:31:49.840Z',
       lastModifiedAt: '2022-07-22T13:31:49.840Z',
       version: 1,
+      published: true,
+      hasStagedChanges: false,
       masterVariant: {
         id: 1,
         sku: 'my-sku',
@@ -148,12 +196,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   timekeeper.reset()
-
-  const response = await supertest(ctMock.app)
-    .delete(`/dummy/products/${productProjection.id}`)
-    .send()
-  expect(response.ok).toBe(true)
-  const product = response.body
+  ctMock.clear()
 })
 
 // Test the general product projection implementation
@@ -192,6 +235,31 @@ describe('Product Projection Search - Generic', () => {
         total: 0,
         facets: {},
         results: [],
+      })
+    }
+  })
+
+  test('Search - unpublished', async () => {
+    {
+      const response = await supertest(ctMock.app)
+        .get('/dummy/product-projections/search')
+        .query({
+          limit: 50,
+          staged: true,
+        })
+
+      const result: ProductProjectionPagedSearchResponse = response.body
+
+      expect(result).toMatchObject({
+        count: 2,
+        limit: 50,
+        offset: 0,
+        total: 2,
+        facets: {},
+        results: [
+          { id: unpublishedProduct.id, published: false},
+          { id: publishedProduct.id, published: true},
+        ],
       })
     }
   })

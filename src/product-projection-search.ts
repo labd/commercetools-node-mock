@@ -5,14 +5,11 @@ import {
   ProductProjection,
   QueryParam,
   FacetResults,
-  FacetTerm,
   TermFacetResult,
   RangeFacetResult,
   FilteredFacetResult,
 } from '@commercetools/platform-sdk'
-import { ByProjectKeyProductProjectionsSearchRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/search/by-project-key-product-projections-search-request-builder'
 import { cloneObject, nestedLookup } from './helpers'
-import { ProductService } from './services/product'
 import { Writable } from './types'
 import { CommercetoolsError } from './exceptions'
 import {
@@ -60,11 +57,17 @@ export class ProductProjectionSearch {
     projectKey: string,
     params: ProductProjectionSearchParams
   ): ProductProjectionPagedSearchResponse {
-    // Get a copy of all the products in the storage engine. We need a copy
-    // since we will be modifying the data.
+
     let resources = this._storage
       .all(projectKey, 'product')
-      .map(r => cloneObject(r))
+      .map((r) => this.transform(r, params.staged ?? false))
+      .filter((p): p is ProductProjection => p !== null)
+      .filter((p) => {
+        if (!params.staged ?? false) {
+          return p.published
+        }
+        return true
+      })
 
     let markMatchingVariant = params.markMatchingVariants ?? false
 
@@ -79,15 +82,14 @@ export class ProductProjectionSearch {
     // Apply filters pre facetting
     if (params.filter) {
       try {
-        const filters = params.filter.map(f =>
-          parseFilterExpression(f, params.staged ?? false)
-        )
+        const filters = params.filter.map(parseFilterExpression)
 
         // Filters can modify the output. So clone the resources first.
-        resources = resources.filter(resource =>
-          filters.every(f => f(resource, markMatchingVariant))
+        resources = resources.filter((resource) =>
+          filters.every((f) => f(resource, markMatchingVariant))
         )
       } catch (err) {
+        console.error(err)
         throw new CommercetoolsError<InvalidInputError>(
           {
             code: 'InvalidInput',
@@ -104,12 +106,9 @@ export class ProductProjectionSearch {
     // Apply filters post facetting
     if (params['filter.query']) {
       try {
-        const filters = params['filter.query'].map(f =>
-          parseFilterExpression(f, params.staged ?? false)
-        )
-        
-        resources = resources.filter(resource =>
-          filters.every(f => f(resource, markMatchingVariant))
+        const filters = params['filter.query'].map(parseFilterExpression)
+        resources = resources.filter((resource) =>
+          filters.every((f) => f(resource, markMatchingVariant))
         )
       } catch (err) {
         throw new CommercetoolsError<InvalidInputError>(
@@ -122,33 +121,36 @@ export class ProductProjectionSearch {
       }
     }
 
-    // Get the total before slicing the array
-    const totalResources = resources.length
-
-    // Apply offset, limit
-    const offset = params.offset || 0
-    const limit = params.limit || 20
-    resources = resources.slice(offset, offset + limit)
-
     // Expand the resources
     if (params.expand !== undefined) {
-      resources = resources.map(resource => {
+      resources = resources.map((resource) => {
         return this._storage.expand(projectKey, resource, params.expand)
       })
     }
 
+
+    // Create a slice for the pagination. If we were working with large datasets
+    // then we should have done this before transforming. But that isn't the
+    // goal of this library. So lets keep it simple.
+    const totalResults = resources.length
+    const offset = params.offset || 0
+    const limit = params.limit || 20
+    const results = resources.slice(offset, offset + limit)
+
     return {
-      count: totalResources,
-      total: resources.length,
+      count: totalResults,
+      total: results.length,
       offset: offset,
       limit: limit,
-      results: resources.map(this.transform),
+      results: results,
       facets: facets,
     }
   }
 
-  transform(product: Product): ProductProjection {
-    const obj = product.masterData.current
+  transform(product: Product, staged: boolean): ProductProjection | null {
+    const obj = !staged ? product.masterData.current : product.masterData.staged
+    if (!obj) return null
+
     return {
       id: product.id,
       createdAt: product.createdAt,
@@ -163,12 +165,14 @@ export class ProductProjectionSearch {
       masterVariant: obj.masterVariant,
       variants: obj.variants,
       productType: product.productType,
+      hasStagedChanges: product.masterData.hasStagedChanges,
+      published: product.masterData.published,
     }
   }
 
   getFacets(
     params: ProductProjectionSearchParams,
-    products: Product[]
+    products: ProductProjection[]
   ): FacetResults {
     if (!params.facet) return {}
     const staged = false
@@ -179,7 +183,7 @@ export class ProductProjectionSearch {
 
       // Term Facet
       if (expression.type === 'TermExpression') {
-        result[facet] = this.termFacet(expression.source, products, staged)
+        result[facet] = this.termFacet(expression.source, products)
       }
 
       // Range Facet
@@ -187,8 +191,7 @@ export class ProductProjectionSearch {
         result[expression.source] = this.rangeFacet(
           expression.source,
           expression.children,
-          products,
-          staged
+          products
         )
       }
 
@@ -197,8 +200,7 @@ export class ProductProjectionSearch {
         result[expression.source] = this.filterFacet(
           expression.source,
           expression.children,
-          products,
-          staged
+          products
         )
       }
     }
@@ -211,11 +213,7 @@ export class ProductProjectionSearch {
    *  - counting products
    *  - correct dataType
    */
-  termFacet(
-    facet: string,
-    products: Product[],
-    staged: boolean
-  ): TermFacetResult {
+  termFacet(facet: string, products: ProductProjection[]): TermFacetResult {
     const result: Writable<TermFacetResult> = {
       type: 'terms',
       dataType: 'text',
@@ -227,9 +225,9 @@ export class ProductProjectionSearch {
     const terms: Record<any, number> = {}
 
     if (facet.startsWith('variants.')) {
-      products.forEach(p => {
-        const variants = getVariants(p, staged)
-        variants.forEach(v => {
+      products.forEach((p) => {
+        const variants = getVariants(p)
+        variants.forEach((v) => {
           result.total++
 
           let value = resolveVariantValue(v, facet)
@@ -244,7 +242,7 @@ export class ProductProjectionSearch {
         })
       })
     } else {
-      products.forEach(p => {
+      products.forEach((p) => {
         const value = nestedLookup(p, facet)
         result.total++
         if (value === undefined) {
@@ -266,15 +264,14 @@ export class ProductProjectionSearch {
   filterFacet(
     source: string,
     filters: FilterExpression[] | undefined,
-    products: Product[],
-    staged: boolean
+    products: ProductProjection[]
   ): FilteredFacetResult {
     let count = 0
     if (source.startsWith('variants.')) {
       for (const p of products) {
-        for (const v of getVariants(p, staged)) {
+        for (const v of getVariants(p)) {
           const val = resolveVariantValue(v, source)
-          if (filters?.some(f => f.match(val))) {
+          if (filters?.some((f) => f.match(val))) {
             count++
           }
         }
@@ -292,15 +289,14 @@ export class ProductProjectionSearch {
   rangeFacet(
     source: string,
     ranges: RangeExpression[] | undefined,
-    products: Product[],
-    staged: boolean
+    products: ProductProjection[]
   ): RangeFacetResult {
     const counts =
-      ranges?.map(range => {
+      ranges?.map((range) => {
         if (source.startsWith('variants.')) {
           const values = []
           for (const p of products) {
-            for (const v of getVariants(p, staged)) {
+            for (const v of getVariants(p)) {
               const val = resolveVariantValue(v, source)
               if (val === undefined) {
                 continue

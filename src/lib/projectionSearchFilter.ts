@@ -2,7 +2,7 @@
  * This module implements the commercetools product projection filter expression.
  */
 
-import { Product, ProductVariant } from '@commercetools/platform-sdk'
+import { Product, ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
 import perplex from 'perplex'
 import Parser from 'pratt'
 import { nestedLookup } from '../helpers'
@@ -10,8 +10,8 @@ import { Writable } from '../types'
 
 type MatchFunc = (target: any) => boolean
 
-type ProductFilter = (
-  p: Writable<Product>,
+type ProductProjectionFilter = (
+  p: Writable<ProductProjection>,
   markMatchingVariants: boolean
 ) => boolean
 
@@ -53,18 +53,17 @@ export type FilterExpression = {
 }
 
 /**
- * Returns a function (ProductFilter).
+ * Returns a function (ProductProjectionFilter).
  * NOTE: The filter can alter the resources in-place (FIXME)
  */
 export const parseFilterExpression = (
   filter: string,
-  staged: boolean
-): ProductFilter => {
+): ProductProjectionFilter => {
   const exprFunc = generateMatchFunc(filter)
   const [source] = filter.split(':', 1)
 
   if (source.startsWith('variants.')) {
-    return filterVariants(source, staged, exprFunc)
+    return filterVariants(source, exprFunc)
   }
   return filterProduct(source, exprFunc)
 }
@@ -268,8 +267,8 @@ export const generateFacetFunc = (filter: string): ExpressionSet => {
   return parseFilter(filter)
 }
 
-const filterProduct = (source: string, exprFunc: MatchFunc): ProductFilter => {
-  return (p: Product, markMatchingVariants: boolean): boolean => {
+const filterProduct = (source: string, exprFunc: MatchFunc): ProductProjectionFilter => {
+  return (p: ProductProjection, markMatchingVariants: boolean): boolean => {
     const value = nestedLookup(p, source)
     return exprFunc(value)
   }
@@ -277,14 +276,13 @@ const filterProduct = (source: string, exprFunc: MatchFunc): ProductFilter => {
 
 const filterVariants = (
   source: string,
-  staged: boolean,
   exprFunc: MatchFunc
-): ProductFilter => {
-  return (p: Product, markMatchingVariants: boolean): boolean => {
+): ProductProjectionFilter => {
+  return (p: ProductProjection, markMatchingVariants: boolean): boolean => {
     const [, ...paths] = source.split('.')
     const path = paths.join('.')
 
-    const variants = getVariants(p, staged) as Writable<ProductVariant>[]
+    const variants = getVariants(p) as Writable<ProductVariant>[]
     for (const variant of variants) {
       const value = resolveVariantValue(variant, path)
 
@@ -335,13 +333,9 @@ export const resolveVariantValue = (obj: ProductVariant, path: string): any => {
   return nestedLookup(obj, path)
 }
 
-export const getVariants = (p: Product, staged: boolean): ProductVariant[] => {
-  return [
-    staged
-      ? p.masterData.staged?.masterVariant
-      : p.masterData.current?.masterVariant,
-    ...(staged
-      ? p.masterData.staged?.variants
-      : p.masterData.current?.variants),
+export const getVariants = (p: ProductProjection): ProductVariant[] => {
+  return  [
+    p.masterVariant,
+    ...(p.variants ?? [])
   ]
 }

@@ -2,6 +2,7 @@ import {
   InvalidInputError,
   Price,
   Product,
+  ProductProjection,
   ProductVariant,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from './exceptions'
@@ -20,18 +21,15 @@ export type PriceSelector = {
  * the scopedPrice attribute
  */
 export const applyPriceSelector = (
-  products: Product[],
+  products: ProductProjection[],
   selector: PriceSelector
 ) => {
   validatePriceSelector(selector)
 
   for (const product of products) {
     const variants: Writable<ProductVariant>[] = [
-      product.masterData.staged?.masterVariant,
-      ...(product.masterData.staged?.variants || []),
-
-      product.masterData.current?.masterVariant,
-      ...(product.masterData.current?.variants || []),
+      product.masterVariant,
+      ...(product.variants ?? []),
     ].filter(x => x != undefined)
 
     for (const variant of variants) {

@@ -1,10 +1,19 @@
-import { Product, ProductData } from '@commercetools/platform-sdk'
+import { ProductProjection } from '@commercetools/platform-sdk'
 import { cloneObject } from '../helpers'
 import { applyPriceSelector } from '../priceSelector'
 import { parseFilterExpression } from './projectionSearchFilter'
 
 describe('Search filter', () => {
-  const productData: ProductData = {
+  const exampleProduct: ProductProjection = {
+    id: '7401d82f-1378-47ba-996a-85beeb87ac87',
+    version: 2,
+    createdAt: '2022-07-22T10:02:40.851Z',
+    lastModifiedAt: '2022-07-22T10:02:44.427Z',
+    key: 'test-product',
+    productType: {
+      typeId: 'product-type',
+      id: 'b9b4b426-938b-4ccb-9f36-c6f933e8446e',
+    },
     name: {
       'nl-NL': 'test',
     },
@@ -48,26 +57,8 @@ describe('Search filter', () => {
     },
   }
 
-  const exampleProduct: Product = {
-    id: '7401d82f-1378-47ba-996a-85beeb87ac87',
-    version: 2,
-    createdAt: '2022-07-22T10:02:40.851Z',
-    lastModifiedAt: '2022-07-22T10:02:44.427Z',
-    key: 'test-product',
-    productType: {
-      typeId: 'product-type',
-      id: 'b9b4b426-938b-4ccb-9f36-c6f933e8446e',
-    },
-    masterData: {
-      current: productData,
-      staged: productData,
-      published: true,
-      hasStagedChanges: false,
-    },
-  }
-
-  const match = (pattern: string, product?: Product) => {
-    const matchFunc = parseFilterExpression(pattern, false)
+  const match = (pattern: string, product?: ProductProjection) => {
+    const matchFunc = parseFilterExpression(pattern)
     const clone = cloneObject(product ?? exampleProduct)
     return {
       isMatch: matchFunc(clone, false),
@@ -82,7 +73,9 @@ describe('Search filter', () => {
   })
 
   test('by product type id', async () => {
-    expect(match(`productType.id:"b9b4b426-938b-4ccb-9f36-c6f933e8446e"`).isMatch).toBeTruthy()
+    expect(
+      match(`productType.id:"b9b4b426-938b-4ccb-9f36-c6f933e8446e"`).isMatch
+    ).toBeTruthy()
   })
 
   test('by SKU', async () => {
@@ -130,13 +123,15 @@ describe('Search filter', () => {
 
   test('by price range - or', async () => {
     expect(
-      match(`variants.price.centAmount:range (2 TO 1500 ), (1500 TO 3000), (3000 TO 6000)`).isMatch
+      match(
+        `variants.price.centAmount:range (2 TO 1500 ), (1500 TO 3000), (3000 TO 6000)`
+      ).isMatch
     ).toBeTruthy()
   })
 
   test('by scopedPrice range', async () => {
     let result
-    let products: Product[]
+    let products: ProductProjection[]
 
     // No currency given
     result = match(`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`)
@@ -152,13 +147,9 @@ describe('Search filter', () => {
     )
     expect(result.isMatch).toBeTruthy()
     expect(result.product).toMatchObject({
-      masterData: {
-        current: {
-          masterVariant: {
-            sku: 'MYSKU',
-            scopedPrice: { value: { centAmount: 1789 } },
-          },
-        },
+      masterVariant: {
+        sku: 'MYSKU',
+        scopedPrice: { value: { centAmount: 1789 } },
       },
     })
 
