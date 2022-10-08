@@ -13,7 +13,7 @@ import {
   ProjectSetShippingRateInputTypeAction,
   ProjectUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
+import { Resource, Writable } from 'types'
 import { AbstractRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
 
@@ -23,7 +23,7 @@ export class ProjectRepository extends AbstractRepository {
     return this.postProcessResource(resource)
   }
 
-  postProcessResource(resource: any): any {
+  postProcessResource<T extends Resource>(resource: T): T {
     if (resource) {
       return maskSecretValue(resource, 'externalOAuth.authorizationHeader')
     }

@@ -1,7 +1,9 @@
 import { ProductProjectionRepository } from './repositories/product-projection'
 import { ShoppingListRepository } from './repositories/shopping-list'
 import * as ctp from '@commercetools/platform-sdk'
-import { ReferenceTypeId } from '@commercetools/platform-sdk'
+import {
+  ReferenceTypeId,
+} from '@commercetools/platform-sdk'
 import AbstractService from './services/abstract'
 import { CartRepository } from './repositories/cart'
 import { CustomerRepository } from './repositories/customer'
@@ -33,6 +35,39 @@ export type ServiceTypes =
 export type Services = Partial<{
   [index in ServiceTypes]: AbstractService
 }>
+
+export type Resource =
+  | ctp.BaseResource
+  | ctp.Cart
+  | ctp.CartDiscount
+  | ctp.Category
+  | ctp.Channel
+  | ctp.Customer
+  | ctp.CustomerGroup
+  | ctp.DiscountCode
+  | ctp.Extension
+  | ctp.InventoryEntry
+  | ctp.CustomObject
+  | ctp.Order
+  | ctp.OrderEdit
+  | ctp.Payment
+  | ctp.Product
+  | ctp.Project
+  | ctp.ProductDiscount
+  | ctp.ProductProjection
+  | ctp.ProductSelection
+  | ctp.StandalonePrice
+  | ctp.ProductType
+  | ctp.Review
+  | ctp.ShippingMethod
+  | ctp.ShoppingList
+  | ctp.StandalonePrice
+  | ctp.State
+  | ctp.Store
+  | ctp.Subscription
+  | ctp.TaxCategory
+  | ctp.Type
+  | ctp.Zone
 
 export type ResourceMap = {
   cart: ctp.Cart

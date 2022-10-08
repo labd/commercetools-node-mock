@@ -24,8 +24,9 @@
   "scripts": {
     "start": "nodemon --watch src --exec 'node -r esbuild-register' src/server.ts",
     "build": "tsup",
+    "check": "eslint src && tsc",
     "test": "jest test --coverage",
-    "lint": "eslint"
+    "lint": "eslint src"
   },
   "prettier": {
     "printWidth": 80,

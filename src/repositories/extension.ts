@@ -8,12 +8,9 @@ import {
   ExtensionUpdateAction,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
-import { Writable } from '../types'
+import { Resource, Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
-import {
-  AbstractResourceRepository,
-  RepositoryContext,
-} from './abstract'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
 
 export class ExtensionRepository extends AbstractResourceRepository {
@@ -21,17 +18,18 @@ export class ExtensionRepository extends AbstractResourceRepository {
     return 'extension'
   }
 
-  postProcessResource(resource: Extension) {
+  postProcessResource<T extends Resource>(resource: T): T {
     if (resource) {
+      const extension = resource as Extension
       if (
-        resource.destination.type === 'HTTP' &&
-        resource.destination.authentication?.type === 'AuthorizationHeader'
+        extension.destination.type === 'HTTP' &&
+        extension.destination.authentication?.type === 'AuthorizationHeader'
       ) {
         return maskSecretValue(
-          resource,
+          extension,
           'destination.authentication.headerValue'
-        )
-      } else if (resource.destination.type == 'AWSLambda') {
+        ) as T
+      } else if (extension.destination.type == 'AWSLambda') {
         return maskSecretValue(resource, 'destination.accessSecret')
       }
     }

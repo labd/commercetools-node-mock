@@ -1,4 +1,4 @@
-import { RepositoryTypes, Writable } from './../types'
+import { RepositoryTypes, Resource, Writable } from './../types'
 import deepEqual from 'deep-equal'
 
 import {
@@ -40,27 +40,22 @@ export abstract class AbstractRepository {
     this._storage = storage
   }
 
-  abstract saveNew(
-    { projectKey }: RepositoryContext,
-    resource: BaseResource | Project
-  ): void
+  abstract saveNew({ projectKey }: RepositoryContext, resource: Resource): void
 
   abstract saveUpdate(
     { projectKey }: RepositoryContext,
     version: number,
-    resource: BaseResource | Project
+    resource: Resource
   ): void
 
-  processUpdateActions<T extends BaseResource | Project>(
+  processUpdateActions<T extends Resource>(
     context: RepositoryContext,
     resource: T,
     version: number,
     actions: UpdateAction[]
   ): T {
     // Deep-copy
-    const updatedResource = cloneObject(resource) as Writable<
-      BaseResource | Project
-    >
+    const updatedResource = cloneObject(resource) as Writable<Resource>
     const identifier = (resource as BaseResource).id
       ? (resource as BaseResource).id
       : (resource as Project).key
@@ -104,7 +99,7 @@ export abstract class AbstractRepository {
     return result as T
   }
 
-  postProcessResource<T extends BaseResource | Project | null>(resource: T): T {
+  postProcessResource<T extends Resource>(resource: T): T {
     return resource
   }
 }
@@ -142,7 +137,7 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
       id,
       params
     )
-    return this.postProcessResource(resource)
+    return resource ? this.postProcessResource(resource) : null
   }
 
   getByKey(
@@ -156,7 +151,7 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
       key,
       params
     )
-    return this.postProcessResource(resource)
+    return resource ? this.postProcessResource(resource) : null
   }
 
   delete(
@@ -170,7 +165,7 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
       id,
       params
     )
-    return this.postProcessResource(resource)
+    return resource ? this.postProcessResource(resource) : null
   }
 
   saveNew(context: RepositoryContext, resource: Writable<BaseResource>) {

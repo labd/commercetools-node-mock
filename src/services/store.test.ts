@@ -23,7 +23,10 @@ describe('Store', () => {
       createdAt: '',
       lastModifiedAt: '',
       key: 'STOREKEY',
+      languages: [],
       distributionChannels: [],
+      supplyChannels: [],
+      productSelections: [],
     })
 
     const response = await supertest(ctMock.app).get(
@@ -48,7 +51,10 @@ describe('Store', () => {
       createdAt: '',
       lastModifiedAt: '',
       key: 'STOREKEY',
+      languages: [],
       distributionChannels: [],
+      supplyChannels: [],
+      productSelections: [],
     })
 
     const response = await supertest(ctMock.app).get(
