@@ -145,27 +145,27 @@ describe('CustomObject retrieve', () => {
   test('update with container and key', async () => {
     ctMock.project('dummy').add('key-value-document', {
       ...getBaseResourceProperties(),
-      container: 'my-container',
+      container: 'my-other-container',
       key: 'my-key',
       value: 'my-value',
       version: 2,
     })
 
     const response = await supertest(ctMock.app)
-      .post('/dummy/custom-objects/my-container/my-key')
+      .post('/dummy/custom-objects/my-other-container/my-key')
       .send({
         value: 'new-value',
       })
 
     expect(response.status).toEqual(200)
     expect(response.body).toEqual({
-      container: 'my-container',
+      container: 'my-other-container',
       createdAt: expect.anything(),
       id: expect.anything(),
       key: 'my-key',
       lastModifiedAt: expect.anything(),
       value: 'new-value',
-      version: 2,
+      version: 3,
     })
   })
 
