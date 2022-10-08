@@ -27,8 +27,8 @@ export default abstract class AbstractService {
     router.get('/key=:key', this.getWithKey.bind(this)) // same thing goes for the key routes
     router.get('/:id', this.getWithId.bind(this))
 
-    router.delete('/key=:key', this.deletewithKey.bind(this))
-    router.delete('/:id', this.deletewithId.bind(this))
+    router.delete('/key=:key', this.deleteWithKey.bind(this))
+    router.delete('/:id', this.deleteWithId.bind(this))
 
     router.post('/', this.post.bind(this))
     router.post('/key=:key', this.postWithKey.bind(this))
@@ -68,7 +68,7 @@ export default abstract class AbstractService {
     return response.status(200).send(result)
   }
 
-  deletewithId(request: Request, response: Response) {
+  deleteWithId(request: Request, response: Response) {
     const result = this.repository.delete(
       getRepositoryContext(request),
       request.params['id'],
@@ -82,7 +82,7 @@ export default abstract class AbstractService {
     return response.status(200).send(result)
   }
 
-  deletewithKey(request: Request, response: Response) {
+  deleteWithKey(request: Request, response: Response) {
     return response.status(500).send('Not implemented')
   }
 

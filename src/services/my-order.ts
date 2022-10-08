@@ -25,7 +25,7 @@ export class MyOrderService extends AbstractService {
     router.get('/orders/', this.get.bind(this))
     router.get('/orders/:id', this.getWithId.bind(this))
 
-    router.delete('/orders/:id', this.deletewithId.bind(this))
+    router.delete('/orders/:id', this.deleteWithId.bind(this))
 
     router.post('/orders/', this.post.bind(this))
     router.post('/orders/:id', this.postWithId.bind(this))

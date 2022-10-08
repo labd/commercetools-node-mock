@@ -26,7 +26,7 @@ export class MyCartService extends AbstractService {
     router.get('/carts/', this.get.bind(this))
     router.get('/carts/:id', this.getWithId.bind(this))
 
-    router.delete('/carts/:id', this.deletewithId.bind(this))
+    router.delete('/carts/:id', this.deleteWithId.bind(this))
 
     router.post('/carts/', this.post.bind(this))
     router.post('/carts/:id', this.postWithId.bind(this))
