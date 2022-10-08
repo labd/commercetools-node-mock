@@ -1,5 +1,10 @@
 import { CommercetoolsMock } from './index'
 
+process.on('SIGINT', function() {
+    console.info("Stopping server...")
+    process.exit();
+});
+
 const instance = new CommercetoolsMock()
 
 let port = 3000
