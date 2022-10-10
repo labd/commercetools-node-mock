@@ -6,13 +6,16 @@ import {
   ProductDraft,
   ProductPublishAction,
   ProductSetAttributeAction,
+  ProductSetDescriptionAction,
+  ProductSetKeyAction,
   ProductTypeReference,
+  ProductUpdateAction,
   ProductVariant,
   ProductVariantDraft,
   ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties, cloneObject } from '../helpers'
+import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from '../types'
 import { getReferenceFromResourceIdentifier } from './helpers'
@@ -76,14 +79,31 @@ export class ProductRepository extends AbstractResourceRepository {
     return resource
   }
 
-  actions = {
+  actions: Partial<
+    Record<
+      ProductUpdateAction['action'],
+      (
+        context: RepositoryContext,
+        resource: Writable<Product>,
+        action: any
+      ) => void
+    >
+  > = {
     publish: (
       context: RepositoryContext,
       resource: Writable<Product>,
       { scope }: ProductPublishAction
     ) => {
-      resource.masterData.current = getStagedData(resource)
+      resource.masterData.current = resource.masterData.staged
       resource.masterData.published = true
+      checkForStagedChanges(resource)
+    },
+    unpublish: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      // { action }: ProductUnpublishAction
+    ) => {
+      resource.masterData.published = false
       checkForStagedChanges(resource)
     },
     setAttribute: (
@@ -127,25 +147,44 @@ export class ProductRepository extends AbstractResourceRepository {
 
       // If true, only the staged Attribute is set. If false, both current and
       // staged Attribute is set.  Default is true
-      const isStaged = staged !== undefined ? staged : true
+      const onlyStaged = staged !== undefined ? staged : true
 
       // Write the attribute to the staged data
-      const stagedData = getStagedData(resource)
-      setAttr(stagedData)
+      setAttr(resource.masterData.staged)
 
       // Also write to published data is isStaged = false
       // if isStaged is false we set the attribute on both the staged and
       // published data.
-      if (!isStaged) {
+      if (!onlyStaged) {
         setAttr(resource.masterData.current)
       }
       checkForStagedChanges(resource)
 
       return resource
     },
-    // 'setKey': () => {},
+    'setDescription': (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { description, staged }: ProductSetDescriptionAction
+    ) => {
+      const onlyStaged = staged !== undefined ? staged : true
+
+      resource.masterData.staged.description = description
+      if (!onlyStaged) {
+        resource.masterData.current.description = description
+      }
+      checkForStagedChanges(resource)
+      return resource
+    },
+    'setKey': (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { key }: ProductSetKeyAction
+    ) => {
+      resource.key = key
+      return resource
+    },
     // 'changeName': () => {},
-    // 'setDescription': () => {},
     // 'changeSlug': () => {},
     // 'addVariant': () => {},
     // 'removeVariant': () => {},
@@ -184,24 +223,15 @@ export class ProductRepository extends AbstractResourceRepository {
     // 'setMetaKeywords': () => {},
     // 'revertStagedChanges': () => {},
     // 'revertStagedVariantChanges': () => {},
-    // 'unpublish': () => {},
     // 'transitionState': () => {},
   }
-}
-
-// Return staged data. If no staged data is set we copy the current data
-const getStagedData = (product: Writable<Product>) => {
-  if (!product.masterData.staged) {
-    product.masterData.staged = cloneObject(product.masterData.current)
-  }
-  return product.masterData.staged
 }
 
 // Check if the product still has staged data that is different from the
 // current data.
 const checkForStagedChanges = (product: Writable<Product>) => {
   if (!product.masterData.staged) {
-    product.masterData.staged = getStagedData(product)
+    product.masterData.staged = product.masterData.current
   }
 
   if (deepEqual(product.masterData.current, product.masterData.staged)) {
