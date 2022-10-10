@@ -80,7 +80,7 @@ export abstract class AbstractRepository {
       if (!deepEqual(beforeUpdate, updatedResource)) {
         // We only check the version when there is an actual modification to
         // be stored.
-        checkConcurrentModification(version, resource.version, identifier)
+        checkConcurrentModification(resource.version, version, identifier)
 
         updatedResource.version += 1
       }
