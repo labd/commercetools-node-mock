@@ -12,6 +12,7 @@ import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 
 // Services
 import { ProjectService } from './services/project'
+import { createGqlRoute } from './gql'
 import { createRepositories } from './repositories'
 import { createServices } from './services'
 import { ProjectRepository } from 'repositories/project'
@@ -132,6 +133,11 @@ export class CommercetoolsMock {
       this._repositories.project as ProjectRepository
     )
     this._services = createServices(projectRouter, this._repositories)
+
+    // TODO:
+    // We should create repositories and pass them to the
+    // REST endpoint handlers and GraphQL handlers
+    createGqlRoute(app, this._repositories as Required<Repositories>)
 
     app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
       if (err instanceof CommercetoolsError) {
