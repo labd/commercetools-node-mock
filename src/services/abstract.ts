@@ -85,7 +85,25 @@ export default abstract class AbstractService {
   }
 
   deleteWithKey(request: Request, response: Response) {
-    return response.status(500).send('Not implemented')
+    const resource = this.repository.getByKey(
+      getRepositoryContext(request),
+      request.params['key']
+    )
+    if (!resource) {
+      return response.status(404).send('Not found')
+    }
+
+    const result = this.repository.delete(
+      getRepositoryContext(request),
+      resource.id,
+      {
+        expand: this._parseParam(request.query.expand),
+      }
+    )
+    if (!result) {
+      return response.status(404).send('Not found')
+    }
+    return response.status(200).send(result)
   }
 
   post(request: Request, response: Response) {
@@ -120,7 +138,23 @@ export default abstract class AbstractService {
   }
 
   postWithKey(request: Request, response: Response) {
-    return response.status(500).send('Not implemented')
+    const updateRequest: Update = request.body
+    const resource = this.repository.getByKey(
+      getRepositoryContext(request),
+      request.params['key']
+    )
+    if (!resource) {
+      return response.status(404).send('Not found')
+    }
+    const updatedResource = this.repository.processUpdateActions(
+      getRepositoryContext(request),
+      resource,
+      updateRequest.version,
+      updateRequest.actions
+    )
+
+    const result = this._expandWithId(request, updatedResource.id)
+    return response.status(200).send(result)
   }
 
   protected _expandWithId(request: Request, resourceId: string) {
