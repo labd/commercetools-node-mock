@@ -5,12 +5,11 @@ import {
   QueryParams,
   RepositoryContext,
 } from './abstract'
-import { RepositoryTypes } from '../types'
 import { AbstractStorage } from '../storage'
 import { ProductProjectionSearch } from '../product-projection-search'
 import { QueryParamsAsArray } from '../helpers'
 
-export class ProductProjectionRepository extends AbstractResourceRepository {
+export class ProductProjectionRepository extends AbstractResourceRepository<'product-projection'> {
   protected _searchService: ProductProjectionSearch
 
   constructor(storage: AbstractStorage) {
@@ -18,8 +17,8 @@ export class ProductProjectionRepository extends AbstractResourceRepository {
     this._searchService = new ProductProjectionSearch(storage)
   }
 
-  getTypeId(): RepositoryTypes {
-    return 'product-projection'
+  getTypeId() {
+    return 'product-projection' as const
   }
 
   create(context: RepositoryContext, draft: ProductDraft): ProductProjection {

@@ -40,6 +40,8 @@ describe('MyCart', () => {
       cartState: 'Active',
       lineItems: [],
       customLineItems: [],
+      shipping: [],
+      shippingMode: 'Single',
       totalPrice: {
         type: 'centPrecision',
         centAmount: 0,

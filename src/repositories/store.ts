@@ -1,7 +1,6 @@
 import {
   Store,
   StoreDraft,
-  ReferenceTypeId,
   StoreUpdateAction,
   StoreSetNameAction,
   ChannelReference,
@@ -19,9 +18,9 @@ import {
   createCustomFields,
 } from './helpers'
 
-export class StoreRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'store'
+export class StoreRepository extends AbstractResourceRepository<'store'> {
+  getTypeId() {
+    return 'store' as const
   }
 
   create(context: RepositoryContext, draft: StoreDraft): Store {

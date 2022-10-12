@@ -15,16 +15,15 @@ import {
   DiscountCodeSetValidFromAndUntilAction,
   DiscountCodeSetValidUntilAction,
   DiscountCodeUpdateAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 
-export class DiscountCodeRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'cart-discount'
+export class DiscountCodeRepository extends AbstractResourceRepository<'cart-discount'> {
+  getTypeId() {
+    return 'cart-discount' as const
   }
 
   create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {

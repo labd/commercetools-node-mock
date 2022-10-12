@@ -6,7 +6,6 @@ import {
   PaymentSetCustomFieldAction,
   PaymentSetCustomTypeAction,
   PaymentTransitionStateAction,
-  ReferenceTypeId,
   State,
   StateReference,
   Transaction,
@@ -22,9 +21,9 @@ import { getBaseResourceProperties } from '../helpers'
 import { v4 as uuidv4 } from 'uuid'
 import { Writable } from '../types'
 
-export class PaymentRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'payment'
+export class PaymentRepository extends AbstractResourceRepository<'payment'> {
+  getTypeId()  {
+    return 'payment' as const
   }
 
   create(context: RepositoryContext, draft: PaymentDraft): Payment {

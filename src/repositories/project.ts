@@ -5,7 +5,7 @@ import {
   ProjectChangeCountryTaxRateFallbackEnabledAction,
   ProjectChangeCurrenciesAction,
   ProjectChangeLanguagesAction,
-  ProjectChangeMessagesEnabledAction,
+  ProjectChangeMessagesConfigurationAction,
   ProjectChangeNameAction,
   ProjectChangeOrderSearchStatusAction,
   ProjectChangeProductSearchIndexingEnabledAction,
@@ -77,12 +77,12 @@ export class ProjectRepository extends AbstractRepository {
     ) => {
       resource.languages = languages
     },
-    changeMessagesEnabled: (
+    changeMessagesConfiguration: (
       context: RepositoryContext,
       resource: Writable<Project>,
-      { messagesEnabled }: ProjectChangeMessagesEnabledAction
+      { messagesConfiguration }: ProjectChangeMessagesConfigurationAction
     ) => {
-      resource.messages.enabled = messagesEnabled
+      resource.messages.enabled = messagesConfiguration.enabled
     },
     changeProductSearchIndexingEnabled: (
       context: RepositoryContext,

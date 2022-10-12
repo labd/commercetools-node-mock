@@ -1,6 +1,5 @@
 import {
   InvalidInputError,
-  ReferenceTypeId,
   Subscription,
   SubscriptionDraft,
 } from '@commercetools/platform-sdk'
@@ -8,9 +7,9 @@ import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
-export class SubscriptionRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'subscription'
+export class SubscriptionRepository extends AbstractResourceRepository<'subscription'> {
+  getTypeId() {
+    return 'subscription' as const
   }
   create(context: RepositoryContext, draft: SubscriptionDraft): Subscription {
     // TODO: We could actually test this here by using the aws sdk. For now

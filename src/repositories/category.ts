@@ -13,16 +13,15 @@ import {
   CategorySetMetaDescriptionAction,
   CategorySetMetaKeywordsAction,
   CategorySetMetaTitleAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { createCustomFields } from './helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
-export class CategoryRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'category'
+export class CategoryRepository extends AbstractResourceRepository<'category'> {
+  getTypeId() {
+    return 'category' as const
   }
 
   create(context: RepositoryContext, draft: CategoryDraft): Category {

@@ -1,5 +1,4 @@
 import {
-  ReferenceTypeId,
   Zone,
   ZoneAddLocationAction,
   ZoneChangeNameAction,
@@ -13,9 +12,9 @@ import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
-export class ZoneRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'zone'
+export class ZoneRepository extends AbstractResourceRepository<'zone'> {
+  getTypeId() {
+    return 'zone' as const
   }
 
   create(context: RepositoryContext, draft: ZoneDraft): Zone {

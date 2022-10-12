@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express'
 import supertest from 'supertest'
 import morgan from 'morgan'
 import { AbstractStorage, InMemoryStorage } from './storage'
-import { Repositories, Services } from './types'
+import { Services } from './types'
 import { CommercetoolsError } from './exceptions'
 import { OAuth2Server } from './oauth/server'
 import { ProjectAPI } from './projectAPI'
@@ -12,7 +12,7 @@ import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from './constants'
 
 // Services
 import { ProjectService } from './services/project'
-import { createRepositories } from './repositories'
+import { createRepositories, RepositoryMap } from './repositories'
 import { createServices } from './services'
 import { ProjectRepository } from 'repositories/project'
 
@@ -46,14 +46,14 @@ export class CommercetoolsMock {
     auth: nock.Scope | undefined
     api: nock.Scope | undefined
   } = { auth: undefined, api: undefined }
-  private _services: Services
-  private _repositories: Repositories
+  private _services: Services | null
+  private _repositories: RepositoryMap | null
   private _projectService?: ProjectService
 
   constructor(options: Partial<CommercetoolsMockOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options }
-    this._services = {}
-    this._repositories = {}
+    this._services = null
+    this._repositories = null
     this._projectService = undefined
 
     this._storage = new InMemoryStorage()
@@ -86,6 +86,10 @@ export class CommercetoolsMock {
   project(projectKey?: string) {
     if (!projectKey && !this.options.defaultProjectKey) {
       throw new Error('No projectKey passed and no default set')
+    }
+
+    if (this._repositories === null) {
+      throw new Error("repositories not initialized yet")
     }
 
     return new ProjectAPI(

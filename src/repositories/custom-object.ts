@@ -2,7 +2,6 @@ import {
   CustomObject,
   CustomObjectDraft,
   InvalidOperationError,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { checkConcurrentModification } from './errors'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
@@ -10,9 +9,9 @@ import { Writable } from '../types'
 import { cloneObject, getBaseResourceProperties } from '../helpers'
 import { CommercetoolsError } from '../exceptions'
 
-export class CustomObjectRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'key-value-document'
+export class CustomObjectRepository extends AbstractResourceRepository<'key-value-document'> {
+  getTypeId() {
+    return 'key-value-document' as const
   }
 
   create(
@@ -73,7 +72,7 @@ export class CustomObjectRepository extends AbstractResourceRepository {
     const items = this._storage.all(
       context.projectKey,
       this.getTypeId()
-    ) as Array<CustomObject>
+    )
     return items.find(
       (item) => item.container === container && item.key === key
     )

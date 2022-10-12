@@ -4,7 +4,6 @@ import {
   getReferenceFromResourceIdentifier,
 } from './helpers'
 import {
-  ReferenceTypeId,
   ShippingMethod,
   ShippingMethodAddShippingRateAction,
   ShippingMethodAddZoneAction,
@@ -30,9 +29,9 @@ import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from 'types'
 import deepEqual from 'deep-equal'
 
-export class ShippingMethodRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'shipping-method'
+export class ShippingMethodRepository extends AbstractResourceRepository<'shipping-method'> {
+  getTypeId() {
+    return 'shipping-method' as const
   }
 
   create(

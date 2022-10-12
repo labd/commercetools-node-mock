@@ -1,5 +1,4 @@
 import {
-  ReferenceTypeId,
   TaxCategory,
   TaxCategoryAddTaxRateAction,
   TaxCategoryChangeNameAction,
@@ -17,9 +16,9 @@ import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { v4 as uuidv4 } from 'uuid'
 import { Writable } from 'types'
 
-export class TaxCategoryRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'tax-category'
+export class TaxCategoryRepository extends AbstractResourceRepository<'tax-category'> {
+  getTypeId() {
+    return 'tax-category' as const
   }
 
   create(context: RepositoryContext, draft: TaxCategoryDraft): TaxCategory {

@@ -1,6 +1,5 @@
 import {
   CustomerReference,
-  ReferenceTypeId,
   ShoppingList,
   ShoppingListDraft,
 } from '@commercetools/platform-sdk'
@@ -11,9 +10,9 @@ import {
   getReferenceFromResourceIdentifier,
 } from './helpers'
 
-export class ShoppingListRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'shopping-list'
+export class ShoppingListRepository extends AbstractResourceRepository<'shopping-list'> {
+  getTypeId()  {
+    return 'shopping-list' as const
   }
   create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {
     // const product =

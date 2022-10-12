@@ -5,21 +5,20 @@ import {
   AttributeType,
   ProductType,
   ProductTypeAddAttributeDefinitionAction,
-  ProductTypeChangeAttributeOrderAction,
+  ProductTypeChangeAttributeOrderByNameAction,
   ProductTypeChangeLabelAction,
   ProductTypeChangeLocalizedEnumValueLabelAction,
   ProductTypeDraft,
   ProductTypeRemoveAttributeDefinitionAction,
   ProductTypeRemoveEnumValuesAction,
   ProductTypeUpdateAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from 'types'
 
-export class ProductTypeRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'product-type'
+export class ProductTypeRepository extends AbstractResourceRepository<'product-type'> {
+  getTypeId() {
+    return 'product-type' as const
   }
 
   create(context: RepositoryContext, draft: ProductTypeDraft): ProductType {
@@ -126,10 +125,10 @@ export class ProductTypeRepository extends AbstractResourceRepository {
         this.attributeDefinitionFromAttributeDefinitionDraft(context, attribute)
       )
     },
-    changeAttributeOrder: (
+    changeAttributeOrderByName: (
       context: RepositoryContext,
       resource: Writable<ProductType>,
-      { attributes }: ProductTypeChangeAttributeOrderAction
+      { attributeNames }: ProductTypeChangeAttributeOrderByNameAction
     ) => {
       const attrs = new Map(
         resource.attributes?.map((item) => [item.name, item])
@@ -137,15 +136,15 @@ export class ProductTypeRepository extends AbstractResourceRepository {
       const result: AttributeDefinition[] = []
       let current = resource.attributes
 
-      attributes.forEach((iAttr) => {
-        const attr = attrs.get(iAttr.name)
+      attributeNames.forEach((attrName) => {
+        const attr = attrs.get(attrName)
         if (attr === undefined) {
           throw new Error('New attr')
         }
         result.push(attr)
 
         // Remove from current items
-        current = current?.filter((f) => f.name !== iAttr.name)
+        current = current?.filter((f) => f.name !== attrName)
       })
 
       resource.attributes = result

@@ -2,7 +2,6 @@ import {
   Type,
   TypeDraft,
   InvalidOperationError,
-  ReferenceTypeId,
   TypeUpdateAction,
   FieldDefinition,
   TypeSetDescriptionAction,
@@ -19,9 +18,9 @@ import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
-export class TypeRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'type'
+export class TypeRepository extends AbstractResourceRepository<'type'> {
+  getTypeId() {
+    return 'type' as const
   }
 
   create(context: RepositoryContext, draft: TypeDraft): Type {
