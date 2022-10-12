@@ -6,3 +6,9 @@ docker-release:
 
 test:
 	pnpm test
+
+
+check:
+	node_modules/typescript/bin/tsc
+	pnpm run test
+	pnpm run lint
