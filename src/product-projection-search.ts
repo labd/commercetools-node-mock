@@ -60,7 +60,6 @@ export class ProductProjectionSearch {
     let resources = this._storage
       .all(projectKey, 'product')
       .map((r) => this.transform(r, params.staged ?? false))
-      .filter((p): p is ProductProjection => p !== null)
       .filter((p) => {
         if (!params.staged ?? false) {
           return p.published
@@ -145,9 +144,8 @@ export class ProductProjectionSearch {
     }
   }
 
-  transform(product: Product, staged: boolean): ProductProjection | null {
+  transform(product: Product, staged: boolean): ProductProjection {
     const obj = !staged ? product.masterData.current : product.masterData.staged
-    if (!obj) return null
 
     return {
       id: product.id,
