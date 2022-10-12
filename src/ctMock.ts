@@ -90,7 +90,7 @@ export class CommercetoolsMock {
 
     return new ProjectAPI(
       projectKey || this.options.defaultProjectKey!,
-      this._services,
+      this._repositories,
       this._storage
     )
   }
@@ -103,6 +103,9 @@ export class CommercetoolsMock {
   }
 
   private createApp(options?: AppOptions): express.Express {
+    this._repositories = createRepositories(this._storage)
+
+
     const app = express()
 
     const projectRouter = express.Router({ mergeParams: true })
@@ -126,12 +129,12 @@ export class CommercetoolsMock {
       app.use('/:projectKey/in-store/key=:storeKey', projectRouter)
     }
 
-    this._repositories = createRepositories(this._storage)
+    // Register the rest api services in the router
+    this._services = createServices(projectRouter, this._repositories)
     this._projectService = new ProjectService(
       projectRouter,
       this._repositories.project as ProjectRepository
     )
-    this._services = createServices(projectRouter, this._repositories)
 
     app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
       if (err instanceof CommercetoolsError) {

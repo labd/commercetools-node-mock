@@ -3,31 +3,29 @@ import { GetParams } from 'repositories/abstract'
 import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
 import {
-  RepositoryMap,
+  Repositories,
   RepositoryTypes,
   ResourceMap,
-  Services,
-  ServiceTypes,
 } from './types'
 
 export class ProjectAPI {
   private projectKey: string
   private _storage: AbstractStorage
-  private _services: Services
+  private _repositories: Repositories
 
   constructor(
     projectKey: string,
-    services: Services,
+    repositories: Repositories,
     storage: AbstractStorage
   ) {
     this.projectKey = projectKey
     this._storage = storage
-    this._services = services
+    this._repositories = repositories
   }
 
   add(typeId: ReferenceTypeId, resource: ResourceMap[ReferenceTypeId]) {
-    const service = this._services[typeId]
-    if (service) {
+    const repository = this._repositories[typeId]
+    if (repository) {
       this._storage.add(this.projectKey, typeId as ReferenceTypeId, {
         ...getBaseResourceProperties(),
         ...resource,
@@ -51,12 +49,12 @@ export class ProjectAPI {
   }
 
   // TODO: Not sure if we want to expose this...
-  getRepository<RT extends keyof RepositoryMap>(
-    typeId: ServiceTypes
-  ): RepositoryMap[RT] {
-    const service = this._services[typeId]
-    if (service !== undefined) {
-      return service.repository as RepositoryMap[RT]
+  getRepository<RT extends keyof Repositories>(
+    typeId: RT
+  ): Repositories[RT] {
+    const repository = this._repositories[typeId]
+    if (repository !== undefined) {
+      return repository
     }
     throw new Error('No such repository')
   }
