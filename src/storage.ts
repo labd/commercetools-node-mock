@@ -36,7 +36,8 @@ import {
   Quote,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
-import { RepositoryTypes, ResourceMap, ResourceType, Writable } from './types'
+import { PagedQueryResponseMap, ResourceMap, ResourceType } from './types'
+import { Writable } from './types'
 import { parseQueryExpression } from './lib/predicateParser'
 import { CommercetoolsError } from './exceptions'
 import { cloneObject } from './helpers'
@@ -94,15 +95,15 @@ export abstract class AbstractStorage {
     params: GetParams
   ): ResourceMap[RT] | null
 
-  abstract query(
+  abstract query<RT extends ResourceType>(
     projectKey: string,
-    typeId: ResourceType,
+    typeId: RT,
     params: QueryParams
-  ): PagedQueryResponse
+  ): PagedQueryResponseMap[RT]
 
   abstract getByResourceIdentifier<RT extends ResourceType>(
     projectKey: string,
-    identifier: ResourceIdentifier,
+    identifier: ResourceIdentifier
   ): ResourceMap[RT] | null
 
   abstract expand<T>(
@@ -113,7 +114,7 @@ export abstract class AbstractStorage {
 }
 
 type ProjectStorage = {
-  [index in RepositoryTypes]: Map<string, BaseResource>
+  [index in ResourceType]: Map<string, BaseResource>
 }
 
 export class InMemoryStorage extends AbstractStorage {
@@ -131,38 +132,37 @@ export class InMemoryStorage extends AbstractStorage {
     let projectStorage = this.resources[projectKey]
     if (!projectStorage) {
       projectStorage = this.resources[projectKey] = {
-        cart: new Map<string, Cart>(),
+        'cart': new Map<string, Cart>(),
         'cart-discount': new Map<string, CartDiscount>(),
-        category: new Map<string, Category>(),
-        channel: new Map<string, Channel>(),
-        customer: new Map<string, Customer>(),
+        'category': new Map<string, Category>(),
+        'channel': new Map<string, Channel>(),
+        'customer': new Map<string, Customer>(),
         'customer-group': new Map<string, CustomerGroup>(),
         'discount-code': new Map<string, DiscountCode>(),
-        extension: new Map<string, Extension>(),
+        'extension': new Map<string, Extension>(),
         'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
-        order: new Map<string, Order>(),
+        'order': new Map<string, Order>(),
         'order-edit': new Map<string, any>(),
-        payment: new Map<string, Payment>(),
-        product: new Map<string, Product>(),
-        quote: new Map<string, Quote>(),
+        'payment': new Map<string, Payment>(),
+        'product': new Map<string, Product>(),
+        'quote': new Map<string, Quote>(),
         'quote-request': new Map<string, QuoteRequest>(),
         'product-discount': new Map<string, ProductDiscount>(),
-        'product-price': new Map<string, any>(),
         'product-selection': new Map<string, any>(),
         'product-type': new Map<string, ProductType>(),
         'product-projection': new Map<string, ProductProjection>(),
-        review: new Map<string, any>(),
+        'review': new Map<string, any>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         'staged-quote': new Map<string, StagedQuote>(),
-        state: new Map<string, State>(),
-        store: new Map<string, Store>(),
+        'state': new Map<string, State>(),
+        'store': new Map<string, Store>(),
         'shopping-list': new Map<string, ShoppingList>(),
         'standalone-price': new Map<string, any>(),
-        subscription: new Map<string, Subscription>(),
+        'subscription': new Map<string, Subscription>(),
         'tax-category': new Map<string, TaxCategory>(),
-        type: new Map<string, Type>(),
-        zone: new Map<string, Zone>(),
+        'type': new Map<string, Type>(),
+        'zone': new Map<string, Zone>(),
       }
     }
     return projectStorage
@@ -251,17 +251,17 @@ export class InMemoryStorage extends AbstractStorage {
     return resource
   }
 
-  query(
+  query<RT extends ResourceType>(
     projectKey: string,
-    typeId: ResourceType,
+    typeId: RT,
     params: QueryParams
-  ): PagedQueryResponse {
+  ): PagedQueryResponseMap[RT] {
     const store = this.forProjectKey(projectKey)[typeId]
     if (!store) {
       throw new Error('No type')
     }
 
-    let resources = Array.from(store.values())
+    let resources = this.all<RT>(projectKey, typeId)
 
     // Apply predicates
     if (params.where) {
@@ -299,8 +299,8 @@ export class InMemoryStorage extends AbstractStorage {
       total: resources.length,
       offset: offset,
       limit: limit,
-      results: resources.map(cloneObject),
-    }
+      results: resources.map(cloneObject)
+    } as PagedQueryResponseMap[RT]
   }
 
   search(

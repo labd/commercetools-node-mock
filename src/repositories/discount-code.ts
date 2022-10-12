@@ -21,9 +21,9 @@ import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 
-export class DiscountCodeRepository extends AbstractResourceRepository<'cart-discount'> {
+export class DiscountCodeRepository extends AbstractResourceRepository<'discount-code'> {
   getTypeId() {
-    return 'cart-discount' as const
+    return 'discount-code' as const
   }
 
   create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {

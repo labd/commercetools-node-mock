@@ -33,7 +33,7 @@ export class CustomObjectRepository extends AbstractResourceRepository<'key-valu
       }
 
       if (draft.value !== current.value) {
-        const updated = cloneObject(current)
+        const updated = cloneObject(current) as Writable<CustomObject>
         updated.value = draft.value
         updated.version += 1
         this.saveUpdate(context, draft.version, updated)
@@ -69,10 +69,7 @@ export class CustomObjectRepository extends AbstractResourceRepository<'key-valu
     container: string,
     key: string
   ) {
-    const items = this._storage.all(
-      context.projectKey,
-      this.getTypeId()
-    )
+    const items = this._storage.all(context.projectKey, this.getTypeId())
     return items.find(
       (item) => item.container === container && item.key === key
     )
