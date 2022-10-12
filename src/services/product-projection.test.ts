@@ -8,8 +8,8 @@ import {
 } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import * as timekeeper from 'timekeeper'
-import { CommercetoolsMock } from '../index'
 import { Writable } from '../types'
+import { CommercetoolsMock } from '../index'
 
 const ctMock = new CommercetoolsMock()
 

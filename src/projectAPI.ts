@@ -2,10 +2,7 @@ import { GetParams } from 'repositories/abstract'
 import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
 import { RepositoryMap } from './repositories'
-import {
-  ResourceMap,
-  ResourceType,
-} from './types'
+import { ResourceMap, ResourceType } from './types'
 
 export class ProjectAPI {
   private projectKey: string
@@ -22,7 +19,10 @@ export class ProjectAPI {
     this._repositories = repositories
   }
 
-  add<T extends keyof RepositoryMap & keyof ResourceMap>(typeId: T, resource: ResourceMap[T]) {
+  add<T extends keyof RepositoryMap & keyof ResourceMap>(
+    typeId: T,
+    resource: ResourceMap[T]
+  ) {
     const repository = this._repositories[typeId]
     if (repository) {
       this._storage.add(this.projectKey, typeId, {
@@ -48,9 +48,7 @@ export class ProjectAPI {
   }
 
   // TODO: Not sure if we want to expose this...
-  getRepository<RT extends keyof RepositoryMap>(
-    typeId: RT
-  ): RepositoryMap[RT] {
+  getRepository<RT extends keyof RepositoryMap>(typeId: RT): RepositoryMap[RT] {
     const repository = this._repositories[typeId]
     if (repository !== undefined) {
       return repository as RepositoryMap[RT]

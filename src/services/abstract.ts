@@ -1,6 +1,6 @@
 import { Update } from '@commercetools/platform-sdk'
-import { ParsedQs } from 'qs'
 import { Request, Response, Router } from 'express'
+import { ParsedQs } from 'qs'
 import { AbstractResourceRepository } from '../repositories/abstract'
 import { getRepositoryContext } from '../repositories/helpers'
 
@@ -14,9 +14,7 @@ export default abstract class AbstractService {
     this.registerRoutes(parent)
   }
 
-  extraRoutes(router: Router) {
-
-  }
+  extraRoutes(router: Router) {}
 
   registerRoutes(parent: Router) {
     const basePath = this.getBasePath()

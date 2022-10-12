@@ -1,6 +1,6 @@
 import { Cart, OrderImportDraft } from '@commercetools/platform-sdk'
-import { OrderRepository } from './order'
 import { InMemoryStorage } from '../storage'
+import { OrderRepository } from './order'
 
 describe('Order repository', () => {
   const storage = new InMemoryStorage()

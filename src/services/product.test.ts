@@ -1,7 +1,7 @@
 import { Product, ProductData, ProductDraft } from '@commercetools/platform-sdk'
+import assert from 'assert'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
-import assert from 'assert'
 
 const ctMock = new CommercetoolsMock()
 

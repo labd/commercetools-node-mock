@@ -1,6 +1,6 @@
 import * as ctp from '@commercetools/platform-sdk'
-import AbstractService from './services/abstract'
 import { RepositoryMap } from './repositories'
+import AbstractService from './services/abstract'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 export type ShallowWritable<T> = { -readonly [P in keyof T]: T[P] }

@@ -14,9 +14,9 @@ import {
   ProductVariantDraft,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
+import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { Writable } from '../types'
 import { getReferenceFromResourceIdentifier } from './helpers'
 import deepEqual from 'deep-equal'
 

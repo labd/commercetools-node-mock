@@ -7,10 +7,10 @@ import {
   ExtensionSetTimeoutInMsAction,
   ExtensionUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
+import { Writable } from '../types'
+import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ExtensionRepository extends AbstractResourceRepository<'extension'> {
   getTypeId() {

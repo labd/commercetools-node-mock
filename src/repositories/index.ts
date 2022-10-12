@@ -33,7 +33,6 @@ import { TaxCategoryRepository } from './tax-category'
 import { TypeRepository } from './type'
 import { ZoneRepository } from './zone'
 
-
 export type RepositoryMap = ReturnType<typeof createRepositories>
 
 export const createRepositories = (storage: AbstractStorage) => ({
@@ -59,9 +58,9 @@ export const createRepositories = (storage: AbstractStorage) => ({
   'product-discount': new ProductDiscountRepository(storage),
   'product-projection': new ProductProjectionRepository(storage),
   'product-selection': new ProductSelectionRepository(storage),
-  'project': new ProjectRepository(storage),
-  'review': new ReviewRepository(storage),
-  'quote': new QuoteRepository(storage),
+  project: new ProjectRepository(storage),
+  review: new ReviewRepository(storage),
+  quote: new QuoteRepository(storage),
   'quote-request': new QuoteRequestRepository(storage),
   'shipping-method': new ShippingMethodRepository(storage),
   'shopping-list': new ShoppingListRepository(storage),
@@ -74,4 +73,3 @@ export const createRepositories = (storage: AbstractStorage) => ({
   type: new TypeRepository(storage),
   zone: new ZoneRepository(storage),
 })
-

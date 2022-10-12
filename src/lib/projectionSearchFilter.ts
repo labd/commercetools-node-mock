@@ -5,8 +5,8 @@
 import { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
 import perplex from 'perplex'
 import Parser from 'pratt'
-import { nestedLookup } from '../helpers'
 import { Writable } from '../types'
+import { nestedLookup } from '../helpers'
 
 type MatchFunc = (target: any) => boolean
 
@@ -99,7 +99,8 @@ const parseFilter = (filter: string): ExpressionSet => {
     .nud('IDENTIFIER', 100, (t) => t.token.match)
     .led(':', 100, ({ left, bp }) => {
       const parsed: any = parser.parse({ terminals: [bp - 1] })
-      const expressions: RangeExpression[] | FilterExpression[] | TypeSymbol[] = !Array.isArray(parsed) ? [parsed] : parsed
+      const expressions: RangeExpression[] | FilterExpression[] | TypeSymbol[] =
+        !Array.isArray(parsed) ? [parsed] : parsed
 
       // Make sure we only have one type of expression (cannot mix)
       const unique = new Set(expressions.map((expr) => expr.type))

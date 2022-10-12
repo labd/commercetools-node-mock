@@ -1,21 +1,21 @@
 import {
-  Type,
-  TypeDraft,
-  InvalidOperationError,
-  TypeUpdateAction,
   FieldDefinition,
-  TypeSetDescriptionAction,
-  TypeChangeNameAction,
+  InvalidOperationError,
+  Type,
+  TypeAddEnumValueAction,
   TypeAddFieldDefinitionAction,
   TypeChangeEnumValueLabelAction,
-  TypeAddEnumValueAction,
   TypeChangeFieldDefinitionOrderAction,
+  TypeChangeNameAction,
+  TypeDraft,
   TypeRemoveFieldDefinitionAction,
+  TypeSetDescriptionAction,
+  TypeUpdateAction,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from '../exceptions'
 import { isEqual } from 'lodash'
-import { Writable } from 'types'
+import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class TypeRepository extends AbstractResourceRepository<'type'> {

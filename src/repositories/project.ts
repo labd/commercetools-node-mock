@@ -13,12 +13,11 @@ import {
   ProjectSetShippingRateInputTypeAction,
   ProjectUpdateAction,
 } from '@commercetools/platform-sdk'
+import { maskSecretValue } from '../lib/masking'
 import { Writable } from '../types'
 import { AbstractRepository, RepositoryContext } from './abstract'
-import { maskSecretValue } from '../lib/masking'
 
 export class ProjectRepository extends AbstractRepository<Project> {
-
   get(context: RepositoryContext): Project | null {
     const resource = this._storage.getProject(context.projectKey)
     return this.postProcessResource(resource)
