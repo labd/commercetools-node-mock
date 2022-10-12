@@ -5,16 +5,15 @@ import {
   CustomerSetAuthenticationModeAction,
   InvalidInputError,
   InvalidJsonInputError,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { CommercetoolsError } from '../exceptions'
 
-export class CustomerRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'customer'
+export class CustomerRepository extends AbstractResourceRepository<'customer'> {
+  getTypeId() {
+    return 'customer' as const
   }
 
   create(context: RepositoryContext, draft: CustomerDraft): Customer {

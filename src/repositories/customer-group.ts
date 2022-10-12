@@ -5,16 +5,15 @@ import {
   CustomerGroupSetCustomFieldAction,
   CustomerGroupSetCustomTypeAction,
   CustomerGroupSetKeyAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 
-export class CustomerGroupRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'customer'
+export class CustomerGroupRepository extends AbstractResourceRepository<'customer-group'> {
+  getTypeId() {
+    return 'customer-group' as const
   }
   create(context: RepositoryContext, draft: CustomerGroupDraft): CustomerGroup {
     const resource: CustomerGroup = {

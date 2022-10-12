@@ -31,9 +31,12 @@ import {
   Channel,
   Subscription,
   ProductDiscount,
+  StagedQuote,
+  QuoteRequest,
+  Quote,
 } from '@commercetools/platform-sdk'
 import { parseExpandClause } from './lib/expandParser'
-import { RepositoryTypes, ResourceMap, Writable } from './types'
+import { RepositoryTypes, ResourceMap, ResourceType, Writable } from './types'
 import { parseQueryExpression } from './lib/predicateParser'
 import { CommercetoolsError } from './exceptions'
 import { cloneObject } from './helpers'
@@ -55,25 +58,25 @@ type QueryParams = {
 export abstract class AbstractStorage {
   abstract clear(): void
 
-  abstract all<RT extends RepositoryTypes>(
+  abstract all<RT extends ResourceType>(
     projectKey: string,
     typeId: RT
   ): Array<ResourceMap[RT]>
 
-  abstract add<RT extends RepositoryTypes>(
+  abstract add<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     obj: ResourceMap[RT]
   ): void
 
-  abstract get<RT extends RepositoryTypes>(
+  abstract get<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     id: string,
     params?: GetParams
   ): ResourceMap[RT] | null
 
-  abstract getByKey<RT extends RepositoryTypes>(
+  abstract getByKey<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     key: string,
@@ -84,23 +87,23 @@ export abstract class AbstractStorage {
   abstract getProject(projectKey: string): Project
   abstract saveProject(project: Project): Project
 
-  abstract delete<RT extends RepositoryTypes>(
+  abstract delete<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     id: string,
     params: GetParams
-  ): BaseResource | null
+  ): ResourceMap[RT] | null
 
   abstract query(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: ResourceType,
     params: QueryParams
   ): PagedQueryResponse
 
-  abstract getByResourceIdentifier<RT extends RepositoryTypes>(
+  abstract getByResourceIdentifier<RT extends ResourceType>(
     projectKey: string,
-    identifier: ResourceIdentifier
-  ): ResourceMap[RT] | undefined
+    identifier: ResourceIdentifier,
+  ): ResourceMap[RT] | null
 
   abstract expand<T>(
     projectKey: string,
@@ -142,6 +145,8 @@ export class InMemoryStorage extends AbstractStorage {
         'order-edit': new Map<string, any>(),
         payment: new Map<string, Payment>(),
         product: new Map<string, Product>(),
+        quote: new Map<string, Quote>(),
+        'quote-request': new Map<string, QuoteRequest>(),
         'product-discount': new Map<string, ProductDiscount>(),
         'product-price': new Map<string, any>(),
         'product-selection': new Map<string, any>(),
@@ -149,6 +154,7 @@ export class InMemoryStorage extends AbstractStorage {
         'product-projection': new Map<string, ProductProjection>(),
         review: new Map<string, any>(),
         'shipping-method': new Map<string, ShippingMethod>(),
+        'staged-quote': new Map<string, StagedQuote>(),
         state: new Map<string, State>(),
         store: new Map<string, Store>(),
         'shopping-list': new Map<string, ShoppingList>(),
@@ -170,7 +176,7 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  all<RT extends RepositoryTypes>(
+  all<RT extends ResourceType>(
     projectKey: string,
     typeId: RT
   ): ResourceMap[RT][] {
@@ -181,7 +187,7 @@ export class InMemoryStorage extends AbstractStorage {
     return []
   }
 
-  add<RT extends RepositoryTypes>(
+  add<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     obj: ResourceMap[RT],
@@ -195,7 +201,7 @@ export class InMemoryStorage extends AbstractStorage {
     return cloneObject(resource)
   }
 
-  get<RT extends RepositoryTypes>(
+  get<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     id: string,
@@ -209,7 +215,7 @@ export class InMemoryStorage extends AbstractStorage {
     return null
   }
 
-  getByKey<RT extends RepositoryTypes>(
+  getByKey<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     key: string,
@@ -230,24 +236,24 @@ export class InMemoryStorage extends AbstractStorage {
     return null
   }
 
-  delete<RT extends RepositoryTypes>(
+  delete<RT extends ResourceType>(
     projectKey: string,
     typeId: RT,
     id: string,
     params: GetParams = {}
-  ): BaseResource | null {
+  ): ResourceMap[RT] | null {
     const resource = this.get(projectKey, typeId, id)
 
     if (resource) {
       this.forProjectKey(projectKey)[typeId]?.delete(id)
-      return this.expand(projectKey, resource, params.expand) as ResourceMap[RT]
+      return this.expand(projectKey, resource, params.expand)
     }
     return resource
   }
 
   query(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: ResourceType,
     params: QueryParams
   ): PagedQueryResponse {
     const store = this.forProjectKey(projectKey)[typeId]
@@ -299,7 +305,7 @@ export class InMemoryStorage extends AbstractStorage {
 
   search(
     projectKey: string,
-    typeId: RepositoryTypes,
+    typeId: ResourceType,
     params: QueryParams
   ): PagedQueryResponse {
     let resources = this.all(projectKey, typeId)
@@ -344,10 +350,10 @@ export class InMemoryStorage extends AbstractStorage {
     }
   }
 
-  getByResourceIdentifier<RT extends RepositoryTypes>(
+  getByResourceIdentifier<RT extends ResourceType>(
     projectKey: string,
     identifier: ResourceIdentifier
-  ): ResourceMap[RT] | undefined {
+  ): ResourceMap[RT] | null {
     if (identifier.id) {
       const resource = this.get(projectKey, identifier.typeId, identifier.id)
       if (resource) {
@@ -356,7 +362,7 @@ export class InMemoryStorage extends AbstractStorage {
       console.error(
         `No resource found with typeId=${identifier.typeId}, id=${identifier.id}`
       )
-      return undefined
+      return null
     }
 
     if (identifier.key) {
@@ -378,7 +384,7 @@ export class InMemoryStorage extends AbstractStorage {
         )
       }
     }
-    return undefined
+    return null
   }
 
   addProject = (projectKey: string): Project => {

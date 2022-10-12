@@ -6,16 +6,15 @@ import {
   ExtensionSetKeyAction,
   ExtensionSetTimeoutInMsAction,
   ExtensionUpdateAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Resource, Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
 
-export class ExtensionRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'extension'
+export class ExtensionRepository extends AbstractResourceRepository<'extension'> {
+  getTypeId() {
+    return 'extension' as const
   }
 
   postProcessResource<T extends Resource>(resource: T): T {

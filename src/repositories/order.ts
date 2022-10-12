@@ -25,7 +25,6 @@ import {
   Product,
   ProductPagedQueryResponse,
   ProductVariant,
-  ReferenceTypeId,
   State,
   Store,
 } from '@commercetools/platform-sdk'
@@ -44,9 +43,9 @@ import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 import { CommercetoolsError } from '../exceptions'
 
-export class OrderRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'order'
+export class OrderRepository extends AbstractResourceRepository<'order'> {
+  getTypeId() {
+    return 'order' as const
   }
 
   create(context: RepositoryContext, draft: OrderFromCartDraft): Order {
@@ -85,6 +84,8 @@ export class OrderRepository extends AbstractResourceRepository {
       refusedGifts: [],
       origin: 'Customer',
       syncInfo: [],
+      shippingMode: cart.shippingMode,
+      shipping: cart.shipping,
       store: context.storeKey
         ? {
             key: context.storeKey,
@@ -118,6 +119,9 @@ export class OrderRepository extends AbstractResourceRepository {
       origin: draft.origin || 'Customer',
       paymentState: draft.paymentState,
       refusedGifts: [],
+      shippingMode: 'Single',
+      shipping: [],
+
       store: resolveStoreReference(
         draft.store,
         context.projectKey,
@@ -202,6 +206,8 @@ export class OrderRepository extends AbstractResourceRepository {
       quantity: draft.quantity,
       state: draft.state || [],
       taxRate: draft.taxRate,
+      taxedPricePortions: [],
+      perMethodTaxRate: [],
       totalPrice: createTypedMoney(draft.price.value),
       variant: {
         id: variant.id,
@@ -228,6 +234,7 @@ export class OrderRepository extends AbstractResourceRepository {
       money: createTypedMoney(draft.money),
       name: draft.name,
       quantity: draft.quantity,
+      priceMode: draft.priceMode,
       slug: draft.slug,
       state: [],
       totalPrice: createTypedMoney(draft.money),

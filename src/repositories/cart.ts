@@ -18,7 +18,6 @@ import {
   Product,
   ProductPagedQueryResponse,
   ProductVariant,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
@@ -27,9 +26,9 @@ import { createCustomFields } from './helpers'
 import { Writable } from '../types'
 import { CommercetoolsError } from '../exceptions'
 
-export class CartRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'cart'
+export class CartRepository extends AbstractResourceRepository<'cart'> {
+  getTypeId() {
+    return 'cart' as const
   }
 
   create(context: RepositoryContext, draft: CartDraft): Cart {
@@ -46,21 +45,23 @@ export class CartRepository extends AbstractResourceRepository {
     const resource: Writable<Cart> = {
       ...getBaseResourceProperties(),
       cartState: 'Active',
-      lineItems,
+      country: draft.country,
       customLineItems: [],
+      lineItems,
+      locale: draft.locale,
+      taxCalculationMode: draft.taxCalculationMode ?? 'LineItemLevel',
+      taxMode: draft.taxMode ?? 'Platform',
+      taxRoundingMode: draft.taxRoundingMode ?? 'HalfEven',
       totalPrice: {
         type: 'centPrecision',
         centAmount: 0,
         currencyCode: draft.currency,
         fractionDigits: 0,
       },
-      taxMode: draft.taxMode ?? 'Platform',
-      taxRoundingMode: draft.taxRoundingMode ?? 'HalfEven',
-      taxCalculationMode: draft.taxCalculationMode ?? 'LineItemLevel',
-      refusedGifts: [],
-      locale: draft.locale,
-      country: draft.country,
+      shippingMode: 'Single',
+      shipping: [],
       origin: draft.origin ?? 'Customer',
+      refusedGifts: [],
       custom: createCustomFields(
         draft.custom,
         context.projectKey,
@@ -181,11 +182,13 @@ export class CartRepository extends AbstractResourceRepository {
           id: uuidv4(),
           productId: product.id,
           productKey: product.key,
-          name: product.masterData.current.name,
           productSlug: product.masterData.current.slug,
           productType: product.productType,
+          name: product.masterData.current.name,
           variant,
           price: price,
+          taxedPricePortions: [],
+          perMethodTaxRate: [],
           totalPrice: {
             ...price.value,
             centAmount: price.value.centAmount * quantity,
@@ -403,15 +406,17 @@ export class CartRepository extends AbstractResourceRepository {
       id: uuidv4(),
       productId: product.id,
       productKey: product.key,
-      name: product.masterData.current.name,
       productSlug: product.masterData.current.slug,
       productType: product.productType,
+      name: product.masterData.current.name,
       variant,
       price: price,
       totalPrice: {
         ...price.value,
         centAmount: price.value.centAmount * quant,
       },
+      taxedPricePortions: [],
+      perMethodTaxRate: [],
       quantity: quant,
       discountedPricePerQuantity: [],
       lineItemMode: 'Standard',

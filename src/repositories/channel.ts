@@ -9,16 +9,15 @@ import {
   ChannelSetCustomTypeAction,
   ChannelSetGeoLocationAction,
   ChannelUpdateAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createAddress, createCustomFields } from './helpers'
 
-export class ChannelRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'channel'
+export class ChannelRepository extends AbstractResourceRepository<'channel'> {
+  getTypeId() {
+    return 'channel' as const
   }
 
   create(context: RepositoryContext, draft: ChannelDraft): Channel {

@@ -12,7 +12,6 @@ import {
   ProductUpdateAction,
   ProductVariant,
   ProductVariantDraft,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
@@ -21,9 +20,9 @@ import { Writable } from '../types'
 import { getReferenceFromResourceIdentifier } from './helpers'
 import deepEqual from 'deep-equal'
 
-export class ProductRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'product'
+export class ProductRepository extends AbstractResourceRepository<'product'> {
+  getTypeId() {
+    return 'product' as const
   }
 
   create(context: RepositoryContext, draft: ProductDraft): Product {
@@ -100,7 +99,7 @@ export class ProductRepository extends AbstractResourceRepository {
     },
     unpublish: (
       context: RepositoryContext,
-      resource: Writable<Product>,
+      resource: Writable<Product>
       // { action }: ProductUnpublishAction
     ) => {
       resource.masterData.published = false
@@ -162,7 +161,7 @@ export class ProductRepository extends AbstractResourceRepository {
 
       return resource
     },
-    'setDescription': (
+    setDescription: (
       context: RepositoryContext,
       resource: Writable<Product>,
       { description, staged }: ProductSetDescriptionAction
@@ -176,7 +175,7 @@ export class ProductRepository extends AbstractResourceRepository {
       checkForStagedChanges(resource)
       return resource
     },
-    'setKey': (
+    setKey: (
       context: RepositoryContext,
       resource: Writable<Product>,
       { key }: ProductSetKeyAction

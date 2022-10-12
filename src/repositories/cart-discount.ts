@@ -14,16 +14,15 @@ import {
   CartDiscountValueFixed,
   CartDiscountValueGiftLineItem,
   CartDiscountValueRelative,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createTypedMoney } from './helpers'
 
-export class CartDiscountRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'cart-discount'
+export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
+  getTypeId() {
+    return 'cart-discount' as const
   }
 
   create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {

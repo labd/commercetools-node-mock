@@ -6,16 +6,15 @@ import {
   InventoryEntrySetCustomTypeAction,
   InventoryEntrySetExpectedDeliveryAction,
   InventoryEntrySetRestockableInDaysAction,
-  ReferenceTypeId,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 import { Writable } from '../types'
 
-export class InventoryEntryRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'inventory-entry'
+export class InventoryEntryRepository extends AbstractResourceRepository<'inventory-entry'> {
+  getTypeId() {
+    return 'inventory-entry' as const
   }
 
   create(

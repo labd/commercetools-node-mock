@@ -6,7 +6,7 @@ import { getRepositoryContext } from '../repositories/helpers'
 
 export default abstract class AbstractService {
   protected abstract getBasePath(): string
-  public abstract repository: AbstractResourceRepository
+  public abstract repository: AbstractResourceRepository<any>
 
   createStatusCode = 201
 

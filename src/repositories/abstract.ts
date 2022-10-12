@@ -1,4 +1,4 @@
-import { RepositoryTypes, Resource, Writable } from './../types'
+import { Resource, ResourceType, Writable } from './../types'
 import deepEqual from 'deep-equal'
 
 import {
@@ -104,9 +104,9 @@ export abstract class AbstractRepository {
   }
 }
 
-export abstract class AbstractResourceRepository extends AbstractRepository {
+export abstract class AbstractResourceRepository<T extends ResourceType> extends AbstractRepository {
   abstract create(context: RepositoryContext, draft: any): BaseResource
-  abstract getTypeId(): RepositoryTypes
+  abstract getTypeId(): T
 
   constructor(storage: AbstractStorage) {
     super(storage)
@@ -143,10 +143,10 @@ export abstract class AbstractResourceRepository extends AbstractRepository {
     context: RepositoryContext,
     key: string,
     params: GetParams = {}
-  ): BaseResource | null {
+  ) {
     const resource = this._storage.getByKey(
       context.projectKey,
-      this.getTypeId(),
+      this.getTypeId(), // extension
       key,
       params
     )

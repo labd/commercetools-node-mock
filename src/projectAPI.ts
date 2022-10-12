@@ -1,21 +1,20 @@
-import { ReferenceTypeId } from '@commercetools/platform-sdk'
 import { GetParams } from 'repositories/abstract'
 import { getBaseResourceProperties } from './helpers'
 import { AbstractStorage } from './storage'
+import { RepositoryMap } from './repositories'
 import {
-  Repositories,
-  RepositoryTypes,
   ResourceMap,
+  ResourceType,
 } from './types'
 
 export class ProjectAPI {
   private projectKey: string
   private _storage: AbstractStorage
-  private _repositories: Repositories
+  private _repositories: RepositoryMap
 
   constructor(
     projectKey: string,
-    repositories: Repositories,
+    repositories: RepositoryMap,
     storage: AbstractStorage
   ) {
     this.projectKey = projectKey
@@ -23,10 +22,10 @@ export class ProjectAPI {
     this._repositories = repositories
   }
 
-  add(typeId: ReferenceTypeId, resource: ResourceMap[ReferenceTypeId]) {
+  add<T extends keyof RepositoryMap & keyof ResourceMap>(typeId: T, resource: ResourceMap[T]) {
     const repository = this._repositories[typeId]
     if (repository) {
-      this._storage.add(this.projectKey, typeId as ReferenceTypeId, {
+      this._storage.add(this.projectKey, typeId, {
         ...getBaseResourceProperties(),
         ...resource,
       })
@@ -35,7 +34,7 @@ export class ProjectAPI {
     }
   }
 
-  get<RT extends RepositoryTypes>(
+  get<RT extends ResourceType>(
     typeId: RT,
     id: string,
     params?: GetParams
@@ -49,12 +48,12 @@ export class ProjectAPI {
   }
 
   // TODO: Not sure if we want to expose this...
-  getRepository<RT extends keyof Repositories>(
+  getRepository<RT extends keyof RepositoryMap>(
     typeId: RT
-  ): Repositories[RT] {
+  ): RepositoryMap[RT] {
     const repository = this._repositories[typeId]
     if (repository !== undefined) {
-      return repository
+      return repository as RepositoryMap[RT]
     }
     throw new Error('No such repository')
   }

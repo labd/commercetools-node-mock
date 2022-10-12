@@ -1,7 +1,6 @@
 import { getBaseResourceProperties } from '../helpers'
 import { getReferenceFromResourceIdentifier } from './helpers'
 import {
-  ReferenceTypeId,
   StateReference,
   State,
   StateChangeKeyAction,
@@ -15,9 +14,9 @@ import {
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { Writable } from 'types'
 
-export class StateRepository extends AbstractResourceRepository {
-  getTypeId(): ReferenceTypeId {
-    return 'state'
+export class StateRepository extends AbstractResourceRepository<'state'> {
+  getTypeId() {
+    return 'state' as const
   }
 
   create(context: RepositoryContext, draft: StateDraft): State {
