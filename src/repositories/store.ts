@@ -1,21 +1,21 @@
 import {
+  ChannelReference,
+  ChannelResourceIdentifier,
   Store,
   StoreDraft,
-  StoreUpdateAction,
-  StoreSetNameAction,
-  ChannelReference,
-  StoreSetDistributionChannelsAction,
-  ChannelResourceIdentifier,
-  StoreSetLanguagesAction,
   StoreSetCustomFieldAction,
   StoreSetCustomTypeAction,
+  StoreSetDistributionChannelsAction,
+  StoreSetLanguagesAction,
+  StoreSetNameAction,
+  StoreUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
-  getReferenceFromResourceIdentifier,
   createCustomFields,
+  getReferenceFromResourceIdentifier,
 } from './helpers'
 
 export class StoreRepository extends AbstractResourceRepository<'store'> {

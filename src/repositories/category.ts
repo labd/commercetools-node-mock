@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import {
   Category,
   CategoryChangeAssetNameAction,
@@ -14,10 +13,11 @@ import {
   CategorySetMetaKeywordsAction,
   CategorySetMetaTitleAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
+import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
-import { createCustomFields } from './helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { createCustomFields } from './helpers'
 
 export class CategoryRepository extends AbstractResourceRepository<'category'> {
   getTypeId() {

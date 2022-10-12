@@ -1,6 +1,6 @@
-import AbstractService from './abstract'
 import { Router } from 'express'
 import { ExtensionRepository } from '../repositories/extension'
+import AbstractService from './abstract'
 
 export class ExtensionServices extends AbstractService {
   public repository: ExtensionRepository

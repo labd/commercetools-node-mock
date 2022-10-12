@@ -20,11 +20,11 @@ import {
   ProductVariant,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
+import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
-import { Writable } from '../types'
-import { CommercetoolsError } from '../exceptions'
 
 export class CartRepository extends AbstractResourceRepository<'cart'> {
   getTypeId() {

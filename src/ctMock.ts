@@ -89,7 +89,7 @@ export class CommercetoolsMock {
     }
 
     if (this._repositories === null) {
-      throw new Error("repositories not initialized yet")
+      throw new Error('repositories not initialized yet')
     }
 
     return new ProjectAPI(
@@ -108,7 +108,6 @@ export class CommercetoolsMock {
 
   private createApp(options?: AppOptions): express.Express {
     this._repositories = createRepositories(this._storage)
-
 
     const app = express()
 

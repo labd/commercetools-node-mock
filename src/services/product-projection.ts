@@ -1,7 +1,7 @@
-import { ProductProjectionRepository } from './../repositories/product-projection'
-import AbstractService from './abstract'
 import { Request, Response, Router } from 'express'
 import { getRepositoryContext } from '../repositories/helpers'
+import { ProductProjectionRepository } from './../repositories/product-projection'
+import AbstractService from './abstract'
 
 export class ProductProjectionService extends AbstractService {
   public repository: ProductProjectionRepository

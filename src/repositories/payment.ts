@@ -11,18 +11,18 @@ import {
   Transaction,
   TransactionDraft,
 } from '@commercetools/platform-sdk'
+import { v4 as uuidv4 } from 'uuid'
+import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
   createCustomFields,
   createTypedMoney,
   getReferenceFromResourceIdentifier,
 } from './helpers'
-import { getBaseResourceProperties } from '../helpers'
-import { v4 as uuidv4 } from 'uuid'
-import { Writable } from '../types'
 
 export class PaymentRepository extends AbstractResourceRepository<'payment'> {
-  getTypeId()  {
+  getTypeId() {
     return 'payment' as const
   }
 

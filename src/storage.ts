@@ -1,46 +1,50 @@
-import assert from 'assert'
 import {
   BaseResource,
   Cart,
+  CartDiscount,
   Category,
+  Channel,
   Customer,
+  CustomerGroup,
   CustomObject,
+  DiscountCode,
+  Extension,
+  InvalidInputError,
   InventoryEntry,
   Order,
   PagedQueryResponse,
+  Payment,
+  Product,
+  ProductDiscount,
+  ProductProjection,
+  ProductType,
+  Project,
   QueryParam,
+  Quote,
+  QuoteRequest,
   Reference,
   ResourceIdentifier,
-  Product,
-  Store,
-  Type,
-  Payment,
-  Project,
-  State,
-  TaxCategory,
   ShippingMethod,
-  ProductType,
-  InvalidInputError,
-  ProductProjection,
   ShoppingList,
-  Extension,
-  CartDiscount,
-  CustomerGroup,
-  DiscountCode,
-  Zone,
-  Channel,
-  Subscription,
-  ProductDiscount,
   StagedQuote,
-  QuoteRequest,
-  Quote,
+  State,
+  Store,
+  Subscription,
+  TaxCategory,
+  Type,
+  Zone,
 } from '@commercetools/platform-sdk'
-import { parseExpandClause } from './lib/expandParser'
-import { PagedQueryResponseMap, ResourceMap, ResourceType } from './types'
-import { Writable } from './types'
-import { parseQueryExpression } from './lib/predicateParser'
+import assert from 'assert'
 import { CommercetoolsError } from './exceptions'
 import { cloneObject } from './helpers'
+import { parseExpandClause } from './lib/expandParser'
+import { parseQueryExpression } from './lib/predicateParser'
+import {
+  PagedQueryResponseMap,
+  ResourceMap,
+  ResourceType,
+  Writable,
+} from './types'
 
 type GetParams = {
   expand?: string[]
@@ -132,37 +136,37 @@ export class InMemoryStorage extends AbstractStorage {
     let projectStorage = this.resources[projectKey]
     if (!projectStorage) {
       projectStorage = this.resources[projectKey] = {
-        'cart': new Map<string, Cart>(),
+        cart: new Map<string, Cart>(),
         'cart-discount': new Map<string, CartDiscount>(),
-        'category': new Map<string, Category>(),
-        'channel': new Map<string, Channel>(),
-        'customer': new Map<string, Customer>(),
+        category: new Map<string, Category>(),
+        channel: new Map<string, Channel>(),
+        customer: new Map<string, Customer>(),
         'customer-group': new Map<string, CustomerGroup>(),
         'discount-code': new Map<string, DiscountCode>(),
-        'extension': new Map<string, Extension>(),
+        extension: new Map<string, Extension>(),
         'inventory-entry': new Map<string, InventoryEntry>(),
         'key-value-document': new Map<string, CustomObject>(),
-        'order': new Map<string, Order>(),
+        order: new Map<string, Order>(),
         'order-edit': new Map<string, any>(),
-        'payment': new Map<string, Payment>(),
-        'product': new Map<string, Product>(),
-        'quote': new Map<string, Quote>(),
+        payment: new Map<string, Payment>(),
+        product: new Map<string, Product>(),
+        quote: new Map<string, Quote>(),
         'quote-request': new Map<string, QuoteRequest>(),
         'product-discount': new Map<string, ProductDiscount>(),
         'product-selection': new Map<string, any>(),
         'product-type': new Map<string, ProductType>(),
         'product-projection': new Map<string, ProductProjection>(),
-        'review': new Map<string, any>(),
+        review: new Map<string, any>(),
         'shipping-method': new Map<string, ShippingMethod>(),
         'staged-quote': new Map<string, StagedQuote>(),
-        'state': new Map<string, State>(),
-        'store': new Map<string, Store>(),
+        state: new Map<string, State>(),
+        store: new Map<string, Store>(),
         'shopping-list': new Map<string, ShoppingList>(),
         'standalone-price': new Map<string, any>(),
-        'subscription': new Map<string, Subscription>(),
+        subscription: new Map<string, Subscription>(),
         'tax-category': new Map<string, TaxCategory>(),
-        'type': new Map<string, Type>(),
-        'zone': new Map<string, Zone>(),
+        type: new Map<string, Type>(),
+        zone: new Map<string, Zone>(),
       }
     }
     return projectStorage
@@ -299,7 +303,7 @@ export class InMemoryStorage extends AbstractStorage {
       total: resources.length,
       offset: offset,
       limit: limit,
-      results: resources.map(cloneObject)
+      results: resources.map(cloneObject),
     } as PagedQueryResponseMap[RT]
   }
 

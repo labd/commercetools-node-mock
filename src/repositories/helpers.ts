@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import {
   Address,
   BaseAddress,
@@ -18,9 +17,10 @@ import {
   TypedMoney,
 } from '@commercetools/platform-sdk'
 import { Request } from 'express'
+import { v4 as uuidv4 } from 'uuid'
+import { CommercetoolsError } from '../exceptions'
 import { AbstractStorage } from '../storage'
 import { RepositoryContext } from './abstract'
-import { CommercetoolsError } from '../exceptions'
 
 export const createAddress = (
   base: BaseAddress | undefined,

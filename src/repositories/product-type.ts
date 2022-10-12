@@ -1,4 +1,3 @@
-import { getBaseResourceProperties } from '../helpers'
 import {
   AttributeDefinition,
   AttributeDefinitionDraft,
@@ -13,8 +12,9 @@ import {
   ProductTypeRemoveEnumValuesAction,
   ProductTypeUpdateAction,
 } from '@commercetools/platform-sdk'
+import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { Writable } from 'types'
 
 export class ProductTypeRepository extends AbstractResourceRepository<'product-type'> {
   getTypeId() {

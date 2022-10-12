@@ -4,9 +4,9 @@ import {
   CentPrecisionMoney,
   ProductDraft,
 } from '@commercetools/platform-sdk'
+import assert from 'assert'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
-import assert from 'assert'
 
 describe('Carts Query', () => {
   const ctMock = new CommercetoolsMock()

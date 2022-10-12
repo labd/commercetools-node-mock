@@ -1,18 +1,18 @@
-import { getBaseResourceProperties } from '../helpers'
-import { getReferenceFromResourceIdentifier } from './helpers'
 import {
-  StateReference,
   State,
   StateChangeKeyAction,
   StateDraft,
+  StateReference,
   StateSetDescriptionAction,
   StateSetNameAction,
   StateSetRolesAction,
   StateSetTransitionsAction,
   StateUpdateAction,
 } from '@commercetools/platform-sdk'
+import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { Writable } from 'types'
+import { getReferenceFromResourceIdentifier } from './helpers'
 
 export class StateRepository extends AbstractResourceRepository<'state'> {
   getTypeId() {

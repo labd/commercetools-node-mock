@@ -1,8 +1,8 @@
-import AbstractService from './abstract'
+import { CustomObjectDraft } from '@commercetools/platform-sdk'
 import { Request, Response, Router } from 'express'
 import { CustomObjectRepository } from '../repositories/custom-object'
-import { CustomObjectDraft } from '@commercetools/platform-sdk'
 import { getRepositoryContext } from '../repositories/helpers'
+import AbstractService from './abstract'
 
 export class CustomObjectService extends AbstractService {
   public repository: CustomObjectRepository

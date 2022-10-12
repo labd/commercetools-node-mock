@@ -1,11 +1,11 @@
 import {
   OrderEdit,
   OrderEditDraft,
-  OrderEditUpdateAction,
   OrderEditResult,
+  OrderEditUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class OrderEditRepository extends AbstractResourceRepository<'order-edit'> {

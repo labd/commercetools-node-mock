@@ -1,6 +1,4 @@
-import {
-  ProductProjection,
-} from '@commercetools/platform-sdk'
+import { ProductProjection } from '@commercetools/platform-sdk'
 import { applyPriceSelector } from './priceSelector'
 
 describe('priceSelector', () => {

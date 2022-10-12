@@ -1,8 +1,7 @@
-import { Router } from 'express'
-import { Request, Response } from 'express'
-import { ProjectRepository } from '../repositories/project'
 import { Update } from '@commercetools/platform-sdk'
+import { Request, Response, Router } from 'express'
 import { getRepositoryContext } from '../repositories/helpers'
+import { ProjectRepository } from '../repositories/project'
 
 export class ProjectService {
   public repository: ProjectRepository

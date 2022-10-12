@@ -1,6 +1,6 @@
+import { Router } from 'express'
 import { TaxCategoryRepository } from '../repositories/tax-category'
 import AbstractService from './abstract'
-import { Router } from 'express'
 
 export class TaxCategoryService extends AbstractService {
   public repository: TaxCategoryRepository

@@ -1,6 +1,6 @@
 import { CustomObject } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
 import supertest from 'supertest'
+import { getBaseResourceProperties } from '../helpers'
 import { CommercetoolsMock } from '../index'
 
 describe('CustomObject create', () => {

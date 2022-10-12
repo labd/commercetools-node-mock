@@ -7,9 +7,9 @@ import {
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
+import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { CommercetoolsError } from '../exceptions'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   getTypeId() {

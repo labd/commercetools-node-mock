@@ -18,8 +18,8 @@ import {
   ProductDiscountValueExternal,
   ProductDiscountValueRelative,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
+import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createTypedMoney } from './helpers'
 

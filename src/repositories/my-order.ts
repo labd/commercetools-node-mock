@@ -1,14 +1,13 @@
-import assert from 'assert'
 import {
   CartReference,
   MyOrderFromCartDraft,
   Order,
 } from '@commercetools/platform-sdk'
-import { OrderRepository } from './order'
+import assert from 'assert'
 import { RepositoryContext } from './abstract'
+import { OrderRepository } from './order'
 
 export class MyOrderRepository extends OrderRepository {
-
   create(context: RepositoryContext, draft: MyOrderFromCartDraft): Order {
     assert(draft.id, 'draft.id is missing')
     const cartIdentifier = {

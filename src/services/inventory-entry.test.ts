@@ -1,5 +1,5 @@
-import assert from 'assert'
 import { InventoryEntry, Type } from '@commercetools/platform-sdk'
+import assert from 'assert'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 
