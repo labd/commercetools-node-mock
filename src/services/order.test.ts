@@ -137,21 +137,13 @@ describe('Order payment tests', () => {
     }
 
     const order: Order = {
+      ...getBaseResourceProperties(),
       customLineItems: [],
       lastMessageSequenceNumber: 0,
       lineItems: [],
+      orderNumber: '1337',
       orderState: 'Open',
       origin: 'Customer',
-      refusedGifts: [],
-      syncInfo: [],
-      totalPrice: {
-        type: 'centPrecision',
-        fractionDigits: 2,
-        centAmount: 2000,
-        currencyCode: 'EUR',
-      },
-      ...getBaseResourceProperties(),
-      orderNumber: '1337',
       paymentInfo: {
         payments: [
           {
@@ -159,6 +151,16 @@ describe('Order payment tests', () => {
             id: payment.id,
           },
         ],
+      },
+      refusedGifts: [],
+      shipping: [],
+      shippingMode: 'Single',
+      syncInfo: [],
+      totalPrice: {
+        type: 'centPrecision',
+        fractionDigits: 2,
+        centAmount: 2000,
+        currencyCode: 'EUR',
       },
     }
 
@@ -228,21 +230,13 @@ describe('Order payment tests', () => {
     }
 
     const order: Order = {
+      ...getBaseResourceProperties(),
       customLineItems: [],
       lastMessageSequenceNumber: 0,
       lineItems: [],
+      orderNumber: '1337',
       orderState: 'Open',
       origin: 'Customer',
-      refusedGifts: [],
-      syncInfo: [],
-      totalPrice: {
-        type: 'centPrecision',
-        fractionDigits: 2,
-        centAmount: 2000,
-        currencyCode: 'EUR',
-      },
-      ...getBaseResourceProperties(),
-      orderNumber: '1337',
       paymentInfo: {
         payments: [
           {
@@ -250,6 +244,16 @@ describe('Order payment tests', () => {
             id: payment.id,
           },
         ],
+      },
+      refusedGifts: [],
+      shipping: [],
+      shippingMode: 'Single',
+      syncInfo: [],
+      totalPrice: {
+        type: 'centPrecision',
+        fractionDigits: 2,
+        centAmount: 2000,
+        currencyCode: 'EUR',
       },
     }
 
