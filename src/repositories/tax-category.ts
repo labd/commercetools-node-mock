@@ -37,22 +37,6 @@ export class TaxCategoryRepository extends AbstractResourceRepository<'tax-categ
     amount: draft.amount || 0,
   })
 
-  getWithKey(context: RepositoryContext, key: string): TaxCategory | undefined {
-    const result = this._storage.query(context.projectKey, this.getTypeId(), {
-      where: [`key="${key}"`],
-    })
-    if (result.count === 1) {
-      return result.results[0] as TaxCategory
-    }
-
-    // Catch this for now, should be checked when creating/updating
-    if (result.count > 1) {
-      throw new Error('Duplicate tax category key')
-    }
-
-    return
-  }
-
   actions: Partial<
     Record<
       TaxCategoryUpdateAction['action'],

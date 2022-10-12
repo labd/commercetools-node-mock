@@ -72,25 +72,6 @@ export class ProductDiscountRepository extends AbstractResourceRepository<'produ
     }
   }
 
-  getWithKey(
-    context: RepositoryContext,
-    key: string
-  ): ProductDiscount | undefined {
-    const result = this._storage.query(context.projectKey, this.getTypeId(), {
-      where: [`key="${key}"`],
-    })
-    if (result.count === 1) {
-      return result.results[0] as ProductDiscount
-    }
-
-    // Catch this for now, should be checked when creating/updating
-    if (result.count > 1) {
-      throw new Error('Duplicate product discount key')
-    }
-
-    return
-  }
-
   actions: Partial<
     Record<
       ProductDiscountUpdateAction['action'],
