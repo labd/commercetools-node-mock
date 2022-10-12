@@ -21,6 +21,8 @@ describe('Order repository', () => {
         fractionDigits: 2,
       },
       cartState: 'Active',
+      shippingMode: 'Single',
+      shipping: [],
       taxMode: 'Platform',
       taxRoundingMode: 'HalfEven',
       taxCalculationMode: 'UnitPriceLevel',
@@ -29,18 +31,19 @@ describe('Order repository', () => {
     }
 
     storage.add('dummy', 'cart', cart)
+    const ctx = { projectKey: 'dummy' }
 
-    const result = repository.create(
-      { projectKey: 'dummy' },
-      {
-        cart: {
-          id: cart.id,
-          typeId: 'cart',
-        },
-        version: cart.version,
-      }
-    )
+    const result = repository.create(ctx, {
+      cart: {
+        id: cart.id,
+        typeId: 'cart',
+      },
+      version: cart.version,
+    })
     expect(result.cart?.id).toBe(cart.id)
+
+    const items = repository.query(ctx)
+    expect(items.count).toBe(1)
   })
 
   test('create from cart - in store', async () => {
@@ -58,6 +61,8 @@ describe('Order repository', () => {
         fractionDigits: 2,
       },
       cartState: 'Active',
+      shippingMode: 'Single',
+      shipping: [],
       taxMode: 'Platform',
       taxRoundingMode: 'HalfEven',
       taxCalculationMode: 'UnitPriceLevel',
