@@ -60,21 +60,6 @@ export class StoreRepository extends AbstractResourceRepository<'store'> {
     )
   }
 
-  getWithKey(context: RepositoryContext, key: string): Store | undefined {
-    const result = this._storage.query(context.projectKey, this.getTypeId(), {
-      where: [`key="${key}"`],
-    })
-    if (result.count === 1) {
-      return result.results[0] as Store
-    }
-
-    if (result.count > 1) {
-      throw new Error('Duplicate store key')
-    }
-
-    return
-  }
-
   actions: Partial<
     Record<
       StoreUpdateAction['action'],

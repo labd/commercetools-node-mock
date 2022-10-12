@@ -50,22 +50,6 @@ export class ProductTypeRepository extends AbstractResourceRepository<'product-t
     isSearchable: draft.isSearchable ?? true,
   })
 
-  getWithKey(context: RepositoryContext, key: string): ProductType | undefined {
-    const result = this._storage.query(context.projectKey, this.getTypeId(), {
-      where: [`key="${key}"`],
-    })
-    if (result.count === 1) {
-      return result.results[0] as ProductType
-    }
-
-    // Catch this for now, should be checked when creating/updating
-    if (result.count > 1) {
-      throw new Error('Duplicate product type key')
-    }
-
-    return
-  }
-
   actions: Partial<
     Record<
       ProductTypeUpdateAction['action'],

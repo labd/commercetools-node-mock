@@ -1,7 +1,6 @@
 import { ProductDiscountRepository } from '../repositories/product-discount'
 import AbstractService from './abstract'
-import { Request, Response, Router } from 'express'
-import { getRepositoryContext } from '../repositories/helpers'
+import { Router } from 'express'
 
 export class ProductDiscountService extends AbstractService {
   public repository: ProductDiscountRepository
@@ -13,20 +12,5 @@ export class ProductDiscountService extends AbstractService {
 
   getBasePath() {
     return 'product-discounts'
-  }
-
-  extraRoutes(router: Router) {
-    router.get('/key=:key', this.getWithKey.bind(this))
-  }
-
-  getWithKey(request: Request, response: Response) {
-    const resource = this.repository.getWithKey(
-      getRepositoryContext(request),
-      request.params.key
-    )
-    if (resource) {
-      return response.status(200).send(resource)
-    }
-    return response.status(404).send('Not found')
   }
 }
