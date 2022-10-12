@@ -26,12 +26,19 @@ export class ProductProjectionRepository extends AbstractResourceRepository<'pro
   }
 
   query(context: RepositoryContext, params: QueryParams = {}) {
-    return this._storage.query(context.projectKey, 'product', {
+    const response = this._storage.query(context.projectKey, 'product', {
       expand: params.expand,
       where: params.where,
       offset: params.offset,
       limit: params.limit,
     })
+
+    return {
+      ...response,
+      results: response.results.map((r) =>
+        this._searchService.transform(r, false)
+      ),
+    }
   }
 
   search(context: RepositoryContext, query: ParsedQs) {
