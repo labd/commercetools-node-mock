@@ -1,16 +1,15 @@
-import { Resource, ResourceType, Writable } from './../types'
-import deepEqual from 'deep-equal'
-
 import {
   BaseResource,
   Project,
   ResourceNotFoundError,
   UpdateAction,
 } from '@commercetools/platform-sdk'
-import { AbstractStorage } from '../storage'
-import { checkConcurrentModification } from './errors'
+import deepEqual from 'deep-equal'
 import { CommercetoolsError } from '../exceptions'
 import { cloneObject } from '../helpers'
+import { AbstractStorage } from '../storage'
+import { ResourceMap, ResourceType, ShallowWritable } from './../types'
+import { checkConcurrentModification } from './errors'
 
 export type QueryParams = {
   expand?: string[]
@@ -27,7 +26,8 @@ export type RepositoryContext = {
   projectKey: string
   storeKey?: string
 }
-export abstract class AbstractRepository {
+
+export abstract class AbstractRepository<R extends BaseResource | Project> {
   protected _storage: AbstractStorage
   protected actions: Partial<
     Record<
@@ -40,22 +40,22 @@ export abstract class AbstractRepository {
     this._storage = storage
   }
 
-  abstract saveNew({ projectKey }: RepositoryContext, resource: Resource): void
+  abstract saveNew({ projectKey }: RepositoryContext, resource: R): void
 
   abstract saveUpdate(
     { projectKey }: RepositoryContext,
     version: number,
-    resource: Resource
+    resource: R
   ): void
 
-  processUpdateActions<T extends Resource>(
+  processUpdateActions(
     context: RepositoryContext,
-    resource: T,
+    resource: R,
     version: number,
     actions: UpdateAction[]
-  ): T {
+  ): R {
     // Deep-copy
-    const updatedResource = cloneObject(resource) as Writable<Resource>
+    const updatedResource = cloneObject(resource) as ShallowWritable<R>
     const identifier = (resource as BaseResource).id
       ? (resource as BaseResource).id
       : (resource as Project).key
@@ -96,20 +96,24 @@ export abstract class AbstractRepository {
     if (!result) {
       throw new Error('invalid post process action')
     }
-    return result as T
+    return result
   }
 
-  postProcessResource<T extends Resource>(resource: T): T {
-    return resource
-  }
+  abstract postProcessResource(resource: any): any
 }
 
-export abstract class AbstractResourceRepository<T extends ResourceType> extends AbstractRepository {
-  abstract create(context: RepositoryContext, draft: any): BaseResource
+export abstract class AbstractResourceRepository<
+  T extends ResourceType
+> extends AbstractRepository<ResourceMap[T]> {
+  abstract create(context: RepositoryContext, draft: any): ResourceMap[T]
   abstract getTypeId(): T
 
   constructor(storage: AbstractStorage) {
     super(storage)
+  }
+
+  postProcessResource(resource: ResourceMap[T]): ResourceMap[T] {
+    return resource
   }
 
   query(context: RepositoryContext, params: QueryParams = {}) {
@@ -129,7 +133,7 @@ export abstract class AbstractResourceRepository<T extends ResourceType> extends
     context: RepositoryContext,
     id: string,
     params: GetParams = {}
-  ): BaseResource | null {
+  ): ResourceMap[T] | null {
     const resource = this._storage.get(
       context.projectKey,
       this.getTypeId(),
@@ -143,10 +147,10 @@ export abstract class AbstractResourceRepository<T extends ResourceType> extends
     context: RepositoryContext,
     key: string,
     params: GetParams = {}
-  ) {
+  ): ResourceMap[T] | null {
     const resource = this._storage.getByKey(
       context.projectKey,
-      this.getTypeId(), // extension
+      this.getTypeId(),
       key,
       params
     )
@@ -157,7 +161,7 @@ export abstract class AbstractResourceRepository<T extends ResourceType> extends
     context: RepositoryContext,
     id: string,
     params: GetParams = {}
-  ): BaseResource | null {
+  ): ResourceMap[T] | null {
     const resource = this._storage.delete(
       context.projectKey,
       this.getTypeId(),
@@ -167,7 +171,10 @@ export abstract class AbstractResourceRepository<T extends ResourceType> extends
     return resource ? this.postProcessResource(resource) : null
   }
 
-  saveNew(context: RepositoryContext, resource: Writable<BaseResource>) {
+  saveNew(
+    context: RepositoryContext,
+    resource: ShallowWritable<ResourceMap[T]>
+  ) {
     resource.version = 1
     this._storage.add(context.projectKey, this.getTypeId(), resource as any)
   }
@@ -175,7 +182,7 @@ export abstract class AbstractResourceRepository<T extends ResourceType> extends
   saveUpdate(
     context: RepositoryContext,
     version: number,
-    resource: Writable<BaseResource>
+    resource: ShallowWritable<ResourceMap[T]>
   ) {
     // Check if the resource still exists.
     const current = this._storage.get(

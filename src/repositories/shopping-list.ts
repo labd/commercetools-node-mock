@@ -11,9 +11,10 @@ import {
 } from './helpers'
 
 export class ShoppingListRepository extends AbstractResourceRepository<'shopping-list'> {
-  getTypeId()  {
+  getTypeId() {
     return 'shopping-list' as const
   }
+
   create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {
     // const product =
 

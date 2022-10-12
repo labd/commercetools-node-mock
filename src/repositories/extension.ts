@@ -7,7 +7,7 @@ import {
   ExtensionSetTimeoutInMsAction,
   ExtensionUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Resource, Writable } from '../types'
+import { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { maskSecretValue } from '../lib/masking'
@@ -17,7 +17,7 @@ export class ExtensionRepository extends AbstractResourceRepository<'extension'>
     return 'extension' as const
   }
 
-  postProcessResource<T extends Resource>(resource: T): T {
+  postProcessResource(resource: Extension): Extension {
     if (resource) {
       const extension = resource as Extension
       if (
@@ -27,7 +27,7 @@ export class ExtensionRepository extends AbstractResourceRepository<'extension'>
         return maskSecretValue(
           extension,
           'destination.authentication.headerValue'
-        ) as T
+        )
       } else if (extension.destination.type == 'AWSLambda') {
         return maskSecretValue(resource, 'destination.accessSecret')
       }

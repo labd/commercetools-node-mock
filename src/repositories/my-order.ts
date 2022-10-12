@@ -8,6 +8,7 @@ import { OrderRepository } from './order'
 import { RepositoryContext } from './abstract'
 
 export class MyOrderRepository extends OrderRepository {
+
   create(context: RepositoryContext, draft: MyOrderFromCartDraft): Order {
     assert(draft.id, 'draft.id is missing')
     const cartIdentifier = {
