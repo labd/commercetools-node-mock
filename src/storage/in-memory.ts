@@ -1,5 +1,4 @@
 import {
-  BaseResource,
   Cart,
   CartDiscount,
   Category,
@@ -19,7 +18,6 @@ import {
   ProductProjection,
   ProductType,
   Project,
-  QueryParam,
   Quote,
   QuoteRequest,
   Reference,
@@ -35,91 +33,22 @@ import {
   Zone,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
-import { CommercetoolsError } from './exceptions'
-import { cloneObject } from './helpers'
-import { parseExpandClause } from './lib/expandParser'
-import { parseQueryExpression } from './lib/predicateParser'
+import { CommercetoolsError } from '../exceptions'
+import { cloneObject } from '../helpers'
+import { parseExpandClause } from '../lib/expandParser'
+import { parseQueryExpression } from '../lib/predicateParser'
 import {
   PagedQueryResponseMap,
   ResourceMap,
   ResourceType,
   Writable,
-} from './types'
-
-type GetParams = {
-  expand?: string[]
-}
-
-type QueryParams = {
-  expand?: string | string[]
-  sort?: string | string[]
-  limit?: number
-  offset?: number
-  withTotal?: boolean
-  where?: string | string[]
-  [key: string]: QueryParam
-}
-
-export abstract class AbstractStorage {
-  abstract clear(): void
-
-  abstract all<RT extends ResourceType>(
-    projectKey: string,
-    typeId: RT
-  ): Array<ResourceMap[RT]>
-
-  abstract add<RT extends ResourceType>(
-    projectKey: string,
-    typeId: RT,
-    obj: ResourceMap[RT]
-  ): void
-
-  abstract get<RT extends ResourceType>(
-    projectKey: string,
-    typeId: RT,
-    id: string,
-    params?: GetParams
-  ): ResourceMap[RT] | null
-
-  abstract getByKey<RT extends ResourceType>(
-    projectKey: string,
-    typeId: RT,
-    key: string,
-    params: GetParams
-  ): ResourceMap[RT] | null
-
-  abstract addProject(projectKey: string): Project
-  abstract getProject(projectKey: string): Project
-  abstract saveProject(project: Project): Project
-
-  abstract delete<RT extends ResourceType>(
-    projectKey: string,
-    typeId: RT,
-    id: string,
-    params: GetParams
-  ): ResourceMap[RT] | null
-
-  abstract query<RT extends ResourceType>(
-    projectKey: string,
-    typeId: RT,
-    params: QueryParams
-  ): PagedQueryResponseMap[RT]
-
-  abstract getByResourceIdentifier<RT extends ResourceType>(
-    projectKey: string,
-    identifier: ResourceIdentifier
-  ): ResourceMap[RT] | null
-
-  abstract expand<T>(
-    projectKey: string,
-    obj: T,
-    clause: undefined | string | string[]
-  ): T
-}
-
-type ProjectStorage = {
-  [index in ResourceType]: Map<string, BaseResource>
-}
+} from '../types'
+import {
+  AbstractStorage,
+  GetParams,
+  ProjectStorage,
+  QueryParams,
+} from './abstract'
 
 export class InMemoryStorage extends AbstractStorage {
   protected resources: {
