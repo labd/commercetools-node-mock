@@ -83,6 +83,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       { messagesConfiguration }: ProjectChangeMessagesConfigurationAction
     ) => {
       resource.messages.enabled = messagesConfiguration.enabled
+      resource.messages.deleteDaysAfterCreation = messagesConfiguration.deleteDaysAfterCreation
     },
     changeProductSearchIndexingEnabled: (
       context: RepositoryContext,
