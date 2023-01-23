@@ -29,13 +29,13 @@ export class ProjectService {
       return response.status(404).send({})
     }
 
-    this.repository.processUpdateActions(
+    const updatedResource = this.repository.processUpdateActions(
       getRepositoryContext(request),
       project,
       updateRequest.version,
       updateRequest.actions
     )
 
-    return response.status(200).send({})
+    return response.status(200).send(updatedResource)
   }
 }
