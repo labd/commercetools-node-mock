@@ -1,5 +1,6 @@
 import {
   State,
+  StateChangeInitialAction,
   StateChangeKeyAction,
   StateDraft,
   StateReference,
@@ -50,6 +51,13 @@ export class StateRepository extends AbstractResourceRepository<'state'> {
       { key }: StateChangeKeyAction
     ) => {
       resource.key = key
+    },
+    changeInitial: (
+      context: RepositoryContext,
+      resource: Writable<State>,
+      {initial }: StateChangeInitialAction
+    ) => {
+      resource.initial = initial
     },
     setDescription: (
       context: RepositoryContext,
