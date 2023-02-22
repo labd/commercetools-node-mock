@@ -1,4 +1,9 @@
-import { Product, ProductData, ProductDraft } from '@commercetools/platform-sdk'
+import {
+  Image,
+  Product,
+  ProductData,
+  ProductDraft,
+} from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
@@ -293,5 +298,61 @@ describe('Product update actions', () => {
     ).toHaveLength(1)
     const attr = response.body.masterData.staged.masterVariant.attributes[0]
     expect(attr).toEqual({ name: 'test', value: 'foo' })
+  })
+
+  test('addExternalImage variant', async () => {
+    assert(productPublished, 'product not created')
+
+    const image: Image = {
+      url: 'http://example.com/image',
+      dimensions: { w: 100, h: 100 },
+    }
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${productPublished.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'addExternalImage', sku: '1338', image }],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.masterData.staged.variants[0].images).toHaveLength(1)
+    const attr = response.body.masterData.staged.variants[0].images[0]
+    expect(attr).toEqual(image)
+  })
+
+  test('removeImage variant', async () => {
+    assert(productPublished, 'product not created')
+
+    const image: Image = {
+      url: 'http://example.com/image',
+      dimensions: { w: 100, h: 100 },
+    }
+
+    {
+      const response = await supertest(ctMock.app)
+        .post(`/dummy/products/${productPublished.id}`)
+        .send({
+          version: 1,
+          actions: [{ action: 'addExternalImage', sku: '1338', image }],
+        })
+      expect(response.status).toBe(200)
+      expect(response.body.version).toBe(2)
+    }
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${productPublished.id}`)
+      .send({
+        version: 2,
+        actions: [
+          {
+            action: 'removeImage',
+            sku: '1338',
+            imageUrl: image.url,
+          },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(3)
+    expect(response.body.masterData.staged.variants[0].images).toHaveLength(0)
   })
 })

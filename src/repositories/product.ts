@@ -7,6 +7,8 @@ import {
   ProductPublishAction,
   ProductSetAttributeAction,
   ProductSetDescriptionAction,
+  ProductAddExternalImageAction,
+  ProductRemoveImageAction,
   ProductSetKeyAction,
   ProductTypeReference,
   ProductUpdateAction,
@@ -183,6 +185,114 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
       resource.key = key
       return resource
     },
+    addExternalImage: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { variantId, sku, image, staged }: ProductAddExternalImageAction
+    ) => {
+      const addImg = (data: Writable<ProductData>) => {
+        const { variant, isMasterVariant, variantIndex } = getVariant(
+          data,
+          variantId,
+          sku
+        )
+        if (!variant) {
+          throw new Error(
+            `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+          )
+        }
+
+        if (!variant.images) {
+          variant.images = []
+        } else {
+          const existingImage = variant.images.find((x) => x.url === image.url)
+          if (existingImage) {
+            throw new Error(
+              `Cannot add image '${image.url}' because product '${resource.id}' already has that image.`
+            )
+          }
+        }
+
+        // Add image
+        variant.images.push(image)
+
+        if (isMasterVariant) {
+          data.masterVariant = variant
+        } else {
+          data.variants[variantIndex] = variant
+        }
+      }
+
+      // If true, only the staged Attribute is set. If false, both current and
+      // staged Attribute is set.  Default is true
+      const onlyStaged = staged !== undefined ? staged : true
+
+      // Write the attribute to the staged data
+      addImg(resource.masterData.staged)
+
+      // Also write to published data is isStaged = false
+      // if isStaged is false we set the attribute on both the staged and
+      // published data.
+      if (!onlyStaged) {
+        addImg(resource.masterData.current)
+      }
+      checkForStagedChanges(resource)
+
+      return resource
+    },
+    removeImage: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { variantId, sku, imageUrl, staged }: ProductRemoveImageAction
+    ) => {
+      const removeImg = (data: Writable<ProductData>) => {
+        const { variant, isMasterVariant, variantIndex } = getVariant(
+          data,
+          variantId,
+          sku
+        )
+        if (!variant) {
+          throw new Error(
+            `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+          )
+        }
+
+        const variantImages = variant.images ?? []
+        const existingImage = variantImages.find((x) => x.url === imageUrl)
+        if (!existingImage) {
+          throw new Error(
+            `Cannot remove image '${imageUrl}' because product '${resource.id}' does not have that image.`
+          )
+        }
+
+        // Remove image
+        variant.images = variantImages.filter((image) => image.url !== imageUrl)
+
+        if (isMasterVariant) {
+          data.masterVariant = variant
+        } else {
+          data.variants[variantIndex] = variant
+        }
+      }
+
+      // If true, only the staged Attribute is set. If false, both current and
+      // staged Attribute is set.  Default is true
+      const onlyStaged = staged !== undefined ? staged : true
+
+      // Write the attribute to the staged data
+      removeImg(resource.masterData.staged)
+
+      // Also write to published data is isStaged = false
+      // if isStaged is false we set the attribute on both the staged and
+      // published data.
+      if (!onlyStaged) {
+        removeImg(resource.masterData.current)
+      }
+      checkForStagedChanges(resource)
+
+      return resource
+    },
+
     // 'changeName': () => {},
     // 'changeSlug': () => {},
     // 'addVariant': () => {},
@@ -202,9 +312,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
     // 'setTaxCategory': () => {},
     // 'setSku': () => {},
     // 'setProductVariantKey': () => {},
-    // 'addExternalImage': () => {},
     // 'moveImageToPosition': () => {},
-    // 'removeImage': () => {},
     // 'setImageLabel': () => {},
     // 'addAsset': () => {},
     // 'removeAsset': () => {},
