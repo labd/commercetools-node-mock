@@ -14,6 +14,7 @@ import {
   ProductUpdateAction,
   ProductVariant,
   ProductVariantDraft,
+  ProductMoveImageToPositionAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { Writable } from '../types'
@@ -292,6 +293,73 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
       return resource
     },
+    moveImageToPosition: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      {
+        variantId,
+        sku,
+        imageUrl,
+        position,
+        staged,
+      }: ProductMoveImageToPositionAction
+    ) => {
+      const moveImg = (data: Writable<ProductData>) => {
+        const { variant, isMasterVariant, variantIndex } = getVariant(
+          data,
+          variantId,
+          sku
+        )
+        if (!variant) {
+          throw new Error(
+            `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+          )
+        }
+
+        const variantImages = variant.images ?? []
+        const existingImage = variantImages.find((x) => x.url === imageUrl)
+        if (!existingImage) {
+          throw new Error(
+            `Cannot move image '${imageUrl}' because product '${resource.id}' does not have that image.`
+          )
+        }
+
+        if (position >= variantImages.length) {
+          throw new Error(
+            `Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.`
+          )
+        }
+
+        // Remove image
+        variant.images = variantImages.filter((image) => image.url !== imageUrl)
+
+        // Re-add image to the correct position
+        variant.images.splice(position, 0, existingImage)
+
+        if (isMasterVariant) {
+          data.masterVariant = variant
+        } else {
+          data.variants[variantIndex] = variant
+        }
+      }
+
+      // If true, only the staged Attribute is set. If false, both current and
+      // staged Attribute is set.  Default is true
+      const onlyStaged = staged !== undefined ? staged : true
+
+      // Write the attribute to the staged data
+      moveImg(resource.masterData.staged)
+
+      // Also write to published data is isStaged = false
+      // if isStaged is false we set the attribute on both the staged and
+      // published data.
+      if (!onlyStaged) {
+        moveImg(resource.masterData.current)
+      }
+      checkForStagedChanges(resource)
+
+      return resource
+    },
 
     // 'changeName': () => {},
     // 'changeSlug': () => {},
@@ -312,7 +380,6 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
     // 'setTaxCategory': () => {},
     // 'setSku': () => {},
     // 'setProductVariantKey': () => {},
-    // 'moveImageToPosition': () => {},
     // 'setImageLabel': () => {},
     // 'addAsset': () => {},
     // 'removeAsset': () => {},

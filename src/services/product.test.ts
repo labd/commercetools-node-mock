@@ -355,4 +355,51 @@ describe('Product update actions', () => {
     expect(response.body.version).toBe(3)
     expect(response.body.masterData.staged.variants[0].images).toHaveLength(0)
   })
+
+  test('moveImageToPosition variant', async () => {
+    assert(productPublished, 'product not created')
+
+    const image1: Image = {
+      url: 'http://example.com/image1',
+      dimensions: { w: 100, h: 100 },
+    }
+    const image2: Image = {
+      url: 'http://example.com/image2',
+      dimensions: { w: 100, h: 100 },
+    }
+
+    {
+      const response = await supertest(ctMock.app)
+        .post(`/dummy/products/${productPublished.id}`)
+        .send({
+          version: 1,
+          actions: [
+            { action: 'addExternalImage', sku: '1338', image: image1 },
+            { action: 'addExternalImage', sku: '1338', image: image2 },
+          ],
+        })
+      expect(response.status).toBe(200)
+      expect(response.body.version).toBe(3)
+    }
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${productPublished.id}`)
+      .send({
+        version: 3,
+        actions: [
+          {
+            action: 'moveImageToPosition',
+            sku: '1338',
+            imageUrl: image2.url,
+            position: 0,
+          },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(4)
+    expect(response.body.masterData.staged.variants[0].images).toEqual([
+      { url: 'http://example.com/image2', dimensions: { w: 100, h: 100 } },
+      { url: 'http://example.com/image1', dimensions: { w: 100, h: 100 } },
+    ])
+  })
 })
