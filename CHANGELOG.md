@@ -1,3 +1,7 @@
+# 0.11.1 (2023-03-01)
+- Store deleteDaysAfterCreation on project settings
+- Add addExternalImage and removeImage product update actions
+
 # 0.10.1 (2022-10-13)
 - Various fixes to the internal type system
 
