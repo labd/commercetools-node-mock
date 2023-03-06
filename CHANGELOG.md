@@ -1,5 +1,11 @@
 ## 0.11.1 (2023-03-01)
 
+## 0.13.0
+
+### Minor Changes
+
+- [`600a470`](https://github.com/labd/commercetools-node-mock/commit/600a470cbb8c89eef78e19f63efbe9a2fc17ebd8) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch to using @changesets for releases
+
 - Store deleteDaysAfterCreation on project settings
 - Add addExternalImage and removeImage product update actions
 
@@ -39,6 +45,7 @@
 - Fix a packaging error in the GitHub workflow. The artifact for version 0.7.0 didn't contain the bundled output files.
 
 ## 0.7.0 (2022-07-25)
+
 - Rewrite the mock implementation of the product projection search endpoint to work with products created via the product endpoint. This also adds support for multiple filters.
 - Replace tsdx with tsup for building the library
 - Drop support for Node 12 and add Node 18.
