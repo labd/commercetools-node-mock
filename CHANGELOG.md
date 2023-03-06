@@ -1,10 +1,12 @@
-## 0.11.1 (2023-03-01)
 
 ## 0.13.0
 
 ### Minor Changes
 
 - [`600a470`](https://github.com/labd/commercetools-node-mock/commit/600a470cbb8c89eef78e19f63efbe9a2fc17ebd8) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch to using @changesets for releases
+
+
+## 0.11.1 (2023-03-01)
 
 - Store deleteDaysAfterCreation on project settings
 - Add addExternalImage and removeImage product update actions
