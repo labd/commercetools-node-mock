@@ -20,6 +20,7 @@ import { ProductProjectionService } from './product-projection'
 import { ProductTypeService } from './product-type'
 import { ShippingMethodService } from './shipping-method'
 import { ShoppingListService } from './shopping-list'
+import { StandAlonePriceService } from './standalone-price'
 import { StateService } from './state'
 import { StoreService } from './store'
 import { SubscriptionService } from './subscription'
@@ -46,6 +47,7 @@ export const createServices = (router: any, repos: any) => ({
   ),
   order: new OrderService(router, repos['order']),
   payment: new PaymentService(router, repos['payment']),
+  'standalone-price': new StandAlonePriceService(router, repos['standalone-price']),
   'my-cart': new MyCartService(router, repos['my-cart']),
   'my-order': new MyOrderService(router, repos['my-order']),
   'my-customer': new MyCustomerService(router, repos['my-customer']),
