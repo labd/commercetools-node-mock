@@ -6,6 +6,7 @@ import {
 import { getBaseResourceProperties } from '../helpers'
 import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import {createTypedMoney} from "./helpers";
 
 export class StandAlonePriceRepository extends AbstractResourceRepository<'standalone-price'> {
   getTypeId() {
@@ -17,7 +18,8 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<'stand
       ...getBaseResourceProperties(),
       active: draft.active,
       sku: draft.sku,
-      value: draft.value,
+      value: createTypedMoney(draft.value),
+      country: draft.country,
     }
     this.saveNew(context, resource)
     return resource

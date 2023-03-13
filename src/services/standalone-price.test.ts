@@ -13,6 +13,7 @@ describe('StandalonePrice', () => {
                 centAmount: 1000,
             },
             active: true,
+            country: "UK",
         }
 
         const response = await supertest(ctMock.app).post('/dummy/standalone-prices').send(draft)
@@ -27,6 +28,7 @@ describe('StandalonePrice', () => {
                 centAmount: 1000,
             },
             active: true,
+            country: "UK",
         }
 
         const createResponse = await supertest(ctMock.app).post('/dummy/standalone-prices').send(draft)
