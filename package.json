@@ -25,6 +25,7 @@
     "start": "nodemon --watch src --exec 'node -r esbuild-register' src/server.ts",
     "build": "tsup",
     "build:server": "esbuild src/server.ts --bundle --outfile=dist/server.js --platform=node",
+    "publish:ci": "pnpm build && pnpm changeset publish",
     "check": "eslint src && tsc",
     "test": "jest test --coverage",
     "lint": "eslint src"
