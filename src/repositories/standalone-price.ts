@@ -1,7 +1,11 @@
 import {
+  ChannelReference,
+  ChannelResourceIdentifier,
+  DiscountedPriceDraft,
   StandalonePrice,
   StandalonePriceChangeActiveAction,
   StandalonePriceChangeValueAction,
+  StandalonePriceDraft,
   StandalonePriceSetDiscountedPriceAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
@@ -14,17 +18,34 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<'stand
     return 'standalone-price' as const
   }
 
-  create(context: RepositoryContext, draft: StandalonePrice): StandalonePrice {
+  create(context: RepositoryContext, draft: StandalonePriceDraft): StandalonePrice {
     const resource: StandalonePrice = {
       ...getBaseResourceProperties(),
-      active: draft.active,
+      active: draft.active? draft.active : false,
       sku: draft.sku,
       value: createTypedMoney(draft.value),
       country: draft.country,
-      channel: draft.channel,
+      discounted: draft.discounted ? this.transformDiscountDraft(draft.discounted) : undefined,
+      channel: draft.channel?.id ? this.transformChannelReferenceDraft(draft.channel) : undefined,
+      validFrom: draft.validFrom,
+      validUntil: draft.validUntil,
     }
     this.saveNew(context, resource)
     return resource
+  }
+
+  transformChannelReferenceDraft(channel: ChannelResourceIdentifier) : ChannelReference {
+    return {
+      typeId: channel.typeId,
+      id: channel.id as string,
+    }
+  }
+
+  transformDiscountDraft(discounted: DiscountedPriceDraft) {
+    return {
+      value: createTypedMoney(discounted.value),
+      discount: discounted.discount,
+    }
   }
 
   actions = {
@@ -47,14 +68,7 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<'stand
       resource: Writable<StandalonePrice>,
       action: StandalonePriceSetDiscountedPriceAction
     ) => {
-      if (action.discounted) {
-        resource.discounted = {
-          value: createTypedMoney(action.discounted.value),
-          discount: action.discounted.discount,
-        }
-      } else {
-        resource.discounted = undefined
-      }
+      resource.discounted = action.discounted ? this.transformDiscountDraft(action.discounted) : undefined
     }
   }
 }
