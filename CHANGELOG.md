@@ -1,5 +1,15 @@
 ## 0.14.0
 
+## 1.0.0
+
+### Major Changes
+
+- [#68](https://github.com/labd/commercetools-node-mock/pull/68) [`7b74869`](https://github.com/labd/commercetools-node-mock/commit/7b74869689692b815e632a413b7a51d22fc76ed1) Thanks [@okkevandereijk](https://github.com/okkevandereijk)! - :warning: This is a major update dropping support for Node 14 and under.
+
+  - Updated node to version 18
+  - Updated pnpm to version 8
+  - Enforce eslint with default library
+
 ## 0.14.1
 
 ### Patch Changes
