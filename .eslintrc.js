@@ -1,11 +1,14 @@
 module.exports = {
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'unused-imports'],
+  extends: [
+    '@labdigital/eslint-config-node',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  plugins: ['unused-imports'],
   rules: {
-    "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-function": "off",
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
@@ -13,8 +16,10 @@ module.exports = {
         argsIgnorePattern: '^_',
       },
     ],
-    "unused-imports/no-unused-imports": "error",
+    'unused-imports/no-unused-imports': 'error',
     'arrow-body-style': ['error', 'as-needed'],
+    'jest/no-standalone-expect': 'off',
+    'jest/no-identical-title': 'off',
     'no-console': [
       'error',
       {
