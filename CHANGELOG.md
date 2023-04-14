@@ -4,7 +4,9 @@
 
 ### Minor Changes
 
-- [#70](https://github.com/labd/commercetools-node-mock/pull/70) [`2776347`](https://github.com/labd/commercetools-node-mock/commit/2776347c752c4682314f9b0cef6f6ae27b972d50) Thanks [@mikedebock](https://github.com/mikedebock)! - - Add addPrice product update action
+- [#70](https://github.com/labd/commercetools-node-mock/pull/70) [`2776347`](https://github.com/labd/commercetools-node-mock/commit/2776347c752c4682314f9b0cef6f6ae27b972d50) Thanks [@mikedebock](https://github.com/mikedebock)! -
+
+  - Add addPrice product update action
   - Add changePrice product update action
   - Add removePrice product update action
 
