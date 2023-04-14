@@ -15,6 +15,9 @@ import {
   ProductVariant,
   ProductVariantDraft,
   ProductMoveImageToPositionAction,
+  ProductChangePriceAction,
+  ProductAddPriceAction,
+  ProductRemovePriceAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { Writable } from '../types'
@@ -361,15 +364,171 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
       return resource
     },
 
+    addPrice: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { variantId, sku, price, staged }: ProductAddPriceAction
+    ) => {
+      const addVariantPrice = (data: Writable<ProductData>) => {
+        const { variant, isMasterVariant, variantIndex } = getVariant(
+          data,
+          variantId,
+          sku
+        )
+        if (!variant) {
+          throw new Error(
+            `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+          )
+        }
+
+        if (variant.prices === undefined) {
+          variant.prices = [priceFromDraft(price)]
+        } else {
+          variant.prices.push(priceFromDraft(price))
+        }
+
+        if (isMasterVariant) {
+          data.masterVariant = variant
+        } else {
+          data.variants[variantIndex] = variant
+        }
+      }
+
+      // If true, only the staged Attribute is set. If false, both current and
+      // staged Attribute is set.  Default is true
+      const onlyStaged = staged !== undefined ? staged : true
+
+      // Write the attribute to the staged data
+      addVariantPrice(resource.masterData.staged)
+
+      // Also write to published data is isStaged = false
+      // if isStaged is false we set the attribute on both the staged and
+      // published data.
+      if (!onlyStaged) {
+        addVariantPrice(resource.masterData.current)
+      }
+      checkForStagedChanges(resource)
+
+      return resource
+    },
+    changePrice: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { priceId, price, staged }: ProductChangePriceAction
+    ) => {
+      const changeVariantPrice = (data: Writable<ProductData>) => {
+        const allVariants = [data.masterVariant, ...(data.variants ?? [])]
+        const priceVariant = allVariants.find((variant) =>
+          variant.prices?.some((x) => x.id === priceId)
+        )
+        if (!priceVariant) {
+          throw new Error(
+            `Price with id ${priceId} not found on product ${resource.id}`
+          )
+        }
+
+        const { variant, isMasterVariant, variantIndex } = getVariant(
+          data,
+          priceVariant.id,
+          priceVariant.sku
+        )
+        if (!variant) {
+          throw new Error(
+            `Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`
+          )
+        }
+
+        variant.prices = variant.prices?.map((x) => {
+          if (x.id === priceId) {
+            return { ...x, ...price } as Price
+          }
+          return x
+        })
+
+        if (isMasterVariant) {
+          data.masterVariant = variant
+        } else {
+          data.variants[variantIndex] = variant
+        }
+      }
+
+      // If true, only the staged Attribute is set. If false, both current and
+      // staged Attribute is set.  Default is true
+      const onlyStaged = staged !== undefined ? staged : true
+
+      // Write the attribute to the staged data
+      changeVariantPrice(resource.masterData.staged)
+
+      // Also write to published data is isStaged = false
+      // if isStaged is false we set the attribute on both the staged and
+      // published data.
+      if (!onlyStaged) {
+        changeVariantPrice(resource.masterData.current)
+      }
+      checkForStagedChanges(resource)
+
+      return resource
+    },
+    removePrice: (
+      context: RepositoryContext,
+      resource: Writable<Product>,
+      { priceId, staged }: ProductRemovePriceAction
+    ) => {
+      const removeVariantPrice = (data: Writable<ProductData>) => {
+        const allVariants = [data.masterVariant, ...(data.variants ?? [])]
+        const priceVariant = allVariants.find((variant) =>
+          variant.prices?.some((x) => x.id === priceId)
+        )
+        if (!priceVariant) {
+          throw new Error(
+            `Price with id ${priceId} not found on product ${resource.id}`
+          )
+        }
+
+        const { variant, isMasterVariant, variantIndex } = getVariant(
+          data,
+          priceVariant.id,
+          priceVariant.sku
+        )
+        if (!variant) {
+          throw new Error(
+            `Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`
+          )
+        }
+
+        variant.prices = variant.prices?.filter((x) => x.id !== priceId)
+
+        if (isMasterVariant) {
+          data.masterVariant = variant
+        } else {
+          data.variants[variantIndex] = variant
+        }
+      }
+
+      // If true, only the staged Attribute is set. If false, both current and
+      // staged Attribute is set.  Default is true
+      const onlyStaged = staged !== undefined ? staged : true
+
+      // Write the attribute to the staged data
+      removeVariantPrice(resource.masterData.staged)
+
+      // Also write to published data is isStaged = false
+      // if isStaged is false we set the attribute on both the staged and
+      // published data.
+      if (!onlyStaged) {
+        removeVariantPrice(resource.masterData.current)
+      }
+      checkForStagedChanges(resource)
+
+      return resource
+    },
+
     // 'changeName': () => {},
     // 'changeSlug': () => {},
     // 'addVariant': () => {},
     // 'removeVariant': () => {},
     // 'changeMasterVariant': () => {},
-    // 'addPrice': () => {},
     // 'setPrices': () => {},
-    // 'changePrice': () => {},
-    // 'removePrice': () => {},
     // 'setProductPriceCustomType': () => {},
     // 'setProductPriceCustomField': () => {},
     // 'setDiscountedPrice': () => {},
@@ -462,6 +621,7 @@ const variantFromDraft = (
 
 const priceFromDraft = (draft: PriceDraft): Price => ({
   id: uuidv4(),
+  country: draft.country,
   value: {
     currencyCode: draft.value.currencyCode,
     centAmount: draft.value.centAmount,

@@ -1,5 +1,6 @@
 import {
   Image,
+  PriceDraft,
   Product,
   ProductData,
   ProductDraft,
@@ -26,6 +27,15 @@ const publishedProductDraft: ProductDraft = {
         value: 'test',
       },
     ],
+    prices: [
+      {
+        country: 'NL',
+        value: {
+          currencyCode: 'EUR',
+          centAmount: 1000,
+        },
+      },
+    ],
   },
   variants: [
     {
@@ -34,6 +44,15 @@ const publishedProductDraft: ProductDraft = {
         {
           name: 'test2',
           value: 'test2',
+        },
+      ],
+      prices: [
+        {
+          country: 'NL',
+          value: {
+            currencyCode: 'EUR',
+            centAmount: 2000,
+          },
         },
       ],
     },
@@ -401,5 +420,110 @@ describe('Product update actions', () => {
       { url: 'http://example.com/image2', dimensions: { w: 100, h: 100 } },
       { url: 'http://example.com/image1', dimensions: { w: 100, h: 100 } },
     ])
+  })
+
+  test('addPrice variant', async () => {
+    assert(productPublished, 'product not created')
+
+    const priceDraft: PriceDraft = {
+      country: 'BE',
+      value: {
+        currencyCode: 'EUR',
+        centAmount: 3000,
+      },
+    }
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${productPublished.id}`)
+      .send({
+        version: 1,
+        actions: [
+          {
+            action: 'addPrice',
+            price: priceDraft,
+            variantId: 1,
+          },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.masterData.staged.masterVariant.prices).toMatchObject([
+      {
+        country: 'NL',
+        value: {
+          currencyCode: 'EUR',
+          centAmount: 1000,
+        },
+      },
+      {
+        country: 'BE',
+        value: {
+          currencyCode: 'EUR',
+          centAmount: 3000,
+        },
+      },
+    ])
+  })
+
+  test('changePrice variant', async () => {
+    assert(productPublished, 'product not created')
+    const priceId =
+      productPublished?.masterData.current.masterVariant.prices?.[0].id
+    assert(priceId)
+
+    const priceDraft: PriceDraft = {
+      country: 'BE',
+      value: {
+        currencyCode: 'EUR',
+        centAmount: 3000,
+      },
+    }
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${productPublished.id}`)
+      .send({
+        version: 1,
+        actions: [
+          {
+            action: 'changePrice',
+            priceId,
+            price: priceDraft,
+          },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.masterData.staged.masterVariant.prices).toMatchObject([
+      {
+        id: priceId,
+        country: 'BE',
+        value: {
+          currencyCode: 'EUR',
+          centAmount: 3000,
+        },
+      },
+    ])
+  })
+
+  test('removePrice variant', async () => {
+    assert(productPublished, 'product not created')
+    const priceId =
+      productPublished?.masterData.current.masterVariant.prices?.[0].id
+    assert(priceId)
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/products/${productPublished.id}`)
+      .send({
+        version: 1,
+        actions: [
+          {
+            action: 'removePrice',
+            priceId,
+          },
+        ],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.masterData.staged.masterVariant.prices).toHaveLength(0)
   })
 })
