@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.1.1
+
+### Patch Changes
+
+- [#72](https://github.com/labd/commercetools-node-mock/pull/72) [`d6b123b`](https://github.com/labd/commercetools-node-mock/commit/d6b123bdc6dfbccb3b4dc0b0791abdeb7a99bbea) Thanks [@okkevandereijk](https://github.com/okkevandereijk)! - fix: revert start script to old situation, running server
+
 ## 1.1.0
 
 ### Minor Changes
