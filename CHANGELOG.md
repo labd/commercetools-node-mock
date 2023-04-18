@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.1.2
+
+### Patch Changes
+
+- [#74](https://github.com/labd/commercetools-node-mock/pull/74) [`b521a4a`](https://github.com/labd/commercetools-node-mock/commit/b521a4a6dc42c1e97c61f0a6683ea7fe21636ddd) Thanks [@okkevandereijk](https://github.com/okkevandereijk)! - fix: use tsup onSuccess instead of nodemon
+
 ## 1.1.1
 
 ### Patch Changes
