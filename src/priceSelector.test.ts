@@ -1,5 +1,6 @@
 import { ProductProjection } from '@commercetools/platform-sdk'
 import { applyPriceSelector } from './priceSelector'
+import { beforeEach, describe, expect, test } from 'vitest'
 
 describe('priceSelector', () => {
   let product: ProductProjection

@@ -1,6 +1,7 @@
 import { Customer } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock, getBaseResourceProperties } from '../index'
 
 describe('Customer Update Actions', () => {
