@@ -1,6 +1,7 @@
 import { InventoryEntry, Type } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'
 
 describe('Inventory Entry Query', () => {

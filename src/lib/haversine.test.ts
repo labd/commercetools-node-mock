@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest'
 import { haversineDistance, Location } from './haversine'
 
 test('haversine', () => {

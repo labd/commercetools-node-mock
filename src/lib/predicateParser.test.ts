@@ -1,4 +1,5 @@
 import { VariableMap } from '@commercetools/platform-sdk'
+import { describe, expect, test } from 'vitest'
 import { parseQueryExpression, PredicateError } from './predicateParser'
 
 describe('Predicate filter', () => {

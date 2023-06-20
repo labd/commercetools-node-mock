@@ -7,6 +7,7 @@ import {
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'
 
 const ctMock = new CommercetoolsMock()

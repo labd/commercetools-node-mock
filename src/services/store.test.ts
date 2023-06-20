@@ -1,5 +1,6 @@
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
+import { afterEach, afterAll, beforeAll, describe, expect, test } from 'vitest'
 
 const ctMock = new CommercetoolsMock()
 
