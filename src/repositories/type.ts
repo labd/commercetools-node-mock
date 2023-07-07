@@ -12,7 +12,7 @@ import {
   TypeSetDescriptionAction,
   TypeUpdateAction,
 } from '@commercetools/platform-sdk'
-import { isEqual } from 'lodash'
+import isEqual from 'lodash.isequal'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
 import { Writable } from '../types'
