@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.1.3
+
+### Patch Changes
+
+- [`c0d5850`](https://github.com/labd/commercetools-node-mock/commit/c0d5850518fa403034e3028ee82b118fabeb3807) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Move from lodash to lodash.isequal
+
 ## 1.1.2
 
 ### Patch Changes
