@@ -11,6 +11,7 @@ import {
   ShippingMethodSetDescriptionAction,
   ShippingMethodSetKeyAction,
   ShippingMethodSetLocalizedDescriptionAction,
+  ShippingMethodSetLocalizedNameAction,
   ShippingMethodSetPredicateAction,
   ShippingMethodUpdateAction,
   ShippingRate,
@@ -173,6 +174,13 @@ export class ShippingMethodRepository extends AbstractResourceRepository<'shippi
       { localizedDescription }: ShippingMethodSetLocalizedDescriptionAction
     ) => {
       resource.localizedDescription = localizedDescription
+    },
+    setLocalizedName: (
+        _context: RepositoryContext,
+        resource: Writable<ShippingMethod>,
+        { localizedName }: ShippingMethodSetLocalizedNameAction
+    ) => {
+      resource.localizedName = localizedName
     },
     setPredicate: (
       _context: RepositoryContext,
