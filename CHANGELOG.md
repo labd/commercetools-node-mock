@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.2.0
+
+### Minor Changes
+
+- [`612de44`](https://github.com/labd/commercetools-node-mock/commit/612de441beb35bb75af55889cba2065d61bf27c4) Thanks [@davidweterings](https://github.com/davidweterings)! - Add shipping method localized name action
+
 ## 1.1.3
 
 ### Patch Changes
