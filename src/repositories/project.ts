@@ -17,6 +17,12 @@ import { maskSecretValue } from '../lib/masking'
 import { Writable } from '../types'
 import { AbstractRepository, RepositoryContext } from './abstract'
 
+// https://docs.commercetools.com/api/releases/2018-10-08-delete-messages-after-days
+export interface changeMessagesEnabled {
+  readonly action: 'changeMessagesEnabled';
+  readonly messagesEnabled: boolean;
+}
+
 export class ProjectRepository extends AbstractRepository<Project> {
   get(context: RepositoryContext): Project | null {
     const resource = this._storage.getProject(context.projectKey)
@@ -41,7 +47,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
   actions: Partial<
     Record<
-      ProjectUpdateAction['action'],
+      // https://docs.commercetools.com/api/releases/2018-10-08-delete-messages-after-days
+      ProjectUpdateAction['action'] | 'changeMessagesEnabled',
       (
         context: RepositoryContext,
         resource: Writable<Project>,
@@ -84,6 +91,13 @@ export class ProjectRepository extends AbstractRepository<Project> {
     ) => {
       resource.messages.enabled = messagesConfiguration.enabled
       resource.messages.deleteDaysAfterCreation = messagesConfiguration.deleteDaysAfterCreation
+    },
+    changeMessagesEnabled: (
+        context: RepositoryContext,
+        resource: Writable<Project>,
+        { messagesEnabled }: { messagesEnabled: boolean }
+    ) => {
+      resource.messages.enabled = messagesEnabled
     },
     changeProductSearchIndexingEnabled: (
       context: RepositoryContext,
