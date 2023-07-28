@@ -133,4 +133,18 @@ describe('Customer Update Actions', () => {
       Buffer.from('newpass').toString('base64')
     )
   })
+
+  test('setCustomField', async () => {
+    assert(customer, 'customer not created')
+
+    const response = await supertest(ctMock.app)
+      .post(`/dummy/customers/${customer.id}`)
+      .send({
+        version: 1,
+        actions: [{ action: 'setCustomField', name: 'isValidCouponCode', value: false }],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.version).toBe(2)
+    expect(response.body.custom.fields.isValidCouponCode).toBe(false)
+  })
 })

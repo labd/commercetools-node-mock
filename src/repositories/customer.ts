@@ -3,10 +3,12 @@ import {
   CustomerChangeEmailAction,
   CustomerDraft,
   CustomerSetAuthenticationModeAction,
+  CustomerSetCustomFieldAction,
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
 import { Writable } from 'types'
+import { v4 as uuidv4 } from 'uuid'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
@@ -84,6 +86,20 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
         },
         400
       )
+    },
+    setCustomField: (
+      _context: RepositoryContext,
+      resource: Writable<Customer>,
+      { name, value }: CustomerSetCustomFieldAction
+    ) => {
+      if (!resource.custom) {
+        resource.custom = {
+          type: { typeId: 'type', id: uuidv4() },
+          fields: {},
+        }
+      }
+
+      resource.custom.fields[name] = value
     },
   }
 }
