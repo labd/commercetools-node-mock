@@ -53,7 +53,7 @@ jobs:
           run_install: true
 
       - name: Test
-        run: pnpm run test --ci --coverage --maxWorkers=2
+        run: pnpm run test:ci
 
       - name: Build
         run: pnpm build

@@ -28,6 +28,7 @@
     "publish:ci": "pnpm build && pnpm changeset publish",
     "check": "eslint src && tsc",
     "test": "vitest run --coverage",
+    "test:ci": "vitest run --coverage",
     "lint": "eslint src"
   },
   "publishConfig": {
