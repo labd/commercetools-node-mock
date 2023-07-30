@@ -242,17 +242,15 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
         })
       }
 
-      const shouldDelete = !quantity || quantity >= lineItem.quantity
-      if (shouldDelete) {
+      if (quantity === 0) {
         // delete line item
         resource.lineItems = resource.lineItems.filter(
           (x) => x.id !== lineItemId
         )
       } else {
-        // decrease quantity and update total price
         resource.lineItems.forEach((x) => {
           if (x.id === lineItemId && quantity) {
-            x.quantity -= quantity
+            x.quantity = quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
         })
