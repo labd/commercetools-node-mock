@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.3.1
+
+### Patch Changes
+
+- [`7528ac2`](https://github.com/labd/commercetools-node-mock/commit/7528ac24884f5a213274ba9c677b6ad62f2e518a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix error related to perplex when used from ESM
+
 ## 1.3.0
 
 ### Minor Changes
