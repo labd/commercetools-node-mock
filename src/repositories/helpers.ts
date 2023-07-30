@@ -157,6 +157,7 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
       {
         code: 'InvalidJsonInput',
         message: `${resourceIdentifier.typeId}: ResourceIdentifier requires an 'id' xor a 'key'`,
+        detailedErrorMessage: `ResourceIdentifier requires an 'id' xor a 'key'`,
       },
       400
     )
