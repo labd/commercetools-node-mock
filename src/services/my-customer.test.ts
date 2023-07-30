@@ -25,13 +25,14 @@ describe('Me', () => {
       customer: {
         ...draft,
         password: 'cDRzc3cwcmQ=',
+        authenticationMode: 'Password',
         version: 1,
         isEmailVerified: false,
         addresses: [],
         id: expect.anything(),
         createdAt: expect.anything(),
         lastModifiedAt: expect.anything(),
-      },
+      }
     })
   })
 

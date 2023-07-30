@@ -19,6 +19,7 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   create(context: RepositoryContext, draft: CustomerDraft): Customer {
     const resource: Customer = {
       ...getBaseResourceProperties(),
+      authenticationMode: draft.authenticationMode || 'Password',
       email: draft.email,
       password: draft.password
         ? Buffer.from(draft.password).toString('base64')
