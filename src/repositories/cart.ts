@@ -1,4 +1,6 @@
 import {
+  Address,
+  AddressDraft,
   Cart,
   CartAddLineItemAction,
   CartDraft,
@@ -11,6 +13,7 @@ import {
   CartSetLocaleAction,
   CartSetShippingAddressAction,
   CartSetShippingMethodAction,
+  CustomFields,
   GeneralError,
   LineItem,
   LineItemDraft,
@@ -24,7 +27,7 @@ import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
 import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { createAddress, createCustomFields } from './helpers'
 
 export class CartRepository extends AbstractResourceRepository<'cart'> {
   getTypeId() {
@@ -248,7 +251,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       resource: Writable<Cart>,
       { address }: CartSetBillingAddressAction
     ) => {
-      resource.billingAddress = address
+      resource.billingAddress = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
     },
     setShippingMethod: (
       context: RepositoryContext,
@@ -340,7 +347,24 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       resource: Writable<Cart>,
       { address }: CartSetShippingAddressAction
     ) => {
-      resource.shippingAddress = address
+      if (!address) {
+        resource.shippingAddress = undefined
+        return
+      }
+
+      let custom: CustomFields | undefined = undefined
+      if ((address as Address & AddressDraft).custom) {
+        custom = createCustomFields(
+          (address as Address & AddressDraft).custom,
+          context.projectKey,
+          this._storage
+        )
+      }
+
+      resource.shippingAddress = {
+        ...address,
+        custom: custom,
+      }
     },
   }
   draftLineItemtoLineItem = (

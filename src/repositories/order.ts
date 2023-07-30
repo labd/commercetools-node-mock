@@ -37,6 +37,8 @@ import {
   RepositoryContext,
 } from './abstract'
 import {
+  createAddress,
+  createCentPrecisionMoney,
   createCustomFields,
   createPrice,
   createTypedMoney,
@@ -104,8 +106,16 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
     const resource: Order = {
       ...getBaseResourceProperties(),
 
-      billingAddress: draft.billingAddress,
-      shippingAddress: draft.shippingAddress,
+      billingAddress: createAddress(
+        draft.billingAddress,
+        context.projectKey,
+        this._storage
+      ),
+      shippingAddress: createAddress(
+        draft.shippingAddress,
+        context.projectKey,
+        this._storage
+      ),
 
       custom: createCustomFields(
         draft.custom,
@@ -323,7 +333,11 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
       resource: Writable<Order>,
       { address }: OrderSetBillingAddressAction
     ) => {
-      resource.billingAddress = address
+      resource.billingAddress = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
     },
     setCustomerEmail: (
       context: RepositoryContext,
@@ -386,7 +400,11 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
       resource: Writable<Order>,
       { address }: OrderSetShippingAddressAction
     ) => {
-      resource.shippingAddress = address
+      resource.shippingAddress = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
     },
     setStore: (
       context: RepositoryContext,
