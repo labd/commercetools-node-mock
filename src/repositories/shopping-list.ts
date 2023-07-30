@@ -8,6 +8,7 @@ import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,
+  getStoreKeyReference,
 } from './helpers'
 
 export class ShoppingListRepository extends AbstractResourceRepository<'shopping-list'> {
@@ -27,16 +28,21 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
         this._storage
       ),
       textLineItems: [],
-      lineItems: draft.lineItems?.map((e) => ({
-        ...getBaseResourceProperties(),
-        ...e,
-        addedAt: e.addedAt ?? '',
-        productId: e.productId ?? '',
-        name: {},
-        quantity: e.quantity ?? 1,
-        productType: { typeId: 'product-type', id: '' },
-        custom: createCustomFields(e.custom, context.projectKey, this._storage),
-      })),
+      lineItems:
+        draft.lineItems?.map((e) => ({
+          ...getBaseResourceProperties(),
+          ...e,
+          addedAt: e.addedAt ?? '',
+          productId: e.productId ?? '',
+          name: {},
+          quantity: e.quantity ?? 1,
+          productType: { typeId: 'product-type', id: '' },
+          custom: createCustomFields(
+            e.custom,
+            context.projectKey,
+            this._storage
+          ),
+        })) ?? [],
       customer: draft.customer
         ? getReferenceFromResourceIdentifier<CustomerReference>(
             draft.customer,
@@ -44,8 +50,8 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
             this._storage
           )
         : undefined,
-      store: draft.store?.key
-        ? { typeId: 'store', key: draft.store.key! }
+      store: draft.store
+        ? getStoreKeyReference(draft.store, context.projectKey, this._storage)
         : undefined,
     }
     this.saveNew(context, resource)

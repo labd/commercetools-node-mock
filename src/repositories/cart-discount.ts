@@ -18,7 +18,10 @@ import {
 import { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createTypedMoney } from './helpers'
+import {
+  createTypedMoney,
+  getStoreKeyReference,
+} from './helpers'
 
 export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
   getTypeId() {
@@ -33,6 +36,10 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
       cartPredicate: draft.cartPredicate,
       isActive: draft.isActive || false,
       name: draft.name,
+      stores:
+        draft.stores?.map((s) =>
+          getStoreKeyReference(s, context.projectKey, this._storage)
+        ) ?? [],
       references: [],
       target: draft.target,
       requiresDiscountCode: draft.requiresDiscountCode || false,

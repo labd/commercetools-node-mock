@@ -14,6 +14,7 @@ import {
   ResourceIdentifier,
   Store,
   StoreKeyReference,
+  StoreReference,
   StoreResourceIdentifier,
   Type,
   TypedMoney,
@@ -185,6 +186,32 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
     typeId: resourceIdentifier.typeId,
     id: resource?.id,
   } as unknown as T
+}
+
+export const getStoreKeyReference = (
+  id: StoreResourceIdentifier,
+  projectKey: string,
+  storage: AbstractStorage
+): StoreKeyReference => {
+  if (id.key) {
+    return {
+      typeId: 'store',
+      key: id.key,
+    }
+  }
+  const value = getReferenceFromResourceIdentifier<StoreReference>(
+    id,
+    projectKey,
+    storage
+  )
+
+  if (!value.obj?.key) {
+    throw new Error('No store found for reference')
+  }
+  return {
+    typeId: 'store',
+    key: value.obj?.key,
+  }
 }
 
 export const getRepositoryContext = (request: Request): RepositoryContext => ({
