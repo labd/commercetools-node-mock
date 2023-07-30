@@ -13,6 +13,10 @@ describe('Order repository', () => {
       version: 1,
       createdAt: '2021-09-02T12:23:30.036Z',
       lastModifiedAt: '2021-09-02T12:23:30.546Z',
+      discountCodes: [],
+      directDiscounts : [],
+      inventoryMode: 'None',
+      itemShippingAddresses: [],
       lineItems: [],
       customLineItems: [],
       totalPrice: {
@@ -53,6 +57,10 @@ describe('Order repository', () => {
       version: 1,
       createdAt: '2021-09-02T12:23:30.036Z',
       lastModifiedAt: '2021-09-02T12:23:30.546Z',
+      discountCodes: [],
+      directDiscounts : [],
+      inventoryMode: 'None',
+      itemShippingAddresses: [],
       lineItems: [],
       customLineItems: [],
       totalPrice: {

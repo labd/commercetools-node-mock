@@ -1,4 +1,4 @@
-import { MyCartDraft } from '@commercetools/platform-sdk'
+import { Cart, MyCartDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'
@@ -39,6 +39,10 @@ describe('MyCart', () => {
       lastModifiedAt: expect.anything(),
       version: 1,
       cartState: 'Active',
+      discountCodes: [],
+      directDiscounts: [],
+      inventoryMode: 'None',
+      itemShippingAddresses: [],
       lineItems: [],
       customLineItems: [],
       shipping: [],
@@ -52,10 +56,9 @@ describe('MyCart', () => {
       taxMode: 'Platform',
       taxRoundingMode: 'HalfEven',
       taxCalculationMode: 'LineItemLevel',
-
       refusedGifts: [],
       origin: 'Customer',
-    })
+    } as Cart)
   })
 
   test('Get my cart by ID', async () => {
