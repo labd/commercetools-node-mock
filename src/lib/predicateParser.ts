@@ -4,7 +4,7 @@
  *
  * See https://docs.commercetools.com/api/predicates/query
  */
-import Lexer from 'perplex'
+import perplex from 'perplex'
 import { ITokenPosition, Parser } from 'pratt'
 import { haversineDistance } from './haversine'
 
@@ -104,7 +104,7 @@ const resolveValue = (obj: any, val: TypeSymbol): any => {
 }
 
 const getLexer = (value: string) =>
-  new Lexer<string>(value)
+  new perplex(value)
 
     .token('AND', /and(?![-_a-z0-9]+)/i)
     .token('OR', /or(?![-_a-z0-9]+)/i)

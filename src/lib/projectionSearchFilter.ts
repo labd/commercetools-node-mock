@@ -3,7 +3,7 @@
  */
 
 import type { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
-import Lexer from 'perplex'
+import perplex from 'perplex'
 import Parser from 'pratt'
 import { nestedLookup } from '../helpers'
 import type { Writable } from '../types'
@@ -72,7 +72,7 @@ export const parseFilterExpression = (
 }
 
 const getLexer = (value: string) =>
-  new Lexer<string>(value)
+  new perplex(value)
     .token('MISSING', /missing(?![-_a-z0-9]+)/i)
     .token('EXISTS', /exists(?![-_a-z0-9]+)/i)
     .token('RANGE', /range(?![-_a-z0-9]+)/i)
