@@ -91,7 +91,7 @@ export class InventoryEntryRepository extends AbstractResourceRepository<'invent
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields || {},
         }
       }
     },

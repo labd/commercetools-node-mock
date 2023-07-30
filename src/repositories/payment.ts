@@ -105,7 +105,7 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields ?? {},
         }
       }
     },

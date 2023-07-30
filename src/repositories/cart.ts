@@ -324,7 +324,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields || {}
         }
       }
     },

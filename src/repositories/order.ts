@@ -363,7 +363,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields || {},
         }
       }
     },
