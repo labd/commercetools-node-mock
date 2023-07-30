@@ -1,5 +1,15 @@
 ## 0.14.0
 
+## 1.4.0
+
+### Minor Changes
+
+- [`de55a18`](https://github.com/labd/commercetools-node-mock/commit/de55a1843e26af7f3565d5a77662a9c555bbeb1c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Move to pure ESM module, we still export the CommonJS module too
+
+### Patch Changes
+
+- [`de55a18`](https://github.com/labd/commercetools-node-mock/commit/de55a1843e26af7f3565d5a77662a9c555bbeb1c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Vendor both pratt and perplex dependencies to make them work with ESM
+
 ## 1.3.2
 
 ### Patch Changes
