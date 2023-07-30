@@ -3,10 +3,10 @@
  */
 
 import type { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
-import perplex from 'perplex'
 import Parser from 'pratt'
 import { nestedLookup } from '../helpers'
 import type { Writable } from '../types'
+import { Lexer } from './lexer'
 
 type MatchFunc = (target: any) => boolean
 
@@ -72,7 +72,7 @@ export const parseFilterExpression = (
 }
 
 const getLexer = (value: string) =>
-  new perplex(value)
+  new Lexer(value)
     .token('MISSING', /missing(?![-_a-z0-9]+)/i)
     .token('EXISTS', /exists(?![-_a-z0-9]+)/i)
     .token('RANGE', /range(?![-_a-z0-9]+)/i)
@@ -211,7 +211,7 @@ const parseFilter = (filter: string): ExpressionSet => {
       // Return a list of functions which matches the ranges. These functions
       // are processed as an OR clause
       return ranges.map((range: any) => {
-        let func = undefined
+        let func: (obj: any) => boolean
 
         if (range.start !== null && range.stop !== null) {
           func = (obj: any): boolean => obj >= range.start && obj <= range.stop
