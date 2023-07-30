@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.3.2
+
+### Patch Changes
+
+- [`9c01157`](https://github.com/labd/commercetools-node-mock/commit/9c011574d42512bd793030161bf9a336ebe4e2cb) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Attempt to fix perplex constructor error
+
 ## 1.3.1
 
 ### Patch Changes
