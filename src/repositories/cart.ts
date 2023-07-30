@@ -158,12 +158,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       )
       if (alreadyAdded) {
         // increase quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.forEach((x) => {
           if (x.productId === product?.id && x.variant.id === variant?.id) {
             x.quantity += quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
-          return x
         })
       } else {
         // add line item
@@ -251,12 +250,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
         )
       } else {
         // decrease quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.forEach((x) => {
           if (x.id === lineItemId && quantity) {
             x.quantity -= quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
-          return x
         })
       }
 
@@ -285,12 +283,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
         )
       } else {
         // decrease quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.forEach((x) => {
           if (x.id === lineItemId && quantity) {
             x.quantity -= quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
-          return x
         })
       }
 
