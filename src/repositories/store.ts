@@ -29,6 +29,7 @@ export class StoreRepository extends AbstractResourceRepository<'store'> {
       key: draft.key,
       name: draft.name,
       languages: draft.languages ?? [],
+      countries: draft.countries ?? [],
       distributionChannels: this.transformChannels(
         context,
         draft.distributionChannels

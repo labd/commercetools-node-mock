@@ -1,6 +1,7 @@
 import supertest from 'supertest'
 import { CommercetoolsMock } from '../index'
 import { afterEach, afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { Store } from '@commercetools/platform-sdk'
 
 const ctMock = new CommercetoolsMock()
 
@@ -24,6 +25,7 @@ describe('Store', () => {
       createdAt: '',
       lastModifiedAt: '',
       key: 'STOREKEY',
+      countries: [],
       languages: [],
       distributionChannels: [],
       supplyChannels: [],
@@ -41,11 +43,12 @@ describe('Store', () => {
       id: 'fake-store',
       key: 'STOREKEY',
       lastModifiedAt: '',
+      countries: [],
       languages: [],
       distributionChannels: [],
       supplyChannels: [],
       productSelections: [],
-    })
+    } as Store)
   })
 
   test('Get store by 404 when not found by key', async () => {
@@ -55,6 +58,7 @@ describe('Store', () => {
       createdAt: '',
       lastModifiedAt: '',
       key: 'STOREKEY',
+      countries: [],
       languages: [],
       distributionChannels: [],
       supplyChannels: [],
