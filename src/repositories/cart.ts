@@ -3,6 +3,7 @@ import {
   AddressDraft,
   Cart,
   CartAddLineItemAction,
+  CartChangeLineItemQuantityAction,
   CartDraft,
   CartRemoveLineItemAction,
   CartSetBillingAddressAction,
@@ -206,6 +207,56 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
           lineItemMode: 'Standard',
           priceMode: 'Platform',
           state: [],
+        })
+      }
+
+      // Update cart total price
+      resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
+    },
+    changeLineItemQuantity: (
+      context: RepositoryContext,
+      resource: Writable<Cart>,
+      { lineItemId, lineItemKey, quantity }: CartChangeLineItemQuantityAction
+    ) => {
+      let lineItem: Writable<LineItem> | undefined
+
+      if (lineItemId) {
+        lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+        if (!lineItem) {
+          throw new CommercetoolsError<GeneralError>({
+            code: 'General',
+            message: `A line item with ID '${lineItemId}' not found.`,
+          })
+        }
+      } else if (lineItemKey) {
+        lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+        if (!lineItem) {
+          throw new CommercetoolsError<GeneralError>({
+            code: 'General',
+            message: `A line item with Key '${lineItemKey}' not found.`,
+          })
+        }
+      } else {
+        throw new CommercetoolsError<GeneralError>({
+          code: 'General',
+          message: `Either lineItemid or lineItemKey needs to be provided.`,
+        })
+      }
+
+      const shouldDelete = !quantity || quantity >= lineItem.quantity
+      if (shouldDelete) {
+        // delete line item
+        resource.lineItems = resource.lineItems.filter(
+          (x) => x.id !== lineItemId
+        )
+      } else {
+        // decrease quantity and update total price
+        resource.lineItems.map((x) => {
+          if (x.id === lineItemId && quantity) {
+            x.quantity -= quantity
+            x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
+          }
+          return x
         })
       }
 
