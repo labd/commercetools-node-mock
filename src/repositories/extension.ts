@@ -1,4 +1,4 @@
-import {
+import type {
   Extension,
   ExtensionChangeDestinationAction,
   ExtensionChangeTriggersAction,
@@ -9,8 +9,8 @@ import {
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
 import { maskSecretValue } from '../lib/masking'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { Writable } from '../types'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 
 export class ExtensionRepository extends AbstractResourceRepository<'extension'> {
   getTypeId() {

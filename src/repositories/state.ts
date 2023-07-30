@@ -1,4 +1,4 @@
-import {
+import type {
   State,
   StateChangeInitialAction,
   StateChangeKeyAction,
@@ -11,7 +11,7 @@ import {
   StateUpdateAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { getReferenceFromResourceIdentifier } from './helpers'
 

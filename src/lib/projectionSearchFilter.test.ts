@@ -1,4 +1,4 @@
-import { ProductProjection } from '@commercetools/platform-sdk'
+import type { ProductProjection } from '@commercetools/platform-sdk'
 import { describe, expect, test } from 'vitest'
 import { cloneObject } from '../helpers'
 import { applyPriceSelector } from '../priceSelector'

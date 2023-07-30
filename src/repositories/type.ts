@@ -1,4 +1,4 @@
-import {
+import type {
   FieldDefinition,
   InvalidOperationError,
   Type,
@@ -15,7 +15,7 @@ import {
 import isEqual from 'lodash.isequal'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class TypeRepository extends AbstractResourceRepository<'type'> {

@@ -1,4 +1,4 @@
-import {
+import type {
   ChannelReference,
   ChannelResourceIdentifier,
   DiscountedPriceDraft,
@@ -9,7 +9,7 @@ import {
   StandalonePriceSetDiscountedPriceAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createTypedMoney } from './helpers'
 
@@ -63,7 +63,7 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<'stand
     ) => {
       resource.value = createTypedMoney(action.value)
     },
-    setDiscountedPrice: ( 
+    setDiscountedPrice: (
       context: RepositoryContext,
       resource: Writable<StandalonePrice>,
       action: StandalonePriceSetDiscountedPriceAction

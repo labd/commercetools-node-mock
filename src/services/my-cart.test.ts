@@ -1,4 +1,4 @@
-import { Cart, MyCartDraft } from '@commercetools/platform-sdk'
+import type { Cart, MyCartDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'

@@ -1,4 +1,4 @@
-import {
+import type {
   CartDiscount,
   CartDiscountChangeIsActiveAction,
   CartDiscountChangeSortOrderAction,
@@ -15,9 +15,9 @@ import {
   CartDiscountValueGiftLineItem,
   CartDiscountValueRelative,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
+import type { Writable } from 'types'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 import {
   createTypedMoney,
   getStoreKeyReference,

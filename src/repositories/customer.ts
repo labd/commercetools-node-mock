@@ -1,4 +1,4 @@
-import {
+import type {
   Customer,
   CustomerChangeEmailAction,
   CustomerDraft,
@@ -6,10 +6,10 @@ import {
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
+import type { Writable } from 'types'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   getTypeId() {

@@ -1,6 +1,6 @@
 import auth from 'basic-auth'
 import bodyParser from 'body-parser'
-import express, { NextFunction, Request, Response } from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import {
   InvalidTokenError,
 } from '@commercetools/platform-sdk'

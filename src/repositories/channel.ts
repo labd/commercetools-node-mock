@@ -1,4 +1,4 @@
-import {
+import type {
   Channel,
   ChannelChangeDescriptionAction,
   ChannelChangeKeyAction,
@@ -11,8 +11,8 @@ import {
   ChannelUpdateAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { Writable } from '../types'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 import { createAddress, createCustomFields } from './helpers'
 
 export class ChannelRepository extends AbstractResourceRepository<'channel'> {

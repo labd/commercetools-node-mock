@@ -1,4 +1,4 @@
-import { CustomObject } from '@commercetools/platform-sdk'
+import type { CustomObject } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { getBaseResourceProperties } from '../helpers'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'

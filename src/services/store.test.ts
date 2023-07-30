@@ -1,7 +1,7 @@
+import type { Store } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'
-import { afterEach, afterAll, beforeAll, describe, expect, test } from 'vitest'
-import { Store } from '@commercetools/platform-sdk'
 
 const ctMock = new CommercetoolsMock()
 

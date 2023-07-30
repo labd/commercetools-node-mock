@@ -1,4 +1,4 @@
-import { VariableMap } from '@commercetools/platform-sdk'
+import type { VariableMap } from '@commercetools/platform-sdk'
 import { describe, expect, test } from 'vitest'
 import { parseQueryExpression, PredicateError } from './predicateParser'
 

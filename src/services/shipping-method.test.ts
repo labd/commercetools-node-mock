@@ -1,4 +1,4 @@
-import {
+import type {
   ShippingMethodDraft,
   TaxCategoryDraft,
 } from '@commercetools/platform-sdk'

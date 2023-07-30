@@ -1,4 +1,4 @@
-import {
+import type {
   ProductDiscount,
   ProductDiscountChangeIsActiveAction,
   ProductDiscountChangeNameAction,
@@ -19,7 +19,7 @@ import {
   ProductDiscountValueRelative,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createTypedMoney } from './helpers'
 

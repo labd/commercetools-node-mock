@@ -1,5 +1,5 @@
-import { AttributeGroup } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { AttributeGroup } from '@commercetools/platform-sdk'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 
 export class AttributeGroupRepository extends AbstractResourceRepository<'attribute-group'> {
   getTypeId() {

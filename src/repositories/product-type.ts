@@ -1,4 +1,4 @@
-import {
+import type {
   AttributeDefinition,
   AttributeDefinitionDraft,
   AttributeType,
@@ -13,7 +13,7 @@ import {
   ProductTypeUpdateAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ProductTypeRepository extends AbstractResourceRepository<'product-type'> {

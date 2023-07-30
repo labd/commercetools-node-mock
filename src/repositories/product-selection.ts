@@ -1,11 +1,11 @@
-import {
+import type {
   ProductSelection,
   ProductSelectionDraft,
   Review,
   ReviewUpdateAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ProductSelectionRepository extends AbstractResourceRepository<'product-selection'> {

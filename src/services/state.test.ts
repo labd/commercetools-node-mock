@@ -1,4 +1,4 @@
-import { StateDraft } from '@commercetools/platform-sdk'
+import { type StateDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'

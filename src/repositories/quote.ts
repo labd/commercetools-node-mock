@@ -1,9 +1,9 @@
-import {
+import type {
   Quote,
   QuoteDraft,
   QuoteUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class QuoteRepository extends AbstractResourceRepository<'quote'> {

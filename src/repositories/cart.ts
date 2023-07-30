@@ -1,4 +1,4 @@
-import {
+import type {
   Address,
   AddressDraft,
   Cart,
@@ -26,8 +26,8 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { Writable } from '../types'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 import { createAddress, createCustomFields } from './helpers'
 
 export class CartRepository extends AbstractResourceRepository<'cart'> {

@@ -1,12 +1,12 @@
-import {
+import type {
   CustomObject,
   CustomObjectDraft,
   InvalidOperationError,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from '../exceptions'
 import { cloneObject, getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { Writable } from '../types'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 import { checkConcurrentModification } from './errors'
 
 export class CustomObjectRepository extends AbstractResourceRepository<'key-value-document'> {

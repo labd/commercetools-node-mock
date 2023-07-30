@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { Order, Payment, State } from '@commercetools/platform-sdk'
+import type { Order, Payment, State } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock, getBaseResourceProperties } from '../index'

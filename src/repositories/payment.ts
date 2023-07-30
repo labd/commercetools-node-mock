@@ -1,4 +1,4 @@
-import {
+import type {
   Payment,
   PaymentAddTransactionAction,
   PaymentChangeTransactionStateAction,
@@ -13,7 +13,7 @@ import {
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
   createCentPrecisionMoney,

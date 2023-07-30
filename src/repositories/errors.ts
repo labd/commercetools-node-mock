@@ -1,4 +1,4 @@
-import { ConcurrentModificationError } from '@commercetools/platform-sdk'
+import { type ConcurrentModificationError } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from '../exceptions'
 
 export const checkConcurrentModification = (

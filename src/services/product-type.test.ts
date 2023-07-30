@@ -1,4 +1,4 @@
-import { ProductTypeDraft } from '@commercetools/platform-sdk'
+import type { ProductTypeDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'

@@ -1,4 +1,4 @@
-import {
+import type {
   Zone,
   ZoneAddLocationAction,
   ZoneChangeNameAction,
@@ -9,7 +9,7 @@ import {
   ZoneUpdateAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class ZoneRepository extends AbstractResourceRepository<'zone'> {

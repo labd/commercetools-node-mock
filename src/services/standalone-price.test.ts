@@ -1,4 +1,4 @@
-import { StandalonePriceDraft } from '@commercetools/platform-sdk'
+import type { StandalonePriceDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import {
   afterAll,

@@ -1,4 +1,4 @@
-import * as ctp from '@commercetools/platform-sdk'
+import type * as ctp from '@commercetools/platform-sdk'
 import { RepositoryMap } from './repositories'
 import AbstractService from './services/abstract'
 

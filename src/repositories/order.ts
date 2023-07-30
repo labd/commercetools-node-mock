@@ -1,4 +1,4 @@
-import {
+import type {
   Cart,
   CartReference,
   CustomLineItem,
@@ -30,10 +30,10 @@ import {
 import assert from 'assert'
 import { CommercetoolsError } from '../exceptions'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import {
   AbstractResourceRepository,
-  QueryParams,
+  type QueryParams,
   RepositoryContext,
 } from './abstract'
 import {

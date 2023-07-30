@@ -1,4 +1,4 @@
-import {
+import type {
   InventoryEntry,
   InventoryEntryChangeQuantityAction,
   InventoryEntryDraft,
@@ -8,8 +8,8 @@ import {
   InventoryEntrySetRestockableInDaysAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { Writable } from '../types'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 import { createCustomFields } from './helpers'
 
 export class InventoryEntryRepository extends AbstractResourceRepository<'inventory-entry'> {

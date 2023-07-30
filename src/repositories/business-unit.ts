@@ -1,5 +1,5 @@
-import { BusinessUnit } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { BusinessUnit } from '@commercetools/platform-sdk'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract'
 
 export class BusinessUnitRepository extends AbstractResourceRepository<'business-unit'> {
   getTypeId() {

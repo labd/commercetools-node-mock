@@ -1,10 +1,10 @@
-import {
+import type {
   Quote,
   StagedQuote,
   StagedQuoteDraft,
   StagedQuoteUpdateAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 
 export class StagedQuoteRepository extends AbstractResourceRepository<'staged-quote'> {

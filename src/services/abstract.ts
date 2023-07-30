@@ -1,5 +1,5 @@
-import { Update } from '@commercetools/platform-sdk'
-import { Request, Response, Router } from 'express'
+import type { Update } from '@commercetools/platform-sdk'
+import { type Request, type Response, Router } from 'express'
 import { ParsedQs } from 'qs'
 import { AbstractResourceRepository } from '../repositories/abstract'
 import { getRepositoryContext } from '../repositories/helpers'

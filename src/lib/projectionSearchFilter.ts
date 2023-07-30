@@ -2,10 +2,10 @@
  * This module implements the commercetools product projection filter expression.
  */
 
-import { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
+import type { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
 import perplex from 'perplex'
 import Parser from 'pratt'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { nestedLookup } from '../helpers'
 
 type MatchFunc = (target: any) => boolean

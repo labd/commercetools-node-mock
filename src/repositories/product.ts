@@ -1,4 +1,4 @@
-import {
+import type {
   Price,
   PriceDraft,
   Product,
@@ -20,7 +20,7 @@ import {
   ProductRemovePriceAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { getBaseResourceProperties } from '../helpers'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import { createTypedMoney, getReferenceFromResourceIdentifier } from './helpers'

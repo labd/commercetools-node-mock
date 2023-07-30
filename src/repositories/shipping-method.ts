@@ -1,4 +1,4 @@
-import {
+import type {
   ShippingMethod,
   ShippingMethodAddShippingRateAction,
   ShippingMethodAddZoneAction,
@@ -22,7 +22,7 @@ import {
 } from '@commercetools/platform-sdk'
 import deepEqual from 'deep-equal'
 import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
   createCustomFields,

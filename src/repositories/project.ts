@@ -1,4 +1,4 @@
-import {
+import type {
   Project,
   ProjectChangeCartsConfigurationAction,
   ProjectChangeCountriesAction,
@@ -14,7 +14,7 @@ import {
   ProjectUpdateAction,
 } from '@commercetools/platform-sdk'
 import { maskSecretValue } from '../lib/masking'
-import { Writable } from '../types'
+import type { Writable } from '../types'
 import { AbstractRepository, RepositoryContext } from './abstract'
 
 export class ProjectRepository extends AbstractRepository<Project> {

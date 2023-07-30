@@ -1,4 +1,4 @@
-import { MyPaymentDraft } from '@commercetools/platform-sdk'
+import type { MyPaymentDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index'
