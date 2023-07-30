@@ -1,10 +1,12 @@
 import {
   Address,
   BaseAddress,
+  CentPrecisionMoney,
   CustomFields,
   CustomFieldsDraft,
+  HighPrecisionMoney,
+  HighPrecisionMoneyDraft,
   InvalidJsonInputError,
-  Money,
   Price,
   PriceDraft,
   Reference,
@@ -15,6 +17,7 @@ import {
   StoreResourceIdentifier,
   Type,
   TypedMoney,
+  _Money,
 } from '@commercetools/platform-sdk'
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
@@ -72,7 +75,7 @@ export const createPrice = (draft: PriceDraft): Price => ({
   value: createTypedMoney(draft.value),
 })
 
-export const createTypedMoney = (value: Money): TypedMoney => {
+export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
   // Taken from https://docs.adyen.com/development-resources/currency-codes
   let fractionDigits = 2
   switch (value.currencyCode.toUpperCase()) {
@@ -106,11 +109,23 @@ export const createTypedMoney = (value: Money): TypedMoney => {
       fractionDigits = 2
   }
 
+  if ((value as HighPrecisionMoney & HighPrecisionMoneyDraft).preciseAmount) {
+    throw new Error('HighPrecisionMoney not supported')
+  }
+
   return {
     type: 'centPrecision',
-    ...value,
+    // centAmont is only optional on HighPrecisionMoney, so this should never
+    // fallback to 0
+    centAmount: value.centAmount ?? 0,
+    currencyCode: value.currencyCode,
     fractionDigits: fractionDigits,
   }
+}
+
+export const createTypedMoney = (value: _Money): TypedMoney => {
+  const result = createCentPrecisionMoney(value)
+  return result
 }
 
 export const resolveStoreReference = (

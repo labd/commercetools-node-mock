@@ -16,8 +16,8 @@ import { getBaseResourceProperties } from '../helpers'
 import { Writable } from '../types'
 import { AbstractResourceRepository, RepositoryContext } from './abstract'
 import {
+  createCentPrecisionMoney,
   createCustomFields,
-  createTypedMoney,
   getReferenceFromResourceIdentifier,
 } from './helpers'
 
@@ -29,7 +29,7 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
   create(context: RepositoryContext, draft: PaymentDraft): Payment {
     const resource: Payment = {
       ...getBaseResourceProperties(),
-      amountPlanned: createTypedMoney(draft.amountPlanned),
+      amountPlanned: createCentPrecisionMoney(draft.amountPlanned),
       paymentMethodInfo: draft.paymentMethodInfo!,
       paymentStatus: draft.paymentStatus
         ? {
@@ -64,11 +64,12 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
   transactionFromTransactionDraft = (
     draft: TransactionDraft,
     context: RepositoryContext
-  ) => ({
+  ): Transaction => ({
     ...draft,
     id: uuidv4(),
-    amount: createTypedMoney(draft.amount),
+    amount: createCentPrecisionMoney(draft.amount),
     custom: createCustomFields(draft.custom, context.projectKey, this._storage),
+    state: draft.state ?? 'Initial', // Documented as default
   })
 
   actions = {

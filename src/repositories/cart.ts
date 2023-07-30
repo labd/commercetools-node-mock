@@ -195,6 +195,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
           perMethodTaxRate: [],
           totalPrice: {
             ...price.value,
+            type: 'centPrecision',
             centAmount: price.value.centAmount * quantity,
           },
           quantity,
@@ -416,7 +417,9 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       variant,
       price: price,
       totalPrice: {
-        ...price.value,
+        type: 'centPrecision',
+        currencyCode: price.value.currencyCode,
+        fractionDigits: price.value.fractionDigits,
         centAmount: price.value.centAmount * quant,
       },
       taxedPricePortions: [],
@@ -438,7 +441,7 @@ const selectPrice = ({
   prices: Price[] | undefined
   currency: string
   country: string | undefined
-}) => {
+}): Price | undefined => {
   if (!prices) {
     return undefined
   }
