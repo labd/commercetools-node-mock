@@ -3,10 +3,9 @@
  */
 
 import type { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
-import Parser from 'pratt'
 import { nestedLookup } from '../helpers'
 import type { Writable } from '../types'
-import { Lexer } from './lexer'
+import { Lexer, Parser } from './parser'
 
 type MatchFunc = (target: any) => boolean
 

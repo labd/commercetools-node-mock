@@ -26,12 +26,6 @@ dependencies:
   nock:
     specifier: ^13.3.2
     version: 13.3.2
-  perplex:
-    specifier: ^0.11.0
-    version: 0.11.0
-  pratt:
-    specifier: ^0.7.0
-    version: 0.7.0
   supertest:
     specifier: ^6.3.3
     version: 6.3.3
@@ -3712,10 +3706,6 @@ packages:
     resolution: {integrity: sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==}
     dev: true
 
-  /perplex@0.11.0:
-    resolution: {integrity: sha512-jBloEOPzQWOk5gWaJjmPuOmCdSGquzM6lzA0aharey9qNE24vB+sTqbPzNGRXMejzCmViuj+9XIKX7JkqyqoLA==}
-    dev: false
-
   /picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
     dev: true
@@ -3775,10 +3765,6 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: true
-
-  /pratt@0.7.0:
-    resolution: {integrity: sha512-QmZfgboJk0tZmCJM93PAdd9H16+4fnSj8XRFNJWHV5ilenqdQM489j57baW/vbtouYeewCTRoLzw+lIksnH3JA==}
-    dev: false
 
   /preferred-pm@3.0.3:
     resolution: {integrity: sha512-+wZgbxNES/KlJs9q40F/1sfOd/j7f1O9JaHcW5Dsn3aUUOZg3L2bjpVUcKV2jvtElYfoTuQiNeMfQJ4kwUAhCQ==}
