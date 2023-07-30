@@ -4,5 +4,5 @@ import { getBaseResourceProperties } from './helpers'
 export {
   CommercetoolsMock,
   getBaseResourceProperties,
-  CommercetoolsMockOptions,
+  type CommercetoolsMockOptions,
 }
