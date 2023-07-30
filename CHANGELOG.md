@@ -1,5 +1,19 @@
 ## 0.14.0
 
+## 1.3.0
+
+### Minor Changes
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove peerDependency for @commercetools/platform-sdk and make sure we only import types
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add support for Cart.changeLineItemQuantity
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update most dependencies to latest version
+
+### Patch Changes
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch to using vitest instead of jest
+
 ## 1.2.0
 
 ### Minor Changes
