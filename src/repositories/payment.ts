@@ -12,14 +12,14 @@ import type {
   TransactionDraft,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 import {
   createCentPrecisionMoney,
   createCustomFields,
   getReferenceFromResourceIdentifier,
-} from './helpers'
+} from './helpers.js'
 
 export class PaymentRepository extends AbstractResourceRepository<'payment'> {
   getTypeId() {

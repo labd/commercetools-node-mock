@@ -2,7 +2,7 @@ import assert from 'assert'
 import type { Order, Payment, State } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock, getBaseResourceProperties } from '../index'
+import { CommercetoolsMock, getBaseResourceProperties } from '../index.js'
 
 describe('Order Query', () => {
   const ctMock = new CommercetoolsMock()

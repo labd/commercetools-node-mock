@@ -9,8 +9,8 @@ import type {
   RangeFacetResult,
   TermFacetResult,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from './exceptions'
-import { nestedLookup } from './helpers'
+import { CommercetoolsError } from './exceptions.js'
+import { nestedLookup } from './helpers.js'
 import {
   FilterExpression,
   RangeExpression,
@@ -18,10 +18,10 @@ import {
   getVariants,
   parseFilterExpression,
   resolveVariantValue,
-} from './lib/projectionSearchFilter'
-import { applyPriceSelector } from './priceSelector'
-import { AbstractStorage } from './storage'
-import type { Writable } from './types'
+} from './lib/projectionSearchFilter.js'
+import { applyPriceSelector } from './priceSelector.js'
+import { AbstractStorage } from './storage/index.js'
+import type { Writable } from './types.js'
 
 export type ProductProjectionSearchParams = {
   fuzzy?: boolean

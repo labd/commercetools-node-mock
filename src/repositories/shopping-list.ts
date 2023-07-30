@@ -3,13 +3,13 @@ import type {
   ShoppingList,
   ShoppingListDraft,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,
   getStoreKeyReference,
-} from './helpers'
+} from './helpers.js'
 
 export class ShoppingListRepository extends AbstractResourceRepository<'shopping-list'> {
   getTypeId() {

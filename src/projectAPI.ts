@@ -1,8 +1,8 @@
-import { GetParams } from 'repositories/abstract'
-import { getBaseResourceProperties } from './helpers'
-import { AbstractStorage } from './storage'
-import { RepositoryMap } from './repositories'
-import { ResourceMap, ResourceType } from './types'
+import { getBaseResourceProperties } from './helpers.js'
+import { GetParams } from './repositories/abstract.js'
+import { RepositoryMap } from './repositories/index.js'
+import { AbstractStorage } from './storage/index.js'
+import { ResourceMap, ResourceType } from './types.js'
 
 export class ProjectAPI {
   private projectKey: string

@@ -4,8 +4,8 @@ import type {
   Order,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
-import { type RepositoryContext } from './abstract'
-import { OrderRepository } from './order'
+import { type RepositoryContext } from './abstract.js'
+import { OrderRepository } from './order.js'
 
 export class MyOrderRepository extends OrderRepository {
   create(context: RepositoryContext, draft: MyOrderFromCartDraft): Order {

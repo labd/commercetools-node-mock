@@ -22,9 +22,9 @@ import type {
 } from '@commercetools/platform-sdk'
 import type { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { CommercetoolsError } from '../exceptions'
-import { AbstractStorage } from '../storage'
-import { type RepositoryContext } from './abstract'
+import { CommercetoolsError } from '../exceptions.js'
+import { AbstractStorage } from '../storage/index.js'
+import { type RepositoryContext } from './abstract.js'
 
 export const createAddress = (
   base: BaseAddress | undefined,

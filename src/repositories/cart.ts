@@ -24,11 +24,11 @@ import type {
   ProductVariant,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract'
-import { createAddress, createCustomFields } from './helpers'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createAddress, createCustomFields } from './helpers.js'
 
 export class CartRepository extends AbstractResourceRepository<'cart'> {
   getTypeId() {

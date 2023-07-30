@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { haversineDistance, Location } from './haversine'
+import { haversineDistance, Location } from './haversine.js'
 
 test('haversine', () => {
   // Lab Digital

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
-import { CustomerRepository } from '../repositories/customer'
-import { getRepositoryContext } from '../repositories/helpers'
-import AbstractService from './abstract'
+import { CustomerRepository } from '../repositories/customer.js'
+import { getRepositoryContext } from '../repositories/helpers.js'
+import AbstractService from './abstract.js'
 
 export class MyCustomerService extends AbstractService {
   public repository: CustomerRepository

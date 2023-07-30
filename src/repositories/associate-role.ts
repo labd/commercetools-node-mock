@@ -1,5 +1,5 @@
 import type { AssociateRole } from '@commercetools/platform-sdk'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
 
 export class AssociateRoleRepository extends AbstractResourceRepository<'associate-role'> {
   getTypeId() {

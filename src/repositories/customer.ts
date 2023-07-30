@@ -6,10 +6,10 @@ import type {
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
-import type { Writable } from 'types'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract'
+import type { Writable } from '../types.js'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   getTypeId() {

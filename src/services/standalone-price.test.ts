@@ -9,7 +9,7 @@ import {
   expect,
   test,
 } from 'vitest'
-import { CommercetoolsMock } from '../index'
+import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()
 

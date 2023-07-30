@@ -15,13 +15,13 @@ import type {
   CartDiscountValueGiftLineItem,
   CartDiscountValueRelative,
 } from '@commercetools/platform-sdk'
-import type { Writable } from 'types'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
 import {
   createTypedMoney,
   getStoreKeyReference,
-} from './helpers'
+} from './helpers.js'
 
 export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
   getTypeId() {

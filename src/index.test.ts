@@ -1,5 +1,5 @@
 import { type InvalidTokenError } from '@commercetools/platform-sdk'
-import { CommercetoolsMock } from './index'
+import { CommercetoolsMock } from './index.js'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import nock from 'nock'
 import got from 'got'

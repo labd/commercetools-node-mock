@@ -7,10 +7,10 @@ import type {
   InventoryEntrySetExpectedDeliveryAction,
   InventoryEntrySetRestockableInDaysAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createCustomFields } from './helpers.js'
 
 export class InventoryEntryRepository extends AbstractResourceRepository<'inventory-entry'> {
   getTypeId() {

@@ -3,9 +3,9 @@ import type {
   Subscription,
   SubscriptionDraft,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 
 export class SubscriptionRepository extends AbstractResourceRepository<'subscription'> {
   getTypeId() {

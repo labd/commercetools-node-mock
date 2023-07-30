@@ -1,13 +1,13 @@
 import type { ProductDraft, ProductProjection } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
-import { QueryParamsAsArray } from '../helpers'
-import { ProductProjectionSearch } from '../product-projection-search'
-import { type AbstractStorage } from '../storage'
+import { QueryParamsAsArray } from '../helpers.js'
+import { ProductProjectionSearch } from '../product-projection-search.js'
+import { type AbstractStorage } from '../storage/index.js'
 import {
   AbstractResourceRepository,
   type QueryParams,
   RepositoryContext,
-} from './abstract'
+} from './abstract.js'
 
 export class ProductProjectionRepository extends AbstractResourceRepository<'product-projection'> {
   protected _searchService: ProductProjectionSearch

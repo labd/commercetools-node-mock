@@ -28,14 +28,14 @@ import type {
   Store,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
 import {
   AbstractResourceRepository,
   type QueryParams,
   RepositoryContext,
-} from './abstract'
+} from './abstract.js'
 import {
   createAddress,
   createCentPrecisionMoney,
@@ -43,7 +43,7 @@ import {
   createPrice,
   createTypedMoney,
   resolveStoreReference,
-} from './helpers'
+} from './helpers.js'
 
 export class OrderRepository extends AbstractResourceRepository<'order'> {
   getTypeId() {

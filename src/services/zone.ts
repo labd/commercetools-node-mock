@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { ZoneRepository } from '../repositories/zone'
-import AbstractService from './abstract'
+import { ZoneRepository } from '../repositories/zone.js'
+import AbstractService from './abstract.js'
 
 export class ZoneService extends AbstractService {
   public repository: ZoneRepository

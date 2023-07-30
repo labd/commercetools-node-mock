@@ -1,8 +1,8 @@
 import type { Update } from '@commercetools/platform-sdk'
 import { type Request, type Response, Router } from 'express'
 import { ParsedQs } from 'qs'
-import { AbstractResourceRepository } from '../repositories/abstract'
-import { getRepositoryContext } from '../repositories/helpers'
+import { AbstractResourceRepository } from '../repositories/abstract.js'
+import { getRepositoryContext } from '../repositories/helpers.js'
 
 export default abstract class AbstractService {
   protected abstract getBasePath(): string

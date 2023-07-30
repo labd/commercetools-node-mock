@@ -4,8 +4,8 @@
  *
  * See https://docs.commercetools.com/api/predicates/query
  */
-import { haversineDistance } from './haversine'
-import { Lexer, Parser, type ITokenPosition } from './parser'
+import { haversineDistance } from './haversine.js'
+import { Lexer, Parser, type ITokenPosition } from './parser.js'
 
 export class PredicateError {
   message: string

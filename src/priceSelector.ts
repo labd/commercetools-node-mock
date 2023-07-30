@@ -4,8 +4,8 @@ import type {
   ProductProjection,
   ProductVariant,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from './exceptions'
-import type { Writable } from './types'
+import { CommercetoolsError } from './exceptions.js'
+import type { Writable } from './types.js'
 
 export type PriceSelector = {
   currency?: string

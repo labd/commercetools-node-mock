@@ -5,11 +5,11 @@ import type {
   UpdateAction,
 } from '@commercetools/platform-sdk'
 import deepEqual from 'deep-equal'
-import { CommercetoolsError } from '../exceptions'
-import { cloneObject } from '../helpers'
-import { AbstractStorage } from '../storage'
-import { ResourceMap, ResourceType, ShallowWritable } from './../types'
-import { checkConcurrentModification } from './errors'
+import { CommercetoolsError } from '../exceptions.js'
+import { cloneObject } from '../helpers.js'
+import { AbstractStorage } from '../storage/index.js'
+import { ResourceMap, ResourceType, ShallowWritable } from './../types.js'
+import { checkConcurrentModification } from './errors.js'
 
 export type QueryParams = {
   expand?: string[]

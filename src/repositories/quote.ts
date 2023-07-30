@@ -3,8 +3,8 @@ import type {
   QuoteDraft,
   QuoteUpdateAction,
 } from '@commercetools/platform-sdk'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 
 export class QuoteRepository extends AbstractResourceRepository<'quote'> {
   getTypeId() {

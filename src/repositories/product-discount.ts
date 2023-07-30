@@ -18,10 +18,10 @@ import type {
   ProductDiscountValueExternal,
   ProductDiscountValueRelative,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createTypedMoney } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+import { createTypedMoney } from './helpers.js'
 
 export class ProductDiscountRepository extends AbstractResourceRepository<'product-discount'> {
   getTypeId() {

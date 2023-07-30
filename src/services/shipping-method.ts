@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { ShippingMethodRepository } from '../repositories/shipping-method'
-import AbstractService from './abstract'
+import { ShippingMethodRepository } from '../repositories/shipping-method.js'
+import AbstractService from './abstract.js'
 
 export class ShippingMethodService extends AbstractService {
   public repository: ShippingMethodRepository

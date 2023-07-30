@@ -1,8 +1,8 @@
 import type { ProductProjection } from '@commercetools/platform-sdk'
 import { describe, expect, test } from 'vitest'
-import { cloneObject } from '../helpers'
-import { applyPriceSelector } from '../priceSelector'
-import { parseFilterExpression } from './projectionSearchFilter'
+import { cloneObject } from '../helpers.js'
+import { applyPriceSelector } from '../priceSelector.js'
+import { parseFilterExpression } from './projectionSearchFilter.js'
 
 describe('Search filter', () => {
   const exampleProduct: ProductProjection = {

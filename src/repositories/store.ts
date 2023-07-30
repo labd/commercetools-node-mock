@@ -10,13 +10,13 @@ import type {
   StoreSetNameAction,
   StoreUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,
-} from './helpers'
+} from './helpers.js'
 
 export class StoreRepository extends AbstractResourceRepository<'store'> {
   getTypeId() {

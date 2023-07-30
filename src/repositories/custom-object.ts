@@ -3,11 +3,11 @@ import type {
   CustomObjectDraft,
   InvalidOperationError,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from '../exceptions'
-import { cloneObject, getBaseResourceProperties } from '../helpers'
-import type { Writable } from '../types'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract'
-import { checkConcurrentModification } from './errors'
+import { CommercetoolsError } from '../exceptions.js'
+import { cloneObject, getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { checkConcurrentModification } from './errors.js'
 
 export class CustomObjectRepository extends AbstractResourceRepository<'key-value-document'> {
   getTypeId() {

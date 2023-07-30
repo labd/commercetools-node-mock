@@ -3,9 +3,9 @@
  */
 
 import type { ProductProjection, ProductVariant } from '@commercetools/platform-sdk'
-import { nestedLookup } from '../helpers'
-import type { Writable } from '../types'
-import { Lexer, Parser } from './parser'
+import { nestedLookup } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { Lexer, Parser } from './parser.js'
 
 type MatchFunc = (target: any) => boolean
 
