@@ -1,4 +1,7 @@
 import { AbstractStorage } from '../storage'
+import { AssociateRoleRepository } from './associate-role'
+import { AttributeGroupRepository } from './attribute-group'
+import { BusinessUnitRepository } from './business-unit'
 import { CartRepository } from './cart'
 import { CartDiscountRepository } from './cart-discount'
 import { CategoryRepository } from './category'
@@ -36,6 +39,9 @@ import { ZoneRepository } from './zone'
 export type RepositoryMap = ReturnType<typeof createRepositories>
 
 export const createRepositories = (storage: AbstractStorage) => ({
+  'associate-role': new AssociateRoleRepository(storage),
+  'attribute-group': new AttributeGroupRepository(storage),
+  'business-unit': new BusinessUnitRepository(storage),
   category: new CategoryRepository(storage),
   cart: new CartRepository(storage),
   'cart-discount': new CartDiscountRepository(storage),

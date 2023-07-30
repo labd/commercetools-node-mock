@@ -21,6 +21,9 @@ export type Services = Partial<{
 export type ResourceType = keyof ResourceMap & keyof RepositoryMap
 
 export type ResourceMap = {
+  'attribute-group': ctp.AttributeGroup
+  'associate-role': ctp.AssociateRole
+  'business-unit': ctp.BusinessUnit
   'cart-discount': ctp.CartDiscount
   cart: ctp.Cart
   category: ctp.Category
@@ -58,6 +61,9 @@ export type ResourceMap = {
 }
 
 export type PagedQueryResponseMap = {
+  'attribute-group': ctp.AttributeGroupPagedQueryResponse
+  'associate-role': ctp.AssociateRolePagedQueryResponse
+  'business-unit': ctp.BusinessUnitPagedQueryResponse
   'cart-discount': ctp.CartDiscountPagedQueryResponse
   cart: ctp.CartPagedQueryResponse
   category: ctp.CategoryPagedQueryResponse

@@ -1,4 +1,7 @@
 import {
+  AssociateRole,
+  AttributeGroup,
+  BusinessUnit,
   Cart,
   CartDiscount,
   Category,
@@ -65,6 +68,9 @@ export class InMemoryStorage extends AbstractStorage {
     let projectStorage = this.resources[projectKey]
     if (!projectStorage) {
       projectStorage = this.resources[projectKey] = {
+        'associate-role': new Map<string, AssociateRole>(),
+        'attribute-group': new Map<string, AttributeGroup>(),
+        'business-unit': new Map<string, BusinessUnit>(),
         cart: new Map<string, Cart>(),
         'cart-discount': new Map<string, CartDiscount>(),
         category: new Map<string, Category>(),
