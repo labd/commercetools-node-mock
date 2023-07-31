@@ -97,12 +97,8 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
       { name, value }: CustomerSetCustomFieldAction
     ) => {
       if (!resource.custom) {
-        throw new CommercetoolsError<GeneralError>({
-          code: 'General',
-          message: "The customr does not have a 'custom' field set.",
-        })
+        throw new Error('Resource has no custom field')
       }
-
       resource.custom.fields[name] = value
     },
   }
