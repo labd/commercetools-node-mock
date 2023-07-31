@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { CategoryRepository } from '../repositories/category'
-import AbstractService from './abstract'
+import { CategoryRepository } from '../repositories/category.js'
+import AbstractService from './abstract.js'
 
 export class CategoryServices extends AbstractService {
   public repository: CategoryRepository

@@ -1,4 +1,4 @@
-import {
+import type {
   Project,
   ProjectChangeCartsConfigurationAction,
   ProjectChangeCountriesAction,
@@ -13,9 +13,9 @@ import {
   ProjectSetShippingRateInputTypeAction,
   ProjectUpdateAction,
 } from '@commercetools/platform-sdk'
-import { maskSecretValue } from '../lib/masking'
-import { Writable } from '../types'
-import { AbstractRepository, RepositoryContext } from './abstract'
+import { maskSecretValue } from '../lib/masking.js'
+import type { Writable } from '../types.js'
+import { AbstractRepository, RepositoryContext } from './abstract.js'
 
 export class ProjectRepository extends AbstractRepository<Project> {
   get(context: RepositoryContext): Project | null {

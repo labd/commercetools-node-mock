@@ -1,4 +1,4 @@
-import {
+import type {
   Price,
   PriceDraft,
   Product,
@@ -20,10 +20,10 @@ import {
   ProductRemovePriceAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { Writable } from '../types'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { getReferenceFromResourceIdentifier } from './helpers'
+import type { Writable } from '../types.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+import { createTypedMoney, getReferenceFromResourceIdentifier } from './helpers.js'
 import deepEqual from 'deep-equal'
 
 export class ProductRepository extends AbstractResourceRepository<'product'> {
@@ -622,10 +622,5 @@ const variantFromDraft = (
 const priceFromDraft = (draft: PriceDraft): Price => ({
   id: uuidv4(),
   country: draft.country,
-  value: {
-    currencyCode: draft.value.currencyCode,
-    centAmount: draft.value.centAmount,
-    fractionDigits: 2,
-    type: 'centPrecision',
-  },
+  value: createTypedMoney(draft.value),
 })

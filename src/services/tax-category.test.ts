@@ -1,6 +1,7 @@
-import { TaxCategoryDraft } from '@commercetools/platform-sdk'
+import type { TaxCategoryDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { afterEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()
 

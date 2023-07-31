@@ -1,4 +1,4 @@
-import {
+import type {
   CustomerGroup,
   CustomerGroupChangeNameAction,
   CustomerGroupDraft,
@@ -6,10 +6,10 @@ import {
   CustomerGroupSetCustomTypeAction,
   CustomerGroupSetKeyAction,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createCustomFields } from './helpers.js'
 
 export class CustomerGroupRepository extends AbstractResourceRepository<'customer-group'> {
   getTypeId() {

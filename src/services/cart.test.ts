@@ -1,4 +1,4 @@
-import {
+import type {
   Address,
   Cart,
   CentPrecisionMoney,
@@ -6,7 +6,8 @@ import {
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
 
 describe('Carts Query', () => {
   const ctMock = new CommercetoolsMock()

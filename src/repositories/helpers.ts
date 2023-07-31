@@ -1,10 +1,12 @@
-import {
+import type {
   Address,
   BaseAddress,
+  CentPrecisionMoney,
   CustomFields,
   CustomFieldsDraft,
+  HighPrecisionMoney,
+  HighPrecisionMoneyDraft,
   InvalidJsonInputError,
-  Money,
   Price,
   PriceDraft,
   Reference,
@@ -12,15 +14,17 @@ import {
   ResourceIdentifier,
   Store,
   StoreKeyReference,
+  StoreReference,
   StoreResourceIdentifier,
   Type,
   TypedMoney,
+  _Money,
 } from '@commercetools/platform-sdk'
-import { Request } from 'express'
+import type { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { CommercetoolsError } from '../exceptions'
-import { AbstractStorage } from '../storage'
-import { RepositoryContext } from './abstract'
+import { CommercetoolsError } from '../exceptions.js'
+import { AbstractStorage } from '../storage/index.js'
+import { type RepositoryContext } from './abstract.js'
 
 export const createAddress = (
   base: BaseAddress | undefined,
@@ -72,7 +76,7 @@ export const createPrice = (draft: PriceDraft): Price => ({
   value: createTypedMoney(draft.value),
 })
 
-export const createTypedMoney = (value: Money): TypedMoney => {
+export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
   // Taken from https://docs.adyen.com/development-resources/currency-codes
   let fractionDigits = 2
   switch (value.currencyCode.toUpperCase()) {
@@ -106,11 +110,23 @@ export const createTypedMoney = (value: Money): TypedMoney => {
       fractionDigits = 2
   }
 
+  if ((value as HighPrecisionMoney & HighPrecisionMoneyDraft).preciseAmount) {
+    throw new Error('HighPrecisionMoney not supported')
+  }
+
   return {
     type: 'centPrecision',
-    ...value,
+    // centAmont is only optional on HighPrecisionMoney, so this should never
+    // fallback to 0
+    centAmount: value.centAmount ?? 0,
+    currencyCode: value.currencyCode,
     fractionDigits: fractionDigits,
   }
+}
+
+export const createTypedMoney = (value: _Money): TypedMoney => {
+  const result = createCentPrecisionMoney(value)
+  return result
 }
 
 export const resolveStoreReference = (
@@ -141,6 +157,7 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
       {
         code: 'InvalidJsonInput',
         message: `${resourceIdentifier.typeId}: ResourceIdentifier requires an 'id' xor a 'key'`,
+        detailedErrorMessage: `ResourceIdentifier requires an 'id' xor a 'key'`,
       },
       400
     )
@@ -170,6 +187,32 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
     typeId: resourceIdentifier.typeId,
     id: resource?.id,
   } as unknown as T
+}
+
+export const getStoreKeyReference = (
+  id: StoreResourceIdentifier,
+  projectKey: string,
+  storage: AbstractStorage
+): StoreKeyReference => {
+  if (id.key) {
+    return {
+      typeId: 'store',
+      key: id.key,
+    }
+  }
+  const value = getReferenceFromResourceIdentifier<StoreReference>(
+    id,
+    projectKey,
+    storage
+  )
+
+  if (!value.obj?.key) {
+    throw new Error('No store found for reference')
+  }
+  return {
+    typeId: 'store',
+    key: value.obj?.key,
+  }
 }
 
 export const getRepositoryContext = (request: Request): RepositoryContext => ({

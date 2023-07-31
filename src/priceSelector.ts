@@ -1,11 +1,11 @@
-import {
+import type {
   InvalidInputError,
   Price,
   ProductProjection,
   ProductVariant,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from './exceptions'
-import { Writable } from './types'
+import { CommercetoolsError } from './exceptions.js'
+import type { Writable } from './types.js'
 
 export type PriceSelector = {
   currency?: string

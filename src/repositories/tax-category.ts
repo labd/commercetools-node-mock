@@ -1,4 +1,4 @@
-import {
+import type {
   TaxCategory,
   TaxCategoryAddTaxRateAction,
   TaxCategoryChangeNameAction,
@@ -12,9 +12,9 @@ import {
   TaxRateDraft,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 
 export class TaxCategoryRepository extends AbstractResourceRepository<'tax-category'> {
   getTypeId() {

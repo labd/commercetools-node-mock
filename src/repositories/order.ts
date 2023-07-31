@@ -1,4 +1,4 @@
-import {
+import type {
   Cart,
   CartReference,
   CustomLineItem,
@@ -28,20 +28,22 @@ import {
   Store,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
 import {
   AbstractResourceRepository,
-  QueryParams,
+  type QueryParams,
   RepositoryContext,
-} from './abstract'
+} from './abstract.js'
 import {
+  createAddress,
+  createCentPrecisionMoney,
   createCustomFields,
   createPrice,
   createTypedMoney,
   resolveStoreReference,
-} from './helpers'
+} from './helpers.js'
 
 export class OrderRepository extends AbstractResourceRepository<'order'> {
   getTypeId() {
@@ -104,8 +106,16 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
     const resource: Order = {
       ...getBaseResourceProperties(),
 
-      billingAddress: draft.billingAddress,
-      shippingAddress: draft.shippingAddress,
+      billingAddress: createAddress(
+        draft.billingAddress,
+        context.projectKey,
+        this._storage
+      ),
+      shippingAddress: createAddress(
+        draft.shippingAddress,
+        context.projectKey,
+        this._storage
+      ),
 
       custom: createCustomFields(
         draft.custom,
@@ -138,11 +148,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
           this.customLineItemFromImportDraft.bind(this)(context, item)
         ) || [],
 
-      totalPrice: {
-        type: 'centPrecision',
-        ...draft.totalPrice,
-        fractionDigits: 2,
-      },
+      totalPrice: createCentPrecisionMoney(draft.totalPrice),
     }
     this.saveNew(context, resource)
     return resource
@@ -208,7 +214,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
       taxRate: draft.taxRate,
       taxedPricePortions: [],
       perMethodTaxRate: [],
-      totalPrice: createTypedMoney(draft.price.value),
+      totalPrice: createCentPrecisionMoney(draft.price.value),
       variant: {
         id: variant.id,
         sku: variant.sku,
@@ -233,11 +239,12 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
       discountedPricePerQuantity: [],
       money: createTypedMoney(draft.money),
       name: draft.name,
-      quantity: draft.quantity,
+      quantity: draft.quantity ?? 0,
+      perMethodTaxRate: [],
       priceMode: draft.priceMode,
       slug: draft.slug,
       state: [],
-      totalPrice: createTypedMoney(draft.money),
+      totalPrice: createCentPrecisionMoney(draft.money),
     }
 
     return lineItem
@@ -326,7 +333,11 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
       resource: Writable<Order>,
       { address }: OrderSetBillingAddressAction
     ) => {
-      resource.billingAddress = address
+      resource.billingAddress = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
     },
     setCustomerEmail: (
       context: RepositoryContext,
@@ -366,7 +377,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields || {},
         }
       }
     },
@@ -389,7 +400,11 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
       resource: Writable<Order>,
       { address }: OrderSetShippingAddressAction
     ) => {
-      resource.shippingAddress = address
+      resource.shippingAddress = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
     },
     setStore: (
       context: RepositoryContext,

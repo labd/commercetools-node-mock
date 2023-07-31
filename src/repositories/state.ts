@@ -1,4 +1,4 @@
-import {
+import type {
   State,
   StateChangeInitialAction,
   StateChangeKeyAction,
@@ -10,10 +10,10 @@ import {
   StateSetTransitionsAction,
   StateUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { getReferenceFromResourceIdentifier } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+import { getReferenceFromResourceIdentifier } from './helpers.js'
 
 export class StateRepository extends AbstractResourceRepository<'state'> {
   getTypeId() {

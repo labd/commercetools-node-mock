@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 18
 
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:
@@ -33,7 +33,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        node: ["16.x", "18.x"]
+        node: ["16.x", "18.x", "20.x"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:
@@ -53,7 +53,7 @@ jobs:
           run_install: true
 
       - name: Test
-        run: pnpm run test --ci --coverage --maxWorkers=2
+        run: pnpm run test:ci
 
       - name: Build
         run: pnpm build
@@ -109,7 +109,7 @@ jobs:
         with:
           node-version: 18
 
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:

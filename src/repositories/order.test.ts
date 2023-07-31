@@ -1,6 +1,7 @@
-import { Cart, OrderImportDraft } from '@commercetools/platform-sdk'
-import { InMemoryStorage } from '../storage'
-import { OrderRepository } from './order'
+import type { Cart, OrderImportDraft } from '@commercetools/platform-sdk'
+import { describe, expect, test } from 'vitest'
+import { InMemoryStorage } from '../storage/index.js'
+import { OrderRepository } from './order.js'
 
 describe('Order repository', () => {
   const storage = new InMemoryStorage()
@@ -12,6 +13,10 @@ describe('Order repository', () => {
       version: 1,
       createdAt: '2021-09-02T12:23:30.036Z',
       lastModifiedAt: '2021-09-02T12:23:30.546Z',
+      discountCodes: [],
+      directDiscounts : [],
+      inventoryMode: 'None',
+      itemShippingAddresses: [],
       lineItems: [],
       customLineItems: [],
       totalPrice: {
@@ -52,6 +57,10 @@ describe('Order repository', () => {
       version: 1,
       createdAt: '2021-09-02T12:23:30.036Z',
       lastModifiedAt: '2021-09-02T12:23:30.546Z',
+      discountCodes: [],
+      directDiscounts : [],
+      inventoryMode: 'None',
+      itemShippingAddresses: [],
       lineItems: [],
       customLineItems: [],
       totalPrice: {
@@ -115,31 +124,21 @@ describe('Order repository', () => {
       customLineItems: [],
       lineItems: [
         {
-          id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
           productId: 'PRODUCTID',
           name: {
             'en-US': 'The product',
           },
-          productType: {
-            typeId: 'product-type',
-            id: '109caecb-abe6-4900-ab03-7af5af985ff3',
-            // @ts-ignore
-            version: 1,
-          },
           variant: {
             id: 1,
             sku: 'MYSKU',
-            key: 'MYKEY',
             prices: [
               {
                 value: {
-                  // @ts-ignore
                   type: 'centPrecision',
                   currencyCode: 'EUR',
                   centAmount: 14900,
                   fractionDigits: 2,
                 },
-                id: '87943be5-c7e6-44eb-b867-f127f94ccfe7',
                 country: 'NL',
                 // channel: {
                 //   typeId: 'channel',
@@ -156,17 +155,14 @@ describe('Order repository', () => {
             ],
             images: [],
             attributes: [],
-            assets: [],
           },
           price: {
             value: {
-              // @ts-ignore
               type: 'centPrecision',
               currencyCode: 'EUR',
               centAmount: 14900,
               fractionDigits: 2,
             },
-            id: '87943be5-c7e6-44eb-b867-f127f94ccfe7',
             country: 'NL',
             // channel: {
             //   typeId: 'channel',
@@ -181,7 +177,6 @@ describe('Order repository', () => {
             // },
           },
           quantity: 3,
-          discountedPricePerQuantity: [],
           // distributionChannel: {
           //   typeId: 'channel',
           //   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
@@ -194,8 +189,6 @@ describe('Order repository', () => {
             id: 'Z0wLUuYw',
             subRates: [],
           },
-          addedAt: '2020-12-08T09:10:27.085Z',
-          lastModifiedAt: '2020-12-08T09:10:27.085Z',
           // state: [
           //   {
           //     quantity: 3,
@@ -205,28 +198,6 @@ describe('Order repository', () => {
           //     },
           //   },
           // ],
-          priceMode: 'Platform',
-          totalPrice: {
-            type: 'centPrecision',
-            currencyCode: 'EUR',
-            centAmount: 44700,
-            fractionDigits: 2,
-          },
-          taxedPrice: {
-            totalNet: {
-              type: 'centPrecision',
-              currencyCode: 'EUR',
-              centAmount: 36942,
-              fractionDigits: 2,
-            },
-            totalGross: {
-              type: 'centPrecision',
-              currencyCode: 'EUR',
-              centAmount: 44700,
-              fractionDigits: 2,
-            },
-          },
-          lineItemMode: 'Standard',
         },
       ],
     }

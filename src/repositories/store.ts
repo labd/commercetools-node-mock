@@ -1,4 +1,4 @@
-import {
+import type {
   ChannelReference,
   ChannelResourceIdentifier,
   Store,
@@ -10,13 +10,13 @@ import {
   StoreSetNameAction,
   StoreUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 import {
   createCustomFields,
   getReferenceFromResourceIdentifier,
-} from './helpers'
+} from './helpers.js'
 
 export class StoreRepository extends AbstractResourceRepository<'store'> {
   getTypeId() {
@@ -29,6 +29,7 @@ export class StoreRepository extends AbstractResourceRepository<'store'> {
       key: draft.key,
       name: draft.name,
       languages: draft.languages ?? [],
+      countries: draft.countries ?? [],
       distributionChannels: this.transformChannels(
         context,
         draft.distributionChannels

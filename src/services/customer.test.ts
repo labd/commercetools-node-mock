@@ -1,7 +1,8 @@
 import { Customer } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
-import { CommercetoolsMock, getBaseResourceProperties } from '../index'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock, getBaseResourceProperties } from '../index.js'
 
 describe('Customer Update Actions', () => {
   const ctMock = new CommercetoolsMock()

@@ -1,4 +1,4 @@
-import {
+import type {
   Channel,
   ChannelChangeDescriptionAction,
   ChannelChangeKeyAction,
@@ -10,10 +10,10 @@ import {
   ChannelSetGeoLocationAction,
   ChannelUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createAddress, createCustomFields } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createAddress, createCustomFields } from './helpers.js'
 
 export class ChannelRepository extends AbstractResourceRepository<'channel'> {
   getTypeId() {

@@ -1,11 +1,11 @@
-import {
+import type {
   Review,
   ReviewDraft,
   ReviewUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 
 export class ReviewRepository extends AbstractResourceRepository<'review'> {
   getTypeId() {

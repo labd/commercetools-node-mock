@@ -1,7 +1,8 @@
-import { InventoryEntry, Type } from '@commercetools/platform-sdk'
+import type { InventoryEntry, Type } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
 
 describe('Inventory Entry Query', () => {
   const ctMock = new CommercetoolsMock()

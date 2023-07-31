@@ -1,4 +1,4 @@
-import {
+import type {
   Category,
   CategoryChangeAssetNameAction,
   CategoryChangeSlugAction,
@@ -14,10 +14,10 @@ import {
   CategorySetMetaTitleAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createCustomFields } from './helpers.js'
 
 export class CategoryRepository extends AbstractResourceRepository<'category'> {
   getTypeId() {

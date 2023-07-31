@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { CartDiscountRepository } from '../repositories/cart-discount'
-import AbstractService from './abstract'
+import { CartDiscountRepository } from '../repositories/cart-discount.js'
+import AbstractService from './abstract.js'
 
 export class CartDiscountService extends AbstractService {
   public repository: CartDiscountRepository

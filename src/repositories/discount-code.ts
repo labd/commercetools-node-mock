@@ -1,4 +1,4 @@
-import {
+import type {
   CartDiscountReference,
   DiscountCode,
   DiscountCodeChangeCartDiscountsAction,
@@ -16,10 +16,10 @@ import {
   DiscountCodeSetValidUntilAction,
   DiscountCodeUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createCustomFields } from './helpers.js'
 
 export class DiscountCodeRepository extends AbstractResourceRepository<'discount-code'> {
   getTypeId() {

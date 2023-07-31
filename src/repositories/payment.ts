@@ -1,4 +1,4 @@
-import {
+import type {
   Payment,
   PaymentAddTransactionAction,
   PaymentChangeTransactionStateAction,
@@ -12,14 +12,14 @@ import {
   TransactionDraft,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 import {
+  createCentPrecisionMoney,
   createCustomFields,
-  createTypedMoney,
   getReferenceFromResourceIdentifier,
-} from './helpers'
+} from './helpers.js'
 
 export class PaymentRepository extends AbstractResourceRepository<'payment'> {
   getTypeId() {
@@ -29,7 +29,7 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
   create(context: RepositoryContext, draft: PaymentDraft): Payment {
     const resource: Payment = {
       ...getBaseResourceProperties(),
-      amountPlanned: createTypedMoney(draft.amountPlanned),
+      amountPlanned: createCentPrecisionMoney(draft.amountPlanned),
       paymentMethodInfo: draft.paymentMethodInfo!,
       paymentStatus: draft.paymentStatus
         ? {
@@ -64,11 +64,12 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
   transactionFromTransactionDraft = (
     draft: TransactionDraft,
     context: RepositoryContext
-  ) => ({
+  ): Transaction => ({
     ...draft,
     id: uuidv4(),
-    amount: createTypedMoney(draft.amount),
+    amount: createCentPrecisionMoney(draft.amount),
     custom: createCustomFields(draft.custom, context.projectKey, this._storage),
+    state: draft.state ?? 'Initial', // Documented as default
   })
 
   actions = {
@@ -104,7 +105,7 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields ?? {},
         }
       }
     },

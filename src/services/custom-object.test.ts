@@ -1,7 +1,8 @@
-import { CustomObject } from '@commercetools/platform-sdk'
+import type { CustomObject } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { getBaseResourceProperties } from '../helpers'
-import { CommercetoolsMock } from '../index'
+import { getBaseResourceProperties } from '../helpers.js'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
 
 describe('CustomObject create', () => {
   const ctMock = new CommercetoolsMock()

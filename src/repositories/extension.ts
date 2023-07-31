@@ -1,4 +1,4 @@
-import {
+import type {
   Extension,
   ExtensionChangeDestinationAction,
   ExtensionChangeTriggersAction,
@@ -7,10 +7,10 @@ import {
   ExtensionSetTimeoutInMsAction,
   ExtensionUpdateAction,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers'
-import { maskSecretValue } from '../lib/masking'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import { maskSecretValue } from '../lib/masking.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
 
 export class ExtensionRepository extends AbstractResourceRepository<'extension'> {
   getTypeId() {

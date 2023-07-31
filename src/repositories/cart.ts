@@ -1,6 +1,9 @@
-import {
+import type {
+  Address,
+  AddressDraft,
   Cart,
   CartAddLineItemAction,
+  CartChangeLineItemQuantityAction,
   CartDraft,
   CartRemoveLineItemAction,
   CartSetBillingAddressAction,
@@ -11,6 +14,7 @@ import {
   CartSetLocaleAction,
   CartSetShippingAddressAction,
   CartSetShippingMethodAction,
+  CustomFields,
   GeneralError,
   LineItem,
   LineItemDraft,
@@ -20,11 +24,11 @@ import {
   ProductVariant,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createCustomFields } from './helpers'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import { createAddress, createCustomFields } from './helpers.js'
 
 export class CartRepository extends AbstractResourceRepository<'cart'> {
   getTypeId() {
@@ -47,6 +51,10 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       cartState: 'Active',
       country: draft.country,
       customLineItems: [],
+      directDiscounts: [],
+      discountCodes: [],
+      inventoryMode: 'None',
+      itemShippingAddresses: [],
       lineItems,
       locale: draft.locale,
       taxCalculationMode: draft.taxCalculationMode ?? 'LineItemLevel',
@@ -150,12 +158,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       )
       if (alreadyAdded) {
         // increase quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.forEach((x) => {
           if (x.productId === product?.id && x.variant.id === variant?.id) {
             x.quantity += quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
-          return x
         })
       } else {
         // add line item
@@ -191,6 +198,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
           perMethodTaxRate: [],
           totalPrice: {
             ...price.value,
+            type: 'centPrecision',
             centAmount: price.value.centAmount * quantity,
           },
           quantity,
@@ -198,6 +206,53 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
           lineItemMode: 'Standard',
           priceMode: 'Platform',
           state: [],
+        })
+      }
+
+      // Update cart total price
+      resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
+    },
+    changeLineItemQuantity: (
+      context: RepositoryContext,
+      resource: Writable<Cart>,
+      { lineItemId, lineItemKey, quantity }: CartChangeLineItemQuantityAction
+    ) => {
+      let lineItem: Writable<LineItem> | undefined
+
+      if (lineItemId) {
+        lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+        if (!lineItem) {
+          throw new CommercetoolsError<GeneralError>({
+            code: 'General',
+            message: `A line item with ID '${lineItemId}' not found.`,
+          })
+        }
+      } else if (lineItemKey) {
+        lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+        if (!lineItem) {
+          throw new CommercetoolsError<GeneralError>({
+            code: 'General',
+            message: `A line item with Key '${lineItemKey}' not found.`,
+          })
+        }
+      } else {
+        throw new CommercetoolsError<GeneralError>({
+          code: 'General',
+          message: `Either lineItemid or lineItemKey needs to be provided.`,
+        })
+      }
+
+      if (quantity === 0) {
+        // delete line item
+        resource.lineItems = resource.lineItems.filter(
+          (x) => x.id !== lineItemId
+        )
+      } else {
+        resource.lineItems.forEach((x) => {
+          if (x.id === lineItemId && quantity) {
+            x.quantity = quantity
+            x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
+          }
         })
       }
 
@@ -226,12 +281,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
         )
       } else {
         // decrease quantity and update total price
-        resource.lineItems.map((x) => {
+        resource.lineItems.forEach((x) => {
           if (x.id === lineItemId && quantity) {
             x.quantity -= quantity
             x.totalPrice.centAmount = calculateLineItemTotalPrice(x)
           }
-          return x
         })
       }
 
@@ -243,7 +297,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       resource: Writable<Cart>,
       { address }: CartSetBillingAddressAction
     ) => {
-      resource.billingAddress = address
+      resource.billingAddress = createAddress(
+        address,
+        context.projectKey,
+        this._storage
+      )
     },
     setShippingMethod: (
       context: RepositoryContext,
@@ -319,7 +377,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
             typeId: 'type',
             id: resolvedType.id,
           },
-          fields: fields || [],
+          fields: fields || {}
         }
       }
     },
@@ -335,7 +393,24 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       resource: Writable<Cart>,
       { address }: CartSetShippingAddressAction
     ) => {
-      resource.shippingAddress = address
+      if (!address) {
+        resource.shippingAddress = undefined
+        return
+      }
+
+      let custom: CustomFields | undefined = undefined
+      if ((address as Address & AddressDraft).custom) {
+        custom = createCustomFields(
+          (address as Address & AddressDraft).custom,
+          context.projectKey,
+          this._storage
+        )
+      }
+
+      resource.shippingAddress = {
+        ...address,
+        custom: custom,
+      }
     },
   }
   draftLineItemtoLineItem = (
@@ -412,7 +487,9 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
       variant,
       price: price,
       totalPrice: {
-        ...price.value,
+        type: 'centPrecision',
+        currencyCode: price.value.currencyCode,
+        fractionDigits: price.value.fractionDigits,
         centAmount: price.value.centAmount * quant,
       },
       taxedPricePortions: [],
@@ -434,7 +511,7 @@ const selectPrice = ({
   prices: Price[] | undefined
   currency: string
   country: string | undefined
-}) => {
+}): Price | undefined => {
   if (!prices) {
     return undefined
   }

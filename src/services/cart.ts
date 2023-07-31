@@ -1,9 +1,9 @@
-import { Cart, CartDraft, Order } from '@commercetools/platform-sdk'
-import { Request, Response, Router } from 'express'
-import { CartRepository } from '../repositories/cart'
-import { getRepositoryContext } from '../repositories/helpers'
-import { OrderRepository } from '../repositories/order'
-import AbstractService from './abstract'
+import type { Cart, CartDraft, Order } from '@commercetools/platform-sdk'
+import type { Request, Response, Router } from 'express'
+import type { CartRepository } from '../repositories/cart.js'
+import { getRepositoryContext } from '../repositories/helpers.js'
+import type { OrderRepository } from '../repositories/order.js'
+import AbstractService from './abstract.js'
 
 export class CartService extends AbstractService {
   public repository: CartRepository

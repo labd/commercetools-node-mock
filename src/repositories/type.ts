@@ -1,4 +1,4 @@
-import {
+import type {
   FieldDefinition,
   InvalidOperationError,
   Type,
@@ -13,10 +13,10 @@ import {
   TypeUpdateAction,
 } from '@commercetools/platform-sdk'
 import isEqual from 'lodash.isequal'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 
 export class TypeRepository extends AbstractResourceRepository<'type'> {
   getTypeId() {

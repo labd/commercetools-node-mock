@@ -1,6 +1,6 @@
-import * as ctp from '@commercetools/platform-sdk'
-import { RepositoryMap } from './repositories'
-import AbstractService from './services/abstract'
+import type * as ctp from '@commercetools/platform-sdk'
+import { RepositoryMap } from './repositories/index.js'
+import AbstractService from './services/abstract.js'
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 export type ShallowWritable<T> = { -readonly [P in keyof T]: T[P] }
@@ -21,6 +21,9 @@ export type Services = Partial<{
 export type ResourceType = keyof ResourceMap & keyof RepositoryMap
 
 export type ResourceMap = {
+  'attribute-group': ctp.AttributeGroup
+  'associate-role': ctp.AssociateRole
+  'business-unit': ctp.BusinessUnit
   'cart-discount': ctp.CartDiscount
   cart: ctp.Cart
   category: ctp.Category
@@ -58,6 +61,9 @@ export type ResourceMap = {
 }
 
 export type PagedQueryResponseMap = {
+  'attribute-group': ctp.AttributeGroupPagedQueryResponse
+  'associate-role': ctp.AssociateRolePagedQueryResponse
+  'business-unit': ctp.BusinessUnitPagedQueryResponse
   'cart-discount': ctp.CartDiscountPagedQueryResponse
   cart: ctp.CartPagedQueryResponse
   category: ctp.CategoryPagedQueryResponse

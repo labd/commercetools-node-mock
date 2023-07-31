@@ -1,27 +1,27 @@
-import {
+import type {
+  FacetResults,
+  FilteredFacetResult,
   InvalidInputError,
-  ProductProjectionPagedSearchResponse,
   Product,
   ProductProjection,
+  ProductProjectionPagedSearchResponse,
   QueryParam,
-  FacetResults,
-  TermFacetResult,
   RangeFacetResult,
-  FilteredFacetResult,
+  TermFacetResult,
 } from '@commercetools/platform-sdk'
-import { nestedLookup } from './helpers'
-import { Writable } from './types'
-import { CommercetoolsError } from './exceptions'
+import { CommercetoolsError } from './exceptions.js'
+import { nestedLookup } from './helpers.js'
 import {
   FilterExpression,
+  RangeExpression,
   generateFacetFunc,
   getVariants,
   parseFilterExpression,
-  RangeExpression,
   resolveVariantValue,
-} from './lib/projectionSearchFilter'
-import { applyPriceSelector } from './priceSelector'
-import { AbstractStorage } from './storage'
+} from './lib/projectionSearchFilter.js'
+import { applyPriceSelector } from './priceSelector.js'
+import { AbstractStorage } from './storage/index.js'
+import type { Writable } from './types.js'
 
 export type ProductProjectionSearchParams = {
   fuzzy?: boolean

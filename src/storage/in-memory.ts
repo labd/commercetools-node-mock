@@ -1,4 +1,7 @@
-import {
+import type {
+  AssociateRole,
+  AttributeGroup,
+  BusinessUnit,
   Cart,
   CartDiscount,
   Category,
@@ -33,22 +36,22 @@ import {
   Zone,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
-import { CommercetoolsError } from '../exceptions'
-import { cloneObject } from '../helpers'
-import { parseExpandClause } from '../lib/expandParser'
-import { parseQueryExpression } from '../lib/predicateParser'
+import { CommercetoolsError } from '../exceptions.js'
+import { cloneObject } from '../helpers.js'
+import { parseExpandClause } from '../lib/expandParser.js'
+import { parseQueryExpression } from '../lib/predicateParser.js'
 import {
   PagedQueryResponseMap,
   ResourceMap,
   ResourceType,
   Writable,
-} from '../types'
+} from '../types.js'
 import {
   AbstractStorage,
   GetParams,
   ProjectStorage,
   QueryParams,
-} from './abstract'
+} from './abstract.js'
 
 export class InMemoryStorage extends AbstractStorage {
   protected resources: {
@@ -65,6 +68,9 @@ export class InMemoryStorage extends AbstractStorage {
     let projectStorage = this.resources[projectKey]
     if (!projectStorage) {
       projectStorage = this.resources[projectKey] = {
+        'associate-role': new Map<string, AssociateRole>(),
+        'attribute-group': new Map<string, AttributeGroup>(),
+        'business-unit': new Map<string, BusinessUnit>(),
         cart: new Map<string, Cart>(),
         'cart-discount': new Map<string, CartDiscount>(),
         category: new Map<string, Category>(),

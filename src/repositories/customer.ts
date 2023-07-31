@@ -1,4 +1,4 @@
-import {
+import type {
   Customer,
   CustomerChangeEmailAction,
   CustomerDraft,
@@ -7,11 +7,14 @@ import {
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
 import { v4 as uuidv4 } from 'uuid'
-import { CommercetoolsError } from '../exceptions'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { CommercetoolsError } from '../exceptions.js'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import {
+  AbstractResourceRepository,
+  type RepositoryContext,
+} from './abstract.js'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   getTypeId() {
@@ -21,6 +24,7 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   create(context: RepositoryContext, draft: CustomerDraft): Customer {
     const resource: Customer = {
       ...getBaseResourceProperties(),
+      authenticationMode: draft.authenticationMode || 'Password',
       email: draft.email,
       password: draft.password
         ? Buffer.from(draft.password).toString('base64')

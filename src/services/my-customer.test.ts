@@ -1,6 +1,7 @@
-import { MyCustomerDraft } from '@commercetools/platform-sdk'
+import type { MyCustomerDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { afterEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()
 
@@ -24,13 +25,14 @@ describe('Me', () => {
       customer: {
         ...draft,
         password: 'cDRzc3cwcmQ=',
+        authenticationMode: 'Password',
         version: 1,
         isEmailVerified: false,
         addresses: [],
         id: expect.anything(),
         createdAt: expect.anything(),
         lastModifiedAt: expect.anything(),
-      },
+      }
     })
   })
 

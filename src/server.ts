@@ -1,4 +1,4 @@
-import { CommercetoolsMock } from './index'
+import { CommercetoolsMock } from './index.js'
 
 process.on('SIGINT', function () {
   console.info('Stopping server...')

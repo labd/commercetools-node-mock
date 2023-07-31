@@ -1,4 +1,4 @@
-import {
+import type {
   ShippingMethod,
   ShippingMethodAddShippingRateAction,
   ShippingMethodAddZoneAction,
@@ -21,14 +21,14 @@ import {
   ZoneReference,
 } from '@commercetools/platform-sdk'
 import deepEqual from 'deep-equal'
-import { getBaseResourceProperties } from '../helpers'
-import { Writable } from '../types'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 import {
   createCustomFields,
   createTypedMoney,
   getReferenceFromResourceIdentifier,
-} from './helpers'
+} from './helpers.js'
 
 export class ShippingMethodRepository extends AbstractResourceRepository<'shipping-method'> {
   getTypeId() {

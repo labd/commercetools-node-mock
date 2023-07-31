@@ -1,14 +1,13 @@
 import auth from 'basic-auth'
 import bodyParser from 'body-parser'
-import express, { NextFunction, Request, Response } from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import {
-  AccessDeniedError,
   InvalidTokenError,
 } from '@commercetools/platform-sdk'
-import { CommercetoolsError, InvalidRequestError } from '../exceptions'
-import { InvalidClientError, UnsupportedGrantType } from './errors'
-import { OAuth2Store } from './store'
-import { getBearerToken } from './helpers'
+import { CommercetoolsError, InvalidRequestError } from '../exceptions.js'
+import { InvalidClientError, UnsupportedGrantType } from './errors.js'
+import { OAuth2Store } from './store.js'
+import { getBearerToken } from './helpers.js'
 
 export class OAuth2Server {
   store: OAuth2Store
@@ -29,9 +28,9 @@ export class OAuth2Server {
       const token = getBearerToken(request)
       if (!token) {
         next(
-          new CommercetoolsError<AccessDeniedError>(
+          new CommercetoolsError<InvalidTokenError>(
             {
-              code: 'access_denied',
+              code: 'invalid_token',
               message:
                 'This endpoint requires an access token. You can get one from the authorization server.',
             },

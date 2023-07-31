@@ -1,26 +1,20 @@
 {
-  // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
-  "include": ["src", "types"],
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "module": "esnext",
-    "lib": ["esnext"],
     "allowJs": true,
-    "importHelpers": true,
-    "declaration": true,
-    "sourceMap": true,
-    "rootDir": "./src",
-    "baseUrl": "src",
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "moduleResolution": "node",
-    "jsx": "react",
+    "baseUrl": "./src",
     "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ES2022",
+    "moduleResolution": "nodenext",
+    "outDir": "dist",
+    "preserveWatchOutput": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "target": "ES2020"
-  }
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "target": "ES2022"
+  },
+  "include": ["*.ts", "types"]
 }

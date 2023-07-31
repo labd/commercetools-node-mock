@@ -1,4 +1,4 @@
-import {
+import type {
   CartDiscount,
   CartDiscountChangeIsActiveAction,
   CartDiscountChangeSortOrderAction,
@@ -15,10 +15,13 @@ import {
   CartDiscountValueGiftLineItem,
   CartDiscountValueRelative,
 } from '@commercetools/platform-sdk'
-import { Writable } from 'types'
-import { getBaseResourceProperties } from '../helpers'
-import { AbstractResourceRepository, RepositoryContext } from './abstract'
-import { createTypedMoney } from './helpers'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
+import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import {
+  createTypedMoney,
+  getStoreKeyReference,
+} from './helpers.js'
 
 export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
   getTypeId() {
@@ -33,6 +36,10 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
       cartPredicate: draft.cartPredicate,
       isActive: draft.isActive || false,
       name: draft.name,
+      stores:
+        draft.stores?.map((s) =>
+          getStoreKeyReference(s, context.projectKey, this._storage)
+        ) ?? [],
       references: [],
       target: draft.target,
       requiresDiscountCode: draft.requiresDiscountCode || false,

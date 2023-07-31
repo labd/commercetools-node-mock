@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties } from '../helpers'
-import { CustomerRepository } from '../repositories/customer'
-import { getRepositoryContext } from '../repositories/helpers'
-import AbstractService from './abstract'
+import { getBaseResourceProperties } from '../helpers.js'
+import { CustomerRepository } from '../repositories/customer.js'
+import { getRepositoryContext } from '../repositories/helpers.js'
+import AbstractService from './abstract.js'
 
 export class CustomerService extends AbstractService {
   public repository: CustomerRepository

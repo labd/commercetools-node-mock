@@ -1,6 +1,7 @@
-import { Category } from '@commercetools/platform-sdk'
+import type { Category } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { CommercetoolsMock } from '../index'
+import { beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
 
 describe('Categories Query', () => {
   const ctMock = new CommercetoolsMock()

@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { StandAlonePriceRepository } from '../repositories/standalone-price'
-import AbstractService from './abstract'
+import { StandAlonePriceRepository } from '../repositories/standalone-price.js'
+import AbstractService from './abstract.js'
 
 export class StandAlonePriceService extends AbstractService {
   public repository: StandAlonePriceRepository

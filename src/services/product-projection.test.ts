@@ -1,4 +1,4 @@
-import {
+import type {
   Product,
   ProductDraft,
   ProductProjection,
@@ -8,8 +8,9 @@ import {
 } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import * as timekeeper from 'timekeeper'
-import { Writable } from '../types'
-import { CommercetoolsMock } from '../index'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../index.js'
+import { Writable } from '../types.js'
 
 const ctMock = new CommercetoolsMock()
 

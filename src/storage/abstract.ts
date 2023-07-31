@@ -1,10 +1,10 @@
-import {
+import type {
     BaseResource,
     Project,
     QueryParam,
     ResourceIdentifier
 } from '@commercetools/platform-sdk'
-import { PagedQueryResponseMap, ResourceMap, ResourceType } from '../types'
+import { PagedQueryResponseMap, ResourceMap, ResourceType } from '../types.js'
 
 export type GetParams = {
   expand?: string[]

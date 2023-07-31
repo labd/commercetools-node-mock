@@ -1,5 +1,41 @@
 ## 0.14.0
 
+## 1.4.0
+
+### Minor Changes
+
+- [`de55a18`](https://github.com/labd/commercetools-node-mock/commit/de55a1843e26af7f3565d5a77662a9c555bbeb1c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Move to pure ESM module, we still export the CommonJS module too
+
+### Patch Changes
+
+- [`de55a18`](https://github.com/labd/commercetools-node-mock/commit/de55a1843e26af7f3565d5a77662a9c555bbeb1c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Vendor both pratt and perplex dependencies to make them work with ESM
+
+## 1.3.2
+
+### Patch Changes
+
+- [`9c01157`](https://github.com/labd/commercetools-node-mock/commit/9c011574d42512bd793030161bf9a336ebe4e2cb) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Attempt to fix perplex constructor error
+
+## 1.3.1
+
+### Patch Changes
+
+- [`7528ac2`](https://github.com/labd/commercetools-node-mock/commit/7528ac24884f5a213274ba9c677b6ad62f2e518a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix error related to perplex when used from ESM
+
+## 1.3.0
+
+### Minor Changes
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove peerDependency for @commercetools/platform-sdk and make sure we only import types
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add support for Cart.changeLineItemQuantity
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update most dependencies to latest version
+
+### Patch Changes
+
+- [`0f4cbbf`](https://github.com/labd/commercetools-node-mock/commit/0f4cbbf17de903a13b73df3c1281923c8c48281d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch to using vitest instead of jest
+
 ## 1.2.0
 
 ### Minor Changes
