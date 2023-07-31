@@ -4,10 +4,10 @@ import type {
   CustomerDraft,
   CustomerSetAuthenticationModeAction,
   CustomerSetCustomFieldAction,
+  GeneralError,
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
-import { v4 as uuidv4 } from 'uuid'
 import { CommercetoolsError } from '../exceptions.js'
 import { getBaseResourceProperties } from '../helpers.js'
 import type { Writable } from '../types.js'
@@ -97,10 +97,10 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
       { name, value }: CustomerSetCustomFieldAction
     ) => {
       if (!resource.custom) {
-        resource.custom = {
-          type: { typeId: 'type', id: uuidv4() },
-          fields: {},
-        }
+        throw new CommercetoolsError<GeneralError>({
+          code: 'General',
+          message: "The customr does not have a 'custom' field set.",
+        })
       }
 
       resource.custom.fields[name] = value
