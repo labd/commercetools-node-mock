@@ -326,7 +326,11 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
         )
       }
 
-      resource.state = { typeId: 'state', id: resolvedType.id }
+      resource.state = {
+        typeId: 'state',
+        id: resolvedType.id,
+        obj: { ...resolvedType, key: state.key ?? '' },
+      }
     },
     setBillingAddress: (
       context: RepositoryContext,

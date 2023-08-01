@@ -3,13 +3,18 @@ import type {
   CustomerChangeEmailAction,
   CustomerDraft,
   CustomerSetAuthenticationModeAction,
+  CustomerSetCustomFieldAction,
+  GeneralError,
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
-import type { Writable } from '../types.js'
 import { CommercetoolsError } from '../exceptions.js'
 import { getBaseResourceProperties } from '../helpers.js'
-import { AbstractResourceRepository, type RepositoryContext } from './abstract.js'
+import type { Writable } from '../types.js'
+import {
+  AbstractResourceRepository,
+  type RepositoryContext,
+} from './abstract.js'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
   getTypeId() {
@@ -85,6 +90,16 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
         },
         400
       )
+    },
+    setCustomField: (
+      _context: RepositoryContext,
+      resource: Writable<Customer>,
+      { name, value }: CustomerSetCustomFieldAction
+    ) => {
+      if (!resource.custom) {
+        throw new Error('Resource has no custom field')
+      }
+      resource.custom.fields[name] = value
     },
   }
 }
