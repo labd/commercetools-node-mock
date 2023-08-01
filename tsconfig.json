@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "allowJs": true,
-    "baseUrl": "./src",
     "esModuleInterop": true,
     "isolatedModules": true,
     "module": "ES2022",
@@ -14,7 +13,11 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "target": "ES2022"
+    "target": "ES2022",
+    "paths": {
+      "~src/*": ["./src/*"],
+      "~vendor/*": ["./vendor/*"]
+    }
   },
   "include": ["*.ts", "types"]
 }
