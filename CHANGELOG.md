@@ -1,5 +1,15 @@
 ## 0.14.0
 
+## 1.5.0
+
+### Minor Changes
+
+- [`9de64b0`](https://github.com/labd/commercetools-node-mock/commit/9de64b098399484fc8b72ceb7a6650f423b96490) Thanks [@okkevandereijk](https://github.com/okkevandereijk)! - add setCustomField to customer
+
+### Patch Changes
+
+- [`131ef6c`](https://github.com/labd/commercetools-node-mock/commit/131ef6c76eec3438950c69c5af33a469e3483bfe) Thanks [@okkevandereijk](https://github.com/okkevandereijk)! - fix: remove general error from customer
+
 ## 1.4.0
 
 ### Minor Changes
