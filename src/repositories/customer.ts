@@ -4,7 +4,6 @@ import type {
   CustomerDraft,
   CustomerSetAuthenticationModeAction,
   CustomerSetCustomFieldAction,
-  GeneralError,
   InvalidInputError,
   InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
