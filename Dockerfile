@@ -14,6 +14,7 @@ RUN pnpm install --frozen-lockfile
 
 # Bundle app source
 COPY src src
+COPY vendor vendor
 
 RUN pnpm build:server
 
