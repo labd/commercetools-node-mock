@@ -3,14 +3,14 @@ import { ProductDiscountRepository } from '../repositories/product-discount.js'
 import AbstractService from './abstract.js'
 
 export class ProductDiscountService extends AbstractService {
-  public repository: ProductDiscountRepository
+	public repository: ProductDiscountRepository
 
-  constructor(parent: Router, repository: ProductDiscountRepository) {
-    super(parent)
-    this.repository = repository
-  }
+	constructor(parent: Router, repository: ProductDiscountRepository) {
+		super(parent)
+		this.repository = repository
+	}
 
-  getBasePath() {
-    return 'product-discounts'
-  }
+	getBasePath() {
+		return 'product-discounts'
+	}
 }

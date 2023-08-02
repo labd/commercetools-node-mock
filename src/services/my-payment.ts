@@ -3,14 +3,14 @@ import { PaymentRepository } from '../repositories/payment.js'
 import AbstractService from './abstract.js'
 
 export class MyPaymentService extends AbstractService {
-  public repository: PaymentRepository
+	public repository: PaymentRepository
 
-  constructor(parent: Router, repository: PaymentRepository) {
-    super(parent)
-    this.repository = repository
-  }
+	constructor(parent: Router, repository: PaymentRepository) {
+		super(parent)
+		this.repository = repository
+	}
 
-  getBasePath() {
-    return 'me/payments'
-  }
+	getBasePath() {
+		return 'me/payments'
+	}
 }

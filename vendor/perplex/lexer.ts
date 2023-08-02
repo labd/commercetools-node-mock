@@ -1,5 +1,5 @@
 import LexerState from './lexer-state'
-import Token, {EOF} from './token'
+import Token, { EOF } from './token'
 import TokenTypes from './token-types'
 
 /**
@@ -176,11 +176,11 @@ class Lexer<T> implements Iterable<Token<T>> {
 					: new Token(
 							n.item.type,
 							n.result[0],
-							n.result.map(x => x),
+							n.result.map((x) => x),
 							i,
 							i + n.result[0].length,
 							this
-						)
+					  )
 				: null
 		}
 		const t = read()
@@ -193,7 +193,7 @@ class Lexer<T> implements Iterable<Token<T>> {
 		} catch (e) {
 			unexpected += e.unexpected
 		}
-		const {line, column} = this.strpos(position)
+		const { line, column } = this.strpos(position)
 		const e = new Error(
 			`Unexpected input: ${unexpected} at (${line}:${column})`
 		)
@@ -207,9 +207,7 @@ class Lexer<T> implements Iterable<Token<T>> {
 	 * @param {number} i The index to compute
 	 * @return {Position}
 	 */
-	strpos(
-		i: number
-	): {
+	strpos(i: number): {
 		line: number
 		column: number
 	} {
@@ -218,7 +216,7 @@ class Lexer<T> implements Iterable<Token<T>> {
 
 		const line = lines.length
 		const column = lines[lines.length - 1].length + 1
-		return {line, column}
+		return { line, column }
 	}
 
 	/**
@@ -278,4 +276,4 @@ class Lexer<T> implements Iterable<Token<T>> {
 }
 
 export default Lexer
-export {EOF, Token, TokenTypes, LexerState, Lexer}
+export { EOF, Token, TokenTypes, LexerState, Lexer }

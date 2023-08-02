@@ -6,35 +6,35 @@ import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
 
 export class CustomerService extends AbstractService {
-  public repository: CustomerRepository
+	public repository: CustomerRepository
 
-  constructor(parent: Router, repository: CustomerRepository) {
-    super(parent)
-    this.repository = repository
-  }
+	constructor(parent: Router, repository: CustomerRepository) {
+		super(parent)
+		this.repository = repository
+	}
 
-  getBasePath() {
-    return 'customers'
-  }
+	getBasePath() {
+		return 'customers'
+	}
 
-  extraRoutes(parent: Router) {
-    parent.post('/password-token', (request, response) => {
-      const customer = this.repository.query(getRepositoryContext(request), {
-        where: [`email="${request.body.email}"`],
-      })
-      // @ts-ignore
-      const ttlMinutes: number = request.params.ttlMinutes
-        ? // @ts-ignore
-          +request.params.ttlMinutes
-        : 34560
-      const { version, ...rest } = getBaseResourceProperties()
+	extraRoutes(parent: Router) {
+		parent.post('/password-token', (request, response) => {
+			const customer = this.repository.query(getRepositoryContext(request), {
+				where: [`email="${request.body.email}"`],
+			})
+			// @ts-ignore
+			const ttlMinutes: number = request.params.ttlMinutes
+				? // @ts-ignore
+				  +request.params.ttlMinutes
+				: 34560
+			const { version, ...rest } = getBaseResourceProperties()
 
-      return response.status(200).send({
-        ...rest,
-        customerId: customer.results[0].id,
-        expiresAt: new Date(Date.now() + ttlMinutes * 60).toISOString(),
-        value: uuidv4(),
-      })
-    })
-  }
+			return response.status(200).send({
+				...rest,
+				customerId: customer.results[0].id,
+				expiresAt: new Date(Date.now() + ttlMinutes * 60).toISOString(),
+				value: uuidv4(),
+			})
+		})
+	}
 }

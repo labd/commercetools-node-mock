@@ -1,28 +1,28 @@
 import type {
-  QuoteRequest,
-  QuoteRequestDraft,
-  QuoteRequestUpdateAction,
+	QuoteRequest,
+	QuoteRequestDraft,
+	QuoteRequestUpdateAction,
 } from '@commercetools/platform-sdk'
 import type { Writable } from '../types.js'
 import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
 
 export class QuoteRequestRepository extends AbstractResourceRepository<'quote-request'> {
-  getTypeId() {
-    return 'quote-request' as const
-  }
+	getTypeId() {
+		return 'quote-request' as const
+	}
 
-  create(context: RepositoryContext, draft: QuoteRequestDraft): QuoteRequest {
-    throw new Error('not implemented')
-  }
+	create(context: RepositoryContext, draft: QuoteRequestDraft): QuoteRequest {
+		throw new Error('not implemented')
+	}
 
-  actions: Partial<
-    Record<
-      QuoteRequestUpdateAction['action'],
-      (
-        context: RepositoryContext,
-        resource: Writable<QuoteRequest>,
-        action: any
-      ) => void
-    >
-  > = {}
+	actions: Partial<
+		Record<
+			QuoteRequestUpdateAction['action'],
+			(
+				context: RepositoryContext,
+				resource: Writable<QuoteRequest>,
+				action: any
+			) => void
+		>
+	> = {}
 }

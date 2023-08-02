@@ -1,17 +1,17 @@
 import type {
-  InvalidInputError,
-  Price,
-  ProductProjection,
-  ProductVariant,
+	InvalidInputError,
+	Price,
+	ProductProjection,
+	ProductVariant,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from './exceptions.js'
 import type { Writable } from './types.js'
 
 export type PriceSelector = {
-  currency?: string
-  country?: string
-  customerGroup?: string
-  channel?: string
+	currency?: string
+	country?: string
+	customerGroup?: string
+	channel?: string
 }
 
 /**
@@ -20,49 +20,49 @@ export type PriceSelector = {
  * the scopedPrice attribute
  */
 export const applyPriceSelector = (
-  products: ProductProjection[],
-  selector: PriceSelector
+	products: ProductProjection[],
+	selector: PriceSelector
 ) => {
-  validatePriceSelector(selector)
+	validatePriceSelector(selector)
 
-  for (const product of products) {
-    const variants: Writable<ProductVariant>[] = [
-      product.masterVariant,
-      ...(product.variants ?? []),
-    ].filter((x) => x != undefined)
+	for (const product of products) {
+		const variants: Writable<ProductVariant>[] = [
+			product.masterVariant,
+			...(product.variants ?? []),
+		].filter((x) => x != undefined)
 
-    for (const variant of variants) {
-      const scopedPrices =
-        variant.prices?.filter((p) => priceSelectorFilter(p, selector)) ?? []
+		for (const variant of variants) {
+			const scopedPrices =
+				variant.prices?.filter((p) => priceSelectorFilter(p, selector)) ?? []
 
-      if (scopedPrices.length > 0) {
-        const price = scopedPrices[0]
+			if (scopedPrices.length > 0) {
+				const price = scopedPrices[0]
 
-        variant.scopedPriceDiscounted = false
-        variant.scopedPrice = {
-          ...price,
-          currentValue: price.value,
-        }
-      }
-    }
-  }
+				variant.scopedPriceDiscounted = false
+				variant.scopedPrice = {
+					...price,
+					currentValue: price.value,
+				}
+			}
+		}
+	}
 }
 
 const validatePriceSelector = (selector: PriceSelector) => {
-  if (
-    (selector.country || selector.channel || selector.customerGroup) &&
-    !selector.currency
-  ) {
-    throw new CommercetoolsError<InvalidInputError>(
-      {
-        code: 'InvalidInput',
-        message:
-          'The price selecting parameters country, channel and customerGroup ' +
-          'cannot be used without the currency.',
-      },
-      400
-    )
-  }
+	if (
+		(selector.country || selector.channel || selector.customerGroup) &&
+		!selector.currency
+	) {
+		throw new CommercetoolsError<InvalidInputError>(
+			{
+				code: 'InvalidInput',
+				message:
+					'The price selecting parameters country, channel and customerGroup ' +
+					'cannot be used without the currency.',
+			},
+			400
+		)
+	}
 }
 
 /**
@@ -71,36 +71,36 @@ const validatePriceSelector = (selector: PriceSelector) => {
  * then it should match.
  */
 export const priceSelectorFilter = (
-  price: Price,
-  selector: PriceSelector
+	price: Price,
+	selector: PriceSelector
 ): boolean => {
-  if (
-    (selector.country || price.country) &&
-    selector.country !== price.country
-  ) {
-    return false
-  }
+	if (
+		(selector.country || price.country) &&
+		selector.country !== price.country
+	) {
+		return false
+	}
 
-  if (
-    (selector.currency || price.value.currencyCode) &&
-    selector.currency !== price.value.currencyCode
-  ) {
-    return false
-  }
+	if (
+		(selector.currency || price.value.currencyCode) &&
+		selector.currency !== price.value.currencyCode
+	) {
+		return false
+	}
 
-  if (
-    (selector.channel || price.channel?.id) &&
-    selector.channel !== price.channel?.id
-  ) {
-    return false
-  }
+	if (
+		(selector.channel || price.channel?.id) &&
+		selector.channel !== price.channel?.id
+	) {
+		return false
+	}
 
-  if (
-    (selector.customerGroup || price.customerGroup?.id) &&
-    selector.customerGroup !== price.customerGroup?.id
-  ) {
-    return false
-  }
+	if (
+		(selector.customerGroup || price.customerGroup?.id) &&
+		selector.customerGroup !== price.customerGroup?.id
+	) {
+		return false
+	}
 
-  return true
+	return true
 }

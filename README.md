@@ -14,7 +14,8 @@ yarn add --dev @labdigital/commercetools-mock
 ```
 
 ## Docker image
-This codebase is also available as a docker image where it provides a runnable http server exposing the mocked endpoints. See 
+
+This codebase is also available as a docker image where it provides a runnable http server exposing the mocked endpoints. See
 https://github.com/labd/commercetools-mock-server
 
 ## Example
@@ -70,10 +71,10 @@ Implement the following:
 - Add new service to src/storage.ts InMemoryStorage
 - Adjust src/types.ts RepositoryMap and possibly serviceTypes
 
-
 ## Releasing
-This codebases use [@changesets](https://github.com/changesets/changesets) for release and version management
-- Create a new changeset using `pnpm changeset`
-- Push the changes to the `main` branch. 
-- GitHub actions will create a release PR. When the release is ready merge the release branch
 
+This codebases use [@changesets](https://github.com/changesets/changesets) for release and version management
+
+- Create a new changeset using `pnpm changeset`
+- Push the changes to the `main` branch.
+- GitHub actions will create a release PR. When the release is ready merge the release branch

@@ -3,14 +3,14 @@ import { ShoppingListRepository } from './../repositories/shopping-list.js'
 import AbstractService from './abstract.js'
 
 export class ShoppingListService extends AbstractService {
-  public repository: ShoppingListRepository
+	public repository: ShoppingListRepository
 
-  constructor(parent: Router, repository: ShoppingListRepository) {
-    super(parent)
-    this.repository = repository
-  }
+	constructor(parent: Router, repository: ShoppingListRepository) {
+		super(parent)
+		this.repository = repository
+	}
 
-  getBasePath() {
-    return 'shopping-lists'
-  }
+	getBasePath() {
+		return 'shopping-lists'
+	}
 }
