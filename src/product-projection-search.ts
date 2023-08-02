@@ -1,341 +1,341 @@
 import type {
-  FacetResults,
-  FilteredFacetResult,
-  InvalidInputError,
-  Product,
-  ProductProjection,
-  ProductProjectionPagedSearchResponse,
-  QueryParam,
-  RangeFacetResult,
-  TermFacetResult,
+	FacetResults,
+	FilteredFacetResult,
+	InvalidInputError,
+	Product,
+	ProductProjection,
+	ProductProjectionPagedSearchResponse,
+	QueryParam,
+	RangeFacetResult,
+	TermFacetResult,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from './exceptions.js'
 import { nestedLookup } from './helpers.js'
 import {
-  FilterExpression,
-  RangeExpression,
-  generateFacetFunc,
-  getVariants,
-  parseFilterExpression,
-  resolveVariantValue,
+	FilterExpression,
+	RangeExpression,
+	generateFacetFunc,
+	getVariants,
+	parseFilterExpression,
+	resolveVariantValue,
 } from './lib/projectionSearchFilter.js'
 import { applyPriceSelector } from './priceSelector.js'
 import { AbstractStorage } from './storage/index.js'
 import type { Writable } from './types.js'
 
 export type ProductProjectionSearchParams = {
-  fuzzy?: boolean
-  fuzzyLevel?: number
-  markMatchingVariants?: boolean
-  staged?: boolean
-  filter?: string[]
-  'filter.facets'?: string[]
-  'filter.query'?: string[]
-  facet?: string | string[]
-  sort?: string | string[]
-  limit?: number
-  offset?: number
-  withTotal?: boolean
-  priceCurrency?: string
-  priceCountry?: string
-  priceCustomerGroup?: string
-  priceChannel?: string
-  localeProjection?: string
-  storeProjection?: string
-  expand?: string | string[]
-  [key: string]: QueryParam
+	fuzzy?: boolean
+	fuzzyLevel?: number
+	markMatchingVariants?: boolean
+	staged?: boolean
+	filter?: string[]
+	'filter.facets'?: string[]
+	'filter.query'?: string[]
+	facet?: string | string[]
+	sort?: string | string[]
+	limit?: number
+	offset?: number
+	withTotal?: boolean
+	priceCurrency?: string
+	priceCountry?: string
+	priceCustomerGroup?: string
+	priceChannel?: string
+	localeProjection?: string
+	storeProjection?: string
+	expand?: string | string[]
+	[key: string]: QueryParam
 }
 
 export class ProductProjectionSearch {
-  protected _storage: AbstractStorage
+	protected _storage: AbstractStorage
 
-  constructor(storage: AbstractStorage) {
-    this._storage = storage
-  }
+	constructor(storage: AbstractStorage) {
+		this._storage = storage
+	}
 
-  search(
-    projectKey: string,
-    params: ProductProjectionSearchParams
-  ): ProductProjectionPagedSearchResponse {
-    let resources = this._storage
-      .all(projectKey, 'product')
-      .map((r) => this.transform(r, params.staged ?? false))
-      .filter((p) => {
-        if (!params.staged ?? false) {
-          return p.published
-        }
-        return true
-      })
+	search(
+		projectKey: string,
+		params: ProductProjectionSearchParams
+	): ProductProjectionPagedSearchResponse {
+		let resources = this._storage
+			.all(projectKey, 'product')
+			.map((r) => this.transform(r, params.staged ?? false))
+			.filter((p) => {
+				if (!params.staged ?? false) {
+					return p.published
+				}
+				return true
+			})
 
-    const markMatchingVariant = params.markMatchingVariants ?? false
+		const markMatchingVariant = params.markMatchingVariants ?? false
 
-    // Apply the priceSelector
-    applyPriceSelector(resources, {
-      country: params.priceCountry,
-      channel: params.priceChannel,
-      customerGroup: params.priceCustomerGroup,
-      currency: params.priceCurrency,
-    })
+		// Apply the priceSelector
+		applyPriceSelector(resources, {
+			country: params.priceCountry,
+			channel: params.priceChannel,
+			customerGroup: params.priceCustomerGroup,
+			currency: params.priceCurrency,
+		})
 
-    // Apply filters pre facetting
-    if (params.filter) {
-      try {
-        const filters = params.filter.map(parseFilterExpression)
+		// Apply filters pre facetting
+		if (params.filter) {
+			try {
+				const filters = params.filter.map(parseFilterExpression)
 
-        // Filters can modify the output. So clone the resources first.
-        resources = resources.filter((resource) =>
-          filters.every((f) => f(resource, markMatchingVariant))
-        )
-      } catch (err) {
-        console.error(err)
-        throw new CommercetoolsError<InvalidInputError>(
-          {
-            code: 'InvalidInput',
-            message: (err as any).message,
-          },
-          400
-        )
-      }
-    }
+				// Filters can modify the output. So clone the resources first.
+				resources = resources.filter((resource) =>
+					filters.every((f) => f(resource, markMatchingVariant))
+				)
+			} catch (err) {
+				console.error(err)
+				throw new CommercetoolsError<InvalidInputError>(
+					{
+						code: 'InvalidInput',
+						message: (err as any).message,
+					},
+					400
+				)
+			}
+		}
 
-    // TODO: Calculate facets
-    const facets = this.getFacets(params, resources)
+		// TODO: Calculate facets
+		const facets = this.getFacets(params, resources)
 
-    // Apply filters post facetting
-    if (params['filter.query']) {
-      try {
-        const filters = params['filter.query'].map(parseFilterExpression)
-        resources = resources.filter((resource) =>
-          filters.every((f) => f(resource, markMatchingVariant))
-        )
-      } catch (err) {
-        throw new CommercetoolsError<InvalidInputError>(
-          {
-            code: 'InvalidInput',
-            message: (err as any).message,
-          },
-          400
-        )
-      }
-    }
+		// Apply filters post facetting
+		if (params['filter.query']) {
+			try {
+				const filters = params['filter.query'].map(parseFilterExpression)
+				resources = resources.filter((resource) =>
+					filters.every((f) => f(resource, markMatchingVariant))
+				)
+			} catch (err) {
+				throw new CommercetoolsError<InvalidInputError>(
+					{
+						code: 'InvalidInput',
+						message: (err as any).message,
+					},
+					400
+				)
+			}
+		}
 
-    // Expand the resources
-    if (params.expand !== undefined) {
-      resources = resources.map((resource) =>
-        this._storage.expand(projectKey, resource, params.expand)
-      )
-    }
+		// Expand the resources
+		if (params.expand !== undefined) {
+			resources = resources.map((resource) =>
+				this._storage.expand(projectKey, resource, params.expand)
+			)
+		}
 
-    // Create a slice for the pagination. If we were working with large datasets
-    // then we should have done this before transforming. But that isn't the
-    // goal of this library. So lets keep it simple.
-    const totalResults = resources.length
-    const offset = params.offset || 0
-    const limit = params.limit || 20
-    const results = resources.slice(offset, offset + limit)
+		// Create a slice for the pagination. If we were working with large datasets
+		// then we should have done this before transforming. But that isn't the
+		// goal of this library. So lets keep it simple.
+		const totalResults = resources.length
+		const offset = params.offset || 0
+		const limit = params.limit || 20
+		const results = resources.slice(offset, offset + limit)
 
-    return {
-      count: totalResults,
-      total: results.length,
-      offset: offset,
-      limit: limit,
-      results: results,
-      facets: facets,
-    }
-  }
+		return {
+			count: totalResults,
+			total: results.length,
+			offset: offset,
+			limit: limit,
+			results: results,
+			facets: facets,
+		}
+	}
 
-  transform(product: Product, staged: boolean): ProductProjection {
-    const obj = !staged ? product.masterData.current : product.masterData.staged
+	transform(product: Product, staged: boolean): ProductProjection {
+		const obj = !staged ? product.masterData.current : product.masterData.staged
 
-    return {
-      id: product.id,
-      createdAt: product.createdAt,
-      lastModifiedAt: product.lastModifiedAt,
-      version: product.version,
-      name: obj.name,
-      key: product.key,
-      description: obj.description,
-      metaDescription: obj.metaDescription,
-      slug: obj.slug,
-      categories: obj.categories,
-      masterVariant: obj.masterVariant,
-      variants: obj.variants,
-      productType: product.productType,
-      hasStagedChanges: product.masterData.hasStagedChanges,
-      published: product.masterData.published,
-    }
-  }
+		return {
+			id: product.id,
+			createdAt: product.createdAt,
+			lastModifiedAt: product.lastModifiedAt,
+			version: product.version,
+			name: obj.name,
+			key: product.key,
+			description: obj.description,
+			metaDescription: obj.metaDescription,
+			slug: obj.slug,
+			categories: obj.categories,
+			masterVariant: obj.masterVariant,
+			variants: obj.variants,
+			productType: product.productType,
+			hasStagedChanges: product.masterData.hasStagedChanges,
+			published: product.masterData.published,
+		}
+	}
 
-  getFacets(
-    params: ProductProjectionSearchParams,
-    products: ProductProjection[]
-  ): FacetResults {
-    if (!params.facet) return {}
-    const staged = false
-    const result: FacetResults = {}
+	getFacets(
+		params: ProductProjectionSearchParams,
+		products: ProductProjection[]
+	): FacetResults {
+		if (!params.facet) return {}
+		const staged = false
+		const result: FacetResults = {}
 
-    for (const facet of params.facet) {
-      const expression = generateFacetFunc(facet)
+		for (const facet of params.facet) {
+			const expression = generateFacetFunc(facet)
 
-      // Term Facet
-      if (expression.type === 'TermExpression') {
-        result[facet] = this.termFacet(expression.source, products)
-      }
+			// Term Facet
+			if (expression.type === 'TermExpression') {
+				result[facet] = this.termFacet(expression.source, products)
+			}
 
-      // Range Facet
-      if (expression.type === 'RangeExpression') {
-        result[expression.source] = this.rangeFacet(
-          expression.source,
-          expression.children,
-          products
-        )
-      }
+			// Range Facet
+			if (expression.type === 'RangeExpression') {
+				result[expression.source] = this.rangeFacet(
+					expression.source,
+					expression.children,
+					products
+				)
+			}
 
-      // FilteredFacet
-      if (expression.type === 'FilterExpression') {
-        result[expression.source] = this.filterFacet(
-          expression.source,
-          expression.children,
-          products
-        )
-      }
-    }
+			// FilteredFacet
+			if (expression.type === 'FilterExpression') {
+				result[expression.source] = this.filterFacet(
+					expression.source,
+					expression.children,
+					products
+				)
+			}
+		}
 
-    return result
-  }
+		return result
+	}
 
-  /**
-   * TODO: This implemention needs the following additional features:
-   *  - counting products
-   *  - correct dataType
-   */
-  termFacet(facet: string, products: ProductProjection[]): TermFacetResult {
-    const result: Writable<TermFacetResult> = {
-      type: 'terms',
-      dataType: 'text',
-      missing: 0,
-      total: 0,
-      other: 0,
-      terms: [],
-    }
-    const terms: Record<any, number> = {}
+	/**
+	 * TODO: This implemention needs the following additional features:
+	 *  - counting products
+	 *  - correct dataType
+	 */
+	termFacet(facet: string, products: ProductProjection[]): TermFacetResult {
+		const result: Writable<TermFacetResult> = {
+			type: 'terms',
+			dataType: 'text',
+			missing: 0,
+			total: 0,
+			other: 0,
+			terms: [],
+		}
+		const terms: Record<any, number> = {}
 
-    if (facet.startsWith('variants.')) {
-      products.forEach((p) => {
-        const variants = getVariants(p)
-        variants.forEach((v) => {
-          result.total++
+		if (facet.startsWith('variants.')) {
+			products.forEach((p) => {
+				const variants = getVariants(p)
+				variants.forEach((v) => {
+					result.total++
 
-          let value = resolveVariantValue(v, facet)
-          if (value === undefined) {
-            result.missing++
-          } else {
-            if (typeof value === 'number') {
-              value = Number(value).toFixed(1)
-            }
-            terms[value] = value in terms ? terms[value] + 1 : 1
-          }
-        })
-      })
-    } else {
-      products.forEach((p) => {
-        const value = nestedLookup(p, facet)
-        result.total++
-        if (value === undefined) {
-          result.missing++
-        } else {
-          terms[value] = value in terms ? terms[value] + 1 : 1
-        }
-      })
-    }
-    for (const term in terms) {
-      result.terms.push({
-        term: term as any,
-        count: terms[term],
-      })
-    }
-    return result
-  }
+					let value = resolveVariantValue(v, facet)
+					if (value === undefined) {
+						result.missing++
+					} else {
+						if (typeof value === 'number') {
+							value = Number(value).toFixed(1)
+						}
+						terms[value] = value in terms ? terms[value] + 1 : 1
+					}
+				})
+			})
+		} else {
+			products.forEach((p) => {
+				const value = nestedLookup(p, facet)
+				result.total++
+				if (value === undefined) {
+					result.missing++
+				} else {
+					terms[value] = value in terms ? terms[value] + 1 : 1
+				}
+			})
+		}
+		for (const term in terms) {
+			result.terms.push({
+				term: term as any,
+				count: terms[term],
+			})
+		}
+		return result
+	}
 
-  filterFacet(
-    source: string,
-    filters: FilterExpression[] | undefined,
-    products: ProductProjection[]
-  ): FilteredFacetResult {
-    let count = 0
-    if (source.startsWith('variants.')) {
-      for (const p of products) {
-        for (const v of getVariants(p)) {
-          const val = resolveVariantValue(v, source)
-          if (filters?.some((f) => f.match(val))) {
-            count++
-          }
-        }
-      }
-    } else {
-      throw new Error('not supported')
-    }
+	filterFacet(
+		source: string,
+		filters: FilterExpression[] | undefined,
+		products: ProductProjection[]
+	): FilteredFacetResult {
+		let count = 0
+		if (source.startsWith('variants.')) {
+			for (const p of products) {
+				for (const v of getVariants(p)) {
+					const val = resolveVariantValue(v, source)
+					if (filters?.some((f) => f.match(val))) {
+						count++
+					}
+				}
+			}
+		} else {
+			throw new Error('not supported')
+		}
 
-    return {
-      type: 'filter',
-      count: count,
-    }
-  }
+		return {
+			type: 'filter',
+			count: count,
+		}
+	}
 
-  rangeFacet(
-    source: string,
-    ranges: RangeExpression[] | undefined,
-    products: ProductProjection[]
-  ): RangeFacetResult {
-    const counts =
-      ranges?.map((range) => {
-        if (source.startsWith('variants.')) {
-          const values = []
-          for (const p of products) {
-            for (const v of getVariants(p)) {
-              const val = resolveVariantValue(v, source)
-              if (val === undefined) {
-                continue
-              }
+	rangeFacet(
+		source: string,
+		ranges: RangeExpression[] | undefined,
+		products: ProductProjection[]
+	): RangeFacetResult {
+		const counts =
+			ranges?.map((range) => {
+				if (source.startsWith('variants.')) {
+					const values = []
+					for (const p of products) {
+						for (const v of getVariants(p)) {
+							const val = resolveVariantValue(v, source)
+							if (val === undefined) {
+								continue
+							}
 
-              if (range.match(val)) {
-                values.push(val)
-              }
-            }
-          }
+							if (range.match(val)) {
+								values.push(val)
+							}
+						}
+					}
 
-          const numValues = values.length
-          return {
-            type: 'double',
-            from: range.start || 0,
-            fromStr: range.start !== null ? Number(range.start).toFixed(1) : '',
-            to: range.stop || 0,
-            toStr: range.stop !== null ? Number(range.stop).toFixed(1) : '',
-            count: numValues,
-            // totalCount: 0,
-            total: values.reduce((a, b) => a + b, 0),
-            min: numValues > 0 ? Math.min(...values) : 0,
-            max: numValues > 0 ? Math.max(...values) : 0,
-            mean: numValues > 0 ? mean(values) : 0,
-          }
-        } else {
-          throw new Error('not supported')
-        }
-      }) || []
-    const data: RangeFacetResult = {
-      type: 'range',
-      // @ts-ignore
-      dataType: 'number',
-      ranges: counts,
-    }
-    return data
-  }
+					const numValues = values.length
+					return {
+						type: 'double',
+						from: range.start || 0,
+						fromStr: range.start !== null ? Number(range.start).toFixed(1) : '',
+						to: range.stop || 0,
+						toStr: range.stop !== null ? Number(range.stop).toFixed(1) : '',
+						count: numValues,
+						// totalCount: 0,
+						total: values.reduce((a, b) => a + b, 0),
+						min: numValues > 0 ? Math.min(...values) : 0,
+						max: numValues > 0 ? Math.max(...values) : 0,
+						mean: numValues > 0 ? mean(values) : 0,
+					}
+				} else {
+					throw new Error('not supported')
+				}
+			}) || []
+		const data: RangeFacetResult = {
+			type: 'range',
+			// @ts-ignore
+			dataType: 'number',
+			ranges: counts,
+		}
+		return data
+	}
 }
 
 const mean = (arr: number[]) => {
-  let total = 0
-  for (let i = 0; i < arr.length; i++) {
-    total += arr[i]
-  }
-  return total / arr.length
+	let total = 0
+	for (let i = 0; i < arr.length; i++) {
+		total += arr[i]
+	}
+	return total / arr.length
 }

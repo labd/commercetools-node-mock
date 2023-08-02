@@ -1,8 +1,5 @@
 module.exports = {
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   plugins: ['unused-imports'],
   rules: {
     '@typescript-eslint/ban-ts-comment': 'off',
@@ -18,6 +15,7 @@ module.exports = {
     ],
     'unused-imports/no-unused-imports': 'error',
     'arrow-body-style': ['error', 'as-needed'],
+    'no-mixed-spaces-and-tabs': 0,
     'no-console': [
       'error',
       {

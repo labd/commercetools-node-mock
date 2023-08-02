@@ -24,8 +24,8 @@ jobs:
           version: 8
           run_install: true
 
-      - name: Lint
-        run: pnpm lint
+      - name: Check formatting and typing
+        run: pnpm check
 
   build:
     name: Build, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
@@ -33,7 +33,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        node: ["16.x", "18.x", "20.x"]
+        node: ['16.x', '18.x', '20.x']
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
@@ -132,8 +132,8 @@ jobs:
       - name: Create and publish versions
         uses: changesets/action@v1
         with:
-          title: "Release new version"
-          commit: "update version"
+          title: 'Release new version'
+          commit: 'update version'
           publish: pnpm publish:ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

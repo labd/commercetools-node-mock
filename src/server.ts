@@ -1,8 +1,8 @@
 import { CommercetoolsMock } from './index.js'
 
 process.on('SIGINT', function () {
-  console.info('Stopping server...')
-  process.exit()
+	console.info('Stopping server...')
+	process.exit()
 })
 
 const instance = new CommercetoolsMock()

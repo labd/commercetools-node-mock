@@ -13,11 +13,11 @@ function normalize(regex: RegExp | string): RegExp {
 function first<T, U>(
 	arr: T[],
 	predicate: (item: T, i: number) => U
-): {item: T; result: U} {
+): { item: T; result: U } {
 	let i = 0
 	for (const item of arr) {
 		const result = predicate(item, i++)
-		if (result) return {item, result}
+		if (result) return { item, result }
 	}
 }
 
@@ -42,13 +42,13 @@ export default class TokenTypes<T> {
 
 	enable(type: T, enabled: boolean = true): TokenTypes<T> {
 		this.tokenTypes
-			.filter(t => t.type == type)
-			.forEach(t => (t.enabled = enabled))
+			.filter((t) => t.type == type)
+			.forEach((t) => (t.enabled = enabled))
 		return this
 	}
 
 	isEnabled(type: T) {
-		const ttypes = this.tokenTypes.filter(tt => tt.type == type)
+		const ttypes = this.tokenTypes.filter((tt) => tt.type == type)
 		if (ttypes.length == 0)
 			throw new Error(`Token of type ${type} does not exists`)
 		return ttypes[0].enabled
@@ -56,10 +56,13 @@ export default class TokenTypes<T> {
 
 	peek(source: string, position: number) {
 		const s = source.substr(position)
-		return first(this.tokenTypes.filter(tt => tt.enabled), tt => {
-			tt.regex.lastIndex = 0
-			return tt.regex.exec(s)
-		})
+		return first(
+			this.tokenTypes.filter((tt) => tt.enabled),
+			(tt) => {
+				tt.regex.lastIndex = 0
+				return tt.regex.exec(s)
+			}
+		)
 	}
 
 	token(

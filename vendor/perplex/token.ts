@@ -81,7 +81,7 @@ class Token<T> {
 	strpos() {
 		const start = this.lexer.strpos(this.start)
 		const end = this.lexer.strpos(this.end)
-		return {start, end}
+		return { start, end }
 	}
 
 	// tslint:disable-next-line prefer-function-over-method

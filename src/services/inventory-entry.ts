@@ -3,14 +3,14 @@ import { InventoryEntryRepository } from '../repositories/inventory-entry.js'
 import AbstractService from './abstract.js'
 
 export class InventoryEntryService extends AbstractService {
-  public repository: InventoryEntryRepository
+	public repository: InventoryEntryRepository
 
-  constructor(parent: Router, repository: InventoryEntryRepository) {
-    super(parent)
-    this.repository = repository
-  }
+	constructor(parent: Router, repository: InventoryEntryRepository) {
+		super(parent)
+		this.repository = repository
+	}
 
-  getBasePath() {
-    return 'inventory'
-  }
+	getBasePath() {
+		return 'inventory'
+	}
 }

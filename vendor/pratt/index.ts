@@ -22,7 +22,7 @@ export interface ILexer<T> {
 export type BPResolver = () => number
 export type BP = number | BPResolver
 
-export type StopFunction = (<T>(x: T) => T) & {isStopped(): boolean}
+export type StopFunction = (<T>(x: T) => T) & { isStopped(): boolean }
 
 export type NudInfo<T> = {
 	token: IToken<T>
@@ -35,7 +35,7 @@ export type NudInfo<T> = {
 	ctx: any
 	options: ParseOpts<T>
 }
-export type LedInfo<T> = NudInfo<T> & {left: any}
+export type LedInfo<T> = NudInfo<T> & { left: any }
 
 export type NudFunction<T> = (inf: NudInfo<T>) => any
 export type LedFunction<T> = (inf: LedInfo<T>) => any
@@ -161,11 +161,9 @@ export class Parser<T> {
 	nud(info: NudInfo<T>) {
 		const fn: NudFunction<T> | undefined = this._nuds.get(info.token.type)
 		if (!fn) {
-			const {start} = info.token.strpos()
+			const { start } = info.token.strpos()
 			throw new Error(
-				`Unexpected token: ${info.token.match} (at ${start.line}:${
-					start.column
-				})`
+				`Unexpected token: ${info.token.match} (at ${start.line}:${start.column})`
 			)
 		}
 		return fn(info)
@@ -179,11 +177,9 @@ export class Parser<T> {
 	led(info: LedInfo<T>) {
 		let fn = this._leds.get(info.token.type)
 		if (!fn) {
-			const {start} = info.token.strpos()
+			const { start } = info.token.strpos()
 			throw new Error(
-				`Unexpected token: ${info.token.match} (at ${start.line}:${
-					start.column
-				})`
+				`Unexpected token: ${info.token.match} (at ${start.line}:${start.column})`
 			)
 		}
 		return fn(info)
@@ -194,25 +190,25 @@ export class Parser<T> {
 	 * @param {ParseOpts<T>} opts The parse options
 	 * @returns {any}
 	 */
-	parse(opts: ParseOpts<T> = {terminals: [0]}): any {
+	parse(opts: ParseOpts<T> = { terminals: [0] }): any {
 		const stop = (opts.stop = opts.stop || createStop())
 		const check = () => {
 			if (stop.isStopped()) return false
 			const t = this.lexer.peek()
 			const bp = this.bp(t)
 
-      // @ts-ignore
+			// @ts-ignore
 			return opts.terminals.reduce((canContinue, rbpOrType) => {
 				if (!canContinue) return false
-      // @ts-ignore
+				// @ts-ignore
 				if (typeof rbpOrType == 'number') return rbpOrType < bp
 				if (typeof rbpOrType == 'string') return t.type != rbpOrType
 			}, true)
 		}
 		const mkinfo = (token: IToken<T>): NudInfo<T> => {
 			const bp = this.bp(token)
-      // @ts-ignore
-			return {token, bp, stop, ctx: opts.ctx, options: opts}
+			// @ts-ignore
+			return { token, bp, stop, ctx: opts.ctx, options: opts }
 		}
 		if (!opts.terminals) opts.terminals = [0]
 		if (opts.terminals.length == 0) opts.terminals.push(0)
@@ -220,7 +216,7 @@ export class Parser<T> {
 		let left = this.nud(mkinfo(this.lexer.next()))
 		while (check()) {
 			const operator = this.lexer.next()
-			left = this.led(Object.assign(mkinfo(operator), {left}))
+			left = this.led(Object.assign(mkinfo(operator), { left }))
 		}
 		return left
 	}
@@ -277,8 +273,8 @@ export class ParserBuilder<T> {
 	 * @return {ParserBuilder<T>} Returns this ParserBuilder
 	 */
 	either(tokenType: T, bp: BP, fn: LedFunction<T>): ParserBuilder<T> {
-		return this.nud(tokenType, bp, inf =>
-			fn(Object.assign(inf, {left: null}))
+		return this.nud(tokenType, bp, (inf) =>
+			fn(Object.assign(inf, { left: null }))
 		).led(tokenType, bp, fn)
 	}
 
@@ -301,4 +297,3 @@ export class ParserBuilder<T> {
 		return this._parser
 	}
 }
-

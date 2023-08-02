@@ -3,14 +3,14 @@ import { CartDiscountRepository } from '../repositories/cart-discount.js'
 import AbstractService from './abstract.js'
 
 export class CartDiscountService extends AbstractService {
-  public repository: CartDiscountRepository
+	public repository: CartDiscountRepository
 
-  constructor(parent: Router, repository: CartDiscountRepository) {
-    super(parent)
-    this.repository = repository
-  }
+	constructor(parent: Router, repository: CartDiscountRepository) {
+		super(parent)
+		this.repository = repository
+	}
 
-  getBasePath() {
-    return 'cart-discounts'
-  }
+	getBasePath() {
+		return 'cart-discounts'
+	}
 }

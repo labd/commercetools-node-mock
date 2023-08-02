@@ -1,0 +1,13 @@
+root = true
+
+# Set up tabs as indent style for a11y reasons
+# This will be the default for prettier in >=v3
+[*.{js,jsx,ts,tsx,json}]
+indent_style = tab
+indent_size = 2
+
+
+# Yaml does not support tabs
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2

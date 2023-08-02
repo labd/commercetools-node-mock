@@ -4,207 +4,207 @@ import { InMemoryStorage } from '../storage/index.js'
 import { OrderRepository } from './order.js'
 
 describe('Order repository', () => {
-  const storage = new InMemoryStorage()
-  const repository = new OrderRepository(storage)
+	const storage = new InMemoryStorage()
+	const repository = new OrderRepository(storage)
 
-  test('create from cart', async () => {
-    const cart: Cart = {
-      id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
-      version: 1,
-      createdAt: '2021-09-02T12:23:30.036Z',
-      lastModifiedAt: '2021-09-02T12:23:30.546Z',
-      discountCodes: [],
-      directDiscounts : [],
-      inventoryMode: 'None',
-      itemShippingAddresses: [],
-      lineItems: [],
-      customLineItems: [],
-      totalPrice: {
-        type: 'centPrecision',
-        currencyCode: 'EUR',
-        centAmount: 10000,
-        fractionDigits: 2,
-      },
-      cartState: 'Active',
-      shippingMode: 'Single',
-      shipping: [],
-      taxMode: 'Platform',
-      taxRoundingMode: 'HalfEven',
-      taxCalculationMode: 'UnitPriceLevel',
-      refusedGifts: [],
-      origin: 'Customer',
-    }
+	test('create from cart', async () => {
+		const cart: Cart = {
+			id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
+			version: 1,
+			createdAt: '2021-09-02T12:23:30.036Z',
+			lastModifiedAt: '2021-09-02T12:23:30.546Z',
+			discountCodes: [],
+			directDiscounts: [],
+			inventoryMode: 'None',
+			itemShippingAddresses: [],
+			lineItems: [],
+			customLineItems: [],
+			totalPrice: {
+				type: 'centPrecision',
+				currencyCode: 'EUR',
+				centAmount: 10000,
+				fractionDigits: 2,
+			},
+			cartState: 'Active',
+			shippingMode: 'Single',
+			shipping: [],
+			taxMode: 'Platform',
+			taxRoundingMode: 'HalfEven',
+			taxCalculationMode: 'UnitPriceLevel',
+			refusedGifts: [],
+			origin: 'Customer',
+		}
 
-    storage.add('dummy', 'cart', cart)
-    const ctx = { projectKey: 'dummy' }
+		storage.add('dummy', 'cart', cart)
+		const ctx = { projectKey: 'dummy' }
 
-    const result = repository.create(ctx, {
-      cart: {
-        id: cart.id,
-        typeId: 'cart',
-      },
-      version: cart.version,
-    })
-    expect(result.cart?.id).toBe(cart.id)
+		const result = repository.create(ctx, {
+			cart: {
+				id: cart.id,
+				typeId: 'cart',
+			},
+			version: cart.version,
+		})
+		expect(result.cart?.id).toBe(cart.id)
 
-    const items = repository.query(ctx)
-    expect(items.count).toBe(1)
-  })
+		const items = repository.query(ctx)
+		expect(items.count).toBe(1)
+	})
 
-  test('create from cart - in store', async () => {
-    const cart: Cart = {
-      id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
-      version: 1,
-      createdAt: '2021-09-02T12:23:30.036Z',
-      lastModifiedAt: '2021-09-02T12:23:30.546Z',
-      discountCodes: [],
-      directDiscounts : [],
-      inventoryMode: 'None',
-      itemShippingAddresses: [],
-      lineItems: [],
-      customLineItems: [],
-      totalPrice: {
-        type: 'centPrecision',
-        currencyCode: 'EUR',
-        centAmount: 10000,
-        fractionDigits: 2,
-      },
-      cartState: 'Active',
-      shippingMode: 'Single',
-      shipping: [],
-      taxMode: 'Platform',
-      taxRoundingMode: 'HalfEven',
-      taxCalculationMode: 'UnitPriceLevel',
-      refusedGifts: [],
-      origin: 'Customer',
-    }
+	test('create from cart - in store', async () => {
+		const cart: Cart = {
+			id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
+			version: 1,
+			createdAt: '2021-09-02T12:23:30.036Z',
+			lastModifiedAt: '2021-09-02T12:23:30.546Z',
+			discountCodes: [],
+			directDiscounts: [],
+			inventoryMode: 'None',
+			itemShippingAddresses: [],
+			lineItems: [],
+			customLineItems: [],
+			totalPrice: {
+				type: 'centPrecision',
+				currencyCode: 'EUR',
+				centAmount: 10000,
+				fractionDigits: 2,
+			},
+			cartState: 'Active',
+			shippingMode: 'Single',
+			shipping: [],
+			taxMode: 'Platform',
+			taxRoundingMode: 'HalfEven',
+			taxCalculationMode: 'UnitPriceLevel',
+			refusedGifts: [],
+			origin: 'Customer',
+		}
 
-    storage.add('dummy', 'cart', cart)
+		storage.add('dummy', 'cart', cart)
 
-    const result = repository.create(
-      { projectKey: 'dummy', storeKey: 'some-store' },
-      {
-        cart: {
-          id: cart.id,
-          typeId: 'cart',
-        },
-        version: cart.version,
-      }
-    )
-    expect(result.cart?.id).toBe(cart.id)
-    expect(result.store?.key).toBe('some-store')
-  })
+		const result = repository.create(
+			{ projectKey: 'dummy', storeKey: 'some-store' },
+			{
+				cart: {
+					id: cart.id,
+					typeId: 'cart',
+				},
+				version: cart.version,
+			}
+		)
+		expect(result.cart?.id).toBe(cart.id)
+		expect(result.store?.key).toBe('some-store')
+	})
 
-  test('import exiting product', async () => {
-    storage.add('dummy', 'product', {
-      id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
-      // @ts-ignore
-      masterData: {
-        // @ts-ignore
-        current: {
-          name: { 'nl-NL': 'Dummy' },
-          slug: { 'nl-NL': 'Dummy' },
-          categories: [],
-          masterVariant: {
-            id: 0,
-            sku: 'MYSKU',
-          },
-          variants: [],
-        },
-      },
-    })
+	test('import exiting product', async () => {
+		storage.add('dummy', 'product', {
+			id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
+			// @ts-ignore
+			masterData: {
+				// @ts-ignore
+				current: {
+					name: { 'nl-NL': 'Dummy' },
+					slug: { 'nl-NL': 'Dummy' },
+					categories: [],
+					masterVariant: {
+						id: 0,
+						sku: 'MYSKU',
+					},
+					variants: [],
+				},
+			},
+		})
 
-    const draft: OrderImportDraft = {
-      orderNumber: '100000001',
-      totalPrice: {
-        centAmount: 1000,
-        currencyCode: 'EUR',
-      },
-      paymentState: 'Paid',
-      customLineItems: [],
-      lineItems: [
-        {
-          productId: 'PRODUCTID',
-          name: {
-            'en-US': 'The product',
-          },
-          variant: {
-            id: 1,
-            sku: 'MYSKU',
-            prices: [
-              {
-                value: {
-                  type: 'centPrecision',
-                  currencyCode: 'EUR',
-                  centAmount: 14900,
-                  fractionDigits: 2,
-                },
-                country: 'NL',
-                // channel: {
-                //   typeId: 'channel',
-                //   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
-                // },
-                // custom: {
-                //   type: {
-                //     typeId: 'type',
-                //     id: '55071385-b6e4-44c4-8c4b-6f2ec0f23649',
-                //   },
-                //   fields: {},
-                // },
-              },
-            ],
-            images: [],
-            attributes: [],
-          },
-          price: {
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'EUR',
-              centAmount: 14900,
-              fractionDigits: 2,
-            },
-            country: 'NL',
-            // channel: {
-            //   typeId: 'channel',
-            //   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
-            // },
-            // custom: {
-            //   type: {
-            //     typeId: 'type',
-            //     id: '55071385-b6e4-44c4-8c4b-6f2ec0f23649',
-            //   },
-            //   fields: {},
-            // },
-          },
-          quantity: 3,
-          // distributionChannel: {
-          //   typeId: 'channel',
-          //   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
-          // },
-          taxRate: {
-            name: '21% BTW',
-            amount: 0.21,
-            includedInPrice: true,
-            country: 'NL',
-            id: 'Z0wLUuYw',
-            subRates: [],
-          },
-          // state: [
-          //   {
-          //     quantity: 3,
-          //     state: {
-          //       typeId: 'state',
-          //       id: 'f1d9531d-41f0-46a7-82f2-c4b0748aa9f5',
-          //     },
-          //   },
-          // ],
-        },
-      ],
-    }
+		const draft: OrderImportDraft = {
+			orderNumber: '100000001',
+			totalPrice: {
+				centAmount: 1000,
+				currencyCode: 'EUR',
+			},
+			paymentState: 'Paid',
+			customLineItems: [],
+			lineItems: [
+				{
+					productId: 'PRODUCTID',
+					name: {
+						'en-US': 'The product',
+					},
+					variant: {
+						id: 1,
+						sku: 'MYSKU',
+						prices: [
+							{
+								value: {
+									type: 'centPrecision',
+									currencyCode: 'EUR',
+									centAmount: 14900,
+									fractionDigits: 2,
+								},
+								country: 'NL',
+								// channel: {
+								//   typeId: 'channel',
+								//   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
+								// },
+								// custom: {
+								//   type: {
+								//     typeId: 'type',
+								//     id: '55071385-b6e4-44c4-8c4b-6f2ec0f23649',
+								//   },
+								//   fields: {},
+								// },
+							},
+						],
+						images: [],
+						attributes: [],
+					},
+					price: {
+						value: {
+							type: 'centPrecision',
+							currencyCode: 'EUR',
+							centAmount: 14900,
+							fractionDigits: 2,
+						},
+						country: 'NL',
+						// channel: {
+						//   typeId: 'channel',
+						//   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
+						// },
+						// custom: {
+						//   type: {
+						//     typeId: 'type',
+						//     id: '55071385-b6e4-44c4-8c4b-6f2ec0f23649',
+						//   },
+						//   fields: {},
+						// },
+					},
+					quantity: 3,
+					// distributionChannel: {
+					//   typeId: 'channel',
+					//   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
+					// },
+					taxRate: {
+						name: '21% BTW',
+						amount: 0.21,
+						includedInPrice: true,
+						country: 'NL',
+						id: 'Z0wLUuYw',
+						subRates: [],
+					},
+					// state: [
+					//   {
+					//     quantity: 3,
+					//     state: {
+					//       typeId: 'state',
+					//       id: 'f1d9531d-41f0-46a7-82f2-c4b0748aa9f5',
+					//     },
+					//   },
+					// ],
+				},
+			],
+		}
 
-    repository.import({ projectKey: 'dummy' }, draft)
-  })
-  /*
+		repository.import({ projectKey: 'dummy' }, draft)
+	})
+	/*
   test('import non exiting product', async () => {
     const draft: OrderImportDraft = {
       orderNumber: '100000001',
