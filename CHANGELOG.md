@@ -1,5 +1,13 @@
 ## 0.14.0
 
+## 1.6.0
+
+### Minor Changes
+
+- [#92](https://github.com/labd/commercetools-node-mock/pull/92) [`c53c2b4`](https://github.com/labd/commercetools-node-mock/commit/c53c2b4884f337e276d0d375cb00a2e4f03cbf20) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added logic for attribute groups
+
+- [#95](https://github.com/labd/commercetools-node-mock/pull/95) [`957864d`](https://github.com/labd/commercetools-node-mock/commit/957864da3ddd35eba66ff3db6abac6b2d11604e3) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix implementation of the product projection query endpoint. This also fixes some issues with passing condition values as separate values (var.name)
+
 ## 1.5.0
 
 ### Minor Changes
