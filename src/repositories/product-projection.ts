@@ -5,12 +5,16 @@ import type {
 	QueryParam,
 } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
+import { CommercetoolsError } from '../exceptions.js'
 import { QueryParamsAsArray } from '../helpers.js'
+import { parseQueryExpression } from '../lib/predicateParser.js'
 import { ProductProjectionSearch } from '../product-projection-search.js'
 import { type AbstractStorage } from '../storage/index.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
-import { parseQueryExpression } from '../lib/predicateParser.js'
-import { CommercetoolsError } from '../exceptions.js'
+import {
+	AbstractResourceRepository,
+	GetParams,
+	RepositoryContext,
+} from './abstract.js'
 
 type ProductProjectionQueryParams = {
 	staged?: boolean
@@ -43,6 +47,23 @@ export class ProductProjectionRepository extends AbstractResourceRepository<'pro
 
 	create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
 		throw new Error('No valid action')
+	}
+
+	get(
+		context: RepositoryContext,
+		id: string,
+		params: GetParams = {}
+	): ProductProjection | null {
+		const resource = this._storage.get(
+			context.projectKey,
+			'product',
+			id,
+			params
+		)
+		if (resource) {
+			return this._searchService.transform(resource, false)
+		}
+		return null
 	}
 
 	query(context: RepositoryContext, params: ProductProjectionQueryParams = {}) {

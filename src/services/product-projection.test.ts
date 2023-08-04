@@ -199,26 +199,36 @@ afterEach(async () => {
 	timekeeper.reset()
 	ctMock.clear()
 })
+// Test the general product projection implementation
+describe('Product Projection Get By ID', () => {
+	test('Get By ID', async () => {
+		const response = await supertest(ctMock.app).get(
+			`/dummy/product-projections/${publishedProduct.id}`
+		)
+
+		const result: ProductProjection = response.body
+		expect(result).toBeDefined()
+		expect(result.id).toBe(publishedProduct.id)
+	})
+})
 
 // Test the general product projection implementation
 describe('Product Projection Query - Generic', () => {
 	test('Filter out staged', async () => {
-		{
-			const response = await supertest(ctMock.app)
-				.get('/dummy/product-projections')
-				.query({
-					limit: 50,
-				})
-
-			const result: ProductProjectionPagedSearchResponse = response.body
-			expect(result).toEqual({
-				count: 1,
+		const response = await supertest(ctMock.app)
+			.get('/dummy/product-projections')
+			.query({
 				limit: 50,
-				offset: 0,
-				total: 1,
-				results: [productProjection],
 			})
-		}
+
+		const result: ProductProjectionPagedSearchResponse = response.body
+		expect(result).toEqual({
+			count: 1,
+			limit: 50,
+			offset: 0,
+			total: 1,
+			results: [productProjection],
+		})
 	})
 
 	test('Filter on valid slug', async () => {
