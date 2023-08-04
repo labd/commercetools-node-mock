@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.6.1
+
+### Patch Changes
+
+- [`f63d8db`](https://github.com/labd/commercetools-node-mock/commit/f63d8dbdae9dbfdc54131deb431dacae68a18af6) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix product projection get by id
+
 ## 1.6.0
 
 ### Minor Changes
