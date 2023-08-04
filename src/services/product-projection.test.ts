@@ -201,6 +201,70 @@ afterEach(async () => {
 })
 
 // Test the general product projection implementation
+describe('Product Projection Query - Generic', () => {
+	test('Filter out staged', async () => {
+		{
+			const response = await supertest(ctMock.app)
+				.get('/dummy/product-projections')
+				.query({
+					limit: 50,
+				})
+
+			const result: ProductProjectionPagedSearchResponse = response.body
+			expect(result).toEqual({
+				count: 1,
+				limit: 50,
+				offset: 0,
+				total: 1,
+				results: [productProjection],
+			})
+		}
+	})
+
+	test('Filter on valid slug', async () => {
+		{
+			const response = await supertest(ctMock.app)
+				.get('/dummy/product-projections')
+				.query({
+					limit: 50,
+					where: ['slug(nl-NL=:slug)'],
+					'var.slug': 'test-product',
+				})
+
+			const result: ProductProjectionPagedSearchResponse = response.body
+			expect(result).toEqual({
+				count: 1,
+				limit: 50,
+				offset: 0,
+				total: 1,
+				results: [productProjection],
+			})
+		}
+	})
+
+	test('Filter on invalid slug', async () => {
+		{
+			const response = await supertest(ctMock.app)
+				.get('/dummy/product-projections')
+				.query({
+					limit: 50,
+					where: ['slug(nl-NL=:slug)'],
+					'var.slug': 'missing-product',
+				})
+
+			const result: ProductProjectionPagedSearchResponse = response.body
+			expect(result).toEqual({
+				count: 0,
+				limit: 50,
+				offset: 0,
+				total: 0,
+				results: [],
+			})
+		}
+	})
+})
+
+// Test the general product projection implementation
 describe('Product Projection Search - Generic', () => {
 	test('Pagination', async () => {
 		{

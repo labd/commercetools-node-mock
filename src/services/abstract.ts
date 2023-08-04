@@ -167,7 +167,7 @@ export default abstract class AbstractService {
 	}
 
 	// No idea what i'm doing
-	private _parseParam(
+	protected _parseParam(
 		value: string | ParsedQs | string[] | ParsedQs[] | undefined
 	): string[] | undefined {
 		if (Array.isArray(value)) {

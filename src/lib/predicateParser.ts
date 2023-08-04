@@ -32,11 +32,11 @@ export const matchesPredicate = (
 	if (Array.isArray(predicate)) {
 		return predicate.every((item) => {
 			const func = generateMatchFunc(item)
-			return func(target, variables || {})
+			return func(target, variables ?? {})
 		})
 	} else {
 		const func = generateMatchFunc(predicate)
-		return func(target, variables || {})
+		return func(target, variables ?? {})
 	}
 }
 
@@ -76,7 +76,7 @@ const validateSymbol = (val: TypeSymbol) => {
 
 const resolveSymbol = (val: TypeSymbol, vars: VariableMap): any => {
 	if (val.type === 'var') {
-		if (!(val.value in vars)) {
+		if (!(val.value in (vars ?? {}))) {
 			throw new PredicateError(`Missing parameter value for ${val.value}`)
 		}
 		return vars[val.value]
@@ -245,7 +245,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			return (obj: any, vars: object) => {
 				const value = resolveValue(obj, left)
 				if (value) {
-					return expr(value)
+					return expr(value, vars)
 				}
 				return false
 			}
