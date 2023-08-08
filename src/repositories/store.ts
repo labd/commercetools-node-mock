@@ -3,6 +3,7 @@ import type {
 	ChannelResourceIdentifier,
 	Store,
 	StoreDraft,
+	StoreSetCountriesAction,
 	StoreSetCustomFieldAction,
 	StoreSetCustomTypeAction,
 	StoreSetDistributionChannelsAction,
@@ -123,6 +124,13 @@ export class StoreRepository extends AbstractResourceRepository<'store'> {
 			} else {
 				resource.custom.fields[name] = value
 			}
+		},
+		setCountries: (
+			context: RepositoryContext,
+			resource: Writable<Store>,
+			{ countries }: StoreSetCountriesAction
+		) => {
+			resource.countries = countries ?? []
 		},
 	}
 }
