@@ -1,7 +1,7 @@
 import type {
 	CartDiscount,
 	CartDiscountChangeIsActiveAction,
-	CartDiscountChangeSortOrderAction,
+	CartDiscountChangeSortOrderAction, CartDiscountChangeTargetAction,
 	CartDiscountDraft,
 	CartDiscountSetDescriptionAction,
 	CartDiscountSetKeyAction,
@@ -15,13 +15,13 @@ import type {
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
 } from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
+import {getBaseResourceProperties} from '../helpers.js'
+import type {Writable} from '../types.js'
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
-import { createTypedMoney, getStoreKeyReference } from './helpers.js'
+import {createTypedMoney, getStoreKeyReference} from './helpers.js'
 
 export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
 	getTypeId() {
@@ -95,35 +95,35 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ key }: CartDiscountSetKeyAction
+			{key}: CartDiscountSetKeyAction
 		) => {
 			resource.key = key
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ description }: CartDiscountSetDescriptionAction
+			{description}: CartDiscountSetDescriptionAction
 		) => {
 			resource.description = description
 		},
 		setValidFrom: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ validFrom }: CartDiscountSetValidFromAction
+			{validFrom}: CartDiscountSetValidFromAction
 		) => {
 			resource.validFrom = validFrom
 		},
 		setValidUntil: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ validUntil }: CartDiscountSetValidUntilAction
+			{validUntil}: CartDiscountSetValidUntilAction
 		) => {
 			resource.validUntil = validUntil
 		},
 		setValidFromAndUntil: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction
+			{validFrom, validUntil}: CartDiscountSetValidFromAndUntilAction
 		) => {
 			resource.validFrom = validFrom
 			resource.validUntil = validUntil
@@ -131,16 +131,23 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 		changeSortOrder: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ sortOrder }: CartDiscountChangeSortOrderAction
+			{sortOrder}: CartDiscountChangeSortOrderAction
 		) => {
 			resource.sortOrder = sortOrder
 		},
 		changeIsActive: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ isActive }: CartDiscountChangeIsActiveAction
+			{isActive}: CartDiscountChangeIsActiveAction
 		) => {
 			resource.isActive = isActive
+		},
+		changeTarget: (
+			context: RepositoryContext,
+			resource: Writable<CartDiscount>,
+			{target}: CartDiscountChangeTargetAction
+		) => {
+			resource.target = target
 		},
 	}
 }
