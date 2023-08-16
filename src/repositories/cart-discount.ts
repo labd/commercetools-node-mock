@@ -24,7 +24,11 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
-import { createCustomFields, createTypedMoney, getStoreKeyReference } from './helpers.js'
+import {
+	createCustomFields,
+	createTypedMoney,
+	getStoreKeyReference,
+} from './helpers.js'
 import { CommercetoolsError } from '../exceptions.js'
 
 export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
@@ -174,7 +178,10 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 					throw new CommercetoolsError<InvalidOperationError>(
 						{
 							code: 'InvalidOperation',
-							message: 'Cannot remove custom field ' + name + ' because it does not exist.',
+							message:
+								'Cannot remove custom field ' +
+								name +
+								' because it does not exist.',
 						},
 						400
 					)
