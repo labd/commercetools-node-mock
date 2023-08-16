@@ -1,10 +1,12 @@
 import type {
 	Asset,
 	AssetDraft,
-	Category, CategoryAddAssetAction,
+	Category,
+	CategoryAddAssetAction,
 	CategoryChangeAssetNameAction,
 	CategoryChangeSlugAction,
-	CategoryDraft, CategoryRemoveAssetAction,
+	CategoryDraft,
+	CategoryRemoveAssetAction,
 	CategorySetAssetDescriptionAction,
 	CategorySetAssetSourcesAction,
 	CategorySetCustomFieldAction,
@@ -15,14 +17,14 @@ import type {
 	CategorySetMetaKeywordsAction,
 	CategorySetMetaTitleAction,
 } from '@commercetools/platform-sdk'
-import {v4 as uuidv4} from 'uuid'
-import {getBaseResourceProperties} from '../helpers.js'
-import type {Writable} from '../types.js'
+import { v4 as uuidv4 } from 'uuid'
+import { getBaseResourceProperties } from '../helpers.js'
+import type { Writable } from '../types.js'
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
-import {createCustomFields} from './helpers.js'
+import { createCustomFields } from './helpers.js'
 
 export class CategoryRepository extends AbstractResourceRepository<'category'> {
 	getTypeId() {
@@ -47,7 +49,7 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 			orderHint: draft.orderHint || '',
 			externalId: draft.externalId || '',
 			parent: draft.parent
-				? {typeId: 'category', id: draft.parent.id!}
+				? { typeId: 'category', id: draft.parent.id! }
 				: undefined,
 			ancestors: [], // TODO
 			assets:
@@ -78,7 +80,7 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		changeAssetName: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{assetId, assetKey, name}: CategoryChangeAssetNameAction
+			{ assetId, assetKey, name }: CategoryChangeAssetNameAction
 		) => {
 			resource.assets?.forEach((asset) => {
 				if (assetId && assetId === asset.id) {
@@ -92,21 +94,21 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		changeSlug: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{slug}: CategoryChangeSlugAction
+			{ slug }: CategoryChangeSlugAction
 		) => {
 			resource.slug = slug
 		},
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{key}: CategorySetKeyAction
+			{ key }: CategorySetKeyAction
 		) => {
 			resource.key = key
 		},
 		setAssetDescription: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{assetId, assetKey, description}: CategorySetAssetDescriptionAction
+			{ assetId, assetKey, description }: CategorySetAssetDescriptionAction
 		) => {
 			resource.assets?.forEach((asset) => {
 				if (assetId && assetId === asset.id) {
@@ -120,7 +122,7 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		setAssetSources: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{assetId, assetKey, sources}: CategorySetAssetSourcesAction
+			{ assetId, assetKey, sources }: CategorySetAssetSourcesAction
 		) => {
 			resource.assets?.forEach((asset) => {
 				if (assetId && assetId === asset.id) {
@@ -134,39 +136,39 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{description}: CategorySetDescriptionAction
+			{ description }: CategorySetDescriptionAction
 		) => {
 			resource.description = description
 		},
 		setMetaDescription: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{metaDescription}: CategorySetMetaDescriptionAction
+			{ metaDescription }: CategorySetMetaDescriptionAction
 		) => {
 			resource.metaDescription = metaDescription
 		},
 		setMetaKeywords: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{metaKeywords}: CategorySetMetaKeywordsAction
+			{ metaKeywords }: CategorySetMetaKeywordsAction
 		) => {
 			resource.metaKeywords = metaKeywords
 		},
 		setMetaTitle: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{metaTitle}: CategorySetMetaTitleAction
+			{ metaTitle }: CategorySetMetaTitleAction
 		) => {
 			resource.metaTitle = metaTitle
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{type, fields}: CategorySetCustomTypeAction
+			{ type, fields }: CategorySetCustomTypeAction
 		) => {
 			if (type) {
 				resource.custom = createCustomFields(
-					{type, fields},
+					{ type, fields },
 					context.projectKey,
 					this._storage
 				)
@@ -177,7 +179,7 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{name, value}: CategorySetCustomFieldAction
+			{ name, value }: CategorySetCustomFieldAction
 		) => {
 			if (!resource.custom) {
 				return
@@ -191,22 +193,22 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		removeAsset: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{assetId}: CategoryRemoveAssetAction
+			{ assetId }: CategoryRemoveAssetAction
 		) => {
 			if (!resource.assets) {
 				return
 			}
 
 			resource.assets = resource.assets.filter(function (obj) {
-				return obj.id !== assetId;
-			});
+				return obj.id !== assetId
+			})
 		},
 		addAsset: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{asset}: CategoryAddAssetAction
+			{ asset }: CategoryAddAssetAction
 		) => {
-			if(!resource.assets) {
+			if (!resource.assets) {
 				resource.assets = [this.assetFromAssetDraft(asset, context)]
 			} else {
 				resource.assets.push(this.assetFromAssetDraft(asset, context))
