@@ -4,8 +4,7 @@
 
 ### Patch Changes
 
-- [`1396677`](https://github.com/labd/commercetools-node-mock/commit/1396677abbf57f20270b7708a2139e3f4a5a9985) Thanks [@demeyerthom](https://github.com/demeyerthom)! - - Added category asset actions
-  - Added cart discount custom fields
+- [`1396677`](https://github.com/labd/commercetools-node-mock/commit/1396677abbf57f20270b7708a2139e3f4a5a9985) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added category asset actions and cart discount custom fields
 
 ## 1.6.1
 
