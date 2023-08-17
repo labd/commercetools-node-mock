@@ -4,6 +4,7 @@ import type {
 	CartDiscountChangeSortOrderAction,
 	CartDiscountChangeTargetAction,
 	CartDiscountDraft,
+	CartDiscountSetCustomFieldAction,
 	CartDiscountSetDescriptionAction,
 	CartDiscountSetKeyAction,
 	CartDiscountSetValidFromAction,
@@ -15,6 +16,7 @@ import type {
 	CartDiscountValueFixed,
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
+	InvalidOperationError,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers.js'
 import type { Writable } from '../types.js'
@@ -22,7 +24,12 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
-import { createTypedMoney, getStoreKeyReference } from './helpers.js'
+import {
+	createCustomFields,
+	createTypedMoney,
+	getStoreKeyReference,
+} from './helpers.js'
+import { CommercetoolsError } from '../exceptions.js'
 
 export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
 	getTypeId() {
@@ -49,6 +56,11 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 			value: this.transformValueDraft(draft.value),
+			custom: createCustomFields(
+				draft.custom,
+				context.projectKey,
+				this._storage
+			),
 		}
 		this.saveNew(context, resource)
 		return resource
@@ -149,6 +161,34 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 			{ target }: CartDiscountChangeTargetAction
 		) => {
 			resource.target = target
+		},
+
+		setCustomField: (
+			context: RepositoryContext,
+			resource: Writable<CartDiscount>,
+			{ name, value }: CartDiscountSetCustomFieldAction
+		) => {
+			if (!resource.custom) {
+				return
+			}
+			if (value === null) {
+				if (name in resource.custom.fields) {
+					delete resource.custom.fields[name]
+				} else {
+					throw new CommercetoolsError<InvalidOperationError>(
+						{
+							code: 'InvalidOperation',
+							message:
+								'Cannot remove custom field ' +
+								name +
+								' because it does not exist.',
+						},
+						400
+					)
+				}
+			} else {
+				resource.custom.fields[name] = value
+			}
 		},
 	}
 }
