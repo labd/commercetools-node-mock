@@ -4,7 +4,7 @@ import type {
 	CategoryRemoveAssetAction,
 } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, afterEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 import assert from 'assert'
 
@@ -27,6 +27,10 @@ describe('Categories Query', () => {
 		expect(response.status).toBe(201)
 
 		category = response.body as Category
+	})
+
+	afterEach(() => {
+		ctMock.clear()
 	})
 
 	test('no filter', async () => {
@@ -79,6 +83,7 @@ describe('Categories add asset', () => {
 				version: 1,
 				actions: [
 					{
+						action: 'addAsset',
 						asset: {
 							key: 'some-other-key',
 						},
