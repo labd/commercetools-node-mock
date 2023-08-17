@@ -1,8 +1,12 @@
 import type {
+	Asset,
+	AssetDraft,
 	Category,
+	CategoryAddAssetAction,
 	CategoryChangeAssetNameAction,
 	CategoryChangeSlugAction,
 	CategoryDraft,
+	CategoryRemoveAssetAction,
 	CategorySetAssetDescriptionAction,
 	CategorySetAssetSourcesAction,
 	CategorySetCustomFieldAction,
@@ -26,6 +30,15 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 	getTypeId() {
 		return 'category' as const
 	}
+
+	assetFromAssetDraft = (
+		draft: AssetDraft,
+		context: RepositoryContext
+	): Asset => ({
+		...draft,
+		id: uuidv4(),
+		custom: createCustomFields(draft.custom, context.projectKey, this._storage),
+	})
 
 	create(context: RepositoryContext, draft: CategoryDraft): Category {
 		const resource: Category = {
@@ -175,6 +188,42 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 				delete resource.custom.fields[name]
 			} else {
 				resource.custom.fields[name] = value
+			}
+		},
+		removeAsset: (
+			context: RepositoryContext,
+			resource: Writable<Category>,
+			{ assetId, assetKey }: CategoryRemoveAssetAction
+		) => {
+			if (!resource.assets) {
+				return
+			}
+
+			if (assetId) {
+				resource.assets = resource.assets.filter(function (obj) {
+					return obj.id !== assetId
+				})
+
+				return
+			}
+
+			if (assetKey) {
+				resource.assets = resource.assets.filter(function (obj) {
+					return obj.key !== assetKey
+				})
+
+				return
+			}
+		},
+		addAsset: (
+			context: RepositoryContext,
+			resource: Writable<Category>,
+			{ asset }: CategoryAddAssetAction
+		) => {
+			if (!resource.assets) {
+				resource.assets = [this.assetFromAssetDraft(asset, context)]
+			} else {
+				resource.assets.push(this.assetFromAssetDraft(asset, context))
 			}
 		},
 	}
