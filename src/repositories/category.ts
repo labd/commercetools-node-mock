@@ -193,15 +193,27 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 		removeAsset: (
 			context: RepositoryContext,
 			resource: Writable<Category>,
-			{ assetId }: CategoryRemoveAssetAction
+			{ assetId, assetKey }: CategoryRemoveAssetAction
 		) => {
 			if (!resource.assets) {
 				return
 			}
 
-			resource.assets = resource.assets.filter(function (obj) {
-				return obj.id !== assetId
-			})
+			if (assetId) {
+				resource.assets = resource.assets.filter(function (obj) {
+					return obj.id !== assetId
+				})
+
+				return
+			}
+
+			if (assetKey) {
+				resource.assets = resource.assets.filter(function (obj) {
+					return obj.key !== assetKey
+				})
+
+				return
+			}
 		},
 		addAsset: (
 			context: RepositoryContext,
