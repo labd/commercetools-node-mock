@@ -1,4 +1,4 @@
-import { CommercetoolsMock } from '../ctMock'
+import { CommercetoolsMock } from '../ctMock.js'
 import { AssociateRole } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { beforeEach, afterEach, describe, expect, test } from 'vitest'
@@ -9,7 +9,7 @@ describe('Associate roles query', () => {
 
 	beforeEach(async () => {
 		const response = await supertest(ctMock.app)
-			.post('dummy/associate-roles')
+			.post('/dummy/associate-roles')
 			.send({
 				name: 'example-role',
 				buyerAssignable: false,
@@ -28,7 +28,7 @@ describe('Associate roles query', () => {
 
 	test('no filter', async () => {
 		const response = await supertest(ctMock.app)
-			.get('dummy/associate-roles')
+			.get('/dummy/associate-roles')
 			.query('{}')
 			.send()
 
