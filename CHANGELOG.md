@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.7.0
+
+### Minor Changes
+
+- [`df59ca9`](https://github.com/labd/commercetools-node-mock/commit/df59ca96acda8d9a6d02a3e98b7dc4a29a89edb2) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added associate role resources
+
 ## 1.6.2
 
 ### Patch Changes
