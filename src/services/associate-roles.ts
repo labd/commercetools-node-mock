@@ -1,18 +1,17 @@
-import { Router } from "express";
-import { AbstractResourceRepository } from "../repositories/abstract";
-import { AssociateRoleRepository } from "../repositories/associate-role";
-import AbstractService from "./abstract";
+import { Router } from 'express'
+import { AssociateRoleRepository } from '../repositories/associate-role.js'
+import AbstractService from './abstract.js'
 
 export class AssociateRoleServices extends AbstractService {
-    public repository: AssociateRoleRepository
+	public repository: AssociateRoleRepository
 
-    constructor(parent: Router, repository: AssociateRoleRepository) {
-        super(parent)
+	constructor(parent: Router, repository: AssociateRoleRepository) {
+		super(parent)
 
-        this.repository = repository
-    }
+		this.repository = repository
+	}
 
-    protected getBasePath(): string {
-        return 'associate-roles'
-    }
+	protected getBasePath(): string {
+		return 'associate-roles'
+	}
 }

@@ -1,4 +1,13 @@
-import type { AssociateRole, AssociateRoleAddPermissionAction, AssociateRoleChangeBuyerAssignableAction, AssociateRoleDraft, AssociateRoleRemovePermissionAction, AssociateRoleSetCustomFieldAction, AssociateRoleSetNameAction, AssociateRoleSetPermissionsAction, Permission } from '@commercetools/platform-sdk'
+import type {
+	AssociateRole,
+	AssociateRoleAddPermissionAction,
+	AssociateRoleChangeBuyerAssignableAction,
+	AssociateRoleDraft,
+	AssociateRoleRemovePermissionAction,
+	AssociateRoleSetCustomFieldAction,
+	AssociateRoleSetNameAction,
+	AssociateRoleSetPermissionsAction,
+} from '@commercetools/platform-sdk'
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -22,7 +31,7 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage,
+				this._storage
 			),
 		}
 
@@ -35,28 +44,28 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 		setName: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ name }: AssociateRoleSetNameAction,
+			{ name }: AssociateRoleSetNameAction
 		) => {
 			resource.name = name
 		},
 		setPermissions: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ permissions }: AssociateRoleSetPermissionsAction,
+			{ permissions }: AssociateRoleSetPermissionsAction
 		) => {
 			resource.permissions = permissions || []
 		},
 		setBuyerAssignable: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction,
+			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction
 		) => {
 			resource.buyerAssignable = buyerAssignable
 		},
 		setCustomFields: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ name, value }: AssociateRoleSetCustomFieldAction,
+			{ name, value }: AssociateRoleSetCustomFieldAction
 		) => {
 			if (!resource.custom) {
 				return
@@ -71,7 +80,7 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 		addPermission: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ permission }: AssociateRoleAddPermissionAction,
+			{ permission }: AssociateRoleAddPermissionAction
 		) => {
 			if (!resource.permissions) {
 				resource.permissions = [permission]
@@ -82,13 +91,15 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 		removePermission: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ permission }: AssociateRoleRemovePermissionAction,
+			{ permission }: AssociateRoleRemovePermissionAction
 		) => {
-			if (!resource.permissions) {return}
+			if (!resource.permissions) {
+				return
+			}
 
 			resource.permissions = resource.permissions.filter((p) => {
 				p !== permission
 			})
-		}
+		},
 	}
 }
