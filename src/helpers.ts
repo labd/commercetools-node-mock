@@ -39,7 +39,9 @@ export const queryParamsArray = (
 		return undefined
 	}
 
-	const values: string[] = Array.isArray(input) ? input as string[] : [input] as string[]
+	const values: string[] = Array.isArray(input)
+		? (input as string[])
+		: ([input] as string[])
 	if (values.length < 1) {
 		return undefined
 	}

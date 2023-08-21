@@ -4,9 +4,7 @@ import type {
 	ProductProjection,
 	QueryParam,
 } from '@commercetools/platform-sdk'
-import { ParsedQs } from 'qs'
 import { CommercetoolsError } from '../exceptions.js'
-import { queryParamsArray } from '../helpers.js'
 import { parseQueryExpression } from '../lib/predicateParser.js'
 import { ProductProjectionSearch } from '../product-projection-search.js'
 import { type AbstractStorage } from '../storage/index.js'

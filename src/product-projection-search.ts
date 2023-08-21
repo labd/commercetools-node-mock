@@ -171,15 +171,25 @@ export class ProductProjectionSearch {
 		products: ProductProjection[]
 	): FacetResults {
 		if (!params.facet) return {}
-		const staged = false
 		const result: FacetResults = {}
 
-		for (const facet of params.facet) {
+		const regexp = new RegExp(/ counting products$/)
+		for (let facet of params.facet) {
+			let countProducts = false
+			if (facet.endsWith(' counting products')) {
+				facet = facet.replace(regexp, '')
+				countProducts = true
+			}
+
 			const expression = generateFacetFunc(facet)
 
 			// Term Facet
 			if (expression.type === 'TermExpression') {
-				result[facet] = this.termFacet(expression.source, products)
+				result[facet] = this.termFacet(
+					expression.source,
+					products,
+					countProducts
+				)
 			}
 
 			// Range Facet
@@ -187,7 +197,8 @@ export class ProductProjectionSearch {
 				result[expression.source] = this.rangeFacet(
 					expression.source,
 					expression.children,
-					products
+					products,
+					countProducts
 				)
 			}
 
@@ -196,7 +207,8 @@ export class ProductProjectionSearch {
 				result[expression.source] = this.filterFacet(
 					expression.source,
 					expression.children,
-					products
+					products,
+					countProducts
 				)
 			}
 		}
@@ -209,7 +221,11 @@ export class ProductProjectionSearch {
 	 *  - counting products
 	 *  - correct dataType
 	 */
-	termFacet(facet: string, products: ProductProjection[]): TermFacetResult {
+	termFacet(
+		facet: string,
+		products: ProductProjection[],
+		countProducts: boolean
+	): TermFacetResult {
 		const result: Writable<TermFacetResult> = {
 			type: 'terms',
 			dataType: 'text',
@@ -254,13 +270,15 @@ export class ProductProjectionSearch {
 				count: terms[term],
 			})
 		}
+
 		return result
 	}
 
 	filterFacet(
 		source: string,
 		filters: FilterExpression[] | undefined,
-		products: ProductProjection[]
+		products: ProductProjection[],
+		countProducts: boolean
 	): FilteredFacetResult {
 		let count = 0
 		if (source.startsWith('variants.')) {
@@ -285,7 +303,8 @@ export class ProductProjectionSearch {
 	rangeFacet(
 		source: string,
 		ranges: RangeExpression[] | undefined,
-		products: ProductProjection[]
+		products: ProductProjection[],
+		countProducts: boolean
 	): RangeFacetResult {
 		const counts =
 			ranges?.map((range) => {
