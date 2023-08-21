@@ -1,7 +1,11 @@
 import { Request, Response, Router } from 'express'
 import { getRepositoryContext } from '../repositories/helpers.js'
-import { ProductProjectionRepository } from './../repositories/product-projection.js'
+import {
+	ProductProjectionQueryParams,
+	ProductProjectionRepository,
+} from './../repositories/product-projection.js'
 import AbstractService from './abstract.js'
+import { queryParamsArray, queryParamsValue } from '../helpers.js'
 
 export class ProductProjectionService extends AbstractService {
 	public repository: ProductProjectionRepository
@@ -34,9 +38,29 @@ export class ProductProjectionService extends AbstractService {
 	}
 
 	search(request: Request, response: Response) {
+		const query = request.query
+		const searchParams: ProductProjectionQueryParams = {
+			filter: queryParamsArray(query.filter),
+			'filter.query': queryParamsArray(query['filter.query']),
+			facet: queryParamsArray(query.facet),
+			expand: queryParamsArray(query.expand),
+			staged: queryParamsValue(query.staged) === 'true',
+			localeProjection: queryParamsValue(query.localeProjection),
+			storeProjection: queryParamsValue(query.storeProjection),
+			priceChannel: queryParamsValue(query.priceChannel),
+			priceCountry: queryParamsValue(query.priceCountry),
+			priceCurrency: queryParamsValue(query.priceCurrency),
+			priceCustomerGroup: queryParamsValue(query.priceCustomerGroup),
+			offset: query.offset
+				? Number(queryParamsValue(query.offset))
+				: undefined,
+			limit: query.limit
+				? Number(queryParamsValue(query.limit))
+				: undefined,
+		}
 		const resource = this.repository.search(
 			getRepositoryContext(request),
-			request.query
+			searchParams
 		)
 		return response.status(200).send(resource)
 	}

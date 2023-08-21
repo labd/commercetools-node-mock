@@ -3,6 +3,7 @@ import { type Request, type Response, Router } from 'express'
 import { ParsedQs } from 'qs'
 import { AbstractResourceRepository } from '../repositories/abstract.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
+import { queryParamsArray } from '../helpers.js'
 
 export default abstract class AbstractService {
 	protected abstract getBasePath(): string
@@ -170,12 +171,6 @@ export default abstract class AbstractService {
 	protected _parseParam(
 		value: string | ParsedQs | string[] | ParsedQs[] | undefined
 	): string[] | undefined {
-		if (Array.isArray(value)) {
-			// @ts-ignore
-			return value
-		} else if (value !== undefined) {
-			return [`${value}`]
-		}
-		return undefined
+		return queryParamsArray(value)
 	}
 }

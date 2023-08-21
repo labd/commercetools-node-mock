@@ -6,7 +6,7 @@ import type {
 } from '@commercetools/platform-sdk'
 import { ParsedQs } from 'qs'
 import { CommercetoolsError } from '../exceptions.js'
-import { QueryParamsAsArray } from '../helpers.js'
+import { queryParamsArray } from '../helpers.js'
 import { parseQueryExpression } from '../lib/predicateParser.js'
 import { ProductProjectionSearch } from '../product-projection-search.js'
 import { type AbstractStorage } from '../storage/index.js'
@@ -16,13 +16,13 @@ import {
 	RepositoryContext,
 } from './abstract.js'
 
-type ProductProjectionQueryParams = {
+export type ProductProjectionQueryParams = {
 	staged?: boolean
 	priceCurrency?: string
 	priceCountry?: string
 	priceCustomerGroup?: string
 	priceChannel?: string
-	localeProjection?: string | string[]
+	localeProjection?: string
 	storeProjection?: string
 	expand?: string | string[]
 	sort?: string | string[]
@@ -126,18 +126,8 @@ export class ProductProjectionRepository extends AbstractResourceRepository<'pro
 		}
 	}
 
-	search(context: RepositoryContext, query: ParsedQs) {
-		const results = this._searchService.search(context.projectKey, {
-			filter: QueryParamsAsArray(query.filter),
-			'filter.query': QueryParamsAsArray(query['filter.query']),
-			facet: QueryParamsAsArray(query.facet),
-			offset: query.offset ? Number(query.offset) : undefined,
-			limit: query.limit ? Number(query.limit) : undefined,
-			expand: QueryParamsAsArray(query.expand),
-			staged: query.staged === 'true',
-		})
-
-		return results
+	search(context: RepositoryContext, query: ProductProjectionQueryParams) {
+		return this._searchService.search(context.projectKey, query)
 	}
 
 	actions = {}

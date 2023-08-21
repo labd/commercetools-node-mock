@@ -32,17 +32,28 @@ export const nestedLookup = (obj: any, path: string): any => {
 	return val
 }
 
-export const QueryParamsAsArray = (
+export const queryParamsArray = (
 	input: string | ParsedQs | string[] | ParsedQs[] | undefined
-): string[] => {
+): string[] | undefined => {
 	if (input == undefined) {
-		return []
+		return undefined
 	}
 
-	if (Array.isArray(input)) {
-		return input as string[]
+	const values: string[] = Array.isArray(input) ? input as string[] : [input] as string[]
+	if (values.length < 1) {
+		return undefined
 	}
-	return [input] as string[]
+	return values
+}
+
+export const queryParamsValue = (
+	value: string | ParsedQs | string[] | ParsedQs[] | undefined
+): string | undefined => {
+	const values = queryParamsArray(value)
+	if (values && values.length > 0) {
+		return values[0]
+	}
+	return undefined
 }
 
 export const cloneObject = <T>(o: T): T => JSON.parse(JSON.stringify(o))
