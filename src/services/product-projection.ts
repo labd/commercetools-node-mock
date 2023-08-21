@@ -51,12 +51,8 @@ export class ProductProjectionService extends AbstractService {
 			priceCountry: queryParamsValue(query.priceCountry),
 			priceCurrency: queryParamsValue(query.priceCurrency),
 			priceCustomerGroup: queryParamsValue(query.priceCustomerGroup),
-			offset: query.offset
-				? Number(queryParamsValue(query.offset))
-				: undefined,
-			limit: query.limit
-				? Number(queryParamsValue(query.limit))
-				: undefined,
+			offset: query.offset ? Number(queryParamsValue(query.offset)) : undefined,
+			limit: query.limit ? Number(queryParamsValue(query.limit)) : undefined,
 		}
 		const resource = this.repository.search(
 			getRepositoryContext(request),
