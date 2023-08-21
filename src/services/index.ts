@@ -1,3 +1,4 @@
+import { AssociateRoleServices } from './associate-roles'
 import { CartService } from './cart.js'
 import { CartDiscountService } from './cart-discount.js'
 import { CategoryServices } from './category.js'
@@ -30,6 +31,7 @@ import { ZoneService } from './zone.js'
 import { AttributeGroupService } from './attribute-group.js'
 
 export const createServices = (router: any, repos: any) => ({
+	'associate-role': new AssociateRoleServices(router, repos['associate-role']),
 	category: new CategoryServices(router, repos['category']),
 	cart: new CartService(router, repos['cart'], repos['order']),
 	'cart-discount': new CartDiscountService(router, repos['cart-discount']),
