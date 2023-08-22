@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.8.0
+
+### Minor Changes
+
+- [`fef6934`](https://github.com/labd/commercetools-node-mock/commit/fef6934083e1155b060354fe43dd742c2f192b1b) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added changeBuyerAssignable action to associate-role repo
+
 ## 1.7.0
 
 ### Minor Changes
