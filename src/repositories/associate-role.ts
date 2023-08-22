@@ -62,6 +62,13 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 		) => {
 			resource.buyerAssignable = buyerAssignable
 		},
+		changeBuyerAssignable: (
+			context: RepositoryContext,
+			resource: Writable<AssociateRole>,
+			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction
+		) => {
+			resource.buyerAssignable = buyerAssignable
+		},
 		setCustomFields: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
