@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.8.1
+
+### Patch Changes
+
+- [#104](https://github.com/labd/commercetools-node-mock/pull/104) [`4d83b97`](https://github.com/labd/commercetools-node-mock/commit/4d83b97b2fe9e550c87482c0c7c2a052a62b47f7) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve mocking of the product projection search
+
 ## 1.8.0
 
 ### Minor Changes
