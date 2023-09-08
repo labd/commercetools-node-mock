@@ -1,27 +1,63 @@
 import { type InvalidTokenError } from '@commercetools/platform-sdk'
 import { CommercetoolsMock } from './index.js'
-import { afterEach, beforeEach, expect, test } from 'vitest'
-import nock from 'nock'
+import { expect, test } from 'vitest'
 import got from 'got'
 
-beforeEach(() => {
-	nock.disableNetConnect()
-	nock.enableNetConnect('127.0.0.1') // supertest
-})
-afterEach(() => {
-	nock.enableNetConnect()
-	nock.cleanAll()
-})
-
-test('Default mock endpoints', async () => {
+test('node:fetch client', async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
+		apiHost: 'https://localhost',
+		authHost: 'https://localhost:8080',
+	})
+	ctMock.start()
+
+	const authHeader = 'Basic ' + Buffer.from('foo:bar').toString('base64')
+	let response = await fetch('https://localhost:8080/oauth/token', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			Authorization: authHeader,
+		},
+		body: new URLSearchParams({
+			grant_type: 'client_credentials',
+			scope: 'manage_project:commercetools-node-mock',
+		}),
+	})
+
+	const authBody = await response.json()
+	expect(response.status).toBe(200)
+
+	const token = authBody.access_token
+	response = await fetch('https://localhost/my-project/orders', {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	})
+
+	const body = await response.json()
+	expect(response.status).toBe(200)
+	expect(body).toStrictEqual({
+		count: 0,
+		total: 0,
+		offset: 0,
+		limit: 20,
+		results: [],
+	})
+	ctMock.stop()
+})
+
+test('got client', async () => {
+	const ctMock = new CommercetoolsMock({
+		enableAuthentication: true,
+		validateCredentials: true,
+		apiHost: 'https://localhost',
+		authHost: 'https://localhost:8080',
 	})
 	ctMock.start()
 
 	let response = await got.post<{ access_token: string }>(
-		'https://auth.europe-west1.gcp.commercetools.com/oauth/token',
+		'https://localhost:8080/oauth/token',
 		{
 			searchParams: {
 				grant_type: 'client_credentials',
@@ -36,15 +72,12 @@ test('Default mock endpoints', async () => {
 
 	const token = response.body.access_token
 	expect(response.body.access_token).toBeDefined()
-	response = await got.get(
-		'https://api.europe-west1.gcp.commercetools.com/my-project/orders',
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-			responseType: 'json',
-		}
-	)
+	response = await got.get('https://localhost/my-project/orders', {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+		responseType: 'json',
+	})
 	expect(response.statusCode).toBe(200)
 	expect(response.body).toStrictEqual({
 		count: 0,
@@ -192,6 +225,7 @@ test('apiHost mock proxy: querystring', async () => {
 			expand: 'custom.type',
 		},
 	})
+
 	expect(response.statusCode).toBe(200)
 	expect(response.body).toStrictEqual({
 		count: 0,

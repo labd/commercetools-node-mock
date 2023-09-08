@@ -1,12 +1,12 @@
-export const copyHeaders = (headers: Record<string, string>) => {
-	const validHeaders = ['accept', 'host', 'authorization']
+export const copyHeaders = (headers: Headers) => {
+	const validHeaders = ['accept', 'host', 'authorization', 'content-type']
 	const result: Record<string, string> = {}
 
-	Object.entries(headers).forEach(([key, value]) => {
+	for (const [key, value] of headers.entries()) {
 		if (validHeaders.includes(key.toLowerCase())) {
 			result[key] = value
 		}
-	})
+	}
 
 	return result
 }

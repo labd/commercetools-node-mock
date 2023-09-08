@@ -3,6 +3,7 @@ import path from 'path'
 
 export default defineConfig({
 	test: {
+		testTimeout: 5000,
 		coverage: {
 			provider: 'v8',
 			all: true,
