@@ -1,7 +1,8 @@
-import nock from 'nock'
 import express, { NextFunction, Request, Response } from 'express'
 import supertest from 'supertest'
 import morgan from 'morgan'
+import { setupServer, SetupServer } from 'msw/node'
+import { http, HttpResponse } from 'msw'
 import { AbstractStorage, InMemoryStorage } from './storage/index.js'
 import { Services } from './types.js'
 import { CommercetoolsError } from './exceptions.js'
@@ -36,16 +37,15 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	silent: false,
 }
 
+const _globalListeners: SetupServer[] = []
+
 export class CommercetoolsMock {
 	public app: express.Express
 	public options: CommercetoolsMockOptions
 
 	private _storage: AbstractStorage
 	private _oauth2: OAuth2Server
-	private _nockScopes: {
-		auth: nock.Scope | undefined
-		api: nock.Scope | undefined
-	} = { auth: undefined, api: undefined }
+	private _mswServer: SetupServer | undefined = undefined
 	private _services: Services | null
 	private _repositories: RepositoryMap | null
 	private _projectService?: ProjectService
@@ -67,19 +67,17 @@ export class CommercetoolsMock {
 
 	start() {
 		// Order is important here when the hostnames match
-		this.mockAuthHost()
-		this.mockApiHost()
+		this.clear()
+		this.startServer()
 	}
 
 	stop() {
-		this._nockScopes.auth?.persist(false)
-		this._nockScopes.auth = undefined
-
-		this._nockScopes.api?.persist(false)
-		this._nockScopes.api = undefined
+		this._mswServer?.close()
+		this._mswServer = undefined
 	}
 
 	clear() {
+		this._mswServer?.resetHandlers()
 		this._storage.clear()
 	}
 
@@ -157,48 +155,81 @@ export class CommercetoolsMock {
 		return app
 	}
 
-	private mockApiHost() {
+	private startServer() {
+		// Check if there are any other servers running
+		if (_globalListeners.length > 0) {
+			if (this._mswServer !== undefined) {
+				throw new Error('Server already started')
+			} else {
+				console.warn("Server wasn't stopped properly, clearing")
+				_globalListeners.forEach((listener) => listener.close())
+			}
+		}
+
 		const app = this.app
+		this._mswServer = setupServer(
+			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
+				const text = await request.text()
+				const url = new URL(request.url)
+				const res = await supertest(app)
+					.post(url.pathname + '?' + url.searchParams.toString())
+					.set(copyHeaders(request.headers))
+					.send(text)
 
-		this._nockScopes.api = nock(this.options.apiHost)
-			.persist()
-			.get(/.*/)
-			.reply(async function (uri) {
-				const response = await supertest(app)
-					.get(uri)
-					.set(copyHeaders(this.req.headers))
-				return [response.status, response.body]
-			})
-			.post(/.*/)
-			.reply(async function (uri, body) {
-				const response = await supertest(app)
-					.post(uri)
-					.set(copyHeaders(this.req.headers))
+				return new HttpResponse(res.text, {
+					status: res.status,
+					headers: res.headers,
+				})
+			}),
+			http.get(`${this.options.apiHost}/*`, async ({ request }) => {
+				const body = await request.text()
+				const url = new URL(request.url)
+				const res = await supertest(app)
+					.get(url.pathname + '?' + url.searchParams.toString())
+					.set(copyHeaders(request.headers))
 					.send(body)
-				return [response.status, response.body]
-			})
-			.delete(/.*/)
-			.reply(async function (uri, body) {
-				const response = await supertest(app)
-					.delete(uri)
-					.set(copyHeaders(this.req.headers))
+				return new HttpResponse(res.text, {
+					status: res.status,
+					headers: res.headers,
+				})
+			}),
+			http.post(`${this.options.apiHost}/*`, async ({ request }) => {
+				const body = await request.text()
+				const url = new URL(request.url)
+				const res = await supertest(app)
+					.post(url.pathname + '?' + url.searchParams.toString())
+					.set(copyHeaders(request.headers))
 					.send(body)
-				return [response.status, response.body]
-			})
-	}
+				return new HttpResponse(res.text, {
+					status: res.status,
+					headers: res.headers,
+				})
+			}),
+			http.delete(`${this.options.apiHost}/*`, async ({ request }) => {
+				const body = await request.text()
+				const url = new URL(request.url)
+				const res = await supertest(app)
+					.delete(url.pathname + '?' + url.searchParams.toString())
+					.set(copyHeaders(request.headers))
+					.send(body)
 
-	private mockAuthHost() {
-		const app = this.app
-
-		this._nockScopes.auth = nock(this.options.authHost)
-			.persist()
-			.post(/^\/oauth\/.*/)
-			.reply(async function (uri, body) {
-				const response = await supertest(app)
-					.post(uri + '?' + body)
-					.set(copyHeaders(this.req.headers))
-					.send()
-				return [response.status, response.body]
+				return new HttpResponse(res.text, {
+					status: res.status,
+					headers: res.headers,
+				})
 			})
+		)
+		this._mswServer.listen({
+			// We need to allow requests done by supertest
+			onUnhandledRequest: (request, print) => {
+				const url = new URL(request.url)
+				if (url.hostname === '127.0.0.1') {
+					return
+				}
+				print.error()
+			},
+		})
+
+		_globalListeners.push(this._mswServer)
 	}
 }
