@@ -1,24 +1,34 @@
-import type {
-	Address,
-	BaseAddress,
-	CentPrecisionMoney,
-	CustomFields,
-	CustomFieldsDraft,
-	HighPrecisionMoney,
-	HighPrecisionMoneyDraft,
-	InvalidJsonInputError,
-	Price,
-	PriceDraft,
-	Reference,
-	ReferencedResourceNotFoundError,
-	ResourceIdentifier,
-	Store,
-	StoreKeyReference,
-	StoreReference,
-	StoreResourceIdentifier,
-	Type,
-	TypedMoney,
-	_Money,
+import {
+	AssociateRoleReference,
+	type Address,
+	type Associate,
+	type AssociateDraft,
+	type AssociateRoleAssignment,
+	type AssociateRoleAssignmentDraft,
+	type AssociateRoleKeyReference,
+	type AssociateRoleResourceIdentifier,
+	type BaseAddress,
+	type CentPrecisionMoney,
+	type CustomFields,
+	type CustomFieldsDraft,
+	type HighPrecisionMoney,
+	type HighPrecisionMoneyDraft,
+	type InvalidJsonInputError,
+	type Price,
+	type PriceDraft,
+	type Reference,
+	type ReferencedResourceNotFoundError,
+	type ResourceIdentifier,
+	type Store,
+	type StoreKeyReference,
+	type StoreReference,
+	type StoreResourceIdentifier,
+	type Type,
+	type TypedMoney,
+	type _Money,
+	BusinessUnitResourceIdentifier,
+	BusinessUnitKeyReference,
+	BusinessUnitReference,
 } from '@commercetools/platform-sdk'
 import type { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
@@ -219,3 +229,90 @@ export const getRepositoryContext = (request: Request): RepositoryContext => ({
 	projectKey: request.params.projectKey,
 	storeKey: request.params.storeKey,
 })
+
+export const createAssociate = (
+	a: AssociateDraft,
+	projectKey: string,
+	storage: AbstractStorage
+): Associate | undefined => {
+	if (!a) return undefined
+
+	if (!a.associateRoleAssignments) {
+		throw new Error('AssociateRoleAssignments is required')
+	}
+
+	return {
+		customer: getReferenceFromResourceIdentifier(
+			a.customer,
+			projectKey,
+			storage
+		),
+		associateRoleAssignments: a.associateRoleAssignments?.map(
+			(a: AssociateRoleAssignmentDraft): AssociateRoleAssignment => ({
+				associateRole: getAssociateRoleKeyReference(
+					a.associateRole,
+					projectKey,
+					storage
+				),
+				inheritance: a.inheritance as string,
+			})
+		),
+		roles: a.roles as string[],
+	}
+}
+
+export const getAssociateRoleKeyReference = (
+	id: AssociateRoleResourceIdentifier,
+	projectKey: string,
+	storage: AbstractStorage
+): AssociateRoleKeyReference => {
+	if (id.key) {
+		return {
+			typeId: 'associate-role',
+			key: id.key,
+		}
+	}
+
+	const value = getReferenceFromResourceIdentifier<AssociateRoleReference>(
+		id,
+		projectKey,
+		storage
+	)
+
+	if (!value.obj?.key) {
+		throw new Error('No associate-role found for reference')
+	}
+
+	return {
+		typeId: 'associate-role',
+		key: value.obj?.key,
+	}
+}
+
+export const getBusinessUnitKeyReference = (
+	id: BusinessUnitResourceIdentifier,
+	projectKey: string,
+	storage: AbstractStorage
+): BusinessUnitKeyReference => {
+	if (id.key) {
+		return {
+			typeId: 'business-unit',
+			key: id.key,
+		}
+	}
+
+	const value = getReferenceFromResourceIdentifier<BusinessUnitReference>(
+		id,
+		projectKey,
+		storage
+	)
+
+	if (!value.obj?.key) {
+		throw new Error('No business-unit found for reference')
+	}
+
+	return {
+		typeId: 'business-unit',
+		key: value.obj?.key,
+	}
+}
