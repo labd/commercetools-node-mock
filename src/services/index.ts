@@ -29,9 +29,11 @@ import { TaxCategoryService } from './tax-category.js'
 import { TypeService } from './type.js'
 import { ZoneService } from './zone.js'
 import { AttributeGroupService } from './attribute-group.js'
+import { BusinessUnitServices } from './business-units'
 
 export const createServices = (router: any, repos: any) => ({
 	'associate-role': new AssociateRoleServices(router, repos['associate-role']),
+	'business-unit': new BusinessUnitServices(router, repos['business-unit']),
 	category: new CategoryServices(router, repos['category']),
 	cart: new CartService(router, repos['cart'], repos['order']),
 	'cart-discount': new CartDiscountService(router, repos['cart-discount']),
