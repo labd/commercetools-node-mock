@@ -1,17 +1,17 @@
-import { Router } from "express";
-import { BusinessUnitRepository } from "../repositories/business-unit.js";
-import AbstractService from "./abstract.js";
+import { Router } from 'express'
+import { BusinessUnitRepository } from '../repositories/business-unit.js'
+import AbstractService from './abstract.js'
 
 export class BusinessUnitServices extends AbstractService {
-    public repository: BusinessUnitRepository
+	public repository: BusinessUnitRepository
 
-    constructor(parent: Router, repository: BusinessUnitRepository) {
-        super(parent)
+	constructor(parent: Router, repository: BusinessUnitRepository) {
+		super(parent)
 
-        this.repository = repository
-    }
+		this.repository = repository
+	}
 
-    protected getBasePath(): string {
-        return 'business-units'
-    }
+	protected getBasePath(): string {
+		return 'business-units'
+	}
 }
