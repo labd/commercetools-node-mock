@@ -75,7 +75,11 @@ export class BusinessUnitRepository extends AbstractResourceRepository<'business
 		if (this._isDivisionDraft(draft)) {
 			const division = {
 				...resource,
-				parentUnit: draft.parentUnit,
+				parentUnit: getBusinessUnitKeyReference(
+					draft.parentUnit,
+					context.projectKey,
+					this._storage
+				),
 			} as Division
 
 			this.saveNew(context, division)
