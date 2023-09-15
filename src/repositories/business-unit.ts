@@ -14,6 +14,8 @@ import {
 	type Company,
 	type Division,
 	BusinessUnitChangeStatusAction,
+	CompanyDraft,
+	DivisionDraft,
 } from '@commercetools/platform-sdk'
 import {
 	AbstractResourceRepository,
@@ -34,70 +36,58 @@ export class BusinessUnitRepository extends AbstractResourceRepository<'business
 		return 'business-unit' as const
 	}
 
-	create(context: RepositoryContext, draft: BusinessUnitDraft): BusinessUnit {
-		let resource
+	private _isCompanyDraft(draft: BusinessUnitDraft): draft is CompanyDraft {
+		return draft.unitType === 'Company'
+	}
 
-		if (draft.unitType === 'Division') {
-			resource = {
-				...getBaseResourceProperties(),
-				unitType: draft.unitType,
-				key: draft.key,
-				status: draft.status,
-				stores: draft.stores?.map((s) =>
-					getStoreKeyReference(s, context.projectKey, this._storage)
-				),
-				storeMode: draft.storeMode,
-				name: draft.name,
-				contactEmail: draft.contactEmail,
-				addresses: draft.addresses?.map((a) =>
-					createAddress(a, context.projectKey, this._storage)
-				),
-				custom: createCustomFields(
-					draft.custom,
-					context.projectKey,
-					this._storage
-				),
-				shippingAddressIds: draft.shippingAddresses,
-				defaultShippingAddressId: draft.defaultShippingAddress,
-				billingAddressIds: draft.billingAddresses,
-				associateMode: draft.associateMode,
-				associates: draft.associates?.map((a) =>
-					createAssociate(a, context.projectKey, this._storage)
-				),
-				parentUnit: draft.parentUnit,
-			} as Division
-		} else if (draft.unitType === 'Company') {
-			resource = {
-				...getBaseResourceProperties(),
-				unitType: draft.unitType,
-				key: draft.key,
-				status: draft.status,
-				stores: draft.stores?.map((s) =>
-					getStoreKeyReference(s, context.projectKey, this._storage)
-				),
-				storeMode: draft.storeMode,
-				name: draft.name,
-				contactEmail: draft.contactEmail,
-				addresses: draft.addresses?.map((a) =>
-					createAddress(a, context.projectKey, this._storage)
-				),
-				custom: createCustomFields(
-					draft.custom,
-					context.projectKey,
-					this._storage
-				),
-				shippingAddressIds: draft.shippingAddresses,
-				defaultShippingAddressId: draft.defaultShippingAddress,
-				billingAddressIds: draft.billingAddresses,
-				associateMode: draft.associateMode,
-				associates: draft.associates?.map((a) =>
-					createAssociate(a, context.projectKey, this._storage)
-				),
-			} as Company
+	private _isDivisionDraft(draft: BusinessUnitDraft): draft is DivisionDraft {
+		return draft.unitType === 'Division'
+	}
+
+	create(context: RepositoryContext, draft: BusinessUnitDraft): BusinessUnit {
+		const resource = {
+			...getBaseResourceProperties(),
+			key: draft.key,
+			status: draft.status,
+			stores: draft.stores?.map((s) =>
+				getStoreKeyReference(s, context.projectKey, this._storage)
+			),
+			storeMode: draft.storeMode,
+			name: draft.name,
+			contactEmail: draft.contactEmail,
+			addresses: draft.addresses?.map((a) =>
+				createAddress(a, context.projectKey, this._storage)
+			),
+			custom: createCustomFields(
+				draft.custom,
+				context.projectKey,
+				this._storage
+			),
+			shippingAddressIds: draft.shippingAddresses,
+			defaultShippingAddressId: draft.defaultShippingAddress,
+			billingAddressIds: draft.billingAddresses,
+			associateMode: draft.associateMode,
+			associates: draft.associates?.map((a) =>
+				createAssociate(a, context.projectKey, this._storage)
+			),
 		}
 
-		this.saveNew(context, resource)
-		return resource
+		if (this._isDivisionDraft(draft)) {
+			const division = {
+				...resource,
+				parentUnit: draft.parentUnit,
+			} as Division
+
+			this.saveNew(context, division)
+			return division
+		} else if (this._isCompanyDraft(draft)) {
+			const company = resource as Company
+
+			this.saveNew(context, company)
+			return company
+		}
+
+		throw new Error('Invalid business unit type')
 	}
 
 	actions = {
