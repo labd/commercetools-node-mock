@@ -5,6 +5,7 @@ import type {
 	CartDiscountChangeTargetAction,
 	CartDiscountDraft,
 	CartDiscountSetCustomFieldAction,
+	CartDiscountSetCustomTypeAction,
 	CartDiscountSetDescriptionAction,
 	CartDiscountSetKeyAction,
 	CartDiscountSetValidFromAction,
@@ -162,7 +163,6 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 		) => {
 			resource.target = target
 		},
-
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
@@ -190,5 +190,30 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 				resource.custom.fields[name] = value
 			}
 		},
+		setCustomType: (
+			context: RepositoryContext,
+			resource: Writable<CartDiscount>,
+			{ type, fields }: CartDiscountSetCustomTypeAction
+		) => {
+			if (!type) {
+				resource.custom = undefined
+			} else {
+				const resolvedType = this._storage.getByResourceIdentifier(
+					context.projectKey,
+					type
+				)
+				if (!resolvedType) {
+					throw new Error(`Type ${type} not found`)
+				}
+
+				resource.custom = {
+					type: {
+						typeId: 'type',
+						id: resolvedType.id,
+					},
+					fields: fields || {},
+				}
+			}
+		}
 	}
 }
