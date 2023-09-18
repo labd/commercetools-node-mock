@@ -214,6 +214,6 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 					fields: fields || {},
 				}
 			}
-		}
+		},
 	}
 }
