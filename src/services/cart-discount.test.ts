@@ -359,4 +359,22 @@ describe('Cart Discounts Update Actions', () => {
 			})
 		expect(response.status).toBe(400)
 	})
+
+	test('remove all custom fields', async () => {
+		assert(cartDiscount, 'cart discount not created')
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setCustomType',
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.custom).toBeUndefined()
+	})
 })
