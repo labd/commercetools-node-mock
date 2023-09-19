@@ -1,4 +1,5 @@
-import { AssociateRoleServices } from './associate-roles'
+import { AssociateRoleServices } from './associate-roles.js'
+import { BusinessUnitServices } from './business-units.js'
 import { CartService } from './cart.js'
 import { CartDiscountService } from './cart-discount.js'
 import { CategoryServices } from './category.js'
@@ -32,6 +33,7 @@ import { AttributeGroupService } from './attribute-group.js'
 
 export const createServices = (router: any, repos: any) => ({
 	'associate-role': new AssociateRoleServices(router, repos['associate-role']),
+	'business-unit': new BusinessUnitServices(router, repos['business-unit']),
 	category: new CategoryServices(router, repos['category']),
 	cart: new CartService(router, repos['cart'], repos['order']),
 	'cart-discount': new CartDiscountService(router, repos['cart-discount']),
