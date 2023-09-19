@@ -1,5 +1,13 @@
 ## 0.14.0
 
+## 1.9.0
+
+### Minor Changes
+
+- [`44822ab`](https://github.com/labd/commercetools-node-mock/commit/44822abb6aeb80cf1a0e8af73b6849e08205e514) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added support for business units
+
+- [`44822ab`](https://github.com/labd/commercetools-node-mock/commit/44822abb6aeb80cf1a0e8af73b6849e08205e514) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added SetCustomType action for CartDiscount
+
 ## 1.8.1
 
 ### Patch Changes
