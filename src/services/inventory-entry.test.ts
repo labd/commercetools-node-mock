@@ -1,7 +1,7 @@
-import type { InventoryEntry, Type } from '@commercetools/platform-sdk'
+	import type { InventoryEntry, Type } from '@commercetools/platform-sdk'
 import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 describe('Inventory Entry Query', () => {
@@ -13,7 +13,7 @@ describe('Inventory Entry Query', () => {
 			sku: '1337',
 			quantityOnStock: 100,
 		})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
 		inventoryEntry = response.body
 	})
 
@@ -62,7 +62,7 @@ describe('Inventory Entry Update Actions', () => {
 			sku: '1337',
 			quantityOnStock: 100,
 		})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
 		inventoryEntry = response.body
 
 		response = await supertest(ctMock.app)
@@ -74,7 +74,7 @@ describe('Inventory Entry Update Actions', () => {
 				},
 				resourceTypeIds: ['inventory-entry'],
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
 		customType = response.body
 	})
 

@@ -1,7 +1,8 @@
 import type { CustomObject } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
 import { getBaseResourceProperties } from '../helpers.js'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 describe('CustomObject create', () => {
@@ -37,11 +38,12 @@ describe('CustomObject retrieve', () => {
 				value: 'my-value',
 			})
 
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 		customObject = response.body
-		expect(customObject.container).toBe('my-container')
-		expect(customObject.key).toBe('my-key')
-		expect(customObject.value).toBe('my-value')
+		assert(customObject.container === 'my-container')
+		assert(customObject.key === 'my-key')
+		assert(customObject.value === 'my-value')
 	})
 	afterEach(async () => {
 		ctMock.clear()

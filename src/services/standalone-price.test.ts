@@ -1,15 +1,17 @@
 import type { StandalonePriceDraft } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
+import assert from 'assert'
 import {
-	afterAll,
-	afterEach,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	test,
-} from 'vitest'
+    afterAll,
+    afterEach,
+    beforeAll,
+    beforeEach,
+    describe,
+    expect,
+    test,
+} from 'bun:test'
+import supertest from 'supertest'
 import { CommercetoolsMock } from '../index.js'
+
 
 const ctMock = new CommercetoolsMock()
 
@@ -41,7 +43,8 @@ describe('Standalone price Query', () => {
 		const createResponse = await supertest(ctMock.app)
 			.post('/dummy/standalone-prices')
 			.send(draft)
-		expect(createResponse.status).toEqual(201)
+		assert(createResponse.status === 201)
+
 	})
 
 	afterAll(async () => {
@@ -110,7 +113,8 @@ describe('Standalone price Actions', () => {
 		const createResponse = await supertest(ctMock.app)
 			.post('/dummy/standalone-prices')
 			.send(draft)
-		expect(createResponse.status).toEqual(201)
+		assert(createResponse.status === 201)
+
 		id = createResponse.body.id
 	})
 

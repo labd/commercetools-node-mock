@@ -1,11 +1,11 @@
 import type {
-	ShippingMethodDraft,
-	TaxCategoryDraft,
+    ShippingMethodDraft,
+    TaxCategoryDraft,
 } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
-
 const ctMock = new CommercetoolsMock()
 
 describe('Shipping method', () => {
@@ -18,7 +18,8 @@ describe('Shipping method', () => {
 		const createResponse = await supertest(ctMock.app)
 			.post('/dummy/tax-categories')
 			.send(draft)
-		expect(createResponse.status).toEqual(201)
+		assert(createResponse.status === 201)
+
 	})
 
 	afterEach(async () => {

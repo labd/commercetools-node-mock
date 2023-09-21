@@ -1,5 +1,5 @@
 import type { Cart, OrderImportDraft } from '@commercetools/platform-sdk'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { InMemoryStorage } from '../storage/index.js'
 import { OrderRepository } from './order.js'
 

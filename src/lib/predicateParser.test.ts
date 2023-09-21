@@ -1,6 +1,6 @@
 import type { VariableMap } from '@commercetools/platform-sdk'
-import { describe, expect, test } from 'vitest'
-import { parseQueryExpression, PredicateError } from './predicateParser.js'
+import { describe, expect, test } from 'bun:test'
+import { PredicateError, parseQueryExpression } from './predicateParser.js'
 
 describe('Predicate filter', () => {
 	const exampleObject = {

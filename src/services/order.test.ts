@@ -1,7 +1,7 @@
-import assert from 'assert'
 import type { Order, Payment, State } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock, getBaseResourceProperties } from '../index.js'
 
 describe('Order Query', () => {
@@ -22,7 +22,8 @@ describe('Order Query', () => {
 					},
 				},
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 		const cart = response.body
 
 		response = await supertest(ctMock.app)
@@ -34,7 +35,8 @@ describe('Order Query', () => {
 				},
 				orderNumber: 'foobar',
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 		order = response.body
 	})
 
@@ -282,7 +284,8 @@ describe('Order Update Actions', () => {
 		let response = await supertest(ctMock.app).post('/dummy/carts').send({
 			currency: 'EUR',
 		})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 		const cart = response.body
 
 		response = await supertest(ctMock.app)
@@ -293,7 +296,7 @@ describe('Order Update Actions', () => {
 					id: cart.id,
 				},
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
 		order = response.body
 	})
 

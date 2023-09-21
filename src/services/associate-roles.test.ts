@@ -1,7 +1,8 @@
-import { CommercetoolsMock } from '../ctMock.js'
 import { AssociateRole } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { beforeEach, afterEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock } from '../ctMock.js'
 
 describe('Associate roles query', () => {
 	const ctMock = new CommercetoolsMock()
@@ -16,8 +17,8 @@ describe('Associate roles query', () => {
 				key: 'example-role-associate-role',
 				permissions: ['ViewMyQuotes', 'ViewMyOrders', 'ViewMyCarts'],
 			})
+			assert(response.status === 201)
 
-		expect(response.status).toBe(201)
 
 		associateRole = response.body as AssociateRole
 	})

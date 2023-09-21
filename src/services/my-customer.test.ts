@@ -1,6 +1,6 @@
 import type { MyCustomerDraft } from '@commercetools/platform-sdk'
+import { afterEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { afterEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()

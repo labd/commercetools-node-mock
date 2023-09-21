@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../ctMock.js'
 import { BusinessUnit } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
+import { CommercetoolsMock } from '../ctMock.js'
 
 describe('Business units query', () => {
 	const ctMock = new CommercetoolsMock()
@@ -17,7 +18,8 @@ describe('Business units query', () => {
 				unitType: 'Company',
 			})
 
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 
 		businessUnit = response.body as BusinessUnit
 	})

@@ -1,9 +1,8 @@
-import assert from 'assert'
-import supertest from 'supertest'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../index.js'
 import { CartDiscount, TypeDraft } from '@commercetools/platform-sdk'
-
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import supertest from 'supertest'
+import { CommercetoolsMock } from '../index.js'
 const typeDraft: TypeDraft = {
 	key: 'my-type',
 	name: {
@@ -76,13 +75,17 @@ describe('Cart Discounts Query', () => {
 	beforeEach(async () => {
 		let response
 		response = await supertest(ctMock.app).post('/dummy/types').send(typeDraft)
-		expect(response.status).toBe(201)
-		const typeId = response._body.id
+		assert(response.status === 201)
+
+
+		const typeId = response.body.id
 
 		response = await supertest(ctMock.app)
 			.post('/dummy/cart-discounts')
 			.send(getCartDiscountDraft(typeId))
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
+
 	})
 
 	test('no filter', async () => {
@@ -137,7 +140,8 @@ describe('Cart Discounts Update Actions', () => {
 		const response = await supertest(ctMock.app)
 			.post('/dummy/types')
 			.send(typeDraft)
-		expect(response.status).toBe(201)
+			assert(response.status === 201)
+
 		return response.body.id
 	}
 
@@ -146,7 +150,8 @@ describe('Cart Discounts Update Actions', () => {
 		const response = await supertest(ctMock.app)
 			.post('/dummy/cart-discounts')
 			.send(cartDiscountDraft)
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 		cartDiscount = response.body
 	}
 

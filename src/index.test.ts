@@ -1,8 +1,8 @@
 import { type InvalidTokenError } from '@commercetools/platform-sdk'
-import { CommercetoolsMock } from './index.js'
-import { afterEach, beforeEach, expect, test } from 'vitest'
-import nock from 'nock'
+import { afterEach, beforeEach, expect, test } from 'bun:test'
 import got from 'got'
+import nock from 'nock'
+import { CommercetoolsMock } from './index.js'
 
 beforeEach(() => {
 	nock.disableNetConnect()

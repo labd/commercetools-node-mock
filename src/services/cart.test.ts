@@ -1,12 +1,12 @@
 import type {
-	Address,
-	Cart,
-	CentPrecisionMoney,
-	ProductDraft,
+    Address,
+    Cart,
+    CentPrecisionMoney,
+    ProductDraft,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 describe('Carts Query', () => {
@@ -39,7 +39,8 @@ describe('Carts Query', () => {
 					},
 				],
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 
 		response = await supertest(ctMock.app)
 			.post('/dummy/carts')
@@ -55,7 +56,9 @@ describe('Carts Query', () => {
 					},
 				},
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
+
 	})
 
 	test('no filter', async () => {
@@ -85,7 +88,8 @@ describe('Cart Update Actions', () => {
 		const response = await supertest(ctMock.app).post('/dummy/carts').send({
 			currency,
 		})
-		expect(response.status).toBe(201)
+				assert(response.status === 201)
+
 		cart = response.body
 	}
 

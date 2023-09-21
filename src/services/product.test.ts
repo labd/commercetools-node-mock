@@ -1,13 +1,13 @@
 import type {
-	Image,
-	PriceDraft,
-	Product,
-	ProductData,
-	ProductDraft,
+    Image,
+    PriceDraft,
+    Product,
+    ProductData,
+    ProductDraft,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
+import { beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()
@@ -171,14 +171,14 @@ describe('Product update actions', () => {
 			.post('/dummy/products')
 			.send(publishedProductDraft)
 
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
 		productPublished = response.body
 
 		response = await supertest(ctMock.app)
 			.post('/dummy/products')
 			.send(unpublishedProductDraft)
 
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
 		productUnpublished = response.body
 	})
 

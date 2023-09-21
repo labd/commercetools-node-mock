@@ -1,12 +1,12 @@
 import type {
-	Category,
-	CategoryAddAssetAction,
-	CategoryRemoveAssetAction,
+    Category,
+    CategoryAddAssetAction,
+    CategoryRemoveAssetAction,
 } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
-import { beforeEach, afterEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../index.js'
 import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import supertest from 'supertest'
+import { CommercetoolsMock } from '../index.js'
 
 describe('Categories Query', () => {
 	const ctMock = new CommercetoolsMock()
@@ -24,7 +24,8 @@ describe('Categories Query', () => {
 				},
 				orderHint: '0.1',
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 
 		category = response.body as Category
 	})
@@ -69,7 +70,8 @@ describe('Categories add asset', () => {
 					},
 				],
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 
 		category = response.body as Category
 	})
@@ -122,7 +124,8 @@ describe('Categories remove asset', () => {
 					},
 				],
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
 
 		category = response.body as Category
 	})

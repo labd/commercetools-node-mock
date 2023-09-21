@@ -1,6 +1,7 @@
 import type { MyPaymentDraft } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()
@@ -16,7 +17,9 @@ describe('MyPayment', () => {
 				},
 				resourceTypeIds: ['payment'],
 			})
-		expect(response.status).toBe(201)
+		assert(response.status === 201)
+
+
 	})
 
 	test('Create payment', async () => {

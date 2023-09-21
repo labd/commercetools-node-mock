@@ -1,14 +1,15 @@
 import type {
-	Product,
-	ProductDraft,
-	ProductProjection,
-	ProductProjectionPagedSearchResponse,
-	ProductType,
-	ProductTypeDraft,
+    Product,
+    ProductDraft,
+    ProductProjection,
+    ProductProjectionPagedSearchResponse,
+    ProductType,
+    ProductTypeDraft,
 } from '@commercetools/platform-sdk'
+import assert from 'assert'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import supertest from 'supertest'
 import * as timekeeper from 'timekeeper'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 import { Writable } from '../types.js'
 
@@ -32,7 +33,7 @@ beforeEach(async () => {
 			.post('/dummy/product-types')
 			.send(draft)
 
-		expect(response.ok).toBe(true)
+		assert(response.ok === true)
 		productType = response.body
 	}
 
@@ -73,7 +74,7 @@ beforeEach(async () => {
 		const response = await supertest(ctMock.app)
 			.post('/dummy/products')
 			.send(productDraft)
-		expect(response.ok).toBe(true)
+		assert(response.ok === true)
 		unpublishedProduct = response.body
 	}
 
@@ -133,7 +134,8 @@ beforeEach(async () => {
 		const response = await supertest(ctMock.app)
 			.post('/dummy/products')
 			.send(productDraft)
-		expect(response.ok).toBe(true)
+		assert(response.ok === true)
+
 		const product = response.body
 		publishedProduct = response.body
 

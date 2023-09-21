@@ -1,5 +1,5 @@
 import type { ProductProjection } from '@commercetools/platform-sdk'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { cloneObject } from '../helpers.js'
 import { applyPriceSelector } from '../priceSelector.js'
 import { parseFilterExpression } from './projectionSearchFilter.js'

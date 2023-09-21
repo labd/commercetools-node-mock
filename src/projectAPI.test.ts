@@ -1,5 +1,5 @@
+import { test } from 'bun:test'
 import { CommercetoolsMock } from './index.js'
-import { test } from 'vitest'
 
 test('getRepository', async () => {
 	const ctMock = new CommercetoolsMock()
