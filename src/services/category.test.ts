@@ -42,7 +42,7 @@ describe('Categories Query', () => {
 		expect(response.status).toBe(200)
 		expect(response.body.count).toBe(1)
 
-		const category = response.body.results[0] as Category
+		category = response.body.results[0] as Category
 
 		expect(category.name.en).toBe('Top hat')
 	})

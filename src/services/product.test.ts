@@ -163,7 +163,6 @@ describe('Product', () => {
 describe('Product update actions', () => {
 	const ctMock = new CommercetoolsMock()
 	let productPublished: Product | undefined
-	let productUnpublished: Product | undefined
 
 	beforeEach(async () => {
 		let response
@@ -179,7 +178,6 @@ describe('Product update actions', () => {
 			.send(unpublishedProductDraft)
 
 		expect(response.status).toBe(201)
-		productUnpublished = response.body
 	})
 
 	test('setAttribute masterVariant (staged)', async () => {
