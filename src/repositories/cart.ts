@@ -21,6 +21,7 @@ import type {
 	Price,
 	Product,
 	ProductPagedQueryResponse,
+	CartRemoveDiscountCodeAction,
 	ProductVariant,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
@@ -414,6 +415,15 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 				...address,
 				custom: custom,
 			}
+		},
+		removeDiscountCode: (
+			context: RepositoryContext,
+			resource: Writable<Cart>,
+			{ discountCode }: CartRemoveDiscountCodeAction
+		) => {
+			resource.discountCodes = resource.discountCodes.filter(
+				(code) => code.discountCode.id !== discountCode.id
+			)
 		},
 	}
 	draftLineItemtoLineItem = (
