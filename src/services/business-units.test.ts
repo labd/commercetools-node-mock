@@ -35,7 +35,7 @@ describe('Business units query', () => {
 		expect(response.status).toBe(200)
 		expect(response.body.count).toBe(1)
 
-		const businessUnit = response.body.results[0] as BusinessUnit
+		businessUnit = response.body.results[0] as BusinessUnit
 
 		expect(businessUnit.key).toBe('example-business-unit')
 	})

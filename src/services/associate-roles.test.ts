@@ -35,7 +35,7 @@ describe('Associate roles query', () => {
 		expect(response.status).toBe(200)
 		expect(response.body.count).toBe(1)
 
-		const associateRole = response.body.results[0] as AssociateRole
+		associateRole = response.body.results[0] as AssociateRole
 
 		expect(associateRole.key).toBe('example-role-associate-role')
 	})
