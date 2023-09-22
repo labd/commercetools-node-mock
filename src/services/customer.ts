@@ -27,6 +27,7 @@ export class CustomerService extends AbstractService {
 				? // @ts-ignore
 				  +request.params.ttlMinutes
 				: 34560
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { version, ...rest } = getBaseResourceProperties()
 
 			return response.status(200).send({
