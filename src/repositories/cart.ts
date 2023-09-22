@@ -421,8 +421,10 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 			resource: Writable<Cart>,
 			{ discountCode }: CartRemoveDiscountCodeAction
 		) => {
-			resource.discountCodes = resource.discountCodes.filter(code => code.discountCode.id !== discountCode.id)
-		}
+			resource.discountCodes = resource.discountCodes.filter(
+				(code) => code.discountCode.id !== discountCode.id
+			)
+		},
 	}
 	draftLineItemtoLineItem = (
 		projectKey: string,
