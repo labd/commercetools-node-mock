@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.10.0
+
+### Minor Changes
+
+- [#115](https://github.com/labd/commercetools-node-mock/pull/115) [`73ef7a2`](https://github.com/labd/commercetools-node-mock/commit/73ef7a2db088b6a0cd7f1e84d8db8d314d9becd0) Thanks [@tleguijt](https://github.com/tleguijt)! - add support for cart removeDiscountCode action
+
 ## 1.9.0
 
 ### Minor Changes
