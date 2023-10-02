@@ -272,6 +272,37 @@ describe('Cart Update Actions', () => {
 		expect(response.body.message).toBe("A product with ID '123' not found.")
 	})
 
+	test('addItemShippingAddress', async () => {
+		const product = await supertest(ctMock.app)
+			.post(`/dummy/products`)
+			.send(productDraft)
+			.then((x) => x.body)
+
+		assert(cart, 'cart not created')
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addItemShippingAddress',
+						address: {
+							firstName: 'John',
+							lastName: 'Doe',
+							company: 'My Company',
+							country: 'NL',
+						},
+					},
+				],
+			})
+
+		expect(response.body.itemShippingAddresses).toHaveLength(1)
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.lineItems).toHaveLength(0)
+	})
+
 	test('removeLineItem', async () => {
 		const product = await supertest(ctMock.app)
 			.post(`/dummy/products`)
@@ -417,5 +448,60 @@ describe('Cart Update Actions', () => {
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
 		expect(response.body.shippingAddress).toEqual(address)
+	})
+
+	test('setLineItemShippingDetails', async () => {
+		const product = await supertest(ctMock.app)
+			.post(`/dummy/products`)
+			.send(productDraft)
+			.then((x) => x.body)
+
+		assert(cart, 'cart not created')
+		assert(product, 'product not created')
+
+		const updatedCart = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addLineItem',
+						productId: product.id,
+						variantId: product.masterData.current.variants[0].id,
+					},
+				],
+			})
+		const lineItem = updatedCart.body.lineItems[0]
+		assert(lineItem, 'lineItem not created')
+
+		expect(updatedCart.body.version).toBe(2)
+		expect(updatedCart.body.lineItems).toHaveLength(1)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: updatedCart.body.version,
+				actions: [
+					{
+						action: 'setLineItemShippingDetails',
+						lineItemId: lineItem.id,
+						shippingDetails: {
+							targets: [
+								{
+									addressKey: 'address-key',
+									quantity: 1,
+								},
+							],
+						},
+					},
+				],
+			})
+
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(3)
+		expect(response.body.lineItems).toHaveLength(1)
+		const updatedLineItem = updatedCart.body.lineItems[0]
+		expect(updatedLineItem.shippingDetails).toBeDefined()
+		expect(updatedLineItem.shippingDetails.targets).toHaveLength(1)
 	})
 })
