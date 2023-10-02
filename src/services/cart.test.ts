@@ -500,7 +500,8 @@ describe('Cart Update Actions', () => {
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(3)
 		expect(response.body.lineItems).toHaveLength(1)
-		const updatedLineItem = updatedCart.body.lineItems[0]
+
+		const updatedLineItem = response.body.lineItems[0]
 		expect(updatedLineItem.shippingDetails).toBeDefined()
 		expect(updatedLineItem.shippingDetails.targets).toHaveLength(1)
 	})
