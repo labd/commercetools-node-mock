@@ -3,8 +3,6 @@ import type {
 	ProductSelectionChangeNameAction,
 	ProductSelectionDraft,
 	ProductSelectionUpdateAction,
-	Review,
-	ReviewUpdateAction,
 } from '@commercetools/platform-sdk'
 import { getBaseResourceProperties } from '../helpers.js'
 import type { Writable } from '../types.js'
