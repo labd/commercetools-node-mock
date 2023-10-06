@@ -1,12 +1,13 @@
 import { AssociateRoleServices } from './associate-roles.js'
+import { AttributeGroupService } from './attribute-group.js'
 import { BusinessUnitServices } from './business-units.js'
-import { CartService } from './cart.js'
 import { CartDiscountService } from './cart-discount.js'
+import { CartService } from './cart.js'
 import { CategoryServices } from './category.js'
 import { ChannelService } from './channel.js'
 import { CustomObjectService } from './custom-object.js'
-import { CustomerService } from './customer.js'
 import { CustomerGroupService } from './customer-group.js'
+import { CustomerService } from './customer.js'
 import { DiscountCodeService } from './discount-code.js'
 import { ExtensionServices } from './extension.js'
 import { InventoryEntryService } from './inventory-entry.js'
@@ -16,10 +17,11 @@ import { MyOrderService } from './my-order.js'
 import { MyPaymentService } from './my-payment.js'
 import { OrderService } from './order.js'
 import { PaymentService } from './payment.js'
-import { ProductService } from './product.js'
 import { ProductDiscountService } from './product-discount.js'
 import { ProductProjectionService } from './product-projection.js'
+import { ProductSelectionService } from './product-selection.js'
 import { ProductTypeService } from './product-type.js'
+import { ProductService } from './product.js'
 import { ShippingMethodService } from './shipping-method.js'
 import { ShoppingListService } from './shopping-list.js'
 import { StandAlonePriceService } from './standalone-price.js'
@@ -29,7 +31,6 @@ import { SubscriptionService } from './subscription.js'
 import { TaxCategoryService } from './tax-category.js'
 import { TypeService } from './type.js'
 import { ZoneService } from './zone.js'
-import { AttributeGroupService } from './attribute-group.js'
 
 export const createServices = (router: any, repos: any) => ({
 	'associate-role': new AssociateRoleServices(router, repos['associate-role']),
@@ -73,6 +74,10 @@ export const createServices = (router: any, repos: any) => ({
 	'product-projection': new ProductProjectionService(
 		router,
 		repos['product-projection']
+	),
+	'product-selection': new ProductSelectionService(
+		router,
+		repos['product-selection']
 	),
 	'shopping-list': new ShoppingListService(router, repos['shopping-list']),
 	state: new StateService(router, repos['state']),

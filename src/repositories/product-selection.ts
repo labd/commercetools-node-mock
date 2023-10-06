@@ -1,6 +1,8 @@
 import type {
 	ProductSelection,
+	ProductSelectionChangeNameAction,
 	ProductSelectionDraft,
+	ProductSelectionUpdateAction,
 	Review,
 	ReviewUpdateAction,
 } from '@commercetools/platform-sdk'
@@ -20,6 +22,7 @@ export class ProductSelectionRepository extends AbstractResourceRepository<'prod
 		const resource: ProductSelection = {
 			...getBaseResourceProperties(),
 			productCount: 0,
+			key: draft.key,
 			name: draft.name,
 			type: 'individual',
 			mode: 'Individual',
@@ -30,12 +33,20 @@ export class ProductSelectionRepository extends AbstractResourceRepository<'prod
 
 	actions: Partial<
 		Record<
-			ReviewUpdateAction['action'],
+			ProductSelectionUpdateAction['action'],
 			(
 				context: RepositoryContext,
-				resource: Writable<Review>,
+				resource: Writable<ProductSelection>,
 				action: any
 			) => void
 		>
-	> = {}
+	> = {
+		changeName: (
+			context: RepositoryContext,
+			resource: Writable<ProductSelection>,
+			{ name }: ProductSelectionChangeNameAction
+		) => {
+			resource.name = name
+		},
+	}
 }
