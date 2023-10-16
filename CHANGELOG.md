@@ -1,5 +1,11 @@
 ## 0.14.0
 
+## 1.11.0
+
+### Minor Changes
+
+- [#117](https://github.com/labd/commercetools-node-mock/pull/117) [`a8b52d9`](https://github.com/labd/commercetools-node-mock/commit/a8b52d988ae1b0981dbd75efea5941901e6d204d) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for cart addItemShippingAddress and setLineItemShippingDetails
+
 ## 1.10.0
 
 ### Minor Changes
