@@ -4,6 +4,8 @@ import type {
 	Cart,
 	CartAddLineItemAction,
 	CartChangeLineItemQuantityAction,
+	CartAddItemShippingAddressAction,
+	CartSetLineItemShippingDetailsAction,
 	CartDraft,
 	CartRemoveLineItemAction,
 	CartSetBillingAddressAction,
@@ -18,6 +20,7 @@ import type {
 	GeneralError,
 	LineItem,
 	LineItemDraft,
+	ItemShippingDetails,
 	Price,
 	Product,
 	ProductPagedQueryResponse,
@@ -216,6 +219,20 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 			// Update cart total price
 			resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
 		},
+		addItemShippingAddress: (
+			context: RepositoryContext,
+			resource: Writable<Cart>,
+			{ action, address }: CartAddItemShippingAddressAction
+		) => {
+			const newAddress = createAddress(
+				address,
+				context.projectKey,
+				this._storage
+			)
+			if (newAddress) {
+				resource.itemShippingAddresses.push(newAddress)
+			}
+		},
 		changeLineItemQuantity: (
 			context: RepositoryContext,
 			resource: Writable<Cart>,
@@ -391,6 +408,37 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 			{ locale }: CartSetLocaleAction
 		) => {
 			resource.locale = locale
+		},
+		setLineItemShippingDetails: (
+			context: RepositoryContext,
+			resource: Writable<Cart>,
+			{
+				action,
+				shippingDetails,
+				lineItemId,
+				lineItemKey,
+			}: CartSetLineItemShippingDetailsAction
+		) => {
+			const lineItem = resource.lineItems.find(
+				(x) =>
+					(lineItemId && x.id === lineItemId) ||
+					(lineItemKey && x.key === lineItemKey)
+			)
+
+			if (!lineItem) {
+				// Check if line item is found
+				throw new CommercetoolsError<GeneralError>({
+					code: 'General',
+					message: lineItemKey
+						? `A line item with key '${lineItemKey}' not found.`
+						: `A line item with ID '${lineItemId}' not found.`,
+				})
+			}
+
+			lineItem.shippingDetails = {
+				...shippingDetails,
+				valid: true,
+			} as ItemShippingDetails
 		},
 		setShippingAddress: (
 			context: RepositoryContext,
