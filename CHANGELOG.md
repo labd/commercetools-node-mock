@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.0.0
+
+### Major Changes
+
+- [#108](https://github.com/labd/commercetools-node-mock/pull/108) [`0073abe`](https://github.com/labd/commercetools-node-mock/commit/0073abe1ff75a4bd8b9150cd053b77f0649576ca) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch from nock to MSW 2.0 to support native fetch calls. This requires Node 18+
+
 ### Minor Changes
 
 - [#117](https://github.com/labd/commercetools-node-mock/pull/117) [`a8b52d9`](https://github.com/labd/commercetools-node-mock/commit/a8b52d988ae1b0981dbd75efea5941901e6d204d) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for cart addItemShippingAddress and setLineItemShippingDetails
