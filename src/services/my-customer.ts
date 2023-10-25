@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express'
 import { CustomerRepository } from '../repositories/customer.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
+import { hashPassword } from '../lib/password.js'
 
 export class MyCustomerService extends AbstractService {
 	public repository: CustomerRepository
@@ -51,7 +52,7 @@ export class MyCustomerService extends AbstractService {
 
 	signIn(request: Request, response: Response) {
 		const { email, password } = request.body
-		const encodedPassword = Buffer.from(password).toString('base64')
+		const encodedPassword = hashPassword(password)
 
 		const result = this.repository.query(getRepositoryContext(request), {
 			where: [`email = "${email}"`, `password = "${encodedPassword}"`],

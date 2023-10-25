@@ -10,18 +10,45 @@ import { CommercetoolsError, InvalidRequestError } from '../exceptions.js'
 import { InvalidClientError, UnsupportedGrantType } from './errors.js'
 import { OAuth2Store } from './store.js'
 import { getBearerToken } from './helpers.js'
+import { CustomerRepository } from '../repositories/customer.js'
+import { hashPassword } from '../lib/password.js'
+
+type AuthRequest = Request & {
+	credentials: {
+		clientId: string
+		clientSecret: string
+	}
+}
 
 export class OAuth2Server {
 	store: OAuth2Store
+	private customerRepository: CustomerRepository
 
 	constructor(options: { enabled: boolean; validate: boolean }) {
 		this.store = new OAuth2Store(options.validate)
 	}
 
+	setCustomerRepository(repository: CustomerRepository) {
+		this.customerRepository = repository
+	}
+
 	createRouter() {
 		const router = express.Router()
 		router.use(bodyParser.urlencoded({ extended: true }))
+		router.use(this.validateClientCredentials.bind(this))
 		router.post('/token', this.tokenHandler.bind(this))
+		router.post(
+			'/:projectKey/customers/token',
+			this.customerTokenHandler.bind(this)
+		)
+		router.post(
+			'/:projectKey/in-store/key=:storeKey/customers/token',
+			this.inStoreCustomerTokenHandler.bind(this)
+		)
+		router.post(
+			'/:projectKey/anonymous/token',
+			this.anonymousTokenHandler.bind(this)
+		)
 		return router
 	}
 
@@ -56,7 +83,12 @@ export class OAuth2Server {
 			next()
 		}
 	}
-	async tokenHandler(request: Request, response: Response, next: NextFunction) {
+
+	async validateClientCredentials(
+		request: AuthRequest,
+		response: Response,
+		next: NextFunction
+	) {
 		const authHeader = request.header('Authorization')
 		if (!authHeader) {
 			return next(
@@ -84,6 +116,19 @@ export class OAuth2Server {
 			)
 		}
 
+		request.credentials = {
+			clientId: credentials.name,
+			clientSecret: credentials.pass,
+		}
+
+		next()
+	}
+
+	async tokenHandler(
+		request: AuthRequest,
+		response: Response,
+		next: NextFunction
+	) {
 		const grantType = request.query.grant_type || request.body.grant_type
 		if (!grantType) {
 			return next(
@@ -99,8 +144,15 @@ export class OAuth2Server {
 
 		if (grantType === 'client_credentials') {
 			const token = this.store.getClientToken(
-				credentials.name,
-				credentials.pass,
+				request.credentials.clientId,
+				request.credentials.clientSecret,
+				request.query.scope?.toString()
+			)
+			return response.status(200).send(token)
+		} else if (grantType === 'refresh_token') {
+			const token = this.store.getClientToken(
+				request.credentials.clientId,
+				request.credentials.clientSecret,
 				request.query.scope?.toString()
 			)
 			return response.status(200).send(token)
@@ -115,5 +167,87 @@ export class OAuth2Server {
 				)
 			)
 		}
+	}
+	async customerTokenHandler(
+		request: AuthRequest,
+		response: Response,
+		next: NextFunction
+	) {
+		const grantType = request.query.grant_type || request.body.grant_type
+		if (!grantType) {
+			return next(
+				new CommercetoolsError<InvalidRequestError>(
+					{
+						code: 'invalid_request',
+						message: 'Missing required parameter: grant_type.',
+					},
+					400
+				)
+			)
+		}
+
+		if (grantType === 'password') {
+			const username = request.query.username || request.body.username
+			const password = hashPassword(
+				request.query.password || request.body.password
+			)
+			const scope =
+				request.query.scope?.toString() || request.body.scope?.toString()
+
+			const result = this.customerRepository.query(
+				{ projectKey: request.params.projectKey },
+				{
+					where: [`email = "${username}"`, `password = "${password}"`],
+				}
+			)
+
+			if (result.count === 0) {
+				return next(
+					new CommercetoolsError<any>(
+						{
+							code: 'invalid_customer_account_credentials',
+							message: 'Customer account with the given credentials not found.',
+						},
+						400
+					)
+				)
+			}
+
+			const customer = result.results[0]
+			const token = this.store.getCustomerToken(scope, customer.id)
+			return response.status(200).send(token)
+		}
+	}
+
+	async inStoreCustomerTokenHandler(
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) {
+		return next(
+			new CommercetoolsError<InvalidClientError>(
+				{
+					code: 'invalid_client',
+					message: 'Not implemented yet in commercetools-mock',
+				},
+				401
+			)
+		)
+	}
+
+	async anonymousTokenHandler(
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) {
+		return next(
+			new CommercetoolsError<InvalidClientError>(
+				{
+					code: 'invalid_client',
+					message: 'Not implemented yet in commercetools-mock',
+				},
+				401
+			)
+		)
 	}
 }
