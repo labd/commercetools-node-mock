@@ -4,6 +4,7 @@ import type {
 	CustomerDraft,
 	CustomerSetAuthenticationModeAction,
 	CustomerSetCustomFieldAction,
+	DuplicateFieldError,
 	InvalidInputError,
 	InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
@@ -22,6 +23,27 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 	}
 
 	create(context: RepositoryContext, draft: CustomerDraft): Customer {
+		// Check uniqueness
+		const results = this._storage.query(context.projectKey, this.getTypeId(), {
+			where: [`email="${draft.email.toLocaleLowerCase()}"`],
+		})
+		if (results.count > 0) {
+			throw new CommercetoolsError<any>({
+				code: 'CustomerAlreadyExists',
+				statusCode: 400,
+				message:
+					'There is already an existing customer with the provided email.',
+				errors: [
+					{
+						code: 'DuplicateField',
+						message: `Customer with email '${draft.email}' already exists.`,
+						duplicateValue: draft.email,
+						field: 'email',
+					} as DuplicateFieldError,
+				],
+			})
+		}
+
 		const resource: Customer = {
 			...getBaseResourceProperties(),
 			authenticationMode: draft.authenticationMode || 'Password',

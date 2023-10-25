@@ -140,7 +140,6 @@ export class CommercetoolsMock {
 
 		app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
 			if (err instanceof CommercetoolsError) {
-
 				if (err.errors?.length > 0) {
 					return resp.status(err.statusCode).send({
 						statusCode: err.statusCode,
