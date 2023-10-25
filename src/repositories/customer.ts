@@ -14,6 +14,7 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
+import { hashPassword } from '../lib/password.js'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 	getTypeId() {
@@ -24,10 +25,8 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 		const resource: Customer = {
 			...getBaseResourceProperties(),
 			authenticationMode: draft.authenticationMode || 'Password',
-			email: draft.email,
-			password: draft.password
-				? Buffer.from(draft.password).toString('base64')
-				: undefined,
+			email: draft.email.toLowerCase(),
+			password: draft.password ? hashPassword(draft.password) : undefined,
 			isEmailVerified: draft.isEmailVerified || false,
 			addresses: [],
 		}
@@ -36,11 +35,14 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 	}
 
 	getMe(context: RepositoryContext): Customer | undefined {
+		// grab the first customer you can find for now. In the future we should
+		// use the customer id from the scope of the token
 		const results = this._storage.query(
 			context.projectKey,
 			this.getTypeId(),
 			{}
-		) // grab the first customer you can find
+		)
+
 		if (results.count > 0) {
 			return results.results[0] as Customer
 		}
@@ -76,9 +78,7 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 				return
 			}
 			if (authMode === 'Password') {
-				resource.password = password
-					? Buffer.from(password).toString('base64')
-					: undefined
+				resource.password = password ? hashPassword(password) : undefined
 				return
 			}
 			throw new CommercetoolsError<InvalidJsonInputError>(

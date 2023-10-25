@@ -26,6 +26,19 @@ export class OAuth2Store {
 		return token
 	}
 
+	getCustomerToken(scope: string, customerId: string) {
+		const token: Token = {
+			access_token: randomBytes(16).toString('base64'),
+			token_type: 'Bearer',
+			expires_in: 172800,
+			scope: scope
+				? `${scope} custome_id:${customerId}`
+				: `customer_id: ${customerId}`,
+		}
+		this.tokens.push(token)
+		return token
+	}
+
 	validateToken(token: string) {
 		if (!this.validate) return true
 

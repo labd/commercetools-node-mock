@@ -106,6 +106,7 @@ export class CommercetoolsMock {
 
 	private createApp(options?: AppOptions): express.Express {
 		this._repositories = createRepositories(this._storage)
+		this._oauth2.setCustomerRepository(this._repositories.customer)
 
 		const app = express()
 
@@ -139,6 +140,15 @@ export class CommercetoolsMock {
 
 		app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
 			if (err instanceof CommercetoolsError) {
+
+				if (err.errors?.length > 0) {
+					return resp.status(err.statusCode).send({
+						statusCode: err.statusCode,
+						message: err.message,
+						errors: err.errors,
+					})
+				}
+
 				return resp.status(err.statusCode).send({
 					statusCode: err.statusCode,
 					message: err.message,
