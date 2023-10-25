@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.1.0
+
+### Minor Changes
+
+- [#120](https://github.com/labd/commercetools-node-mock/pull/120) [`5bf3c6e`](https://github.com/labd/commercetools-node-mock/commit/5bf3c6e88a9903aa45a6341bacb70bf61a20d4b6) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve mocking of customer authentication
+
 ## 2.0.0
 
 ### Major Changes
