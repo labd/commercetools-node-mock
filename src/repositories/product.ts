@@ -76,6 +76,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		const productData: ProductData = {
 			name: draft.name,
 			slug: draft.slug,
+			description: draft.description,
 			categories: categoryReferences,
 			masterVariant: variantFromDraft(1, draft.masterVariant),
 			variants:
