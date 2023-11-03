@@ -18,6 +18,7 @@ import type {
 	ProductChangePriceAction,
 	ProductAddPriceAction,
 	ProductRemovePriceAction,
+	CategoryReference,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -57,10 +58,25 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			}
 		}
 
+		// Product categories
+		const categoryReferences: CategoryReference[] = []
+		draft.categories?.forEach((category) => {
+			try {
+				categoryReferences.push(getReferenceFromResourceIdentifier<CategoryReference>(
+						category,
+						context.projectKey,
+						this._storage
+					)
+				)
+			} catch (err) {
+				throw new Error(`Cannot resolve category: ${JSON.stringify(category)}`)
+			}
+		})
+
 		const productData: ProductData = {
 			name: draft.name,
 			slug: draft.slug,
-			categories: [],
+			categories: categoryReferences,
 			masterVariant: variantFromDraft(1, draft.masterVariant),
 			variants:
 				draft.variants?.map((variant, index) =>
