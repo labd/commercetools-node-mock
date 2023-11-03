@@ -19,6 +19,7 @@ import type {
 	ProductAddPriceAction,
 	ProductRemovePriceAction,
 	CategoryReference,
+	TaxCategoryReference,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -73,6 +74,20 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			}
 		})
 
+		// Tax category
+		let taxCategoryReference: TaxCategoryReference | undefined = undefined
+		if(draft.taxCategory) {
+			try {
+				taxCategoryReference = getReferenceFromResourceIdentifier<TaxCategoryReference>(
+					draft.taxCategory,
+					context.projectKey,
+					this._storage
+				)
+			} catch(err) {
+				throw new Error(`Cannot resolve tax category: ${JSON.stringify(draft.taxCategory)}`)
+			}
+		}
+
 		const productData: ProductData = {
 			name: draft.name,
 			slug: draft.slug,
@@ -91,6 +106,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			...getBaseResourceProperties(),
 			key: draft.key,
 			productType: productType,
+			taxCategory: taxCategoryReference,
 			masterData: {
 				current: productData,
 				staged: productData,
