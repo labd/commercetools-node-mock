@@ -676,6 +676,7 @@ const variantFromDraft = (
 
 const priceFromDraft = (draft: PriceDraft): Price => ({
 	id: uuidv4(),
+	key: draft.key,
 	country: draft.country,
 	value: createTypedMoney(draft.value),
 })
