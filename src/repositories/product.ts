@@ -20,6 +20,7 @@ import type {
 	ProductRemovePriceAction,
 	CategoryReference,
 	TaxCategoryReference,
+	StateReference,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -59,7 +60,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			}
 		}
 
-		// Product categories
+		// Resolve Product categories
 		const categoryReferences: CategoryReference[] = []
 		draft.categories?.forEach((category) => {
 			try {
@@ -70,11 +71,11 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 					)
 				)
 			} catch (err) {
-				throw new Error(`Cannot resolve category: ${JSON.stringify(category)}`)
+				throw new Error(err)
 			}
 		})
 
-		// Tax category
+		// Resolve Tax category
 		let taxCategoryReference: TaxCategoryReference | undefined = undefined
 		if(draft.taxCategory) {
 			try {
@@ -84,7 +85,21 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 					this._storage
 				)
 			} catch(err) {
-				throw new Error(`Cannot resolve tax category: ${JSON.stringify(draft.taxCategory)}`)
+				throw new Error(err)
+			}
+		}
+
+		// Resolve Product State
+		let productStateReference: StateReference | undefined = undefined
+		if(draft.state) {
+			try {
+				productStateReference = getReferenceFromResourceIdentifier<StateReference>(
+					draft.state,
+					context.projectKey,
+					this._storage
+				)
+			} catch(err) {
+				throw new Error(err)
 			}
 		}
 
@@ -109,6 +124,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			key: draft.key,
 			productType: productType,
 			taxCategory: taxCategoryReference,
+			state: productStateReference,
 			masterData: {
 				current: productData,
 				staged: productData,
