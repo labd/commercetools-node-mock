@@ -87,7 +87,9 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 						this._storage
 					)
 			} catch (err) {
-				throw new Error(`Error resolving tax category with key '${draft.taxCategory}'.`)
+				throw new Error(
+					`Error resolving tax category with key '${draft.taxCategory}'.`
+				)
 			}
 		}
 
