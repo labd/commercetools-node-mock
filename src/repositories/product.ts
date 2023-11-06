@@ -100,6 +100,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				) ?? [],
 			metaTitle: draft.metaTitle,
 			metaDescription: draft.metaDescription,
+			metaKeywords: draft.metaKeywords,
 			searchKeywords: draft.searchKeywords ?? {},
 		}
 
