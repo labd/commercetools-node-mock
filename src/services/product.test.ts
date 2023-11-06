@@ -21,22 +21,22 @@ import { CommercetoolsMock } from '../index.js'
 const productTypeDraft: ProductTypeDraft = {
 	key: 'test-product-type',
 	name: 'Test Product Type',
-	description: 'Test Product Type description'
+	description: 'Test Product Type description',
 }
 
 const categoryDraft: CategoryDraft = {
 	key: 'category-1',
 	name: {
-		'nl-NL': 'Category One'
+		'nl-NL': 'Category One',
 	},
 	slug: {
-		'nl-NL': 'category_1'
-	}
+		'nl-NL': 'category_1',
+	},
 }
 
 const taxcategoryDraft: TaxCategoryDraft = {
 	name: 'Tax category 1',
-	key: 'tax-category-1'
+	key: 'tax-category-1',
 }
 
 const productStateDraft: StateDraft = {
@@ -48,7 +48,7 @@ const productStateDraft: StateDraft = {
 	},
 	description: {
 		'nl-NL': 'Product initial state',
-	}
+	},
 }
 
 const publishedProductDraft: ProductDraft = {
@@ -56,7 +56,7 @@ const publishedProductDraft: ProductDraft = {
 		'nl-NL': 'test published product',
 	},
 	description: {
-		'nl-NL': 'Test published product description'
+		'nl-NL': 'Test published product description',
 	},
 	productType: {
 		typeId: 'product-type',
@@ -66,7 +66,7 @@ const publishedProductDraft: ProductDraft = {
 		{
 			typeId: 'category',
 			key: 'category-1',
-		}
+		},
 	],
 	taxCategory: {
 		typeId: 'tax-category',
@@ -139,7 +139,7 @@ const unpublishedProductDraft: ProductDraft = {
 		'nl-NL': 'test unpublished product',
 	},
 	description: {
-		'nl-NL': 'Test published product description'
+		'nl-NL': 'Test published product description',
 	},
 	productType: {
 		typeId: 'product-type',
@@ -149,10 +149,10 @@ const unpublishedProductDraft: ProductDraft = {
 		{
 			typeId: 'category',
 			key: 'category-1',
-		}
+		},
 	],
 	taxCategory: {
-		typeId: "tax-category",
+		typeId: 'tax-category',
 		key: taxcategoryDraft.key,
 	},
 	state: {
@@ -251,7 +251,7 @@ async function beforeAllProductTests(mock) {
 	response = await supertest(mock.app)
 		.post('/dummy/states')
 		.send(productStateDraft)
-	
+
 	expect(response.status).toBe(201)
 	productState = response.body
 }
@@ -274,15 +274,17 @@ describe('Product', () => {
 				'nl-NL': 'test unpublished product',
 			},
 			description: {
-				'nl-NL': 'Test published product description'
+				'nl-NL': 'Test published product description',
 			},
 			slug: {
 				'nl-NL': 'test-unpublished-product',
 			},
-			categories: [{
-				'id': category.id,
-				'typeId': 'category',
-			}],
+			categories: [
+				{
+					id: category.id,
+					typeId: 'category',
+				},
+			],
 			metaTitle: {
 				'nl-NL': 'Unpublished product (meta title)',
 			},

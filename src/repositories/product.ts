@@ -64,7 +64,8 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		const categoryReferences: CategoryReference[] = []
 		draft.categories?.forEach((category) => {
 			try {
-				categoryReferences.push(getReferenceFromResourceIdentifier<CategoryReference>(
+				categoryReferences.push(
+					getReferenceFromResourceIdentifier<CategoryReference>(
 						category,
 						context.projectKey,
 						this._storage
@@ -77,28 +78,30 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 		// Resolve Tax category
 		let taxCategoryReference: TaxCategoryReference | undefined = undefined
-		if(draft.taxCategory) {
+		if (draft.taxCategory) {
 			try {
-				taxCategoryReference = getReferenceFromResourceIdentifier<TaxCategoryReference>(
-					draft.taxCategory,
-					context.projectKey,
-					this._storage
-				)
-			} catch(err) {
+				taxCategoryReference =
+					getReferenceFromResourceIdentifier<TaxCategoryReference>(
+						draft.taxCategory,
+						context.projectKey,
+						this._storage
+					)
+			} catch (err) {
 				throw new Error(err)
 			}
 		}
 
 		// Resolve Product State
 		let productStateReference: StateReference | undefined = undefined
-		if(draft.state) {
+		if (draft.state) {
 			try {
-				productStateReference = getReferenceFromResourceIdentifier<StateReference>(
-					draft.state,
-					context.projectKey,
-					this._storage
-				)
-			} catch(err) {
+				productStateReference =
+					getReferenceFromResourceIdentifier<StateReference>(
+						draft.state,
+						context.projectKey,
+						this._storage
+					)
+			} catch (err) {
 				throw new Error(err)
 			}
 		}
