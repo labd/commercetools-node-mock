@@ -99,6 +99,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 					variantFromDraft(index + 2, variant)
 				) ?? [],
 			metaTitle: draft.metaTitle,
+			metaDescription: draft.metaDescription,
 			searchKeywords: draft.searchKeywords ?? {},
 		}
 
