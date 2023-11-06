@@ -1,26 +1,83 @@
 import type {
+	Category,
+	CategoryDraft,
 	Image,
 	PriceDraft,
 	Product,
 	ProductData,
 	ProductDraft,
+	ProductType,
+	ProductTypeDraft,
+	State,
+	StateDraft,
+	TaxCategory,
+	TaxCategoryDraft,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import supertest from 'supertest'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
-const ctMock = new CommercetoolsMock()
+const productTypeDraft: ProductTypeDraft = {
+	key: 'test-product-type',
+	name: 'Test Product Type',
+	description: 'Test Product Type description'
+}
+
+const categoryDraft: CategoryDraft = {
+	key: 'category-1',
+	name: {
+		'nl-NL': 'Category One'
+	},
+	slug: {
+		'nl-NL': 'category_1'
+	}
+}
+
+const taxcategoryDraft: TaxCategoryDraft = {
+	name: 'Tax category 1',
+	key: 'tax-category-1'
+}
+
+const productStateDraft: StateDraft = {
+	key: 'initial-state',
+	type: 'ProductState',
+	initial: true,
+	name: {
+		'nl-NL': 'Initial state',
+	},
+	description: {
+		'nl-NL': 'Product initial state',
+	}
+}
 
 const publishedProductDraft: ProductDraft = {
 	name: {
 		'nl-NL': 'test published product',
 	},
+	description: {
+		'nl-NL': 'Test published product description'
+	},
 	productType: {
 		typeId: 'product-type',
-		id: 'some-uuid',
+		key: 'test-product-type',
+	},
+	categories: [
+		{
+			typeId: 'category',
+			key: 'category-1',
+		}
+	],
+	taxCategory: {
+		typeId: 'tax-category',
+		key: taxcategoryDraft.key,
+	},
+	state: {
+		typeId: 'state',
+		key: 'initial-state',
 	},
 	masterVariant: {
+		key: 'master-variant-key',
 		sku: '1337',
 		attributes: [
 			{
@@ -30,6 +87,7 @@ const publishedProductDraft: ProductDraft = {
 		],
 		prices: [
 			{
+				key: 'base_price_eur',
 				country: 'NL',
 				value: {
 					currencyCode: 'EUR',
@@ -40,6 +98,7 @@ const publishedProductDraft: ProductDraft = {
 	},
 	variants: [
 		{
+			key: 'variant-1-key',
 			sku: '1338',
 			attributes: [
 				{
@@ -49,6 +108,7 @@ const publishedProductDraft: ProductDraft = {
 			],
 			prices: [
 				{
+					key: 'base_price_eur',
 					country: 'NL',
 					value: {
 						currencyCode: 'EUR',
@@ -61,18 +121,46 @@ const publishedProductDraft: ProductDraft = {
 	slug: {
 		'nl-NL': 'test-published-product',
 	},
+	metaTitle: {
+		'nl-NL': 'Unpublished product (meta title)',
+	},
+	metaDescription: {
+		'nl-NL': 'Unpublished product description (meta description)',
+	},
+	metaKeywords: {
+		'nl-NL': 'Test product (meta Keywords)',
+	},
 	publish: true,
 }
 
 const unpublishedProductDraft: ProductDraft = {
+	key: 'test-unpublished-product',
 	name: {
 		'nl-NL': 'test unpublished product',
 	},
+	description: {
+		'nl-NL': 'Test published product description'
+	},
 	productType: {
 		typeId: 'product-type',
-		id: 'some-uuid',
+		key: 'test-product-type',
+	},
+	categories: [
+		{
+			typeId: 'category',
+			key: 'category-1',
+		}
+	],
+	taxCategory: {
+		typeId: "tax-category",
+		key: taxcategoryDraft.key,
+	},
+	state: {
+		typeId: 'state',
+		key: 'initial-state',
 	},
 	masterVariant: {
+		key: 'master-variant-key',
 		sku: '2337',
 		attributes: [
 			{
@@ -80,9 +168,20 @@ const unpublishedProductDraft: ProductDraft = {
 				value: 'test',
 			},
 		],
+		prices: [
+			{
+				key: 'base_price_eur',
+				country: 'NL',
+				value: {
+					currencyCode: 'EUR',
+					centAmount: 1000,
+				},
+			},
+		],
 	},
 	variants: [
 		{
+			key: 'variant-1-key',
 			sku: '2338',
 			attributes: [
 				{
@@ -90,16 +189,82 @@ const unpublishedProductDraft: ProductDraft = {
 					value: 'test2',
 				},
 			],
+			prices: [
+				{
+					key: 'base_price_eur',
+					country: 'NL',
+					value: {
+						currencyCode: 'EUR',
+						centAmount: 2000,
+					},
+				},
+			],
 		},
 	],
 	slug: {
 		'nl-NL': 'test-unpublished-product',
 	},
+	metaTitle: {
+		'nl-NL': 'Unpublished product (meta title)',
+	},
+	metaDescription: {
+		'nl-NL': 'Unpublished product description (meta description)',
+	},
+	metaKeywords: {
+		'nl-NL': 'Test product (meta Keywords)',
+	},
 	publish: false,
 }
 
+let productType: ProductType
+let category: Category
+let taxCategory: TaxCategory
+let productState: State
+
+async function beforeAllProductTests(mock) {
+	let response
+	// Create Product Type
+	response = await supertest(mock.app)
+		.post('/dummy/product-types')
+		.send(productTypeDraft)
+
+	expect(response.status).toBe(201)
+	productType = response.body
+
+	// Create Category
+	response = await supertest(mock.app)
+		.post('/dummy/categories')
+		.send(categoryDraft)
+
+	expect(response.status).toBe(201)
+	category = response.body
+
+	// Create Tax Category
+	response = await supertest(mock.app)
+		.post('/dummy/tax-categories')
+		.send(taxcategoryDraft)
+
+	expect(response.status).toBe(201)
+	taxCategory = response.body
+
+	// Create Product State
+	response = await supertest(mock.app)
+		.post('/dummy/states')
+		.send(productStateDraft)
+	
+	expect(response.status).toBe(201)
+	productState = response.body
+}
+
 describe('Product', () => {
+	const ctMock = new CommercetoolsMock()
+	beforeAll(async () => {
+		await beforeAllProductTests(ctMock)
+	})
+
 	test('Create product', async () => {
+		assert(productType, 'product type not created')
+
 		const response = await supertest(ctMock.app)
 			.post('/dummy/products')
 			.send(unpublishedProductDraft)
@@ -108,11 +273,28 @@ describe('Product', () => {
 			name: {
 				'nl-NL': 'test unpublished product',
 			},
+			description: {
+				'nl-NL': 'Test published product description'
+			},
 			slug: {
 				'nl-NL': 'test-unpublished-product',
 			},
-			categories: [],
+			categories: [{
+				'id': category.id,
+				'typeId': 'category',
+			}],
+			metaTitle: {
+				'nl-NL': 'Unpublished product (meta title)',
+			},
+			metaDescription: {
+				'nl-NL': 'Unpublished product description (meta description)',
+			},
+			metaKeywords: {
+				'nl-NL': 'Test product (meta Keywords)',
+			},
 			masterVariant: {
+				id: 1,
+				key: 'master-variant-key',
 				sku: '2337',
 				assets: [],
 				attributes: [
@@ -121,11 +303,24 @@ describe('Product', () => {
 						value: 'test',
 					},
 				],
-				id: 1,
+				prices: [
+					{
+						id: expect.anything(),
+						key: 'base_price_eur',
+						country: 'NL',
+						value: {
+							type: 'centPrecision',
+							centAmount: 1000,
+							currencyCode: 'EUR',
+							fractionDigits: 2,
+						},
+					},
+				],
 				images: [],
 			},
 			variants: [
 				{
+					key: 'variant-1-key',
 					sku: '2338',
 					assets: [],
 					id: 2,
@@ -134,6 +329,19 @@ describe('Product', () => {
 						{
 							name: 'test2',
 							value: 'test2',
+						},
+					],
+					prices: [
+						{
+							id: expect.anything(),
+							key: 'base_price_eur',
+							country: 'NL',
+							value: {
+								type: 'centPrecision',
+								centAmount: 2000,
+								currencyCode: 'EUR',
+								fractionDigits: 2,
+							},
 						},
 					],
 				},
@@ -145,6 +353,11 @@ describe('Product', () => {
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			key: 'test-unpublished-product',
+			taxCategory: {
+				typeId: 'tax-category',
+				id: taxCategory.id,
+			},
 			masterData: {
 				staged: productData,
 				current: productData,
@@ -153,7 +366,11 @@ describe('Product', () => {
 			},
 			productType: {
 				typeId: 'product-type',
-				id: 'some-uuid',
+				id: productType.id,
+			},
+			state: {
+				typeId: 'state',
+				id: productState.id,
 			},
 			version: 1,
 		} as Product)
@@ -163,6 +380,9 @@ describe('Product', () => {
 describe('Product update actions', () => {
 	const ctMock = new CommercetoolsMock()
 	let productPublished: Product | undefined
+	beforeAll(async () => {
+		await beforeAllProductTests(ctMock)
+	})
 
 	beforeEach(async () => {
 		let response
