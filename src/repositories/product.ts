@@ -72,7 +72,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 					)
 				)
 			} catch (err) {
-				throw new Error(err)
+				throw new Error(`Error resolving category '${category}'.`)
 			}
 		})
 
@@ -87,7 +87,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 						this._storage
 					)
 			} catch (err) {
-				throw new Error(err)
+				throw new Error(`Error resolving tax category with key '${draft.taxCategory}'.`)
 			}
 		}
 
@@ -102,7 +102,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 						this._storage
 					)
 			} catch (err) {
-				throw new Error(err)
+				throw new Error(`Error resolving state '${draft.state}'.`)
 			}
 		}
 
