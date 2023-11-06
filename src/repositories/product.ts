@@ -651,6 +651,7 @@ const variantFromDraft = (
 ): ProductVariant => ({
 	id: variantId,
 	sku: variant?.sku,
+	key: variant?.key,
 	attributes: variant?.attributes ?? [],
 	prices: variant?.prices?.map(priceFromDraft),
 	assets: [],
