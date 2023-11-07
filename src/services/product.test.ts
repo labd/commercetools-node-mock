@@ -896,4 +896,62 @@ describe('Product update actions', () => {
 		expect(response.body.masterData.staged.variants[1].id).toBe(3)
 		expect(response.body.masterData.current.variants[1].id).toBe(3)
 	})
+
+	test('removeVariant by id', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'removeVariant',
+						id: 2,
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.masterData.staged.variants).toHaveLength(0)
+		expect(response.body.masterData.current.variants).toHaveLength(0)
+	})
+
+	test('removeVariant by sku', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'removeVariant',
+						sku: '1338',
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.masterData.staged.variants).toHaveLength(0)
+		expect(response.body.masterData.current.variants).toHaveLength(0)
+	})
+
+	test('removeVariant master', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'removeVariant',
+						id: 1,
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(500)
+		expect(response.body.error).toBe(`Can not remove the variant [ID:1] for [Product:${productPublished.id}] since it's the master variant`)
+	})
 })

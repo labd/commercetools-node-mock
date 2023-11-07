@@ -27,6 +27,7 @@ import type {
 	ProductSetMetaDescriptionAction,
 	ProductSetMetaKeywordsAction,
 	ProductAddVariantAction,
+	ProductRemoveVariantAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -680,7 +681,42 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
-		// 'removeVariant': () => {},
+		removeVariant: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ id, sku, staged }: ProductRemoveVariantAction
+		) => {
+			const removeVariant = (data: Writable<ProductData>) => {
+				const { variant, isMasterVariant, variantIndex } = getVariant(
+					data,
+					id,
+					sku
+				)
+				if (!variant) {
+					throw new Error(
+						`Variant with id ${id} or sku ${sku} not found on product ${resource.id}`
+					)
+				}
+				if (isMasterVariant) {
+					throw new Error(
+						`Can not remove the variant [ID:${id}] for [Product:${resource.id}] since it's the master variant`
+					)
+				}
+
+				data.variants.splice(variantIndex, 1);
+			}
+
+			const onlyStaged = staged !== undefined ? staged : true
+
+			removeVariant(resource.masterData.staged)
+
+			if (!onlyStaged) {
+				removeVariant(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
 		// 'changeMasterVariant': () => {},
 		// 'setPrices': () => {},
 		// 'setProductPriceCustomType': () => {},
