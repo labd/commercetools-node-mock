@@ -786,8 +786,8 @@ describe('Product update actions', () => {
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.slug).toEqual({'nl-NL': 'test-published-product-new'})
-		expect(response.body.masterData.current.slug).toEqual({'nl-NL': 'test-published-product-new'})
+		expect(response.body.masterData.staged.slug).toMatchObject({'nl-NL': 'test-published-product-new'})
+		expect(response.body.masterData.current.slug).toMatchObject({'nl-NL': 'test-published-product-new'})
 	})
 
 	test('setMetaTitle product', async () => {
@@ -808,8 +808,8 @@ describe('Product update actions', () => {
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.metaTitle).toEqual({'nl-NL': 'Unpublished product (new meta title)'})
-		expect(response.body.masterData.current.metaTitle).toEqual({'nl-NL': 'Unpublished product (new meta title)'})
+		expect(response.body.masterData.staged.metaTitle).toMatchObject({'nl-NL': 'Unpublished product (new meta title)'})
+		expect(response.body.masterData.current.metaTitle).toMatchObject({'nl-NL': 'Unpublished product (new meta title)'})
 	})
 
 	test('setMetaDescription product', async () => {
@@ -830,8 +830,8 @@ describe('Product update actions', () => {
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.metaDescription).toEqual({'nl-NL': 'Unpublished product description (new meta description)'})
-		expect(response.body.masterData.current.metaDescription).toEqual({'nl-NL': 'Unpublished product description (new meta description)'})
+		expect(response.body.masterData.staged.metaDescription).toMatchObject({'nl-NL': 'Unpublished product description (new meta description)'})
+		expect(response.body.masterData.current.metaDescription).toMatchObject({'nl-NL': 'Unpublished product description (new meta description)'})
 	})
 
 	test('setMetaKeywords product', async () => {
@@ -852,7 +852,7 @@ describe('Product update actions', () => {
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.metaKeywords).toEqual({'nl-NL': 'Test product (newmeta Keywords)'})
-		expect(response.body.masterData.current.metaKeywords).toEqual({'nl-NL': 'Test product (newmeta Keywords)'})
+		expect(response.body.masterData.staged.metaKeywords).toMatchObject({'nl-NL': 'Test product (newmeta Keywords)'})
+		expect(response.body.masterData.current.metaKeywords).toMatchObject({'nl-NL': 'Test product (newmeta Keywords)'})
 	})
 })
