@@ -26,6 +26,7 @@ import type {
 	ProductSetMetaTitleAction,
 	ProductSetMetaDescriptionAction,
 	ProductSetMetaKeywordsAction,
+	ProductAddVariantAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -650,7 +651,35 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			checkForStagedChanges(resource)
 			return resource
 		},
-		// 'addVariant': () => {},
+		addVariant: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ sku, key, prices, images, attributes, staged, assets }: ProductAddVariantAction
+		) => {
+			const variantDraft: ProductVariantDraft = {
+				sku: sku,
+				key: key,
+				prices: prices,
+				images: images,
+				attributes: attributes,
+				assets: assets
+			}
+
+			const dataStaged = resource.masterData.staged
+			const allVariants = [dataStaged.masterVariant, ...(dataStaged.variants ?? [])]
+			const maxId = allVariants.reduce((max, element) => (element.id > max ? element.id : max), 0);
+			const variant = variantFromDraft(maxId + 1, variantDraft)
+			dataStaged.variants.push(variant)
+
+			const onlyStaged = staged !== undefined ? staged : true
+
+			if (!onlyStaged) {
+				resource.masterData.current.variants.push(variant)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
 		// 'removeVariant': () => {},
 		// 'changeMasterVariant': () => {},
 		// 'setPrices': () => {},

@@ -855,4 +855,45 @@ describe('Product update actions', () => {
 		expect(response.body.masterData.staged.metaKeywords).toMatchObject({'nl-NL': 'Test product (newmeta Keywords)'})
 		expect(response.body.masterData.current.metaKeywords).toMatchObject({'nl-NL': 'Test product (newmeta Keywords)'})
 	})
+
+	test('addVariant product', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addVariant',
+						sku: '4567',
+						key: 'variant-2-key',
+						price: [
+							{
+								key: 'base_price_eur',
+								country: 'NL',
+								value: {
+									currencyCode: 'EUR',
+									centAmount: 3000,
+								},
+							},
+						],
+						images: [],
+						attributes: [
+							{
+								name: 'test3',
+								value: 'test3',
+							},
+						],
+						assets: [],
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.masterData.staged.variants).toHaveLength(2)
+		expect(response.body.masterData.current.variants).toHaveLength(2)
+		expect(response.body.masterData.staged.variants[1].id).toBe(3)
+		expect(response.body.masterData.current.variants[1].id).toBe(3)
+	})
 })
