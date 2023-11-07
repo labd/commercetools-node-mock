@@ -1055,6 +1055,47 @@ describe('Product update actions', () => {
 				],
 			})
 		expect(response.status).toBe(200)
+		expect(response.body.taxCategory.id).toBe(taxCategory2.id)
+	})
+
+	test('setTaxCategory fail1', async () => {
+		assert(productPublished, 'product not created')
+		const fakeTaxCategoryId = '00000000-0000-0000-0000-000000000000'
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setTaxCategory',
+						taxCategory: {
+							typeId: 'tax-category',
+							id: fakeTaxCategoryId
+						},
+					},
+				],
+			})
+		expect(response.status).toBe(400)
+		expect(response.body.errors[0].code).toBe('ReferencedResourceNotFound')
+	})
+
+	test('setTaxCategory fail2', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setTaxCategory',
+						taxCategory: {
+							typeId: 'tax-category'
+						},
+					},
+				],
+			})
+		expect(response.status).toBe(400)
+		expect(response.body.errors[0].code).toBe('InvalidJsonInput')
 	})
 
 	test('addToCategory by id', async () => {

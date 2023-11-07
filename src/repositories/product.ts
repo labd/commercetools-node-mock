@@ -85,10 +85,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		})
 
 		// Resolve Tax category
-		let taxCategoryReference: TaxCategoryReference | undefined = undefined
-		if (draft.taxCategory) {
-			taxCategoryReference = resolveTaxCategory(draft.taxCategory, context, this._storage)
-		}
+		const taxCategoryReference = resolveTaxCategory(draft.taxCategory, context.projectKey, this._storage)
 
 		// Resolve Product State
 		let productStateReference: StateReference | undefined = undefined
@@ -753,14 +750,10 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			) => {
 				const taxCategoryResolved = resolveTaxCategory(
 					taxCategory,
-					context,
+					context.projectKey,
 					this._storage
 				)
-
-				if (taxCategoryResolved) {
-					resource.taxCategory = taxCategoryResolved
-				}
-
+				resource.taxCategory = taxCategoryResolved
 				return resource
 			},
 			addToCategory: (
@@ -885,22 +878,16 @@ const priceFromDraft = (draft: PriceDraft): Price => ({
 
 const resolveTaxCategory = (
 	taxCategory: TaxCategoryResourceIdentifier | undefined,
-	context: RepositoryContext,
+	projectKey: string,
 	storage: AbstractStorage
 ): TaxCategoryReference | undefined => {
 	let taxCategoryReference: TaxCategoryReference | undefined = undefined
 	if (taxCategory) {
-		try {
-			taxCategoryReference = getReferenceFromResourceIdentifier<TaxCategoryReference>(
-				taxCategory,
-				context.projectKey,
-				storage
-			)
-		} catch (err) {
-			throw new Error(
-				`Error resolving tax category with key '${taxCategory}'.`
-			)
-		}
+		taxCategoryReference = getReferenceFromResourceIdentifier<TaxCategoryReference>(
+			taxCategory,
+			projectKey,
+			storage
+		)
 	}
 	return taxCategoryReference
 }
