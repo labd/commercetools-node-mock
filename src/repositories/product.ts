@@ -25,6 +25,7 @@ import type {
 	ProductChangeSlugAction,
 	ProductSetMetaTitleAction,
 	ProductSetMetaDescriptionAction,
+	ProductSetMetaKeywordsAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -636,6 +637,19 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			checkForStagedChanges(resource)
 			return resource
 		},
+		setMetaKeywords: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ metaKeywords, staged }: ProductSetMetaKeywordsAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.metaKeywords = metaKeywords
+			if (!onlyStaged) {
+				resource.masterData.current.metaKeywords = metaKeywords
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
 		// 'addVariant': () => {},
 		// 'removeVariant': () => {},
 		// 'changeMasterVariant': () => {},
@@ -662,7 +676,6 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// 'setAssetCustomType': () => {},
 		// 'setAssetCustomField': () => {},
 		// 'setSearchKeywords': () => {},
-		// 'setMetaKeywords': () => {},
 		// 'revertStagedChanges': () => {},
 		// 'revertStagedVariantChanges': () => {},
 		// 'transitionState': () => {},
