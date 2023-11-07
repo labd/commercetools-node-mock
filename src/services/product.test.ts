@@ -811,4 +811,26 @@ describe('Product update actions', () => {
 		expect(response.body.masterData.staged.metaTitle).toEqual({'nl-NL': 'Unpublished product (new meta title)'})
 		expect(response.body.masterData.current.metaTitle).toEqual({'nl-NL': 'Unpublished product (new meta title)'})
 	})
+
+	test('setMetaDescription product', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setMetaDescription',
+						metaDescription: {
+							'nl-NL': 'Unpublished product description (new meta description)',
+						},
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.masterData.staged.metaDescription).toEqual({'nl-NL': 'Unpublished product description (new meta description)'})
+		expect(response.body.masterData.current.metaDescription).toEqual({'nl-NL': 'Unpublished product description (new meta description)'})
+	})
 })
