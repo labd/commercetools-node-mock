@@ -1142,7 +1142,7 @@ describe('Product update actions', () => {
 		expect(response.body.masterData.current.categories).toHaveLength(1)
 	})
 
-	test('addToCategory fail', async () => {
+	test('addToCategory fail 1', async () => {
 		assert(productPublished, 'product not created')
 		const fakeCategoryId = '00000000-0000-0000-0000-000000000000'
 		const response = await supertest(ctMock.app)
@@ -1160,7 +1160,25 @@ describe('Product update actions', () => {
 					},
 				],
 			})
-		expect(response.status).toBe(500)
-		expect(response.body.error).toBe(`Error resolving category '${fakeCategoryId}'.`)
+		expect(response.status).toBe(400)
+		expect(response.body.errors[0].code).toBe('ReferencedResourceNotFound')
+	})
+
+	test('addToCategory fail 2', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addToCategory',
+						category: null,
+						staged: true
+					},
+				],
+			})
+		expect(response.status).toBe(400)
+		expect(response.body.errors[0].code).toBe('InvalidJsonInput')
 	})
 })

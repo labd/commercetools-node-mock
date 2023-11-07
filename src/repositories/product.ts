@@ -20,6 +20,7 @@ import type {
 	ProductRemovePriceAction,
 	CategoryReference,
 	CategoryResourceIdentifier,
+	InvalidJsonInputError,
 	TaxCategoryReference,
 	TaxCategoryResourceIdentifier,
 	StateReference,
@@ -44,6 +45,7 @@ import {
 } from './helpers.js'
 import deepEqual from 'deep-equal'
 import { AbstractStorage } from '../storage/abstract.js'
+import { CommercetoolsError } from '../exceptions.js'
 
 export class ProductRepository extends AbstractResourceRepository<'product'> {
 	getTypeId() {
@@ -76,11 +78,23 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// Resolve Product categories
 		const categoryReferences: CategoryReference[] = []
 		draft.categories?.forEach((category) => {
-			const categoryResolved = resolveCategory(category, context.projectKey, this._storage)
-			if (categoryResolved) {
-				categoryReferences.push(categoryResolved)
+			if (category) {
+				categoryReferences.push(
+					getReferenceFromResourceIdentifier<CategoryReference>(
+						category,
+						context.projectKey,
+						this._storage
+					)
+				)
 			} else {
-				throw new Error(`Error resolving category '${category.id}'.`)
+				throw new CommercetoolsError<InvalidJsonInputError>(
+					{
+						code: 'InvalidJsonInput',
+						message: 'Request body does not contain valid JSON.',
+						detailedErrorMessage: 'categories: JSON object expected.',
+					},
+					400
+				)
 			}
 		})
 
@@ -762,11 +776,21 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				{ category, staged, orderHint }: ProductAddToCategoryAction
 			) => {
 				const addCategory = (data: Writable<ProductData>) => {
-					const categoryResolved = resolveCategory(category, context.projectKey, this._storage)
-					if (categoryResolved) {
-						data.categories.push(categoryResolved)
+					if (category) {
+						data.categories.push(getReferenceFromResourceIdentifier<CategoryReference>(
+							category,
+							context.projectKey,
+							this._storage
+						))
 					} else {
-						throw new Error(`Error resolving category '${category.id}'.`)
+						throw new CommercetoolsError<InvalidJsonInputError>(
+							{
+								code: 'InvalidJsonInput',
+								message: 'Request body does not contain valid JSON.',
+								detailedErrorMessage: 'actions -> category: Missing required value',
+							},
+							400
+						)
 					}
 				}
 
@@ -890,24 +914,4 @@ const resolveTaxCategory = (
 		)
 	}
 	return taxCategoryReference
-}
-
-const resolveCategory = (
-	category: CategoryResourceIdentifier | undefined,
-	projectKey: string,
-	storage: AbstractStorage
-): CategoryReference | undefined => {
-	let categoryReference: CategoryReference | undefined = undefined
-	if (category) {
-		try {
-			categoryReference = getReferenceFromResourceIdentifier<CategoryReference>(
-				category,
-				projectKey,
-				storage
-			)
-		} catch (err) {
-			console.error(`Category with id ${category.id} or key ${category.key} not found.`)
-		}
-	}
-	return categoryReference
 }
