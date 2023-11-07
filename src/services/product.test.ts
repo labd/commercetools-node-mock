@@ -34,9 +34,14 @@ const categoryDraft: CategoryDraft = {
 	},
 }
 
-const taxcategoryDraft: TaxCategoryDraft = {
+const taxcategoryDraft1: TaxCategoryDraft = {
 	name: 'Tax category 1',
 	key: 'tax-category-1',
+}
+
+const taxcategoryDraft2: TaxCategoryDraft = {
+	name: 'Tax category 2',
+	key: 'tax-category-2',
 }
 
 const productStateDraft: StateDraft = {
@@ -70,7 +75,7 @@ const publishedProductDraft: ProductDraft = {
 	],
 	taxCategory: {
 		typeId: 'tax-category',
-		key: taxcategoryDraft.key,
+		key: taxcategoryDraft1.key,
 	},
 	state: {
 		typeId: 'state',
@@ -153,7 +158,7 @@ const unpublishedProductDraft: ProductDraft = {
 	],
 	taxCategory: {
 		typeId: 'tax-category',
-		key: taxcategoryDraft.key,
+		key: taxcategoryDraft1.key,
 	},
 	state: {
 		typeId: 'state',
@@ -218,7 +223,8 @@ const unpublishedProductDraft: ProductDraft = {
 
 let productType: ProductType
 let category: Category
-let taxCategory: TaxCategory
+let taxCategory1: TaxCategory
+let taxCategory2: TaxCategory
 let productState: State
 
 async function beforeAllProductTests(mock) {
@@ -239,13 +245,21 @@ async function beforeAllProductTests(mock) {
 	expect(response.status).toBe(201)
 	category = response.body
 
-	// Create Tax Category
+	// Create Tax Category 1
 	response = await supertest(mock.app)
 		.post('/dummy/tax-categories')
-		.send(taxcategoryDraft)
+		.send(taxcategoryDraft1)
 
 	expect(response.status).toBe(201)
-	taxCategory = response.body
+	taxCategory1 = response.body
+
+	// Create Tax Category 2
+	response = await supertest(mock.app)
+		.post('/dummy/tax-categories')
+		.send(taxcategoryDraft2)
+
+	expect(response.status).toBe(201)
+	taxCategory2 = response.body
 
 	// Create Product State
 	response = await supertest(mock.app)
@@ -358,7 +372,7 @@ describe('Product', () => {
 			key: 'test-unpublished-product',
 			taxCategory: {
 				typeId: 'tax-category',
-				id: taxCategory.id,
+				id: taxCategory1.id,
 			},
 			masterData: {
 				staged: productData,
@@ -1003,5 +1017,24 @@ describe('Product update actions', () => {
 		expect(response.body.masterData.current.variants).toHaveLength(1)
 		expect(response.body.masterData.current.masterVariant.id).toBe(1)
 		expect(response.body.masterData.current.variants[0].id).toBe(2)
+	})
+
+	test('setTaxCategory', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setTaxCategory',
+						taxCategory: {
+							typeId: 'tax-category',
+							id: taxCategory2.id
+						},
+					},
+				],
+			})
+		expect(response.status).toBe(200)
 	})
 })

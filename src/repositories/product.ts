@@ -20,6 +20,7 @@ import type {
 	ProductRemovePriceAction,
 	CategoryReference,
 	TaxCategoryReference,
+	TaxCategoryResourceIdentifier,
 	StateReference,
 	ProductChangeNameAction,
 	ProductChangeSlugAction,
@@ -29,6 +30,7 @@ import type {
 	ProductAddVariantAction,
 	ProductRemoveVariantAction,
 	ProductChangeMasterVariantAction,
+	ProductSetTaxCategoryAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -39,6 +41,7 @@ import {
 	getReferenceFromResourceIdentifier,
 } from './helpers.js'
 import deepEqual from 'deep-equal'
+import { AbstractStorage } from '../storage/abstract.js'
 
 export class ProductRepository extends AbstractResourceRepository<'product'> {
 	getTypeId() {
@@ -87,18 +90,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// Resolve Tax category
 		let taxCategoryReference: TaxCategoryReference | undefined = undefined
 		if (draft.taxCategory) {
-			try {
-				taxCategoryReference =
-					getReferenceFromResourceIdentifier<TaxCategoryReference>(
-						draft.taxCategory,
-						context.projectKey,
-						this._storage
-					)
-			} catch (err) {
-				throw new Error(
-					`Error resolving tax category with key '${draft.taxCategory}'.`
-				)
-			}
+			taxCategoryReference = resolveTaxCategory(draft.taxCategory, context, this._storage)
 		}
 
 		// Resolve Product State
@@ -161,630 +153,646 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			) => void
 		>
 	> = {
-		publish: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ scope }: ProductPublishAction
-		) => {
-			resource.masterData.current = resource.masterData.staged
-			resource.masterData.published = true
-			checkForStagedChanges(resource)
-		},
-		unpublish: (
-			context: RepositoryContext,
-			resource: Writable<Product>
-			// { action }: ProductUnpublishAction
-		) => {
-			resource.masterData.published = false
-			checkForStagedChanges(resource)
-		},
-		setAttribute: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ variantId, sku, name, value, staged }: ProductSetAttributeAction
-		) => {
-			const setAttr = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					variantId,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+			publish: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ scope }: ProductPublishAction
+			) => {
+				resource.masterData.current = resource.masterData.staged
+				resource.masterData.published = true
+				checkForStagedChanges(resource)
+			},
+			unpublish: (
+				context: RepositoryContext,
+				resource: Writable<Product>
+				// { action }: ProductUnpublishAction
+			) => {
+				resource.masterData.published = false
+				checkForStagedChanges(resource)
+			},
+			setAttribute: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ variantId, sku, name, value, staged }: ProductSetAttributeAction
+			) => {
+				const setAttr = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						variantId,
+						sku
 					)
-				}
-
-				if (!variant.attributes) {
-					variant.attributes = []
-				}
-
-				const existingAttr = variant.attributes.find(
-					(attr) => attr.name === name
-				)
-				if (existingAttr) {
-					existingAttr.value = value
-				} else {
-					variant.attributes.push({
-						name,
-						value,
-					})
-				}
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
-				}
-			}
-
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			setAttr(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				setAttr(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		setDescription: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ description, staged }: ProductSetDescriptionAction
-		) => {
-			const onlyStaged = staged !== undefined ? staged : true
-
-			resource.masterData.staged.description = description
-			if (!onlyStaged) {
-				resource.masterData.current.description = description
-			}
-			checkForStagedChanges(resource)
-			return resource
-		},
-		setKey: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ key }: ProductSetKeyAction
-		) => {
-			resource.key = key
-			return resource
-		},
-		addExternalImage: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ variantId, sku, image, staged }: ProductAddExternalImageAction
-		) => {
-			const addImg = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					variantId,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
-					)
-				}
-
-				if (!variant.images) {
-					variant.images = []
-				} else {
-					const existingImage = variant.images.find((x) => x.url === image.url)
-					if (existingImage) {
+					if (!variant) {
 						throw new Error(
-							`Cannot add image '${image.url}' because product '${resource.id}' already has that image.`
+							`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
 						)
 					}
-				}
 
-				// Add image
-				variant.images.push(image)
-
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
-				}
-			}
-
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			addImg(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				addImg(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		removeImage: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ variantId, sku, imageUrl, staged }: ProductRemoveImageAction
-		) => {
-			const removeImg = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					variantId,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
-					)
-				}
-
-				const variantImages = variant.images ?? []
-				const existingImage = variantImages.find((x) => x.url === imageUrl)
-				if (!existingImage) {
-					throw new Error(
-						`Cannot remove image '${imageUrl}' because product '${resource.id}' does not have that image.`
-					)
-				}
-
-				// Remove image
-				variant.images = variantImages.filter((image) => image.url !== imageUrl)
-
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
-				}
-			}
-
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			removeImg(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				removeImg(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		moveImageToPosition: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{
-				variantId,
-				sku,
-				imageUrl,
-				position,
-				staged,
-			}: ProductMoveImageToPositionAction
-		) => {
-			const moveImg = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					variantId,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
-					)
-				}
-
-				const variantImages = variant.images ?? []
-				const existingImage = variantImages.find((x) => x.url === imageUrl)
-				if (!existingImage) {
-					throw new Error(
-						`Cannot move image '${imageUrl}' because product '${resource.id}' does not have that image.`
-					)
-				}
-
-				if (position >= variantImages.length) {
-					throw new Error(
-						`Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.`
-					)
-				}
-
-				// Remove image
-				variant.images = variantImages.filter((image) => image.url !== imageUrl)
-
-				// Re-add image to the correct position
-				variant.images.splice(position, 0, existingImage)
-
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
-				}
-			}
-
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			moveImg(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				moveImg(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		addPrice: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ variantId, sku, price, staged }: ProductAddPriceAction
-		) => {
-			const addVariantPrice = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					variantId,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
-					)
-				}
-
-				if (variant.prices === undefined) {
-					variant.prices = [priceFromDraft(price)]
-				} else {
-					variant.prices.push(priceFromDraft(price))
-				}
-
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
-				}
-			}
-
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			addVariantPrice(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				addVariantPrice(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		changePrice: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ priceId, price, staged }: ProductChangePriceAction
-		) => {
-			const changeVariantPrice = (data: Writable<ProductData>) => {
-				const allVariants = [data.masterVariant, ...(data.variants ?? [])]
-				const priceVariant = allVariants.find(
-					(variant) => variant.prices?.some((x) => x.id === priceId)
-				)
-				if (!priceVariant) {
-					throw new Error(
-						`Price with id ${priceId} not found on product ${resource.id}`
-					)
-				}
-
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					priceVariant.id,
-					priceVariant.sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`
-					)
-				}
-
-				variant.prices = variant.prices?.map((x) => {
-					if (x.id === priceId) {
-						return { ...x, ...price } as Price
+					if (!variant.attributes) {
+						variant.attributes = []
 					}
-					return x
-				})
 
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
-				}
-			}
-
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			changeVariantPrice(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				changeVariantPrice(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		removePrice: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ priceId, staged }: ProductRemovePriceAction
-		) => {
-			const removeVariantPrice = (data: Writable<ProductData>) => {
-				const allVariants = [data.masterVariant, ...(data.variants ?? [])]
-				const priceVariant = allVariants.find(
-					(variant) => variant.prices?.some((x) => x.id === priceId)
-				)
-				if (!priceVariant) {
-					throw new Error(
-						`Price with id ${priceId} not found on product ${resource.id}`
+					const existingAttr = variant.attributes.find(
+						(attr) => attr.name === name
 					)
+					if (existingAttr) {
+						existingAttr.value = value
+					} else {
+						variant.attributes.push({
+							name,
+							value,
+						})
+					}
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
 				}
 
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					priceVariant.id,
-					priceVariant.sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
+
+				// Write the attribute to the staged data
+				setAttr(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					setAttr(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			setDescription: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ description, staged }: ProductSetDescriptionAction
+			) => {
+				const onlyStaged = staged !== undefined ? staged : true
+
+				resource.masterData.staged.description = description
+				if (!onlyStaged) {
+					resource.masterData.current.description = description
+				}
+				checkForStagedChanges(resource)
+				return resource
+			},
+			setKey: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ key }: ProductSetKeyAction
+			) => {
+				resource.key = key
+				return resource
+			},
+			addExternalImage: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ variantId, sku, image, staged }: ProductAddExternalImageAction
+			) => {
+				const addImg = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						variantId,
+						sku
 					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+						)
+					}
+
+					if (!variant.images) {
+						variant.images = []
+					} else {
+						const existingImage = variant.images.find((x) => x.url === image.url)
+						if (existingImage) {
+							throw new Error(
+								`Cannot add image '${image.url}' because product '${resource.id}' already has that image.`
+							)
+						}
+					}
+
+					// Add image
+					variant.images.push(image)
+
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
 				}
 
-				variant.prices = variant.prices?.filter((x) => x.id !== priceId)
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
 
-				if (isMasterVariant) {
-					data.masterVariant = variant
-				} else {
-					data.variants[variantIndex] = variant
+				// Write the attribute to the staged data
+				addImg(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					addImg(resource.masterData.current)
 				}
-			}
+				checkForStagedChanges(resource)
 
-			// If true, only the staged Attribute is set. If false, both current and
-			// staged Attribute is set.  Default is true
-			const onlyStaged = staged !== undefined ? staged : true
-
-			// Write the attribute to the staged data
-			removeVariantPrice(resource.masterData.staged)
-
-			// Also write to published data is isStaged = false
-			// if isStaged is false we set the attribute on both the staged and
-			// published data.
-			if (!onlyStaged) {
-				removeVariantPrice(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		changeName: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ name, staged }: ProductChangeNameAction
-		) => {
-			const onlyStaged = staged !== undefined ? staged : true
-			resource.masterData.staged.name = name
-			if (!onlyStaged) {
-				resource.masterData.current.name = name
-			}
-			checkForStagedChanges(resource)
-			return resource
-		},
-		changeSlug: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ slug, staged }: ProductChangeSlugAction
-		) => {
-			const onlyStaged = staged !== undefined ? staged : true
-			resource.masterData.staged.slug = slug
-			if (!onlyStaged) {
-				resource.masterData.current.slug = slug
-			}
-			checkForStagedChanges(resource)
-			return resource
-		},
-		setMetaTitle: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ metaTitle, staged }: ProductSetMetaTitleAction
-		) => {
-			const onlyStaged = staged !== undefined ? staged : true
-			resource.masterData.staged.metaTitle = metaTitle
-			if (!onlyStaged) {
-				resource.masterData.current.metaTitle = metaTitle
-			}
-			checkForStagedChanges(resource)
-			return resource
-		},
-		setMetaDescription: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ metaDescription, staged }: ProductSetMetaDescriptionAction
-		) => {
-			const onlyStaged = staged !== undefined ? staged : true
-			resource.masterData.staged.metaDescription = metaDescription
-			if (!onlyStaged) {
-				resource.masterData.current.metaDescription = metaDescription
-			}
-			checkForStagedChanges(resource)
-			return resource
-		},
-		setMetaKeywords: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ metaKeywords, staged }: ProductSetMetaKeywordsAction
-		) => {
-			const onlyStaged = staged !== undefined ? staged : true
-			resource.masterData.staged.metaKeywords = metaKeywords
-			if (!onlyStaged) {
-				resource.masterData.current.metaKeywords = metaKeywords
-			}
-			checkForStagedChanges(resource)
-			return resource
-		},
-		addVariant: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ sku, key, prices, images, attributes, staged, assets }: ProductAddVariantAction
-		) => {
-			const variantDraft: ProductVariantDraft = {
-				sku: sku,
-				key: key,
-				prices: prices,
-				images: images,
-				attributes: attributes,
-				assets: assets
-			}
-
-			const dataStaged = resource.masterData.staged
-			const allVariants = [dataStaged.masterVariant, ...(dataStaged.variants ?? [])]
-			const maxId = allVariants.reduce((max, element) => (element.id > max ? element.id : max), 0);
-			const variant = variantFromDraft(maxId + 1, variantDraft)
-			dataStaged.variants.push(variant)
-
-			const onlyStaged = staged !== undefined ? staged : true
-
-			if (!onlyStaged) {
-				resource.masterData.current.variants.push(variant)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		removeVariant: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ id, sku, staged }: ProductRemoveVariantAction
-		) => {
-			const removeVariant = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
-					id,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${id} or sku ${sku} not found on product ${resource.id}`
+				return resource
+			},
+			removeImage: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ variantId, sku, imageUrl, staged }: ProductRemoveImageAction
+			) => {
+				const removeImg = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						variantId,
+						sku
 					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+						)
+					}
+
+					const variantImages = variant.images ?? []
+					const existingImage = variantImages.find((x) => x.url === imageUrl)
+					if (!existingImage) {
+						throw new Error(
+							`Cannot remove image '${imageUrl}' because product '${resource.id}' does not have that image.`
+						)
+					}
+
+					// Remove image
+					variant.images = variantImages.filter((image) => image.url !== imageUrl)
+
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
 				}
-				if (isMasterVariant) {
-					throw new Error(
-						`Can not remove the variant [ID:${id}] for [Product:${resource.id}] since it's the master variant`
-					)
+
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
+
+				// Write the attribute to the staged data
+				removeImg(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					removeImg(resource.masterData.current)
 				}
+				checkForStagedChanges(resource)
 
-				data.variants.splice(variantIndex, 1);
-			}
-
-			const onlyStaged = staged !== undefined ? staged : true
-
-			removeVariant(resource.masterData.staged)
-
-			if (!onlyStaged) {
-				removeVariant(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
-
-			return resource
-		},
-		changeMasterVariant: (
-			context: RepositoryContext,
-			resource: Writable<Product>,
-			{ variantId, sku, staged }: ProductChangeMasterVariantAction
-		) => {
-			const setMaster = (data: Writable<ProductData>) => {
-				const { variant, isMasterVariant, variantIndex } = getVariant(
-					data,
+				return resource
+			},
+			moveImageToPosition: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{
 					variantId,
-					sku
-				)
-				if (!variant) {
-					throw new Error(
-						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+					sku,
+					imageUrl,
+					position,
+					staged,
+				}: ProductMoveImageToPositionAction
+			) => {
+				const moveImg = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						variantId,
+						sku
 					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+						)
+					}
+
+					const variantImages = variant.images ?? []
+					const existingImage = variantImages.find((x) => x.url === imageUrl)
+					if (!existingImage) {
+						throw new Error(
+							`Cannot move image '${imageUrl}' because product '${resource.id}' does not have that image.`
+						)
+					}
+
+					if (position >= variantImages.length) {
+						throw new Error(
+							`Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.`
+						)
+					}
+
+					// Remove image
+					variant.images = variantImages.filter((image) => image.url !== imageUrl)
+
+					// Re-add image to the correct position
+					variant.images.splice(position, 0, existingImage)
+
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
 				}
 
-				if (!isMasterVariant) {
-					// Save previous master variant
-					const masterVariantPrev = data.masterVariant
-					data.masterVariant = variant
-					// Remove new master from variants
-					data.variants.splice(variantIndex, 1)
-					// Add previous master to variants
-					data.variants.push(masterVariantPrev)
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
+
+				// Write the attribute to the staged data
+				moveImg(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					moveImg(resource.masterData.current)
 				}
-			}
+				checkForStagedChanges(resource)
 
-			const onlyStaged = staged !== undefined ? staged : true
+				return resource
+			},
+			addPrice: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ variantId, sku, price, staged }: ProductAddPriceAction
+			) => {
+				const addVariantPrice = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						variantId,
+						sku
+					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+						)
+					}
 
-			setMaster(resource.masterData.staged)
+					if (variant.prices === undefined) {
+						variant.prices = [priceFromDraft(price)]
+					} else {
+						variant.prices.push(priceFromDraft(price))
+					}
 
-			if (!onlyStaged) {
-				setMaster(resource.masterData.current)
-			}
-			checkForStagedChanges(resource)
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
+				}
 
-			return resource
-		},
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
 
-		// 'setPrices': () => {},
-		// 'setProductPriceCustomType': () => {},
-		// 'setProductPriceCustomField': () => {},
-		// 'setDiscountedPrice': () => {},
-		// 'setAttributeInAllVariants': () => {},
-		// 'addToCategory': () => {},
-		// 'setCategoryOrderHint': () => {},
-		// 'removeFromCategory': () => {},
-		// 'setTaxCategory': () => {},
-		// 'setSku': () => {},
-		// 'setProductVariantKey': () => {},
-		// 'setImageLabel': () => {},
-		// 'addAsset': () => {},
-		// 'removeAsset': () => {},
-		// 'setAssetKey': () => {},
-		// 'changeAssetOrder': () => {},
-		// 'changeAssetName': () => {},
-		// 'setAssetDescription': () => {},
-		// 'setAssetTags': () => {},
-		// 'setAssetSources': () => {},
-		// 'setAssetCustomType': () => {},
-		// 'setAssetCustomField': () => {},
-		// 'setSearchKeywords': () => {},
-		// 'revertStagedChanges': () => {},
-		// 'revertStagedVariantChanges': () => {},
-		// 'transitionState': () => {},
-	}
+				// Write the attribute to the staged data
+				addVariantPrice(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					addVariantPrice(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			changePrice: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ priceId, price, staged }: ProductChangePriceAction
+			) => {
+				const changeVariantPrice = (data: Writable<ProductData>) => {
+					const allVariants = [data.masterVariant, ...(data.variants ?? [])]
+					const priceVariant = allVariants.find(
+						(variant) => variant.prices?.some((x) => x.id === priceId)
+					)
+					if (!priceVariant) {
+						throw new Error(
+							`Price with id ${priceId} not found on product ${resource.id}`
+						)
+					}
+
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						priceVariant.id,
+						priceVariant.sku
+					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`
+						)
+					}
+
+					variant.prices = variant.prices?.map((x) => {
+						if (x.id === priceId) {
+							return { ...x, ...price } as Price
+						}
+						return x
+					})
+
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
+				}
+
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
+
+				// Write the attribute to the staged data
+				changeVariantPrice(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					changeVariantPrice(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			removePrice: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ priceId, staged }: ProductRemovePriceAction
+			) => {
+				const removeVariantPrice = (data: Writable<ProductData>) => {
+					const allVariants = [data.masterVariant, ...(data.variants ?? [])]
+					const priceVariant = allVariants.find(
+						(variant) => variant.prices?.some((x) => x.id === priceId)
+					)
+					if (!priceVariant) {
+						throw new Error(
+							`Price with id ${priceId} not found on product ${resource.id}`
+						)
+					}
+
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						priceVariant.id,
+						priceVariant.sku
+					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`
+						)
+					}
+
+					variant.prices = variant.prices?.filter((x) => x.id !== priceId)
+
+					if (isMasterVariant) {
+						data.masterVariant = variant
+					} else {
+						data.variants[variantIndex] = variant
+					}
+				}
+
+				// If true, only the staged Attribute is set. If false, both current and
+				// staged Attribute is set.  Default is true
+				const onlyStaged = staged !== undefined ? staged : true
+
+				// Write the attribute to the staged data
+				removeVariantPrice(resource.masterData.staged)
+
+				// Also write to published data is isStaged = false
+				// if isStaged is false we set the attribute on both the staged and
+				// published data.
+				if (!onlyStaged) {
+					removeVariantPrice(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			changeName: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ name, staged }: ProductChangeNameAction
+			) => {
+				const onlyStaged = staged !== undefined ? staged : true
+				resource.masterData.staged.name = name
+				if (!onlyStaged) {
+					resource.masterData.current.name = name
+				}
+				checkForStagedChanges(resource)
+				return resource
+			},
+			changeSlug: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ slug, staged }: ProductChangeSlugAction
+			) => {
+				const onlyStaged = staged !== undefined ? staged : true
+				resource.masterData.staged.slug = slug
+				if (!onlyStaged) {
+					resource.masterData.current.slug = slug
+				}
+				checkForStagedChanges(resource)
+				return resource
+			},
+			setMetaTitle: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ metaTitle, staged }: ProductSetMetaTitleAction
+			) => {
+				const onlyStaged = staged !== undefined ? staged : true
+				resource.masterData.staged.metaTitle = metaTitle
+				if (!onlyStaged) {
+					resource.masterData.current.metaTitle = metaTitle
+				}
+				checkForStagedChanges(resource)
+				return resource
+			},
+			setMetaDescription: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ metaDescription, staged }: ProductSetMetaDescriptionAction
+			) => {
+				const onlyStaged = staged !== undefined ? staged : true
+				resource.masterData.staged.metaDescription = metaDescription
+				if (!onlyStaged) {
+					resource.masterData.current.metaDescription = metaDescription
+				}
+				checkForStagedChanges(resource)
+				return resource
+			},
+			setMetaKeywords: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ metaKeywords, staged }: ProductSetMetaKeywordsAction
+			) => {
+				const onlyStaged = staged !== undefined ? staged : true
+				resource.masterData.staged.metaKeywords = metaKeywords
+				if (!onlyStaged) {
+					resource.masterData.current.metaKeywords = metaKeywords
+				}
+				checkForStagedChanges(resource)
+				return resource
+			},
+			addVariant: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ sku, key, prices, images, attributes, staged, assets }: ProductAddVariantAction
+			) => {
+				const variantDraft: ProductVariantDraft = {
+					sku: sku,
+					key: key,
+					prices: prices,
+					images: images,
+					attributes: attributes,
+					assets: assets
+				}
+
+				const dataStaged = resource.masterData.staged
+				const allVariants = [dataStaged.masterVariant, ...(dataStaged.variants ?? [])]
+				const maxId = allVariants.reduce((max, element) => (element.id > max ? element.id : max), 0);
+				const variant = variantFromDraft(maxId + 1, variantDraft)
+				dataStaged.variants.push(variant)
+
+				const onlyStaged = staged !== undefined ? staged : true
+
+				if (!onlyStaged) {
+					resource.masterData.current.variants.push(variant)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			removeVariant: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ id, sku, staged }: ProductRemoveVariantAction
+			) => {
+				const removeVariant = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						id,
+						sku
+					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${id} or sku ${sku} not found on product ${resource.id}`
+						)
+					}
+					if (isMasterVariant) {
+						throw new Error(
+							`Can not remove the variant [ID:${id}] for [Product:${resource.id}] since it's the master variant`
+						)
+					}
+
+					data.variants.splice(variantIndex, 1);
+				}
+
+				const onlyStaged = staged !== undefined ? staged : true
+
+				removeVariant(resource.masterData.staged)
+
+				if (!onlyStaged) {
+					removeVariant(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			changeMasterVariant: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ variantId, sku, staged }: ProductChangeMasterVariantAction
+			) => {
+				const setMaster = (data: Writable<ProductData>) => {
+					const { variant, isMasterVariant, variantIndex } = getVariant(
+						data,
+						variantId,
+						sku
+					)
+					if (!variant) {
+						throw new Error(
+							`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+						)
+					}
+
+					if (!isMasterVariant) {
+						// Save previous master variant
+						const masterVariantPrev = data.masterVariant
+						data.masterVariant = variant
+						// Remove new master from variants
+						data.variants.splice(variantIndex, 1)
+						// Add previous master to variants
+						data.variants.push(masterVariantPrev)
+					}
+				}
+
+				const onlyStaged = staged !== undefined ? staged : true
+
+				setMaster(resource.masterData.staged)
+
+				if (!onlyStaged) {
+					setMaster(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
+			setTaxCategory: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ taxCategory }: ProductSetTaxCategoryAction
+			) => {
+				const taxCategoryResolved = resolveTaxCategory(
+					taxCategory,
+					context,
+					this._storage
+				)
+
+				if (taxCategoryResolved) {
+					resource.taxCategory = taxCategoryResolved
+				}
+
+				return resource
+			},
+
+			// 'setPrices': () => {},
+			// 'setProductPriceCustomType': () => {},
+			// 'setProductPriceCustomField': () => {},
+			// 'setDiscountedPrice': () => {},
+			// 'setAttributeInAllVariants': () => {},
+			// 'addToCategory': () => {},
+			// 'setCategoryOrderHint': () => {},
+			// 'removeFromCategory': () => {},
+			// 'setSku': () => {},
+			// 'setProductVariantKey': () => {},
+			// 'setImageLabel': () => {},
+			// 'addAsset': () => {},
+			// 'removeAsset': () => {},
+			// 'setAssetKey': () => {},
+			// 'changeAssetOrder': () => {},
+			// 'changeAssetName': () => {},
+			// 'setAssetDescription': () => {},
+			// 'setAssetTags': () => {},
+			// 'setAssetSources': () => {},
+			// 'setAssetCustomType': () => {},
+			// 'setAssetCustomField': () => {},
+			// 'setSearchKeywords': () => {},
+			// 'revertStagedChanges': () => {},
+			// 'revertStagedVariantChanges': () => {},
+			// 'transitionState': () => {},
+		}
 }
 
 // Check if the product still has staged data that is different from the
@@ -853,3 +861,25 @@ const priceFromDraft = (draft: PriceDraft): Price => ({
 	country: draft.country,
 	value: createTypedMoney(draft.value),
 })
+
+const resolveTaxCategory = (
+	taxCategory: TaxCategoryResourceIdentifier | undefined,
+	context: RepositoryContext,
+	storage: AbstractStorage
+): TaxCategoryReference | undefined => {
+	let taxCategoryReference: TaxCategoryReference | undefined = undefined
+	if (taxCategory) {
+		try {
+			taxCategoryReference = getReferenceFromResourceIdentifier<TaxCategoryReference>(
+				taxCategory,
+				context.projectKey,
+				storage
+			)
+		} catch (err) {
+			throw new Error(
+				`Error resolving tax category with key '${taxCategory}'.`
+			)
+		}
+	}
+	return taxCategoryReference
+}
