@@ -24,13 +24,23 @@ const productTypeDraft: ProductTypeDraft = {
 	description: 'Test Product Type description',
 }
 
-const categoryDraft: CategoryDraft = {
+const categoryDraft1: CategoryDraft = {
 	key: 'category-1',
 	name: {
 		'nl-NL': 'Category One',
 	},
 	slug: {
 		'nl-NL': 'category_1',
+	},
+}
+
+const categoryDraft2: CategoryDraft = {
+	key: 'category-2',
+	name: {
+		'nl-NL': 'Category Two',
+	},
+	slug: {
+		'nl-NL': 'category_2',
 	},
 }
 
@@ -222,7 +232,8 @@ const unpublishedProductDraft: ProductDraft = {
 }
 
 let productType: ProductType
-let category: Category
+let category1: Category
+let category2: Category
 let taxCategory1: TaxCategory
 let taxCategory2: TaxCategory
 let productState: State
@@ -237,13 +248,21 @@ async function beforeAllProductTests(mock) {
 	expect(response.status).toBe(201)
 	productType = response.body
 
-	// Create Category
+	// Create Category 1
 	response = await supertest(mock.app)
 		.post('/dummy/categories')
-		.send(categoryDraft)
+		.send(categoryDraft1)
 
 	expect(response.status).toBe(201)
-	category = response.body
+	category1 = response.body
+
+	// Create Category 2
+	response = await supertest(mock.app)
+		.post('/dummy/categories')
+		.send(categoryDraft2)
+
+	expect(response.status).toBe(201)
+	category2 = response.body
 
 	// Create Tax Category 1
 	response = await supertest(mock.app)
@@ -295,7 +314,7 @@ describe('Product', () => {
 			},
 			categories: [
 				{
-					id: category.id,
+					id: category1.id,
 					typeId: 'category',
 				},
 			],
@@ -1036,5 +1055,71 @@ describe('Product update actions', () => {
 				],
 			})
 		expect(response.status).toBe(200)
+	})
+
+	test('addToCategory by id', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addToCategory',
+						category: {
+							typeId: 'category',
+							id: category2.id,
+						},
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.masterData.staged.categories).toHaveLength(2)
+		expect(response.body.masterData.current.categories).toHaveLength(2)
+	})
+
+	test('addToCategory by key', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addToCategory',
+						category: {
+							typeId: 'category',
+							key: category2.key,
+						},
+						staged: true
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.masterData.staged.categories).toHaveLength(2)
+		expect(response.body.masterData.current.categories).toHaveLength(1)
+	})
+
+	test('addToCategory fail', async () => {
+		assert(productPublished, 'product not created')
+		const fakeCategoryId = '00000000-0000-0000-0000-000000000000'
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'addToCategory',
+						category: {
+							typeId: 'category',
+							id: fakeCategoryId,
+						},
+						staged: true
+					},
+				],
+			})
+		expect(response.status).toBe(500)
+		expect(response.body.error).toBe(`Error resolving category '${fakeCategoryId}'.`)
 	})
 })

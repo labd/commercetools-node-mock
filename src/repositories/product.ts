@@ -19,6 +19,7 @@ import type {
 	ProductAddPriceAction,
 	ProductRemovePriceAction,
 	CategoryReference,
+	CategoryResourceIdentifier,
 	TaxCategoryReference,
 	TaxCategoryResourceIdentifier,
 	StateReference,
@@ -31,6 +32,7 @@ import type {
 	ProductRemoveVariantAction,
 	ProductChangeMasterVariantAction,
 	ProductSetTaxCategoryAction,
+	ProductAddToCategoryAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -74,16 +76,11 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// Resolve Product categories
 		const categoryReferences: CategoryReference[] = []
 		draft.categories?.forEach((category) => {
-			try {
-				categoryReferences.push(
-					getReferenceFromResourceIdentifier<CategoryReference>(
-						category,
-						context.projectKey,
-						this._storage
-					)
-				)
-			} catch (err) {
-				throw new Error(`Error resolving category '${category}'.`)
+			const categoryResolved = resolveCategory(category, context.projectKey, this._storage)
+			if (categoryResolved) {
+				categoryReferences.push(categoryResolved)
+			} else {
+				throw new Error(`Error resolving category '${category.id}'.`)
 			}
 		})
 
@@ -766,13 +763,37 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 				return resource
 			},
+			addToCategory: (
+				context: RepositoryContext,
+				resource: Writable<Product>,
+				{ category, staged, orderHint }: ProductAddToCategoryAction
+			) => {
+				const addCategory = (data: Writable<ProductData>) => {
+					const categoryResolved = resolveCategory(category, context.projectKey, this._storage)
+					if (categoryResolved) {
+						data.categories.push(categoryResolved)
+					} else {
+						throw new Error(`Error resolving category '${category.id}'.`)
+					}
+				}
+
+				const onlyStaged = staged !== undefined ? staged : true
+
+				addCategory(resource.masterData.staged)
+
+				if (!onlyStaged) {
+					addCategory(resource.masterData.current)
+				}
+				checkForStagedChanges(resource)
+
+				return resource
+			},
 
 			// 'setPrices': () => {},
 			// 'setProductPriceCustomType': () => {},
 			// 'setProductPriceCustomField': () => {},
 			// 'setDiscountedPrice': () => {},
 			// 'setAttributeInAllVariants': () => {},
-			// 'addToCategory': () => {},
 			// 'setCategoryOrderHint': () => {},
 			// 'removeFromCategory': () => {},
 			// 'setSku': () => {},
@@ -882,4 +903,24 @@ const resolveTaxCategory = (
 		}
 	}
 	return taxCategoryReference
+}
+
+const resolveCategory = (
+	category: CategoryResourceIdentifier | undefined,
+	projectKey: string,
+	storage: AbstractStorage
+): CategoryReference | undefined => {
+	let categoryReference: CategoryReference | undefined = undefined
+	if (category) {
+		try {
+			categoryReference = getReferenceFromResourceIdentifier<CategoryReference>(
+				category,
+				projectKey,
+				storage
+			)
+		} catch (err) {
+			console.error(`Category with id ${category.id} or key ${category.key} not found.`)
+		}
+	}
+	return categoryReference
 }
