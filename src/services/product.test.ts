@@ -747,4 +747,24 @@ describe('Product update actions', () => {
 		expect(response.body.version).toBe(2)
 		expect(response.body.masterData.staged.masterVariant.prices).toHaveLength(0)
 	})
+
+	test('changeName product', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'changeName',
+						name: 'new test published product',
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.masterData.staged.name).toBe('new test published product')
+		expect(response.body.masterData.current.name).toBe('new test published product')
+	})
 })

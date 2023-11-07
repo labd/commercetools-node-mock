@@ -21,6 +21,7 @@ import type {
 	CategoryReference,
 	TaxCategoryReference,
 	StateReference,
+	ProductChangeNameAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -422,7 +423,6 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
-
 		addPrice: (
 			context: RepositoryContext,
 			resource: Writable<Product>,
@@ -581,8 +581,19 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
-
-		// 'changeName': () => {},
+		changeName: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ name, staged }: ProductChangeNameAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.name = name
+			if (!onlyStaged) {
+				resource.masterData.current.name = name
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
 		// 'changeSlug': () => {},
 		// 'addVariant': () => {},
 		// 'removeVariant': () => {},
