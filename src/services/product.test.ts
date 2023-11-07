@@ -789,4 +789,26 @@ describe('Product update actions', () => {
 		expect(response.body.masterData.staged.slug).toEqual({'nl-NL': 'test-published-product-new'})
 		expect(response.body.masterData.current.slug).toEqual({'nl-NL': 'test-published-product-new'})
 	})
+
+	test('setMetaTitle product', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setMetaTitle',
+						metaTitle: {
+							'nl-NL': 'Unpublished product (new meta title)',
+						},
+						staged: false
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.masterData.staged.metaTitle).toEqual({'nl-NL': 'Unpublished product (new meta title)'})
+		expect(response.body.masterData.current.metaTitle).toEqual({'nl-NL': 'Unpublished product (new meta title)'})
+	})
 })
