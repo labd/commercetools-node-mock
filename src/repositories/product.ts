@@ -34,6 +34,7 @@ import type {
 	ProductSetTaxCategoryAction,
 	ProductAddToCategoryAction,
 	ProductRemoveFromCategoryAction,
+	ProductTransitionStateAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -111,16 +112,12 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// Resolve Product State
 		let productStateReference: StateReference | undefined = undefined
 		if (draft.state) {
-			try {
-				productStateReference =
-					getReferenceFromResourceIdentifier<StateReference>(
-						draft.state,
-						context.projectKey,
-						this._storage
-					)
-			} catch (err) {
-				throw new Error(`Error resolving state '${draft.state}'.`)
-			}
+			productStateReference =
+				getReferenceFromResourceIdentifier<StateReference>(
+					draft.state,
+					context.projectKey,
+					this._storage
+				)
 		}
 
 		const productData: ProductData = {
@@ -909,6 +906,33 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
+		transitionState: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ state, force }: ProductTransitionStateAction
+		) => {
+			let productStateReference: StateReference | undefined = undefined
+			if (state) {
+				productStateReference =
+					getReferenceFromResourceIdentifier<StateReference>(
+						state,
+						context.projectKey,
+						this._storage
+					)
+				resource.state = productStateReference
+			} else {
+				throw new CommercetoolsError<InvalidJsonInputError>(
+					{
+						code: 'InvalidJsonInput',
+						message: 'Request body does not contain valid JSON.',
+						detailedErrorMessage: 'actions -> state: Missing required value',
+					},
+					400
+				)
+			}
+
+			return resource
+		},
 
 		// 'setPrices': () => {},
 		// 'setProductPriceCustomType': () => {},
@@ -932,7 +956,6 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// 'setSearchKeywords': () => {},
 		// 'revertStagedChanges': () => {},
 		// 'revertStagedVariantChanges': () => {},
-		// 'transitionState': () => {},
 	}
 }
 

@@ -54,7 +54,7 @@ const taxcategoryDraft2: TaxCategoryDraft = {
 	key: 'tax-category-2',
 }
 
-const productStateDraft: StateDraft = {
+const productState1Draft: StateDraft = {
 	key: 'initial-state',
 	type: 'ProductState',
 	initial: true,
@@ -63,6 +63,18 @@ const productStateDraft: StateDraft = {
 	},
 	description: {
 		'nl-NL': 'Product initial state',
+	},
+}
+
+const productState2Draft: StateDraft = {
+	key: 'another-state',
+	type: 'ProductState',
+	initial: true,
+	name: {
+		'nl-NL': 'Another state',
+	},
+	description: {
+		'nl-NL': 'Product another state',
 	},
 }
 
@@ -236,7 +248,8 @@ let category1: Category
 let category2: Category
 let taxCategory1: TaxCategory
 let taxCategory2: TaxCategory
-let productState: State
+let productState1: State
+let productState2: State
 
 async function beforeAllProductTests(mock) {
 	let response
@@ -280,13 +293,21 @@ async function beforeAllProductTests(mock) {
 	expect(response.status).toBe(201)
 	taxCategory2 = response.body
 
-	// Create Product State
+	// Create Product State 1
 	response = await supertest(mock.app)
 		.post('/dummy/states')
-		.send(productStateDraft)
+		.send(productState1Draft)
 
 	expect(response.status).toBe(201)
-	productState = response.body
+	productState1 = response.body
+
+	// Create Product State 2
+	response = await supertest(mock.app)
+	.post('/dummy/states')
+	.send(productState2Draft)
+
+	expect(response.status).toBe(201)
+	productState2 = response.body
 }
 
 describe('Product', () => {
@@ -405,7 +426,7 @@ describe('Product', () => {
 			},
 			state: {
 				typeId: 'state',
-				id: productState.id,
+				id: productState1.id,
 			},
 			version: 1,
 		} as Product)
@@ -1266,5 +1287,29 @@ describe('Product update actions', () => {
 			})
 		expect(response.status).toBe(400)
 		expect(response.body.errors[0].code).toBe('InvalidOperation')
+	})
+
+	test('transitionState', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'transitionState',
+						state: {
+							typeId: 'state',
+							id: productState2.id,
+						},
+						force: false,
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.state).toMatchObject({
+			typeId: 'state',
+			id: productState2.id,
+		})
 	})
 })
