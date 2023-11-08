@@ -1203,4 +1203,68 @@ describe('Product update actions', () => {
 		expect(response.status).toBe(400)
 		expect(response.body.errors[0].code).toBe('InvalidJsonInput')
 	})
+
+	test('removeFromCategory', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'removeFromCategory',
+						category: {
+							typeId: 'category',
+							key: category1.key,
+						},
+						staged: false,
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.masterData.staged.categories).toHaveLength(0)
+		expect(response.body.masterData.current.categories).toHaveLength(0)
+	})
+
+	test('removeFromCategory fail 1', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'removeFromCategory',
+						category: {
+							typeId: 'category',
+							id: 'fake-category-id',
+						},
+						staged: false,
+					},
+				],
+			})
+		expect(response.status).toBe(400)
+		expect(response.body.errors[0].code).toBe('ReferencedResourceNotFound')
+	})
+
+	test('removeFromCategory fail 2', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'removeFromCategory',
+						category: {
+							typeId: 'category',
+							id: category2.id,
+						},
+						staged: false,
+					},
+				],
+			})
+		expect(response.status).toBe(400)
+		expect(response.body.errors[0].code).toBe('InvalidOperation')
+	})
 })

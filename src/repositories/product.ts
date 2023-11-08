@@ -20,6 +20,7 @@ import type {
 	ProductRemovePriceAction,
 	CategoryReference,
 	InvalidJsonInputError,
+	InvalidOperationError,
 	TaxCategoryReference,
 	StateReference,
 	ProductChangeNameAction,
@@ -32,6 +33,7 @@ import type {
 	ProductChangeMasterVariantAction,
 	ProductSetTaxCategoryAction,
 	ProductAddToCategoryAction,
+	ProductRemoveFromCategoryAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -841,6 +843,72 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
+		removeFromCategory: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ category, staged }: ProductRemoveFromCategoryAction
+		) => {
+			const removeCategory = (data: Writable<ProductData>) => {
+				if (category) {
+					const resolvedCategory =
+						getReferenceFromResourceIdentifier<CategoryReference>(
+							category,
+							context.projectKey,
+							this._storage
+						)
+
+					const foundCategory = data.categories.find(
+						(productCategory: CategoryReference) => {
+							if (productCategory.id == resolvedCategory.id) {
+								return productCategory
+							}
+							return false
+						}
+					)
+
+					if (!foundCategory) {
+						throw new CommercetoolsError<InvalidOperationError>(
+							{
+								code: 'InvalidOperation',
+								message:
+									`Cannot remove from category '${resolvedCategory.id}' because product ` +
+									`'${resource.masterData.current.name}' is not in that category.`,
+							},
+							400
+						)
+					}
+
+					data.categories = data.categories.filter(
+						(productCategory: CategoryReference) => {
+							if (productCategory.id == resolvedCategory.id) {
+								return false
+							}
+							return true
+						}
+					)
+				} else {
+					throw new CommercetoolsError<InvalidJsonInputError>(
+						{
+							code: 'InvalidJsonInput',
+							message: 'Request body does not contain valid JSON.',
+							detailedErrorMessage:
+								'actions -> category: Missing required value',
+						},
+						400
+					)
+				}
+			}
+
+			const onlyStaged = staged !== undefined ? staged : true
+			removeCategory(resource.masterData.staged)
+
+			if (!onlyStaged) {
+				removeCategory(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
 
 		// 'setPrices': () => {},
 		// 'setProductPriceCustomType': () => {},
@@ -848,7 +916,6 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// 'setDiscountedPrice': () => {},
 		// 'setAttributeInAllVariants': () => {},
 		// 'setCategoryOrderHint': () => {},
-		// 'removeFromCategory': () => {},
 		// 'setSku': () => {},
 		// 'setProductVariantKey': () => {},
 		// 'setImageLabel': () => {},
