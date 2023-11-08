@@ -791,14 +791,18 @@ describe('Product update actions', () => {
 					{
 						action: 'changeName',
 						name: 'new test published product',
-						staged: false
+						staged: false,
 					},
 				],
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.name).toBe('new test published product')
-		expect(response.body.masterData.current.name).toBe('new test published product')
+		expect(response.body.masterData.staged.name).toBe(
+			'new test published product'
+		)
+		expect(response.body.masterData.current.name).toBe(
+			'new test published product'
+		)
 	})
 
 	test('changeSlug product', async () => {
@@ -813,14 +817,18 @@ describe('Product update actions', () => {
 						slug: {
 							'nl-NL': 'test-published-product-new',
 						},
-						staged: false
+						staged: false,
 					},
 				],
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.slug).toMatchObject({'nl-NL': 'test-published-product-new'})
-		expect(response.body.masterData.current.slug).toMatchObject({'nl-NL': 'test-published-product-new'})
+		expect(response.body.masterData.staged.slug).toMatchObject({
+			'nl-NL': 'test-published-product-new',
+		})
+		expect(response.body.masterData.current.slug).toMatchObject({
+			'nl-NL': 'test-published-product-new',
+		})
 	})
 
 	test('setMetaTitle product', async () => {
@@ -835,14 +843,18 @@ describe('Product update actions', () => {
 						metaTitle: {
 							'nl-NL': 'Unpublished product (new meta title)',
 						},
-						staged: false
+						staged: false,
 					},
 				],
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.metaTitle).toMatchObject({'nl-NL': 'Unpublished product (new meta title)'})
-		expect(response.body.masterData.current.metaTitle).toMatchObject({'nl-NL': 'Unpublished product (new meta title)'})
+		expect(response.body.masterData.staged.metaTitle).toMatchObject({
+			'nl-NL': 'Unpublished product (new meta title)',
+		})
+		expect(response.body.masterData.current.metaTitle).toMatchObject({
+			'nl-NL': 'Unpublished product (new meta title)',
+		})
 	})
 
 	test('setMetaDescription product', async () => {
@@ -857,14 +869,18 @@ describe('Product update actions', () => {
 						metaDescription: {
 							'nl-NL': 'Unpublished product description (new meta description)',
 						},
-						staged: false
+						staged: false,
 					},
 				],
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.metaDescription).toMatchObject({'nl-NL': 'Unpublished product description (new meta description)'})
-		expect(response.body.masterData.current.metaDescription).toMatchObject({'nl-NL': 'Unpublished product description (new meta description)'})
+		expect(response.body.masterData.staged.metaDescription).toMatchObject({
+			'nl-NL': 'Unpublished product description (new meta description)',
+		})
+		expect(response.body.masterData.current.metaDescription).toMatchObject({
+			'nl-NL': 'Unpublished product description (new meta description)',
+		})
 	})
 
 	test('setMetaKeywords product', async () => {
@@ -879,14 +895,18 @@ describe('Product update actions', () => {
 						metaKeywords: {
 							'nl-NL': 'Test product (newmeta Keywords)',
 						},
-						staged: false
+						staged: false,
 					},
 				],
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.masterData.staged.metaKeywords).toMatchObject({'nl-NL': 'Test product (newmeta Keywords)'})
-		expect(response.body.masterData.current.metaKeywords).toMatchObject({'nl-NL': 'Test product (newmeta Keywords)'})
+		expect(response.body.masterData.staged.metaKeywords).toMatchObject({
+			'nl-NL': 'Test product (newmeta Keywords)',
+		})
+		expect(response.body.masterData.current.metaKeywords).toMatchObject({
+			'nl-NL': 'Test product (newmeta Keywords)',
+		})
 	})
 
 	test('addVariant product', async () => {
@@ -918,7 +938,7 @@ describe('Product update actions', () => {
 							},
 						],
 						assets: [],
-						staged: false
+						staged: false,
 					},
 				],
 			})
@@ -940,7 +960,7 @@ describe('Product update actions', () => {
 					{
 						action: 'removeVariant',
 						id: 2,
-						staged: false
+						staged: false,
 					},
 				],
 			})
@@ -960,7 +980,7 @@ describe('Product update actions', () => {
 					{
 						action: 'removeVariant',
 						sku: '1338',
-						staged: false
+						staged: false,
 					},
 				],
 			})
@@ -980,12 +1000,14 @@ describe('Product update actions', () => {
 					{
 						action: 'removeVariant',
 						id: 1,
-						staged: false
+						staged: false,
 					},
 				],
 			})
 		expect(response.status).toBe(500)
-		expect(response.body.error).toBe(`Can not remove the variant [ID:1] for [Product:${productPublished.id}] since it's the master variant`)
+		expect(response.body.error).toBe(
+			`Can not remove the variant [ID:1] for [Product:${productPublished.id}] since it's the master variant`
+		)
 	})
 
 	test('changeMasterVariant', async () => {
@@ -998,7 +1020,7 @@ describe('Product update actions', () => {
 					{
 						action: 'changeMasterVariant',
 						sku: '1338',
-						staged: false
+						staged: false,
 					},
 				],
 			})
@@ -1023,7 +1045,7 @@ describe('Product update actions', () => {
 					{
 						action: 'changeMasterVariant',
 						variantId: 1,
-						staged: false
+						staged: false,
 					},
 				],
 			})
@@ -1049,7 +1071,7 @@ describe('Product update actions', () => {
 						action: 'setTaxCategory',
 						taxCategory: {
 							typeId: 'tax-category',
-							id: taxCategory2.id
+							id: taxCategory2.id,
 						},
 					},
 				],
@@ -1058,7 +1080,7 @@ describe('Product update actions', () => {
 		expect(response.body.taxCategory.id).toBe(taxCategory2.id)
 	})
 
-	test('setTaxCategory fail1', async () => {
+	test('setTaxCategory fail 1', async () => {
 		assert(productPublished, 'product not created')
 		const fakeTaxCategoryId = '00000000-0000-0000-0000-000000000000'
 		const response = await supertest(ctMock.app)
@@ -1070,7 +1092,7 @@ describe('Product update actions', () => {
 						action: 'setTaxCategory',
 						taxCategory: {
 							typeId: 'tax-category',
-							id: fakeTaxCategoryId
+							id: fakeTaxCategoryId,
 						},
 					},
 				],
@@ -1079,7 +1101,7 @@ describe('Product update actions', () => {
 		expect(response.body.errors[0].code).toBe('ReferencedResourceNotFound')
 	})
 
-	test('setTaxCategory fail2', async () => {
+	test('setTaxCategory fail 2', async () => {
 		assert(productPublished, 'product not created')
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/products/${productPublished.id}`)
@@ -1089,7 +1111,7 @@ describe('Product update actions', () => {
 					{
 						action: 'setTaxCategory',
 						taxCategory: {
-							typeId: 'tax-category'
+							typeId: 'tax-category',
 						},
 					},
 				],
@@ -1111,7 +1133,7 @@ describe('Product update actions', () => {
 							typeId: 'category',
 							id: category2.id,
 						},
-						staged: false
+						staged: false,
 					},
 				],
 			})
@@ -1133,7 +1155,7 @@ describe('Product update actions', () => {
 							typeId: 'category',
 							key: category2.key,
 						},
-						staged: true
+						staged: true,
 					},
 				],
 			})
@@ -1156,7 +1178,7 @@ describe('Product update actions', () => {
 							typeId: 'category',
 							id: fakeCategoryId,
 						},
-						staged: true
+						staged: true,
 					},
 				],
 			})
@@ -1174,7 +1196,7 @@ describe('Product update actions', () => {
 					{
 						action: 'addToCategory',
 						category: null,
-						staged: true
+						staged: true,
 					},
 				],
 			})
