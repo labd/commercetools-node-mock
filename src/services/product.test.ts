@@ -303,8 +303,8 @@ async function beforeAllProductTests(mock) {
 
 	// Create Product State 2
 	response = await supertest(mock.app)
-	.post('/dummy/states')
-	.send(productState2Draft)
+		.post('/dummy/states')
+		.send(productState2Draft)
 
 	expect(response.status).toBe(201)
 	productState2 = response.body
