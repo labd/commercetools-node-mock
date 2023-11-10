@@ -439,7 +439,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			resource: Writable<Product>,
 			{ variantId, sku, price, staged }: ProductAddPriceAction
 		) => {
-			const addVariantPrice = (data: Writable<ProductData>) => {
+			const addVariantPrice = (data: Writable<ProductData>, priceToAdd: Price) => {
 				const { variant, isMasterVariant, variantIndex } = getVariant(
 					data,
 					variantId,
@@ -452,9 +452,9 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				}
 
 				if (variant.prices === undefined) {
-					variant.prices = [priceFromDraft(price)]
+					variant.prices = [priceToAdd]
 				} else {
-					variant.prices.push(priceFromDraft(price))
+					variant.prices.push(priceToAdd)
 				}
 
 				if (isMasterVariant) {
@@ -464,18 +464,21 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				}
 			}
 
+			// Pre-creating the price object ensures consistency between staged and current versions
+			const priceToAdd = priceFromDraft(price)
+
 			// If true, only the staged Attribute is set. If false, both current and
 			// staged Attribute is set.  Default is true
 			const onlyStaged = staged !== undefined ? staged : true
 
 			// Write the attribute to the staged data
-			addVariantPrice(resource.masterData.staged)
+			addVariantPrice(resource.masterData.staged, priceToAdd)
 
 			// Also write to published data is isStaged = false
 			// if isStaged is false we set the attribute on both the staged and
 			// published data.
 			if (!onlyStaged) {
-				addVariantPrice(resource.masterData.current)
+				addVariantPrice(resource.masterData.current, priceToAdd)
 			}
 			checkForStagedChanges(resource)
 
