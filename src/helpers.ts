@@ -1,3 +1,4 @@
+import { OutgoingHttpHeaders } from 'node:http'
 import { ParsedQs } from 'qs'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -59,3 +60,20 @@ export const queryParamsValue = (
 }
 
 export const cloneObject = <T>(o: T): T => JSON.parse(JSON.stringify(o))
+
+export const mapHeaderType = (
+	outgoingHttpHeaders: OutgoingHttpHeaders
+): HeadersInit => {
+	const headersInit: HeadersInit = {}
+	for (const key in outgoingHttpHeaders) {
+		const value = outgoingHttpHeaders[key]
+		if (Array.isArray(value)) {
+			// Join multiple values for the same header with a comma
+			headersInit[key] = value.join(', ')
+		} else if (value !== undefined) {
+			// Single value or undefined
+			headersInit[key] = value.toString()
+		}
+	}
+	return headersInit
+}

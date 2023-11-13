@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
-import supertest from 'supertest'
 import morgan from 'morgan'
+import inject from 'light-my-request'
 import { setupServer, SetupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 import { AbstractStorage, InMemoryStorage } from './storage/index.js'
@@ -16,6 +16,7 @@ import { ProjectService } from './services/project.js'
 import { createRepositories, RepositoryMap } from './repositories/index.js'
 import { createServices } from './services/index.js'
 import { ProjectRepository } from './repositories/project.js'
+import { mapHeaderType } from './helpers.js'
 
 export type CommercetoolsMockOptions = {
 	validateCredentials: boolean
@@ -175,56 +176,66 @@ export class CommercetoolsMock {
 			}
 		}
 
-		const app = this.app
+		const server = this.app
 		this._mswServer = setupServer(
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
-				const text = await request.text()
+				const body = await request.text()
 				const url = new URL(request.url)
-				const res = await supertest(app)
-					.post(url.pathname + '?' + url.searchParams.toString())
-					.set(copyHeaders(request.headers))
-					.send(text)
+				const headers = copyHeaders(request.headers)
 
-				return new HttpResponse(res.text, {
-					status: res.status,
-					headers: res.headers,
+				const res = await inject(server)
+					.post(url.pathname + '?' + url.searchParams.toString())
+					.body(body)
+					.headers(headers)
+					.end()
+				return new HttpResponse(res.body, {
+					status: res.statusCode,
+					headers: mapHeaderType(res.headers),
 				})
 			}),
 			http.get(`${this.options.apiHost}/*`, async ({ request }) => {
 				const body = await request.text()
 				const url = new URL(request.url)
-				const res = await supertest(app)
+				const headers = copyHeaders(request.headers)
+
+				const res = await inject(server)
 					.get(url.pathname + '?' + url.searchParams.toString())
-					.set(copyHeaders(request.headers))
-					.send(body)
-				return new HttpResponse(res.text, {
-					status: res.status,
-					headers: res.headers,
+					.body(body)
+					.headers(headers)
+					.end()
+				return new HttpResponse(res.body, {
+					status: res.statusCode,
+					headers: mapHeaderType(res.headers),
 				})
 			}),
 			http.post(`${this.options.apiHost}/*`, async ({ request }) => {
 				const body = await request.text()
 				const url = new URL(request.url)
-				const res = await supertest(app)
+				const headers = copyHeaders(request.headers)
+
+				const res = await inject(server)
 					.post(url.pathname + '?' + url.searchParams.toString())
-					.set(copyHeaders(request.headers))
-					.send(body)
-				return new HttpResponse(res.text, {
-					status: res.status,
-					headers: res.headers,
+					.body(body)
+					.headers(headers)
+					.end()
+				return new HttpResponse(res.body, {
+					status: res.statusCode,
+					headers: mapHeaderType(res.headers),
 				})
 			}),
 			http.delete(`${this.options.apiHost}/*`, async ({ request }) => {
 				const body = await request.text()
 				const url = new URL(request.url)
-				const res = await supertest(app)
-					.delete(url.pathname + '?' + url.searchParams.toString())
-					.set(copyHeaders(request.headers))
-					.send(body)
+				const headers = copyHeaders(request.headers)
 
-				return new HttpResponse(res.text, {
-					status: res.status,
-					headers: res.headers,
+				const res = await inject(server)
+					.delete(url.pathname + '?' + url.searchParams.toString())
+					.body(body)
+					.headers(headers)
+					.end()
+				return new HttpResponse(res.body, {
+					status: res.statusCode,
+					headers: mapHeaderType(res.headers),
 				})
 			})
 		)
