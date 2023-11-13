@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.2.0
+
+### Minor Changes
+
+- [`f66d431`](https://github.com/labd/commercetools-node-mock/commit/f66d431882a3044e1d51dcbcff9259573ec3fed6) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix Premature close errors by switching from supertest to light-my-request for mapping between msw and express
+
 ## 2.1.0
 
 ### Minor Changes
