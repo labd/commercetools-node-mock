@@ -18,6 +18,23 @@ import type {
 	ProductChangePriceAction,
 	ProductAddPriceAction,
 	ProductRemovePriceAction,
+	CategoryReference,
+	InvalidJsonInputError,
+	InvalidOperationError,
+	TaxCategoryReference,
+	StateReference,
+	ProductChangeNameAction,
+	ProductChangeSlugAction,
+	ProductSetMetaTitleAction,
+	ProductSetMetaDescriptionAction,
+	ProductSetMetaKeywordsAction,
+	ProductAddVariantAction,
+	ProductRemoveVariantAction,
+	ProductChangeMasterVariantAction,
+	ProductSetTaxCategoryAction,
+	ProductAddToCategoryAction,
+	ProductRemoveFromCategoryAction,
+	ProductTransitionStateAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -28,6 +45,7 @@ import {
 	getReferenceFromResourceIdentifier,
 } from './helpers.js'
 import deepEqual from 'deep-equal'
+import { CommercetoolsError } from '../exceptions.js'
 
 export class ProductRepository extends AbstractResourceRepository<'product'> {
 	getTypeId() {
@@ -57,16 +75,64 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			}
 		}
 
+		// Resolve Product categories
+		const categoryReferences: CategoryReference[] = []
+		draft.categories?.forEach((category) => {
+			if (category) {
+				categoryReferences.push(
+					getReferenceFromResourceIdentifier<CategoryReference>(
+						category,
+						context.projectKey,
+						this._storage
+					)
+				)
+			} else {
+				throw new CommercetoolsError<InvalidJsonInputError>(
+					{
+						code: 'InvalidJsonInput',
+						message: 'Request body does not contain valid JSON.',
+						detailedErrorMessage: 'categories: JSON object expected.',
+					},
+					400
+				)
+			}
+		})
+
+		// Resolve Tax category
+		let taxCategoryReference: TaxCategoryReference | undefined = undefined
+		if (draft.taxCategory) {
+			taxCategoryReference =
+				getReferenceFromResourceIdentifier<TaxCategoryReference>(
+					draft.taxCategory,
+					context.projectKey,
+					this._storage
+				)
+		}
+
+		// Resolve Product State
+		let productStateReference: StateReference | undefined = undefined
+		if (draft.state) {
+			productStateReference =
+				getReferenceFromResourceIdentifier<StateReference>(
+					draft.state,
+					context.projectKey,
+					this._storage
+				)
+		}
+
 		const productData: ProductData = {
 			name: draft.name,
 			slug: draft.slug,
-			categories: [],
+			description: draft.description,
+			categories: categoryReferences,
 			masterVariant: variantFromDraft(1, draft.masterVariant),
 			variants:
 				draft.variants?.map((variant, index) =>
 					variantFromDraft(index + 2, variant)
 				) ?? [],
-
+			metaTitle: draft.metaTitle,
+			metaDescription: draft.metaDescription,
+			metaKeywords: draft.metaKeywords,
 			searchKeywords: draft.searchKeywords ?? {},
 		}
 
@@ -74,6 +140,8 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			...getBaseResourceProperties(),
 			key: draft.key,
 			productType: productType,
+			taxCategory: taxCategoryReference,
+			state: productStateReference,
 			masterData: {
 				current: productData,
 				staged: productData,
@@ -366,13 +434,15 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
-
 		addPrice: (
 			context: RepositoryContext,
 			resource: Writable<Product>,
 			{ variantId, sku, price, staged }: ProductAddPriceAction
 		) => {
-			const addVariantPrice = (data: Writable<ProductData>) => {
+			const addVariantPrice = (
+				data: Writable<ProductData>,
+				priceToAdd: Price
+			) => {
 				const { variant, isMasterVariant, variantIndex } = getVariant(
 					data,
 					variantId,
@@ -385,9 +455,9 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				}
 
 				if (variant.prices === undefined) {
-					variant.prices = [priceFromDraft(price)]
+					variant.prices = [priceToAdd]
 				} else {
-					variant.prices.push(priceFromDraft(price))
+					variant.prices.push(priceToAdd)
 				}
 
 				if (isMasterVariant) {
@@ -397,18 +467,21 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				}
 			}
 
+			// Pre-creating the price object ensures consistency between staged and current versions
+			const priceToAdd = priceFromDraft(price)
+
 			// If true, only the staged Attribute is set. If false, both current and
 			// staged Attribute is set.  Default is true
 			const onlyStaged = staged !== undefined ? staged : true
 
 			// Write the attribute to the staged data
-			addVariantPrice(resource.masterData.staged)
+			addVariantPrice(resource.masterData.staged, priceToAdd)
 
 			// Also write to published data is isStaged = false
 			// if isStaged is false we set the attribute on both the staged and
 			// published data.
 			if (!onlyStaged) {
-				addVariantPrice(resource.masterData.current)
+				addVariantPrice(resource.masterData.current, priceToAdd)
 			}
 			checkForStagedChanges(resource)
 
@@ -525,21 +598,354 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 
 			return resource
 		},
+		changeName: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ name, staged }: ProductChangeNameAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.name = name
+			if (!onlyStaged) {
+				resource.masterData.current.name = name
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
+		changeSlug: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ slug, staged }: ProductChangeSlugAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.slug = slug
+			if (!onlyStaged) {
+				resource.masterData.current.slug = slug
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
+		setMetaTitle: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ metaTitle, staged }: ProductSetMetaTitleAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.metaTitle = metaTitle
+			if (!onlyStaged) {
+				resource.masterData.current.metaTitle = metaTitle
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
+		setMetaDescription: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ metaDescription, staged }: ProductSetMetaDescriptionAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.metaDescription = metaDescription
+			if (!onlyStaged) {
+				resource.masterData.current.metaDescription = metaDescription
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
+		setMetaKeywords: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ metaKeywords, staged }: ProductSetMetaKeywordsAction
+		) => {
+			const onlyStaged = staged !== undefined ? staged : true
+			resource.masterData.staged.metaKeywords = metaKeywords
+			if (!onlyStaged) {
+				resource.masterData.current.metaKeywords = metaKeywords
+			}
+			checkForStagedChanges(resource)
+			return resource
+		},
+		addVariant: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{
+				sku,
+				key,
+				prices,
+				images,
+				attributes,
+				staged,
+				assets,
+			}: ProductAddVariantAction
+		) => {
+			const variantDraft: ProductVariantDraft = {
+				sku: sku,
+				key: key,
+				prices: prices,
+				images: images,
+				attributes: attributes,
+				assets: assets,
+			}
 
-		// 'changeName': () => {},
-		// 'changeSlug': () => {},
-		// 'addVariant': () => {},
-		// 'removeVariant': () => {},
-		// 'changeMasterVariant': () => {},
+			const dataStaged = resource.masterData.staged
+			const allVariants = [
+				dataStaged.masterVariant,
+				...(dataStaged.variants ?? []),
+			]
+			const maxId = allVariants.reduce(
+				(max, element) => (element.id > max ? element.id : max),
+				0
+			)
+			const variant = variantFromDraft(maxId + 1, variantDraft)
+			dataStaged.variants.push(variant)
+
+			const onlyStaged = staged !== undefined ? staged : true
+
+			if (!onlyStaged) {
+				resource.masterData.current.variants.push(variant)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
+		removeVariant: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ id, sku, staged }: ProductRemoveVariantAction
+		) => {
+			const removeVariant = (data: Writable<ProductData>) => {
+				const { variant, isMasterVariant, variantIndex } = getVariant(
+					data,
+					id,
+					sku
+				)
+				if (!variant) {
+					throw new Error(
+						`Variant with id ${id} or sku ${sku} not found on product ${resource.id}`
+					)
+				}
+				if (isMasterVariant) {
+					throw new Error(
+						`Can not remove the variant [ID:${id}] for [Product:${resource.id}] since it's the master variant`
+					)
+				}
+
+				data.variants.splice(variantIndex, 1)
+			}
+
+			const onlyStaged = staged !== undefined ? staged : true
+
+			removeVariant(resource.masterData.staged)
+
+			if (!onlyStaged) {
+				removeVariant(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
+		changeMasterVariant: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ variantId, sku, staged }: ProductChangeMasterVariantAction
+		) => {
+			const setMaster = (data: Writable<ProductData>) => {
+				const { variant, isMasterVariant, variantIndex } = getVariant(
+					data,
+					variantId,
+					sku
+				)
+				if (!variant) {
+					throw new Error(
+						`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`
+					)
+				}
+
+				if (!isMasterVariant) {
+					// Save previous master variant
+					const masterVariantPrev = data.masterVariant
+					data.masterVariant = variant
+					// Remove new master from variants
+					data.variants.splice(variantIndex, 1)
+					// Add previous master to variants
+					data.variants.push(masterVariantPrev)
+				}
+			}
+
+			const onlyStaged = staged !== undefined ? staged : true
+
+			setMaster(resource.masterData.staged)
+
+			if (!onlyStaged) {
+				setMaster(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
+		setTaxCategory: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ taxCategory }: ProductSetTaxCategoryAction
+		) => {
+			let taxCategoryReference: TaxCategoryReference | undefined = undefined
+			if (taxCategory) {
+				taxCategoryReference =
+					getReferenceFromResourceIdentifier<TaxCategoryReference>(
+						taxCategory,
+						context.projectKey,
+						this._storage
+					)
+			} else {
+				throw new CommercetoolsError<InvalidJsonInputError>(
+					{
+						code: 'InvalidJsonInput',
+						message: 'Request body does not contain valid JSON.',
+						detailedErrorMessage:
+							'actions -> taxCategory: Missing required value',
+					},
+					400
+				)
+			}
+			resource.taxCategory = taxCategoryReference
+			return resource
+		},
+		addToCategory: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ category, staged, orderHint }: ProductAddToCategoryAction
+		) => {
+			const addCategory = (data: Writable<ProductData>) => {
+				if (category) {
+					data.categories.push(
+						getReferenceFromResourceIdentifier<CategoryReference>(
+							category,
+							context.projectKey,
+							this._storage
+						)
+					)
+				} else {
+					throw new CommercetoolsError<InvalidJsonInputError>(
+						{
+							code: 'InvalidJsonInput',
+							message: 'Request body does not contain valid JSON.',
+							detailedErrorMessage:
+								'actions -> category: Missing required value',
+						},
+						400
+					)
+				}
+			}
+
+			const onlyStaged = staged !== undefined ? staged : true
+
+			addCategory(resource.masterData.staged)
+
+			if (!onlyStaged) {
+				addCategory(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
+		removeFromCategory: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ category, staged }: ProductRemoveFromCategoryAction
+		) => {
+			const removeCategory = (data: Writable<ProductData>) => {
+				if (category) {
+					const resolvedCategory =
+						getReferenceFromResourceIdentifier<CategoryReference>(
+							category,
+							context.projectKey,
+							this._storage
+						)
+
+					const foundCategory = data.categories.find(
+						(productCategory: CategoryReference) => {
+							if (productCategory.id == resolvedCategory.id) {
+								return productCategory
+							}
+							return false
+						}
+					)
+
+					if (!foundCategory) {
+						throw new CommercetoolsError<InvalidOperationError>(
+							{
+								code: 'InvalidOperation',
+								message:
+									`Cannot remove from category '${resolvedCategory.id}' because product ` +
+									`'${resource.masterData.current.name}' is not in that category.`,
+							},
+							400
+						)
+					}
+
+					data.categories = data.categories.filter(
+						(productCategory: CategoryReference) => {
+							if (productCategory.id == resolvedCategory.id) {
+								return false
+							}
+							return true
+						}
+					)
+				} else {
+					throw new CommercetoolsError<InvalidJsonInputError>(
+						{
+							code: 'InvalidJsonInput',
+							message: 'Request body does not contain valid JSON.',
+							detailedErrorMessage:
+								'actions -> category: Missing required value',
+						},
+						400
+					)
+				}
+			}
+
+			const onlyStaged = staged !== undefined ? staged : true
+			removeCategory(resource.masterData.staged)
+
+			if (!onlyStaged) {
+				removeCategory(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
+		transitionState: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ state, force }: ProductTransitionStateAction
+		) => {
+			let productStateReference: StateReference | undefined = undefined
+			if (state) {
+				productStateReference =
+					getReferenceFromResourceIdentifier<StateReference>(
+						state,
+						context.projectKey,
+						this._storage
+					)
+				resource.state = productStateReference
+			} else {
+				throw new CommercetoolsError<InvalidJsonInputError>(
+					{
+						code: 'InvalidJsonInput',
+						message: 'Request body does not contain valid JSON.',
+						detailedErrorMessage: 'actions -> state: Missing required value',
+					},
+					400
+				)
+			}
+
+			return resource
+		},
+
 		// 'setPrices': () => {},
 		// 'setProductPriceCustomType': () => {},
 		// 'setProductPriceCustomField': () => {},
 		// 'setDiscountedPrice': () => {},
 		// 'setAttributeInAllVariants': () => {},
-		// 'addToCategory': () => {},
 		// 'setCategoryOrderHint': () => {},
-		// 'removeFromCategory': () => {},
-		// 'setTaxCategory': () => {},
 		// 'setSku': () => {},
 		// 'setProductVariantKey': () => {},
 		// 'setImageLabel': () => {},
@@ -554,12 +960,8 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		// 'setAssetCustomType': () => {},
 		// 'setAssetCustomField': () => {},
 		// 'setSearchKeywords': () => {},
-		// 'setMetaTitle': () => {},
-		// 'setMetaDescription': () => {},
-		// 'setMetaKeywords': () => {},
 		// 'revertStagedChanges': () => {},
 		// 'revertStagedVariantChanges': () => {},
-		// 'transitionState': () => {},
 	}
 }
 
@@ -616,6 +1018,7 @@ const variantFromDraft = (
 ): ProductVariant => ({
 	id: variantId,
 	sku: variant?.sku,
+	key: variant?.key,
 	attributes: variant?.attributes ?? [],
 	prices: variant?.prices?.map(priceFromDraft),
 	assets: [],
@@ -624,6 +1027,7 @@ const variantFromDraft = (
 
 const priceFromDraft = (draft: PriceDraft): Price => ({
 	id: uuidv4(),
+	key: draft.key,
 	country: draft.country,
 	value: createTypedMoney(draft.value),
 })
