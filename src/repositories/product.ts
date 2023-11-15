@@ -439,7 +439,10 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			resource: Writable<Product>,
 			{ variantId, sku, price, staged }: ProductAddPriceAction
 		) => {
-			const addVariantPrice = (data: Writable<ProductData>, priceToAdd: Price) => {
+			const addVariantPrice = (
+				data: Writable<ProductData>,
+				priceToAdd: Price
+			) => {
 				const { variant, isMasterVariant, variantIndex } = getVariant(
 					data,
 					variantId,

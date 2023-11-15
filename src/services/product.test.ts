@@ -739,7 +739,9 @@ describe('Product update actions', () => {
 				},
 			},
 		])
-		expect(response.body.masterData.staged.masterVariant.prices[1].id).toBe(response.body.masterData.current.masterVariant.prices[1].id)
+		expect(response.body.masterData.staged.masterVariant.prices[1].id).toBe(
+			response.body.masterData.current.masterVariant.prices[1].id
+		)
 	})
 
 	test('changePrice variant', async () => {
