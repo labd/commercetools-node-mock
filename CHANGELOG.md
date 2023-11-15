@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.3.0
+
+### Minor Changes
+
+- [`4c09caf`](https://github.com/labd/commercetools-node-mock/commit/4c09caf4b76c4c78120171065c4ac1944108593d) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Extended product resource support
+
 ## 2.2.0
 
 ### Minor Changes
