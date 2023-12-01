@@ -6,6 +6,7 @@ import type {
 	ProductDraft,
 	ProductPublishAction,
 	ProductSetAttributeAction,
+	ProductSetAttributeInAllVariantsAction,
 	ProductSetDescriptionAction,
 	ProductAddExternalImageAction,
 	ProductRemoveImageAction,
@@ -233,6 +234,65 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			// published data.
 			if (!onlyStaged) {
 				setAttr(resource.masterData.current)
+			}
+			checkForStagedChanges(resource)
+
+			return resource
+		},
+		setAttributeInAllVariants: (
+			context: RepositoryContext,
+			resource: Writable<Product>,
+			{ name, value, staged }: ProductSetAttributeInAllVariantsAction
+		) => {
+			const setAttrInAllVariants = (data: Writable<ProductData>) => {
+				if (!data.masterVariant.attributes) {
+					data.masterVariant.attributes = []
+				}
+
+				const existingAttr = data.masterVariant.attributes?.find(
+					(attr) => attr.name === name
+				)
+
+				if (existingAttr) {
+					existingAttr.value = value
+				} else {
+					data.masterVariant.attributes.push({
+						name,
+						value,
+					})
+				}
+
+				data.variants.forEach((variant) => {
+					if (!variant.attributes) {
+						variant.attributes = []
+					}
+
+					const existingAttr = variant.attributes.find(
+						(attr) => attr.name === name
+					)
+					if (existingAttr) {
+						existingAttr.value = value
+					} else {
+						variant.attributes.push({
+							name,
+							value,
+						})
+					}
+				})
+			}
+
+			// If true, only the staged Attribute is set. If false, both current and
+			// staged Attribute is set.  Default is true
+			const onlyStaged = staged !== undefined ? staged : true
+
+			// Write the attribute to the staged data
+			setAttrInAllVariants(resource.masterData.staged)
+
+			// Also write to published data is isStaged = false
+			// if isStaged is false we set the attribute on both the staged and
+			// published data.
+			if (!onlyStaged) {
+				setAttrInAllVariants(resource.masterData.current)
 			}
 			checkForStagedChanges(resource)
 

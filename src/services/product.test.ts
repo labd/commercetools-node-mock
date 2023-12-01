@@ -594,6 +594,106 @@ describe('Product update actions', () => {
 		expect(attr).toEqual({ name: 'test', value: 'foo' })
 	})
 
+	test('setAttributeInAllVariants overwrite', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setAttributeInAllVariants',
+						name: 'test',
+						value: 'foo',
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(
+			response.body.masterData.staged.masterVariant.attributes
+		).toHaveLength(1)
+
+		const masterVariantAttr1 =
+			response.body.masterData.staged.masterVariant.attributes[0]
+		expect(masterVariantAttr1).toEqual({ name: 'test', value: 'foo' })
+
+		response.body.masterData.staged.variants.forEach((variant) => {
+			expect(variant.attributes).toHaveLength(2)
+			expect(variant.attributes[1]).toEqual({
+				name: 'test',
+				value: 'foo',
+			})
+		})
+	})
+
+	test('setAttributeInAllVariants product staged', async () => {
+		assert(productPublished, 'product not created')
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setAttributeInAllVariants',
+						name: 'foo',
+						value: 'bar',
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(
+			response.body.masterData.staged.masterVariant.attributes
+		).toHaveLength(2)
+		const masterVariantAttr1 =
+			response.body.masterData.staged.masterVariant.attributes[0]
+		expect(masterVariantAttr1).toEqual({ name: 'test', value: 'test' })
+
+		const masterVariantAttr2 =
+			response.body.masterData.staged.masterVariant.attributes[1]
+		expect(masterVariantAttr2).toEqual({
+			name: 'foo',
+			value: 'bar',
+		})
+		response.body.masterData.staged.variants.forEach((variant) => {
+			expect(variant.attributes).toHaveLength(2)
+			expect(variant.attributes[1]).toEqual({
+				name: 'foo',
+				value: 'bar',
+			})
+		})
+	})
+
+	test('setAttributeInAllVariants and publish', async () => {
+		assert(productPublished, 'product not created')
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: 'setAttributeInAllVariants', name: 'foo', value: 'bar' },
+					{ action: 'publish' },
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(3)
+		expect(
+			response.body.masterData.current.masterVariant.attributes
+		).toHaveLength(2)
+		const attr = response.body.masterData.current.masterVariant.attributes[1]
+		expect(attr).toEqual({ name: 'foo', value: 'bar' })
+
+		response.body.masterData.current.variants.forEach((variant) => {
+			expect(variant.attributes).toHaveLength(2)
+			expect(variant.attributes[1]).toEqual({
+				name: 'foo',
+				value: 'bar',
+			})
+		})
+	})
+
 	test('addExternalImage variant', async () => {
 		assert(productPublished, 'product not created')
 
