@@ -48,6 +48,105 @@ describe('Categories Query', () => {
 	})
 })
 
+describe('categories changeName', () => {
+	const ctMock = new CommercetoolsMock()
+	let category: Category | undefined
+
+	beforeEach(async () => {
+		const response = await supertest(ctMock.app)
+			.post('/dummy/categories')
+			.send({
+				name: {
+					en: 'Top hat',
+				},
+				slug: {
+					en: 'top-hat',
+				},
+				orderHint: '0.1',
+			})
+		expect(response.status).toBe(201)
+		category = response.body as Category
+	})
+
+	test('changeName', async () => {
+		const changeNameResponse = await supertest(ctMock.app)
+			.post(`/dummy/categories/${category?.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'changeName',
+						name: {
+							en: 'Top hat - new name',
+						},
+					},
+				],
+			})
+
+		expect(changeNameResponse.status).toBe(200)
+		expect(changeNameResponse.body.name.en).toBe('Top hat - new name')
+	})
+})
+
+describe('categories changeParent', () => {
+	const ctMock = new CommercetoolsMock()
+	let category1: Category | undefined
+	let category2: Category | undefined
+
+	beforeEach(async () => {
+		const response1 = await supertest(ctMock.app)
+			.post('/dummy/categories')
+			.send({
+				name: {
+					en: 'Top hat',
+				},
+				slug: {
+					en: 'top-hat',
+				},
+				orderHint: '0.1',
+			})
+		expect(response1.status).toBe(201)
+		category1 = response1.body as Category
+
+		const response2 = await supertest(ctMock.app)
+			.post('/dummy/categories')
+			.send({
+				name: {
+					en: 'Top hat',
+				},
+				slug: {
+					en: 'top-hat',
+				},
+				orderHint: '0.1',
+			})
+		expect(response2.status).toBe(201)
+		category2 = response2.body as Category
+	})
+
+	test('changeParent', async () => {
+		const changeNameResponse = await supertest(ctMock.app)
+			.post(`/dummy/categories/${category2?.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'changeParent',
+						parent: {
+							typeId: 'category',
+							id: category1?.id,
+						},
+					},
+				],
+			})
+
+		expect(changeNameResponse.status).toBe(200)
+		expect(changeNameResponse.body.parent).toEqual({
+			typeId: 'category',
+			id: category1?.id,
+		})
+	})
+})
+
 describe('Categories add asset', () => {
 	const ctMock = new CommercetoolsMock()
 	let category: Category | undefined

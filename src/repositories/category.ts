@@ -4,6 +4,8 @@ import type {
 	Category,
 	CategoryAddAssetAction,
 	CategoryChangeAssetNameAction,
+	CategoryChangeNameAction,
+	CategoryChangeParentAction,
 	CategoryChangeSlugAction,
 	CategoryDraft,
 	CategoryRemoveAssetAction,
@@ -97,6 +99,30 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 			{ slug }: CategoryChangeSlugAction
 		) => {
 			resource.slug = slug
+		},
+		changeName: (
+			context: RepositoryContext,
+			resource: Writable<Category>,
+			{ name }: CategoryChangeNameAction
+		) => {
+			resource.name = name
+		},
+		changeParent: (
+			context: RepositoryContext,
+			resource: Writable<Category>,
+			{ parent }: CategoryChangeParentAction
+		) => {
+			const category = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				parent
+			)
+			if (!category) {
+				throw new Error('No category found for reference')
+			}
+			resource.parent = {
+				typeId: 'category',
+				id: category.id,
+			}
 		},
 		setKey: (
 			context: RepositoryContext,
