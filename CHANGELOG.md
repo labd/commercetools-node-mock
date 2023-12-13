@@ -1,5 +1,16 @@
 ## 1.11.0
 
+## 2.4.0
+
+### Minor Changes
+
+- [#129](https://github.com/labd/commercetools-node-mock/pull/129) [`92a232f`](https://github.com/labd/commercetools-node-mock/commit/92a232f12cc6ba0ff3cfcc76a1dcecc5f576a172) Thanks [@whyhankee](https://github.com/whyhankee)! - feat(categories): add extra actions
+
+  - changeName
+  - changeParent
+
+- [#126](https://github.com/labd/commercetools-node-mock/pull/126) [`a0946b7`](https://github.com/labd/commercetools-node-mock/commit/a0946b710911d3303727ce331a970a30643114fc) Thanks [@TiagoUmemura](https://github.com/TiagoUmemura)! - add support for setAttributeInAllVariants
+
 ## 2.3.0
 
 ### Minor Changes
