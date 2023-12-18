@@ -206,6 +206,8 @@ export class CommercetoolsMock {
 
 				if (res.statusCode === 200) {
 					const parsedBody = JSON.parse(res.body)
+					// Check if we have a count property (e.g. for query-lookups)
+					// or if we have a result object (e.g. for single lookups)
 					const resultCount =
 						'count' in parsedBody
 							? parsedBody.count
