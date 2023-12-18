@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.5.0
+
+### Minor Changes
+
+- [#130](https://github.com/labd/commercetools-node-mock/pull/130) [`1197e45`](https://github.com/labd/commercetools-node-mock/commit/1197e457be3255b87c5228c0ba258a98368e112e) Thanks [@mikedebock](https://github.com/mikedebock)! - Add support for HEAD requests
+
 ## 2.4.0
 
 ### Minor Changes
