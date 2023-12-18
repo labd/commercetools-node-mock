@@ -26,6 +26,26 @@ describe('Customer Update Actions', () => {
 		ctMock.clear()
 	})
 
+	test('exists', async () => {
+		assert(customer, 'customer not created')
+
+		const response = await supertest(ctMock.app)
+			.head(`/dummy/customers/${customer.id}`)
+			.send()
+
+		expect(response.status).toBe(200)
+	})
+
+	test('non-existent', async () => {
+		assert(customer, 'customer not created')
+
+		const response = await supertest(ctMock.app)
+			.head(`/dummy/customers/invalid-id`)
+			.send()
+
+		expect(response.status).toBe(404)
+	})
+
 	test('changeEmail', async () => {
 		assert(customer, 'customer not created')
 
