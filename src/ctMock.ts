@@ -193,6 +193,35 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				})
 			}),
+			http.head(`${this.options.apiHost}/*`, async ({ request }) => {
+				const body = await request.text()
+				const url = new URL(request.url)
+				const headers = copyHeaders(request.headers)
+
+				const res = await inject(server)
+					.get(url.pathname + '?' + url.searchParams.toString())
+					.body(body)
+					.headers(headers)
+					.end()
+
+				if (res.statusCode === 200) {
+					const parsedBody = JSON.parse(res.body)
+					const resultCount =
+						'count' in parsedBody
+							? parsedBody.count
+							: Object.keys(parsedBody).length
+
+					return new HttpResponse(null, {
+						status: resultCount > 0 ? 200 : 404,
+						headers: mapHeaderType(res.headers),
+					})
+				}
+
+				return new HttpResponse(null, {
+					status: res.statusCode,
+					headers: mapHeaderType(res.headers),
+				})
+			}),
 			http.get(`${this.options.apiHost}/*`, async ({ request }) => {
 				const body = await request.text()
 				const url = new URL(request.url)

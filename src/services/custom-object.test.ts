@@ -47,7 +47,23 @@ describe('CustomObject retrieve', () => {
 		ctMock.clear()
 	})
 
-	test('createget', async () => {
+	test('exists', async () => {
+		const response = await supertest(ctMock.app)
+			.head('/dummy/custom-objects/my-container/my-key')
+			.send()
+
+		expect(response.status).toBe(200)
+	})
+
+	test('non-existent', async () => {
+		const response = await supertest(ctMock.app)
+			.head('/dummy/custom-objects/invalid-container/invalid')
+			.send()
+
+		expect(response.status).toBe(404)
+	})
+
+	test('get', async () => {
 		const response = await supertest(ctMock.app)
 			.get('/dummy/custom-objects/my-container/my-key')
 			.send()
