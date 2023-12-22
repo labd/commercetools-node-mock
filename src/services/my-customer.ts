@@ -3,6 +3,7 @@ import { CustomerRepository } from '../repositories/customer.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
 import { hashPassword } from '../lib/password.js'
+import { Update } from '@commercetools/platform-sdk'
 
 export class MyCustomerService extends AbstractService {
 	public repository: CustomerRepository
@@ -24,6 +25,7 @@ export class MyCustomerService extends AbstractService {
 		this.extraRoutes(router)
 
 		router.get('', this.getMe.bind(this))
+		router.post('', this.updateMe.bind(this))
 
 		router.post('/signup', this.signUp.bind(this))
 
@@ -38,6 +40,24 @@ export class MyCustomerService extends AbstractService {
 			return response.status(404).send('Not found')
 		}
 		return response.status(200).send(resource)
+	}
+
+	updateMe(request: Request, response: Response) {
+		const resource = this.repository.getMe(getRepositoryContext(request))
+
+		if (!resource) {
+			return response.status(404).send('Not found')
+		}
+		const updateRequest: Update = request.body
+		const updatedResource = this.repository.processUpdateActions(
+			getRepositoryContext(request),
+			resource,
+			updateRequest.version,
+			updateRequest.actions
+		)
+
+		const result = this._expandWithId(request, updatedResource.id)
+		return response.status(200).send(result)
 	}
 
 	signUp(request: Request, response: Response) {

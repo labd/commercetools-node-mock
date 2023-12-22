@@ -15,6 +15,7 @@ import { MyCartService } from './my-cart.js'
 import { MyCustomerService } from './my-customer.js'
 import { MyOrderService } from './my-order.js'
 import { MyPaymentService } from './my-payment.js'
+import { MyShoppingListService } from './my-shopping-list.js'
 import { OrderService } from './order.js'
 import { PaymentService } from './payment.js'
 import { ProductDiscountService } from './product-discount.js'
@@ -61,6 +62,7 @@ export const createServices = (router: any, repos: any) => ({
 	'my-order': new MyOrderService(router, repos['my-order']),
 	'my-customer': new MyCustomerService(router, repos['my-customer']),
 	'my-payment': new MyPaymentService(router, repos['my-payment']),
+	'my-shopping-list': new MyShoppingListService(router, repos['my-shopping-list']),
 	'shipping-method': new ShippingMethodService(
 		router,
 		repos['shipping-method']

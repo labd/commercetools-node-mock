@@ -59,6 +59,7 @@ export const createRepositories = (storage: AbstractStorage) => ({
 	'my-order': new MyOrderRepository(storage),
 	'my-customer': new CustomerRepository(storage),
 	'my-payment': new PaymentRepository(storage),
+	'my-shopping-list': new ShoppingListRepository(storage),
 	product: new ProductRepository(storage),
 	'product-type': new ProductTypeRepository(storage),
 	'product-discount': new ProductDiscountRepository(storage),

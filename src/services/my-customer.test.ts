@@ -1,6 +1,6 @@
 import type { MyCustomerDraft } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import { afterEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../index.js'
 
 const ctMock = new CommercetoolsMock()
@@ -49,5 +49,60 @@ describe('Me', () => {
 
 		expect(response.status).toBe(200)
 		expect(response.body).toEqual(createResponse.body.customer)
+	})
+})
+
+describe('/me', () => {
+	afterEach(() => {
+		ctMock.clear()
+	})
+
+	beforeEach(() => {
+		ctMock.project('dummy').add('customer', {
+			id: '123',
+			createdAt: '2021-03-18T14:00:00.000Z',
+			version: 2,
+			lastModifiedAt: '2021-03-18T14:00:00.000Z',
+			email: 'foo@example.org',
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: 'password',
+			custom: { type: { typeId: 'type', id: '' }, fields: {} },
+		})
+	})
+
+	test('Get me', async () => {
+		const response = await supertest(ctMock.app).get('/dummy/me')
+
+		expect(response.status).toBe(200)
+		expect(response.body).toEqual({
+			id: '123',
+			createdAt: '2021-03-18T14:00:00.000Z',
+			version: 2,
+			lastModifiedAt: '2021-03-18T14:00:00.000Z',
+			email: 'foo@example.org',
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: 'password',
+			custom: {
+				fields: {},
+				type: {
+					id: '',
+					typeId: 'type',
+				},
+			},
+		})
+	})
+
+	test('setCustomField', async () => {
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/me`)
+			.send({
+				version: 2,
+				actions: [{ action: 'setCustomField', name: 'foobar', value: true }],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(3)
+		expect(response.body.custom.fields.foobar).toBe(true)
 	})
 })
