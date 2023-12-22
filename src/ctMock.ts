@@ -165,25 +165,18 @@ export class CommercetoolsMock {
 		return app
 	}
 
-	private startServer() {
-		// Check if there are any other servers running
-		if (_globalListeners.length > 0) {
-			if (this._mswServer !== undefined) {
-				throw new Error('Server already started')
-			} else {
-				console.warn("Server wasn't stopped properly, clearing")
-				_globalListeners.forEach((listener) => listener.close())
-			}
-		}
-
-		const server = this.app
-		this._mswServer = setupServer(
+	// registerHandlers is an alternative way to work with commercetools-mock, it
+	// allows you to manage msw server yourself and register the handlers needed
+	// for commercetools-mock to work.
+	public registerHandlers(server: SetupServer) {
+		const app = this.app
+		server.use(
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
 				const body = await request.text()
 				const url = new URL(request.url)
 				const headers = copyHeaders(request.headers)
 
-				const res = await inject(server)
+				const res = await inject(app)
 					.post(url.pathname + '?' + url.searchParams.toString())
 					.body(body)
 					.headers(headers)
@@ -229,7 +222,7 @@ export class CommercetoolsMock {
 				const url = new URL(request.url)
 				const headers = copyHeaders(request.headers)
 
-				const res = await inject(server)
+				const res = await inject(app)
 					.get(url.pathname + '?' + url.searchParams.toString())
 					.body(body)
 					.headers(headers)
@@ -244,7 +237,7 @@ export class CommercetoolsMock {
 				const url = new URL(request.url)
 				const headers = copyHeaders(request.headers)
 
-				const res = await inject(server)
+				const res = await inject(app)
 					.post(url.pathname + '?' + url.searchParams.toString())
 					.body(body)
 					.headers(headers)
@@ -259,7 +252,7 @@ export class CommercetoolsMock {
 				const url = new URL(request.url)
 				const headers = copyHeaders(request.headers)
 
-				const res = await inject(server)
+				const res = await inject(app)
 					.delete(url.pathname + '?' + url.searchParams.toString())
 					.body(body)
 					.headers(headers)
@@ -270,7 +263,22 @@ export class CommercetoolsMock {
 				})
 			})
 		)
-		this._mswServer.listen({
+	}
+
+	private startServer() {
+		// Check if there are any other servers running
+		if (_globalListeners.length > 0) {
+			if (this._mswServer !== undefined) {
+				throw new Error('Server already started')
+			} else {
+				console.warn("Server wasn't stopped properly, clearing")
+				_globalListeners.forEach((listener) => listener.close())
+			}
+		}
+
+		const server = setupServer()
+		this.registerHandlers(server)
+		server.listen({
 			// We need to allow requests done by supertest
 			onUnhandledRequest: (request, print) => {
 				const url = new URL(request.url)
@@ -280,7 +288,7 @@ export class CommercetoolsMock {
 				print.error()
 			},
 		})
-
-		_globalListeners.push(this._mswServer)
+		_globalListeners.push(server)
+		this._mswServer = server
 	}
 }
