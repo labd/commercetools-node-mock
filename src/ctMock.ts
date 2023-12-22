@@ -78,7 +78,6 @@ export class CommercetoolsMock {
 	}
 
 	clear() {
-		this._mswServer?.resetHandlers()
 		this._storage.clear()
 	}
 
