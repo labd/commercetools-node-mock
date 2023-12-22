@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.6.0
+
+### Minor Changes
+
+- [`419a0e1`](https://github.com/labd/commercetools-node-mock/commit/419a0e1556aeb220dd142f8ecc0cbbf01c7bec2a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve integration options with msw by adding registerHandlers()
+
 ## 2.5.0
 
 ### Minor Changes
