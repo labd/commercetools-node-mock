@@ -1,5 +1,15 @@
 ## 1.11.0
 
+## 2.7.0
+
+### Minor Changes
+
+- [`b1370cf`](https://github.com/labd/commercetools-node-mock/commit/b1370cfbb2b43f136a37473fcc1fb41d75e08fe8) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve support for /me endpoint
+
+### Patch Changes
+
+- [`f6f9069`](https://github.com/labd/commercetools-node-mock/commit/f6f90692099a83f8fa755c29fd3b8d0e7dc5f7b8) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Don't clear msw handlers when calling ctMock.clear()
+
 ## 2.6.0
 
 ### Minor Changes
