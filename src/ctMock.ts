@@ -191,7 +191,7 @@ export class CommercetoolsMock {
 				const url = new URL(request.url)
 				const headers = copyHeaders(request.headers)
 
-				const res = await inject(server)
+				const res = await inject(app)
 					.get(url.pathname + '?' + url.searchParams.toString())
 					.body(body)
 					.headers(headers)
