@@ -74,8 +74,8 @@ describe('A module', () => {
 
 ## Contributing
 
-
 ### Adding a new service
+
 Implement the following:
 
 - New repository in src/repositories
