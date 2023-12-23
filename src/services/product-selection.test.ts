@@ -29,7 +29,6 @@ describe('product-selection', () => {
 			key: 'foo',
 			version: 1,
 			productCount: 0,
-			type: 'individual',
 			mode: 'Individual',
 		})
 	})
