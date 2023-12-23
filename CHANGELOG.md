@@ -1,5 +1,25 @@
 ## 1.11.0
 
+## 2.8.0
+
+### Minor Changes
+
+- [`361fbef`](https://github.com/labd/commercetools-node-mock/commit/361fbef5983b7f150487cef830f4aed72d059586) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add support for reviews endpoint
+
+- [`16e1237`](https://github.com/labd/commercetools-node-mock/commit/16e12373da7b45c6332ea1549842b8721cef05a2) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add support for returnInfo on orders
+
+- [`61e5729`](https://github.com/labd/commercetools-node-mock/commit/61e5729f2777d066e78328b276507d7e19d2bcad) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add priceSelector logic to product-projections query endpoint
+
+### Patch Changes
+
+- [`dded2b9`](https://github.com/labd/commercetools-node-mock/commit/dded2b9ce4dda72a3057b61151f7852adaab7cd2) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Expose the MSW server via mswServer()
+
+- [`efc6495`](https://github.com/labd/commercetools-node-mock/commit/efc64953ee32c0d1cc3f2b2b97d6b00259b09227) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Upgrade to commercetools sdk 6.0.0
+
+- [`a7d3305`](https://github.com/labd/commercetools-node-mock/commit/a7d3305e3e8428095cf93dcdf9eb78a1599a0059) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Don't overwrite the expanded obj if already set
+
+- [`aa4c63a`](https://github.com/labd/commercetools-node-mock/commit/aa4c63af0770665a2054ac23e591bc76e1af4475) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Keep price channel intact when creating product
+
 ## 2.7.0
 
 ### Minor Changes
