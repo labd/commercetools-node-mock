@@ -70,15 +70,12 @@ export class ProductProjectionSearch {
 		const markMatchingVariant = params.markMatchingVariants ?? false
 
 		// Apply the priceSelector
-		applyPriceSelector(
-			resources,
-			{
-				country: params.priceCountry,
-				channel: params.priceChannel,
-				customerGroup: params.priceCustomerGroup,
-				currency: params.priceCurrency,
-			},
-		)
+		applyPriceSelector(resources, {
+			country: params.priceCountry,
+			channel: params.priceChannel,
+			customerGroup: params.priceCustomerGroup,
+			currency: params.priceCurrency,
+		})
 
 		// Apply filters pre facetting
 		if (params.filter) {

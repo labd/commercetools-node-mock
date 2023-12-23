@@ -104,12 +104,16 @@ export class ProductProjectionRepository extends AbstractResourceRepository<'pro
 		// We do this after the filtering, since the docs mention:
 		// Only available when Price selection is used. Cannot be used in a Query
 		// Predicate.
-		applyPriceSelector(resources, {
-			country: params.priceCountry,
-			channel: params.priceChannel,
-			customerGroup: params.priceCustomerGroup,
-			currency: params.priceCurrency,
-		}, true)
+		applyPriceSelector(
+			resources,
+			{
+				country: params.priceCountry,
+				channel: params.priceChannel,
+				customerGroup: params.priceCustomerGroup,
+				currency: params.priceCurrency,
+			},
+			true
+		)
 
 		// Expand the resources
 		if (params.expand !== undefined) {

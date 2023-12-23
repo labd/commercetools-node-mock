@@ -1,8 +1,6 @@
 import {
 	ChannelReference,
-	ChannelResourceIdentifier,
 	ProductReference,
-	ProductResourceIdentifier,
 	type Review,
 	type ReviewDraft,
 	type ReviewUpdateAction,
@@ -11,7 +9,10 @@ import {
 import { getBaseResourceProperties } from '../helpers.js'
 import type { Writable } from '../types.js'
 import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
-import { createCustomFields, getReferenceFromResourceIdentifier } from './helpers.js'
+import {
+	createCustomFields,
+	getReferenceFromResourceIdentifier,
+} from './helpers.js'
 
 export class ReviewRepository extends AbstractResourceRepository<'review'> {
 	getTypeId() {
