@@ -23,6 +23,7 @@ import { ProductProjectionService } from './product-projection.js'
 import { ProductSelectionService } from './product-selection.js'
 import { ProductTypeService } from './product-type.js'
 import { ProductService } from './product.js'
+import { ReviewService } from './reviews.js'
 import { ShippingMethodService } from './shipping-method.js'
 import { ShoppingListService } from './shopping-list.js'
 import { StandAlonePriceService } from './standalone-price.js'
@@ -84,6 +85,7 @@ export const createServices = (router: any, repos: any) => ({
 		router,
 		repos['product-selection']
 	),
+	'reviews': new ReviewService(router, repos['review']),
 	'shopping-list': new ShoppingListService(router, repos['shopping-list']),
 	state: new StateService(router, repos['state']),
 	store: new StoreService(router, repos['store']),
