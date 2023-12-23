@@ -3,11 +3,15 @@ import type {
 	CartReference,
 	CustomLineItem,
 	CustomLineItemDraft,
+	CustomLineItemImportDraft,
+	CustomLineItemReturnItem,
 	GeneralError,
 	LineItem,
 	LineItemImportDraft,
+	LineItemReturnItem,
 	Order,
 	OrderAddPaymentAction,
+	OrderAddReturnInfoAction,
 	OrderChangeOrderStateAction,
 	OrderChangePaymentStateAction,
 	OrderFromCartDraft,
@@ -24,6 +28,7 @@ import type {
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
+	ReturnInfo,
 	State,
 	Store,
 } from '@commercetools/platform-sdk'
@@ -296,6 +301,43 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 				typeId: 'payment',
 				id: payment.id!,
 			})
+		},
+		addReturnInfo: (
+			context: RepositoryContext,
+			resource: Writable<Order>,
+			info: OrderAddReturnInfoAction
+		) => {
+			if (!resource.returnInfo) {
+				resource.returnInfo = []
+			}
+
+			const resolved: ReturnInfo = {
+				items: info.items.map((item) => {
+					const common = {
+						...getBaseResourceProperties(),
+						quantity: item.quantity,
+						paymentState: 'Initial',
+						shipmentState: 'Initial',
+						comment: item.comment,
+					}
+					if (item.customLineItemId) {
+						return {
+							...common,
+							type: 'CustomLineItemReturnItem',
+							customLineItemId: item.customLineItemId,
+						} as CustomLineItemReturnItem
+					}
+					return {
+						...common,
+						type: 'LineItemReturnItem',
+						lineItemId: item.customLineItemId || item.lineItemId,
+					} as LineItemReturnItem
+				}),
+				returnTrackingId: info.returnTrackingId,
+				returnDate: info.returnDate,
+			}
+
+			resource.returnInfo.push(resolved)
 		},
 		changeOrderState: (
 			context: RepositoryContext,
