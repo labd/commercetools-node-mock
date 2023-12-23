@@ -36,6 +36,7 @@ import type {
 	ProductAddToCategoryAction,
 	ProductRemoveFromCategoryAction,
 	ProductTransitionStateAction,
+	ChannelReference,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import type { Writable } from '../types.js'
@@ -126,10 +127,10 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			slug: draft.slug,
 			description: draft.description,
 			categories: categoryReferences,
-			masterVariant: variantFromDraft(1, draft.masterVariant),
+			masterVariant: this.variantFromDraft(context, 1, draft.masterVariant),
 			variants:
 				draft.variants?.map((variant, index) =>
-					variantFromDraft(index + 2, variant)
+					this.variantFromDraft(context, index + 2, variant)
 				) ?? [],
 			metaTitle: draft.metaTitle,
 			metaDescription: draft.metaDescription,
@@ -154,6 +155,38 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		this.saveNew(context, resource)
 
 		return resource
+	}
+
+	private variantFromDraft(
+		context: RepositoryContext,
+		variantId: number,
+		variant: ProductVariantDraft
+	): ProductVariant {
+		return {
+			id: variantId,
+			sku: variant?.sku,
+			key: variant?.key,
+			attributes: variant?.attributes ?? [],
+			prices: variant?.prices?.map((p) => this.priceFromDraft(context, p)),
+			assets: [],
+			images: [],
+		}
+	}
+
+	private priceFromDraft(context: RepositoryContext, draft: PriceDraft): Price {
+		return {
+			id: uuidv4(),
+			key: draft.key,
+			country: draft.country,
+			value: createTypedMoney(draft.value),
+			channel: draft.channel
+				? getReferenceFromResourceIdentifier<ChannelReference>(
+						draft.channel,
+						context.projectKey,
+						this._storage
+				  )
+				: undefined,
+		}
 	}
 
 	actions: Partial<
@@ -528,7 +561,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			}
 
 			// Pre-creating the price object ensures consistency between staged and current versions
-			const priceToAdd = priceFromDraft(price)
+			const priceToAdd = this.priceFromDraft(context, price)
 
 			// If true, only the staged Attribute is set. If false, both current and
 			// staged Attribute is set.  Default is true
@@ -754,7 +787,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 				(max, element) => (element.id > max ? element.id : max),
 				0
 			)
-			const variant = variantFromDraft(maxId + 1, variantDraft)
+			const variant = this.variantFromDraft(context, maxId + 1, variantDraft)
 			dataStaged.variants.push(variant)
 
 			const onlyStaged = staged !== undefined ? staged : true
@@ -1071,23 +1104,3 @@ const getVariant = (
 				: -1,
 	}
 }
-
-const variantFromDraft = (
-	variantId: number,
-	variant: ProductVariantDraft
-): ProductVariant => ({
-	id: variantId,
-	sku: variant?.sku,
-	key: variant?.key,
-	attributes: variant?.attributes ?? [],
-	prices: variant?.prices?.map(priceFromDraft),
-	assets: [],
-	images: [],
-})
-
-const priceFromDraft = (draft: PriceDraft): Price => ({
-	id: uuidv4(),
-	key: draft.key,
-	country: draft.country,
-	value: createTypedMoney(draft.value),
-})
