@@ -264,6 +264,10 @@ export class CommercetoolsMock {
 		)
 	}
 
+	public mswServer() {
+		return this._mswServer
+	}
+
 	private startServer() {
 		// Check if there are any other servers running
 		if (_globalListeners.length > 0) {
