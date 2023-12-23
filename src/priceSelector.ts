@@ -21,11 +21,13 @@ export type PriceSelector = {
  */
 export const applyPriceSelector = (
 	products: ProductProjection[],
-	selector: PriceSelector
+	selector: PriceSelector,
+	noScopedPrice: boolean = false
 ) => {
 	validatePriceSelector(selector)
 
 	for (const product of products) {
+		// Get list of all variants (master + variants)
 		const variants: Writable<ProductVariant>[] = [
 			product.masterVariant,
 			...(product.variants ?? []),
@@ -38,10 +40,13 @@ export const applyPriceSelector = (
 			if (scopedPrices.length > 0) {
 				const price = scopedPrices[0]
 
-				variant.scopedPriceDiscounted = false
-				variant.scopedPrice = {
-					...price,
-					currentValue: price.value,
+				variant.price = scopedPrices[0]
+				if (!noScopedPrice) {
+					variant.scopedPriceDiscounted = false
+					variant.scopedPrice = {
+						...price,
+						currentValue: price.value,
+					}
 				}
 			}
 		}
