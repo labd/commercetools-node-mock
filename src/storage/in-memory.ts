@@ -415,12 +415,15 @@ export class InMemoryStorage extends AbstractStorage {
 			reference.typeId !== undefined &&
 			(reference.id !== undefined || reference.key !== undefined)
 		) {
-			// @ts-ignore
-			reference.obj = this.getByResourceIdentifier(projectKey, {
-				typeId: reference.typeId,
-				id: reference.id,
-				key: reference.key,
-			} as ResourceIdentifier)
+			// First check if the object is already resolved. This is the case when
+			// the complete resource is pushed via the .add() method.
+			if (!reference.obj) {
+				reference.obj = this.getByResourceIdentifier(projectKey, {
+					typeId: reference.typeId,
+					id: reference.id,
+					key: reference.key,
+				} as ResourceIdentifier)
+			}
 			if (expand) {
 				this._resolveResource(projectKey, reference.obj, expand)
 			}
