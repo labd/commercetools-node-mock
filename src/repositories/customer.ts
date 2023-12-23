@@ -51,6 +51,7 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 			password: draft.password ? hashPassword(draft.password) : undefined,
 			isEmailVerified: draft.isEmailVerified || false,
 			addresses: [],
+			customerNumber: draft.customerNumber,
 		}
 		this.saveNew(context, resource)
 		return resource
