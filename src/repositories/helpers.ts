@@ -180,7 +180,7 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
 	if (!resource) {
 		const errIdentifier = resourceIdentifier.key
 			? `key '${resourceIdentifier.key}'`
-			: `identifier '${resourceIdentifier.key}'`
+			: `identifier '${resourceIdentifier.id}'`
 
 		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
 			{
