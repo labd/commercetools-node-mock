@@ -22,7 +22,6 @@ export class ProductSelectionRepository extends AbstractResourceRepository<'prod
 			productCount: 0,
 			key: draft.key,
 			name: draft.name,
-			type: 'individual',
 			mode: 'Individual',
 		}
 		this.saveNew(context, resource)

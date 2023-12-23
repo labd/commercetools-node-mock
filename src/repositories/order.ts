@@ -227,7 +227,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 
 	private customLineItemFromImportDraft(
 		context: RepositoryContext,
-		draft: CustomLineItemDraft
+		draft: CustomLineItemImportDraft
 	): CustomLineItem {
 		const lineItem: CustomLineItem = {
 			...getBaseResourceProperties(),
@@ -241,10 +241,11 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 			name: draft.name,
 			quantity: draft.quantity ?? 0,
 			perMethodTaxRate: [],
-			priceMode: draft.priceMode,
+			priceMode: draft.priceMode ?? "Standard",
 			slug: draft.slug,
 			state: [],
 			totalPrice: createCentPrecisionMoney(draft.money),
+			taxedPricePortions: [],
 		}
 
 		return lineItem
