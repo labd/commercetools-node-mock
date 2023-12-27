@@ -1,6 +1,7 @@
 import type {
 	BaseResource,
 	Project,
+	QueryParam,
 	ResourceNotFoundError,
 	UpdateAction,
 } from '@commercetools/platform-sdk'
@@ -16,6 +17,9 @@ export type QueryParams = {
 	where?: string[]
 	offset?: number
 	limit?: number
+
+	// Predicate var values. Should always start with `var.`
+	[key: string]: QueryParam
 }
 
 export type GetParams = {
@@ -118,10 +122,7 @@ export abstract class AbstractResourceRepository<
 
 	query(context: RepositoryContext, params: QueryParams = {}) {
 		const result = this._storage.query(context.projectKey, this.getTypeId(), {
-			expand: params.expand,
-			where: params.where,
-			offset: params.offset,
-			limit: params.limit,
+			...params
 		})
 
 		// @ts-ignore
