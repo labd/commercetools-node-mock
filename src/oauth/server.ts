@@ -24,7 +24,7 @@ export class OAuth2Server {
 	store: OAuth2Store
 	private customerRepository: CustomerRepository
 
-	constructor(options: { enabled: boolean; validate: boolean }) {
+	constructor(private options: { enabled: boolean; validate: boolean }) {
 		this.store = new OAuth2Store(options.validate)
 	}
 
@@ -53,6 +53,12 @@ export class OAuth2Server {
 	}
 
 	createMiddleware() {
+		if (!this.options.validate) {
+			return async (request: Request, response: Response, next: NextFunction) => {
+				next()
+			}
+		}
+
 		return async (request: Request, response: Response, next: NextFunction) => {
 			const token = getBearerToken(request)
 			if (!token) {
