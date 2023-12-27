@@ -1,5 +1,19 @@
 ## 1.11.0
 
+## 2.9.0
+
+### Minor Changes
+
+- [`bab0609`](https://github.com/labd/commercetools-node-mock/commit/bab060977c0e00f513db63dda1218677754d8f1c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add cart action to set custom shipping method
+
+- [`31bce78`](https://github.com/labd/commercetools-node-mock/commit/31bce78fd80e1bd8dc39c5181d86b69d6ecd9d67) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve support for custom-objects
+
+- [`768cb56`](https://github.com/labd/commercetools-node-mock/commit/768cb569594d87647d7881ae5f9dd7cd53b9b380) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve mocking of the shipping-methods/matching-cart endpoint
+
+### Patch Changes
+
+- [`abc58e8`](https://github.com/labd/commercetools-node-mock/commit/abc58e836bfbb37137a8369f5b0927c2da0cb31d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Disable token validation if the validate flag is not set
+
 ## 2.8.0
 
 ### Minor Changes
