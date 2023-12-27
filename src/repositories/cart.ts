@@ -1,31 +1,33 @@
-import type {
-	Address,
-	AddressDraft,
-	Cart,
-	CartAddLineItemAction,
-	CartChangeLineItemQuantityAction,
-	CartAddItemShippingAddressAction,
-	CartSetLineItemShippingDetailsAction,
-	CartDraft,
-	CartRemoveLineItemAction,
-	CartSetBillingAddressAction,
-	CartSetCountryAction,
-	CartSetCustomerEmailAction,
-	CartSetCustomFieldAction,
-	CartSetCustomTypeAction,
-	CartSetLocaleAction,
-	CartSetShippingAddressAction,
-	CartSetShippingMethodAction,
-	CustomFields,
-	GeneralError,
-	LineItem,
-	LineItemDraft,
-	ItemShippingDetails,
-	Price,
-	Product,
-	ProductPagedQueryResponse,
-	CartRemoveDiscountCodeAction,
-	ProductVariant,
+import {
+	type Address,
+	type AddressDraft,
+	type Cart,
+	type CartAddLineItemAction,
+	type CartChangeLineItemQuantityAction,
+	type CartAddItemShippingAddressAction,
+	type CartSetLineItemShippingDetailsAction,
+	type CartDraft,
+	type CartRemoveLineItemAction,
+	type CartSetBillingAddressAction,
+	type CartSetCountryAction,
+	type CartSetCustomerEmailAction,
+	type CartSetCustomFieldAction,
+	type CartSetCustomTypeAction,
+	type CartSetLocaleAction,
+	type CartSetShippingAddressAction,
+	type CartSetShippingMethodAction,
+	type CustomFields,
+	type GeneralError,
+	type LineItem,
+	type LineItemDraft,
+	type ItemShippingDetails,
+	type Price,
+	type Product,
+	type ProductPagedQueryResponse,
+	type CartRemoveDiscountCodeAction,
+	type ProductVariant,
+	type CartSetCustomShippingMethodAction,
+	TaxCategory,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { CommercetoolsError } from '../exceptions.js'
@@ -35,7 +37,12 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
-import { createAddress, createCustomFields } from './helpers.js'
+import {
+	createAddress,
+	createCentPrecisionMoney,
+	createCustomFields,
+	createTypedMoney,
+} from './helpers.js'
 
 export class CartRepository extends AbstractResourceRepository<'cart'> {
 	getTypeId() {
@@ -74,6 +81,11 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 				fractionDigits: 0,
 			},
 			shippingMode: 'Single',
+			shippingAddress: createAddress(
+				draft.shippingAddress,
+				context.projectKey,
+				this._storage
+			),
 			shipping: [],
 			origin: draft.origin ?? 'Customer',
 			refusedGifts: [],
@@ -335,10 +347,6 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 					shippingMethod
 				)
 
-				if (!method) {
-					throw new Error(`Type ${shippingMethod} not found`)
-				}
-
 				// Based on the address we should select a shipping zone and
 				// use that to define the price.
 				// @ts-ignore
@@ -376,6 +384,43 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 				throw new Error('Resource has no custom field')
 			}
 			resource.custom.fields[name] = value
+		},
+		setCustomShippingMethod: (
+			context: RepositoryContext,
+			resource: Writable<Cart>,
+			{
+				shippingMethodName,
+				shippingRate,
+				taxCategory,
+				externalTaxRate,
+			}: CartSetCustomShippingMethodAction
+		) => {
+			if (externalTaxRate) {
+				throw new Error('External tax rate is not supported')
+			}
+
+			const tax = taxCategory
+				? this._storage.getByResourceIdentifier<'tax-category'>(
+						context.projectKey,
+						taxCategory
+				  )
+				: undefined
+
+			resource.shippingInfo = {
+				shippingMethodName,
+				price: createCentPrecisionMoney(shippingRate.price),
+				shippingRate: {
+					price: createTypedMoney(shippingRate.price),
+					tiers: [],
+				},
+				taxCategory: tax
+					? {
+							typeId: 'tax-category',
+							id: tax?.id,
+					  }
+					: undefined,
+				shippingMethodState: 'MatchesCart',
+			}
 		},
 		setCustomType: (
 			context: RepositoryContext,
