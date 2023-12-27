@@ -42,9 +42,14 @@ const ctMock = new CommercetoolsMock({
 })
 
 describe('A module', () => {
+  const mswServer = setupServer()
+
   beforeAll(() => {
-    const server = setupServer()
-    ctMock.registerHandlers(server)
+    mswServer.listen({ onUnhandledRequest: "error" })
+  })
+
+  beforeEach(() => {
+    ctMock.registerHandlers(mswServer)
 
     ctMock.project().add('type', {
       ...getBaseResourceProperties()
@@ -54,11 +59,11 @@ describe('A module', () => {
   })
 
   afterAll(() => {
-    server.clearHandlers()
-    ctMock.stop()
+    mswServer.close()
   })
 
   afterEach(() => {
+    server.clearHandlers()
     ctMock.clear()
   })
 
