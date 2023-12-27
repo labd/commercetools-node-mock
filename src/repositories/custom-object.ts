@@ -8,6 +8,7 @@ import { cloneObject, getBaseResourceProperties } from '../helpers.js'
 import type { Writable } from '../types.js'
 import {
 	AbstractResourceRepository,
+	QueryParams,
 	type RepositoryContext,
 } from './abstract.js'
 import { checkConcurrentModification } from './errors.js'
@@ -65,6 +66,23 @@ export class CustomObjectRepository extends AbstractResourceRepository<'key-valu
 			this.saveNew(context, resource)
 			return resource
 		}
+	}
+
+	queryWithContainer(
+		context: RepositoryContext,
+		container: string,
+		params: QueryParams = {}
+	) {
+		const whereClause = params.where || []
+		whereClause.push(`container="${container}"`)
+		const result = this._storage.query(context.projectKey, this.getTypeId(), {
+			...params,
+			where: whereClause,
+		})
+
+		// @ts-ignore
+		result.results = result.results.map(this.postProcessResource)
+		return result
 	}
 
 	getWithContainerAndKey(

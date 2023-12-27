@@ -1,39 +1,41 @@
-import type {
-	AssociateRole,
-	AttributeGroup,
-	BusinessUnit,
-	Cart,
-	CartDiscount,
-	Category,
-	Channel,
-	Customer,
-	CustomerGroup,
-	CustomObject,
-	DiscountCode,
-	Extension,
-	InvalidInputError,
-	InventoryEntry,
-	Order,
-	PagedQueryResponse,
-	Payment,
-	Product,
-	ProductDiscount,
-	ProductProjection,
-	ProductType,
-	Project,
-	Quote,
-	QuoteRequest,
-	Reference,
-	ResourceIdentifier,
-	ShippingMethod,
-	ShoppingList,
-	StagedQuote,
-	State,
-	Store,
-	Subscription,
-	TaxCategory,
-	Type,
-	Zone,
+import {
+	ReferencedResourceNotFoundError,
+	type AssociateRole,
+	type AttributeGroup,
+	type BusinessUnit,
+	type Cart,
+	type CartDiscount,
+	type Category,
+	type Channel,
+	type Customer,
+	type CustomerGroup,
+	type CustomObject,
+	type DiscountCode,
+	type Extension,
+	type InvalidInputError,
+	type InventoryEntry,
+	type Order,
+	type PagedQueryResponse,
+	type Payment,
+	type Product,
+	type ProductDiscount,
+	type ProductProjection,
+	type ProductType,
+	type Project,
+	type Quote,
+	type QuoteRequest,
+	type Reference,
+	type ResourceIdentifier,
+	type ShippingMethod,
+	type ShoppingList,
+	type StagedQuote,
+	type State,
+	type Store,
+	type Subscription,
+	type TaxCategory,
+	type Type,
+	type Zone,
+	InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import { CommercetoolsError } from '../exceptions.js'
@@ -204,9 +206,17 @@ export class InMemoryStorage extends AbstractStorage {
 
 		// Apply predicates
 		if (params.where) {
+			// Get all key-value pairs starting with 'var.' to pass as variables, removing
+			// the 'var.' prefix.
+			const vars = Object.fromEntries(
+				Object.entries(params)
+					.filter(([key]) => key.startsWith('var.'))
+					.map(([key, value]) => [key.slice(4), value])
+			)
+
 			try {
 				const filterFunc = parseQueryExpression(params.where)
-				resources = resources.filter((resource) => filterFunc(resource, {}))
+				resources = resources.filter((resource) => filterFunc(resource, vars))
 			} catch (err) {
 				throw new CommercetoolsError<InvalidInputError>(
 					{
@@ -292,38 +302,51 @@ export class InMemoryStorage extends AbstractStorage {
 	getByResourceIdentifier<RT extends ResourceType>(
 		projectKey: string,
 		identifier: ResourceIdentifier
-	): ResourceMap[RT] | null {
+	): ResourceMap[RT] {
 		if (identifier.id) {
 			const resource = this.get(projectKey, identifier.typeId, identifier.id)
 			if (resource) {
 				return resource as ResourceMap[RT]
 			}
-			console.error(
-				`No resource found with typeId=${identifier.typeId}, id=${identifier.id}`
-			)
-			return null
+
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: 'ReferencedResourceNotFound',
+				message:
+					`The referenced object of type '${identifier.typeId}' with id ` +
+					`'${identifier.id}' was not found. It either doesn't exist, or it ` +
+					`can't be accessed from this endpoint (e.g., if the endpoint ` +
+					`filters by store or customer account).`,
+				typeId: identifier.typeId,
+				id: identifier.id,
+			})
 		}
 
 		if (identifier.key) {
-			const store = this.forProjectKey(projectKey)[identifier.typeId]
-
-			if (store) {
-				// TODO: BaseResource has no key attribute, but the subclasses should
-				// have them all.
-				const resource = Array.from(store.values()).find(
-					// @ts-ignore
-					(r) => r.key === identifier.key
-				)
-				if (resource) {
-					return resource as ResourceMap[RT]
-				}
-			} else {
-				throw new Error(
-					`No storage found for resource type: ${identifier.typeId}`
-				)
+			const resource = this.getByKey(
+				projectKey,
+				identifier.typeId,
+				identifier.key
+			)
+			if (resource) {
+				return resource as ResourceMap[RT]
 			}
+
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: 'ReferencedResourceNotFound',
+				message:
+					`The referenced object of type '${identifier.typeId}' with key ` +
+					`'${identifier.key}' was not found. It either doesn't exist, or it ` +
+					`can't be accessed from this endpoint (e.g., if the endpoint ` +
+					`filters by store or customer account).`,
+				typeId: identifier.typeId,
+				key: identifier.key,
+			})
 		}
-		return null
+		throw new CommercetoolsError<InvalidJsonInputError>({
+			code: 'InvalidJsonInput',
+			message: 'Request body does not contain valid JSON.',
+			detailedErrorMessage: "ResourceIdentifier requires an 'id' xor a 'key'",
+		})
 	}
 
 	addProject = (projectKey: string): Project => {

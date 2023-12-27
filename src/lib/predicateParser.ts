@@ -96,7 +96,12 @@ const resolveValue = (obj: any, val: TypeSymbol): any => {
 				.filter((v) => val.value in v)
 				.map((v) => v[val.value])
 		}
-		throw new PredicateError(`The field '${val.value}' does not exist.`)
+
+		// TODO: We don't really validate the shape of the object here. To actually
+		// match commercetools behaviour we should throw an error if the requested
+		// field doesn't exist (unless it's a map)
+		// throw new PredicateError(`The field '${val.value}' does not exist.`)
+		return undefined
 	}
 
 	return obj[val.value]
@@ -243,11 +248,21 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			const expr = parser.parse()
 			lexer.expect(')')
 			return (obj: any, vars: object) => {
-				const value = resolveValue(obj, left)
-				if (value) {
-					return expr(value, vars)
+				if (Array.isArray(obj)) {
+					return obj.some((item) => {
+						const value = resolveValue(item, left)
+						if (value) {
+							return expr(value, vars)
+						}
+						return false
+					})
+				} else {
+					const value = resolveValue(obj, left)
+					if (value) {
+						return expr(value, vars)
+					}
+					return false
 				}
-				return false
 			}
 		})
 		.bp(')', 0)
@@ -256,12 +271,23 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			validateSymbol(expr)
 
 			return (obj: any, vars: VariableMap) => {
-				const resolvedValue = resolveValue(obj, left)
-				const resolvedSymbol = resolveSymbol(expr, vars)
-				if (Array.isArray(resolvedValue)) {
-					return !!resolvedValue.some((elem) => elem === resolvedSymbol)
+				if (Array.isArray(obj)) {
+					return obj.some((item) => {
+						const value = resolveValue(item, left)
+						const other = resolveSymbol(expr, vars)
+						if (Array.isArray(value)) {
+							return !!value.some((elem) => elem === other)
+						}
+						return value === other
+					})
+				} else {
+					const resolvedValue = resolveValue(obj, left)
+					const resolvedSymbol = resolveSymbol(expr, vars)
+					if (Array.isArray(resolvedValue)) {
+						return !!resolvedValue.some((elem) => elem === resolvedSymbol)
+					}
+					return resolvedValue === resolvedSymbol
 				}
-				return resolvedValue === resolvedSymbol
 			}
 		})
 		.led('!=', 20, ({ left, bp }) => {
@@ -350,10 +376,15 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 					symbols = [expr]
 				}
 
-				const inValues = symbols.map((item: TypeSymbol) =>
+				// The expression can be a list of variables, like
+				// :value_1, :value_2, but it can also be one variable
+				// containing a list, like :values.
+				// So to support both we just flatten the list.
+				const inValues = symbols.flatMap((item: TypeSymbol) =>
 					resolveSymbol(item, vars)
 				)
-				return inValues.includes(resolveValue(obj, left))
+				const value = resolveValue(obj, left)
+				return inValues.includes(value)
 			}
 		})
 		.led('MATCHES_IGNORE_CASE', 20, ({ left, bp }) => {

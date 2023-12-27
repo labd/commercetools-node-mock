@@ -68,7 +68,7 @@ export abstract class AbstractStorage {
 	abstract getByResourceIdentifier<RT extends ResourceType>(
 		projectKey: string,
 		identifier: ResourceIdentifier
-	): ResourceMap[RT] | null
+	): ResourceMap[RT]
 
 	abstract expand<T>(
 		projectKey: string,

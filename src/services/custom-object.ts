@@ -17,9 +17,28 @@ export class CustomObjectService extends AbstractService {
 	}
 
 	extraRoutes(router: Router) {
+		router.get('/:container', this.getWithContainer.bind(this))
 		router.get('/:container/:key', this.getWithContainerAndKey.bind(this))
 		router.post('/:container/:key', this.createWithContainerAndKey.bind(this))
 		router.delete('/:container/:key', this.deleteWithContainerAndKey.bind(this))
+	}
+
+	getWithContainer(request: Request, response: Response) {
+		const limit = this._parseParam(request.query.limit)
+		const offset = this._parseParam(request.query.offset)
+
+		const result = this.repository.queryWithContainer(
+			getRepositoryContext(request),
+			request.params.container,
+			{
+				expand: this._parseParam(request.query.expand),
+				where: this._parseParam(request.query.where),
+				limit: limit !== undefined ? Number(limit) : undefined,
+				offset: offset !== undefined ? Number(offset) : undefined,
+			}
+		)
+
+		return response.status(200).send(result)
 	}
 
 	getWithContainerAndKey(request: Request, response: Response) {
