@@ -54,7 +54,11 @@ export class OAuth2Server {
 
 	createMiddleware() {
 		if (!this.options.validate) {
-			return async (request: Request, response: Response, next: NextFunction) => {
+			return async (
+				request: Request,
+				response: Response,
+				next: NextFunction
+			) => {
 				next()
 			}
 		}

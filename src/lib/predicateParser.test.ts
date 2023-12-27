@@ -194,7 +194,9 @@ describe('Predicate filter', () => {
 
 	test('array filters on property', async () => {
 		expect(match(`array(nestedArray(stringProperty="foo")))`)).toBeTruthy()
-		expect(match(`array(nestedArray(nested(stringProperty="foo"))))`)).toBeTruthy()
+		expect(
+			match(`array(nestedArray(nested(stringProperty="foo"))))`)
+		).toBeTruthy()
 	})
 
 	test('geolocation within circle (...)', async () => {

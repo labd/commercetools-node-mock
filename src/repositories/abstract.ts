@@ -122,7 +122,7 @@ export abstract class AbstractResourceRepository<
 
 	query(context: RepositoryContext, params: QueryParams = {}) {
 		const result = this._storage.query(context.projectKey, this.getTypeId(), {
-			...params
+			...params,
 		})
 
 		// @ts-ignore

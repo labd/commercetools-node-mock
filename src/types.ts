@@ -2,7 +2,7 @@ import type * as ctp from '@commercetools/platform-sdk'
 import { RepositoryMap } from './repositories/index.js'
 import AbstractService from './services/abstract.js'
 
-export const isType = <T>(x: T) => x;
+export const isType = <T>(x: T) => x
 
 export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> }
 export type ShallowWritable<T> = { -readonly [P in keyof T]: T[P] }

@@ -1,6 +1,5 @@
 import {
 	InvalidOperationError,
-	type Cart,
 	type ShippingMethod,
 	type ShippingMethodAddShippingRateAction,
 	type ShippingMethodAddZoneAction,
@@ -21,8 +20,6 @@ import {
 	type ZoneRate,
 	type ZoneRateDraft,
 	type ZoneReference,
-	Zone,
-	CartSetCustomShippingMethodAction,
 } from '@commercetools/platform-sdk'
 import deepEqual from 'deep-equal'
 import { getBaseResourceProperties } from '../helpers.js'
