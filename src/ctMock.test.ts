@@ -8,7 +8,7 @@ test('ctMock.authServer', async () => {
 		apiHost: 'http://api.localhost',
 	})
 
-	ctMock.authServer().addToken({
+	ctMock.authStore().addToken({
 		token_type: 'Bearer',
 		access_token: 'foobar',
 		expires_in: 172800,

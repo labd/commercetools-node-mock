@@ -97,8 +97,8 @@ export class CommercetoolsMock {
 		)
 	}
 
-	authServer() {
-		return this._oauth2
+	authStore() {
+		return this._oauth2.store
 	}
 
 	runServer(port = 3000, options?: AppOptions) {

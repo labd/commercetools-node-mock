@@ -39,10 +39,6 @@ export class OAuth2Server {
 		this.store = new OAuth2Store(options.validate)
 	}
 
-	addToken(token: Token) {
-		this.store.addToken(token)
-	}
-
 	setCustomerRepository(repository: CustomerRepository) {
 		this.customerRepository = repository
 	}
