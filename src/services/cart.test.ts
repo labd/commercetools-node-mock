@@ -303,6 +303,30 @@ describe('Cart Update Actions', () => {
 		expect(response.body.lineItems).toHaveLength(0)
 	})
 
+	test('recalculate', async () => {
+		const product = await supertest(ctMock.app)
+			.post(`/dummy/products`)
+			.send(productDraft)
+			.then((x) => x.body)
+
+		assert(cart, 'cart not created')
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'recalculate',
+						updateProductData: true,
+					},
+				],
+			})
+
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(1)
+	})
+
 	test('removeLineItem', async () => {
 		const product = await supertest(ctMock.app)
 			.post(`/dummy/products`)
