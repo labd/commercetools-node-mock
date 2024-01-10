@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.10.0
+
+### Minor Changes
+
+- [#136](https://github.com/labd/commercetools-node-mock/pull/136) [`7927c24`](https://github.com/labd/commercetools-node-mock/commit/7927c24c35e1213755dca65235b70078113e9075) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for cart recalculate action
+
 ## 2.9.0
 
 ### Minor Changes
