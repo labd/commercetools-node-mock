@@ -171,7 +171,8 @@ export class OAuth2Server {
 			)
 			return response.status(200).send(token)
 		} else if (grantType === 'refresh_token') {
-			const refreshToken = request.query.refresh_token?.toString()
+			const refreshToken =
+				request.query.refresh_token?.toString() || request.body.refresh_token
 			if (!refreshToken) {
 				return next(
 					new CommercetoolsError<InvalidRequestError>(
