@@ -7,6 +7,7 @@ import {
 	type CartAddItemShippingAddressAction,
 	type CartSetLineItemShippingDetailsAction,
 	type CartDraft,
+	type CartRecalculateAction,
 	type CartRemoveLineItemAction,
 	type CartSetBillingAddressAction,
 	type CartSetCountryAction,
@@ -229,6 +230,15 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 
 			// Update cart total price
 			resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
+		},
+		recalculate: () => {
+			// Dummy action when triggering a recalculation of the cart
+			//
+			// From commercetools documentation:
+			// This update action does not set any Cart field in particular,
+			// but it triggers several Cart updates to bring prices and discounts to the latest state.
+			// Those can become stale over time when no Cart updates have been performed for a while
+			// and prices on related Products have changed in the meanwhile.
 		},
 		addItemShippingAddress: (
 			context: RepositoryContext,
