@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.12.1
+
+### Patch Changes
+
+- [`ffa83f9`](https://github.com/labd/commercetools-node-mock/commit/ffa83f978c8d2762738f1ab724fda9a318d4eb62) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Expose the authServer publically
+
 ## 2.12.0
 
 ### Minor Changes
