@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.12.0
+
+### Minor Changes
+
+- [`6f0dc45`](https://github.com/labd/commercetools-node-mock/commit/6f0dc4563898dfae87cc60c023437b72e0b1f516) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add support for refresh token flow
+
 ## 2.11.0
 
 ### Minor Changes
