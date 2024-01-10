@@ -17,6 +17,10 @@ export class OAuth2Store {
 		this.validate = validate
 	}
 
+	addToken(token: Token) {
+		this.tokens.push(token)
+	}
+
 	getClientToken(clientId: string, clientSecret: string, scope?: string) {
 		const token: Token = {
 			access_token: randomBytes(16).toString('base64'),
@@ -25,7 +29,7 @@ export class OAuth2Store {
 			scope: scope || 'todo',
 			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
 		}
-		this.tokens.push(token)
+		this.addToken(token)
 		return token
 	}
 
@@ -42,7 +46,7 @@ export class OAuth2Store {
 				: `anonymous_id:${anonymousId}`,
 			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
 		}
-		this.tokens.push(token)
+		this.addToken(token)
 		return token
 	}
 
@@ -56,7 +60,7 @@ export class OAuth2Store {
 				: `customer_id:${customerId}`,
 			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
 		}
-		this.tokens.push(token)
+		this.addToken(token)
 		return token
 	}
 
@@ -69,7 +73,7 @@ export class OAuth2Store {
 			...existing,
 			access_token: randomBytes(16).toString('base64'),
 		}
-		this.tokens.push(token)
+		this.addToken(token)
 
 		// We don't want to return the refresh_token again
 		return {

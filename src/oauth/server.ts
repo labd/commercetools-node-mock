@@ -23,6 +23,13 @@ type AuthRequest = Request & {
 		clientSecret: string
 	}
 }
+export type Token = {
+	access_token: string
+	token_type: 'Bearer'
+	expires_in: number
+	scope: string
+	refresh_token?: string
+}
 
 export class OAuth2Server {
 	store: OAuth2Store
@@ -30,6 +37,10 @@ export class OAuth2Server {
 
 	constructor(private options: { enabled: boolean; validate: boolean }) {
 		this.store = new OAuth2Store(options.validate)
+	}
+
+	addToken(token: Token) {
+		this.store.addToken(token)
 	}
 
 	setCustomerRepository(repository: CustomerRepository) {

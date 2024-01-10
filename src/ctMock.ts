@@ -97,6 +97,10 @@ export class CommercetoolsMock {
 		)
 	}
 
+	authServer() {
+		return this._oauth2
+	}
+
 	runServer(port = 3000, options?: AppOptions) {
 		const server = this.app.listen(port, () => {
 			console.info(`Mock server listening at http://localhost:${port}`)
