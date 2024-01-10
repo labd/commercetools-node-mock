@@ -318,7 +318,7 @@ describe('Cart Update Actions', () => {
 				actions: [
 					{
 						action: 'recalculate',
-						updateProductData: true
+						updateProductData: true,
 					},
 				],
 			})

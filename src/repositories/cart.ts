@@ -7,7 +7,6 @@ import {
 	type CartAddItemShippingAddressAction,
 	type CartSetLineItemShippingDetailsAction,
 	type CartDraft,
-	type CartRecalculateAction,
 	type CartRemoveLineItemAction,
 	type CartSetBillingAddressAction,
 	type CartSetCountryAction,
