@@ -250,14 +250,27 @@ export class OAuth2Server {
 		response: Response,
 		next: NextFunction
 	) {
-		return next(
-			new CommercetoolsError<InvalidClientError>(
-				{
-					code: 'invalid_client',
-					message: 'Not implemented yet in commercetools-mock',
-				},
-				401
+		const grantType = request.query.grant_type || request.body.grant_type
+		if (!grantType) {
+			return next(
+				new CommercetoolsError<InvalidRequestError>(
+					{
+						code: 'invalid_request',
+						message: 'Missing required parameter: grant_type.',
+					},
+					400
+				)
 			)
-		)
+		}
+
+		if (grantType === 'client_credentials') {
+			const scope =
+				request.query.scope?.toString() || request.body.scope?.toString()
+
+			const anonymous_id = undefined
+
+			const token = this.store.getAnonymousToken(scope, anonymous_id)
+			return response.status(200).send(token)
+		}
 	}
 }
