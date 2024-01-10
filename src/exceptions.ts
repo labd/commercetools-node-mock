@@ -21,3 +21,10 @@ export interface InvalidRequestError {
 	readonly code: 'invalid_request'
 	readonly message: string
 }
+
+export interface AuthError {
+	readonly statusCode: number
+	readonly message: string
+	readonly error: string
+	readonly error_description: string
+}

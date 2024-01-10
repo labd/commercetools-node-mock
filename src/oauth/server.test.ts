@@ -26,6 +26,40 @@ describe('OAuth2Server', () => {
 			expect(response.status, JSON.stringify(body)).toBe(200)
 			expect(body).toHaveProperty('access_token')
 		})
+
+		it('should failed on invalid refresh token', async () => {
+			const response = await supertest(app)
+				.post('/token')
+				.auth('validClientId', 'validClientSecret')
+				.query({ grant_type: 'refresh_token', refresh_token: 'invalid' })
+				.send()
+
+			const body = await response.body
+
+			expect(response.status, JSON.stringify(body)).toBe(400)
+		})
+
+		it('should refresh a token', async () => {
+			const createResponse = await supertest(app)
+				.post(`/my-project/anonymous/token`)
+				.auth('validClientId', 'validClientSecret')
+				.query({ grant_type: 'client_credentials' })
+				.send()
+
+			const refreshToken = createResponse.body.refresh_token
+
+			const response = await supertest(app)
+				.post('/token')
+				.auth('validClientId', 'validClientSecret')
+				.query({ grant_type: 'refresh_token', refresh_token: refreshToken })
+				.send()
+
+			const body = await response.body
+
+			expect(response.status, JSON.stringify(body)).toBe(200)
+			expect(body.access_token).not.toBe(createResponse.body.access_token)
+			expect(body.refresh_token).toBeUndefined()
+		})
 	})
 
 	describe('POST /:projectKey/anonymous/token', () => {

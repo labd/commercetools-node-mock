@@ -6,7 +6,11 @@ import express, {
 	type Response,
 } from 'express'
 import { InvalidTokenError } from '@commercetools/platform-sdk'
-import { CommercetoolsError, InvalidRequestError } from '../exceptions.js'
+import {
+	AuthError,
+	CommercetoolsError,
+	InvalidRequestError,
+} from '../exceptions.js'
 import { InvalidClientError, UnsupportedGrantType } from './errors.js'
 import { OAuth2Store } from './store.js'
 import { getBearerToken } from './helpers.js'
@@ -160,11 +164,37 @@ export class OAuth2Server {
 			)
 			return response.status(200).send(token)
 		} else if (grantType === 'refresh_token') {
-			const token = this.store.getClientToken(
+			const refreshToken = request.query.refresh_token?.toString()
+			if (!refreshToken) {
+				return next(
+					new CommercetoolsError<InvalidRequestError>(
+						{
+							code: 'invalid_request',
+							message: 'Missing required parameter: refresh_token.',
+						},
+						400
+					)
+				)
+			}
+			const token = this.store.refreshToken(
 				request.credentials.clientId,
 				request.credentials.clientSecret,
-				request.query.scope?.toString()
+				refreshToken
 			)
+			if (!token) {
+				return next(
+					new CommercetoolsError<AuthError>(
+						{
+							statusCode: 400,
+							message: 'The refresh token was not found. It may have expired.',
+							error: 'invalid_grant',
+							error_description:
+								'The refresh token was not found. It may have expired.',
+						},
+						400
+					)
+				)
+			}
 			return response.status(200).send(token)
 		} else {
 			return next(

@@ -6,6 +6,7 @@ type Token = {
 	token_type: 'Bearer'
 	expires_in: number
 	scope: string
+	refresh_token?: string
 }
 
 export class OAuth2Store {
@@ -22,6 +23,7 @@ export class OAuth2Store {
 			token_type: 'Bearer',
 			expires_in: 172800,
 			scope: scope || 'todo',
+			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
 		}
 		this.tokens.push(token)
 		return token
@@ -38,6 +40,7 @@ export class OAuth2Store {
 			scope: scope
 				? `${scope} anonymous_id:${anonymousId}`
 				: `anonymous_id:${anonymousId}`,
+			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
 		}
 		this.tokens.push(token)
 		return token
@@ -51,9 +54,30 @@ export class OAuth2Store {
 			scope: scope
 				? `${scope} customer_id:${customerId}`
 				: `customer_id:${customerId}`,
+			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
 		}
 		this.tokens.push(token)
 		return token
+	}
+
+	refreshToken(clientId: string, clientSecret: string, refreshToken: string) {
+		const existing = this.tokens.find((t) => t.refresh_token === refreshToken)
+		if (!existing) {
+			return undefined
+		}
+		const token: Token = {
+			...existing,
+			access_token: randomBytes(16).toString('base64'),
+		}
+		this.tokens.push(token)
+
+		// We don't want to return the refresh_token again
+		return {
+			access_token: token.access_token,
+			token_type: token.token_type,
+			expires_in: token.expires_in,
+			scope: token.scope,
+		}
 	}
 
 	validateToken(token: string) {
