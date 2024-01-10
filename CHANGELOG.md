@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.12.2
+
+### Patch Changes
+
+- [`04c9b41`](https://github.com/labd/commercetools-node-mock/commit/04c9b4121f412103f02839bb2189c5dda26a466b) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Read refresh token from body
+
 ## 2.12.1
 
 ### Patch Changes
