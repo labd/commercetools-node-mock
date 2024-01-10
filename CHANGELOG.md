@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.11.0
+
+### Minor Changes
+
+- [`a9f0031`](https://github.com/labd/commercetools-node-mock/commit/a9f00315e3de828f4d4fecc04fd0854510e62ff4) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add ability to create anonymous tokens
+
 ## 2.10.0
 
 ### Minor Changes
