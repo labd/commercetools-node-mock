@@ -94,6 +94,32 @@ describe('/me', () => {
 		})
 	})
 
+	test('Delete me', async () => {
+		const response = await supertest(ctMock.app).delete('/dummy/me')
+
+		expect(response.status).toBe(200)
+		expect(response.body).toEqual({
+			id: '123',
+			createdAt: '2021-03-18T14:00:00.000Z',
+			version: 2,
+			lastModifiedAt: '2021-03-18T14:00:00.000Z',
+			email: 'foo@example.org',
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: 'password',
+			custom: {
+				fields: {},
+				type: {
+					id: '',
+					typeId: 'type',
+				},
+			},
+		})
+
+		const newResponse = await supertest(ctMock.app).get('/dummy/me')
+		expect(newResponse.status).toBe(404)
+	})
+
 	test('setCustomField', async () => {
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/me`)

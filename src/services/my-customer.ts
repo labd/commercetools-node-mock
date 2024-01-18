@@ -26,6 +26,7 @@ export class MyCustomerService extends AbstractService {
 
 		router.get('', this.getMe.bind(this))
 		router.post('', this.updateMe.bind(this))
+		router.delete('', this.deleteMe.bind(this))
 
 		router.post('/signup', this.signUp.bind(this))
 
@@ -58,6 +59,14 @@ export class MyCustomerService extends AbstractService {
 
 		const result = this._expandWithId(request, updatedResource.id)
 		return response.status(200).send(result)
+	}
+	deleteMe(request: Request, response: Response) {
+		const resource = this.repository.deleteMe(getRepositoryContext(request))
+		if (!resource) {
+			return response.status(404).send('Not found')
+		}
+
+		return response.status(200).send(resource)
 	}
 
 	signUp(request: Request, response: Response) {
