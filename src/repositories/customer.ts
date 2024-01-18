@@ -73,6 +73,22 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 		return
 	}
 
+	deleteMe(context: RepositoryContext): Customer | undefined {
+		// grab the first customer you can find for now. In the future we should
+		// use the customer id from the scope of the token
+		const results = this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{}
+		)
+
+		if (results.count > 0) {
+			return this.delete(context, results.results[0].id) as Customer
+		}
+
+		return
+	}
+
 	actions = {
 		changeEmail: (
 			_context: RepositoryContext,
