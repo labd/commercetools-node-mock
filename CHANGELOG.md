@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.13.0
+
+### Minor Changes
+
+- [#143](https://github.com/labd/commercetools-node-mock/pull/143) [`b3dd521`](https://github.com/labd/commercetools-node-mock/commit/b3dd521363fb4ceefdfe721ff4e9e3ddcbb4ed03) Thanks [@mikedebock](https://github.com/mikedebock)! - Add order syncInfo support
+
 ## 2.12.2
 
 ### Patch Changes
