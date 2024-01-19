@@ -366,6 +366,40 @@ describe('Order Update Actions', () => {
 		expect(response.body.orderState).toBe('Cancelled')
 		expect(response.body.paymentState).toBe('Failed')
 	})
+
+	test('updateSyncInfo', async () => {
+		assert(order, 'order not created')
+
+		const channelResponse = await supertest(ctMock.app)
+			.post('/dummy/channels')
+			.send({
+				key: 'order-sync',
+				roles: ['OrderImport', 'OrderExport'],
+			})
+		expect(channelResponse.status).toBe(201)
+		const channel = channelResponse.body
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'updateSyncInfo',
+						channel: { typeId: 'channel', key: 'order-sync' },
+						externalId: '1234',
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.syncInfo).toMatchObject([
+			{
+				channel: { typeId: 'channel', id: channel.id },
+				externalId: '1234',
+			},
+		])
+	})
 })
 
 describe('Order Import', () => {

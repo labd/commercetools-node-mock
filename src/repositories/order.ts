@@ -15,6 +15,7 @@ import type {
 	OrderChangePaymentStateAction,
 	OrderFromCartDraft,
 	OrderImportDraft,
+	OrderUpdateSyncInfoAction,
 	OrderSetBillingAddressAction,
 	OrderSetCustomerEmailAction,
 	OrderSetCustomFieldAction,
@@ -30,6 +31,7 @@ import type {
 	ReturnInfo,
 	State,
 	Store,
+	SyncInfo,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import { CommercetoolsError } from '../exceptions.js'
@@ -301,6 +303,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 				id: payment.id!,
 			})
 		},
+
 		addReturnInfo: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
@@ -470,6 +473,41 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 			resource.store = {
 				typeId: 'store',
 				key: storeReference.key,
+			}
+		},
+		updateSyncInfo: (
+			context: RepositoryContext,
+			resource: Writable<Order>,
+			{ channel, externalId, syncedAt }: OrderUpdateSyncInfoAction
+		) => {
+			if (!channel) return
+			const resolvedType = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				channel
+			)
+			if (!resolvedType) {
+				throw new Error(`Channel ${channel} not found`)
+			}
+
+			const syncData: SyncInfo = {
+				channel: {
+					typeId: 'channel',
+					id: resolvedType.id,
+				},
+				externalId,
+				syncedAt: syncedAt ?? new Date().toISOString(),
+			}
+
+			if (!resource.syncInfo?.length) {
+				resource.syncInfo = [syncData]
+			} else {
+				const lastSyncInfo = resource.syncInfo[resource.syncInfo.length - 1]
+				if (
+					lastSyncInfo.channel.id !== syncData.channel.id ||
+					lastSyncInfo.externalId !== syncData.externalId
+				) {
+					resource.syncInfo.push(syncData)
+				}
 			}
 		},
 	}
