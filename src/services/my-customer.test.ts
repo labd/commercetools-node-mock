@@ -1,7 +1,11 @@
-import type { MyCustomerDraft } from '@commercetools/platform-sdk'
+import type {
+	CustomerChangePassword,
+	MyCustomerDraft,
+} from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../index.js'
+import { CommercetoolsMock, getBaseResourceProperties } from '../index.js'
+import { hashPassword } from '../lib/password.js'
 
 const ctMock = new CommercetoolsMock()
 
@@ -118,6 +122,32 @@ describe('/me', () => {
 
 		const newResponse = await supertest(ctMock.app).get('/dummy/me')
 		expect(newResponse.status).toBe(404)
+	})
+
+	test('Change my password', async () => {
+		const customer = {
+			...getBaseResourceProperties(),
+			id: 'customer-uuid',
+			email: 'user@example.com',
+			password: hashPassword('p4ssw0rd'),
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: 'Password', //default in Commercetools
+			version: 1,
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const draft: CustomerChangePassword = {
+			id: customer.id,
+			version: customer.version,
+			newPassword: 'newP4ssw0rd',
+			currentPassword: 'p4ssw0rd',
+		}
+		const response = await supertest(ctMock.app)
+			.post('/dummy/me/password')
+			.send(draft)
+
+		expect(response.status).toBe(200)
 	})
 
 	test('setCustomField', async () => {
