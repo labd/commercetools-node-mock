@@ -136,9 +136,15 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 			resource: Writable<Customer>,
 			{ addressId, addressKey, address }: CustomerChangeAddressAction
 		) => {
-			const oldAddressIndex = resource.addresses
-				.map((a) => a.id)
-				.indexOf(addressId)
+			const oldAddressIndex = resource.addresses.findIndex((a) => {
+				if (a.id != undefined && addressId != undefined && a.id === addressId) {
+					return true
+				}
+
+				return (
+					a.key != undefined && addressKey != undefined && a.key === addressKey
+				)
+			})
 
 			if (oldAddressIndex === -1) {
 				throw new CommercetoolsError<InvalidInputError>(

@@ -309,23 +309,25 @@ describe('Customer Update Actions', () => {
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(2)
-		expect(response.body.addresses[0]).toMatchObject({
-			id: 'other-address-uid',
-			firstName: 'Foo',
-			lastName: 'Bar',
-			streetName: 'Baz Street',
-			streetNumber: '99',
-			postalCode: '12ab',
-			country: 'NL',
-		})
-		expect(response.body.addresses[1]).toMatchObject({
-			id: 'address-uuid',
-			firstName: 'Marie',
-			lastName: 'Johnson',
-			streetName: 'Last Street',
-			streetNumber: '2',
-			postalCode: 'ABCS',
-			country: 'US',
-		})
+		expect(response.body.addresses).toMatchObject([
+			{
+				id: 'other-address-uid',
+				firstName: 'Foo',
+				lastName: 'Bar',
+				streetName: 'Baz Street',
+				streetNumber: '99',
+				postalCode: '12ab',
+				country: 'NL',
+			},
+			{
+				id: 'address-uuid',
+				firstName: 'Marie',
+				lastName: 'Johnson',
+				streetName: 'Last Street',
+				streetNumber: '2',
+				postalCode: 'ABCS',
+				country: 'US',
+			},
+		])
 	})
 })
