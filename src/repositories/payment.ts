@@ -208,7 +208,7 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 			{ interfaceId }: PaymentSetInterfaceIdAction
 		) => {
 			resource.interfaceId = interfaceId
-		}
+		},
 		// addInterfaceInteraction: () => {},
 		// changeAmountPlanned: () => {},
 		// changeTransactionInteractionId: () => {},
