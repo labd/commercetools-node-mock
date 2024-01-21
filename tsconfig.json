@@ -5,7 +5,7 @@
 		"esModuleInterop": true,
 		"isolatedModules": true,
 		"module": "ES2022",
-		"moduleResolution": "nodenext",
+		"moduleResolution": "bundler",
 		"outDir": "dist",
 		"preserveWatchOutput": true,
 		"resolveJsonModule": true,
@@ -16,8 +16,8 @@
 		"target": "ES2022",
 		"paths": {
 			"~src/*": ["./src/*"],
-			"~vendor/*": ["./vendor/*"]
-		}
+			"~vendor/*": ["./vendor/*"],
+		},
 	},
-	"include": ["*.ts", "types"]
+	"include": ["*.ts", "types"],
 }

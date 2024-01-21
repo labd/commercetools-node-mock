@@ -46,9 +46,9 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 									draft.paymentStatus.state,
 									context.projectKey,
 									this._storage
-							  )
+								)
 							: undefined,
-				  }
+					}
 				: {},
 			transactions: (draft.transactions || []).map((t) =>
 				this.transactionFromTransactionDraft(t, context)

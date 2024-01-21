@@ -48,7 +48,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 						draft.customer,
 						context.projectKey,
 						this._storage
-				  )
+					)
 				: undefined,
 			store: draft.store
 				? getStoreKeyReference(draft.store, context.projectKey, this._storage)
