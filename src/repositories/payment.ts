@@ -5,6 +5,13 @@ import type {
 	PaymentDraft,
 	PaymentSetCustomFieldAction,
 	PaymentSetCustomTypeAction,
+	PaymentSetInterfaceIdAction,
+	PaymentSetKeyAction,
+	PaymentSetMethodInfoInterfaceAction,
+	PaymentSetMethodInfoMethodAction,
+	PaymentSetMethodInfoNameAction,
+	PaymentSetStatusInterfaceCodeAction,
+	PaymentSetStatusInterfaceTextAction,
 	PaymentTransitionStateAction,
 	State,
 	StateReference,
@@ -73,42 +80,6 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 	})
 
 	actions = {
-		setCustomField: (
-			context: RepositoryContext,
-			resource: Payment,
-			{ name, value }: PaymentSetCustomFieldAction
-		) => {
-			if (!resource.custom) {
-				throw new Error('Resource has no custom field')
-			}
-
-			resource.custom.fields[name] = value
-		},
-		setCustomType: (
-			context: RepositoryContext,
-			resource: Writable<Payment>,
-			{ type, fields }: PaymentSetCustomTypeAction
-		) => {
-			if (!type) {
-				resource.custom = undefined
-			} else {
-				const resolvedType = this._storage.getByResourceIdentifier(
-					context.projectKey,
-					type
-				)
-				if (!resolvedType) {
-					throw new Error(`Type ${type} not found`)
-				}
-
-				resource.custom = {
-					type: {
-						typeId: 'type',
-						id: resolvedType.id,
-					},
-					fields: fields ?? {},
-				}
-			}
-		},
 		addTransaction: (
 			context: RepositoryContext,
 			resource: Writable<Payment>,
@@ -153,22 +124,96 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 				obj: stateObj,
 			}
 		},
+		setCustomField: (
+			context: RepositoryContext,
+			resource: Payment,
+			{ name, value }: PaymentSetCustomFieldAction
+		) => {
+			if (!resource.custom) {
+				throw new Error('Resource has no custom field')
+			}
+
+			resource.custom.fields[name] = value
+		},
+		setCustomType: (
+			context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ type, fields }: PaymentSetCustomTypeAction
+		) => {
+			if (!type) {
+				resource.custom = undefined
+			} else {
+				const resolvedType = this._storage.getByResourceIdentifier(
+					context.projectKey,
+					type
+				)
+				if (!resolvedType) {
+					throw new Error(`Type ${type} not found`)
+				}
+
+				resource.custom = {
+					type: {
+						typeId: 'type',
+						id: resolvedType.id,
+					},
+					fields: fields ?? {},
+				}
+			}
+		},
+		setKey: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ key }: PaymentSetKeyAction
+		) => {
+			resource.key = key
+		},
+		setStatusInterfaceCode: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ interfaceCode }: PaymentSetStatusInterfaceCodeAction
+		) => {
+			resource.paymentStatus.interfaceCode = interfaceCode
+		},
+		setStatusInterfaceText: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ interfaceText }: PaymentSetStatusInterfaceTextAction
+		) => {
+			resource.paymentStatus.interfaceText = interfaceText
+		},
+		setMethodInfoName: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ name }: PaymentSetMethodInfoNameAction
+		) => {
+			resource.paymentMethodInfo.name = name
+		},
+		setMethodInfoMethod: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ method }: PaymentSetMethodInfoMethodAction
+		) => {
+			resource.paymentMethodInfo.method = method
+		},
+		setMethodInfoInterface: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			args: PaymentSetMethodInfoInterfaceAction
+		) => {
+			resource.paymentMethodInfo.paymentInterface = args.interface
+		},
+		setInterfaceId: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ interfaceId }: PaymentSetInterfaceIdAction
+		) => {
+			resource.interfaceId = interfaceId
+		}
 		// addInterfaceInteraction: () => {},
 		// changeAmountPlanned: () => {},
 		// changeTransactionInteractionId: () => {},
 		// changeTransactionTimestamp: () => {},
-		// setAmountPaid: () => {},
-		// setAmountRefunded: () => {},
 		// setAnonymousId: () => {},
-		// setAuthorization: () => {},
 		// setCustomer: () => {},
-		// setExternalId: () => {},
-		// setInterfaceId: () => {},
-		// setKey: () => {},
-		// setMethodInfoInterface: () => {},
-		// setMethodInfoMethod: () => {},
-		// setMethodInfoName: () => {},
-		// setStatusInterfaceCode: () => {},
-		// setStatusInterfaceText: () => {},
 	}
 }
