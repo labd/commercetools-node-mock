@@ -1,5 +1,13 @@
 ## 1.11.0
 
+## 2.14.0
+
+### Minor Changes
+
+- [`73efc3d`](https://github.com/labd/commercetools-node-mock/commit/73efc3de72227a6cf65e27ed75cb086c13647ff1) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add various update actions to the Payment API
+
+- [`82a4dc6`](https://github.com/labd/commercetools-node-mock/commit/82a4dc66aa03493d126b1e1a6c3bc15fcedd50c9) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update all dependencies to their latest version
+
 ## 2.13.0
 
 ### Minor Changes
