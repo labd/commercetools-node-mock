@@ -150,6 +150,29 @@ describe('/me', () => {
 		expect(response.status).toBe(200)
 	})
 
+	test('Fail to change password', async () => {
+		const draft: CustomerChangePassword = {
+			id: 'foo',
+			version: 1,
+			newPassword: 'newP4ssw0rd',
+			currentPassword: 'p4ssw0rd',
+		}
+		const response = await supertest(ctMock.app)
+			.post('/dummy/me/password')
+			.send(draft)
+
+		expect(response.status).toBe(404)
+		expect(response.body).toEqual({
+			errors: [
+				{
+					code: 'InvalidCurrentPassword',
+					message: 'Account with the given credentials not found.',
+				},
+			],
+			message: 'Account with the given credentials not found.',
+		})
+	})
+
 	test('setCustomField', async () => {
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/me`)

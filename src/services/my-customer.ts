@@ -3,7 +3,11 @@ import { CustomerRepository } from '../repositories/customer.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
 import { hashPassword } from '../lib/password.js'
-import { Customer, Update } from '@commercetools/platform-sdk'
+import {
+	Customer,
+	Update,
+	InvalidCurrentPasswordError,
+} from '@commercetools/platform-sdk'
 
 export class MyCustomerService extends AbstractService {
 	public repository: CustomerRepository
@@ -93,9 +97,9 @@ export class MyCustomerService extends AbstractService {
 				message: 'Account with the given credentials not found.',
 				errors: [
 					{
-						code: 'InvalidCredentials',
+						code: 'InvalidCurrentPassword',
 						message: 'Account with the given credentials not found.',
-					},
+					} as InvalidCurrentPasswordError,
 				],
 			})
 		}
