@@ -3,9 +3,9 @@ import type {
 	MyCustomerDraft,
 } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
-import {afterEach, beforeEach, describe, expect, test} from 'vitest'
-import {CommercetoolsMock, getBaseResourceProperties} from '../index.js'
-import {hashPassword} from '../lib/password.js'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { CommercetoolsMock, getBaseResourceProperties } from '../index.js'
+import { hashPassword } from '../lib/password.js'
 
 const ctMock = new CommercetoolsMock()
 
@@ -71,7 +71,7 @@ describe('/me', () => {
 			addresses: [],
 			isEmailVerified: true,
 			authenticationMode: 'password',
-			custom: {type: {typeId: 'type', id: ''}, fields: {}},
+			custom: { type: { typeId: 'type', id: '' }, fields: {} },
 		})
 	})
 
@@ -150,10 +150,9 @@ describe('/me', () => {
 		expect(response.status).toBe(200)
 	})
 
-
 	test('Fail to change password', async () => {
 		const draft: CustomerChangePassword = {
-			id: "foo",
+			id: 'foo',
 			version: 1,
 			newPassword: 'newP4ssw0rd',
 			currentPassword: 'p4ssw0rd',
@@ -166,11 +165,11 @@ describe('/me', () => {
 		expect(response.body).toEqual({
 			errors: [
 				{
-					code: "InvalidCurrentPassword",
-					message: "Account with the given credentials not found.",
+					code: 'InvalidCurrentPassword',
+					message: 'Account with the given credentials not found.',
 				},
 			],
-			message: "Account with the given credentials not found.",
+			message: 'Account with the given credentials not found.',
 		})
 	})
 
@@ -179,7 +178,7 @@ describe('/me', () => {
 			.post(`/dummy/me`)
 			.send({
 				version: 2,
-				actions: [{action: 'setCustomField', name: 'foobar', value: true}],
+				actions: [{ action: 'setCustomField', name: 'foobar', value: true }],
 			})
 		expect(response.status).toBe(200)
 		expect(response.body.version).toBe(3)

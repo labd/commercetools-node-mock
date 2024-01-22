@@ -3,7 +3,11 @@ import { CustomerRepository } from '../repositories/customer.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
 import { hashPassword } from '../lib/password.js'
-import { Customer, Update,  InvalidCurrentPasswordError} from '@commercetools/platform-sdk'
+import {
+	Customer,
+	Update,
+	InvalidCurrentPasswordError,
+} from '@commercetools/platform-sdk'
 
 export class MyCustomerService extends AbstractService {
 	public repository: CustomerRepository
