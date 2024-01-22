@@ -1,9 +1,14 @@
 import type {
 	Customer,
+	CustomerChangeAddressAction,
 	CustomerChangeEmailAction,
 	CustomerDraft,
 	CustomerSetAuthenticationModeAction,
+	CustomerSetCompanyNameAction,
 	CustomerSetCustomFieldAction,
+	CustomerSetFirstNameAction,
+	CustomerSetLastNameAction,
+	CustomerSetVatIdAction,
 	DuplicateFieldError,
 	InvalidInputError,
 	InvalidJsonInputError,
@@ -16,6 +21,7 @@ import {
 	type RepositoryContext,
 } from './abstract.js'
 import { hashPassword } from '../lib/password.js'
+import { createAddress } from './helpers.js'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 	getTypeId() {
@@ -96,6 +102,72 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 			{ email }: CustomerChangeEmailAction
 		) => {
 			resource.email = email
+		},
+		setFirstName: (
+			_context: RepositoryContext,
+			resource: Writable<Customer>,
+			{ firstName }: CustomerSetFirstNameAction
+		) => {
+			resource.firstName = firstName
+		},
+		setLastName: (
+			_context: RepositoryContext,
+			resource: Writable<Customer>,
+			{ lastName }: CustomerSetLastNameAction
+		) => {
+			resource.lastName = lastName
+		},
+		setCompanyName: (
+			_context: RepositoryContext,
+			resource: Writable<Customer>,
+			{ companyName }: CustomerSetCompanyNameAction
+		) => {
+			resource.companyName = companyName
+		},
+		setVatId: (
+			_context: RepositoryContext,
+			resource: Writable<Customer>,
+			{ vatId }: CustomerSetVatIdAction
+		) => {
+			resource.vatId = vatId
+		},
+		changeAddress: (
+			context: RepositoryContext,
+			resource: Writable<Customer>,
+			{ addressId, addressKey, address }: CustomerChangeAddressAction
+		) => {
+			const oldAddressIndex = resource.addresses.findIndex((a) => {
+				if (a.id != undefined && addressId != undefined && a.id === addressId) {
+					return true
+				}
+
+				return (
+					a.key != undefined && addressKey != undefined && a.key === addressKey
+				)
+			})
+
+			if (oldAddressIndex === -1) {
+				throw new CommercetoolsError<InvalidInputError>(
+					{
+						code: 'InvalidInput',
+						message: `Address with id '${addressId}' or key '${addressKey}' not found.`,
+					},
+					400
+				)
+			}
+
+			const newAddress = createAddress(
+				address,
+				context.projectKey,
+				this._storage
+			)
+
+			if (newAddress) {
+				resource.addresses[oldAddressIndex] = {
+					id: addressId,
+					...newAddress,
+				}
+			}
 		},
 		setAuthenticationMode: (
 			_context: RepositoryContext,

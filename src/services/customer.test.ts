@@ -176,4 +176,158 @@ describe('Customer Update Actions', () => {
 		expect(response.body.version).toBe(2)
 		expect(response.body.custom.fields.isValidCouponCode).toBe(false)
 	})
+
+	test('setFirstName', async () => {
+		assert(customer, 'customer not created')
+
+		customer = {
+			...customer,
+			firstName: 'John',
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: 'setFirstName', firstName: 'Mary' }],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.firstName).toBe('Mary')
+	})
+
+	test('setLastName', async () => {
+		assert(customer, 'customer not created')
+
+		customer = {
+			...customer,
+			lastName: 'Doe',
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: 'setLastName', lastName: 'Smith' }],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.lastName).toBe('Smith')
+	})
+
+	test('setCompanyName', async () => {
+		assert(customer, 'customer not created')
+
+		customer = {
+			...customer,
+			companyName: 'Acme',
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: 'setCompanyName', companyName: 'Acme Inc.' }],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.companyName).toBe('Acme Inc.')
+	})
+
+	test('setVatId', async () => {
+		assert(customer, 'customer not created')
+
+		customer = {
+			...customer,
+			vatId: '123456789',
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: 'setVatId', vatId: 'ABCD' }],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.vatId).toBe('ABCD')
+	})
+
+	test('changeAddress', async () => {
+		assert(customer, 'customer not created')
+
+		customer = {
+			...customer,
+			addresses: [
+				{
+					...getBaseResourceProperties(),
+					id: 'other-address-uid',
+					firstName: 'Foo',
+					lastName: 'Bar',
+					streetName: 'Baz Street',
+					streetNumber: '99',
+					postalCode: '12ab',
+					country: 'NL',
+				},
+				{
+					...getBaseResourceProperties(),
+					id: 'address-uuid',
+					firstName: 'John',
+					lastName: 'Doe',
+					streetName: 'Main Street',
+					streetNumber: '1',
+					postalCode: '12345',
+					country: 'DE',
+				},
+			],
+			defaultBillingAddressId: 'address-uuid',
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'changeAddress',
+						addressId: 'address-uuid',
+						address: {
+							firstName: 'Marie',
+							lastName: 'Johnson',
+							streetName: 'Last Street',
+							streetNumber: '2',
+							postalCode: 'ABCS',
+							country: 'US',
+						},
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.addresses).toMatchObject([
+			{
+				id: 'other-address-uid',
+				firstName: 'Foo',
+				lastName: 'Bar',
+				streetName: 'Baz Street',
+				streetNumber: '99',
+				postalCode: '12ab',
+				country: 'NL',
+			},
+			{
+				id: 'address-uuid',
+				firstName: 'Marie',
+				lastName: 'Johnson',
+				streetName: 'Last Street',
+				streetNumber: '2',
+				postalCode: 'ABCS',
+				country: 'US',
+			},
+		])
+	})
 })
