@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.14.2
+
+### Patch Changes
+
+- [#148](https://github.com/labd/commercetools-node-mock/pull/148) [`438fc00`](https://github.com/labd/commercetools-node-mock/commit/438fc009173169d44515b55ac64a5a3bab3eae08) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Fixed /me password not found error response
+
 ## 2.14.1
 
 ### Patch Changes
