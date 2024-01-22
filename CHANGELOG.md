@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.14.1
+
+### Patch Changes
+
+- [#145](https://github.com/labd/commercetools-node-mock/pull/145) [`7c2c3ca`](https://github.com/labd/commercetools-node-mock/commit/7c2c3ca2348675a39067d4d5a5f9f47f01efdfe9) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added additional functionality to customer and me/customer
+
 ## 2.14.0
 
 ### Minor Changes
