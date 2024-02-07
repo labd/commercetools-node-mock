@@ -86,11 +86,7 @@ export const createServices = (router: any, repos: any) => ({
 		repos['product-selection']
 	),
 	reviews: new ReviewService(router, repos['review']),
-	'shopping-list': new ShoppingListService(
-		router,
-		repos['shopping-list'],
-		repos['product']
-	),
+	'shopping-list': new ShoppingListService(router, repos['shopping-list']),
 	state: new StateService(router, repos['state']),
 	store: new StoreService(router, repos['store']),
 	subscription: new SubscriptionService(router, repos['subscription']),
