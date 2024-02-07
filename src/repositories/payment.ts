@@ -1,10 +1,17 @@
 import type {
+	CustomerReference,
 	Payment,
+	PaymentAddInterfaceInteractionAction,
 	PaymentAddTransactionAction,
+	PaymentChangeAmountPlannedAction,
+	PaymentChangeTransactionInteractionIdAction,
 	PaymentChangeTransactionStateAction,
+	PaymentChangeTransactionTimestampAction,
 	PaymentDraft,
+	PaymentSetAnonymousIdAction,
 	PaymentSetCustomFieldAction,
 	PaymentSetCustomTypeAction,
+	PaymentSetCustomerAction,
 	PaymentSetInterfaceIdAction,
 	PaymentSetKeyAction,
 	PaymentSetMethodInfoInterfaceAction,
@@ -12,7 +19,10 @@ import type {
 	PaymentSetMethodInfoNameAction,
 	PaymentSetStatusInterfaceCodeAction,
 	PaymentSetStatusInterfaceTextAction,
+	PaymentSetTransactionCustomFieldAction,
+	PaymentSetTransactionCustomTypeAction,
 	PaymentTransitionStateAction,
+	PaymentUpdateAction,
 	State,
 	StateReference,
 	Transaction,
@@ -79,7 +89,23 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 		state: draft.state ?? 'Initial', // Documented as default
 	})
 
-	actions = {
+	actions: Record<
+		PaymentUpdateAction['action'],
+		(
+			context: RepositoryContext,
+			resource: Writable<Payment>,
+			action: any
+		) => void
+	> = {
+		addInterfaceInteraction: (
+			context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ type, fields }: PaymentAddInterfaceInteractionAction
+		) => {
+			resource.interfaceInteractions.push(
+				createCustomFields({ type, fields }, context.projectKey, this._storage)!
+			)
+		},
 		addTransaction: (
 			context: RepositoryContext,
 			resource: Writable<Payment>,
@@ -89,6 +115,28 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 				...resource.transactions,
 				this.transactionFromTransactionDraft(transaction, context),
 			]
+		},
+		changeAmountPlanned: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ amount }: PaymentChangeAmountPlannedAction
+		) => {
+			resource.amountPlanned = createCentPrecisionMoney(amount)
+		},
+		changeTransactionInteractionId: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{
+				transactionId,
+				interactionId,
+			}: PaymentChangeTransactionInteractionIdAction
+		) => {
+			const transaction = resource.transactions.find(
+				(e: Transaction) => e.id === transactionId
+			)
+			if (transaction) {
+				transaction.interactionId = interactionId
+			}
 		},
 		changeTransactionState: (
 			_context: RepositoryContext,
@@ -103,6 +151,18 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 				state,
 			}
 			resource.transactions[index] = updatedTransaction
+		},
+		changeTransactionTimestamp: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ transactionId, timestamp }: PaymentChangeTransactionTimestampAction
+		) => {
+			const transaction = resource.transactions.find(
+				(e: Transaction) => e.id === transactionId
+			)
+			if (transaction) {
+				transaction.timestamp = timestamp
+			}
 		},
 		transitionState: (
 			context: RepositoryContext,
@@ -122,6 +182,29 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 				typeId: 'state',
 				id: stateObj.id,
 				obj: stateObj,
+			}
+		},
+		setAnonymousId: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ anonymousId }: PaymentSetAnonymousIdAction
+		) => {
+			resource.anonymousId = anonymousId
+			resource.customer = undefined
+		},
+		setCustomer: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ customer }: PaymentSetCustomerAction
+		) => {
+			if (customer) {
+				const c = getReferenceFromResourceIdentifier<CustomerReference>(
+					customer,
+					_context.projectKey,
+					this._storage
+				)
+				resource.customer = c
+				resource.anonymousId = undefined
 			}
 		},
 		setCustomField: (
@@ -160,12 +243,40 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 				}
 			}
 		},
+		setInterfaceId: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ interfaceId }: PaymentSetInterfaceIdAction
+		) => {
+			resource.interfaceId = interfaceId
+		},
 		setKey: (
 			_context: RepositoryContext,
 			resource: Writable<Payment>,
 			{ key }: PaymentSetKeyAction
 		) => {
 			resource.key = key
+		},
+		setMethodInfoMethod: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ method }: PaymentSetMethodInfoMethodAction
+		) => {
+			resource.paymentMethodInfo.method = method
+		},
+		setMethodInfoName: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			{ name }: PaymentSetMethodInfoNameAction
+		) => {
+			resource.paymentMethodInfo.name = name
+		},
+		setMethodInfoInterface: (
+			_context: RepositoryContext,
+			resource: Writable<Payment>,
+			args: PaymentSetMethodInfoInterfaceAction
+		) => {
+			resource.paymentMethodInfo.paymentInterface = args.interface
 		},
 		setStatusInterfaceCode: (
 			_context: RepositoryContext,
@@ -181,39 +292,51 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 		) => {
 			resource.paymentStatus.interfaceText = interfaceText
 		},
-		setMethodInfoName: (
+		setTransactionCustomField: (
 			_context: RepositoryContext,
 			resource: Writable<Payment>,
-			{ name }: PaymentSetMethodInfoNameAction
+			{ transactionId, name, value }: PaymentSetTransactionCustomFieldAction
 		) => {
-			resource.paymentMethodInfo.name = name
+			const transaction = resource.transactions.find(
+				(e: Transaction) => e.id === transactionId
+			)
+			if (transaction) {
+				if (!transaction.custom) {
+					throw new Error('Transaction has no custom field')
+				}
+
+				transaction.custom.fields[name] = value
+			}
 		},
-		setMethodInfoMethod: (
-			_context: RepositoryContext,
+		setTransactionCustomType: (
+			context: RepositoryContext,
 			resource: Writable<Payment>,
-			{ method }: PaymentSetMethodInfoMethodAction
+			{ transactionId, type, fields }: PaymentSetTransactionCustomTypeAction
 		) => {
-			resource.paymentMethodInfo.method = method
+			const transaction = resource.transactions.find(
+				(e: Transaction) => e.id === transactionId
+			)
+			if (transaction) {
+				if (!type) {
+					transaction.custom = undefined
+				} else {
+					const resolvedType = this._storage.getByResourceIdentifier(
+						context.projectKey,
+						type
+					)
+					if (!resolvedType) {
+						throw new Error(`Type ${type} not found`)
+					}
+
+					transaction.custom = {
+						type: {
+							typeId: 'type',
+							id: resolvedType.id,
+						},
+						fields: fields ?? {},
+					}
+				}
+			}
 		},
-		setMethodInfoInterface: (
-			_context: RepositoryContext,
-			resource: Writable<Payment>,
-			args: PaymentSetMethodInfoInterfaceAction
-		) => {
-			resource.paymentMethodInfo.paymentInterface = args.interface
-		},
-		setInterfaceId: (
-			_context: RepositoryContext,
-			resource: Writable<Payment>,
-			{ interfaceId }: PaymentSetInterfaceIdAction
-		) => {
-			resource.interfaceId = interfaceId
-		},
-		// addInterfaceInteraction: () => {},
-		// changeAmountPlanned: () => {},
-		// changeTransactionInteractionId: () => {},
-		// changeTransactionTimestamp: () => {},
-		// setAnonymousId: () => {},
-		// setCustomer: () => {},
 	}
 }
