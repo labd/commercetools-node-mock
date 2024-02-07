@@ -301,4 +301,52 @@ describe('Shopping List Update Actions', () => {
 		expect(response.body.version).toBe(2)
 		expect(response.body.lineItems.length).toBe(0)
 	})
+
+	test('various setters', async () => {
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/shopping-lists/${shoppingList.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setKey',
+						key: 'new-key',
+					},
+					{
+						action: 'setSlug',
+						slug: 'new-slug',
+					},
+					{
+						action: 'changeName',
+						name: { en: 'new name' },
+					},
+					{
+						action: 'setDescription',
+						description: { en: 'new description' },
+					},
+					{
+						action: 'setCustomer',
+						customer: { typeId: 'customer', id: 'customer-id' },
+					},
+					{ action: 'setStore', store: { typeId: 'store', key: 'store-key' } },
+					{ action: 'setAnonymousId', anonymousId: 'new-anonymous-id' },
+					{
+						action: 'setDeleteDaysAfterLastModification',
+						deleteDaysAfterLastModification: 1,
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.key).toBe('new-key')
+		expect(response.body.slug).toBe('new-slug')
+		expect(response.body.name).toEqual({ en: 'new name' })
+		expect(response.body.description).toEqual({ en: 'new description' })
+		expect(response.body.customer).toEqual({
+			typeId: 'customer',
+			id: 'customer-id',
+		})
+		expect(response.body.store).toEqual({ typeId: 'store', key: 'store-key' })
+		expect(response.body.anonymousId).toEqual('new-anonymous-id')
+		expect(response.body.deleteDaysAfterLastModification).toEqual(1)
+	})
 })
