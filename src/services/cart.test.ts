@@ -273,7 +273,7 @@ describe('Cart Update Actions', () => {
 	})
 
 	test('addItemShippingAddress', async () => {
-		const product = await supertest(ctMock.app)
+		await supertest(ctMock.app)
 			.post(`/dummy/products`)
 			.send(productDraft)
 			.then((x) => x.body)
@@ -304,7 +304,7 @@ describe('Cart Update Actions', () => {
 	})
 
 	test('recalculate', async () => {
-		const product = await supertest(ctMock.app)
+		await supertest(ctMock.app)
 			.post(`/dummy/products`)
 			.send(productDraft)
 			.then((x) => x.body)
