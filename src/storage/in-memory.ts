@@ -1,5 +1,7 @@
 import {
+	InvalidJsonInputError,
 	ReferencedResourceNotFoundError,
+	ShoppingListLineItem,
 	type AssociateRole,
 	type AttributeGroup,
 	type BusinessUnit,
@@ -7,9 +9,9 @@ import {
 	type CartDiscount,
 	type Category,
 	type Channel,
+	type CustomObject,
 	type Customer,
 	type CustomerGroup,
-	type CustomObject,
 	type DiscountCode,
 	type Extension,
 	type InvalidInputError,
@@ -35,7 +37,6 @@ import {
 	type TaxCategory,
 	type Type,
 	type Zone,
-	InvalidJsonInputError,
 } from '@commercetools/platform-sdk'
 import assert from 'assert'
 import { CommercetoolsError } from '../exceptions.js'
@@ -408,6 +409,23 @@ export class InMemoryStorage extends AbstractStorage {
 	private _resolveResource = (projectKey: string, obj: any, expand: string) => {
 		const params = parseExpandClause(expand)
 
+		// 'lineItems[*].variant' on ShoppingList is an exception, these variants are not references
+		if (params.index === '*') {
+			const reference = obj[params.element]
+			if (
+				params.element === 'lineItems' &&
+				params.rest?.startsWith('variant') &&
+				reference.every(
+					(item: any) =>
+						item.variant === undefined && item.variantId !== undefined
+				)
+			) {
+				reference.forEach((item: ShoppingListLineItem) => {
+					this._resolveShoppingListLineItemVariant(projectKey, item)
+				})
+			}
+		}
+
 		if (!params.index) {
 			const reference = obj[params.element]
 			if (reference === undefined) {
@@ -455,5 +473,25 @@ export class InMemoryStorage extends AbstractStorage {
 				this._resolveResource(projectKey, reference, expand)
 			}
 		}
+	}
+	private _resolveShoppingListLineItemVariant(
+		projectKey: string,
+		lineItem: ShoppingListLineItem
+	) {
+		const product = this.getByResourceIdentifier(projectKey, {
+			typeId: 'product',
+			id: lineItem.productId,
+		}) as Product | undefined
+
+		if (!product) {
+			return
+		}
+
+		const variant = [
+			product.masterData.current.masterVariant,
+			...product.masterData.current.variants,
+		].find((e) => e.id === lineItem.variantId)
+		// @ts-ignore
+		lineItem.variant = variant
 	}
 }

@@ -1,4 +1,8 @@
-import { Product, ShoppingList } from '@commercetools/platform-sdk'
+import {
+	Product,
+	ShoppingList,
+	ShoppingListDraft,
+} from '@commercetools/platform-sdk'
 import supertest from 'supertest'
 import { beforeEach, describe, expect, test } from 'vitest'
 import { CommercetoolsMock } from '../ctMock'
@@ -12,23 +16,22 @@ const shoppingList: ShoppingList = {
 			productType: { typeId: 'product-type', id: 'product-type-id' },
 			id: '42ea3c57-aced-49ea-ae70-7005a47c7463',
 			productId: '303bf5d8-1201-4fb9-8157-ff6efb8c04b4',
-			name: { 'en-GB': '2 Pack Trunks Mens' },
+			name: {},
 			quantity: 1,
-			productSlug: { 'en-GB': 'product-42201103' },
+			productSlug: {},
 			variantId: 2,
 		},
 	],
 	textLineItems: [],
 	createdAt: '2021-07-22T12:23:33.472Z',
 	lastModifiedAt: '2021-08-03T14:19:29.496Z',
-	name: { 'en-GB': 'foo' },
+	name: {},
 }
 
 export const product: Product = {
 	id: '303bf5d8-1201-4fb9-8157-ff6efb8c04b4',
 	createdAt: '2022-05-30T13:21:26.777Z',
 	lastModifiedAt: '2022-05-30T13:21:26.777Z',
-	key: '76149475',
 	version: 1,
 	productType: {
 		typeId: 'product-type',
@@ -36,78 +39,27 @@ export const product: Product = {
 	},
 	masterData: {
 		staged: {
-			name: { 'en-GB': 'test product' },
+			name: {},
 			categories: [],
-			slug: { 'en-GB': 'test-product' },
+			slug: {},
 			masterVariant: {
 				id: 1,
-				sku: '22241940260',
-				attributes: [{ name: 'test', value: 'test' }],
-				prices: [],
 			},
 			variants: [],
 			searchKeywords: {},
 		},
 		current: {
-			name: { 'en-GB': 'test product' },
-			slug: { 'en-GB': 'test-product' },
-			description: { 'en-GB': 'test product' },
-			metaDescription: { 'en-GB': 'test product' },
-			metaKeywords: { 'en-GB': 'foo, bar' },
+			name: {},
+			slug: {},
 			categories: [],
 			masterVariant: {
 				id: 1,
-				sku: '22241940260',
-				attributes: [],
-				prices: [],
-				availability: {
-					channels: {
-						'd63b6da3-6b4c-43ca-9e46-d43f866fd388': {
-							id: 'd63b6da3-6b4c-43ca-9e46-d43f866fd388',
-							version: 1,
-							isOnStock: true,
-							restockableInDays: 0,
-							availableQuantity: 361,
-						},
-					},
-				},
-				price: {
-					id: 'd63b6da3-6b4c-43ca-9e46-d43f866fd388',
-					value: {
-						type: 'centPrecision',
-						currencyCode: 'MYR',
-						centAmount: 9200,
-						fractionDigits: 2,
-					},
-				},
+				availability: {},
 			},
 			variants: [
 				{
 					id: 2,
 					sku: '22241940260',
-					attributes: [],
-					prices: [],
-					availability: {
-						channels: {
-							'd63b6da3-6b4c-43ca-9e46-d43f866fd388': {
-								id: 'd63b6da3-6b4c-43ca-9e46-d43f866fd388',
-								version: 1,
-								isOnStock: true,
-								restockableInDays: 0,
-								availableQuantity: 361,
-							},
-						},
-					},
-					images: [],
-					price: {
-						id: '303bf5d8-1201-4fb9-8157-ff6efb8c04b4',
-						value: {
-							type: 'centPrecision',
-							currencyCode: 'MYR',
-							centAmount: 9200,
-							fractionDigits: 2,
-						},
-					},
 				},
 			],
 			searchKeywords: {},
@@ -127,7 +79,18 @@ describe('Shopping list', () => {
 		ctMock.project().add('shopping-list', shoppingList)
 	})
 
-	test('Adds variant ID on lineItems when creating', () => {})
+	test('Adds variant ID on lineItems when creating', async () => {
+		const draft: ShoppingListDraft = {
+			name: {},
+			lineItems: [{ sku: '22241940260' }],
+		}
+		const response = await supertest(ctMock.app)
+			.post('/dummy/shopping-lists')
+			.send(draft)
+
+		expect(response.status).toBe(201)
+		expect(response.body.lineItems[0].variantId).toBe(2)
+	})
 
 	test('Expands variant on lineItems', async () => {
 		const response = await supertest(ctMock.app)
@@ -135,9 +98,9 @@ describe('Shopping list', () => {
 			.query({ expand: 'lineItems[*].variant' })
 
 		expect(response.status).toBe(200)
-		expect(response.body.lineItems[0].variantId).toBe(2)
-		expect(response.body.lineItems[0].variant).toEqual(
-			product.masterData.current.variants[0]
-		)
+		expect(response.body.lineItems[0].variant).toEqual({
+			id: 2,
+			sku: '22241940260',
+		})
 	})
 })
