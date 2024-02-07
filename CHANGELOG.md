@@ -1,5 +1,11 @@
 ## 1.11.0
 
+## 2.15.0
+
+### Minor Changes
+
+- [`c36ccb6`](https://github.com/labd/commercetools-node-mock/commit/c36ccb6da4ad4674cb4d54f73d9cbd7949dc7c2b) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Implement all Payment update actions
+
 ## 2.14.2
 
 ### Patch Changes
