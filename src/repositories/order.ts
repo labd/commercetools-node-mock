@@ -98,7 +98,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 				? {
 						key: context.storeKey,
 						typeId: 'store',
-					}
+				  }
 				: undefined,
 			lastMessageSequenceNumber: 0,
 		}

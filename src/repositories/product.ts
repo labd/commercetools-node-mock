@@ -184,7 +184,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 						draft.channel,
 						context.projectKey,
 						this._storage
-					)
+				  )
 				: undefined,
 		}
 	}
@@ -587,8 +587,8 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		) => {
 			const changeVariantPrice = (data: Writable<ProductData>) => {
 				const allVariants = [data.masterVariant, ...(data.variants ?? [])]
-				const priceVariant = allVariants.find((variant) =>
-					variant.prices?.some((x) => x.id === priceId)
+				const priceVariant = allVariants.find(
+					(variant) => variant.prices?.some((x) => x.id === priceId)
 				)
 				if (!priceVariant) {
 					throw new Error(
@@ -645,8 +645,8 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 		) => {
 			const removeVariantPrice = (data: Writable<ProductData>) => {
 				const allVariants = [data.masterVariant, ...(data.variants ?? [])]
-				const priceVariant = allVariants.find((variant) =>
-					variant.prices?.some((x) => x.id === priceId)
+				const priceVariant = allVariants.find(
+					(variant) => variant.prices?.some((x) => x.id === priceId)
 				)
 				if (!priceVariant) {
 					throw new Error(

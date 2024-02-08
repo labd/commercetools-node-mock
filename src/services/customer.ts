@@ -25,7 +25,7 @@ export class CustomerService extends AbstractService {
 			// @ts-ignore
 			const ttlMinutes: number = request.params.ttlMinutes
 				? // @ts-ignore
-					+request.params.ttlMinutes
+				  +request.params.ttlMinutes
 				: 34560
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { version, ...rest } = getBaseResourceProperties()

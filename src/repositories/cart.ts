@@ -411,7 +411,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 				? this._storage.getByResourceIdentifier<'tax-category'>(
 						context.projectKey,
 						taxCategory
-					)
+				  )
 				: undefined
 
 			resource.shippingInfo = {
@@ -425,7 +425,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 					? {
 							typeId: 'tax-category',
 							id: tax?.id,
-						}
+					  }
 					: undefined,
 				shippingMethodState: 'MatchesCart',
 			}
