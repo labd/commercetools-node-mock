@@ -180,7 +180,7 @@ class Lexer<T> implements Iterable<Token<T>> {
 							i,
 							i + n.result[0].length,
 							this
-					  )
+						)
 				: null
 		}
 		const t = read()

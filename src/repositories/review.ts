@@ -35,12 +35,12 @@ export class ReviewRepository extends AbstractResourceRepository<'review'> {
 						draft.state,
 						context.projectKey,
 						this._storage
-				  )
+					)
 				: undefined,
 			target: draft.target
 				? getReferenceFromResourceIdentifier<
 						ProductReference | ChannelReference
-				  >(draft.target, context.projectKey, this._storage)
+					>(draft.target, context.projectKey, this._storage)
 				: undefined,
 			includedInStatistics: false,
 			custom: createCustomFields(
