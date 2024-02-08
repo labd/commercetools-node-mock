@@ -1,5 +1,3 @@
-## 1.11.0
-
 ## 2.15.0
 
 ### Minor Changes
@@ -152,6 +150,8 @@
 ### Major Changes
 
 - [#108](https://github.com/labd/commercetools-node-mock/pull/108) [`0073abe`](https://github.com/labd/commercetools-node-mock/commit/0073abe1ff75a4bd8b9150cd053b77f0649576ca) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch from nock to MSW 2.0 to support native fetch calls. This requires Node 18+
+
+## 1.11.0
 
 ### Minor Changes
 

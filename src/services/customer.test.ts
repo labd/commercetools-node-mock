@@ -330,4 +330,44 @@ describe('Customer Update Actions', () => {
 			},
 		])
 	})
+
+	test('setCustomerNumber', async () => {
+		assert(customer, 'customer not created')
+
+		ctMock.project('dummy').add('customer', customer)
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: 'setCustomerNumber', customerNumber: 'CUSTOMER-001' },
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.customerNumber).toBe('CUSTOMER-001')
+	})
+
+	test('setCustomerNumber error when already have a customer number', async () => {
+		assert(customer, 'customer not created')
+
+		ctMock.project('dummy').add('customer', {
+			...customer,
+			customerNumber: 'CUSTOMER-002',
+		})
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: 'setCustomerNumber', customerNumber: 'CUSTOMER-001' },
+				],
+			})
+		expect(response.status).toBe(500)
+		expect(response.body.error).toBe(
+			'A Customer number already exists and cannot be set again.'
+		)
+	})
 })
