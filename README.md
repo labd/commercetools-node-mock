@@ -79,7 +79,15 @@ describe('A module', () => {
 
 ## Contributing
 
-### Adding a new service
+This codebases use [@changesets](https://github.com/changesets/changesets) for release and version management
+
+- Create a feature branch with new features / fixes (see [Adding a new service](#adding-a-service))
+- When your code changes are complete, add a changeset file to your feature branch using `pnpm changeset`
+- Create a PR to request your changes to be merged to main
+- After your PR is merged, GitHub actions will create a release PR or add your changeset to an existing release PR
+- When the release is ready merge the release branch. A new version will be released
+
+### Adding a new service {#adding-a-service}
 
 Implement the following:
 
@@ -88,11 +96,3 @@ Implement the following:
 - Add new service to src/ctMock.ts ctMock.\_services
 - Add new service to src/storage.ts InMemoryStorage
 - Adjust src/types.ts RepositoryMap and possibly serviceTypes
-
-### Releasing
-
-This codebases use [@changesets](https://github.com/changesets/changesets) for release and version management
-
-- Create a new changeset using `pnpm changeset`
-- Push the changes to the `main` branch.
-- GitHub actions will create a release PR. When the release is ready merge the release branch
