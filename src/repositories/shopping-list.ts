@@ -345,7 +345,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 			),
 		}
 
-		if (variantId) {
+		if (productId && variantId) {
 			return lineItem
 		}
 
@@ -367,6 +367,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 			]
 			const variantId = allVariants.find((e) => e.sku === sku)?.id
 			lineItem.variantId = variantId
+			lineItem.productId = product.id
 			return lineItem
 		}
 

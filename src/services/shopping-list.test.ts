@@ -93,12 +93,29 @@ describe('Shopping List', () => {
 		expect(response.body.lineItems[0].variantId).toBe(2)
 	})
 
-	test('Expands variant on lineItems', async () => {
+	test('Expands variant on lineItems when getting', async () => {
 		const response = await supertest(ctMock.app)
 			.get(`/dummy/shopping-lists/${shoppingList.id}`)
 			.query({ expand: 'lineItems[*].variant' })
 
 		expect(response.status).toBe(200)
+		expect(response.body.lineItems[0].variant).toEqual({
+			id: 2,
+			sku: '22241940260',
+		})
+	})
+
+	test('Expands variant on lineItems when creating', async () => {
+		const draft: ShoppingListDraft = {
+			name: {},
+			lineItems: [{ sku: '22241940260' }],
+		}
+		const response = await supertest(ctMock.app)
+			.post('/dummy/shopping-lists')
+			.query({ expand: 'lineItems[*].variant' })
+			.send(draft)
+
+		expect(response.status).toBe(201)
 		expect(response.body.lineItems[0].variant).toEqual({
 			id: 2,
 			sku: '22241940260',
