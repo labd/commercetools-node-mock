@@ -9,6 +9,7 @@ import type {
 	CustomerSetFirstNameAction,
 	CustomerSetLastNameAction,
 	CustomerSetVatIdAction,
+	CustomerSetCustomerNumberAction,
 	DuplicateFieldError,
 	InvalidInputError,
 	InvalidJsonInputError,
@@ -210,6 +211,18 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 				throw new Error('Resource has no custom field')
 			}
 			resource.custom.fields[name] = value
+		},
+		setCustomerNumber: (
+			_context: RepositoryContext,
+			resource: Writable<Customer>,
+			{ customerNumber }: CustomerSetCustomerNumberAction
+		) => {
+			if (resource.customerNumber) {
+				throw new Error(
+					'A Customer number already exists and cannot be set again.'
+				)
+			}
+			resource.customerNumber = customerNumber
 		},
 	}
 }
