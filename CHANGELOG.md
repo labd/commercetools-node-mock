@@ -1,5 +1,11 @@
 ## 2.15.0
 
+## 2.16.1
+
+### Patch Changes
+
+- [#156](https://github.com/labd/commercetools-node-mock/pull/156) [`c426209`](https://github.com/labd/commercetools-node-mock/commit/c42620971baba43940c8bd97fd9be677ac48ce80) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - correctly set productID on ShoppingListLineItem when adding line item by sku
+
 ## 2.16.0
 
 ### Minor Changes
