@@ -27,6 +27,7 @@ import {
 	type CartRemoveDiscountCodeAction,
 	type ProductVariant,
 	type CartSetCustomShippingMethodAction,
+	CartSetDirectDiscountsAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { CommercetoolsError } from '../exceptions.js'
@@ -454,6 +455,17 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 					fields: fields || {},
 				}
 			}
+		},
+		setDirectDiscounts: (
+			context: RepositoryContext,
+			resource: Writable<Cart>,
+			{ discounts }: CartSetDirectDiscountsAction
+		) => {
+			// Doesn't apply any discounts logic, just sets the directDiscounts field
+			resource.directDiscounts = discounts.map((discount) => ({
+				...discount,
+				id: uuidv4(),
+			}))
 		},
 		setLocale: (
 			context: RepositoryContext,

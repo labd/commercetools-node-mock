@@ -440,6 +440,56 @@ describe('Cart Update Actions', () => {
 		expect(response.body.country).toBe('NL')
 	})
 
+	test('setDirectDiscounts', async () => {
+		assert(cart, 'cart not created')
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: 'setDirectDiscounts',
+						discounts: [
+							{
+								target: { type: 'totalPrice' },
+								value: {
+									money: [
+										{
+											centAmount: 500,
+											currencyCode: 'EUR',
+											fractionDigits: 2,
+											type: 'centPrecision',
+										},
+									],
+									type: 'absolute',
+								},
+							},
+						],
+					},
+				],
+			})
+		expect(response.status).toBe(200)
+		expect(response.body.version).toBe(2)
+		expect(response.body.directDiscounts).toMatchObject([
+			{
+				id: expect.any(String),
+				target: { type: 'totalPrice' },
+				value: {
+					money: [
+						{
+							centAmount: 500,
+							currencyCode: 'EUR',
+							fractionDigits: 2,
+							type: 'centPrecision',
+						},
+					],
+					type: 'absolute',
+				},
+			},
+		])
+	})
+
 	test('setCustomerEmail', async () => {
 		assert(cart, 'cart not created')
 
