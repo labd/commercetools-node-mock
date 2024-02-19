@@ -1,5 +1,11 @@
 ## 2.15.0
 
+## 2.17.0
+
+### Minor Changes
+
+- [#158](https://github.com/labd/commercetools-node-mock/pull/158) [`91c4637`](https://github.com/labd/commercetools-node-mock/commit/91c46376c026246c33bf26bb1c2fa3ef5989aa3a) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for cart setDirectDiscounts action
+
 ## 2.16.1
 
 ### Patch Changes
