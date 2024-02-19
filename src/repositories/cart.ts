@@ -27,7 +27,7 @@ import {
 	type CartRemoveDiscountCodeAction,
 	type ProductVariant,
 	type CartSetCustomShippingMethodAction,
-	CartSetDirectDiscountsAction,
+	type CartSetDirectDiscountsAction,
 } from '@commercetools/platform-sdk'
 import { v4 as uuidv4 } from 'uuid'
 import { CommercetoolsError } from '../exceptions.js'
