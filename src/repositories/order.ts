@@ -102,8 +102,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 				: undefined,
 			lastMessageSequenceNumber: 0,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	import(context: RepositoryContext, draft: OrderImportDraft): Order {
@@ -156,8 +155,7 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 
 			totalPrice: createCentPrecisionMoney(draft.totalPrice),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	private lineItemFromImportDraft(

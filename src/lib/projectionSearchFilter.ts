@@ -288,7 +288,9 @@ const filterVariants =
 				// set to true. For the other variants in the same product projection
 				// this field is set to false.
 				if (markMatchingVariants) {
-					variants.forEach((v) => (v.isMatchingVariant = false))
+					for (const v of variants) {
+						v.isMatchingVariant = false
+					}
 					variant.isMatchingVariant = true
 				}
 				return true

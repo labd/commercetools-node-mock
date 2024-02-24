@@ -64,7 +64,7 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 			? (resource as BaseResource).id
 			: (resource as Project).key
 
-		actions.forEach((action) => {
+		for (const action of actions) {
 			const updateFunc = this.actions[action.action]
 
 			if (!updateFunc) {
@@ -88,7 +88,7 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 
 				updatedResource.version += 1
 			}
-		})
+		}
 
 		// If all actions succeeded we write the new version
 		// to the storage.
@@ -175,9 +175,13 @@ export abstract class AbstractResourceRepository<
 	saveNew(
 		context: RepositoryContext,
 		resource: ShallowWritable<ResourceMap[T]>
-	) {
+	): ResourceMap[T] {
 		resource.version = 1
-		this._storage.add(context.projectKey, this.getTypeId(), resource as any)
+		return this._storage.add(
+			context.projectKey,
+			this.getTypeId(),
+			resource as any
+		)
 	}
 
 	saveUpdate(

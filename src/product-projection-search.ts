@@ -237,9 +237,9 @@ export class ProductProjectionSearch {
 		const terms: Record<any, number> = {}
 
 		if (facet.startsWith('variants.')) {
-			products.forEach((p) => {
+			for (const p of products) {
 				const variants = getVariants(p)
-				variants.forEach((v) => {
+				for (const v of variants) {
 					result.total++
 
 					let value = resolveVariantValue(v, facet)
@@ -251,10 +251,10 @@ export class ProductProjectionSearch {
 						}
 						terms[value] = value in terms ? terms[value] + 1 : 1
 					}
-				})
-			})
+				}
+			}
 		} else {
-			products.forEach((p) => {
+			for (const p of products) {
 				const value = nestedLookup(p, facet)
 				result.total++
 				if (value === undefined) {
@@ -262,7 +262,7 @@ export class ProductProjectionSearch {
 				} else {
 					terms[value] = value in terms ? terms[value] + 1 : 1
 				}
-			})
+			}
 		}
 		for (const term in terms) {
 			result.terms.push({
@@ -309,7 +309,7 @@ export class ProductProjectionSearch {
 		const counts =
 			ranges?.map((range) => {
 				if (source.startsWith('variants.')) {
-					const values = []
+					const values: number[] = []
 					for (const p of products) {
 						for (const v of getVariants(p)) {
 							const val = resolveVariantValue(v, source)

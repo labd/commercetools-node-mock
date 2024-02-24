@@ -32,8 +32,7 @@ export class TypeRepository extends AbstractResourceRepository<'type'> {
 			fieldDefinitions: draft.fieldDefinitions || [],
 			description: draft.description,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 	actions: Partial<
 		Record<

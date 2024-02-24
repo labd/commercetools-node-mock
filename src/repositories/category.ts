@@ -74,8 +74,7 @@ export class CategoryRepository extends AbstractResourceRepository<'category'> {
 				this._storage
 			),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions = {

@@ -32,7 +32,7 @@ export abstract class AbstractStorage {
 		projectKey: string,
 		typeId: RT,
 		obj: ResourceMap[RT]
-	): void
+	): ResourceMap[RT]
 
 	abstract get<RT extends ResourceType>(
 		projectKey: string,

@@ -35,9 +35,7 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 			),
 		}
 
-		this.saveNew(context, resource)
-
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions = {

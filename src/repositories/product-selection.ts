@@ -24,8 +24,7 @@ export class ProductSelectionRepository extends AbstractResourceRepository<'prod
 			name: draft.name,
 			mode: 'Individual',
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions: Partial<

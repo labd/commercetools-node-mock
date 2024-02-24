@@ -64,8 +64,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 				? getStoreKeyReference(draft.store, context.projectKey, this._storage)
 				: undefined,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions = {

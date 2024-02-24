@@ -29,8 +29,7 @@ export class CustomerGroupRepository extends AbstractResourceRepository<'custome
 				this._storage
 			),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions = {

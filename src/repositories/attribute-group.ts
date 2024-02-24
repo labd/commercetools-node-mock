@@ -29,8 +29,7 @@ export class AttributeGroupRepository extends AbstractResourceRepository<'attrib
 			key: draft.key,
 			attributes: draft.attributes,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions = {

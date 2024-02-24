@@ -74,8 +74,7 @@ export class PaymentRepository extends AbstractResourceRepository<'payment'> {
 			),
 		}
 
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	transactionFromTransactionDraft = (

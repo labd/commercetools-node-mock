@@ -63,8 +63,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 				this._storage
 			),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	private transformValueDraft(value: CartDiscountValueDraft) {

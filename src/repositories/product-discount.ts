@@ -45,8 +45,7 @@ export class ProductDiscountRepository extends AbstractResourceRepository<'produ
 			validUntil: draft.validUntil,
 			references: [],
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	private transformValueDraft(

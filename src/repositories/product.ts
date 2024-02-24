@@ -152,9 +152,7 @@ export class ProductRepository extends AbstractResourceRepository<'product'> {
 			},
 		}
 
-		this.saveNew(context, resource)
-
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	private variantFromDraft(

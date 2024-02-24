@@ -63,8 +63,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository<'shippi
 				this._storage
 			),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	private _transformZoneRateDraft = (

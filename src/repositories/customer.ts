@@ -62,8 +62,7 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 			addresses: [],
 			customerNumber: draft.customerNumber,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	passwordResetToken(context: RepositoryContext, email: string): CustomerToken {

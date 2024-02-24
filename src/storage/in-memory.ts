@@ -397,9 +397,9 @@ export class InMemoryStorage extends AbstractStorage {
 		if (!clause) return obj
 		const newObj = cloneObject(obj)
 		if (Array.isArray(clause)) {
-			clause.forEach((c) => {
+			for (const c of clause) {
 				this._resolveResource(projectKey, newObj, c)
-			})
+			}
 		} else {
 			this._resolveResource(projectKey, newObj, clause)
 		}
@@ -420,9 +420,9 @@ export class InMemoryStorage extends AbstractStorage {
 						item.variant === undefined && item.variantId !== undefined
 				)
 			) {
-				reference.forEach((item: ShoppingListLineItem) => {
+				for (const item of reference as ShoppingListLineItem[]) {
 					this._resolveShoppingListLineItemVariant(projectKey, item)
-				})
+				}
 			}
 		}
 
@@ -435,9 +435,9 @@ export class InMemoryStorage extends AbstractStorage {
 		} else if (params.index === '*') {
 			const reference = obj[params.element]
 			if (reference === undefined || !Array.isArray(reference)) return
-			reference.forEach((itemRef: Writable<Reference>) => {
+			for (const itemRef of reference as Writable<Reference>[]) {
 				this._resolveReference(projectKey, itemRef, params.rest)
-			})
+			}
 		} else {
 			const reference = obj[params.element][params.index]
 			if (reference === undefined) return

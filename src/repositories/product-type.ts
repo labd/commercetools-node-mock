@@ -32,8 +32,7 @@ export class ProductTypeRepository extends AbstractResourceRepository<'product-t
 			),
 		}
 
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	attributeDefinitionFromAttributeDefinitionDraft = (

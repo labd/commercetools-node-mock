@@ -56,8 +56,7 @@ export class DiscountCodeRepository extends AbstractResourceRepository<'discount
 				this._storage
 			),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions: Partial<

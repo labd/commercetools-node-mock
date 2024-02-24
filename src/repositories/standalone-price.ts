@@ -37,8 +37,7 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<'stand
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	transformChannelReferenceDraft(

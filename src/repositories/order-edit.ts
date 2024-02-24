@@ -22,8 +22,7 @@ export class OrderEditRepository extends AbstractResourceRepository<'order-edit'
 				type: 'NotProcessed',
 			} as OrderEditResult,
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions: Partial<

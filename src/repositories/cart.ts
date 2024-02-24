@@ -97,8 +97,7 @@ export class CartRepository extends AbstractResourceRepository<'cart'> {
 		}
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource)
 
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	getActiveCart(projectKey: string): Cart | undefined {

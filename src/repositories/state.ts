@@ -31,8 +31,7 @@ export class StateRepository extends AbstractResourceRepository<'state'> {
 			),
 		}
 
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	actions: Partial<

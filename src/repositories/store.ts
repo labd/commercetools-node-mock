@@ -43,8 +43,7 @@ export class StoreRepository extends AbstractResourceRepository<'store'> {
 				this._storage
 			),
 		}
-		this.saveNew(context, resource)
-		return resource
+		return this.saveNew(context, resource)
 	}
 
 	private transformChannels(
