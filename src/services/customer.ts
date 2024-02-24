@@ -1,9 +1,10 @@
-import { Router } from 'express'
+import { type Request, type Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { getBaseResourceProperties } from '../helpers.js'
 import { CustomerRepository } from '../repositories/customer.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
+import { CustomerSignInResult } from '@commercetools/platform-sdk'
 
 export class CustomerService extends AbstractService {
 	public repository: CustomerRepository
@@ -15,6 +16,20 @@ export class CustomerService extends AbstractService {
 
 	getBasePath() {
 		return 'customers'
+	}
+
+	post(request: Request, response: Response) {
+		const draft = request.body
+		const resource = this.repository.create(
+			getRepositoryContext(request),
+			draft
+		)
+		const expanded = this._expandWithId(request, resource.id)
+
+		const result: CustomerSignInResult = {
+			customer: expanded,
+		}
+		return response.status(this.createStatusCode).send(result)
 	}
 
 	extraRoutes(parent: Router) {
