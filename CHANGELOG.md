@@ -1,5 +1,13 @@
 ## 2.15.0
 
+## 2.17.1
+
+### Patch Changes
+
+- [`f101f3b`](https://github.com/labd/commercetools-node-mock/commit/f101f3b974c2b36aad6065fe652c4a6ce1931825) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Return correct type for customer create (CustomerSignInResult)
+
+- [`19df959`](https://github.com/labd/commercetools-node-mock/commit/19df959556216ea7e56e82b8e3ebd39f1b2a84e8) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Format the refresh tokens to match commercetools
+
 ## 2.17.0
 
 ### Minor Changes
