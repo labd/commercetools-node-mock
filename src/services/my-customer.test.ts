@@ -1,5 +1,6 @@
 import type {
 	CustomerChangePassword,
+	CustomerToken,
 	MyCustomerDraft,
 } from '@commercetools/platform-sdk'
 import supertest from 'supertest'
@@ -161,15 +162,65 @@ describe('/me', () => {
 			.post('/dummy/me/password')
 			.send(draft)
 
-		expect(response.status).toBe(404)
+		expect(response.status).toBe(400)
 		expect(response.body).toEqual({
+			message: 'Account with the given credentials not found.',
+			statusCode: 400,
 			errors: [
 				{
 					code: 'InvalidCurrentPassword',
 					message: 'Account with the given credentials not found.',
 				},
 			],
-			message: 'Account with the given credentials not found.',
+		})
+	})
+
+	test('reset password flow', async () => {
+		const customer = {
+			...getBaseResourceProperties(),
+			id: 'customer-uuid',
+			email: 'user@example.com',
+			password: hashPassword('p4ssw0rd'),
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: 'Password', //default in Commercetools
+			version: 1,
+		}
+		ctMock.project('dummy').add('customer', customer)
+
+		const token = await supertest(ctMock.app)
+			.post('/dummy/customers/password-token')
+			.send({
+				email: 'user@example.com',
+			})
+			.then((response) => response.body as CustomerToken)
+
+		const response = await supertest(ctMock.app)
+			.post('/dummy/me/password/reset')
+			.send({
+				tokenValue: token.value,
+				newPassword: 'somethingNew',
+			})
+		expect(response.status).toBe(200)
+	})
+
+	test('fail reset password flow', async () => {
+		const response = await supertest(ctMock.app)
+			.post('/dummy/me/password/reset')
+			.send({
+				tokenValue: 'invalid-token',
+				newPassword: 'somethingNew',
+			})
+		expect(response.status).toBe(400)
+		expect(response.body).toEqual({
+			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+			statusCode: 400,
+			errors: [
+				{
+					code: 'ResourceNotFound',
+					message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+				},
+			],
 		})
 	})
 

@@ -35,6 +35,7 @@ import { SubscriptionRepository } from './subscription.js'
 import { TaxCategoryRepository } from './tax-category.js'
 import { TypeRepository } from './type.js'
 import { ZoneRepository } from './zone.js'
+import { MyCustomerRepository } from './my-customer.js'
 
 export type RepositoryMap = ReturnType<typeof createRepositories>
 
@@ -57,7 +58,7 @@ export const createRepositories = (storage: AbstractStorage) => ({
 	payment: new PaymentRepository(storage),
 	'my-cart': new CartRepository(storage),
 	'my-order': new MyOrderRepository(storage),
-	'my-customer': new CustomerRepository(storage),
+	'my-customer': new MyCustomerRepository(storage),
 	'my-payment': new PaymentRepository(storage),
 	'my-shopping-list': new ShoppingListRepository(storage),
 	product: new ProductRepository(storage),

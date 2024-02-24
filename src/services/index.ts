@@ -33,8 +33,12 @@ import { SubscriptionService } from './subscription.js'
 import { TaxCategoryService } from './tax-category.js'
 import { TypeService } from './type.js'
 import { ZoneService } from './zone.js'
+import { createRepositories } from '../repositories'
 
-export const createServices = (router: any, repos: any) => ({
+export const createServices = (
+	router: any,
+	repos: ReturnType<typeof createRepositories>
+) => ({
 	'associate-role': new AssociateRoleServices(router, repos['associate-role']),
 	'business-unit': new BusinessUnitServices(router, repos['business-unit']),
 	category: new CategoryServices(router, repos['category']),

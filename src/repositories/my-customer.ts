@@ -1,0 +1,114 @@
+import {
+	ResourceNotFoundError,
+	type MyCustomerResetPassword,
+	Customer,
+	MyCustomerChangePassword,
+	InvalidCurrentPasswordError,
+} from '@commercetools/platform-sdk'
+import { type RepositoryContext } from './abstract.js'
+import { CustomerRepository } from './customer.js'
+import { hashPassword, validatePasswordResetToken } from '../lib/password.js'
+import { CommercetoolsError } from '../exceptions.js'
+import { Writable } from '../types.js'
+
+export class MyCustomerRepository extends CustomerRepository {
+	getMe(context: RepositoryContext): Customer | undefined {
+		// grab the first customer you can find for now. In the future we should
+		// use the customer id from the scope of the token
+		const results = this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{}
+		)
+
+		if (results.count > 0) {
+			return results.results[0] as Customer
+		}
+
+		return
+	}
+
+	deleteMe(context: RepositoryContext): Customer | undefined {
+		// grab the first customer you can find for now. In the future we should
+		// use the customer id from the scope of the token
+		const results = this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{}
+		)
+
+		if (results.count > 0) {
+			return this.delete(context, results.results[0].id) as Customer
+		}
+
+		return
+	}
+
+	changePassword(
+		context: RepositoryContext,
+		changePassword: MyCustomerChangePassword
+	) {
+		const { currentPassword, newPassword } = changePassword
+		const encodedPassword = hashPassword(currentPassword)
+
+		const result = this._storage.query(context.projectKey, 'customer', {
+			where: [`password = "${encodedPassword}"`],
+		})
+		if (result.count === 0) {
+			throw new CommercetoolsError<InvalidCurrentPasswordError>({
+				code: 'InvalidCurrentPassword',
+				message: 'Account with the given credentials not found.',
+			})
+		}
+
+		const customer = result.results[0] as Writable<Customer>
+		if (customer.password !== hashPassword(currentPassword)) {
+			throw new CommercetoolsError<InvalidCurrentPasswordError>({
+				code: 'InvalidCurrentPassword',
+				message: 'The current password is invalid.',
+			})
+		}
+
+		customer.password = hashPassword(newPassword)
+		customer.version += 1
+
+		// Update storage
+		this._storage.add(context.projectKey, 'customer', customer)
+		return customer
+	}
+
+	resetPassword(
+		context: RepositoryContext,
+		resetPassword: MyCustomerResetPassword
+	) {
+		const { newPassword, tokenValue } = resetPassword
+
+		const customerId = validatePasswordResetToken(tokenValue)
+		if (!customerId) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: 'ResourceNotFound',
+				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
+			})
+		}
+
+		const customer = this._storage.get(
+			context.projectKey,
+			'customer',
+			customerId
+		) as Writable<Customer> | undefined
+
+		if (!customer) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: 'ResourceNotFound',
+				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
+			})
+		}
+
+		customer.password = hashPassword(newPassword)
+		customer.version += 1
+
+		// Update storage
+		this._storage.add(context.projectKey, 'customer', customer)
+		return customer
+	}
+}

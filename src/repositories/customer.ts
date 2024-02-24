@@ -13,6 +13,8 @@ import type {
 	DuplicateFieldError,
 	InvalidInputError,
 	InvalidJsonInputError,
+	ResourceNotFoundError,
+	CustomerToken,
 } from '@commercetools/platform-sdk'
 import { CommercetoolsError } from '../exceptions.js'
 import { getBaseResourceProperties } from '../helpers.js'
@@ -21,7 +23,7 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from './abstract.js'
-import { hashPassword } from '../lib/password.js'
+import { createPasswordResetToken, hashPassword } from '../lib/password.js'
 import { createAddress } from './helpers.js'
 
 export class CustomerRepository extends AbstractResourceRepository<'customer'> {
@@ -64,36 +66,26 @@ export class CustomerRepository extends AbstractResourceRepository<'customer'> {
 		return resource
 	}
 
-	getMe(context: RepositoryContext): Customer | undefined {
-		// grab the first customer you can find for now. In the future we should
-		// use the customer id from the scope of the token
-		const results = this._storage.query(
-			context.projectKey,
-			this.getTypeId(),
-			{}
-		)
-
-		if (results.count > 0) {
-			return results.results[0] as Customer
+	passwordResetToken(context: RepositoryContext, email: string): CustomerToken {
+		const results = this._storage.query(context.projectKey, this.getTypeId(), {
+			where: [`email="${email.toLocaleLowerCase()}"`],
+		})
+		if (results.count === 0) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: 'ResourceNotFound',
+				message: `The Customer with ID '${email}' was not found.`,
+			})
 		}
-
-		return
-	}
-
-	deleteMe(context: RepositoryContext): Customer | undefined {
-		// grab the first customer you can find for now. In the future we should
-		// use the customer id from the scope of the token
-		const results = this._storage.query(
-			context.projectKey,
-			this.getTypeId(),
-			{}
-		)
-
-		if (results.count > 0) {
-			return this.delete(context, results.results[0].id) as Customer
+		const expiresAt = new Date(Date.now() + 30 * 60)
+		const customer = results.results[0] as Customer
+		const { version: _, ...rest } = getBaseResourceProperties()
+		const token = createPasswordResetToken(customer)
+		return {
+			...rest,
+			customerId: customer.id,
+			expiresAt: expiresAt.toISOString(),
+			value: token,
 		}
-
-		return
 	}
 
 	actions = {

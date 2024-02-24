@@ -1,18 +1,14 @@
 import { Request, Response, Router } from 'express'
-import { CustomerRepository } from '../repositories/customer.js'
 import { getRepositoryContext } from '../repositories/helpers.js'
 import AbstractService from './abstract.js'
 import { hashPassword } from '../lib/password.js'
-import {
-	Customer,
-	Update,
-	InvalidCurrentPasswordError,
-} from '@commercetools/platform-sdk'
+import { Update } from '@commercetools/platform-sdk'
+import { MyCustomerRepository } from '../repositories/my-customer.js'
 
 export class MyCustomerService extends AbstractService {
-	public repository: CustomerRepository
+	public repository: MyCustomerRepository
 
-	constructor(parent: Router, repository: CustomerRepository) {
+	constructor(parent: Router, repository: MyCustomerRepository) {
 		super(parent)
 		this.repository = repository
 	}
@@ -36,6 +32,7 @@ export class MyCustomerService extends AbstractService {
 
 		router.post('/login', this.signIn.bind(this))
 		router.post('/password', this.changePassword.bind(this))
+		router.post('/password/reset', this.resetPassword.bind(this))
 
 		parent.use(`/${basePath}`, router)
 	}
@@ -85,33 +82,21 @@ export class MyCustomerService extends AbstractService {
 	}
 
 	changePassword(request: Request, response: Response) {
-		const { currentPassword, newPassword } = request.body
-		const encodedPassword = hashPassword(currentPassword)
+		const customer = this.repository.changePassword(
+			getRepositoryContext(request),
+			request.body
+		)
 
-		const result = this.repository.query(getRepositoryContext(request), {
-			where: [`password = "${encodedPassword}"`],
-		})
+		return response.status(200).send(customer)
+	}
 
-		if (result.count === 0) {
-			return response.status(404).send({
-				message: 'Account with the given credentials not found.',
-				errors: [
-					{
-						code: 'InvalidCurrentPassword',
-						message: 'Account with the given credentials not found.',
-					} as InvalidCurrentPasswordError,
-				],
-			})
-		}
+	resetPassword(request: Request, response: Response) {
+		const customer = this.repository.resetPassword(
+			getRepositoryContext(request),
+			request.body
+		)
 
-		const newCustomer: Customer = {
-			...result.results[0],
-			password: hashPassword(newPassword),
-		}
-
-		this.repository.saveNew(getRepositoryContext(request), newCustomer)
-
-		return response.status(200).send(newCustomer)
+		return response.status(200).send(customer)
 	}
 
 	signIn(request: Request, response: Response) {
