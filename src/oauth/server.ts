@@ -221,6 +221,7 @@ export class OAuth2Server {
 		response: Response,
 		next: NextFunction
 	) {
+		const projectKey = request.params.projectKey
 		const grantType = request.query.grant_type || request.body.grant_type
 		if (!grantType) {
 			return next(
@@ -262,7 +263,7 @@ export class OAuth2Server {
 			}
 
 			const customer = result.results[0]
-			const token = this.store.getCustomerToken(scope, customer.id)
+			const token = this.store.getCustomerToken(projectKey, customer.id, scope)
 			return response.status(200).send(token)
 		}
 	}
@@ -288,6 +289,7 @@ export class OAuth2Server {
 		response: Response,
 		next: NextFunction
 	) {
+		const projectKey = request.params.projectKey
 		const grantType = request.query.grant_type || request.body.grant_type
 		if (!grantType) {
 			return next(
@@ -307,7 +309,11 @@ export class OAuth2Server {
 
 			const anonymous_id = undefined
 
-			const token = this.store.getAnonymousToken(scope, anonymous_id)
+			const token = this.store.getAnonymousToken(
+				projectKey,
+				anonymous_id,
+				scope
+			)
 			return response.status(200).send(token)
 		}
 	}

@@ -33,7 +33,11 @@ export class OAuth2Store {
 		return token
 	}
 
-	getAnonymousToken(scope: string, anonymousId: string | undefined) {
+	getAnonymousToken(
+		projectKey: string,
+		anonymousId: string | undefined,
+		scope: string
+	) {
 		if (!anonymousId) {
 			anonymousId = uuidv4()
 		}
@@ -44,13 +48,13 @@ export class OAuth2Store {
 			scope: scope
 				? `${scope} anonymous_id:${anonymousId}`
 				: `anonymous_id:${anonymousId}`,
-			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
+			refresh_token: `${projectKey}:${randomBytes(16).toString('base64')}`,
 		}
 		this.addToken(token)
 		return token
 	}
 
-	getCustomerToken(scope: string, customerId: string) {
+	getCustomerToken(projectKey: string, customerId: string, scope: string) {
 		const token: Token = {
 			access_token: randomBytes(16).toString('base64'),
 			token_type: 'Bearer',
@@ -58,7 +62,7 @@ export class OAuth2Store {
 			scope: scope
 				? `${scope} customer_id:${customerId}`
 				: `customer_id:${customerId}`,
-			refresh_token: `my-project-${randomBytes(16).toString('base64')}`,
+			refresh_token: `${projectKey}:${randomBytes(16).toString('base64')}`,
 		}
 		this.addToken(token)
 		return token

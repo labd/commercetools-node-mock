@@ -2,15 +2,26 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import express from 'express'
 import supertest from 'supertest'
 import { OAuth2Server } from './server'
+import { CustomerRepository } from '../repositories/customer'
+import { AbstractStorage, InMemoryStorage } from '../storage'
+import { getBaseResourceProperties } from '../helpers'
+import { hashPassword } from '../lib/password'
 
 describe('OAuth2Server', () => {
 	let app: express.Express
 	let server: OAuth2Server
 
+	let storage: AbstractStorage
+	let customerRepository: CustomerRepository
+
 	beforeEach(() => {
 		server = new OAuth2Server({ enabled: true, validate: false })
 		app = express()
 		app.use(server.createRouter())
+
+		storage = new InMemoryStorage()
+		customerRepository = new CustomerRepository(storage)
+		server.setCustomerRepository(customerRepository)
 	})
 
 	describe('POST /token', () => {
@@ -74,16 +85,48 @@ describe('OAuth2Server', () => {
 
 			expect(response.status).toBe(200)
 			expect(response.body).toHaveProperty('access_token')
+			expect(response.body).toEqual({
+				scope: expect.stringMatching(/anonymous_id:([^\s]+)/),
+				access_token: expect.stringMatching(/\S{8,}==$/),
+				refresh_token: expect.stringMatching(/test-project:\S{8,}==$/),
+				expires_in: 172800,
+				token_type: 'Bearer',
+			})
+		})
+	})
 
-			const matches = response.body.scope?.match(
-				/(customer_id|anonymous_id):([^\s]+)/
-			)
-			if (matches) {
-				expect(matches[1]).toBe('anonymous_id')
-				expect(matches[2]).toBeDefined()
-			} else {
-				expect(response.body.scope).toBe('')
-			}
+	describe('POST /:projectKey/customers/token', () => {
+		it('should return a token for customer access', async () => {
+			const projectKey = 'test-project'
+
+			storage.add(projectKey, 'customer', {
+				...getBaseResourceProperties(),
+				email: 'j.doe@example.org',
+				password: hashPassword('password'),
+				addresses: [],
+				authenticationMode: 'password',
+				isEmailVerified: true,
+			})
+
+			const response = await supertest(app)
+				.post(`/${projectKey}/customers/token`)
+				.auth('validClientId', 'validClientSecret')
+				.query({
+					grant_type: 'password',
+					username: 'j.doe@example.org',
+					password: 'password',
+					scope: `${projectKey}:manage_my_profile`,
+				})
+				.send()
+
+			expect(response.status).toBe(200)
+			expect(response.body).toEqual({
+				scope: expect.stringMatching(/customer_id:([^\s]+)/),
+				access_token: expect.stringMatching(/\S{8,}==$/),
+				refresh_token: expect.stringMatching(/test-project:\S{8,}==$/),
+				expires_in: 172800,
+				token_type: 'Bearer',
+			})
 		})
 	})
 })
