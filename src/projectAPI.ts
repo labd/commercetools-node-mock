@@ -1,58 +1,58 @@
-import { getBaseResourceProperties } from './helpers.js'
-import { GetParams } from './repositories/abstract.js'
-import { RepositoryMap } from './repositories/index.js'
-import { AbstractStorage } from './storage/index.js'
-import { ResourceMap, ResourceType } from './types.js'
+import { getBaseResourceProperties } from "./helpers";
+import { GetParams } from "./repositories/abstract";
+import { RepositoryMap } from "./repositories/index";
+import { AbstractStorage } from "./storage/index";
+import { ResourceMap, ResourceType } from "./types";
 
 export class ProjectAPI {
-	private projectKey: string
-	private _storage: AbstractStorage
-	private _repositories: RepositoryMap
+	private projectKey: string;
+	private _storage: AbstractStorage;
+	private _repositories: RepositoryMap;
 
 	constructor(
 		projectKey: string,
 		repositories: RepositoryMap,
-		storage: AbstractStorage
+		storage: AbstractStorage,
 	) {
-		this.projectKey = projectKey
-		this._storage = storage
-		this._repositories = repositories
+		this.projectKey = projectKey;
+		this._storage = storage;
+		this._repositories = repositories;
 	}
 
 	add<T extends keyof RepositoryMap & keyof ResourceMap>(
 		typeId: T,
-		resource: ResourceMap[T]
+		resource: ResourceMap[T],
 	) {
-		const repository = this._repositories[typeId]
+		const repository = this._repositories[typeId];
 		if (repository) {
 			this._storage.add(this.projectKey, typeId, {
 				...getBaseResourceProperties(),
 				...resource,
-			})
+			});
 		} else {
-			throw new Error(`Service for ${typeId} not implemented yet`)
+			throw new Error(`Service for ${typeId} not implemented yet`);
 		}
 	}
 
 	get<RT extends ResourceType>(
 		typeId: RT,
 		id: string,
-		params?: GetParams
+		params?: GetParams,
 	): ResourceMap[RT] {
 		return this._storage.get(
 			this.projectKey,
 			typeId,
 			id,
-			params
-		) as ResourceMap[RT]
+			params,
+		) as ResourceMap[RT];
 	}
 
 	// TODO: Not sure if we want to expose this...
 	getRepository<RT extends keyof RepositoryMap>(typeId: RT): RepositoryMap[RT] {
-		const repository = this._repositories[typeId]
+		const repository = this._repositories[typeId];
 		if (repository !== undefined) {
-			return repository as RepositoryMap[RT]
+			return repository as RepositoryMap[RT];
 		}
-		throw new Error('No such repository')
+		throw new Error("No such repository");
 	}
 }

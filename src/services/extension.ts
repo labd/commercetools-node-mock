@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import { ExtensionRepository } from '../repositories/extension.js'
-import AbstractService from './abstract.js'
+import { Router } from "express";
+import { ExtensionRepository } from "../repositories/extension";
+import AbstractService from "./abstract";
 
 export class ExtensionServices extends AbstractService {
-	public repository: ExtensionRepository
+	public repository: ExtensionRepository;
 
 	constructor(parent: Router, repository: ExtensionRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'extensions'
+		return "extensions";
 	}
 }

@@ -12,137 +12,138 @@ import type {
 	ProjectSetExternalOAuthAction,
 	ProjectSetShippingRateInputTypeAction,
 	ProjectUpdateAction,
-} from '@commercetools/platform-sdk'
-import { maskSecretValue } from '../lib/masking.js'
-import type { Writable } from '../types.js'
-import { AbstractRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { maskSecretValue } from "../lib/masking";
+import type { Writable } from "../types";
+import { AbstractRepository, RepositoryContext } from "./abstract";
 
 export class ProjectRepository extends AbstractRepository<Project> {
 	get(context: RepositoryContext): Project | null {
-		const resource = this._storage.getProject(context.projectKey)
-		return this.postProcessResource(resource)
+		const resource = this._storage.getProject(context.projectKey);
+		return this.postProcessResource(resource);
 	}
 
 	postProcessResource(resource: Project): Project {
 		if (resource) {
-			return maskSecretValue(resource, 'externalOAuth.authorizationHeader')
+			return maskSecretValue(resource, "externalOAuth.authorizationHeader");
 		}
-		return resource
+		return resource;
 	}
 
 	saveNew(context: RepositoryContext, resource: Writable<Project>) {
-		resource.version = 1
-		this._storage.saveProject(resource)
+		resource.version = 1;
+		this._storage.saveProject(resource);
 	}
 
 	saveUpdate(context: RepositoryContext, version: number, resource: Project) {
-		this._storage.saveProject(resource)
+		this._storage.saveProject(resource);
 	}
 
 	actions: Partial<
 		Record<
-			ProjectUpdateAction['action'],
+			ProjectUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<Project>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ name }: ProjectChangeNameAction
+			{ name }: ProjectChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		changeCurrencies: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ currencies }: ProjectChangeCurrenciesAction
+			{ currencies }: ProjectChangeCurrenciesAction,
 		) => {
-			resource.currencies = currencies
+			resource.currencies = currencies;
 		},
 		changeCountries: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ countries }: ProjectChangeCountriesAction
+			{ countries }: ProjectChangeCountriesAction,
 		) => {
-			resource.countries = countries
+			resource.countries = countries;
 		},
 		changeLanguages: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ languages }: ProjectChangeLanguagesAction
+			{ languages }: ProjectChangeLanguagesAction,
 		) => {
-			resource.languages = languages
+			resource.languages = languages;
 		},
 		changeMessagesConfiguration: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ messagesConfiguration }: ProjectChangeMessagesConfigurationAction
+			{ messagesConfiguration }: ProjectChangeMessagesConfigurationAction,
 		) => {
-			resource.messages.enabled = messagesConfiguration.enabled
+			resource.messages.enabled = messagesConfiguration.enabled;
 			resource.messages.deleteDaysAfterCreation =
-				messagesConfiguration.deleteDaysAfterCreation
+				messagesConfiguration.deleteDaysAfterCreation;
 		},
 		changeProductSearchIndexingEnabled: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ enabled }: ProjectChangeProductSearchIndexingEnabledAction
+			{ enabled }: ProjectChangeProductSearchIndexingEnabledAction,
 		) => {
 			if (!resource.searchIndexing?.products) {
-				throw new Error('Invalid project state')
+				throw new Error("Invalid project state");
 			}
 			resource.searchIndexing.products.status = enabled
-				? 'Activated'
-				: 'Deactivated'
-			resource.searchIndexing.products.lastModifiedAt = new Date().toISOString()
+				? "Activated"
+				: "Deactivated";
+			resource.searchIndexing.products.lastModifiedAt =
+				new Date().toISOString();
 		},
 		changeOrderSearchStatus: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ status }: ProjectChangeOrderSearchStatusAction
+			{ status }: ProjectChangeOrderSearchStatusAction,
 		) => {
 			if (!resource.searchIndexing?.orders) {
-				throw new Error('Invalid project state')
+				throw new Error("Invalid project state");
 			}
-			resource.searchIndexing.orders.status = status
-			resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString()
+			resource.searchIndexing.orders.status = status;
+			resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString();
 		},
 		setShippingRateInputType: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ shippingRateInputType }: ProjectSetShippingRateInputTypeAction
+			{ shippingRateInputType }: ProjectSetShippingRateInputTypeAction,
 		) => {
-			resource.shippingRateInputType = shippingRateInputType
+			resource.shippingRateInputType = shippingRateInputType;
 		},
 		setExternalOAuth: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ externalOAuth }: ProjectSetExternalOAuthAction
+			{ externalOAuth }: ProjectSetExternalOAuthAction,
 		) => {
-			resource.externalOAuth = externalOAuth
+			resource.externalOAuth = externalOAuth;
 		},
 		changeCountryTaxRateFallbackEnabled: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
 			{
 				countryTaxRateFallbackEnabled,
-			}: ProjectChangeCountryTaxRateFallbackEnabledAction
+			}: ProjectChangeCountryTaxRateFallbackEnabledAction,
 		) => {
 			resource.carts.countryTaxRateFallbackEnabled =
-				countryTaxRateFallbackEnabled
+				countryTaxRateFallbackEnabled;
 		},
 		changeCartsConfiguration: (
 			context: RepositoryContext,
 			resource: Writable<Project>,
-			{ cartsConfiguration }: ProjectChangeCartsConfigurationAction
+			{ cartsConfiguration }: ProjectChangeCartsConfigurationAction,
 		) => {
 			resource.carts = cartsConfiguration || {
 				countryTaxRateFallbackEnabled: false,
 				deleteDaysAfterLastModification: 90,
-			}
+			};
 		},
-	}
+	};
 }

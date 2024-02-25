@@ -1,34 +1,34 @@
-import { Router } from 'express'
-import { MyOrderRepository } from '../repositories/my-order.js'
-import AbstractService from './abstract.js'
+import { Router } from "express";
+import { MyOrderRepository } from "../repositories/my-order";
+import AbstractService from "./abstract";
 
 export class MyOrderService extends AbstractService {
-	public repository: MyOrderRepository
+	public repository: MyOrderRepository;
 
 	constructor(parent: Router, repository: MyOrderRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'me'
+		return "me";
 	}
 
 	registerRoutes(parent: Router) {
 		// Overwrite this function to be able to handle /me/active-cart path.
-		const basePath = this.getBasePath()
-		const router = Router({ mergeParams: true })
+		const basePath = this.getBasePath();
+		const router = Router({ mergeParams: true });
 
-		this.extraRoutes(router)
+		this.extraRoutes(router);
 
-		router.get('/orders/', this.get.bind(this))
-		router.get('/orders/:id', this.getWithId.bind(this))
+		router.get("/orders/", this.get.bind(this));
+		router.get("/orders/:id", this.getWithId.bind(this));
 
-		router.delete('/orders/:id', this.deleteWithId.bind(this))
+		router.delete("/orders/:id", this.deleteWithId.bind(this));
 
-		router.post('/orders/', this.post.bind(this))
-		router.post('/orders/:id', this.postWithId.bind(this))
+		router.post("/orders/", this.post.bind(this));
+		router.post("/orders/:id", this.postWithId.bind(this));
 
-		parent.use(`/${basePath}`, router)
+		parent.use(`/${basePath}`, router);
 	}
 }

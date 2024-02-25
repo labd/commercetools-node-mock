@@ -2,12 +2,12 @@ import {
 	Cart,
 	ShippingRate,
 	ShippingRatePriceTier,
-} from '@commercetools/platform-sdk'
-import { describe, expect, it } from 'vitest'
+} from "@commercetools/platform-sdk";
+import { describe, expect, it } from "vitest";
 import {
 	markMatchingShippingRate,
 	markMatchingShippingRatePriceTiers,
-} from './shippingCalculator'
+} from "./shippingCalculator";
 
 // describe('markMatchingShippingMethods', () => {
 // 	const zones: Record<string, Zone> = {
@@ -161,107 +161,107 @@ import {
 // 	})
 // })
 
-describe('markMatchingShippingRate', () => {
+describe("markMatchingShippingRate", () => {
 	const rate: ShippingRate = {
 		price: {
-			type: 'centPrecision',
-			currencyCode: 'EUR',
+			type: "centPrecision",
+			currencyCode: "EUR",
 			centAmount: 495,
 			fractionDigits: 2,
 		},
 		freeAbove: {
-			type: 'centPrecision',
-			currencyCode: 'USD',
+			type: "centPrecision",
+			currencyCode: "USD",
 			centAmount: 5000,
 			fractionDigits: 2,
 		},
 		tiers: [],
-	}
+	};
 
-	it('should mark the shipping rate as matching', () => {
+	it("should mark the shipping rate as matching", () => {
 		const cart: Partial<Cart> = {
 			totalPrice: {
-				currencyCode: 'EUR',
+				currencyCode: "EUR",
 				centAmount: 1000,
 				fractionDigits: 2,
-				type: 'centPrecision',
+				type: "centPrecision",
 			},
-		}
+		};
 
-		const result = markMatchingShippingRate(cart as Cart, rate)
+		const result = markMatchingShippingRate(cart as Cart, rate);
 		expect(result).toMatchObject({
 			...rate,
 			isMatching: true,
-		})
-	})
+		});
+	});
 
-	it('should mark the shipping rate as not matching', () => {
+	it("should mark the shipping rate as not matching", () => {
 		const cart: Partial<Cart> = {
 			totalPrice: {
-				currencyCode: 'USD',
+				currencyCode: "USD",
 				centAmount: 1000,
 				fractionDigits: 2,
-				type: 'centPrecision',
+				type: "centPrecision",
 			},
-		}
+		};
 
-		const result = markMatchingShippingRate(cart as Cart, rate)
+		const result = markMatchingShippingRate(cart as Cart, rate);
 		expect(result).toMatchObject({
 			...rate,
 			isMatching: false,
-		})
-	})
-})
+		});
+	});
+});
 
-describe('markMatchingShippingRatePriceTiers', () => {
-	it('should handle CartValue types', () => {
+describe("markMatchingShippingRatePriceTiers", () => {
+	it("should handle CartValue types", () => {
 		const tiers: ShippingRatePriceTier[] = [
 			// Above 100 euro shipping is 4 euro
 			{
-				type: 'CartValue',
+				type: "CartValue",
 				minimumCentAmount: 10000,
 				price: {
-					type: 'centPrecision',
-					currencyCode: 'EUR',
+					type: "centPrecision",
+					currencyCode: "EUR",
 					centAmount: 400,
 					fractionDigits: 2,
 				},
 			},
 			// Above 200 euro shipping is 3 euro
 			{
-				type: 'CartValue',
+				type: "CartValue",
 				minimumCentAmount: 20000,
 				price: {
-					type: 'centPrecision',
-					currencyCode: 'EUR',
+					type: "centPrecision",
+					currencyCode: "EUR",
 					centAmount: 300,
 					fractionDigits: 2,
 				},
 			},
 			// Above 50 euro shipping is 5 euro
 			{
-				type: 'CartValue',
+				type: "CartValue",
 				minimumCentAmount: 500,
 				price: {
-					type: 'centPrecision',
-					currencyCode: 'EUR',
+					type: "centPrecision",
+					currencyCode: "EUR",
 					centAmount: 700,
 					fractionDigits: 2,
 				},
 			},
-		]
+		];
 
 		// Create a cart with a total price of 90 euro
 		const cart: Partial<Cart> = {
 			totalPrice: {
-				currencyCode: 'EUR',
+				currencyCode: "EUR",
 				centAmount: 9000,
 				fractionDigits: 2,
-				type: 'centPrecision',
+				type: "centPrecision",
 			},
-		}
+		};
 
-		const result = markMatchingShippingRatePriceTiers(cart as Cart, tiers)
+		const result = markMatchingShippingRatePriceTiers(cart as Cart, tiers);
 		expect(result).toMatchObject([
 			{
 				minimumCentAmount: 10000,
@@ -275,6 +275,6 @@ describe('markMatchingShippingRatePriceTiers', () => {
 				minimumCentAmount: 500,
 				isMatching: true,
 			},
-		])
-	})
-})
+		]);
+	});
+});

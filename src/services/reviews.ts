@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import AbstractService from './abstract.js'
-import { ReviewRepository } from '../repositories/review.js'
+import { Router } from "express";
+import { ReviewRepository } from "../repositories/review";
+import AbstractService from "./abstract";
 
 export class ReviewService extends AbstractService {
-	public repository: ReviewRepository
+	public repository: ReviewRepository;
 
 	constructor(parent: Router, repository: ReviewRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'reviews'
+		return "reviews";
 	}
 }

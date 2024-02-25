@@ -7,20 +7,20 @@ import type {
 	StandalonePriceChangeValueAction,
 	StandalonePriceDraft,
 	StandalonePriceSetDiscountedPriceAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
-import { createTypedMoney } from './helpers.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import { createTypedMoney } from "./helpers";
 
-export class StandAlonePriceRepository extends AbstractResourceRepository<'standalone-price'> {
+export class StandAlonePriceRepository extends AbstractResourceRepository<"standalone-price"> {
 	getTypeId() {
-		return 'standalone-price' as const
+		return "standalone-price" as const;
 	}
 
 	create(
 		context: RepositoryContext,
-		draft: StandalonePriceDraft
+		draft: StandalonePriceDraft,
 	): StandalonePrice {
 		const resource: StandalonePrice = {
 			...getBaseResourceProperties(),
@@ -36,49 +36,49 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<'stand
 				: undefined,
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	transformChannelReferenceDraft(
-		channel: ChannelResourceIdentifier
+		channel: ChannelResourceIdentifier,
 	): ChannelReference {
 		return {
 			typeId: channel.typeId,
 			id: channel.id as string,
-		}
+		};
 	}
 
 	transformDiscountDraft(discounted: DiscountedPriceDraft) {
 		return {
 			value: createTypedMoney(discounted.value),
 			discount: discounted.discount,
-		}
+		};
 	}
 
 	actions = {
 		setActive: (
 			context: RepositoryContext,
 			resource: Writable<StandalonePrice>,
-			action: StandalonePriceChangeActiveAction
+			action: StandalonePriceChangeActiveAction,
 		) => {
-			resource.active = action.active
+			resource.active = action.active;
 		},
 		changeValue: (
 			context: RepositoryContext,
 			resource: Writable<StandalonePrice>,
-			action: StandalonePriceChangeValueAction
+			action: StandalonePriceChangeValueAction,
 		) => {
-			resource.value = createTypedMoney(action.value)
+			resource.value = createTypedMoney(action.value);
 		},
 		setDiscountedPrice: (
 			context: RepositoryContext,
 			resource: Writable<StandalonePrice>,
-			action: StandalonePriceSetDiscountedPriceAction
+			action: StandalonePriceSetDiscountedPriceAction,
 		) => {
 			resource.discounted = action.discounted
 				? this.transformDiscountDraft(action.discounted)
-				: undefined
+				: undefined;
 		},
-	}
+	};
 }

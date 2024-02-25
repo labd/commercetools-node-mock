@@ -1,4 +1,4 @@
-import Lexer from './lexer'
+import Lexer from "./lexer";
 
 /**
  * @typedef {{
@@ -11,12 +11,12 @@ import Lexer from './lexer'
  * Represents a token instance
  */
 class Token<T> {
-	type: T
-	match: string
-	groups: string[]
-	start: number
-	end: number
-	lexer: Lexer<T>
+	type: T;
+	match: string;
+	groups: string[];
+	start: number;
+	end: number;
+	lexer: Lexer<T>;
 
 	/* tslint:disable:indent */
 	/**
@@ -34,44 +34,44 @@ class Token<T> {
 		groups: string[],
 		start: number,
 		end: number,
-		lexer: Lexer<T>
+		lexer: Lexer<T>,
 	) {
 		/* tslint:enable */
 		/**
 		 * The token type
 		 * @type {T}
 		 */
-		this.type = type
+		this.type = type;
 
 		/**
 		 * The string that the lexer consumed to create this token
 		 * @type {string}
 		 */
-		this.match = match
+		this.match = match;
 
 		/**
 		 * Any RegExp groups that accrued during the match
 		 * @type {string[]}
 		 */
-		this.groups = groups
+		this.groups = groups;
 
 		/**
 		 * The string position where this match started
 		 * @type {number}
 		 */
-		this.start = start
+		this.start = start;
 
 		/**
 		 * The string position where this match ends
 		 * @type {number}
 		 */
-		this.end = end
+		this.end = end;
 
 		/**
 		 * The parent {@link Lexer}
 		 * @type {Lexer<T>}
 		 */
-		this.lexer = lexer
+		this.lexer = lexer;
 	}
 
 	/**
@@ -79,32 +79,32 @@ class Token<T> {
 	 * @return {TokenPosition}
 	 */
 	strpos() {
-		const start = this.lexer.strpos(this.start)
-		const end = this.lexer.strpos(this.end)
-		return { start, end }
+		const start = this.lexer.strpos(this.start);
+		const end = this.lexer.strpos(this.end);
+		return { start, end };
 	}
 
 	// tslint:disable-next-line prefer-function-over-method
 	isEof() {
-		return false
+		return false;
 	}
 }
 
-export default Token
+export default Token;
 
 export class EOFToken<T> extends Token<T> {
 	constructor(lexer: Lexer<T>) {
-		const end = lexer.source.length
-		super(null, '(eof)', [], end, end, lexer)
+		const end = lexer.source.length;
+		super(null, "(eof)", [], end, end, lexer);
 	}
 
 	// tslint:disable-next-line prefer-function-over-method
 	isEof() {
-		return true
+		return true;
 	}
 }
 
 /**
  * @private
  */
-export const EOF = (lexer: Lexer<any>) => new EOFToken(lexer)
+export const EOF = (lexer: Lexer<any>) => new EOFToken(lexer);

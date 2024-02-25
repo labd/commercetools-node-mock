@@ -9,15 +9,15 @@ import type {
 	StateSetRolesAction,
 	StateSetTransitionsAction,
 	StateUpdateAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
-import { getReferenceFromResourceIdentifier } from './helpers.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import { getReferenceFromResourceIdentifier } from "./helpers";
 
-export class StateRepository extends AbstractResourceRepository<'state'> {
+export class StateRepository extends AbstractResourceRepository<"state"> {
 	getTypeId() {
-		return 'state' as const
+		return "state" as const;
 	}
 
 	create(context: RepositoryContext, draft: StateDraft): State {
@@ -27,69 +27,73 @@ export class StateRepository extends AbstractResourceRepository<'state'> {
 			builtIn: false,
 			initial: draft.initial || false,
 			transitions: (draft.transitions || []).map((t) =>
-				getReferenceFromResourceIdentifier(t, context.projectKey, this._storage)
+				getReferenceFromResourceIdentifier(
+					t,
+					context.projectKey,
+					this._storage,
+				),
 			),
-		}
+		};
 
-		return this.saveNew(context, resource)
+		return this.saveNew(context, resource);
 	}
 
 	actions: Partial<
 		Record<
-			StateUpdateAction['action'],
+			StateUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<State>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		changeKey: (
 			context: RepositoryContext,
 			resource: Writable<State>,
-			{ key }: StateChangeKeyAction
+			{ key }: StateChangeKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		changeInitial: (
 			context: RepositoryContext,
 			resource: Writable<State>,
-			{ initial }: StateChangeInitialAction
+			{ initial }: StateChangeInitialAction,
 		) => {
-			resource.initial = initial
+			resource.initial = initial;
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<State>,
-			{ description }: StateSetDescriptionAction
+			{ description }: StateSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setName: (
 			context: RepositoryContext,
 			resource: Writable<State>,
-			{ name }: StateSetNameAction
+			{ name }: StateSetNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setRoles: (
 			context: RepositoryContext,
 			resource: Writable<State>,
-			{ roles }: StateSetRolesAction
+			{ roles }: StateSetRolesAction,
 		) => {
-			resource.roles = roles
+			resource.roles = roles;
 		},
 		setTransitions: (
 			context: RepositoryContext,
 			resource: Writable<State>,
-			{ transitions }: StateSetTransitionsAction
+			{ transitions }: StateSetTransitionsAction,
 		) => {
 			resource.transitions = transitions?.map(
 				(resourceId): StateReference => ({
-					id: resourceId.id || '',
-					typeId: 'state',
-				})
-			)
+					id: resourceId.id || "",
+					typeId: "state",
+				}),
+			);
 		},
-	}
+	};
 }

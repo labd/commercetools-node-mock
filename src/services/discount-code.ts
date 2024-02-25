@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import { DiscountCodeRepository } from '../repositories/discount-code.js'
-import AbstractService from './abstract.js'
+import { Router } from "express";
+import { DiscountCodeRepository } from "../repositories/discount-code";
+import AbstractService from "./abstract";
 
 export class DiscountCodeService extends AbstractService {
-	public repository: DiscountCodeRepository
+	public repository: DiscountCodeRepository;
 
 	constructor(parent: Router, repository: DiscountCodeRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'discount-codes'
+		return "discount-codes";
 	}
 }

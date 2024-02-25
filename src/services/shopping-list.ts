@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import { ShoppingListRepository } from './../repositories/shopping-list.js'
-import AbstractService from './abstract.js'
+import { Router } from "express";
+import { ShoppingListRepository } from "./../repositories/shopping-list";
+import AbstractService from "./abstract";
 
 export class ShoppingListService extends AbstractService {
-	public repository: ShoppingListRepository
+	public repository: ShoppingListRepository;
 
 	constructor(parent: Router, repository: ShoppingListRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'shopping-lists'
+		return "shopping-lists";
 	}
 }

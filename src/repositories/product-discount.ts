@@ -17,20 +17,20 @@ import type {
 	ProductDiscountValueDraft,
 	ProductDiscountValueExternal,
 	ProductDiscountValueRelative,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
-import { createTypedMoney } from './helpers.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import { createTypedMoney } from "./helpers";
 
-export class ProductDiscountRepository extends AbstractResourceRepository<'product-discount'> {
+export class ProductDiscountRepository extends AbstractResourceRepository<"product-discount"> {
 	getTypeId() {
-		return 'product-discount' as const
+		return "product-discount" as const;
 	}
 
 	create(
 		context: RepositoryContext,
-		draft: ProductDiscountDraft
+		draft: ProductDiscountDraft,
 	): ProductDiscount {
 		const resource: ProductDiscount = {
 			...getBaseResourceProperties(),
@@ -44,117 +44,117 @@ export class ProductDiscountRepository extends AbstractResourceRepository<'produ
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 			references: [],
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	private transformValueDraft(
-		value: ProductDiscountValueDraft
+		value: ProductDiscountValueDraft,
 	): ProductDiscountValue {
 		switch (value.type) {
-			case 'absolute': {
+			case "absolute": {
 				return {
-					type: 'absolute',
+					type: "absolute",
 					money: value.money.map(createTypedMoney),
-				} as ProductDiscountValueAbsolute
+				} as ProductDiscountValueAbsolute;
 			}
-			case 'external': {
+			case "external": {
 				return {
-					type: 'external',
-				} as ProductDiscountValueExternal
+					type: "external",
+				} as ProductDiscountValueExternal;
 			}
-			case 'relative': {
+			case "relative": {
 				return {
 					...value,
-				} as ProductDiscountValueRelative
+				} as ProductDiscountValueRelative;
 			}
 		}
 	}
 
 	actions: Partial<
 		Record<
-			ProductDiscountUpdateAction['action'],
+			ProductDiscountUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<ProductDiscount>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ key }: ProductDiscountSetKeyAction
+			{ key }: ProductDiscountSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ description }: ProductDiscountSetDescriptionAction
+			{ description }: ProductDiscountSetDescriptionAction,
 		) => {
 			if (description && Object.keys(description).length > 0) {
-				resource.description = description
+				resource.description = description;
 			} else {
-				resource.description = undefined
+				resource.description = undefined;
 			}
 		},
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ name }: ProductDiscountChangeNameAction
+			{ name }: ProductDiscountChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		changeValue: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ value }: ProductDiscountChangeValueAction
+			{ value }: ProductDiscountChangeValueAction,
 		) => {
-			resource.value = this.transformValueDraft(value)
+			resource.value = this.transformValueDraft(value);
 		},
 		changePredicate: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ predicate }: ProductDiscountChangePredicateAction
+			{ predicate }: ProductDiscountChangePredicateAction,
 		) => {
-			resource.predicate = predicate
+			resource.predicate = predicate;
 		},
 		changeSortOrder: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ sortOrder }: ProductDiscountChangeSortOrderAction
+			{ sortOrder }: ProductDiscountChangeSortOrderAction,
 		) => {
-			resource.sortOrder = sortOrder
+			resource.sortOrder = sortOrder;
 		},
 		changeIsActive: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ isActive }: ProductDiscountChangeIsActiveAction
+			{ isActive }: ProductDiscountChangeIsActiveAction,
 		) => {
-			resource.isActive = isActive
+			resource.isActive = isActive;
 		},
 		setValidFrom: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ validFrom }: ProductDiscountSetValidFromAction
+			{ validFrom }: ProductDiscountSetValidFromAction,
 		) => {
-			resource.validFrom = validFrom
+			resource.validFrom = validFrom;
 		},
 		setValidUntil: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ validUntil }: ProductDiscountSetValidUntilAction
+			{ validUntil }: ProductDiscountSetValidUntilAction,
 		) => {
-			resource.validUntil = validUntil
+			resource.validUntil = validUntil;
 		},
 		setValidFromAndUntil: (
 			context: RepositoryContext,
 			resource: Writable<ProductDiscount>,
-			{ validFrom, validUntil }: ProductDiscountSetValidFromAndUntilAction
+			{ validFrom, validUntil }: ProductDiscountSetValidFromAndUntilAction,
 		) => {
-			resource.validFrom = validFrom
-			resource.validUntil = validUntil
+			resource.validFrom = validFrom;
+			resource.validUntil = validUntil;
 		},
-	}
+	};
 }

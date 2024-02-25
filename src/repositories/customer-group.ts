@@ -5,18 +5,15 @@ import type {
 	CustomerGroupSetCustomFieldAction,
 	CustomerGroupSetCustomTypeAction,
 	CustomerGroupSetKeyAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import {
-	AbstractResourceRepository,
-	type RepositoryContext,
-} from './abstract.js'
-import { createCustomFields } from './helpers.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
+import { createCustomFields } from "./helpers";
 
-export class CustomerGroupRepository extends AbstractResourceRepository<'customer-group'> {
+export class CustomerGroupRepository extends AbstractResourceRepository<"customer-group"> {
 	getTypeId() {
-		return 'customer-group' as const
+		return "customer-group" as const;
 	}
 	create(context: RepositoryContext, draft: CustomerGroupDraft): CustomerGroup {
 		const resource: CustomerGroup = {
@@ -26,55 +23,55 @@ export class CustomerGroupRepository extends AbstractResourceRepository<'custome
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions = {
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<CustomerGroup>,
-			{ key }: CustomerGroupSetKeyAction
+			{ key }: CustomerGroupSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<CustomerGroup>,
-			{ name }: CustomerGroupChangeNameAction
+			{ name }: CustomerGroupChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<CustomerGroup>,
-			{ type, fields }: CustomerGroupSetCustomTypeAction
+			{ type, fields }: CustomerGroupSetCustomTypeAction,
 		) => {
 			if (type) {
 				resource.custom = createCustomFields(
 					{ type, fields },
 					context.projectKey,
-					this._storage
-				)
+					this._storage,
+				);
 			} else {
-				resource.custom = undefined
+				resource.custom = undefined;
 			}
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<CustomerGroup>,
-			{ name, value }: CustomerGroupSetCustomFieldAction
+			{ name, value }: CustomerGroupSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				return
+				return;
 			}
 			if (value === null) {
-				delete resource.custom.fields[name]
+				delete resource.custom.fields[name];
 			} else {
-				resource.custom.fields[name] = value
+				resource.custom.fields[name] = value;
 			}
 		},
-	}
+	};
 }

@@ -10,18 +10,18 @@ import type {
 	StoreSetLanguagesAction,
 	StoreSetNameAction,
 	StoreUpdateAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from './helpers.js'
+} from "./helpers";
 
-export class StoreRepository extends AbstractResourceRepository<'store'> {
+export class StoreRepository extends AbstractResourceRepository<"store"> {
 	getTypeId() {
-		return 'store' as const
+		return "store" as const;
 	}
 
 	create(context: RepositoryContext, draft: StoreDraft): Store {
@@ -33,103 +33,103 @@ export class StoreRepository extends AbstractResourceRepository<'store'> {
 			countries: draft.countries ?? [],
 			distributionChannels: this.transformChannels(
 				context,
-				draft.distributionChannels
+				draft.distributionChannels,
 			),
 			supplyChannels: this.transformChannels(context, draft.supplyChannels),
 			productSelections: [],
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	private transformChannels(
 		context: RepositoryContext,
-		channels?: ChannelResourceIdentifier[]
+		channels?: ChannelResourceIdentifier[],
 	) {
-		if (!channels) return []
+		if (!channels) return [];
 
 		return channels.map((ref) =>
 			getReferenceFromResourceIdentifier<ChannelReference>(
 				ref,
 				context.projectKey,
-				this._storage
-			)
-		)
+				this._storage,
+			),
+		);
 	}
 
 	actions: Partial<
 		Record<
-			StoreUpdateAction['action'],
+			StoreUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<Store>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		setName: (
 			context: RepositoryContext,
 			resource: Writable<Store>,
-			{ name }: StoreSetNameAction
+			{ name }: StoreSetNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setDistributionChannels: (
 			context: RepositoryContext,
 			resource: Writable<Store>,
-			{ distributionChannels }: StoreSetDistributionChannelsAction
+			{ distributionChannels }: StoreSetDistributionChannelsAction,
 		) => {
 			resource.distributionChannels = this.transformChannels(
 				context,
-				distributionChannels
-			)
+				distributionChannels,
+			);
 		},
 		setLanguages: (
 			context: RepositoryContext,
 			resource: Writable<Store>,
-			{ languages }: StoreSetLanguagesAction
+			{ languages }: StoreSetLanguagesAction,
 		) => {
-			resource.languages = languages ?? []
+			resource.languages = languages ?? [];
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<Store>,
-			{ type, fields }: StoreSetCustomTypeAction
+			{ type, fields }: StoreSetCustomTypeAction,
 		) => {
 			if (type) {
 				resource.custom = createCustomFields(
 					{ type, fields },
 					context.projectKey,
-					this._storage
-				)
+					this._storage,
+				);
 			} else {
-				resource.custom = undefined
+				resource.custom = undefined;
 			}
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<Store>,
-			{ name, value }: StoreSetCustomFieldAction
+			{ name, value }: StoreSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				return
+				return;
 			}
 			if (value === null) {
-				delete resource.custom.fields[name]
+				delete resource.custom.fields[name];
 			} else {
-				resource.custom.fields[name] = value
+				resource.custom.fields[name] = value;
 			}
 		},
 		setCountries: (
 			context: RepositoryContext,
 			resource: Writable<Store>,
-			{ countries }: StoreSetCountriesAction
+			{ countries }: StoreSetCountriesAction,
 		) => {
-			resource.countries = countries ?? []
+			resource.countries = countries ?? [];
 		},
-	}
+	};
 }

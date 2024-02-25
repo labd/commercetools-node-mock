@@ -5,22 +5,22 @@ import {
 	type ReviewDraft,
 	type ReviewUpdateAction,
 	type StateReference,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from './helpers.js'
+} from "./helpers";
 
-export class ReviewRepository extends AbstractResourceRepository<'review'> {
+export class ReviewRepository extends AbstractResourceRepository<"review"> {
 	getTypeId() {
-		return 'review' as const
+		return "review" as const;
 	}
 
 	create(context: RepositoryContext, draft: ReviewDraft): Review {
-		if (!draft.target) throw new Error('Missing target')
+		if (!draft.target) throw new Error("Missing target");
 		const resource: Review = {
 			...getBaseResourceProperties(),
 
@@ -34,7 +34,7 @@ export class ReviewRepository extends AbstractResourceRepository<'review'> {
 				? getReferenceFromResourceIdentifier<StateReference>(
 						draft.state,
 						context.projectKey,
-						this._storage
+						this._storage,
 					)
 				: undefined,
 			target: draft.target
@@ -46,20 +46,20 @@ export class ReviewRepository extends AbstractResourceRepository<'review'> {
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions: Partial<
 		Record<
-			ReviewUpdateAction['action'],
+			ReviewUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<Review>,
-				action: any
+				action: any,
 			) => void
 		>
-	> = {}
+	> = {};
 }

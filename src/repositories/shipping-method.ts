@@ -20,31 +20,31 @@ import {
 	type ZoneRate,
 	type ZoneRateDraft,
 	type ZoneReference,
-} from '@commercetools/platform-sdk'
-import deepEqual from 'deep-equal'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
+} from "@commercetools/platform-sdk";
+import deepEqual from "deep-equal";
+import { CommercetoolsError } from "../exceptions";
+import { getBaseResourceProperties } from "../helpers";
+import { markMatchingShippingRate } from "../shippingCalculator";
+import type { Writable } from "../types";
 import {
 	AbstractResourceRepository,
 	GetParams,
 	RepositoryContext,
-} from './abstract.js'
+} from "./abstract";
 import {
 	createCustomFields,
 	createTypedMoney,
 	getReferenceFromResourceIdentifier,
-} from './helpers.js'
-import { CommercetoolsError } from '../exceptions.js'
-import { markMatchingShippingRate } from '../shippingCalculator.js'
+} from "./helpers";
 
-export class ShippingMethodRepository extends AbstractResourceRepository<'shipping-method'> {
+export class ShippingMethodRepository extends AbstractResourceRepository<"shipping-method"> {
 	getTypeId() {
-		return 'shipping-method' as const
+		return "shipping-method" as const;
 	}
 
 	create(
 		context: RepositoryContext,
-		draft: ShippingMethodDraft
+		draft: ShippingMethodDraft,
 	): ShippingMethod {
 		const resource: ShippingMethod = {
 			...getBaseResourceProperties(),
@@ -52,38 +52,38 @@ export class ShippingMethodRepository extends AbstractResourceRepository<'shippi
 			taxCategory: getReferenceFromResourceIdentifier(
 				draft.taxCategory,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			zoneRates: draft.zoneRates?.map((z) =>
-				this._transformZoneRateDraft(context, z)
+				this._transformZoneRateDraft(context, z),
 			),
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	private _transformZoneRateDraft = (
 		context: RepositoryContext,
-		draft: ZoneRateDraft
+		draft: ZoneRateDraft,
 	): ZoneRate => ({
 		...draft,
 		zone: getReferenceFromResourceIdentifier<ZoneReference>(
 			draft.zone,
 			context.projectKey,
-			this._storage
+			this._storage,
 		),
 		shippingRates: draft.shippingRates?.map(this._transformShippingRate),
-	})
+	});
 
 	private _transformShippingRate = (rate: ShippingRateDraft): ShippingRate => ({
 		price: createTypedMoney(rate.price),
 		freeAbove: rate.freeAbove && createTypedMoney(rate.freeAbove),
 		tiers: rate.tiers || [],
-	})
+	});
 
 	/*
 	 * Retrieves all the ShippingMethods that can ship to the shipping address of
@@ -94,34 +94,34 @@ export class ShippingMethodRepository extends AbstractResourceRepository<'shippi
 	public matchingCart(
 		context: RepositoryContext,
 		cartId: string,
-		params: GetParams = {}
+		params: GetParams = {},
 	) {
-		const cart = this._storage.get(context.projectKey, 'cart', cartId)
+		const cart = this._storage.get(context.projectKey, "cart", cartId);
 		if (!cart) {
-			return undefined
+			return undefined;
 		}
 
 		if (!cart.shippingAddress?.country) {
 			throw new CommercetoolsError<InvalidOperationError>({
-				code: 'InvalidOperation',
+				code: "InvalidOperation",
 				message: `The cart with ID '${cart.id}' does not have a shipping address set.`,
-			})
+			});
 		}
 
 		// Get all shipping methods that have a zone that matches the shipping address
-		const zones = this._storage.query<'zone'>(context.projectKey, 'zone', {
+		const zones = this._storage.query<"zone">(context.projectKey, "zone", {
 			where: [`locations(country="${cart.shippingAddress.country}"))`],
 			limit: 100,
-		})
-		const zoneIds = zones.results.map((zone) => zone.id)
+		});
+		const zoneIds = zones.results.map((zone) => zone.id);
 		const shippingMethods = this.query(context, {
-			where: [
+			"where": [
 				`zoneRates(zone(id in (:zoneIds)))`,
 				`zoneRates(shippingRates(price(currencyCode="${cart.totalPrice.currencyCode}")))`,
 			],
-			'var.zoneIds': zoneIds,
-			expand: params.expand,
-		})
+			"var.zoneIds": zoneIds,
+			"expand": params.expand,
+		});
 
 		// Make sure that each shipping method has exactly one shipping rate and
 		// that the shipping rate is marked as matching
@@ -139,173 +139,173 @@ export class ShippingMethodRepository extends AbstractResourceRepository<'shippi
 							.map((rate) => markMatchingShippingRate(cart, rate))
 							.filter((rate) => rate.isMatching),
 					}))
-					.filter((zoneRate) => zoneRate.shippingRates.length > 0)
+					.filter((zoneRate) => zoneRate.shippingRates.length > 0);
 
 				return {
 					...shippingMethod,
 					zoneRates: rates,
-				}
+				};
 			})
-			.filter((shippingMethod) => shippingMethod.zoneRates.length > 0)
+			.filter((shippingMethod) => shippingMethod.zoneRates.length > 0);
 
 		return {
 			...shippingMethods,
 			results: results,
-		}
+		};
 	}
 
 	actions: Partial<
 		Record<
-			ShippingMethodUpdateAction['action'],
+			ShippingMethodUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<ShippingMethod>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		addShippingRate: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ shippingRate, zone }: ShippingMethodAddShippingRateAction
+			{ shippingRate, zone }: ShippingMethodAddShippingRateAction,
 		) => {
-			const rate = this._transformShippingRate(shippingRate)
+			const rate = this._transformShippingRate(shippingRate);
 
 			resource.zoneRates.forEach((zoneRate) => {
 				if (zoneRate.zone.id === zone.id) {
-					zoneRate.shippingRates.push(rate)
-					return
+					zoneRate.shippingRates.push(rate);
+					return;
 				}
-			})
+			});
 			resource.zoneRates.push({
 				zone: {
-					typeId: 'zone',
+					typeId: "zone",
 					id: zone.id!,
 				},
 				shippingRates: [rate],
-			})
+			});
 		},
 		removeShippingRate: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ shippingRate, zone }: ShippingMethodAddShippingRateAction
+			{ shippingRate, zone }: ShippingMethodAddShippingRateAction,
 		) => {
-			const rate = this._transformShippingRate(shippingRate)
+			const rate = this._transformShippingRate(shippingRate);
 
 			resource.zoneRates.forEach((zoneRate) => {
 				if (zoneRate.zone.id === zone.id) {
 					zoneRate.shippingRates = zoneRate.shippingRates.filter(
-						(otherRate) => !deepEqual(rate, otherRate)
-					)
+						(otherRate) => !deepEqual(rate, otherRate),
+					);
 				}
-			})
+			});
 		},
 		addZone: (
 			context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ zone }: ShippingMethodAddZoneAction
+			{ zone }: ShippingMethodAddZoneAction,
 		) => {
 			const zoneReference = getReferenceFromResourceIdentifier<ZoneReference>(
 				zone,
 				context.projectKey,
-				this._storage
-			)
+				this._storage,
+			);
 
 			if (resource.zoneRates === undefined) {
-				resource.zoneRates = []
+				resource.zoneRates = [];
 			}
 
 			resource.zoneRates.push({
 				zone: zoneReference,
 				shippingRates: [],
-			})
+			});
 		},
 		removeZone: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ zone }: ShippingMethodRemoveZoneAction
+			{ zone }: ShippingMethodRemoveZoneAction,
 		) => {
 			resource.zoneRates = resource.zoneRates.filter(
-				(zoneRate) => zoneRate.zone.id !== zone.id
-			)
+				(zoneRate) => zoneRate.zone.id !== zone.id,
+			);
 		},
 		setKey: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ key }: ShippingMethodSetKeyAction
+			{ key }: ShippingMethodSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		setDescription: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ description }: ShippingMethodSetDescriptionAction
+			{ description }: ShippingMethodSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setLocalizedDescription: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ localizedDescription }: ShippingMethodSetLocalizedDescriptionAction
+			{ localizedDescription }: ShippingMethodSetLocalizedDescriptionAction,
 		) => {
-			resource.localizedDescription = localizedDescription
+			resource.localizedDescription = localizedDescription;
 		},
 		setLocalizedName: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ localizedName }: ShippingMethodSetLocalizedNameAction
+			{ localizedName }: ShippingMethodSetLocalizedNameAction,
 		) => {
-			resource.localizedName = localizedName
+			resource.localizedName = localizedName;
 		},
 		setPredicate: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ predicate }: ShippingMethodSetPredicateAction
+			{ predicate }: ShippingMethodSetPredicateAction,
 		) => {
-			resource.predicate = predicate
+			resource.predicate = predicate;
 		},
 		changeIsDefault: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ isDefault }: ShippingMethodChangeIsDefaultAction
+			{ isDefault }: ShippingMethodChangeIsDefaultAction,
 		) => {
-			resource.isDefault = isDefault
+			resource.isDefault = isDefault;
 		},
 		changeName: (
 			_context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ name }: ShippingMethodChangeNameAction
+			{ name }: ShippingMethodChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ type, fields }: ShippingMethodSetCustomTypeAction
+			{ type, fields }: ShippingMethodSetCustomTypeAction,
 		) => {
 			if (type) {
 				resource.custom = createCustomFields(
 					{ type, fields },
 					context.projectKey,
-					this._storage
-				)
+					this._storage,
+				);
 			} else {
-				resource.custom = undefined
+				resource.custom = undefined;
 			}
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<ShippingMethod>,
-			{ name, value }: ShippingMethodSetCustomFieldAction
+			{ name, value }: ShippingMethodSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				return
+				return;
 			}
 			if (value === null) {
-				delete resource.custom.fields[name]
+				delete resource.custom.fields[name];
 			} else {
-				resource.custom.fields[name] = value
+				resource.custom.fields[name] = value;
 			}
 		},
-	}
+	};
 }

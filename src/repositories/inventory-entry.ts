@@ -6,23 +6,20 @@ import type {
 	InventoryEntrySetCustomTypeAction,
 	InventoryEntrySetExpectedDeliveryAction,
 	InventoryEntrySetRestockableInDaysAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import {
-	AbstractResourceRepository,
-	type RepositoryContext,
-} from './abstract.js'
-import { createCustomFields } from './helpers.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
+import { createCustomFields } from "./helpers";
 
-export class InventoryEntryRepository extends AbstractResourceRepository<'inventory-entry'> {
+export class InventoryEntryRepository extends AbstractResourceRepository<"inventory-entry"> {
 	getTypeId() {
-		return 'inventory-entry' as const
+		return "inventory-entry" as const;
 	}
 
 	create(
 		context: RepositoryContext,
-		draft: InventoryEntryDraft
+		draft: InventoryEntryDraft,
 	): InventoryEntry {
 		const resource: InventoryEntry = {
 			...getBaseResourceProperties(),
@@ -33,76 +30,76 @@ export class InventoryEntryRepository extends AbstractResourceRepository<'invent
 			restockableInDays: draft.restockableInDays,
 			supplyChannel: {
 				...draft.supplyChannel,
-				typeId: 'channel',
-				id: draft.supplyChannel?.id ?? '',
+				typeId: "channel",
+				id: draft.supplyChannel?.id ?? "",
 			},
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions = {
 		changeQuantity: (
 			context: RepositoryContext,
 			resource: Writable<InventoryEntry>,
-			{ quantity }: InventoryEntryChangeQuantityAction
+			{ quantity }: InventoryEntryChangeQuantityAction,
 		) => {
-			resource.quantityOnStock = quantity
+			resource.quantityOnStock = quantity;
 			// don't know active reservations so just set to same value
-			resource.availableQuantity = quantity
+			resource.availableQuantity = quantity;
 		},
 		setExpectedDelivery: (
 			context: RepositoryContext,
 			resource: Writable<InventoryEntry>,
-			{ expectedDelivery }: InventoryEntrySetExpectedDeliveryAction
+			{ expectedDelivery }: InventoryEntrySetExpectedDeliveryAction,
 		) => {
-			resource.expectedDelivery = new Date(expectedDelivery!).toISOString()
+			resource.expectedDelivery = new Date(expectedDelivery!).toISOString();
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: InventoryEntry,
-			{ name, value }: InventoryEntrySetCustomFieldAction
+			{ name, value }: InventoryEntrySetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				throw new Error('Resource has no custom field')
+				throw new Error("Resource has no custom field");
 			}
-			resource.custom.fields[name] = value
+			resource.custom.fields[name] = value;
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<InventoryEntry>,
-			{ type, fields }: InventoryEntrySetCustomTypeAction
+			{ type, fields }: InventoryEntrySetCustomTypeAction,
 		) => {
 			if (!type) {
-				resource.custom = undefined
+				resource.custom = undefined;
 			} else {
 				const resolvedType = this._storage.getByResourceIdentifier(
 					context.projectKey,
-					type
-				)
+					type,
+				);
 				if (!resolvedType) {
-					throw new Error(`Type ${type} not found`)
+					throw new Error(`Type ${type} not found`);
 				}
 
 				resource.custom = {
 					type: {
-						typeId: 'type',
+						typeId: "type",
 						id: resolvedType.id,
 					},
 					fields: fields || {},
-				}
+				};
 			}
 		},
 		setRestockableInDays: (
 			context: RepositoryContext,
 			resource: Writable<InventoryEntry>,
-			{ restockableInDays }: InventoryEntrySetRestockableInDaysAction
+			{ restockableInDays }: InventoryEntrySetRestockableInDaysAction,
 		) => {
-			resource.restockableInDays = restockableInDays
+			resource.restockableInDays = restockableInDays;
 		},
-	}
+	};
 }

@@ -1,83 +1,83 @@
-import { AbstractStorage } from '../storage/index.js'
-import { AssociateRoleRepository } from './associate-role.js'
-import { AttributeGroupRepository } from './attribute-group.js'
-import { BusinessUnitRepository } from './business-unit.js'
-import { CartRepository } from './cart.js'
-import { CartDiscountRepository } from './cart-discount.js'
-import { CategoryRepository } from './category.js'
-import { ChannelRepository } from './channel.js'
-import { CustomObjectRepository } from './custom-object.js'
-import { CustomerRepository } from './customer.js'
-import { CustomerGroupRepository } from './customer-group.js'
-import { DiscountCodeRepository } from './discount-code.js'
-import { ExtensionRepository } from './extension.js'
-import { InventoryEntryRepository } from './inventory-entry.js'
-import { MyOrderRepository } from './my-order.js'
-import { OrderRepository } from './order.js'
-import { OrderEditRepository } from './order-edit.js'
-import { PaymentRepository } from './payment.js'
-import { ProductRepository } from './product.js'
-import { ProductDiscountRepository } from './product-discount.js'
-import { ProductProjectionRepository } from './product-projection.js'
-import { ProductSelectionRepository } from './product-selection.js'
-import { ProductTypeRepository } from './product-type.js'
-import { ProjectRepository } from './project.js'
-import { QuoteRepository } from './quote.js'
-import { QuoteRequestRepository } from './quote-request.js'
-import { ReviewRepository } from './review.js'
-import { ShippingMethodRepository } from './shipping-method.js'
-import { ShoppingListRepository } from './shopping-list.js'
-import { StagedQuoteRepository } from './staged-quote.js'
-import { StandAlonePriceRepository } from './standalone-price.js'
-import { StateRepository } from './state.js'
-import { StoreRepository } from './store.js'
-import { SubscriptionRepository } from './subscription.js'
-import { TaxCategoryRepository } from './tax-category.js'
-import { TypeRepository } from './type.js'
-import { ZoneRepository } from './zone.js'
-import { MyCustomerRepository } from './my-customer.js'
+import { AbstractStorage } from "../storage/index";
+import { AssociateRoleRepository } from "./associate-role";
+import { AttributeGroupRepository } from "./attribute-group";
+import { BusinessUnitRepository } from "./business-unit";
+import { CartRepository } from "./cart";
+import { CartDiscountRepository } from "./cart-discount";
+import { CategoryRepository } from "./category";
+import { ChannelRepository } from "./channel";
+import { CustomObjectRepository } from "./custom-object";
+import { CustomerRepository } from "./customer";
+import { CustomerGroupRepository } from "./customer-group";
+import { DiscountCodeRepository } from "./discount-code";
+import { ExtensionRepository } from "./extension";
+import { InventoryEntryRepository } from "./inventory-entry";
+import { MyCustomerRepository } from "./my-customer";
+import { MyOrderRepository } from "./my-order";
+import { OrderRepository } from "./order";
+import { OrderEditRepository } from "./order-edit";
+import { PaymentRepository } from "./payment";
+import { ProductRepository } from "./product";
+import { ProductDiscountRepository } from "./product-discount";
+import { ProductProjectionRepository } from "./product-projection";
+import { ProductSelectionRepository } from "./product-selection";
+import { ProductTypeRepository } from "./product-type";
+import { ProjectRepository } from "./project";
+import { QuoteRepository } from "./quote";
+import { QuoteRequestRepository } from "./quote-request";
+import { ReviewRepository } from "./review";
+import { ShippingMethodRepository } from "./shipping-method";
+import { ShoppingListRepository } from "./shopping-list";
+import { StagedQuoteRepository } from "./staged-quote";
+import { StandAlonePriceRepository } from "./standalone-price";
+import { StateRepository } from "./state";
+import { StoreRepository } from "./store";
+import { SubscriptionRepository } from "./subscription";
+import { TaxCategoryRepository } from "./tax-category";
+import { TypeRepository } from "./type";
+import { ZoneRepository } from "./zone";
 
-export type RepositoryMap = ReturnType<typeof createRepositories>
+export type RepositoryMap = ReturnType<typeof createRepositories>;
 
 export const createRepositories = (storage: AbstractStorage) => ({
-	'associate-role': new AssociateRoleRepository(storage),
-	'attribute-group': new AttributeGroupRepository(storage),
-	'business-unit': new BusinessUnitRepository(storage),
-	category: new CategoryRepository(storage),
-	cart: new CartRepository(storage),
-	'cart-discount': new CartDiscountRepository(storage),
-	customer: new CustomerRepository(storage),
-	channel: new ChannelRepository(storage),
-	'customer-group': new CustomerGroupRepository(storage),
-	'discount-code': new DiscountCodeRepository(storage),
-	extension: new ExtensionRepository(storage),
-	'inventory-entry': new InventoryEntryRepository(storage),
-	'key-value-document': new CustomObjectRepository(storage),
-	order: new OrderRepository(storage),
-	'order-edit': new OrderEditRepository(storage),
-	payment: new PaymentRepository(storage),
-	'my-cart': new CartRepository(storage),
-	'my-order': new MyOrderRepository(storage),
-	'my-customer': new MyCustomerRepository(storage),
-	'my-payment': new PaymentRepository(storage),
-	'my-shopping-list': new ShoppingListRepository(storage),
-	product: new ProductRepository(storage),
-	'product-type': new ProductTypeRepository(storage),
-	'product-discount': new ProductDiscountRepository(storage),
-	'product-projection': new ProductProjectionRepository(storage),
-	'product-selection': new ProductSelectionRepository(storage),
-	project: new ProjectRepository(storage),
-	review: new ReviewRepository(storage),
-	quote: new QuoteRepository(storage),
-	'quote-request': new QuoteRequestRepository(storage),
-	'shipping-method': new ShippingMethodRepository(storage),
-	'shopping-list': new ShoppingListRepository(storage),
-	'staged-quote': new StagedQuoteRepository(storage),
-	'standalone-price': new StandAlonePriceRepository(storage),
-	state: new StateRepository(storage),
-	store: new StoreRepository(storage),
-	subscription: new SubscriptionRepository(storage),
-	'tax-category': new TaxCategoryRepository(storage),
-	type: new TypeRepository(storage),
-	zone: new ZoneRepository(storage),
-})
+	"associate-role": new AssociateRoleRepository(storage),
+	"attribute-group": new AttributeGroupRepository(storage),
+	"business-unit": new BusinessUnitRepository(storage),
+	"category": new CategoryRepository(storage),
+	"cart": new CartRepository(storage),
+	"cart-discount": new CartDiscountRepository(storage),
+	"customer": new CustomerRepository(storage),
+	"channel": new ChannelRepository(storage),
+	"customer-group": new CustomerGroupRepository(storage),
+	"discount-code": new DiscountCodeRepository(storage),
+	"extension": new ExtensionRepository(storage),
+	"inventory-entry": new InventoryEntryRepository(storage),
+	"key-value-document": new CustomObjectRepository(storage),
+	"order": new OrderRepository(storage),
+	"order-edit": new OrderEditRepository(storage),
+	"payment": new PaymentRepository(storage),
+	"my-cart": new CartRepository(storage),
+	"my-order": new MyOrderRepository(storage),
+	"my-customer": new MyCustomerRepository(storage),
+	"my-payment": new PaymentRepository(storage),
+	"my-shopping-list": new ShoppingListRepository(storage),
+	"product": new ProductRepository(storage),
+	"product-type": new ProductTypeRepository(storage),
+	"product-discount": new ProductDiscountRepository(storage),
+	"product-projection": new ProductProjectionRepository(storage),
+	"product-selection": new ProductSelectionRepository(storage),
+	"project": new ProjectRepository(storage),
+	"review": new ReviewRepository(storage),
+	"quote": new QuoteRepository(storage),
+	"quote-request": new QuoteRequestRepository(storage),
+	"shipping-method": new ShippingMethodRepository(storage),
+	"shopping-list": new ShoppingListRepository(storage),
+	"staged-quote": new StagedQuoteRepository(storage),
+	"standalone-price": new StandAlonePriceRepository(storage),
+	"state": new StateRepository(storage),
+	"store": new StoreRepository(storage),
+	"subscription": new SubscriptionRepository(storage),
+	"tax-category": new TaxCategoryRepository(storage),
+	"type": new TypeRepository(storage),
+	"zone": new ZoneRepository(storage),
+});

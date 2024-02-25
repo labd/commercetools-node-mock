@@ -20,28 +20,28 @@ import type {
 	ShoppingListSetKeyAction,
 	ShoppingListSetSlugAction,
 	ShoppingListSetStoreAction,
-} from '@commercetools/platform-sdk'
-import { v4 as uuidv4 } from 'uuid'
-import { CommercetoolsError } from '../exceptions.js'
-import { getBaseResourceProperties } from '../helpers.js'
-import { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { v4 as uuidv4 } from "uuid";
+import { CommercetoolsError } from "../exceptions";
+import { getBaseResourceProperties } from "../helpers";
+import { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
 	getStoreKeyReference,
-} from './helpers.js'
+} from "./helpers";
 
-export class ShoppingListRepository extends AbstractResourceRepository<'shopping-list'> {
+export class ShoppingListRepository extends AbstractResourceRepository<"shopping-list"> {
 	getTypeId() {
-		return 'shopping-list' as const
+		return "shopping-list" as const;
 	}
 
 	create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {
 		const lineItems =
 			draft.lineItems?.map((draftLineItem) =>
-				this.draftLineItemtoLineItem(context.projectKey, draftLineItem)
-			) ?? []
+				this.draftLineItemtoLineItem(context.projectKey, draftLineItem),
+			) ?? [];
 
 		const resource: ShoppingList = {
 			...getBaseResourceProperties(),
@@ -49,7 +49,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			textLineItems: [],
 			lineItems,
@@ -57,179 +57,185 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 				? getReferenceFromResourceIdentifier<CustomerReference>(
 						draft.customer,
 						context.projectKey,
-						this._storage
+						this._storage,
 					)
 				: undefined,
 			store: draft.store
 				? getStoreKeyReference(draft.store, context.projectKey, this._storage)
 				: undefined,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions = {
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ key }: ShoppingListSetKeyAction
+			{ key }: ShoppingListSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		setSlug: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ slug }: ShoppingListSetSlugAction
+			{ slug }: ShoppingListSetSlugAction,
 		) => {
-			resource.slug = slug
+			resource.slug = slug;
 		},
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ name }: ShoppingListChangeNameAction
+			{ name }: ShoppingListChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ description }: ShoppingListSetDescriptionAction
+			{ description }: ShoppingListSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setCustomer: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ customer }: ShoppingListSetCustomerAction
+			{ customer }: ShoppingListSetCustomerAction,
 		) => {
 			if (customer?.key) {
-				throw new Error('set customer on shoppinglist by key not implemented')
+				throw new Error("set customer on shoppinglist by key not implemented");
 			}
 			if (customer?.id) {
-				resource.customer = { typeId: 'customer', id: customer.id }
+				resource.customer = { typeId: "customer", id: customer.id };
 			}
 		},
 		setStore: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ store }: ShoppingListSetStoreAction
+			{ store }: ShoppingListSetStoreAction,
 		) => {
 			if (store?.key) {
-				resource.store = { typeId: 'store', key: store.key }
+				resource.store = { typeId: "store", key: store.key };
 			}
 			if (store?.id) {
-				throw new Error('set store on shoppinglist by id not implemented')
+				throw new Error("set store on shoppinglist by id not implemented");
 			}
 		},
 		setAnonymousId: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ anonymousId }: ShoppingListSetAnonymousIdAction
+			{ anonymousId }: ShoppingListSetAnonymousIdAction,
 		) => {
-			resource.anonymousId = anonymousId
+			resource.anonymousId = anonymousId;
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ type, fields }: ShoppingListSetCustomTypeAction
+			{ type, fields }: ShoppingListSetCustomTypeAction,
 		) => {
 			if (!type) {
-				resource.custom = undefined
+				resource.custom = undefined;
 			} else {
 				const resolvedType = this._storage.getByResourceIdentifier(
 					context.projectKey,
-					type
-				)
+					type,
+				);
 				if (!resolvedType) {
-					throw new Error(`Type ${type} not found`)
+					throw new Error(`Type ${type} not found`);
 				}
 
 				resource.custom = {
 					type: {
-						typeId: 'type',
+						typeId: "type",
 						id: resolvedType.id,
 					},
 					fields: fields || {},
-				}
+				};
 			}
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: ShoppingList,
-			{ name, value }: ShoppingListSetCustomFieldAction
+			{ name, value }: ShoppingListSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				throw new Error('Resource has no custom field')
+				throw new Error("Resource has no custom field");
 			}
-			resource.custom.fields[name] = value
+			resource.custom.fields[name] = value;
 		},
 		setDeleteDaysAfterLastModification: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
 			{
 				deleteDaysAfterLastModification,
-			}: ShoppingListSetDeleteDaysAfterLastModificationAction
+			}: ShoppingListSetDeleteDaysAfterLastModificationAction,
 		) => {
-			resource.deleteDaysAfterLastModification = deleteDaysAfterLastModification
+			resource.deleteDaysAfterLastModification =
+				deleteDaysAfterLastModification;
 		},
 		addLineItem: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ productId, variantId, sku, quantity = 1 }: ShoppingListAddLineItemAction
+			{
+				productId,
+				variantId,
+				sku,
+				quantity = 1,
+			}: ShoppingListAddLineItemAction,
 		) => {
-			let product: Product | null = null
+			let product: Product | null = null;
 
 			if (productId) {
 				// Fetch product and variant by ID
 				product = this._storage.get(
 					context.projectKey,
-					'product',
+					"product",
 					productId,
-					{}
-				)
+					{},
+				);
 			} else if (sku) {
 				// Fetch product and variant by SKU
-				const items = this._storage.query(context.projectKey, 'product', {
+				const items = this._storage.query(context.projectKey, "product", {
 					where: [
 						`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 					],
-				}) as ProductPagedQueryResponse
+				}) as ProductPagedQueryResponse;
 
 				if (items.count === 1) {
-					product = items.results[0]
+					product = items.results[0];
 				}
 			}
 
 			if (!product) {
 				// Check if product is found
 				throw new CommercetoolsError<GeneralError>({
-					code: 'General',
+					code: "General",
 					message: sku
 						? `A product containing a variant with SKU '${sku}' not found.`
 						: `A product with ID '${productId}' not found.`,
-				})
+				});
 			}
 
-			let varId: number | undefined = variantId
+			let varId: number | undefined = variantId;
 			if (sku) {
 				varId = [
 					product.masterData.current.masterVariant,
 					...product.masterData.current.variants,
-				].find((x) => x.sku === sku)?.id
+				].find((x) => x.sku === sku)?.id;
 			}
 			if (!varId) {
-				varId = product.masterData.current.masterVariant.id
+				varId = product.masterData.current.masterVariant.id;
 			}
 
 			const alreadyAdded = resource.lineItems.some(
-				(x) => x.productId === product?.id && x.variantId === varId
-			)
+				(x) => x.productId === product?.id && x.variantId === varId,
+			);
 			if (alreadyAdded) {
 				// increase quantity and update total price
 				resource.lineItems.forEach((x) => {
 					if (x.productId === product?.id && x.variantId === varId) {
-						x.quantity += quantity
+						x.quantity += quantity;
 					}
-				})
+				});
 			} else {
 				// add line item
 				resource.lineItems.push({
@@ -241,36 +247,36 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 					name: product.masterData.current.name,
 					variantId: varId,
 					quantity,
-				})
+				});
 			}
 		},
 		removeLineItem: (
 			context: RepositoryContext,
 			resource: Writable<ShoppingList>,
-			{ lineItemId, quantity }: ShoppingListRemoveLineItemAction
+			{ lineItemId, quantity }: ShoppingListRemoveLineItemAction,
 		) => {
-			const lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+			const lineItem = resource.lineItems.find((x) => x.id === lineItemId);
 			if (!lineItem) {
 				// Check if product is found
 				throw new CommercetoolsError<GeneralError>({
-					code: 'General',
+					code: "General",
 					message: `A line item with ID '${lineItemId}' not found.`,
-				})
+				});
 			}
 
-			const shouldDelete = !quantity || quantity >= lineItem.quantity
+			const shouldDelete = !quantity || quantity >= lineItem.quantity;
 			if (shouldDelete) {
 				// delete line item
 				resource.lineItems = resource.lineItems.filter(
-					(x) => x.id !== lineItemId
-				)
+					(x) => x.id !== lineItemId,
+				);
 			} else {
 				// decrease quantity and update total price
 				resource.lineItems.forEach((x) => {
 					if (x.id === lineItemId && quantity) {
-						x.quantity -= quantity
+						x.quantity -= quantity;
 					}
-				})
+				});
 			}
 		},
 		changeLineItemQuantity: (
@@ -280,112 +286,112 @@ export class ShoppingListRepository extends AbstractResourceRepository<'shopping
 				lineItemId,
 				lineItemKey,
 				quantity,
-			}: ShoppingListChangeLineItemQuantityAction
+			}: ShoppingListChangeLineItemQuantityAction,
 		) => {
-			let lineItem: Writable<ShoppingListLineItem> | undefined
+			let lineItem: Writable<ShoppingListLineItem> | undefined;
 
 			if (lineItemId) {
-				lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+				lineItem = resource.lineItems.find((x) => x.id === lineItemId);
 				if (!lineItem) {
 					throw new CommercetoolsError<GeneralError>({
-						code: 'General',
+						code: "General",
 						message: `A line item with ID '${lineItemId}' not found.`,
-					})
+					});
 				}
 			} else if (lineItemKey) {
-				lineItem = resource.lineItems.find((x) => x.id === lineItemId)
+				lineItem = resource.lineItems.find((x) => x.id === lineItemId);
 				if (!lineItem) {
 					throw new CommercetoolsError<GeneralError>({
-						code: 'General',
+						code: "General",
 						message: `A line item with Key '${lineItemKey}' not found.`,
-					})
+					});
 				}
 			} else {
 				throw new CommercetoolsError<GeneralError>({
-					code: 'General',
+					code: "General",
 					message: `Either lineItemid or lineItemKey needs to be provided.`,
-				})
+				});
 			}
 
 			if (quantity === 0) {
 				// delete line item
 				resource.lineItems = resource.lineItems.filter(
-					(x) => x.id !== lineItemId
-				)
+					(x) => x.id !== lineItemId,
+				);
 			} else {
 				resource.lineItems.forEach((x) => {
 					if (x.id === lineItemId && quantity) {
-						x.quantity = quantity
+						x.quantity = quantity;
 					}
-				})
+				});
 			}
 		},
-	}
+	};
 
 	draftLineItemtoLineItem = (
 		projectKey: string,
-		draftLineItem: LineItemDraft
+		draftLineItem: LineItemDraft,
 	): ShoppingListLineItem => {
-		const { sku, productId, variantId } = draftLineItem
+		const { sku, productId, variantId } = draftLineItem;
 
 		const lineItem: Writable<ShoppingListLineItem> = {
 			...getBaseResourceProperties(),
 			...draftLineItem,
-			addedAt: draftLineItem.addedAt ?? '',
-			productId: draftLineItem.productId ?? '',
+			addedAt: draftLineItem.addedAt ?? "",
+			productId: draftLineItem.productId ?? "",
 			name: {},
 			variantId,
 			quantity: draftLineItem.quantity ?? 1,
-			productType: { typeId: 'product-type', id: '' },
+			productType: { typeId: "product-type", id: "" },
 			custom: createCustomFields(
 				draftLineItem.custom,
 				projectKey,
-				this._storage
+				this._storage,
 			),
-		}
+		};
 
 		if (productId && variantId) {
-			return lineItem
+			return lineItem;
 		}
 
 		if (sku) {
-			const items = this._storage.query(projectKey, 'product', {
+			const items = this._storage.query(projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			}) as ProductPagedQueryResponse
+			}) as ProductPagedQueryResponse;
 
 			if (items.count === 0) {
-				throw new Error(`Product with sku ${sku} not found`)
+				throw new Error(`Product with sku ${sku} not found`);
 			}
 
-			const product = items.results[0]
+			const product = items.results[0];
 			const allVariants = [
 				product.masterData.current.masterVariant,
 				...product.masterData.current.variants,
-			]
-			const variantId = allVariants.find((e) => e.sku === sku)?.id
-			lineItem.variantId = variantId
-			lineItem.productId = product.id
-			return lineItem
+			];
+			const variantId = allVariants.find((e) => e.sku === sku)?.id;
+			lineItem.variantId = variantId;
+			lineItem.productId = product.id;
+			return lineItem;
 		}
 
 		if (productId) {
-			const items = this._storage.query(projectKey, 'product', {
+			const items = this._storage.query(projectKey, "product", {
 				where: [`id="${productId}"`],
-			}) as ProductPagedQueryResponse
+			}) as ProductPagedQueryResponse;
 
 			if (items.count === 0) {
-				throw new Error(`Product with id ${productId} not found`)
+				throw new Error(`Product with id ${productId} not found`);
 			}
 
-			const variantId = items.results[0].masterData.current.masterVariant.id
-			lineItem.variantId = variantId
-			return lineItem
+			const variantId = items.results[0].masterData.current.masterVariant.id;
+			lineItem.variantId = variantId;
+			return lineItem;
 		}
 
 		throw new Error(
-			`must provide either sku, productId or variantId for ShoppingListLineItem`
-		)
-	}
+			`must provide either sku, productId or variantId for ShoppingListLineItem`,
+		);
+	};
 }

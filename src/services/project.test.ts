@@ -1,27 +1,27 @@
-import type { Project } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
-import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../index.js'
+import type { Project } from "@commercetools/platform-sdk";
+import supertest from "supertest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { CommercetoolsMock } from "../index";
 
-const ctMock = new CommercetoolsMock()
+const ctMock = new CommercetoolsMock();
 
-describe('Project', () => {
+describe("Project", () => {
 	beforeAll(() => {
-		ctMock.start()
-	})
+		ctMock.start();
+	});
 
 	afterEach(() => {
-		ctMock.clear()
-	})
+		ctMock.clear();
+	});
 
 	afterAll(() => {
-		ctMock.stop()
-	})
+		ctMock.stop();
+	});
 
-	test('Get project by key', async () => {
-		const response = await supertest(ctMock.app).get('/dummy/')
+	test("Get project by key", async () => {
+		const response = await supertest(ctMock.app).get("/dummy/");
 
-		expect(response.status).toBe(200)
+		expect(response.status).toBe(200);
 		expect(response.body).toEqual({
 			version: 1,
 			carts: {
@@ -29,24 +29,24 @@ describe('Project', () => {
 				deleteDaysAfterLastModification: 90,
 			},
 			countries: [],
-			createdAt: '2018-10-04T11:32:12.603Z',
+			createdAt: "2018-10-04T11:32:12.603Z",
 			currencies: [],
-			key: 'dummy',
+			key: "dummy",
 			languages: [],
 			messages: {
 				deleteDaysAfterCreation: 15,
 				enabled: false,
 			},
-			name: '',
+			name: "",
 			searchIndexing: {
 				orders: {
-					status: 'Deactivated',
+					status: "Deactivated",
 				},
 				products: {
-					status: 'Deactivated',
+					status: "Deactivated",
 				},
 			},
-			trialUntil: '2018-12',
-		} as Project)
-	})
-})
+			trialUntil: "2018-12",
+		} as Project);
+	});
+});

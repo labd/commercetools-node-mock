@@ -7,18 +7,15 @@ import type {
 	AssociateRoleSetCustomFieldAction,
 	AssociateRoleSetNameAction,
 	AssociateRoleSetPermissionsAction,
-} from '@commercetools/platform-sdk'
-import {
-	AbstractResourceRepository,
-	type RepositoryContext,
-} from './abstract.js'
-import { getBaseResourceProperties } from '../helpers.js'
-import { createCustomFields } from './helpers.js'
-import { Writable } from '../types.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import { Writable } from "../types";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
+import { createCustomFields } from "./helpers";
 
-export class AssociateRoleRepository extends AbstractResourceRepository<'associate-role'> {
+export class AssociateRoleRepository extends AbstractResourceRepository<"associate-role"> {
 	getTypeId() {
-		return 'associate-role' as const
+		return "associate-role" as const;
 	}
 
 	create(context: RepositoryContext, draft: AssociateRoleDraft): AssociateRole {
@@ -31,80 +28,80 @@ export class AssociateRoleRepository extends AbstractResourceRepository<'associa
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
+		};
 
-		return this.saveNew(context, resource)
+		return this.saveNew(context, resource);
 	}
 
 	actions = {
 		setName: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ name }: AssociateRoleSetNameAction
+			{ name }: AssociateRoleSetNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setPermissions: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ permissions }: AssociateRoleSetPermissionsAction
+			{ permissions }: AssociateRoleSetPermissionsAction,
 		) => {
-			resource.permissions = permissions || []
+			resource.permissions = permissions || [];
 		},
 		setBuyerAssignable: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction
+			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction,
 		) => {
-			resource.buyerAssignable = buyerAssignable
+			resource.buyerAssignable = buyerAssignable;
 		},
 		changeBuyerAssignable: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction
+			{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction,
 		) => {
-			resource.buyerAssignable = buyerAssignable
+			resource.buyerAssignable = buyerAssignable;
 		},
 		setCustomFields: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ name, value }: AssociateRoleSetCustomFieldAction
+			{ name, value }: AssociateRoleSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				return
+				return;
 			}
 
 			if (value === null) {
-				delete resource.custom.fields[name]
+				delete resource.custom.fields[name];
 			} else {
-				resource.custom.fields[name] = value
+				resource.custom.fields[name] = value;
 			}
 		},
 		addPermission: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ permission }: AssociateRoleAddPermissionAction
+			{ permission }: AssociateRoleAddPermissionAction,
 		) => {
 			if (!resource.permissions) {
-				resource.permissions = [permission]
+				resource.permissions = [permission];
 			} else {
-				resource.permissions.push(permission)
+				resource.permissions.push(permission);
 			}
 		},
 		removePermission: (
 			context: RepositoryContext,
 			resource: Writable<AssociateRole>,
-			{ permission }: AssociateRoleRemovePermissionAction
+			{ permission }: AssociateRoleRemovePermissionAction,
 		) => {
 			if (!resource.permissions) {
-				return
+				return;
 			}
 
 			resource.permissions = resource.permissions.filter((p) => {
-				p !== permission
-			})
+				p !== permission;
+			});
 		},
-	}
+	};
 }

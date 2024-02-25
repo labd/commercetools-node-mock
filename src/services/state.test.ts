@@ -1,51 +1,51 @@
-import { type StateDraft } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
-import { describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../index.js'
+import { type StateDraft } from "@commercetools/platform-sdk";
+import supertest from "supertest";
+import { describe, expect, test } from "vitest";
+import { CommercetoolsMock } from "../index";
 
-const ctMock = new CommercetoolsMock()
+const ctMock = new CommercetoolsMock();
 
-describe('State', () => {
-	test('Create state', async () => {
+describe("State", () => {
+	test("Create state", async () => {
 		const draft: StateDraft = {
-			key: 'foo',
-			type: 'PaymentState',
-		}
+			key: "foo",
+			type: "PaymentState",
+		};
 		const response = await supertest(ctMock.app)
-			.post('/dummy/states')
-			.send(draft)
+			.post("/dummy/states")
+			.send(draft);
 
-		expect(response.status).toBe(201)
+		expect(response.status).toBe(201);
 
 		expect(response.body).toEqual({
 			builtIn: false,
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			initial: false,
-			key: 'foo',
+			key: "foo",
 			lastModifiedAt: expect.anything(),
 			transitions: [],
-			type: 'PaymentState',
+			type: "PaymentState",
 			version: 1,
-		})
-	})
+		});
+	});
 
-	test('Get state', async () => {
+	test("Get state", async () => {
 		const draft: StateDraft = {
-			key: 'foo',
-			type: 'PaymentState',
-		}
+			key: "foo",
+			type: "PaymentState",
+		};
 		const createResponse = await supertest(ctMock.app)
-			.post('/dummy/states')
-			.send(draft)
+			.post("/dummy/states")
+			.send(draft);
 
-		expect(createResponse.status).toBe(201)
+		expect(createResponse.status).toBe(201);
 
 		const response = await supertest(ctMock.app).get(
-			`/dummy/states/${createResponse.body.id}`
-		)
+			`/dummy/states/${createResponse.body.id}`,
+		);
 
-		expect(response.status).toBe(200)
-		expect(response.body).toEqual(createResponse.body)
-	})
-})
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual(createResponse.body);
+	});
+});

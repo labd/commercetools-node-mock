@@ -37,173 +37,176 @@ import {
 	type TaxCategory,
 	type Type,
 	type Zone,
-} from '@commercetools/platform-sdk'
-import assert from 'assert'
-import { CommercetoolsError } from '../exceptions.js'
-import { cloneObject } from '../helpers.js'
-import { parseExpandClause } from '../lib/expandParser.js'
-import { parseQueryExpression } from '../lib/predicateParser.js'
+} from "@commercetools/platform-sdk";
+import assert from "assert";
+import { CommercetoolsError } from "../exceptions";
+import { cloneObject } from "../helpers";
+import { parseExpandClause } from "../lib/expandParser";
+import { parseQueryExpression } from "../lib/predicateParser";
 import {
 	PagedQueryResponseMap,
 	ResourceMap,
 	ResourceType,
 	Writable,
-} from '../types.js'
+} from "../types";
 import {
 	AbstractStorage,
 	GetParams,
 	ProjectStorage,
 	QueryParams,
-} from './abstract.js'
+} from "./abstract";
 
 export class InMemoryStorage extends AbstractStorage {
 	protected resources: {
-		[projectKey: string]: ProjectStorage
-	} = {}
+		[projectKey: string]: ProjectStorage;
+	} = {};
 
 	protected projects: {
-		[projectKey: string]: Project
-	} = {}
+		[projectKey: string]: Project;
+	} = {};
 
 	private forProjectKey(projectKey: string): ProjectStorage {
-		this.addProject(projectKey)
+		this.addProject(projectKey);
 
-		let projectStorage = this.resources[projectKey]
+		let projectStorage = this.resources[projectKey];
 		if (!projectStorage) {
 			projectStorage = this.resources[projectKey] = {
-				'associate-role': new Map<string, AssociateRole>(),
-				'attribute-group': new Map<string, AttributeGroup>(),
-				'business-unit': new Map<string, BusinessUnit>(),
-				cart: new Map<string, Cart>(),
-				'cart-discount': new Map<string, CartDiscount>(),
-				category: new Map<string, Category>(),
-				channel: new Map<string, Channel>(),
-				customer: new Map<string, Customer>(),
-				'customer-group': new Map<string, CustomerGroup>(),
-				'discount-code': new Map<string, DiscountCode>(),
-				extension: new Map<string, Extension>(),
-				'inventory-entry': new Map<string, InventoryEntry>(),
-				'key-value-document': new Map<string, CustomObject>(),
-				order: new Map<string, Order>(),
-				'order-edit': new Map<string, any>(),
-				payment: new Map<string, Payment>(),
-				product: new Map<string, Product>(),
-				quote: new Map<string, Quote>(),
-				'quote-request': new Map<string, QuoteRequest>(),
-				'product-discount': new Map<string, ProductDiscount>(),
-				'product-selection': new Map<string, any>(),
-				'product-type': new Map<string, ProductType>(),
-				'product-projection': new Map<string, ProductProjection>(),
-				review: new Map<string, any>(),
-				'shipping-method': new Map<string, ShippingMethod>(),
-				'staged-quote': new Map<string, StagedQuote>(),
-				state: new Map<string, State>(),
-				store: new Map<string, Store>(),
-				'shopping-list': new Map<string, ShoppingList>(),
-				'standalone-price': new Map<string, any>(),
-				subscription: new Map<string, Subscription>(),
-				'tax-category': new Map<string, TaxCategory>(),
-				type: new Map<string, Type>(),
-				zone: new Map<string, Zone>(),
-			}
+				"associate-role": new Map<string, AssociateRole>(),
+				"attribute-group": new Map<string, AttributeGroup>(),
+				"business-unit": new Map<string, BusinessUnit>(),
+				"cart": new Map<string, Cart>(),
+				"cart-discount": new Map<string, CartDiscount>(),
+				"category": new Map<string, Category>(),
+				"channel": new Map<string, Channel>(),
+				"customer": new Map<string, Customer>(),
+				"customer-group": new Map<string, CustomerGroup>(),
+				"discount-code": new Map<string, DiscountCode>(),
+				"extension": new Map<string, Extension>(),
+				"inventory-entry": new Map<string, InventoryEntry>(),
+				"key-value-document": new Map<string, CustomObject>(),
+				"order": new Map<string, Order>(),
+				"order-edit": new Map<string, any>(),
+				"payment": new Map<string, Payment>(),
+				"product": new Map<string, Product>(),
+				"quote": new Map<string, Quote>(),
+				"quote-request": new Map<string, QuoteRequest>(),
+				"product-discount": new Map<string, ProductDiscount>(),
+				"product-selection": new Map<string, any>(),
+				"product-type": new Map<string, ProductType>(),
+				"product-projection": new Map<string, ProductProjection>(),
+				"review": new Map<string, any>(),
+				"shipping-method": new Map<string, ShippingMethod>(),
+				"staged-quote": new Map<string, StagedQuote>(),
+				"state": new Map<string, State>(),
+				"store": new Map<string, Store>(),
+				"shopping-list": new Map<string, ShoppingList>(),
+				"standalone-price": new Map<string, any>(),
+				"subscription": new Map<string, Subscription>(),
+				"tax-category": new Map<string, TaxCategory>(),
+				"type": new Map<string, Type>(),
+				"zone": new Map<string, Zone>(),
+			};
 		}
-		return projectStorage
+		return projectStorage;
 	}
 
 	clear() {
 		for (const [, projectStorage] of Object.entries(this.resources)) {
 			for (const [, value] of Object.entries(projectStorage)) {
-				value?.clear()
+				value?.clear();
 			}
 		}
 	}
 
 	all<RT extends ResourceType>(
 		projectKey: string,
-		typeId: RT
+		typeId: RT,
 	): ResourceMap[RT][] {
-		const store = this.forProjectKey(projectKey)[typeId]
+		const store = this.forProjectKey(projectKey)[typeId];
 		if (store) {
-			return Array.from(store.values()).map(cloneObject) as ResourceMap[RT][]
+			return Array.from(store.values()).map(cloneObject) as ResourceMap[RT][];
 		}
-		return []
+		return [];
 	}
 
 	add<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		obj: ResourceMap[RT],
-		params: GetParams = {}
+		params: GetParams = {},
 	): ResourceMap[RT] {
-		const store = this.forProjectKey(projectKey)
-		store[typeId]?.set(obj.id, obj)
+		const store = this.forProjectKey(projectKey);
+		store[typeId]?.set(obj.id, obj);
 
-		const resource = this.get(projectKey, typeId, obj.id, params)
-		assert(resource, `resource of type ${typeId} with id ${obj.id} not created`)
-		return cloneObject(resource)
+		const resource = this.get(projectKey, typeId, obj.id, params);
+		assert(
+			resource,
+			`resource of type ${typeId} with id ${obj.id} not created`,
+		);
+		return cloneObject(resource);
 	}
 
 	get<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		id: string,
-		params: GetParams = {}
+		params: GetParams = {},
 	): ResourceMap[RT] | null {
-		const resource = this.forProjectKey(projectKey)[typeId]?.get(id)
+		const resource = this.forProjectKey(projectKey)[typeId]?.get(id);
 		if (resource) {
-			const clone = cloneObject(resource)
-			return this.expand(projectKey, clone, params.expand) as ResourceMap[RT]
+			const clone = cloneObject(resource);
+			return this.expand(projectKey, clone, params.expand) as ResourceMap[RT];
 		}
-		return null
+		return null;
 	}
 
 	getByKey<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		key: string,
-		params: GetParams = {}
+		params: GetParams = {},
 	): ResourceMap[RT] | null {
-		const store = this.forProjectKey(projectKey)
-		const resourceStore = store[typeId]
+		const store = this.forProjectKey(projectKey);
+		const resourceStore = store[typeId];
 		if (!store) {
-			throw new Error('No type')
+			throw new Error("No type");
 		}
 
-		const resources: any[] = Array.from(resourceStore.values())
-		const resource = resources.find((e) => e.key === key)
+		const resources: any[] = Array.from(resourceStore.values());
+		const resource = resources.find((e) => e.key === key);
 		if (resource) {
-			const clone = cloneObject(resource)
-			return this.expand(projectKey, clone, params.expand) as ResourceMap[RT]
+			const clone = cloneObject(resource);
+			return this.expand(projectKey, clone, params.expand) as ResourceMap[RT];
 		}
-		return null
+		return null;
 	}
 
 	delete<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		id: string,
-		params: GetParams = {}
+		params: GetParams = {},
 	): ResourceMap[RT] | null {
-		const resource = this.get(projectKey, typeId, id)
+		const resource = this.get(projectKey, typeId, id);
 
 		if (resource) {
-			this.forProjectKey(projectKey)[typeId]?.delete(id)
-			return this.expand(projectKey, resource, params.expand)
+			this.forProjectKey(projectKey)[typeId]?.delete(id);
+			return this.expand(projectKey, resource, params.expand);
 		}
-		return resource
+		return resource;
 	}
 
 	query<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
-		params: QueryParams
+		params: QueryParams,
 	): PagedQueryResponseMap[RT] {
-		const store = this.forProjectKey(projectKey)[typeId]
+		const store = this.forProjectKey(projectKey)[typeId];
 		if (!store) {
-			throw new Error('No type')
+			throw new Error("No type");
 		}
 
-		let resources = this.all<RT>(projectKey, typeId)
+		let resources = this.all<RT>(projectKey, typeId);
 
 		// Apply predicates
 		if (params.where) {
@@ -211,37 +214,37 @@ export class InMemoryStorage extends AbstractStorage {
 			// the 'var.' prefix.
 			const vars = Object.fromEntries(
 				Object.entries(params)
-					.filter(([key]) => key.startsWith('var.'))
-					.map(([key, value]) => [key.slice(4), value])
-			)
+					.filter(([key]) => key.startsWith("var."))
+					.map(([key, value]) => [key.slice(4), value]),
+			);
 
 			try {
-				const filterFunc = parseQueryExpression(params.where)
-				resources = resources.filter((resource) => filterFunc(resource, vars))
+				const filterFunc = parseQueryExpression(params.where);
+				resources = resources.filter((resource) => filterFunc(resource, vars));
 			} catch (err) {
 				throw new CommercetoolsError<InvalidInputError>(
 					{
-						code: 'InvalidInput',
+						code: "InvalidInput",
 						message: (err as any).message,
 					},
-					400
-				)
+					400,
+				);
 			}
 		}
 
 		// Get the total before slicing the array
-		const totalResources = resources.length
+		const totalResources = resources.length;
 
 		// Apply offset, limit
-		const offset = params.offset || 0
-		const limit = params.limit || 20
-		resources = resources.slice(offset, offset + limit)
+		const offset = params.offset || 0;
+		const limit = params.limit || 20;
+		resources = resources.slice(offset, offset + limit);
 
 		// Expand the resources
 		if (params.expand !== undefined) {
 			resources = resources.map((resource) =>
-				this.expand(projectKey, resource, params.expand)
-			)
+				this.expand(projectKey, resource, params.expand),
+			);
 		}
 
 		return {
@@ -250,45 +253,45 @@ export class InMemoryStorage extends AbstractStorage {
 			offset: offset,
 			limit: limit,
 			results: resources.map(cloneObject),
-		} as PagedQueryResponseMap[RT]
+		} as PagedQueryResponseMap[RT];
 	}
 
 	search(
 		projectKey: string,
 		typeId: ResourceType,
-		params: QueryParams
+		params: QueryParams,
 	): PagedQueryResponse {
-		let resources = this.all(projectKey, typeId)
+		let resources = this.all(projectKey, typeId);
 
 		// Apply predicates
 		if (params.where) {
 			try {
-				const filterFunc = parseQueryExpression(params.where)
-				resources = resources.filter((resource) => filterFunc(resource, {}))
+				const filterFunc = parseQueryExpression(params.where);
+				resources = resources.filter((resource) => filterFunc(resource, {}));
 			} catch (err) {
 				throw new CommercetoolsError<InvalidInputError>(
 					{
-						code: 'InvalidInput',
+						code: "InvalidInput",
 						message: (err as any).message,
 					},
-					400
-				)
+					400,
+				);
 			}
 		}
 
 		// Get the total before slicing the array
-		const totalResources = resources.length
+		const totalResources = resources.length;
 
 		// Apply offset, limit
-		const offset = params.offset || 0
-		const limit = params.limit || 20
-		resources = resources.slice(offset, offset + limit)
+		const offset = params.offset || 0;
+		const limit = params.limit || 20;
+		resources = resources.slice(offset, offset + limit);
 
 		// Expand the resources
 		if (params.expand !== undefined) {
 			resources = resources.map((resource) =>
-				this.expand(projectKey, resource, params.expand)
-			)
+				this.expand(projectKey, resource, params.expand),
+			);
 		}
 
 		return {
@@ -297,21 +300,21 @@ export class InMemoryStorage extends AbstractStorage {
 			offset: offset,
 			limit: limit,
 			results: resources,
-		}
+		};
 	}
 
 	getByResourceIdentifier<RT extends ResourceType>(
 		projectKey: string,
-		identifier: ResourceIdentifier
+		identifier: ResourceIdentifier,
 	): ResourceMap[RT] {
 		if (identifier.id) {
-			const resource = this.get(projectKey, identifier.typeId, identifier.id)
+			const resource = this.get(projectKey, identifier.typeId, identifier.id);
 			if (resource) {
-				return resource as ResourceMap[RT]
+				return resource as ResourceMap[RT];
 			}
 
 			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
-				code: 'ReferencedResourceNotFound',
+				code: "ReferencedResourceNotFound",
 				message:
 					`The referenced object of type '${identifier.typeId}' with id ` +
 					`'${identifier.id}' was not found. It either doesn't exist, or it ` +
@@ -319,21 +322,21 @@ export class InMemoryStorage extends AbstractStorage {
 					`filters by store or customer account).`,
 				typeId: identifier.typeId,
 				id: identifier.id,
-			})
+			});
 		}
 
 		if (identifier.key) {
 			const resource = this.getByKey(
 				projectKey,
 				identifier.typeId,
-				identifier.key
-			)
+				identifier.key,
+			);
 			if (resource) {
-				return resource as ResourceMap[RT]
+				return resource as ResourceMap[RT];
 			}
 
 			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
-				code: 'ReferencedResourceNotFound',
+				code: "ReferencedResourceNotFound",
 				message:
 					`The referenced object of type '${identifier.typeId}' with key ` +
 					`'${identifier.key}' was not found. It either doesn't exist, or it ` +
@@ -341,25 +344,25 @@ export class InMemoryStorage extends AbstractStorage {
 					`filters by store or customer account).`,
 				typeId: identifier.typeId,
 				key: identifier.key,
-			})
+			});
 		}
 		throw new CommercetoolsError<InvalidJsonInputError>({
-			code: 'InvalidJsonInput',
-			message: 'Request body does not contain valid JSON.',
+			code: "InvalidJsonInput",
+			message: "Request body does not contain valid JSON.",
 			detailedErrorMessage: "ResourceIdentifier requires an 'id' xor a 'key'",
-		})
+		});
 	}
 
 	addProject = (projectKey: string): Project => {
 		if (!this.projects[projectKey]) {
 			this.projects[projectKey] = {
 				key: projectKey,
-				name: '',
+				name: "",
 				countries: [],
 				currencies: [],
 				languages: [],
-				createdAt: '2018-10-04T11:32:12.603Z',
-				trialUntil: '2018-12',
+				createdAt: "2018-10-04T11:32:12.603Z",
+				trialUntil: "2018-12",
 				carts: {
 					countryTaxRateFallbackEnabled: false,
 					deleteDaysAfterLastModification: 90,
@@ -369,88 +372,88 @@ export class InMemoryStorage extends AbstractStorage {
 				externalOAuth: undefined,
 				searchIndexing: {
 					products: {
-						status: 'Deactivated',
+						status: "Deactivated",
 					},
 					orders: {
-						status: 'Deactivated',
+						status: "Deactivated",
 					},
 				},
 				version: 1,
-			}
+			};
 		}
-		return this.projects[projectKey]
-	}
+		return this.projects[projectKey];
+	};
 
 	saveProject = (project: Project): Project => {
-		this.projects[project.key] = project
-		return project
-	}
+		this.projects[project.key] = project;
+		return project;
+	};
 
-	getProject = (projectKey: string): Project => this.addProject(projectKey)
+	getProject = (projectKey: string): Project => this.addProject(projectKey);
 
 	// Expand resolves a nested reference and injects the object in the given obj
 	public expand = <T>(
 		projectKey: string,
 		obj: T,
-		clause: undefined | string | string[]
+		clause: undefined | string | string[],
 	): T => {
-		if (!clause) return obj
-		const newObj = cloneObject(obj)
+		if (!clause) return obj;
+		const newObj = cloneObject(obj);
 		if (Array.isArray(clause)) {
 			for (const c of clause) {
-				this._resolveResource(projectKey, newObj, c)
+				this._resolveResource(projectKey, newObj, c);
 			}
 		} else {
-			this._resolveResource(projectKey, newObj, clause)
+			this._resolveResource(projectKey, newObj, clause);
 		}
-		return newObj
-	}
+		return newObj;
+	};
 
 	private _resolveResource = (projectKey: string, obj: any, expand: string) => {
-		const params = parseExpandClause(expand)
+		const params = parseExpandClause(expand);
 
 		// 'lineItems[*].variant' on ShoppingList is an exception, these variants are not references
-		if (params.index === '*') {
-			const reference = obj[params.element]
+		if (params.index === "*") {
+			const reference = obj[params.element];
 			if (
-				params.element === 'lineItems' &&
-				params.rest?.startsWith('variant') &&
+				params.element === "lineItems" &&
+				params.rest?.startsWith("variant") &&
 				reference.every(
 					(item: any) =>
-						item.variant === undefined && item.variantId !== undefined
+						item.variant === undefined && item.variantId !== undefined,
 				)
 			) {
 				for (const item of reference as ShoppingListLineItem[]) {
-					this._resolveShoppingListLineItemVariant(projectKey, item)
+					this._resolveShoppingListLineItemVariant(projectKey, item);
 				}
 			}
 		}
 
 		if (!params.index) {
-			const reference = obj[params.element]
+			const reference = obj[params.element];
 			if (reference === undefined) {
-				return
+				return;
 			}
-			this._resolveReference(projectKey, reference, params.rest)
-		} else if (params.index === '*') {
-			const reference = obj[params.element]
-			if (reference === undefined || !Array.isArray(reference)) return
+			this._resolveReference(projectKey, reference, params.rest);
+		} else if (params.index === "*") {
+			const reference = obj[params.element];
+			if (reference === undefined || !Array.isArray(reference)) return;
 			for (const itemRef of reference as Writable<Reference>[]) {
-				this._resolveReference(projectKey, itemRef, params.rest)
+				this._resolveReference(projectKey, itemRef, params.rest);
 			}
 		} else {
-			const reference = obj[params.element][params.index]
-			if (reference === undefined) return
-			this._resolveReference(projectKey, reference, params.rest)
+			const reference = obj[params.element][params.index];
+			if (reference === undefined) return;
+			this._resolveReference(projectKey, reference, params.rest);
 		}
-	}
+	};
 
 	private _resolveReference(
 		projectKey: string,
 		reference: any,
-		expand: string | undefined
+		expand: string | undefined,
 	) {
-		if (reference === undefined) return
+		if (reference === undefined) return;
 
 		if (
 			reference.typeId !== undefined &&
@@ -463,35 +466,35 @@ export class InMemoryStorage extends AbstractStorage {
 					typeId: reference.typeId,
 					id: reference.id,
 					key: reference.key,
-				} as ResourceIdentifier)
+				} as ResourceIdentifier);
 			}
 			if (expand) {
-				this._resolveResource(projectKey, reference.obj, expand)
+				this._resolveResource(projectKey, reference.obj, expand);
 			}
 		} else {
 			if (expand) {
-				this._resolveResource(projectKey, reference, expand)
+				this._resolveResource(projectKey, reference, expand);
 			}
 		}
 	}
 	private _resolveShoppingListLineItemVariant(
 		projectKey: string,
-		lineItem: ShoppingListLineItem
+		lineItem: ShoppingListLineItem,
 	) {
 		const product = this.getByResourceIdentifier(projectKey, {
-			typeId: 'product',
+			typeId: "product",
 			id: lineItem.productId,
-		}) as Product | undefined
+		}) as Product | undefined;
 
 		if (!product) {
-			return
+			return;
 		}
 
 		const variant = [
 			product.masterData.current.masterVariant,
 			...product.masterData.current.variants,
-		].find((e) => e.id === lineItem.variantId)
+		].find((e) => e.id === lineItem.variantId);
 		// @ts-ignore
-		lineItem.variant = variant
+		lineItem.variant = variant;
 	}
 }

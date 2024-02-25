@@ -5,22 +5,19 @@ import type {
 	AttributeGroupSetAttributesAction,
 	AttributeGroupSetDescriptionAction,
 	AttributeGroupSetKeyAction,
-} from '@commercetools/platform-sdk'
-import {
-	AbstractResourceRepository,
-	type RepositoryContext,
-} from './abstract.js'
-import { getBaseResourceProperties } from '../helpers.js'
-import { Writable } from '../types.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import { Writable } from "../types";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
 
-export class AttributeGroupRepository extends AbstractResourceRepository<'attribute-group'> {
+export class AttributeGroupRepository extends AbstractResourceRepository<"attribute-group"> {
 	getTypeId() {
-		return 'attribute-group' as const
+		return "attribute-group" as const;
 	}
 
 	create(
 		context: RepositoryContext,
-		draft: AttributeGroupDraft
+		draft: AttributeGroupDraft,
 	): AttributeGroup {
 		const resource: AttributeGroup = {
 			...getBaseResourceProperties(),
@@ -28,38 +25,38 @@ export class AttributeGroupRepository extends AbstractResourceRepository<'attrib
 			description: draft.description,
 			key: draft.key,
 			attributes: draft.attributes,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions = {
 		setAttributes: (
 			_context: RepositoryContext,
 			resource: Writable<AttributeGroup>,
-			{ attributes }: AttributeGroupSetAttributesAction
+			{ attributes }: AttributeGroupSetAttributesAction,
 		) => {
-			resource.attributes = attributes
+			resource.attributes = attributes;
 		},
 		changeName: (
 			_context: RepositoryContext,
 			resource: Writable<AttributeGroup>,
-			{ name }: AttributeGroupChangeNameAction
+			{ name }: AttributeGroupChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setDescription: (
 			_context: RepositoryContext,
 			resource: Writable<AttributeGroup>,
-			{ description }: AttributeGroupSetDescriptionAction
+			{ description }: AttributeGroupSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setKey: (
 			_context: RepositoryContext,
 			resource: Writable<AttributeGroup>,
-			{ key }: AttributeGroupSetKeyAction
+			{ key }: AttributeGroupSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
-	}
+	};
 }

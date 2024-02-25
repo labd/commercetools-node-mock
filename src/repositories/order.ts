@@ -15,16 +15,16 @@ import type {
 	OrderChangePaymentStateAction,
 	OrderFromCartDraft,
 	OrderImportDraft,
-	OrderUpdateSyncInfoAction,
 	OrderSetBillingAddressAction,
-	OrderSetCustomerEmailAction,
 	OrderSetCustomFieldAction,
 	OrderSetCustomTypeAction,
+	OrderSetCustomerEmailAction,
 	OrderSetLocaleAction,
 	OrderSetOrderNumberAction,
 	OrderSetShippingAddressAction,
 	OrderSetStoreAction,
 	OrderTransitionStateAction,
+	OrderUpdateSyncInfoAction,
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
@@ -32,16 +32,16 @@ import type {
 	State,
 	Store,
 	SyncInfo,
-} from '@commercetools/platform-sdk'
-import assert from 'assert'
-import { CommercetoolsError } from '../exceptions.js'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
+} from "@commercetools/platform-sdk";
+import assert from "assert";
+import { CommercetoolsError } from "../exceptions";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
 import {
 	AbstractResourceRepository,
-	type QueryParams,
 	RepositoryContext,
-} from './abstract.js'
+	type QueryParams,
+} from "./abstract";
 import {
 	createAddress,
 	createCentPrecisionMoney,
@@ -49,154 +49,154 @@ import {
 	createPrice,
 	createTypedMoney,
 	resolveStoreReference,
-} from './helpers.js'
+} from "./helpers";
 
-export class OrderRepository extends AbstractResourceRepository<'order'> {
+export class OrderRepository extends AbstractResourceRepository<"order"> {
 	getTypeId() {
-		return 'order' as const
+		return "order" as const;
 	}
 
 	create(context: RepositoryContext, draft: OrderFromCartDraft): Order {
-		assert(draft.cart, 'draft.cart is missing')
+		assert(draft.cart, "draft.cart is missing");
 		return this.createFromCart(
 			context,
 			{
 				id: draft.cart.id!,
-				typeId: 'cart',
+				typeId: "cart",
 			},
-			draft.orderNumber
-		)
+			draft.orderNumber,
+		);
 	}
 
 	createFromCart(
 		context: RepositoryContext,
 		cartReference: CartReference,
-		orderNumber?: string
+		orderNumber?: string,
 	) {
 		const cart = this._storage.getByResourceIdentifier(
 			context.projectKey,
-			cartReference
-		) as Cart | null
+			cartReference,
+		) as Cart | null;
 		if (!cart) {
-			throw new Error('Cannot find cart')
+			throw new Error("Cannot find cart");
 		}
 
 		const resource: Order = {
 			...getBaseResourceProperties(),
 			orderNumber,
 			cart: cartReference,
-			orderState: 'Open',
+			orderState: "Open",
 			lineItems: [],
 			customLineItems: [],
 			totalPrice: cart.totalPrice,
 			refusedGifts: [],
-			origin: 'Customer',
+			origin: "Customer",
 			syncInfo: [],
 			shippingMode: cart.shippingMode,
 			shipping: cart.shipping,
 			store: context.storeKey
 				? {
 						key: context.storeKey,
-						typeId: 'store',
+						typeId: "store",
 					}
 				: undefined,
 			lastMessageSequenceNumber: 0,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	import(context: RepositoryContext, draft: OrderImportDraft): Order {
 		// TODO: Check if order with given orderNumber already exists
-		assert(this, 'OrderRepository not valid')
+		assert(this, "OrderRepository not valid");
 		const resource: Order = {
 			...getBaseResourceProperties(),
 
 			billingAddress: createAddress(
 				draft.billingAddress,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			shippingAddress: createAddress(
 				draft.shippingAddress,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			customerEmail: draft.customerEmail,
 			lastMessageSequenceNumber: 0,
 			orderNumber: draft.orderNumber,
-			orderState: draft.orderState || 'Open',
-			origin: draft.origin || 'Customer',
+			orderState: draft.orderState || "Open",
+			origin: draft.origin || "Customer",
 			paymentState: draft.paymentState,
 			refusedGifts: [],
-			shippingMode: 'Single',
+			shippingMode: "Single",
 			shipping: [],
 
 			store: resolveStoreReference(
 				draft.store,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			syncInfo: [],
 
 			lineItems:
 				draft.lineItems?.map((item) =>
-					this.lineItemFromImportDraft.bind(this)(context, item)
+					this.lineItemFromImportDraft.bind(this)(context, item),
 				) || [],
 			customLineItems:
 				draft.customLineItems?.map((item) =>
-					this.customLineItemFromImportDraft.bind(this)(context, item)
+					this.customLineItemFromImportDraft.bind(this)(context, item),
 				) || [],
 
 			totalPrice: createCentPrecisionMoney(draft.totalPrice),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	private lineItemFromImportDraft(
 		context: RepositoryContext,
-		draft: LineItemImportDraft
+		draft: LineItemImportDraft,
 	): LineItem {
-		let product: Product
-		let variant: ProductVariant | undefined
+		let product: Product;
+		let variant: ProductVariant | undefined;
 
 		if (draft.variant.sku) {
 			variant = {
 				id: 0,
 				sku: draft.variant.sku,
-			}
+			};
 
-			const items = this._storage.query(context.projectKey, 'product', {
+			const items = this._storage.query(context.projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${draft.variant.sku}"))) or masterData(current(variants(sku="${draft.variant.sku}")))`,
 				],
-			}) as ProductPagedQueryResponse
+			}) as ProductPagedQueryResponse;
 
 			if (items.count !== 1) {
 				throw new CommercetoolsError<GeneralError>({
-					code: 'General',
+					code: "General",
 					message: `A product containing a variant with SKU '${draft.variant.sku}' not found.`,
-				})
+				});
 			}
 
-			product = items.results[0]
+			product = items.results[0];
 			if (product.masterData.current.masterVariant.sku === draft.variant.sku) {
-				variant = product.masterData.current.masterVariant
+				variant = product.masterData.current.masterVariant;
 			} else {
 				variant = product.masterData.current.variants.find(
-					(v) => v.sku === draft.variant.sku
-				)
+					(v) => v.sku === draft.variant.sku,
+				);
 			}
 			if (!variant) {
-				throw new Error('Internal state error')
+				throw new Error("Internal state error");
 			}
 		} else {
-			throw new Error('No product found')
+			throw new Error("No product found");
 		}
 
 		const lineItem: LineItem = {
@@ -204,13 +204,13 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			discountedPricePerQuantity: [],
-			lineItemMode: 'Standard',
+			lineItemMode: "Standard",
 			name: draft.name,
 			price: createPrice(draft.price),
-			priceMode: 'Platform',
+			priceMode: "Platform",
 			productId: product.id,
 			productType: product.productType,
 			quantity: draft.quantity,
@@ -224,91 +224,91 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 				sku: variant.sku,
 				price: createPrice(draft.price),
 			},
-		}
+		};
 
-		return lineItem
+		return lineItem;
 	}
 
 	private customLineItemFromImportDraft(
 		context: RepositoryContext,
-		draft: CustomLineItemImportDraft
+		draft: CustomLineItemImportDraft,
 	): CustomLineItem {
 		const lineItem: CustomLineItem = {
 			...getBaseResourceProperties(),
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
 			discountedPricePerQuantity: [],
 			money: createTypedMoney(draft.money),
 			name: draft.name,
 			quantity: draft.quantity ?? 0,
 			perMethodTaxRate: [],
-			priceMode: draft.priceMode ?? 'Standard',
+			priceMode: draft.priceMode ?? "Standard",
 			slug: draft.slug,
 			state: [],
 			totalPrice: createCentPrecisionMoney(draft.money),
 			taxedPricePortions: [],
-		}
+		};
 
-		return lineItem
+		return lineItem;
 	}
 
 	getWithOrderNumber(
 		context: RepositoryContext,
 		orderNumber: string,
-		params: QueryParams = {}
+		params: QueryParams = {},
 	): Order | undefined {
 		const result = this._storage.query(context.projectKey, this.getTypeId(), {
 			...params,
 			where: [`orderNumber="${orderNumber}"`],
-		})
+		});
 		if (result.count === 1) {
-			return result.results[0] as Order
+			return result.results[0] as Order;
 		}
 
 		// Catch this for now, should be checked when creating/updating
 		if (result.count > 1) {
-			throw new Error('Duplicate order numbers')
+			throw new Error("Duplicate order numbers");
 		}
 
-		return
+		return;
 	}
 
 	actions = {
 		addPayment: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ payment }: OrderAddPaymentAction
+			{ payment }: OrderAddPaymentAction,
 		) => {
 			const resolvedPayment = this._storage.getByResourceIdentifier(
 				context.projectKey,
-				payment
-			)
+				payment,
+			);
 			if (!resolvedPayment) {
-				throw new Error(`Payment ${payment.id} not found`)
+				throw new Error(`Payment ${payment.id} not found`);
 			}
 
 			if (!resource.paymentInfo) {
 				resource.paymentInfo = {
 					payments: [],
-				}
+				};
 			}
 
 			resource.paymentInfo.payments.push({
-				typeId: 'payment',
+				typeId: "payment",
 				id: payment.id!,
-			})
+			});
 		},
 
 		addReturnInfo: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			info: OrderAddReturnInfoAction
+			info: OrderAddReturnInfoAction,
 		) => {
 			if (!resource.returnInfo) {
-				resource.returnInfo = []
+				resource.returnInfo = [];
 			}
 
 			const resolved: ReturnInfo = {
@@ -316,197 +316,197 @@ export class OrderRepository extends AbstractResourceRepository<'order'> {
 					const common = {
 						...getBaseResourceProperties(),
 						quantity: item.quantity,
-						paymentState: 'Initial',
-						shipmentState: 'Initial',
+						paymentState: "Initial",
+						shipmentState: "Initial",
 						comment: item.comment,
-					}
+					};
 					if (item.customLineItemId) {
 						return {
 							...common,
-							type: 'CustomLineItemReturnItem',
+							type: "CustomLineItemReturnItem",
 							customLineItemId: item.customLineItemId,
-						} as CustomLineItemReturnItem
+						} as CustomLineItemReturnItem;
 					}
 					return {
 						...common,
-						type: 'LineItemReturnItem',
+						type: "LineItemReturnItem",
 						lineItemId: item.customLineItemId || item.lineItemId,
-					} as LineItemReturnItem
+					} as LineItemReturnItem;
 				}),
 				returnTrackingId: info.returnTrackingId,
 				returnDate: info.returnDate,
-			}
+			};
 
-			resource.returnInfo.push(resolved)
+			resource.returnInfo.push(resolved);
 		},
 		changeOrderState: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ orderState }: OrderChangeOrderStateAction
+			{ orderState }: OrderChangeOrderStateAction,
 		) => {
-			resource.orderState = orderState
+			resource.orderState = orderState;
 		},
 		changePaymentState: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ paymentState }: OrderChangePaymentStateAction
+			{ paymentState }: OrderChangePaymentStateAction,
 		) => {
-			resource.paymentState = paymentState
+			resource.paymentState = paymentState;
 		},
 		transitionState: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ state }: OrderTransitionStateAction
+			{ state }: OrderTransitionStateAction,
 		) => {
 			const resolvedType = this._storage.getByResourceIdentifier(
 				context.projectKey,
-				state
-			) as State | null
+				state,
+			) as State | null;
 
 			if (!resolvedType) {
 				throw new Error(
-					`No state found with key=${state.key} or id=${state.key}`
-				)
+					`No state found with key=${state.key} or id=${state.key}`,
+				);
 			}
 
 			resource.state = {
-				typeId: 'state',
+				typeId: "state",
 				id: resolvedType.id,
-				obj: { ...resolvedType, key: state.key ?? '' },
-			}
+				obj: { ...resolvedType, key: state.key ?? "" },
+			};
 		},
 		setBillingAddress: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ address }: OrderSetBillingAddressAction
+			{ address }: OrderSetBillingAddressAction,
 		) => {
 			resource.billingAddress = createAddress(
 				address,
 				context.projectKey,
-				this._storage
-			)
+				this._storage,
+			);
 		},
 		setCustomerEmail: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ email }: OrderSetCustomerEmailAction
+			{ email }: OrderSetCustomerEmailAction,
 		) => {
-			resource.customerEmail = email
+			resource.customerEmail = email;
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Order,
-			{ name, value }: OrderSetCustomFieldAction
+			{ name, value }: OrderSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				throw new Error('Resource has no custom field')
+				throw new Error("Resource has no custom field");
 			}
-			resource.custom.fields[name] = value
+			resource.custom.fields[name] = value;
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ type, fields }: OrderSetCustomTypeAction
+			{ type, fields }: OrderSetCustomTypeAction,
 		) => {
 			if (!type) {
-				resource.custom = undefined
+				resource.custom = undefined;
 			} else {
 				const resolvedType = this._storage.getByResourceIdentifier(
 					context.projectKey,
-					type
-				)
+					type,
+				);
 				if (!resolvedType) {
-					throw new Error(`Type ${type} not found`)
+					throw new Error(`Type ${type} not found`);
 				}
 
 				resource.custom = {
 					type: {
-						typeId: 'type',
+						typeId: "type",
 						id: resolvedType.id,
 					},
 					fields: fields || {},
-				}
+				};
 			}
 		},
 		setLocale: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ locale }: OrderSetLocaleAction
+			{ locale }: OrderSetLocaleAction,
 		) => {
-			resource.locale = locale
+			resource.locale = locale;
 		},
 		setOrderNumber: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ orderNumber }: OrderSetOrderNumberAction
+			{ orderNumber }: OrderSetOrderNumberAction,
 		) => {
-			resource.orderNumber = orderNumber
+			resource.orderNumber = orderNumber;
 		},
 		setShippingAddress: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ address }: OrderSetShippingAddressAction
+			{ address }: OrderSetShippingAddressAction,
 		) => {
 			resource.shippingAddress = createAddress(
 				address,
 				context.projectKey,
-				this._storage
-			)
+				this._storage,
+			);
 		},
 		setStore: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ store }: OrderSetStoreAction
+			{ store }: OrderSetStoreAction,
 		) => {
-			if (!store) return
+			if (!store) return;
 			const resolvedType = this._storage.getByResourceIdentifier(
 				context.projectKey,
-				store
-			)
+				store,
+			);
 			if (!resolvedType) {
-				throw new Error(`No store found with key=${store.key}`)
+				throw new Error(`No store found with key=${store.key}`);
 			}
 
-			const storeReference = resolvedType as Store
+			const storeReference = resolvedType as Store;
 			resource.store = {
-				typeId: 'store',
+				typeId: "store",
 				key: storeReference.key,
-			}
+			};
 		},
 		updateSyncInfo: (
 			context: RepositoryContext,
 			resource: Writable<Order>,
-			{ channel, externalId, syncedAt }: OrderUpdateSyncInfoAction
+			{ channel, externalId, syncedAt }: OrderUpdateSyncInfoAction,
 		) => {
-			if (!channel) return
+			if (!channel) return;
 			const resolvedType = this._storage.getByResourceIdentifier(
 				context.projectKey,
-				channel
-			)
+				channel,
+			);
 			if (!resolvedType) {
-				throw new Error(`Channel ${channel} not found`)
+				throw new Error(`Channel ${channel} not found`);
 			}
 
 			const syncData: SyncInfo = {
 				channel: {
-					typeId: 'channel',
+					typeId: "channel",
 					id: resolvedType.id,
 				},
 				externalId,
 				syncedAt: syncedAt ?? new Date().toISOString(),
-			}
+			};
 
 			if (!resource.syncInfo?.length) {
-				resource.syncInfo = [syncData]
+				resource.syncInfo = [syncData];
 			} else {
-				const lastSyncInfo = resource.syncInfo[resource.syncInfo.length - 1]
+				const lastSyncInfo = resource.syncInfo[resource.syncInfo.length - 1];
 				if (
 					lastSyncInfo.channel.id !== syncData.channel.id ||
 					lastSyncInfo.externalId !== syncData.externalId
 				) {
-					resource.syncInfo.push(syncData)
+					resource.syncInfo.push(syncData);
 				}
 			}
 		},
-	}
+	};
 }

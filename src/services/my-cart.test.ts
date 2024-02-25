@@ -1,99 +1,99 @@
-import type { Cart, MyCartDraft } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../index.js'
+import type { Cart, MyCartDraft } from "@commercetools/platform-sdk";
+import supertest from "supertest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { CommercetoolsMock } from "../index";
 
-const ctMock = new CommercetoolsMock()
+const ctMock = new CommercetoolsMock();
 
-describe('MyCart', () => {
+describe("MyCart", () => {
 	beforeEach(async () => {
 		const response = await supertest(ctMock.app)
-			.post('/dummy/types')
+			.post("/dummy/types")
 			.send({
-				key: 'custom-payment',
+				key: "custom-payment",
 				name: {
-					'nl-NL': 'custom-payment',
+					"nl-NL": "custom-payment",
 				},
-				resourceTypeIds: ['payment'],
-			})
-		expect(response.status).toBe(201)
-	})
+				resourceTypeIds: ["payment"],
+			});
+		expect(response.status).toBe(201);
+	});
 
 	afterEach(() => {
-		ctMock.clear()
-	})
+		ctMock.clear();
+	});
 
-	test('Create my cart', async () => {
+	test("Create my cart", async () => {
 		const draft: MyCartDraft = {
-			currency: 'EUR',
-		}
+			currency: "EUR",
+		};
 
 		const response = await supertest(ctMock.app)
-			.post('/dummy/me/carts')
-			.send(draft)
+			.post("/dummy/me/carts")
+			.send(draft);
 
-		expect(response.status).toBe(201)
+		expect(response.status).toBe(201);
 		expect(response.body).toEqual({
 			id: expect.anything(),
 			createdAt: expect.anything(),
 			lastModifiedAt: expect.anything(),
 			version: 1,
-			cartState: 'Active',
+			cartState: "Active",
 			discountCodes: [],
 			directDiscounts: [],
-			inventoryMode: 'None',
+			inventoryMode: "None",
 			itemShippingAddresses: [],
 			lineItems: [],
 			customLineItems: [],
 			shipping: [],
-			shippingMode: 'Single',
+			shippingMode: "Single",
 			totalPrice: {
-				type: 'centPrecision',
+				type: "centPrecision",
 				centAmount: 0,
-				currencyCode: 'EUR',
+				currencyCode: "EUR",
 				fractionDigits: 0,
 			},
-			taxMode: 'Platform',
-			taxRoundingMode: 'HalfEven',
-			taxCalculationMode: 'LineItemLevel',
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "LineItemLevel",
 			refusedGifts: [],
-			origin: 'Customer',
-		} as Cart)
-	})
+			origin: "Customer",
+		} as Cart);
+	});
 
-	test('Get my cart by ID', async () => {
+	test("Get my cart by ID", async () => {
 		const draft: MyCartDraft = {
-			currency: 'EUR',
-		}
+			currency: "EUR",
+		};
 		const createResponse = await supertest(ctMock.app)
-			.post('/dummy/me/carts')
-			.send(draft)
+			.post("/dummy/me/carts")
+			.send(draft);
 
 		const response = await supertest(ctMock.app).get(
-			`/dummy/me/carts/${createResponse.body.id}`
-		)
+			`/dummy/me/carts/${createResponse.body.id}`,
+		);
 
-		expect(response.status).toBe(200)
-		expect(response.body).toEqual(createResponse.body)
-	})
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual(createResponse.body);
+	});
 
-	test('Get my active cart', async () => {
+	test("Get my active cart", async () => {
 		const draft: MyCartDraft = {
-			currency: 'EUR',
-		}
+			currency: "EUR",
+		};
 		const createResponse = await supertest(ctMock.app)
-			.post('/dummy/me/carts')
-			.send(draft)
+			.post("/dummy/me/carts")
+			.send(draft);
 
-		const response = await supertest(ctMock.app).get(`/dummy/me/active-cart`)
+		const response = await supertest(ctMock.app).get(`/dummy/me/active-cart`);
 
-		expect(response.status).toBe(200)
-		expect(response.body).toEqual(createResponse.body)
-	})
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual(createResponse.body);
+	});
 
-	test('Get my active cart which doesnt exists', async () => {
-		const response = await supertest(ctMock.app).get(`/dummy/me/active-cart`)
+	test("Get my active cart which doesnt exists", async () => {
+		const response = await supertest(ctMock.app).get(`/dummy/me/active-cart`);
 
-		expect(response.status).toBe(404)
-	})
-})
+		expect(response.status).toBe(404);
+	});
+});

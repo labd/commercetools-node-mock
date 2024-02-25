@@ -15,18 +15,15 @@ import type {
 	DiscountCodeSetValidFromAndUntilAction,
 	DiscountCodeSetValidUntilAction,
 	DiscountCodeUpdateAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import {
-	AbstractResourceRepository,
-	type RepositoryContext,
-} from './abstract.js'
-import { createCustomFields } from './helpers.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
+import { createCustomFields } from "./helpers";
 
-export class DiscountCodeRepository extends AbstractResourceRepository<'discount-code'> {
+export class DiscountCodeRepository extends AbstractResourceRepository<"discount-code"> {
 	getTypeId() {
-		return 'discount-code' as const
+		return "discount-code" as const;
 	}
 
 	create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {
@@ -35,9 +32,9 @@ export class DiscountCodeRepository extends AbstractResourceRepository<'discount
 			applicationVersion: 1,
 			cartDiscounts: draft.cartDiscounts.map(
 				(obj): CartDiscountReference => ({
-					typeId: 'cart-discount',
+					typeId: "cart-discount",
 					id: obj.id!,
-				})
+				}),
 			),
 			cartPredicate: draft.cartPredicate,
 			code: draft.code,
@@ -53,128 +50,128 @@ export class DiscountCodeRepository extends AbstractResourceRepository<'discount
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions: Partial<
 		Record<
-			DiscountCodeUpdateAction['action'],
+			DiscountCodeUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<DiscountCode>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		changeIsActive: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ isActive }: DiscountCodeChangeIsActiveAction
+			{ isActive }: DiscountCodeChangeIsActiveAction,
 		) => {
-			resource.isActive = isActive
+			resource.isActive = isActive;
 		},
 		changeCartDiscounts: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ cartDiscounts }: DiscountCodeChangeCartDiscountsAction
+			{ cartDiscounts }: DiscountCodeChangeCartDiscountsAction,
 		) => {
 			resource.cartDiscounts = cartDiscounts.map(
 				(obj): CartDiscountReference => ({
-					typeId: 'cart-discount',
+					typeId: "cart-discount",
 					id: obj.id!,
-				})
-			)
+				}),
+			);
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ description }: DiscountCodeSetDescriptionAction
+			{ description }: DiscountCodeSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setCartPredicate: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ cartPredicate }: DiscountCodeSetCartPredicateAction
+			{ cartPredicate }: DiscountCodeSetCartPredicateAction,
 		) => {
-			resource.cartPredicate = cartPredicate
+			resource.cartPredicate = cartPredicate;
 		},
 		setName: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ name }: DiscountCodeSetNameAction
+			{ name }: DiscountCodeSetNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setMaxApplications: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ maxApplications }: DiscountCodeSetMaxApplicationsAction
+			{ maxApplications }: DiscountCodeSetMaxApplicationsAction,
 		) => {
-			resource.maxApplications = maxApplications
+			resource.maxApplications = maxApplications;
 		},
 		setMaxApplicationsPerCustomer: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
 			{
 				maxApplicationsPerCustomer,
-			}: DiscountCodeSetMaxApplicationsPerCustomerAction
+			}: DiscountCodeSetMaxApplicationsPerCustomerAction,
 		) => {
-			resource.maxApplicationsPerCustomer = maxApplicationsPerCustomer
+			resource.maxApplicationsPerCustomer = maxApplicationsPerCustomer;
 		},
 		setValidFrom: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ validFrom }: DiscountCodeSetValidFromAction
+			{ validFrom }: DiscountCodeSetValidFromAction,
 		) => {
-			resource.validFrom = validFrom
+			resource.validFrom = validFrom;
 		},
 		setValidUntil: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ validUntil }: DiscountCodeSetValidUntilAction
+			{ validUntil }: DiscountCodeSetValidUntilAction,
 		) => {
-			resource.validUntil = validUntil
+			resource.validUntil = validUntil;
 		},
 		setValidFromAndUntil: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ validFrom, validUntil }: DiscountCodeSetValidFromAndUntilAction
+			{ validFrom, validUntil }: DiscountCodeSetValidFromAndUntilAction,
 		) => {
-			resource.validFrom = validFrom
-			resource.validUntil = validUntil
+			resource.validFrom = validFrom;
+			resource.validUntil = validUntil;
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ type, fields }: DiscountCodeSetCustomTypeAction
+			{ type, fields }: DiscountCodeSetCustomTypeAction,
 		) => {
 			if (type) {
 				resource.custom = createCustomFields(
 					{ type, fields },
 					context.projectKey,
-					this._storage
-				)
+					this._storage,
+				);
 			} else {
-				resource.custom = undefined
+				resource.custom = undefined;
 			}
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<DiscountCode>,
-			{ name, value }: DiscountCodeSetCustomFieldAction
+			{ name, value }: DiscountCodeSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				return
+				return;
 			}
 			if (value === null) {
-				delete resource.custom.fields[name]
+				delete resource.custom.fields[name];
 			} else {
-				resource.custom.fields[name] = value
+				resource.custom.fields[name] = value;
 			}
 		},
-	}
+	};
 }

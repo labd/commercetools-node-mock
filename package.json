@@ -1,16 +1,9 @@
 {
 	"name": "@labdigital/commercetools-mock",
-	"author": "Michael van Tellingen",
 	"version": "2.17.1",
 	"license": "MIT",
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
+	"author": "Michael van Tellingen",
 	"type": "module",
-	"typings": "dist/index.d.ts",
-	"files": [
-		"dist",
-		"src"
-	],
 	"exports": {
 		".": {
 			"require": "./dist/index.cjs",
@@ -18,72 +11,77 @@
 			"types": "./dist/index.d.ts"
 		}
 	},
-	"engines": {
-		"node": ">=18",
-		"pnpm": ">=8.6.5"
-	},
-	"packageManager": "pnpm@8.6.5",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"src"
+	],
 	"scripts": {
-		"start": "tsup src/server.ts --watch --onSuccess 'node dist/server.js'",
 		"build": "tsup",
 		"build:server": "esbuild src/server.ts --bundle --outfile=dist/server.js --platform=node",
-		"publish:ci": "pnpm build && pnpm changeset publish",
-		"test": "vitest run",
-		"test:ci": "vitest run --coverage",
 		"check": "pnpm lint && tsc",
 		"format": "eslint src --fix ; prettier --write .",
-		"lint": "eslint src && prettier --check ."
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"prettier": {
-		"printWidth": 80,
-		"semi": false,
-		"singleQuote": true,
-		"trailingComma": "es5"
+		"lint": "eslint src && prettier --check .",
+		"publish:ci": "pnpm build && pnpm changeset publish",
+		"start": "tsup src/server.ts --watch --onSuccess 'node dist/server'",
+		"test": "vitest run",
+		"test:ci": "vitest run --coverage"
 	},
 	"dependencies": {
 		"basic-auth": "^2.0.1",
 		"body-parser": "^1.20.2",
 		"deep-equal": "^2.2.3",
 		"express": "^4.18.2",
-		"light-my-request": "^5.11.0",
+		"light-my-request": "^5.11.1",
 		"lodash.isequal": "^4.5.0",
 		"morgan": "^1.10.0",
-		"msw": "^2.1.2",
+		"msw": "^2.2.1",
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
 		"@changesets/changelog-github": "^0.5.0",
 		"@changesets/cli": "^2.27.1",
-		"@commercetools/platform-sdk": "7.2.0-alpha.2",
-		"@types/basic-auth": "^1.1.7",
+		"@commercetools/platform-sdk": "7.3.0",
+		"@stylistic/eslint-plugin": "^1.6.2",
+		"@types/basic-auth": "^1.1.8",
 		"@types/body-parser": "^1.19.5",
 		"@types/deep-equal": "^1.0.4",
 		"@types/express": "^4.17.21",
-		"@types/express-serve-static-core": "^4.17.41",
+		"@types/express-serve-static-core": "^4.17.43",
 		"@types/lodash.isequal": "^4.5.8",
 		"@types/morgan": "^1.9.9",
-		"@types/node": "^20.11.5",
+		"@types/node": "^20.11.20",
 		"@types/qs": "^6.9.11",
 		"@types/supertest": "^6.0.2",
-		"@types/uuid": "^9.0.7",
-		"@typescript-eslint/eslint-plugin": "^6.19.0",
-		"@typescript-eslint/parser": "^6.19.0",
-		"@vitest/coverage-v8": "^1.2.1",
-		"esbuild": "^0.19.11",
-		"eslint": "^8.56.0",
-		"eslint-plugin-unused-imports": "^3.0.0",
-		"got": "^14.0.0",
-		"husky": "^8.0.3",
-		"prettier": "^3.2.4",
+		"@types/uuid": "^9.0.8",
+		"@typescript-eslint/eslint-plugin": "^7.0.2",
+		"@typescript-eslint/parser": "^7.0.2",
+		"@vitest/coverage-v8": "^1.3.1",
+		"esbuild": "^0.20.1",
+		"eslint": "^8.57.0",
+		"eslint-plugin-sort-class-members": "^1.20.0",
+		"eslint-plugin-unused-imports": "^3.1.0",
+		"got": "^14.2.0",
+		"husky": "^9.0.11",
+		"prettier": "^3.2.5",
+		"prettier-plugin-organize-imports": "^3.2.4",
+		"prettier-plugin-packagejson": "^2.4.12",
 		"supertest": "^6.3.4",
 		"timekeeper": "^2.3.1",
 		"ts-node": "^10.9.2",
 		"tslib": "^2.6.2",
-		"tsup": "^8.0.1",
+		"tsup": "^8.0.2",
 		"typescript": "^5.3.3",
-		"vitest": "^1.2.1"
+		"vitest": "^1.3.1"
+	},
+	"packageManager": "pnpm@8.6.5",
+	"engines": {
+		"node": ">=18",
+		"pnpm": ">=8.6.5"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

@@ -3,16 +3,16 @@ import type {
 	Price,
 	ProductProjection,
 	ProductVariant,
-} from '@commercetools/platform-sdk'
-import { CommercetoolsError } from './exceptions.js'
-import type { Writable } from './types.js'
+} from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "./exceptions";
+import type { Writable } from "./types";
 
 export type PriceSelector = {
-	currency?: string
-	country?: string
-	customerGroup?: string
-	channel?: string
-}
+	currency?: string;
+	country?: string;
+	customerGroup?: string;
+	channel?: string;
+};
 
 /**
  * Apply the price selector on all the variants. The price selector is applied
@@ -22,36 +22,36 @@ export type PriceSelector = {
 export const applyPriceSelector = (
 	products: ProductProjection[],
 	selector: PriceSelector,
-	noScopedPrice: boolean = false
+	noScopedPrice: boolean = false,
 ) => {
-	validatePriceSelector(selector)
+	validatePriceSelector(selector);
 
 	for (const product of products) {
 		// Get list of all variants (master + variants)
 		const variants: Writable<ProductVariant>[] = [
 			product.masterVariant,
 			...(product.variants ?? []),
-		].filter((x) => x != undefined)
+		].filter((x) => x != undefined);
 
 		for (const variant of variants) {
 			const scopedPrices =
-				variant.prices?.filter((p) => priceSelectorFilter(p, selector)) ?? []
+				variant.prices?.filter((p) => priceSelectorFilter(p, selector)) ?? [];
 
 			if (scopedPrices.length > 0) {
-				const price = scopedPrices[0]
+				const price = scopedPrices[0];
 
-				variant.price = scopedPrices[0]
+				variant.price = scopedPrices[0];
 				if (!noScopedPrice) {
-					variant.scopedPriceDiscounted = false
+					variant.scopedPriceDiscounted = false;
 					variant.scopedPrice = {
 						...price,
 						currentValue: price.value,
-					}
+					};
 				}
 			}
 		}
 	}
-}
+};
 
 const validatePriceSelector = (selector: PriceSelector) => {
 	if (
@@ -60,15 +60,15 @@ const validatePriceSelector = (selector: PriceSelector) => {
 	) {
 		throw new CommercetoolsError<InvalidInputError>(
 			{
-				code: 'InvalidInput',
+				code: "InvalidInput",
 				message:
-					'The price selecting parameters country, channel and customerGroup ' +
-					'cannot be used without the currency.',
+					"The price selecting parameters country, channel and customerGroup " +
+					"cannot be used without the currency.",
 			},
-			400
-		)
+			400,
+		);
 	}
-}
+};
 
 /**
  * Return a boolean to indicate if the price matches the selector. Price
@@ -77,35 +77,35 @@ const validatePriceSelector = (selector: PriceSelector) => {
  */
 export const priceSelectorFilter = (
 	price: Price,
-	selector: PriceSelector
+	selector: PriceSelector,
 ): boolean => {
 	if (
 		(selector.country || price.country) &&
 		selector.country !== price.country
 	) {
-		return false
+		return false;
 	}
 
 	if (
 		(selector.currency || price.value.currencyCode) &&
 		selector.currency !== price.value.currencyCode
 	) {
-		return false
+		return false;
 	}
 
 	if (
 		(selector.channel || price.channel?.id) &&
 		selector.channel !== price.channel?.id
 	) {
-		return false
+		return false;
 	}
 
 	if (
 		(selector.customerGroup || price.customerGroup?.id) &&
 		selector.customerGroup !== price.customerGroup?.id
 	) {
-		return false
+		return false;
 	}
 
-	return true
-}
+	return true;
+};

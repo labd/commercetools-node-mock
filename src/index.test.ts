@@ -1,238 +1,238 @@
-import { type InvalidTokenError } from '@commercetools/platform-sdk'
-import { CommercetoolsMock } from './index.js'
-import { expect, test } from 'vitest'
-import got from 'got'
+import { type InvalidTokenError } from "@commercetools/platform-sdk";
+import got from "got";
+import { expect, test } from "vitest";
+import { CommercetoolsMock } from "./index";
 
-test('node:fetch client', async () => {
+test("node:fetch client", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
-		apiHost: 'https://localhost',
-		authHost: 'https://localhost:8080',
-	})
-	ctMock.start()
+		apiHost: "https://localhost",
+		authHost: "https://localhost:8080",
+	});
+	ctMock.start();
 
-	const authHeader = 'Basic ' + Buffer.from('foo:bar').toString('base64')
-	let response = await fetch('https://localhost:8080/oauth/token', {
-		method: 'POST',
+	const authHeader = "Basic " + Buffer.from("foo:bar").toString("base64");
+	let response = await fetch("https://localhost:8080/oauth/token", {
+		method: "POST",
 		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			Authorization: authHeader,
+			"Content-Type": "application/x-www-form-urlencoded",
+			"Authorization": authHeader,
 		},
 		body: new URLSearchParams({
-			grant_type: 'client_credentials',
-			scope: 'manage_project:commercetools-node-mock',
+			grant_type: "client_credentials",
+			scope: "manage_project:commercetools-node-mock",
 		}),
-	})
+	});
 
-	const authBody = await response.json()
-	expect(response.status).toBe(200)
+	const authBody = await response.json();
+	expect(response.status).toBe(200);
 
-	const token = authBody.access_token
-	response = await fetch('https://localhost/my-project/orders', {
+	const token = authBody.access_token;
+	response = await fetch("https://localhost/my-project/orders", {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
-	})
+	});
 
-	const body = await response.json()
-	expect(response.status).toBe(200)
+	const body = await response.json();
+	expect(response.status).toBe(200);
 	expect(body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
 		limit: 20,
 		results: [],
-	})
-	ctMock.stop()
-})
+	});
+	ctMock.stop();
+});
 
-test('got client', async () => {
+test("got client", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
-		apiHost: 'https://localhost',
-		authHost: 'https://localhost:8080',
-	})
-	ctMock.start()
+		apiHost: "https://localhost",
+		authHost: "https://localhost:8080",
+	});
+	ctMock.start();
 
 	let response = await got.post<{ access_token: string }>(
-		'https://localhost:8080/oauth/token',
+		"https://localhost:8080/oauth/token",
 		{
 			searchParams: {
-				grant_type: 'client_credentials',
-				scope: 'manage_project:commercetools-node-mock',
+				grant_type: "client_credentials",
+				scope: "manage_project:commercetools-node-mock",
 			},
-			username: 'foo',
-			password: 'bar',
-			responseType: 'json',
-		}
-	)
-	expect(response.statusCode).toBe(200)
+			username: "foo",
+			password: "bar",
+			responseType: "json",
+		},
+	);
+	expect(response.statusCode).toBe(200);
 
-	const token = response.body.access_token
-	expect(response.body.access_token).toBeDefined()
-	response = await got.get('https://localhost/my-project/orders', {
+	const token = response.body.access_token;
+	expect(response.body.access_token).toBeDefined();
+	response = await got.get("https://localhost/my-project/orders", {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
-		responseType: 'json',
-	})
-	expect(response.statusCode).toBe(200)
+		responseType: "json",
+	});
+	expect(response.statusCode).toBe(200);
 	expect(response.body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
 		limit: 20,
 		results: [],
-	})
-	ctMock.stop()
-})
+	});
+	ctMock.stop();
+});
 
-test('Options.validateCredentials: true (error)', async () => {
+test("Options.validateCredentials: true (error)", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
-	})
-	ctMock.start()
+	});
+	ctMock.start();
 
 	const response = await got.get<InvalidTokenError>(
-		'https://api.europe-west1.gcp.commercetools.com/my-project/orders',
+		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
 			headers: {
 				Authorization: `Bearer foobar`,
 			},
-			responseType: 'json',
+			responseType: "json",
 			throwHttpErrors: false,
-		}
-	)
-	expect(response.statusCode).toBe(401)
-	expect(response.body.message).toBe('invalid_token')
-	ctMock.stop()
-})
+		},
+	);
+	expect(response.statusCode).toBe(401);
+	expect(response.body.message).toBe("invalid_token");
+	ctMock.stop();
+});
 
-test('Options.validateCredentials: false', async () => {
+test("Options.validateCredentials: false", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: false,
-	})
-	ctMock.start()
+	});
+	ctMock.start();
 
 	const response = await got.get(
-		'https://api.europe-west1.gcp.commercetools.com/my-project/orders',
+		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
 			headers: {
 				Authorization: `Bearer foobar`,
 			},
-			responseType: 'json',
-		}
-	)
-	expect(response.statusCode).toBe(200)
+			responseType: "json",
+		},
+	);
+	expect(response.statusCode).toBe(200);
 	expect(response.body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
 		limit: 20,
 		results: [],
-	})
-	ctMock.stop()
-})
+	});
+	ctMock.stop();
+});
 
-test('Options.enableAuthentication: false', async () => {
+test("Options.enableAuthentication: false", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: false,
 		validateCredentials: false,
-	})
-	ctMock.start()
+	});
+	ctMock.start();
 
 	const response = await got.get(
-		'https://api.europe-west1.gcp.commercetools.com/my-project/orders',
+		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
-			responseType: 'json',
-		}
-	)
-	expect(response.statusCode).toBe(200)
+			responseType: "json",
+		},
+	);
+	expect(response.statusCode).toBe(200);
 	expect(response.body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
 		limit: 20,
 		results: [],
-	})
-	ctMock.stop()
-})
+	});
+	ctMock.stop();
+});
 
-test('Options.apiHost: is overridden is set', async () => {
+test("Options.apiHost: is overridden is set", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: false,
 		validateCredentials: false,
-		apiHost: 'http://api.localhost',
-	})
-	ctMock.start()
+		apiHost: "http://api.localhost",
+	});
+	ctMock.start();
 
-	const response = await got.get('http://api.localhost/my-project/orders', {
-		responseType: 'json',
-	})
-	expect(response.statusCode).toBe(200)
+	const response = await got.get("http://api.localhost/my-project/orders", {
+		responseType: "json",
+	});
+	expect(response.statusCode).toBe(200);
 	expect(response.body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
 		limit: 20,
 		results: [],
-	})
-	ctMock.stop()
-})
+	});
+	ctMock.stop();
+});
 
-test('Options.authHost: is set', async () => {
+test("Options.authHost: is set", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
-		authHost: 'http://auth.localhost',
-	})
-	ctMock.start()
+		authHost: "http://auth.localhost",
+	});
+	ctMock.start();
 
 	const response = await got.post<{ access_token: string }>(
-		'http://auth.localhost/oauth/token',
+		"http://auth.localhost/oauth/token",
 		{
 			searchParams: {
-				grant_type: 'client_credentials',
-				scope: 'manage_project:commercetools-node-mock',
+				grant_type: "client_credentials",
+				scope: "manage_project:commercetools-node-mock",
 			},
-			username: 'foo',
-			password: 'bar',
-			responseType: 'json',
-		}
-	)
-	expect(response.statusCode).toBe(200)
+			username: "foo",
+			password: "bar",
+			responseType: "json",
+		},
+	);
+	expect(response.statusCode).toBe(200);
 
-	const token = response.body.access_token
-	expect(token).toBeDefined()
-})
+	const token = response.body.access_token;
+	expect(token).toBeDefined();
+});
 
-test('apiHost mock proxy: querystring', async () => {
+test("apiHost mock proxy: querystring", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: false,
 		validateCredentials: false,
-		apiHost: 'http://api.localhost',
-	})
-	ctMock.start()
+		apiHost: "http://api.localhost",
+	});
+	ctMock.start();
 
-	const response = await got.get('http://api.localhost/my-project/orders', {
-		responseType: 'json',
+	const response = await got.get("http://api.localhost/my-project/orders", {
+		responseType: "json",
 		searchParams: {
 			where: 'orderNumber="foobar"',
-			expand: 'custom.type',
+			expand: "custom.type",
 		},
-	})
+	});
 
-	expect(response.statusCode).toBe(200)
+	expect(response.statusCode).toBe(200);
 	expect(response.body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
 		limit: 20,
 		results: [],
-	})
-	ctMock.stop()
-})
+	});
+	ctMock.stop();
+});

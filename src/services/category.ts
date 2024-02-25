@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import { CategoryRepository } from '../repositories/category.js'
-import AbstractService from './abstract.js'
+import { Router } from "express";
+import { CategoryRepository } from "../repositories/category";
+import AbstractService from "./abstract";
 
 export class CategoryServices extends AbstractService {
-	public repository: CategoryRepository
+	public repository: CategoryRepository;
 
 	constructor(parent: Router, repository: CategoryRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'categories'
+		return "categories";
 	}
 }

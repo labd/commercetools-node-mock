@@ -10,15 +10,15 @@ import type {
 	TaxCategoryUpdateAction,
 	TaxRate,
 	TaxRateDraft,
-} from '@commercetools/platform-sdk'
-import { v4 as uuidv4 } from 'uuid'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { v4 as uuidv4 } from "uuid";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
-export class TaxCategoryRepository extends AbstractResourceRepository<'tax-category'> {
+export class TaxCategoryRepository extends AbstractResourceRepository<"tax-category"> {
 	getTypeId() {
-		return 'tax-category' as const
+		return "tax-category" as const;
 	}
 
 	create(context: RepositoryContext, draft: TaxCategoryDraft): TaxCategory {
@@ -26,85 +26,85 @@ export class TaxCategoryRepository extends AbstractResourceRepository<'tax-categ
 			...getBaseResourceProperties(),
 			...draft,
 			rates: draft.rates?.map(this.taxRateFromTaxRateDraft) || [],
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	private taxRateFromTaxRateDraft = (draft: TaxRateDraft): TaxRate => ({
 		...draft,
 		id: uuidv4(),
 		amount: draft.amount || 0,
-	})
+	});
 
 	actions: Partial<
 		Record<
-			TaxCategoryUpdateAction['action'],
+			TaxCategoryUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<TaxCategory>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		addTaxRate: (
 			context: RepositoryContext,
 			resource: Writable<TaxCategory>,
-			{ taxRate }: TaxCategoryAddTaxRateAction
+			{ taxRate }: TaxCategoryAddTaxRateAction,
 		) => {
 			if (resource.rates === undefined) {
-				resource.rates = []
+				resource.rates = [];
 			}
-			resource.rates.push(this.taxRateFromTaxRateDraft(taxRate))
+			resource.rates.push(this.taxRateFromTaxRateDraft(taxRate));
 		},
 		removeTaxRate: (
 			context: RepositoryContext,
 			resource: Writable<TaxCategory>,
-			{ taxRateId }: TaxCategoryRemoveTaxRateAction
+			{ taxRateId }: TaxCategoryRemoveTaxRateAction,
 		) => {
 			if (resource.rates === undefined) {
-				resource.rates = []
+				resource.rates = [];
 			}
 			resource.rates = resource.rates.filter(
-				(taxRate) => taxRate.id !== taxRateId
-			)
+				(taxRate) => taxRate.id !== taxRateId,
+			);
 		},
 		replaceTaxRate: (
 			context: RepositoryContext,
 			resource: Writable<TaxCategory>,
-			{ taxRateId, taxRate }: TaxCategoryReplaceTaxRateAction
+			{ taxRateId, taxRate }: TaxCategoryReplaceTaxRateAction,
 		) => {
 			if (resource.rates === undefined) {
-				resource.rates = []
+				resource.rates = [];
 			}
 
-			const taxRateObj = this.taxRateFromTaxRateDraft(taxRate)
+			const taxRateObj = this.taxRateFromTaxRateDraft(taxRate);
 			for (let i = 0; i < resource.rates.length; i++) {
-				const rate = resource.rates[i]
+				const rate = resource.rates[i];
 				if (rate.id === taxRateId) {
-					resource.rates[i] = taxRateObj
+					resource.rates[i] = taxRateObj;
 				}
 			}
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<TaxCategory>,
-			{ description }: TaxCategorySetDescriptionAction
+			{ description }: TaxCategorySetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<TaxCategory>,
-			{ key }: TaxCategorySetKeyAction
+			{ key }: TaxCategorySetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<TaxCategory>,
-			{ name }: TaxCategoryChangeNameAction
+			{ name }: TaxCategoryChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
-	}
+	};
 }

@@ -7,14 +7,14 @@ import type {
 	ZoneSetDescriptionAction,
 	ZoneSetKeyAction,
 	ZoneUpdateAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
-export class ZoneRepository extends AbstractResourceRepository<'zone'> {
+export class ZoneRepository extends AbstractResourceRepository<"zone"> {
 	getTypeId() {
-		return 'zone' as const
+		return "zone" as const;
 	}
 
 	create(context: RepositoryContext, draft: ZoneDraft): Zone {
@@ -24,57 +24,57 @@ export class ZoneRepository extends AbstractResourceRepository<'zone'> {
 			locations: draft.locations || [],
 			name: draft.name,
 			description: draft.description,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions: Partial<
 		Record<
-			ZoneUpdateAction['action'],
+			ZoneUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<Zone>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		addLocation: (
 			context: RepositoryContext,
 			resource: Writable<Zone>,
-			{ location }: ZoneAddLocationAction
+			{ location }: ZoneAddLocationAction,
 		) => {
-			resource.locations.push(location)
+			resource.locations.push(location);
 		},
 		removeLocation: (
 			context: RepositoryContext,
 			resource: Writable<Zone>,
-			{ location }: ZoneRemoveLocationAction
+			{ location }: ZoneRemoveLocationAction,
 		) => {
 			resource.locations = resource.locations.filter(
 				(loc) =>
-					!(loc.country === location.country && loc.state === location.state)
-			)
+					!(loc.country === location.country && loc.state === location.state),
+			);
 		},
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<Zone>,
-			{ name }: ZoneChangeNameAction
+			{ name }: ZoneChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<Zone>,
-			{ description }: ZoneSetDescriptionAction
+			{ description }: ZoneSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<Zone>,
-			{ key }: ZoneSetKeyAction
+			{ key }: ZoneSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
-	}
+	};
 }

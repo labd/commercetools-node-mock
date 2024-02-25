@@ -1,43 +1,43 @@
-import { type Request, type Response, Router } from 'express'
-import { CustomerRepository } from '../repositories/customer.js'
-import { getRepositoryContext } from '../repositories/helpers.js'
-import AbstractService from './abstract.js'
-import { CustomerSignInResult } from '@commercetools/platform-sdk'
+import { CustomerSignInResult } from "@commercetools/platform-sdk";
+import { Router, type Request, type Response } from "express";
+import { CustomerRepository } from "../repositories/customer";
+import { getRepositoryContext } from "../repositories/helpers";
+import AbstractService from "./abstract";
 
 export class CustomerService extends AbstractService {
-	public repository: CustomerRepository
+	public repository: CustomerRepository;
 
 	constructor(parent: Router, repository: CustomerRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'customers'
+		return "customers";
 	}
 
 	post(request: Request, response: Response) {
-		const draft = request.body
+		const draft = request.body;
 		const resource = this.repository.create(
 			getRepositoryContext(request),
-			draft
-		)
-		const expanded = this._expandWithId(request, resource.id)
+			draft,
+		);
+		const expanded = this._expandWithId(request, resource.id);
 
 		const result: CustomerSignInResult = {
 			customer: expanded,
-		}
-		return response.status(this.createStatusCode).send(result)
+		};
+		return response.status(this.createStatusCode).send(result);
 	}
 
 	extraRoutes(parent: Router) {
-		parent.post('/password-token', (request, response) => {
-			const email = request.body.email
+		parent.post("/password-token", (request, response) => {
+			const email = request.body.email;
 			const token = this.repository.passwordResetToken(
 				getRepositoryContext(request),
-				email
-			)
-			return response.status(200).send(token)
-		})
+				email,
+			);
+			return response.status(200).send(token);
+		});
 	}
 }

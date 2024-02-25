@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import AbstractService from './abstract.js'
-import { AttributeGroupRepository } from '../repositories/attribute-group.js'
+import { Router } from "express";
+import { AttributeGroupRepository } from "../repositories/attribute-group";
+import AbstractService from "./abstract";
 
 export class AttributeGroupService extends AbstractService {
-	public repository: AttributeGroupRepository
+	public repository: AttributeGroupRepository;
 
 	constructor(parent: Router, repository: AttributeGroupRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'attribute-groups'
+		return "attribute-groups";
 	}
 }

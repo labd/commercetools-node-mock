@@ -1,22 +1,22 @@
-import { type ConcurrentModificationError } from '@commercetools/platform-sdk'
-import { CommercetoolsError } from '../exceptions.js'
+import { type ConcurrentModificationError } from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "../exceptions";
 
 export const checkConcurrentModification = (
 	currentVersion: number,
 	expectedVersion: number,
-	identifier: string
+	identifier: string,
 ) => {
-	if (currentVersion === expectedVersion) return
+	if (currentVersion === expectedVersion) return;
 	console.error(
-		`Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`
-	)
+		`Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`,
+	);
 
 	throw new CommercetoolsError<ConcurrentModificationError>(
 		{
 			message: `Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`,
 			currentVersion: currentVersion,
-			code: 'ConcurrentModification',
+			code: "ConcurrentModification",
 		},
-		409
-	)
-}
+		409,
+	);
+};

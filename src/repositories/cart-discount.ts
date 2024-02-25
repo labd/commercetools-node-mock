@@ -18,23 +18,20 @@ import type {
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
 	InvalidOperationError,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import {
-	AbstractResourceRepository,
-	type RepositoryContext,
-} from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "../exceptions";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
 import {
 	createCustomFields,
 	createTypedMoney,
 	getStoreKeyReference,
-} from './helpers.js'
-import { CommercetoolsError } from '../exceptions.js'
+} from "./helpers";
 
-export class CartDiscountRepository extends AbstractResourceRepository<'cart-discount'> {
+export class CartDiscountRepository extends AbstractResourceRepository<"cart-discount"> {
 	getTypeId() {
-		return 'cart-discount' as const
+		return "cart-discount" as const;
 	}
 
 	create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {
@@ -47,172 +44,172 @@ export class CartDiscountRepository extends AbstractResourceRepository<'cart-dis
 			name: draft.name,
 			stores:
 				draft.stores?.map((s) =>
-					getStoreKeyReference(s, context.projectKey, this._storage)
+					getStoreKeyReference(s, context.projectKey, this._storage),
 				) ?? [],
 			references: [],
 			target: draft.target,
 			requiresDiscountCode: draft.requiresDiscountCode || false,
 			sortOrder: draft.sortOrder,
-			stackingMode: draft.stackingMode || 'Stacking',
+			stackingMode: draft.stackingMode || "Stacking",
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 			value: this.transformValueDraft(draft.value),
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
-				this._storage
+				this._storage,
 			),
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	private transformValueDraft(value: CartDiscountValueDraft) {
 		switch (value.type) {
-			case 'absolute': {
+			case "absolute": {
 				return {
-					type: 'absolute',
+					type: "absolute",
 					money: value.money.map(createTypedMoney),
-				} as CartDiscountValueAbsolute
+				} as CartDiscountValueAbsolute;
 			}
-			case 'fixed': {
+			case "fixed": {
 				return {
-					type: 'fixed',
+					type: "fixed",
 					money: value.money.map(createTypedMoney),
-				} as CartDiscountValueFixed
+				} as CartDiscountValueFixed;
 			}
-			case 'giftLineItem': {
+			case "giftLineItem": {
 				return {
 					...value,
-				} as CartDiscountValueGiftLineItem
+				} as CartDiscountValueGiftLineItem;
 			}
-			case 'relative': {
+			case "relative": {
 				return {
 					...value,
-				} as CartDiscountValueRelative
+				} as CartDiscountValueRelative;
 			}
 		}
 
-		return value
+		return value;
 	}
 
 	actions: Partial<
 		Record<
-			CartDiscountUpdateAction['action'],
+			CartDiscountUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<CartDiscount>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		setKey: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ key }: CartDiscountSetKeyAction
+			{ key }: CartDiscountSetKeyAction,
 		) => {
-			resource.key = key
+			resource.key = key;
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ description }: CartDiscountSetDescriptionAction
+			{ description }: CartDiscountSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		setValidFrom: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ validFrom }: CartDiscountSetValidFromAction
+			{ validFrom }: CartDiscountSetValidFromAction,
 		) => {
-			resource.validFrom = validFrom
+			resource.validFrom = validFrom;
 		},
 		setValidUntil: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ validUntil }: CartDiscountSetValidUntilAction
+			{ validUntil }: CartDiscountSetValidUntilAction,
 		) => {
-			resource.validUntil = validUntil
+			resource.validUntil = validUntil;
 		},
 		setValidFromAndUntil: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction
+			{ validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction,
 		) => {
-			resource.validFrom = validFrom
-			resource.validUntil = validUntil
+			resource.validFrom = validFrom;
+			resource.validUntil = validUntil;
 		},
 		changeSortOrder: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ sortOrder }: CartDiscountChangeSortOrderAction
+			{ sortOrder }: CartDiscountChangeSortOrderAction,
 		) => {
-			resource.sortOrder = sortOrder
+			resource.sortOrder = sortOrder;
 		},
 		changeIsActive: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ isActive }: CartDiscountChangeIsActiveAction
+			{ isActive }: CartDiscountChangeIsActiveAction,
 		) => {
-			resource.isActive = isActive
+			resource.isActive = isActive;
 		},
 		changeTarget: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ target }: CartDiscountChangeTargetAction
+			{ target }: CartDiscountChangeTargetAction,
 		) => {
-			resource.target = target
+			resource.target = target;
 		},
 		setCustomField: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ name, value }: CartDiscountSetCustomFieldAction
+			{ name, value }: CartDiscountSetCustomFieldAction,
 		) => {
 			if (!resource.custom) {
-				return
+				return;
 			}
 			if (value === null) {
 				if (name in resource.custom.fields) {
-					delete resource.custom.fields[name]
+					delete resource.custom.fields[name];
 				} else {
 					throw new CommercetoolsError<InvalidOperationError>(
 						{
-							code: 'InvalidOperation',
+							code: "InvalidOperation",
 							message:
-								'Cannot remove custom field ' +
+								"Cannot remove custom field " +
 								name +
-								' because it does not exist.',
+								" because it does not exist.",
 						},
-						400
-					)
+						400,
+					);
 				}
 			} else {
-				resource.custom.fields[name] = value
+				resource.custom.fields[name] = value;
 			}
 		},
 		setCustomType: (
 			context: RepositoryContext,
 			resource: Writable<CartDiscount>,
-			{ type, fields }: CartDiscountSetCustomTypeAction
+			{ type, fields }: CartDiscountSetCustomTypeAction,
 		) => {
 			if (!type) {
-				resource.custom = undefined
+				resource.custom = undefined;
 			} else {
 				const resolvedType = this._storage.getByResourceIdentifier(
 					context.projectKey,
-					type
-				)
+					type,
+				);
 				if (!resolvedType) {
-					throw new Error(`Type ${type} not found`)
+					throw new Error(`Type ${type} not found`);
 				}
 
 				resource.custom = {
 					type: {
-						typeId: 'type',
+						typeId: "type",
 						id: resolvedType.id,
 					},
 					fields: fields || {},
-				}
+				};
 			}
 		},
-	}
+	};
 }

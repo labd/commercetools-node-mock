@@ -3,46 +3,46 @@ import type {
 	ProductSelectionChangeNameAction,
 	ProductSelectionDraft,
 	ProductSelectionUpdateAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
-export class ProductSelectionRepository extends AbstractResourceRepository<'product-selection'> {
+export class ProductSelectionRepository extends AbstractResourceRepository<"product-selection"> {
 	getTypeId() {
-		return 'product-selection' as const
+		return "product-selection" as const;
 	}
 
 	create(
 		context: RepositoryContext,
-		draft: ProductSelectionDraft
+		draft: ProductSelectionDraft,
 	): ProductSelection {
 		const resource: ProductSelection = {
 			...getBaseResourceProperties(),
 			productCount: 0,
 			key: draft.key,
 			name: draft.name,
-			mode: 'Individual',
-		}
-		return this.saveNew(context, resource)
+			mode: "Individual",
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions: Partial<
 		Record<
-			ProductSelectionUpdateAction['action'],
+			ProductSelectionUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<ProductSelection>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<ProductSelection>,
-			{ name }: ProductSelectionChangeNameAction
+			{ name }: ProductSelectionChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
-	}
+	};
 }

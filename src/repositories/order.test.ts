@@ -1,145 +1,145 @@
-import type { Cart, OrderImportDraft } from '@commercetools/platform-sdk'
-import { describe, expect, test } from 'vitest'
-import { InMemoryStorage } from '../storage/index.js'
-import { OrderRepository } from './order.js'
+import type { Cart, OrderImportDraft } from "@commercetools/platform-sdk";
+import { describe, expect, test } from "vitest";
+import { InMemoryStorage } from "../storage/index";
+import { OrderRepository } from "./order";
 
-describe('Order repository', () => {
-	const storage = new InMemoryStorage()
-	const repository = new OrderRepository(storage)
+describe("Order repository", () => {
+	const storage = new InMemoryStorage();
+	const repository = new OrderRepository(storage);
 
-	test('create from cart', async () => {
+	test("create from cart", async () => {
 		const cart: Cart = {
-			id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
+			id: "b3875a58-4ab2-4aaa-b399-184ce7561c27",
 			version: 1,
-			createdAt: '2021-09-02T12:23:30.036Z',
-			lastModifiedAt: '2021-09-02T12:23:30.546Z',
+			createdAt: "2021-09-02T12:23:30.036Z",
+			lastModifiedAt: "2021-09-02T12:23:30.546Z",
 			discountCodes: [],
 			directDiscounts: [],
-			inventoryMode: 'None',
+			inventoryMode: "None",
 			itemShippingAddresses: [],
 			lineItems: [],
 			customLineItems: [],
 			totalPrice: {
-				type: 'centPrecision',
-				currencyCode: 'EUR',
+				type: "centPrecision",
+				currencyCode: "EUR",
 				centAmount: 10000,
 				fractionDigits: 2,
 			},
-			cartState: 'Active',
-			shippingMode: 'Single',
+			cartState: "Active",
+			shippingMode: "Single",
 			shipping: [],
-			taxMode: 'Platform',
-			taxRoundingMode: 'HalfEven',
-			taxCalculationMode: 'UnitPriceLevel',
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "UnitPriceLevel",
 			refusedGifts: [],
-			origin: 'Customer',
-		}
+			origin: "Customer",
+		};
 
-		storage.add('dummy', 'cart', cart)
-		const ctx = { projectKey: 'dummy' }
+		storage.add("dummy", "cart", cart);
+		const ctx = { projectKey: "dummy" };
 
 		const result = repository.create(ctx, {
 			cart: {
 				id: cart.id,
-				typeId: 'cart',
+				typeId: "cart",
 			},
 			version: cart.version,
-		})
-		expect(result.cart?.id).toBe(cart.id)
+		});
+		expect(result.cart?.id).toBe(cart.id);
 
-		const items = repository.query(ctx)
-		expect(items.count).toBe(1)
-	})
+		const items = repository.query(ctx);
+		expect(items.count).toBe(1);
+	});
 
-	test('create from cart - in store', async () => {
+	test("create from cart - in store", async () => {
 		const cart: Cart = {
-			id: 'b3875a58-4ab2-4aaa-b399-184ce7561c27',
+			id: "b3875a58-4ab2-4aaa-b399-184ce7561c27",
 			version: 1,
-			createdAt: '2021-09-02T12:23:30.036Z',
-			lastModifiedAt: '2021-09-02T12:23:30.546Z',
+			createdAt: "2021-09-02T12:23:30.036Z",
+			lastModifiedAt: "2021-09-02T12:23:30.546Z",
 			discountCodes: [],
 			directDiscounts: [],
-			inventoryMode: 'None',
+			inventoryMode: "None",
 			itemShippingAddresses: [],
 			lineItems: [],
 			customLineItems: [],
 			totalPrice: {
-				type: 'centPrecision',
-				currencyCode: 'EUR',
+				type: "centPrecision",
+				currencyCode: "EUR",
 				centAmount: 10000,
 				fractionDigits: 2,
 			},
-			cartState: 'Active',
-			shippingMode: 'Single',
+			cartState: "Active",
+			shippingMode: "Single",
 			shipping: [],
-			taxMode: 'Platform',
-			taxRoundingMode: 'HalfEven',
-			taxCalculationMode: 'UnitPriceLevel',
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "UnitPriceLevel",
 			refusedGifts: [],
-			origin: 'Customer',
-		}
+			origin: "Customer",
+		};
 
-		storage.add('dummy', 'cart', cart)
+		storage.add("dummy", "cart", cart);
 
 		const result = repository.create(
-			{ projectKey: 'dummy', storeKey: 'some-store' },
+			{ projectKey: "dummy", storeKey: "some-store" },
 			{
 				cart: {
 					id: cart.id,
-					typeId: 'cart',
+					typeId: "cart",
 				},
 				version: cart.version,
-			}
-		)
-		expect(result.cart?.id).toBe(cart.id)
-		expect(result.store?.key).toBe('some-store')
-	})
+			},
+		);
+		expect(result.cart?.id).toBe(cart.id);
+		expect(result.store?.key).toBe("some-store");
+	});
 
-	test('import exiting product', async () => {
-		storage.add('dummy', 'product', {
-			id: '15fc56ba-a74e-4cf8-b4b0-bada5c101541',
+	test("import exiting product", async () => {
+		storage.add("dummy", "product", {
+			id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
 			// @ts-ignore
 			masterData: {
 				// @ts-ignore
 				current: {
-					name: { 'nl-NL': 'Dummy' },
-					slug: { 'nl-NL': 'Dummy' },
+					name: { "nl-NL": "Dummy" },
+					slug: { "nl-NL": "Dummy" },
 					categories: [],
 					masterVariant: {
 						id: 0,
-						sku: 'MYSKU',
+						sku: "MYSKU",
 					},
 					variants: [],
 				},
 			},
-		})
+		});
 
 		const draft: OrderImportDraft = {
-			orderNumber: '100000001',
+			orderNumber: "100000001",
 			totalPrice: {
 				centAmount: 1000,
-				currencyCode: 'EUR',
+				currencyCode: "EUR",
 			},
-			paymentState: 'Paid',
+			paymentState: "Paid",
 			customLineItems: [],
 			lineItems: [
 				{
-					productId: 'PRODUCTID',
+					productId: "PRODUCTID",
 					name: {
-						'en-US': 'The product',
+						"en-US": "The product",
 					},
 					variant: {
 						id: 1,
-						sku: 'MYSKU',
+						sku: "MYSKU",
 						prices: [
 							{
 								value: {
-									type: 'centPrecision',
-									currencyCode: 'EUR',
+									type: "centPrecision",
+									currencyCode: "EUR",
 									centAmount: 14900,
 									fractionDigits: 2,
 								},
-								country: 'NL',
+								country: "NL",
 								// channel: {
 								//   typeId: 'channel',
 								//   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
@@ -158,12 +158,12 @@ describe('Order repository', () => {
 					},
 					price: {
 						value: {
-							type: 'centPrecision',
-							currencyCode: 'EUR',
+							type: "centPrecision",
+							currencyCode: "EUR",
 							centAmount: 14900,
 							fractionDigits: 2,
 						},
-						country: 'NL',
+						country: "NL",
 						// channel: {
 						//   typeId: 'channel',
 						//   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
@@ -182,11 +182,11 @@ describe('Order repository', () => {
 					//   id: '411485eb-7875-46f4-8d40-1db9e61374ed',
 					// },
 					taxRate: {
-						name: '21% BTW',
+						name: "21% BTW",
 						amount: 0.21,
 						includedInPrice: true,
-						country: 'NL',
-						id: 'Z0wLUuYw',
+						country: "NL",
+						id: "Z0wLUuYw",
 						subRates: [],
 					},
 					// state: [
@@ -200,10 +200,10 @@ describe('Order repository', () => {
 					// ],
 				},
 			],
-		}
+		};
 
-		repository.import({ projectKey: 'dummy' }, draft)
-	})
+		repository.import({ projectKey: "dummy" }, draft);
+	});
 	/*
   test('import non exiting product', async () => {
     const draft: OrderImportDraft = {
@@ -334,4 +334,4 @@ describe('Order repository', () => {
     repository.import('dummy', draft)
   })
   */
-})
+});

@@ -3,14 +3,14 @@ import type {
 	OrderEditDraft,
 	OrderEditResult,
 	OrderEditUpdateAction,
-} from '@commercetools/platform-sdk'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
-export class OrderEditRepository extends AbstractResourceRepository<'order-edit'> {
+export class OrderEditRepository extends AbstractResourceRepository<"order-edit"> {
 	getTypeId() {
-		return 'order-edit' as const
+		return "order-edit" as const;
 	}
 
 	create(context: RepositoryContext, draft: OrderEditDraft): OrderEdit {
@@ -19,20 +19,20 @@ export class OrderEditRepository extends AbstractResourceRepository<'order-edit'
 			stagedActions: draft.stagedActions ?? [],
 			resource: draft.resource,
 			result: {
-				type: 'NotProcessed',
+				type: "NotProcessed",
 			} as OrderEditResult,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 
 	actions: Partial<
 		Record<
-			OrderEditUpdateAction['action'],
+			OrderEditUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<OrderEdit>,
-				action: any
+				action: any,
 			) => void
 		>
-	> = {}
+	> = {};
 }

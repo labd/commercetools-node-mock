@@ -11,16 +11,16 @@ import type {
 	TypeRemoveFieldDefinitionAction,
 	TypeSetDescriptionAction,
 	TypeUpdateAction,
-} from '@commercetools/platform-sdk'
-import isEqual from 'lodash.isequal'
-import { CommercetoolsError } from '../exceptions.js'
-import { getBaseResourceProperties } from '../helpers.js'
-import type { Writable } from '../types.js'
-import { AbstractResourceRepository, RepositoryContext } from './abstract.js'
+} from "@commercetools/platform-sdk";
+import isEqual from "lodash.isequal";
+import { CommercetoolsError } from "../exceptions";
+import { getBaseResourceProperties } from "../helpers";
+import type { Writable } from "../types";
+import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
-export class TypeRepository extends AbstractResourceRepository<'type'> {
+export class TypeRepository extends AbstractResourceRepository<"type"> {
 	getTypeId() {
-		return 'type' as const
+		return "type" as const;
 	}
 
 	create(context: RepositoryContext, draft: TypeDraft): Type {
@@ -31,141 +31,141 @@ export class TypeRepository extends AbstractResourceRepository<'type'> {
 			resourceTypeIds: draft.resourceTypeIds,
 			fieldDefinitions: draft.fieldDefinitions || [],
 			description: draft.description,
-		}
-		return this.saveNew(context, resource)
+		};
+		return this.saveNew(context, resource);
 	}
 	actions: Partial<
 		Record<
-			TypeUpdateAction['action'],
+			TypeUpdateAction["action"],
 			(
 				context: RepositoryContext,
 				resource: Writable<Type>,
-				action: any
+				action: any,
 			) => void
 		>
 	> = {
 		addFieldDefinition: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ fieldDefinition }: TypeAddFieldDefinitionAction
+			{ fieldDefinition }: TypeAddFieldDefinitionAction,
 		) => {
-			resource.fieldDefinitions.push(fieldDefinition)
+			resource.fieldDefinitions.push(fieldDefinition);
 		},
 		removeFieldDefinition: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ fieldName }: TypeRemoveFieldDefinitionAction
+			{ fieldName }: TypeRemoveFieldDefinitionAction,
 		) => {
 			resource.fieldDefinitions = resource.fieldDefinitions.filter(
-				(f) => f.name !== fieldName
-			)
+				(f) => f.name !== fieldName,
+			);
 		},
 		setDescription: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ description }: TypeSetDescriptionAction
+			{ description }: TypeSetDescriptionAction,
 		) => {
-			resource.description = description
+			resource.description = description;
 		},
 		changeName: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ name }: TypeChangeNameAction
+			{ name }: TypeChangeNameAction,
 		) => {
-			resource.name = name
+			resource.name = name;
 		},
 		changeFieldDefinitionOrder: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ fieldNames }: TypeChangeFieldDefinitionOrderAction
+			{ fieldNames }: TypeChangeFieldDefinitionOrderAction,
 		) => {
 			const fields = new Map(
-				resource.fieldDefinitions.map((item) => [item.name, item])
-			)
-			const result: FieldDefinition[] = []
-			let current = resource.fieldDefinitions
+				resource.fieldDefinitions.map((item) => [item.name, item]),
+			);
+			const result: FieldDefinition[] = [];
+			let current = resource.fieldDefinitions;
 
 			fieldNames.forEach((fieldName) => {
-				const field = fields.get(fieldName)
+				const field = fields.get(fieldName);
 				if (field === undefined) {
-					throw new Error('New field')
+					throw new Error("New field");
 				}
-				result.push(field)
+				result.push(field);
 
 				// Remove from current items
-				current = current.filter((f) => f.name !== fieldName)
-			})
+				current = current.filter((f) => f.name !== fieldName);
+			});
 
 			if (
 				isEqual(
 					fieldNames,
-					resource.fieldDefinitions.map((item) => item.name)
+					resource.fieldDefinitions.map((item) => item.name),
 				)
 			) {
 				throw new CommercetoolsError<InvalidOperationError>({
-					code: 'InvalidOperation',
+					code: "InvalidOperation",
 					message: "'fieldDefinitions' has no changes.",
 					action: {
-						action: 'changeFieldDefinitionOrder',
+						action: "changeFieldDefinitionOrder",
 						fieldNames: fieldNames,
 					},
-				})
+				});
 			}
 
-			resource.fieldDefinitions = result
+			resource.fieldDefinitions = result;
 			// Add fields which were not specified in the order as last items. Not
 			// sure if this follows commercetools
-			resource.fieldDefinitions.push(...current)
+			resource.fieldDefinitions.push(...current);
 		},
 		addEnumValue: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ fieldName, value }: TypeAddEnumValueAction
+			{ fieldName, value }: TypeAddEnumValueAction,
 		) => {
 			resource.fieldDefinitions.forEach((field) => {
 				if (field.name === fieldName) {
 					// TODO, should be done better i suppose
-					if (field.type.name === 'Enum') {
-						field.type.values.push(value)
+					if (field.type.name === "Enum") {
+						field.type.values.push(value);
 					} else if (
-						field.type.name === 'Set' &&
-						field.type.elementType.name === 'Enum'
+						field.type.name === "Set" &&
+						field.type.elementType.name === "Enum"
 					) {
-						field.type.elementType.values.push(value)
+						field.type.elementType.values.push(value);
 					} else {
-						throw new Error('Type is not a Enum (or Set of Enum)')
+						throw new Error("Type is not a Enum (or Set of Enum)");
 					}
 				}
-			})
+			});
 		},
 		changeEnumValueLabel: (
 			context: RepositoryContext,
 			resource: Writable<Type>,
-			{ fieldName, value }: TypeChangeEnumValueLabelAction
+			{ fieldName, value }: TypeChangeEnumValueLabelAction,
 		) => {
 			resource.fieldDefinitions.forEach((field) => {
 				if (field.name === fieldName) {
 					// TODO, should be done better i suppose
-					if (field.type.name === 'Enum') {
+					if (field.type.name === "Enum") {
 						field.type.values.forEach((v) => {
 							if (v.key === value.key) {
-								v.label = value.label
+								v.label = value.label;
 							}
-						})
+						});
 					} else if (
-						field.type.name === 'Set' &&
-						field.type.elementType.name === 'Enum'
+						field.type.name === "Set" &&
+						field.type.elementType.name === "Enum"
 					) {
 						field.type.elementType.values.forEach((v) => {
 							if (v.key === value.key) {
-								v.label = value.label
+								v.label = value.label;
 							}
-						})
+						});
 					} else {
-						throw new Error('Type is not a Enum (or Set of Enum)')
+						throw new Error("Type is not a Enum (or Set of Enum)");
 					}
 				}
-			})
+			});
 		},
-	}
+	};
 }

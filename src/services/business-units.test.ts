@@ -1,42 +1,42 @@
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { CommercetoolsMock } from '../ctMock.js'
-import { BusinessUnit } from '@commercetools/platform-sdk'
-import supertest from 'supertest'
+import { BusinessUnit } from "@commercetools/platform-sdk";
+import supertest from "supertest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { CommercetoolsMock } from "../ctMock";
 
-describe('Business units query', () => {
-	const ctMock = new CommercetoolsMock()
-	let businessUnit: BusinessUnit | undefined
+describe("Business units query", () => {
+	const ctMock = new CommercetoolsMock();
+	let businessUnit: BusinessUnit | undefined;
 
 	beforeEach(async () => {
 		const response = await supertest(ctMock.app)
-			.post('/dummy/business-units')
+			.post("/dummy/business-units")
 			.send({
-				key: 'example-business-unit',
-				status: 'Active',
-				name: 'Example Business Unit',
-				unitType: 'Company',
-			})
+				key: "example-business-unit",
+				status: "Active",
+				name: "Example Business Unit",
+				unitType: "Company",
+			});
 
-		expect(response.status).toBe(201)
+		expect(response.status).toBe(201);
 
-		businessUnit = response.body as BusinessUnit
-	})
+		businessUnit = response.body as BusinessUnit;
+	});
 
 	afterEach(() => {
-		ctMock.clear()
-	})
+		ctMock.clear();
+	});
 
-	test('no filter', async () => {
+	test("no filter", async () => {
 		const response = await supertest(ctMock.app)
-			.get('/dummy/business-units')
-			.query('{}')
-			.send()
+			.get("/dummy/business-units")
+			.query("{}")
+			.send();
 
-		expect(response.status).toBe(200)
-		expect(response.body.count).toBe(1)
+		expect(response.status).toBe(200);
+		expect(response.body.count).toBe(1);
 
-		businessUnit = response.body.results[0] as BusinessUnit
+		businessUnit = response.body.results[0] as BusinessUnit;
 
-		expect(businessUnit.key).toBe('example-business-unit')
-	})
-})
+		expect(businessUnit.key).toBe("example-business-unit");
+	});
+});

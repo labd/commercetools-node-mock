@@ -1,43 +1,43 @@
-import { Request, Response, Router } from 'express'
-import { CartRepository } from '../repositories/cart.js'
-import AbstractService from './abstract.js'
+import { Request, Response, Router } from "express";
+import { CartRepository } from "../repositories/cart";
+import AbstractService from "./abstract";
 
 export class MyCartService extends AbstractService {
-	public repository: CartRepository
+	public repository: CartRepository;
 
 	constructor(parent: Router, repository: CartRepository) {
-		super(parent)
-		this.repository = repository
+		super(parent);
+		this.repository = repository;
 	}
 
 	getBasePath() {
-		return 'me'
+		return "me";
 	}
 
 	registerRoutes(parent: Router) {
 		// Overwrite this function to be able to handle /me/active-cart path.
-		const basePath = this.getBasePath()
-		const router = Router({ mergeParams: true })
+		const basePath = this.getBasePath();
+		const router = Router({ mergeParams: true });
 
-		this.extraRoutes(router)
+		this.extraRoutes(router);
 
-		router.get('/active-cart', this.activeCart.bind(this))
-		router.get('/carts/', this.get.bind(this))
-		router.get('/carts/:id', this.getWithId.bind(this))
+		router.get("/active-cart", this.activeCart.bind(this));
+		router.get("/carts/", this.get.bind(this));
+		router.get("/carts/:id", this.getWithId.bind(this));
 
-		router.delete('/carts/:id', this.deleteWithId.bind(this))
+		router.delete("/carts/:id", this.deleteWithId.bind(this));
 
-		router.post('/carts/', this.post.bind(this))
-		router.post('/carts/:id', this.postWithId.bind(this))
+		router.post("/carts/", this.post.bind(this));
+		router.post("/carts/:id", this.postWithId.bind(this));
 
-		parent.use(`/${basePath}`, router)
+		parent.use(`/${basePath}`, router);
 	}
 
 	activeCart(request: Request, response: Response) {
-		const resource = this.repository.getActiveCart(request.params.projectKey)
+		const resource = this.repository.getActiveCart(request.params.projectKey);
 		if (!resource) {
-			return response.status(404).send('Not found')
+			return response.status(404).send("Not found");
 		}
-		return response.status(200).send(resource)
+		return response.status(200).send(resource);
 	}
 }
