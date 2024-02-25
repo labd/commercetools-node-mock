@@ -12,6 +12,7 @@ import { AbstractStorage, InMemoryStorage } from "./storage";
 import { Services } from "./types";
 
 // Services
+import { warnDeprecation } from "./deprecation";
 import { mapHeaderType } from "./helpers";
 import { createRepositories, RepositoryMap } from "./repositories";
 import { ProjectRepository } from "./repositories/project";
@@ -73,12 +74,19 @@ export class CommercetoolsMock {
 	}
 
 	start() {
+		warnDeprecation(
+			"The start method is deprecated, use .registerHandlers() to bind to an msw server instead",
+		);
+
 		// Order is important here when the hostnames match
 		this.clear();
 		this.startServer();
 	}
 
 	stop() {
+		warnDeprecation(
+			"The stop method is deprecated, use .registerHandlers() to bind to an msw server instead",
+		);
 		this._mswServer?.close();
 		this._mswServer = undefined;
 	}
