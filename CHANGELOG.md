@@ -1,5 +1,13 @@
 ## 2.15.0
 
+## 2.18.0
+
+### Minor Changes
+
+- [`2c6e829`](https://github.com/labd/commercetools-node-mock/commit/2c6e82912a62ba1ddc6de678e96955c86d02e90c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Refactor customer password reset flow to better mock commercetools
+
+- [`d801cf3`](https://github.com/labd/commercetools-node-mock/commit/d801cf3b7ccfacb50bea51503445911c00043371) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Show deprecation warnings when start() and stop() are used.
+
 ## 2.17.1
 
 ### Patch Changes
