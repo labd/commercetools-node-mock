@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import inject from "light-my-request";
 import morgan from "morgan";
 import { http, HttpResponse } from "msw";
-import { setupServer, SetupServer } from "msw/node";
+import { setupServer, SetupServer, SetupServerApi } from "msw/node";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants";
 import { CommercetoolsError } from "./exceptions";
 import { copyHeaders } from "./lib/proxy";
@@ -185,7 +185,7 @@ export class CommercetoolsMock {
 	// registerHandlers is an alternative way to work with commercetools-mock, it
 	// allows you to manage msw server yourself and register the handlers needed
 	// for commercetools-mock to work.
-	public registerHandlers(server: SetupServer) {
+	public registerHandlers(server: SetupServerApi) {
 		const app = this.app;
 		server.use(
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
