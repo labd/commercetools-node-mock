@@ -1,5 +1,11 @@
 ## 2.15.0
 
+## 2.18.2
+
+### Patch Changes
+
+- [`8474dda`](https://github.com/labd/commercetools-node-mock/commit/8474ddaea428c93fe96973a102d2f6709e3c14cc) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Use `SetupServerApi` for registerHandler as type
+
 ## 2.18.1
 
 ### Patch Changes
