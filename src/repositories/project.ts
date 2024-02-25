@@ -26,7 +26,7 @@ import {
 export class ProjectRepository extends AbstractRepository<Project> {
 	constructor(storage: AbstractStorage) {
 		super(storage);
-		this.actions = new ProjectUpdateHandler(this._storage);
+		this.actions = new ProjectUpdateHandler(storage);
 	}
 
 	get(context: RepositoryContext): Project | null {

@@ -1,5 +1,7 @@
 import { Update } from "@commercetools/platform-sdk";
 import { Request, Response, Router } from "express";
+import { updateRequestSchema } from "~src/schemas/update-request";
+import { validateData } from "~src/validate";
 import { hashPassword } from "../lib/password";
 import { getRepositoryContext } from "../repositories/helpers";
 import { MyCustomerRepository } from "../repositories/my-customer";
@@ -51,7 +53,10 @@ export class MyCustomerService extends AbstractService {
 		if (!resource) {
 			return response.status(404).send("Not found");
 		}
-		const updateRequest: Update = request.body;
+		const updateRequest = validateData<Update>(
+			request.body,
+			updateRequestSchema,
+		);
 		const updatedResource = this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			resource,

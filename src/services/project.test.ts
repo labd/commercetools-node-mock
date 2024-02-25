@@ -49,4 +49,9 @@ describe("Project", () => {
 			trialUntil: "2018-12",
 		} as Project);
 	});
+
+	test("Post empty update ", async () => {
+		const response = await supertest(ctMock.app).post("/dummy/");
+		expect(response.statusCode).toBe(400);
+	});
 });

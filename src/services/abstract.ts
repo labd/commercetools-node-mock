@@ -1,6 +1,8 @@
 import type { Update } from "@commercetools/platform-sdk";
 import { Router, type Request, type Response } from "express";
 import { ParsedQs } from "qs";
+import { updateRequestSchema } from "~src/schemas/update-request";
+import { validateData } from "~src/validate";
 import { queryParamsArray } from "../helpers";
 import { AbstractResourceRepository } from "../repositories/abstract";
 import { getRepositoryContext } from "../repositories/helpers";
@@ -119,7 +121,10 @@ export default abstract class AbstractService {
 	}
 
 	postWithId(request: Request, response: Response) {
-		const updateRequest: Update = request.body;
+		const updateRequest = validateData<Update>(
+			request.body,
+			updateRequestSchema,
+		);
 		const resource = this.repository.get(
 			getRepositoryContext(request),
 			request.params["id"],
@@ -140,7 +145,11 @@ export default abstract class AbstractService {
 	}
 
 	postWithKey(request: Request, response: Response) {
-		const updateRequest: Update = request.body;
+		const updateRequest = validateData<Update>(
+			request.body,
+			updateRequestSchema,
+		);
+
 		const resource = this.repository.getByKey(
 			getRepositoryContext(request),
 			request.params["key"],
@@ -148,6 +157,7 @@ export default abstract class AbstractService {
 		if (!resource) {
 			return response.status(404).send("Not found");
 		}
+
 		const updatedResource = this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			resource,
