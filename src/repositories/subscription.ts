@@ -2,15 +2,26 @@ import type {
 	InvalidInputError,
 	Subscription,
 	SubscriptionDraft,
+	SubscriptionSetKeyAction,
+	SubscriptionUpdateAction,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "../exceptions";
+import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import { AbstractStorage } from "../storage/abstract";
+import { Writable } from "../types";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+	RepositoryContext,
+	UpdateHandlerInterface,
+} from "./abstract";
 
 export class SubscriptionRepository extends AbstractResourceRepository<"subscription"> {
-	getTypeId() {
-		return "subscription" as const;
+	constructor(storage: AbstractStorage) {
+		super("subscription", storage);
+		this.actions = new SubscriptionUpdateHandler(storage);
 	}
+
 	create(context: RepositoryContext, draft: SubscriptionDraft): Subscription {
 		// TODO: We could actually test this here by using the aws sdk. For now
 		// hardcode a failed check when account id is 0000000000
@@ -44,5 +55,19 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 			status: "Healthy",
 		};
 		return this.saveNew(context, resource);
+	}
+}
+
+class SubscriptionUpdateHandler
+	extends AbstractUpdateHandler
+	implements
+		Partial<UpdateHandlerInterface<Subscription, SubscriptionUpdateAction>>
+{
+	setKey(
+		_context: RepositoryContext,
+		resource: Writable<Subscription>,
+		{ key }: SubscriptionSetKeyAction,
+	) {
+		resource.key = key;
 	}
 }

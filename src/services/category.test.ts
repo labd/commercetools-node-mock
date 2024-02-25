@@ -236,11 +236,11 @@ describe("Categories remove asset", () => {
 				actions: [
 					{
 						action: "removeAsset",
-						assetKey: category.assets[1].key,
+						assetKey: category.assets?.[1].key,
 					} as CategoryRemoveAssetAction,
 					{
 						action: "removeAsset",
-						assetId: category.assets[0].id,
+						assetId: category.assets?.[0].id,
 					} as CategoryRemoveAssetAction,
 				],
 			});

@@ -62,6 +62,7 @@ export class MyCustomerService extends AbstractService {
 		const result = this._expandWithId(request, updatedResource.id);
 		return response.status(200).send(result);
 	}
+
 	deleteMe(request: Request, response: Response) {
 		const resource = this.repository.deleteMe(getRepositoryContext(request));
 		if (!resource) {

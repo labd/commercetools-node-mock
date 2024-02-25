@@ -49,7 +49,9 @@ export abstract class AbstractStorage {
 	): ResourceMap[RT] | null;
 
 	abstract addProject(projectKey: string): Project;
+
 	abstract getProject(projectKey: string): Project;
+
 	abstract saveProject(project: Project): Project;
 
 	abstract delete<RT extends ResourceType>(

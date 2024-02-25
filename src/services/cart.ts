@@ -7,6 +7,7 @@ import AbstractService from "./abstract";
 
 export class CartService extends AbstractService {
 	public repository: CartRepository;
+
 	public orderRepository: OrderRepository;
 
 	constructor(

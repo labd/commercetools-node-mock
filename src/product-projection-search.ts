@@ -20,7 +20,7 @@ import {
 	resolveVariantValue,
 } from "./lib/projectionSearchFilter";
 import { applyPriceSelector } from "./priceSelector";
-import { AbstractStorage } from "./storage/index";
+import { AbstractStorage } from "./storage";
 import type { Writable } from "./types";
 
 export type ProductProjectionSearchParams = {

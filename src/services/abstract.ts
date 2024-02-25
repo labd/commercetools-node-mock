@@ -6,7 +6,6 @@ import { AbstractResourceRepository } from "../repositories/abstract";
 import { getRepositoryContext } from "../repositories/helpers";
 
 export default abstract class AbstractService {
-	protected abstract getBasePath(): string;
 	public abstract repository: AbstractResourceRepository<any>;
 
 	createStatusCode = 201;
@@ -14,6 +13,8 @@ export default abstract class AbstractService {
 	constructor(parent: Router) {
 		this.registerRoutes(parent);
 	}
+
+	protected abstract getBasePath(): string;
 
 	extraRoutes(router: Router) {}
 
@@ -63,7 +64,9 @@ export default abstract class AbstractService {
 		const result = this.repository.getByKey(
 			getRepositoryContext(request),
 			request.params["key"],
-			{ expand: this._parseParam(request.query.expand) },
+			{
+				expand: this._parseParam(request.query.expand),
+			},
 		);
 		if (!result) return response.status(404).send();
 		return response.status(200).send(result);

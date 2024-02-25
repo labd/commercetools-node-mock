@@ -3,7 +3,8 @@ import type {
 	CustomObjectDraft,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "../exceptions";
+import { CommercetoolsError } from "~src/exceptions";
+import { AbstractStorage } from "~src/storage";
 import { cloneObject, getBaseResourceProperties } from "../helpers";
 import type { Writable } from "../types";
 import {
@@ -14,8 +15,8 @@ import {
 import { checkConcurrentModification } from "./errors";
 
 export class CustomObjectRepository extends AbstractResourceRepository<"key-value-document"> {
-	getTypeId() {
-		return "key-value-document" as const;
+	constructor(storage: AbstractStorage) {
+		super("key-value-document", storage);
 	}
 
 	create(

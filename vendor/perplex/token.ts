@@ -12,10 +12,15 @@ import Lexer from "./lexer";
  */
 class Token<T> {
 	type: T;
+
 	match: string;
+
 	groups: string[];
+
 	start: number;
+
 	end: number;
+
 	lexer: Lexer<T>;
 
 	/* tslint:disable:indent */
@@ -95,7 +100,7 @@ export default Token;
 export class EOFToken<T> extends Token<T> {
 	constructor(lexer: Lexer<T>) {
 		const end = lexer.source.length;
-		super(null, "(eof)", [], end, end, lexer);
+		super(null as T, "(eof)", [], end, end, lexer);
 	}
 
 	// tslint:disable-next-line prefer-function-over-method

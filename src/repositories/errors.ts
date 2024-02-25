@@ -1,5 +1,5 @@
 import { type ConcurrentModificationError } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "../exceptions";
+import { CommercetoolsError } from "~src/exceptions";
 
 export const checkConcurrentModification = (
 	currentVersion: number,

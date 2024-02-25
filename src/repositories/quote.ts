@@ -1,28 +1,13 @@
-import type {
-	Quote,
-	QuoteDraft,
-	QuoteUpdateAction,
-} from "@commercetools/platform-sdk";
-import type { Writable } from "../types";
+import type { Quote, QuoteDraft } from "@commercetools/platform-sdk";
+import { AbstractStorage } from "~src/storage";
 import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
 export class QuoteRepository extends AbstractResourceRepository<"quote"> {
-	getTypeId() {
-		return "quote" as const;
+	constructor(storage: AbstractStorage) {
+		super("quote", storage);
 	}
 
 	create(context: RepositoryContext, draft: QuoteDraft): Quote {
 		throw new Error("not implemented");
 	}
-
-	actions: Partial<
-		Record<
-			QuoteUpdateAction["action"],
-			(
-				context: RepositoryContext,
-				resource: Writable<Quote>,
-				action: any,
-			) => void
-		>
-	> = {};
 }

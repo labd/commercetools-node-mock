@@ -3,11 +3,10 @@ import {
 	ProductReference,
 	type Review,
 	type ReviewDraft,
-	type ReviewUpdateAction,
 	type StateReference,
 } from "@commercetools/platform-sdk";
+import { AbstractStorage } from "~src/storage";
 import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
 import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 import {
 	createCustomFields,
@@ -15,8 +14,8 @@ import {
 } from "./helpers";
 
 export class ReviewRepository extends AbstractResourceRepository<"review"> {
-	getTypeId() {
-		return "review" as const;
+	constructor(storage: AbstractStorage) {
+		super("review", storage);
 	}
 
 	create(context: RepositoryContext, draft: ReviewDraft): Review {
@@ -51,15 +50,4 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 		};
 		return this.saveNew(context, resource);
 	}
-
-	actions: Partial<
-		Record<
-			ReviewUpdateAction["action"],
-			(
-				context: RepositoryContext,
-				resource: Writable<Review>,
-				action: any,
-			) => void
-		>
-	> = {};
 }

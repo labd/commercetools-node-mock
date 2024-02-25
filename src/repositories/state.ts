@@ -11,13 +11,20 @@ import type {
 	StateUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
+import { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+	RepositoryContext,
+	UpdateHandlerInterface,
+} from "./abstract";
 import { getReferenceFromResourceIdentifier } from "./helpers";
 
 export class StateRepository extends AbstractResourceRepository<"state"> {
-	getTypeId() {
-		return "state" as const;
+	constructor(storage: AbstractStorage) {
+		super("state", storage);
+		this.actions = new StateUpdateHandler(storage);
 	}
 
 	create(context: RepositoryContext, draft: StateDraft): State {
@@ -37,63 +44,62 @@ export class StateRepository extends AbstractResourceRepository<"state"> {
 
 		return this.saveNew(context, resource);
 	}
+}
 
-	actions: Partial<
-		Record<
-			StateUpdateAction["action"],
-			(
-				context: RepositoryContext,
-				resource: Writable<State>,
-				action: any,
-			) => void
-		>
-	> = {
-		changeKey: (
-			context: RepositoryContext,
-			resource: Writable<State>,
-			{ key }: StateChangeKeyAction,
-		) => {
-			resource.key = key;
-		},
-		changeInitial: (
-			context: RepositoryContext,
-			resource: Writable<State>,
-			{ initial }: StateChangeInitialAction,
-		) => {
-			resource.initial = initial;
-		},
-		setDescription: (
-			context: RepositoryContext,
-			resource: Writable<State>,
-			{ description }: StateSetDescriptionAction,
-		) => {
-			resource.description = description;
-		},
-		setName: (
-			context: RepositoryContext,
-			resource: Writable<State>,
-			{ name }: StateSetNameAction,
-		) => {
-			resource.name = name;
-		},
-		setRoles: (
-			context: RepositoryContext,
-			resource: Writable<State>,
-			{ roles }: StateSetRolesAction,
-		) => {
-			resource.roles = roles;
-		},
-		setTransitions: (
-			context: RepositoryContext,
-			resource: Writable<State>,
-			{ transitions }: StateSetTransitionsAction,
-		) => {
-			resource.transitions = transitions?.map(
-				(resourceId): StateReference => ({
-					id: resourceId.id || "",
-					typeId: "state",
-				}),
-			);
-		},
-	};
+class StateUpdateHandler
+	extends AbstractUpdateHandler
+	implements Partial<UpdateHandlerInterface<State, StateUpdateAction>>
+{
+	changeKey(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ key }: StateChangeKeyAction,
+	) {
+		resource.key = key;
+	}
+
+	changeInitial(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ initial }: StateChangeInitialAction,
+	) {
+		resource.initial = initial;
+	}
+
+	setDescription(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ description }: StateSetDescriptionAction,
+	) {
+		resource.description = description;
+	}
+
+	setName(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ name }: StateSetNameAction,
+	) {
+		resource.name = name;
+	}
+
+	setRoles(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ roles }: StateSetRolesAction,
+	) {
+		resource.roles = roles;
+	}
+
+	setTransitions(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ transitions }: StateSetTransitionsAction,
+	) {
+		resource.transitions = transitions?.map(
+			(resourceId): StateReference => ({
+				id: resourceId.id || "",
+				typeId: "state",
+			}),
+		);
+	}
 }

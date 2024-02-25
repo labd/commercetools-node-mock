@@ -7,14 +7,32 @@ import type {
 	ExtensionSetTimeoutInMsAction,
 	ExtensionUpdateAction,
 } from "@commercetools/platform-sdk";
+import { AbstractStorage } from "~src/storage";
 import { getBaseResourceProperties } from "../helpers";
 import { maskSecretValue } from "../lib/masking";
 import type { Writable } from "../types";
-import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+	UpdateHandlerInterface,
+	type RepositoryContext,
+} from "./abstract";
 
 export class ExtensionRepository extends AbstractResourceRepository<"extension"> {
-	getTypeId() {
-		return "extension" as const;
+	constructor(storage: AbstractStorage) {
+		super("extension", storage);
+		this.actions = new ExtensionUpdateHandler(storage);
+	}
+
+	create(context: RepositoryContext, draft: ExtensionDraft): Extension {
+		const resource: Extension = {
+			...getBaseResourceProperties(),
+			key: draft.key,
+			timeoutInMs: draft.timeoutInMs,
+			destination: draft.destination,
+			triggers: draft.triggers,
+		};
+		return this.saveNew(context, resource);
 	}
 
 	postProcessResource(resource: Extension): Extension {
@@ -34,53 +52,41 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 		}
 		return resource;
 	}
+}
 
-	create(context: RepositoryContext, draft: ExtensionDraft): Extension {
-		const resource: Extension = {
-			...getBaseResourceProperties(),
-			key: draft.key,
-			timeoutInMs: draft.timeoutInMs,
-			destination: draft.destination,
-			triggers: draft.triggers,
-		};
-		return this.saveNew(context, resource);
+class ExtensionUpdateHandler
+	extends AbstractUpdateHandler
+	implements UpdateHandlerInterface<Extension, ExtensionUpdateAction>
+{
+	setKey(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionSetKeyAction,
+	): void {
+		resource.key = action.key;
 	}
 
-	actions: Record<
-		ExtensionUpdateAction["action"],
-		(
-			context: RepositoryContext,
-			resource: Writable<Extension>,
-			action: any,
-		) => void
-	> = {
-		setKey: (
-			context: RepositoryContext,
-			resource: Writable<Extension>,
-			{ key }: ExtensionSetKeyAction,
-		) => {
-			resource.key = key;
-		},
-		setTimeoutInMs: (
-			context: RepositoryContext,
-			resource: Writable<Extension>,
-			{ timeoutInMs }: ExtensionSetTimeoutInMsAction,
-		) => {
-			resource.timeoutInMs = timeoutInMs;
-		},
-		changeTriggers: (
-			context: RepositoryContext,
-			resource: Writable<Extension>,
-			{ triggers }: ExtensionChangeTriggersAction,
-		) => {
-			resource.triggers = triggers;
-		},
-		changeDestination: (
-			context: RepositoryContext,
-			resource: Writable<Extension>,
-			{ destination }: ExtensionChangeDestinationAction,
-		) => {
-			resource.destination = destination;
-		},
-	};
+	setTimeoutInMs(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionSetTimeoutInMsAction,
+	): void {
+		resource.timeoutInMs = action.timeoutInMs;
+	}
+
+	changeTriggers(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionChangeTriggersAction,
+	): void {
+		resource.triggers = action.triggers;
+	}
+
+	changeDestination(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionChangeDestinationAction,
+	): void {
+		resource.destination = action.destination;
+	}
 }

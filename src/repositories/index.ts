@@ -1,4 +1,4 @@
-import { AbstractStorage } from "../storage/index";
+import { AbstractStorage } from "../storage";
 import { AssociateRoleRepository } from "./associate-role";
 import { AttributeGroupRepository } from "./attribute-group";
 import { BusinessUnitRepository } from "./business-unit";

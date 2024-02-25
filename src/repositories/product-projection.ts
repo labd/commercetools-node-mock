@@ -4,11 +4,11 @@ import type {
 	ProductProjection,
 	QueryParam,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "../exceptions";
+import { CommercetoolsError } from "~src/exceptions";
 import { parseQueryExpression } from "../lib/predicateParser";
 import { applyPriceSelector } from "../priceSelector";
 import { ProductProjectionSearch } from "../product-projection-search";
-import { type AbstractStorage } from "../storage/index";
+import { type AbstractStorage } from "../storage";
 import {
 	AbstractResourceRepository,
 	GetParams,
@@ -36,12 +36,8 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 	protected _searchService: ProductProjectionSearch;
 
 	constructor(storage: AbstractStorage) {
-		super(storage);
+		super("product-projection", storage);
 		this._searchService = new ProductProjectionSearch(storage);
-	}
-
-	getTypeId() {
-		return "product-projection" as const;
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
@@ -142,6 +138,4 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 	search(context: RepositoryContext, query: ProductProjectionQueryParams) {
 		return this._searchService.search(context.projectKey, query);
 	}
-
-	actions = {};
 }

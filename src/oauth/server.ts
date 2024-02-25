@@ -10,7 +10,7 @@ import {
 	AuthError,
 	CommercetoolsError,
 	InvalidRequestError,
-} from "../exceptions";
+} from "~src/exceptions";
 import { hashPassword } from "../lib/password";
 import { CustomerRepository } from "../repositories/customer";
 import { InvalidClientError, UnsupportedGrantType } from "./errors";
@@ -18,7 +18,7 @@ import { getBearerToken } from "./helpers";
 import { OAuth2Store } from "./store";
 
 type AuthRequest = Request & {
-	credentials: {
+	credentials?: {
 		clientId: string;
 		clientSecret: string;
 	};
@@ -33,6 +33,7 @@ export type Token = {
 
 export class OAuth2Server {
 	store: OAuth2Store;
+
 	private customerRepository: CustomerRepository;
 
 	constructor(private options: { enabled: boolean; validate: boolean }) {
@@ -150,6 +151,18 @@ export class OAuth2Server {
 		response: Response,
 		next: NextFunction,
 	) {
+		if (!request.credentials) {
+			return next(
+				new CommercetoolsError<InvalidClientError>(
+					{
+						code: "invalid_client",
+						message: "Client credentials are missing.",
+					},
+					401,
+				),
+			);
+		}
+
 		const grantType = request.query.grant_type || request.body.grant_type;
 		if (!grantType) {
 			return next(
@@ -216,6 +229,7 @@ export class OAuth2Server {
 			);
 		}
 	}
+
 	async customerTokenHandler(
 		request: AuthRequest,
 		response: Response,

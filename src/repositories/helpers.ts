@@ -32,8 +32,8 @@ import {
 } from "@commercetools/platform-sdk";
 import type { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { CommercetoolsError } from "../exceptions";
-import { AbstractStorage } from "../storage/index";
+import { CommercetoolsError } from "~src/exceptions";
+import { AbstractStorage } from "../storage";
 import { type RepositoryContext } from "./abstract";
 
 export const createAddress = (
@@ -257,7 +257,6 @@ export const createAssociate = (
 				inheritance: a.inheritance as string,
 			}),
 		),
-		roles: a.roles as string[],
 	};
 };
 

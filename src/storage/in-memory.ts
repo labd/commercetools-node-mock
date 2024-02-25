@@ -39,7 +39,7 @@ import {
 	type Zone,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
-import { CommercetoolsError } from "../exceptions";
+import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
 import { parseExpandClause } from "../lib/expandParser";
 import { parseQueryExpression } from "../lib/predicateParser";
@@ -64,6 +64,101 @@ export class InMemoryStorage extends AbstractStorage {
 	protected projects: {
 		[projectKey: string]: Project;
 	} = {};
+
+	addProject = (projectKey: string): Project => {
+		if (!this.projects[projectKey]) {
+			this.projects[projectKey] = {
+				key: projectKey,
+				name: "",
+				countries: [],
+				currencies: [],
+				languages: [],
+				createdAt: "2018-10-04T11:32:12.603Z",
+				trialUntil: "2018-12",
+				carts: {
+					countryTaxRateFallbackEnabled: false,
+					deleteDaysAfterLastModification: 90,
+				},
+				messages: { enabled: false, deleteDaysAfterCreation: 15 },
+				shippingRateInputType: undefined,
+				externalOAuth: undefined,
+				searchIndexing: {
+					products: {
+						status: "Deactivated",
+					},
+					orders: {
+						status: "Deactivated",
+					},
+				},
+				version: 1,
+			};
+		}
+		return this.projects[projectKey];
+	};
+
+	saveProject = (project: Project): Project => {
+		this.projects[project.key] = project;
+		return project;
+	};
+
+	getProject = (projectKey: string): Project => this.addProject(projectKey);
+
+	// Expand resolves a nested reference and injects the object in the given obj
+	public expand = <T>(
+		projectKey: string,
+		obj: T,
+		clause: undefined | string | string[],
+	): T => {
+		if (!clause) return obj;
+		const newObj = cloneObject(obj);
+		if (Array.isArray(clause)) {
+			for (const c of clause) {
+				this._resolveResource(projectKey, newObj, c);
+			}
+		} else {
+			this._resolveResource(projectKey, newObj, clause);
+		}
+		return newObj;
+	};
+
+	private _resolveResource = (projectKey: string, obj: any, expand: string) => {
+		const params = parseExpandClause(expand);
+
+		// 'lineItems[*].variant' on ShoppingList is an exception, these variants are not references
+		if (params.index === "*") {
+			const reference = obj[params.element];
+			if (
+				params.element === "lineItems" &&
+				params.rest?.startsWith("variant") &&
+				reference.every(
+					(item: any) =>
+						item.variant === undefined && item.variantId !== undefined,
+				)
+			) {
+				for (const item of reference as ShoppingListLineItem[]) {
+					this._resolveShoppingListLineItemVariant(projectKey, item);
+				}
+			}
+		}
+
+		if (!params.index) {
+			const reference = obj[params.element];
+			if (reference === undefined) {
+				return;
+			}
+			this._resolveReference(projectKey, reference, params.rest);
+		} else if (params.index === "*") {
+			const reference = obj[params.element];
+			if (reference === undefined || !Array.isArray(reference)) return;
+			for (const itemRef of reference as Writable<Reference>[]) {
+				this._resolveReference(projectKey, itemRef, params.rest);
+			}
+		} else {
+			const reference = obj[params.element][params.index];
+			if (reference === undefined) return;
+			this._resolveReference(projectKey, reference, params.rest);
+		}
+	};
 
 	private forProjectKey(projectKey: string): ProjectStorage {
 		this.addProject(projectKey);
@@ -353,101 +448,6 @@ export class InMemoryStorage extends AbstractStorage {
 		});
 	}
 
-	addProject = (projectKey: string): Project => {
-		if (!this.projects[projectKey]) {
-			this.projects[projectKey] = {
-				key: projectKey,
-				name: "",
-				countries: [],
-				currencies: [],
-				languages: [],
-				createdAt: "2018-10-04T11:32:12.603Z",
-				trialUntil: "2018-12",
-				carts: {
-					countryTaxRateFallbackEnabled: false,
-					deleteDaysAfterLastModification: 90,
-				},
-				messages: { enabled: false, deleteDaysAfterCreation: 15 },
-				shippingRateInputType: undefined,
-				externalOAuth: undefined,
-				searchIndexing: {
-					products: {
-						status: "Deactivated",
-					},
-					orders: {
-						status: "Deactivated",
-					},
-				},
-				version: 1,
-			};
-		}
-		return this.projects[projectKey];
-	};
-
-	saveProject = (project: Project): Project => {
-		this.projects[project.key] = project;
-		return project;
-	};
-
-	getProject = (projectKey: string): Project => this.addProject(projectKey);
-
-	// Expand resolves a nested reference and injects the object in the given obj
-	public expand = <T>(
-		projectKey: string,
-		obj: T,
-		clause: undefined | string | string[],
-	): T => {
-		if (!clause) return obj;
-		const newObj = cloneObject(obj);
-		if (Array.isArray(clause)) {
-			for (const c of clause) {
-				this._resolveResource(projectKey, newObj, c);
-			}
-		} else {
-			this._resolveResource(projectKey, newObj, clause);
-		}
-		return newObj;
-	};
-
-	private _resolveResource = (projectKey: string, obj: any, expand: string) => {
-		const params = parseExpandClause(expand);
-
-		// 'lineItems[*].variant' on ShoppingList is an exception, these variants are not references
-		if (params.index === "*") {
-			const reference = obj[params.element];
-			if (
-				params.element === "lineItems" &&
-				params.rest?.startsWith("variant") &&
-				reference.every(
-					(item: any) =>
-						item.variant === undefined && item.variantId !== undefined,
-				)
-			) {
-				for (const item of reference as ShoppingListLineItem[]) {
-					this._resolveShoppingListLineItemVariant(projectKey, item);
-				}
-			}
-		}
-
-		if (!params.index) {
-			const reference = obj[params.element];
-			if (reference === undefined) {
-				return;
-			}
-			this._resolveReference(projectKey, reference, params.rest);
-		} else if (params.index === "*") {
-			const reference = obj[params.element];
-			if (reference === undefined || !Array.isArray(reference)) return;
-			for (const itemRef of reference as Writable<Reference>[]) {
-				this._resolveReference(projectKey, itemRef, params.rest);
-			}
-		} else {
-			const reference = obj[params.element][params.index];
-			if (reference === undefined) return;
-			this._resolveReference(projectKey, reference, params.rest);
-		}
-	};
-
 	private _resolveReference(
 		projectKey: string,
 		reference: any,
@@ -477,6 +477,7 @@ export class InMemoryStorage extends AbstractStorage {
 			}
 		}
 	}
+
 	private _resolveShoppingListLineItemVariant(
 		projectKey: string,
 		lineItem: ShoppingListLineItem,

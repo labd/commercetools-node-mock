@@ -5,12 +5,19 @@ import type {
 	ProductSelectionUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
+import { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+	RepositoryContext,
+	UpdateHandlerInterface,
+} from "./abstract";
 
 export class ProductSelectionRepository extends AbstractResourceRepository<"product-selection"> {
-	getTypeId() {
-		return "product-selection" as const;
+	constructor(storage: AbstractStorage) {
+		super("product-selection", storage);
+		this.actions = new ProductSelectionUpdateHandler(this._storage);
 	}
 
 	create(
@@ -26,23 +33,20 @@ export class ProductSelectionRepository extends AbstractResourceRepository<"prod
 		};
 		return this.saveNew(context, resource);
 	}
+}
 
-	actions: Partial<
-		Record<
-			ProductSelectionUpdateAction["action"],
-			(
-				context: RepositoryContext,
-				resource: Writable<ProductSelection>,
-				action: any,
-			) => void
+class ProductSelectionUpdateHandler
+	extends AbstractUpdateHandler
+	implements
+		Partial<
+			UpdateHandlerInterface<ProductSelection, ProductSelectionUpdateAction>
 		>
-	> = {
-		changeName: (
-			context: RepositoryContext,
-			resource: Writable<ProductSelection>,
-			{ name }: ProductSelectionChangeNameAction,
-		) => {
-			resource.name = name;
-		},
-	};
+{
+	changeName(
+		context: RepositoryContext,
+		resource: Writable<ProductSelection>,
+		{ name }: ProductSelectionChangeNameAction,
+	) {
+		resource.name = name;
+	}
 }

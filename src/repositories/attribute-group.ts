@@ -5,14 +5,22 @@ import type {
 	AttributeGroupSetAttributesAction,
 	AttributeGroupSetDescriptionAction,
 	AttributeGroupSetKeyAction,
+	AttributeGroupUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
+import { AbstractStorage } from "../storage/abstract";
 import { Writable } from "../types";
-import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+	UpdateHandlerInterface,
+	type RepositoryContext,
+} from "./abstract";
 
 export class AttributeGroupRepository extends AbstractResourceRepository<"attribute-group"> {
-	getTypeId() {
-		return "attribute-group" as const;
+	constructor(storage: AbstractStorage) {
+		super("attribute-group", storage);
+		this.actions = new AttributeGroupUpdateHandler(this._storage);
 	}
 
 	create(
@@ -28,35 +36,42 @@ export class AttributeGroupRepository extends AbstractResourceRepository<"attrib
 		};
 		return this.saveNew(context, resource);
 	}
+}
 
-	actions = {
-		setAttributes: (
-			_context: RepositoryContext,
-			resource: Writable<AttributeGroup>,
-			{ attributes }: AttributeGroupSetAttributesAction,
-		) => {
-			resource.attributes = attributes;
-		},
-		changeName: (
-			_context: RepositoryContext,
-			resource: Writable<AttributeGroup>,
-			{ name }: AttributeGroupChangeNameAction,
-		) => {
-			resource.name = name;
-		},
-		setDescription: (
-			_context: RepositoryContext,
-			resource: Writable<AttributeGroup>,
-			{ description }: AttributeGroupSetDescriptionAction,
-		) => {
-			resource.description = description;
-		},
-		setKey: (
-			_context: RepositoryContext,
-			resource: Writable<AttributeGroup>,
-			{ key }: AttributeGroupSetKeyAction,
-		) => {
-			resource.key = key;
-		},
-	};
+class AttributeGroupUpdateHandler
+	extends AbstractUpdateHandler
+	implements
+		Partial<UpdateHandlerInterface<AttributeGroup, AttributeGroupUpdateAction>>
+{
+	setAttributes(
+		_context: RepositoryContext,
+		resource: Writable<AttributeGroup>,
+		{ attributes }: AttributeGroupSetAttributesAction,
+	) {
+		resource.attributes = attributes;
+	}
+
+	changeName(
+		_context: RepositoryContext,
+		resource: Writable<AttributeGroup>,
+		{ name }: AttributeGroupChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
+	setDescription(
+		_context: RepositoryContext,
+		resource: Writable<AttributeGroup>,
+		{ description }: AttributeGroupSetDescriptionAction,
+	) {
+		resource.description = description;
+	}
+
+	setKey(
+		_context: RepositoryContext,
+		resource: Writable<AttributeGroup>,
+		{ key }: AttributeGroupSetKeyAction,
+	) {
+		resource.key = key;
+	}
 }

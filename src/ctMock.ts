@@ -8,14 +8,14 @@ import { CommercetoolsError } from "./exceptions";
 import { copyHeaders } from "./lib/proxy";
 import { OAuth2Server } from "./oauth/server";
 import { ProjectAPI } from "./projectAPI";
-import { AbstractStorage, InMemoryStorage } from "./storage/index";
+import { AbstractStorage, InMemoryStorage } from "./storage";
 import { Services } from "./types";
 
 // Services
 import { mapHeaderType } from "./helpers";
-import { createRepositories, RepositoryMap } from "./repositories/index";
+import { createRepositories, RepositoryMap } from "./repositories";
 import { ProjectRepository } from "./repositories/project";
-import { createServices } from "./services/index";
+import { createServices } from "./services";
 import { ProjectService } from "./services/project";
 
 export type CommercetoolsMockOptions = {
@@ -42,13 +42,19 @@ const _globalListeners: SetupServer[] = [];
 
 export class CommercetoolsMock {
 	public app: express.Express;
+
 	public options: CommercetoolsMockOptions;
 
 	private _storage: AbstractStorage;
+
 	private _oauth2: OAuth2Server;
+
 	private _mswServer: SetupServer | undefined = undefined;
+
 	private _services: Services | null;
+
 	private _repositories: RepositoryMap | null;
+
 	private _projectService?: ProjectService;
 
 	constructor(options: Partial<CommercetoolsMockOptions> = {}) {

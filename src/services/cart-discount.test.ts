@@ -2,7 +2,7 @@ import { CartDiscount, TypeDraft } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "../index";
+import { CommercetoolsMock } from "..";
 
 const typeDraft: TypeDraft = {
 	key: "my-type",
@@ -77,7 +77,7 @@ describe("Cart Discounts Query", () => {
 		let response;
 		response = await supertest(ctMock.app).post("/dummy/types").send(typeDraft);
 		expect(response.status).toBe(201);
-		const typeId = response._body.id;
+		const typeId = response.body.id;
 
 		response = await supertest(ctMock.app)
 			.post("/dummy/cart-discounts")
@@ -141,7 +141,7 @@ describe("Cart Discounts Update Actions", () => {
 		return response.body.id;
 	};
 
-	const createCartDiscount = async (typeId) => {
+	const createCartDiscount = async (typeId: string) => {
 		const cartDiscountDraft = getCartDiscountDraft(typeId);
 		const response = await supertest(ctMock.app)
 			.post("/dummy/cart-discounts")

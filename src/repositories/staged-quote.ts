@@ -1,29 +1,16 @@
 import type {
-	Quote,
 	StagedQuote,
 	StagedQuoteDraft,
-	StagedQuoteUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "../types";
+import { AbstractStorage } from "~src/storage";
 import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
 export class StagedQuoteRepository extends AbstractResourceRepository<"staged-quote"> {
-	getTypeId() {
-		return "staged-quote" as const;
+	constructor(storage: AbstractStorage) {
+		super("staged-quote", storage);
 	}
 
 	create(context: RepositoryContext, draft: StagedQuoteDraft): StagedQuote {
 		throw new Error("not implemented");
 	}
-
-	actions: Partial<
-		Record<
-			StagedQuoteUpdateAction["action"],
-			(
-				context: RepositoryContext,
-				resource: Writable<Quote>,
-				action: any,
-			) => void
-		>
-	> = {};
 }

@@ -11,6 +11,7 @@ type Token = {
 
 export class OAuth2Store {
 	tokens: Token[] = [];
+
 	validate = true;
 
 	constructor(validate = true) {

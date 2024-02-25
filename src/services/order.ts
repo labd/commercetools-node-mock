@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { getRepositoryContext } from "../repositories/helpers";
-import { OrderRepository } from "../repositories/order";
+import { OrderRepository } from "../repositories/order/index";
 import AbstractService from "./abstract";
 
 export class OrderService extends AbstractService {
@@ -36,6 +36,8 @@ export class OrderService extends AbstractService {
 		const resource = this.repository.getWithOrderNumber(
 			getRepositoryContext(request),
 			request.params.orderNumber,
+
+			// @ts-ignore
 			request.query,
 		);
 		if (resource) {

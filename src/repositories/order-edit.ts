@@ -2,15 +2,14 @@ import type {
 	OrderEdit,
 	OrderEditDraft,
 	OrderEditResult,
-	OrderEditUpdateAction,
 } from "@commercetools/platform-sdk";
+import { AbstractStorage } from "~src/storage";
 import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
 import { AbstractResourceRepository, RepositoryContext } from "./abstract";
 
 export class OrderEditRepository extends AbstractResourceRepository<"order-edit"> {
-	getTypeId() {
-		return "order-edit" as const;
+	constructor(storage: AbstractStorage) {
+		super("order-edit", storage);
 	}
 
 	create(context: RepositoryContext, draft: OrderEditDraft): OrderEdit {
@@ -24,15 +23,4 @@ export class OrderEditRepository extends AbstractResourceRepository<"order-edit"
 		};
 		return this.saveNew(context, resource);
 	}
-
-	actions: Partial<
-		Record<
-			OrderEditUpdateAction["action"],
-			(
-				context: RepositoryContext,
-				resource: Writable<OrderEdit>,
-				action: any,
-			) => void
-		>
-	> = {};
 }

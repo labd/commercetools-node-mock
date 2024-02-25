@@ -251,7 +251,7 @@ let taxCategory2: TaxCategory;
 let productState1: State;
 let productState2: State;
 
-async function beforeAllProductTests(mock) {
+async function beforeAllProductTests(mock: CommercetoolsMock) {
 	let response;
 	// Create Product Type
 	response = await supertest(mock.app)
@@ -611,18 +611,17 @@ describe("Product update actions", () => {
 				],
 			});
 		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(
-			response.body.masterData.staged.masterVariant.attributes,
-		).toHaveLength(1);
+		const product = response.body as Product;
+		expect(product.version).toBe(2);
+		expect(product.masterData.staged.masterVariant.attributes).toHaveLength(1);
 
 		const masterVariantAttr1 =
-			response.body.masterData.staged.masterVariant.attributes[0];
+			product.masterData.staged.masterVariant.attributes?.[0];
 		expect(masterVariantAttr1).toEqual({ name: "test", value: "foo" });
 
-		response.body.masterData.staged.variants.forEach((variant) => {
+		product.masterData.staged.variants.forEach((variant) => {
 			expect(variant.attributes).toHaveLength(2);
-			expect(variant.attributes[1]).toEqual({
+			expect(variant.attributes?.[1]).toEqual({
 				name: "test",
 				value: "foo",
 			});
@@ -644,23 +643,22 @@ describe("Product update actions", () => {
 				],
 			});
 		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(
-			response.body.masterData.staged.masterVariant.attributes,
-		).toHaveLength(2);
+		const product = response.body as Product;
+		expect(product.version).toBe(2);
+		expect(product.masterData.staged.masterVariant.attributes).toHaveLength(2);
 		const masterVariantAttr1 =
-			response.body.masterData.staged.masterVariant.attributes[0];
+			product.masterData.staged.masterVariant.attributes?.[0];
 		expect(masterVariantAttr1).toEqual({ name: "test", value: "test" });
 
 		const masterVariantAttr2 =
-			response.body.masterData.staged.masterVariant.attributes[1];
+			product.masterData.staged.masterVariant.attributes?.[1];
 		expect(masterVariantAttr2).toEqual({
 			name: "foo",
 			value: "bar",
 		});
-		response.body.masterData.staged.variants.forEach((variant) => {
+		product.masterData.staged.variants.forEach((variant) => {
 			expect(variant.attributes).toHaveLength(2);
-			expect(variant.attributes[1]).toEqual({
+			expect(variant.attributes?.[1]).toEqual({
 				name: "foo",
 				value: "bar",
 			});
@@ -679,17 +677,17 @@ describe("Product update actions", () => {
 					{ action: "publish" },
 				],
 			});
+
+		const product = response.body as Product;
 		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(
-			response.body.masterData.current.masterVariant.attributes,
-		).toHaveLength(2);
-		const attr = response.body.masterData.current.masterVariant.attributes[1];
+		expect(product.version).toBe(3);
+		expect(product.masterData.current.masterVariant.attributes).toHaveLength(2);
+		const attr = product.masterData.current.masterVariant.attributes?.[1];
 		expect(attr).toEqual({ name: "foo", value: "bar" });
 
-		response.body.masterData.current.variants.forEach((variant) => {
+		product.masterData.current.variants.forEach((variant) => {
 			expect(variant.attributes).toHaveLength(2);
-			expect(variant.attributes[1]).toEqual({
+			expect(variant.attributes?.[1]).toEqual({
 				name: "foo",
 				value: "bar",
 			});

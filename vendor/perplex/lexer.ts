@@ -30,6 +30,7 @@ import TokenTypes from "./token-types";
 class Lexer<T> implements Iterable<Token<T>> {
 	/* tslint:disable:variable-name */
 	private _state: LexerState<T>;
+
 	private _tokenTypes: TokenTypes<T>;
 	/* tslint:enable */
 
@@ -154,7 +155,7 @@ class Lexer<T> implements Iterable<Token<T>> {
 			this._state.position = t.end;
 			return t;
 		} catch (e) {
-			this._state.position = e.end;
+			this._state.position = (e as any).end;
 			throw e;
 		}
 	}
@@ -167,9 +168,17 @@ class Lexer<T> implements Iterable<Token<T>> {
 	 * @return {Token<T>}
 	 */
 	peek(position: number = this._state.position): Token<T> {
-		const read = (i: number = position) => {
+		const read = (i: number = position): Token<T> | null => {
 			if (i >= this._state.source.length) return EOF(this);
 			const n = this._tokenTypes.peek(this._state.source, i);
+			if (!n || !n.result) {
+				throw new Error(
+					`Unexpected input: ${this._state.source.substring(
+						i,
+						i + 1,
+					)} at (${this.strpos(i).line}:${this.strpos(i).column})`,
+				);
+			}
 			return n
 				? n.item.skip
 					? read(i + n.result[0].length)
@@ -191,7 +200,7 @@ class Lexer<T> implements Iterable<Token<T>> {
 		try {
 			this.peek(position + 1);
 		} catch (e) {
-			unexpected += e.unexpected;
+			unexpected += (e as any).unexpected;
 		}
 		const { line, column } = this.strpos(position);
 		const e = new Error(

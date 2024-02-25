@@ -5,7 +5,7 @@ import {
 	ResourceNotFoundError,
 	type MyCustomerResetPassword,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "../exceptions";
+import { CommercetoolsError } from "~src/exceptions";
 import { hashPassword, validatePasswordResetToken } from "../lib/password";
 import { Writable } from "../types";
 import { type RepositoryContext } from "./abstract";

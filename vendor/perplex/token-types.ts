@@ -13,7 +13,7 @@ function normalize(regex: RegExp | string): RegExp {
 function first<T, U>(
 	arr: T[],
 	predicate: (item: T, i: number) => U,
-): { item: T; result: U } {
+): { item: T; result: U } | undefined {
 	let i = 0;
 	for (const item of arr) {
 		const result = predicate(item, i++);

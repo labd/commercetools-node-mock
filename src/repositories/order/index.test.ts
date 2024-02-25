@@ -1,7 +1,7 @@
 import type { Cart, OrderImportDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import { InMemoryStorage } from "../storage/index";
-import { OrderRepository } from "./order";
+import { InMemoryStorage } from "~src/storage";
+import { OrderRepository } from "./index";
 
 describe("Order repository", () => {
 	const storage = new InMemoryStorage();

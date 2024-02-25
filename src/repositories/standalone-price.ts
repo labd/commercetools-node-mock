@@ -7,15 +7,23 @@ import type {
 	StandalonePriceChangeValueAction,
 	StandalonePriceDraft,
 	StandalonePriceSetDiscountedPriceAction,
+	StandalonePriceUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
+import { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+	RepositoryContext,
+	UpdateHandlerInterface,
+} from "./abstract";
 import { createTypedMoney } from "./helpers";
 
 export class StandAlonePriceRepository extends AbstractResourceRepository<"standalone-price"> {
-	getTypeId() {
-		return "standalone-price" as const;
+	constructor(storage: AbstractStorage) {
+		super("standalone-price", storage);
+		this.actions = new StandalonePriceUpdateHandler(this._storage);
 	}
 
 	create(
@@ -29,7 +37,7 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<"stand
 			value: createTypedMoney(draft.value),
 			country: draft.country,
 			discounted: draft.discounted
-				? this.transformDiscountDraft(draft.discounted)
+				? transformDiscountDraft(draft.discounted)
 				: undefined,
 			channel: draft.channel?.id
 				? this.transformChannelReferenceDraft(draft.channel)
@@ -48,37 +56,43 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<"stand
 			id: channel.id as string,
 		};
 	}
+}
 
-	transformDiscountDraft(discounted: DiscountedPriceDraft) {
-		return {
-			value: createTypedMoney(discounted.value),
-			discount: discounted.discount,
-		};
+const transformDiscountDraft = (discounted: DiscountedPriceDraft) => ({
+	value: createTypedMoney(discounted.value),
+	discount: discounted.discount,
+});
+
+class StandalonePriceUpdateHandler
+	extends AbstractUpdateHandler
+	implements
+		Partial<
+			UpdateHandlerInterface<StandalonePrice, StandalonePriceUpdateAction>
+		>
+{
+	setActive(
+		context: RepositoryContext,
+		resource: Writable<StandalonePrice>,
+		action: StandalonePriceChangeActiveAction,
+	) {
+		resource.active = action.active;
 	}
 
-	actions = {
-		setActive: (
-			context: RepositoryContext,
-			resource: Writable<StandalonePrice>,
-			action: StandalonePriceChangeActiveAction,
-		) => {
-			resource.active = action.active;
-		},
-		changeValue: (
-			context: RepositoryContext,
-			resource: Writable<StandalonePrice>,
-			action: StandalonePriceChangeValueAction,
-		) => {
-			resource.value = createTypedMoney(action.value);
-		},
-		setDiscountedPrice: (
-			context: RepositoryContext,
-			resource: Writable<StandalonePrice>,
-			action: StandalonePriceSetDiscountedPriceAction,
-		) => {
-			resource.discounted = action.discounted
-				? this.transformDiscountDraft(action.discounted)
-				: undefined;
-		},
-	};
+	changeValue(
+		context: RepositoryContext,
+		resource: Writable<StandalonePrice>,
+		action: StandalonePriceChangeValueAction,
+	) {
+		resource.value = createTypedMoney(action.value);
+	}
+
+	setDiscountedPrice(
+		context: RepositoryContext,
+		resource: Writable<StandalonePrice>,
+		action: StandalonePriceSetDiscountedPriceAction,
+	) {
+		resource.discounted = action.discounted
+			? transformDiscountDraft(action.discounted)
+			: undefined;
+	}
 }
