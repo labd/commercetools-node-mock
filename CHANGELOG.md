@@ -1,5 +1,11 @@
 ## 2.15.0
 
+## 2.18.1
+
+### Patch Changes
+
+- [`e9f337a`](https://github.com/labd/commercetools-node-mock/commit/e9f337a4f62c94431993dc8fd52a469742e1625f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Validate update json body for version and actions
+
 ## 2.18.0
 
 ### Minor Changes
