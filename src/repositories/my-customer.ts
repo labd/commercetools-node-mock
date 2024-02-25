@@ -12,38 +12,6 @@ import { type RepositoryContext } from "./abstract";
 import { CustomerRepository } from "./customer";
 
 export class MyCustomerRepository extends CustomerRepository {
-	getMe(context: RepositoryContext): Customer | undefined {
-		// grab the first customer you can find for now. In the future we should
-		// use the customer id from the scope of the token
-		const results = this._storage.query(
-			context.projectKey,
-			this.getTypeId(),
-			{},
-		);
-
-		if (results.count > 0) {
-			return results.results[0] as Customer;
-		}
-
-		return;
-	}
-
-	deleteMe(context: RepositoryContext): Customer | undefined {
-		// grab the first customer you can find for now. In the future we should
-		// use the customer id from the scope of the token
-		const results = this._storage.query(
-			context.projectKey,
-			this.getTypeId(),
-			{},
-		);
-
-		if (results.count > 0) {
-			return this.delete(context, results.results[0].id) as Customer;
-		}
-
-		return;
-	}
-
 	changePassword(
 		context: RepositoryContext,
 		changePassword: MyCustomerChangePassword,
@@ -75,6 +43,38 @@ export class MyCustomerRepository extends CustomerRepository {
 		// Update storage
 		this._storage.add(context.projectKey, "customer", customer);
 		return customer;
+	}
+
+	deleteMe(context: RepositoryContext): Customer | undefined {
+		// grab the first customer you can find for now. In the future we should
+		// use the customer id from the scope of the token
+		const results = this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{},
+		);
+
+		if (results.count > 0) {
+			return this.delete(context, results.results[0].id) as Customer;
+		}
+
+		return;
+	}
+
+	getMe(context: RepositoryContext): Customer | undefined {
+		// grab the first customer you can find for now. In the future we should
+		// use the customer id from the scope of the token
+		const results = this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{},
+		);
+
+		if (results.count > 0) {
+			return results.results[0] as Customer;
+		}
+
+		return;
 	}
 
 	resetPassword(

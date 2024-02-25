@@ -136,6 +136,76 @@ class BusinessUnitUpdateHandler
 		}
 	}
 
+	addStore(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ store }: BusinessUnitAddStoreAction,
+	) {
+		const newStore = getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
+		);
+		if (newStore) {
+			if (!resource.stores) {
+				resource.stores = [];
+			}
+
+			resource.stores.push(newStore);
+		}
+	}
+
+	changeAddress(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ address }: BusinessUnitChangeAddressAction,
+	) {
+		const newAddress = createAddress(
+			address,
+			context.projectKey,
+			this._storage,
+		);
+		if (newAddress) {
+			resource.addresses.push(newAddress);
+		}
+	}
+
+	changeAssociateMode(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ associateMode }: BusinessUnitChangeAssociateModeAction,
+	) {
+		resource.associateMode = associateMode;
+	}
+
+	changeName(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ name }: BusinessUnitChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
+	changeParentUnit(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ parentUnit }: BusinessUnitChangeParentUnitAction,
+	) {
+		resource.parentUnit = getBusinessUnitKeyReference(
+			parentUnit,
+			context.projectKey,
+			this._storage,
+		);
+	}
+
+	changeStatus(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ status }: BusinessUnitChangeStatusAction,
+	) {
+		resource.status = status;
+	}
+
 	setAssociates(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
@@ -161,75 +231,5 @@ class BusinessUnitUpdateHandler
 		{ storeMode }: BusinessUnitSetStoreModeAction,
 	) {
 		resource.storeMode = storeMode;
-	}
-
-	changeAssociateMode(
-		context: RepositoryContext,
-		resource: Writable<BusinessUnit>,
-		{ associateMode }: BusinessUnitChangeAssociateModeAction,
-	) {
-		resource.associateMode = associateMode;
-	}
-
-	changeName(
-		context: RepositoryContext,
-		resource: Writable<BusinessUnit>,
-		{ name }: BusinessUnitChangeNameAction,
-	) {
-		resource.name = name;
-	}
-
-	changeAddress(
-		context: RepositoryContext,
-		resource: Writable<BusinessUnit>,
-		{ address }: BusinessUnitChangeAddressAction,
-	) {
-		const newAddress = createAddress(
-			address,
-			context.projectKey,
-			this._storage,
-		);
-		if (newAddress) {
-			resource.addresses.push(newAddress);
-		}
-	}
-
-	addStore(
-		context: RepositoryContext,
-		resource: Writable<BusinessUnit>,
-		{ store }: BusinessUnitAddStoreAction,
-	) {
-		const newStore = getStoreKeyReference(
-			store,
-			context.projectKey,
-			this._storage,
-		);
-		if (newStore) {
-			if (!resource.stores) {
-				resource.stores = [];
-			}
-
-			resource.stores.push(newStore);
-		}
-	}
-
-	changeParentUnit(
-		context: RepositoryContext,
-		resource: Writable<BusinessUnit>,
-		{ parentUnit }: BusinessUnitChangeParentUnitAction,
-	) {
-		resource.parentUnit = getBusinessUnitKeyReference(
-			parentUnit,
-			context.projectKey,
-			this._storage,
-		);
-	}
-
-	changeStatus(
-		context: RepositoryContext,
-		resource: Writable<BusinessUnit>,
-		{ status }: BusinessUnitChangeStatusAction,
-	) {
-		resource.status = status;
 	}
 }

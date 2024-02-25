@@ -69,6 +69,17 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 		}
 	}
 
+	getWithContainerAndKey(
+		context: RepositoryContext,
+		container: string,
+		key: string,
+	) {
+		const items = this._storage.all(context.projectKey, this.getTypeId());
+		return items.find(
+			(item) => item.container === container && item.key === key,
+		);
+	}
+
 	queryWithContainer(
 		context: RepositoryContext,
 		container: string,
@@ -84,16 +95,5 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 		// @ts-ignore
 		result.results = result.results.map(this.postProcessResource);
 		return result;
-	}
-
-	getWithContainerAndKey(
-		context: RepositoryContext,
-		container: string,
-		key: string,
-	) {
-		const items = this._storage.all(context.projectKey, this.getTypeId());
-		return items.find(
-			(item) => item.container === container && item.key === key,
-		);
 	}
 }

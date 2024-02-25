@@ -33,119 +33,6 @@ export class ShoppingListUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<ShoppingList, ShoppingListUpdateAction>>
 {
-	setKey(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ key }: ShoppingListSetKeyAction,
-	) {
-		resource.key = key;
-	}
-
-	setSlug(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ slug }: ShoppingListSetSlugAction,
-	) {
-		resource.slug = slug;
-	}
-
-	changeName(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ name }: ShoppingListChangeNameAction,
-	) {
-		resource.name = name;
-	}
-
-	setDescription(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ description }: ShoppingListSetDescriptionAction,
-	) {
-		resource.description = description;
-	}
-
-	setCustomer(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ customer }: ShoppingListSetCustomerAction,
-	) {
-		if (customer?.key) {
-			throw new Error("set customer on shoppinglist by key not implemented");
-		}
-		if (customer?.id) {
-			resource.customer = { typeId: "customer", id: customer.id };
-		}
-	}
-
-	setStore(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ store }: ShoppingListSetStoreAction,
-	) {
-		if (store?.key) {
-			resource.store = { typeId: "store", key: store.key };
-		}
-		if (store?.id) {
-			throw new Error("set store on shoppinglist by id not implemented");
-		}
-	}
-
-	setAnonymousId(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ anonymousId }: ShoppingListSetAnonymousIdAction,
-	) {
-		resource.anonymousId = anonymousId;
-	}
-
-	setCustomType(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ type, fields }: ShoppingListSetCustomTypeAction,
-	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields || {},
-			};
-		}
-	}
-
-	setCustomField(
-		context: RepositoryContext,
-		resource: ShoppingList,
-		{ name, value }: ShoppingListSetCustomFieldAction,
-	) {
-		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
-		}
-		resource.custom.fields[name] = value;
-	}
-
-	setDeleteDaysAfterLastModification(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{
-			deleteDaysAfterLastModification,
-		}: ShoppingListSetDeleteDaysAfterLastModificationAction,
-	) {
-		resource.deleteDaysAfterLastModification = deleteDaysAfterLastModification;
-	}
-
 	addLineItem(
 		context: RepositoryContext,
 		resource: Writable<ShoppingList>,
@@ -215,36 +102,6 @@ export class ShoppingListUpdateHandler
 		}
 	}
 
-	removeLineItem(
-		context: RepositoryContext,
-		resource: Writable<ShoppingList>,
-		{ lineItemId, quantity }: ShoppingListRemoveLineItemAction,
-	) {
-		const lineItem = resource.lineItems.find((x) => x.id === lineItemId);
-		if (!lineItem) {
-			// Check if product is found
-			throw new CommercetoolsError<GeneralError>({
-				code: "General",
-				message: `A line item with ID '${lineItemId}' not found.`,
-			});
-		}
-
-		const shouldDelete = !quantity || quantity >= lineItem.quantity;
-		if (shouldDelete) {
-			// delete line item
-			resource.lineItems = resource.lineItems.filter(
-				(x) => x.id !== lineItemId,
-			);
-		} else {
-			// decrease quantity and update total price
-			resource.lineItems.forEach((x) => {
-				if (x.id === lineItemId && quantity) {
-					x.quantity -= quantity;
-				}
-			});
-		}
-	}
-
 	changeLineItemQuantity(
 		context: RepositoryContext,
 		resource: Writable<ShoppingList>,
@@ -290,6 +147,149 @@ export class ShoppingListUpdateHandler
 					x.quantity = quantity;
 				}
 			});
+		}
+	}
+
+	changeName(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ name }: ShoppingListChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
+	removeLineItem(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ lineItemId, quantity }: ShoppingListRemoveLineItemAction,
+	) {
+		const lineItem = resource.lineItems.find((x) => x.id === lineItemId);
+		if (!lineItem) {
+			// Check if product is found
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		const shouldDelete = !quantity || quantity >= lineItem.quantity;
+		if (shouldDelete) {
+			// delete line item
+			resource.lineItems = resource.lineItems.filter(
+				(x) => x.id !== lineItemId,
+			);
+		} else {
+			// decrease quantity and update total price
+			resource.lineItems.forEach((x) => {
+				if (x.id === lineItemId && quantity) {
+					x.quantity -= quantity;
+				}
+			});
+		}
+	}
+
+	setAnonymousId(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ anonymousId }: ShoppingListSetAnonymousIdAction,
+	) {
+		resource.anonymousId = anonymousId;
+	}
+
+	setCustomer(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ customer }: ShoppingListSetCustomerAction,
+	) {
+		if (customer?.key) {
+			throw new Error("set customer on shoppinglist by key not implemented");
+		}
+		if (customer?.id) {
+			resource.customer = { typeId: "customer", id: customer.id };
+		}
+	}
+
+	setCustomField(
+		context: RepositoryContext,
+		resource: ShoppingList,
+		{ name, value }: ShoppingListSetCustomFieldAction,
+	) {
+		if (!resource.custom) {
+			throw new Error("Resource has no custom field");
+		}
+		resource.custom.fields[name] = value;
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ type, fields }: ShoppingListSetCustomTypeAction,
+	) {
+		if (!type) {
+			resource.custom = undefined;
+		} else {
+			const resolvedType = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				type,
+			);
+			if (!resolvedType) {
+				throw new Error(`Type ${type} not found`);
+			}
+
+			resource.custom = {
+				type: {
+					typeId: "type",
+					id: resolvedType.id,
+				},
+				fields: fields || {},
+			};
+		}
+	}
+
+	setDeleteDaysAfterLastModification(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{
+			deleteDaysAfterLastModification,
+		}: ShoppingListSetDeleteDaysAfterLastModificationAction,
+	) {
+		resource.deleteDaysAfterLastModification = deleteDaysAfterLastModification;
+	}
+
+	setDescription(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ description }: ShoppingListSetDescriptionAction,
+	) {
+		resource.description = description;
+	}
+
+	setKey(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ key }: ShoppingListSetKeyAction,
+	) {
+		resource.key = key;
+	}
+
+	setSlug(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ slug }: ShoppingListSetSlugAction,
+	) {
+		resource.slug = slug;
+	}
+
+	setStore(
+		context: RepositoryContext,
+		resource: Writable<ShoppingList>,
+		{ store }: ShoppingListSetStoreAction,
+	) {
+		if (store?.key) {
+			resource.store = { typeId: "store", key: store.key };
+		}
+		if (store?.id) {
+			throw new Error("set store on shoppinglist by id not implemented");
 		}
 	}
 }

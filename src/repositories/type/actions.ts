@@ -30,6 +30,28 @@ export class TypeUpdateHandler
 	extends AbstractUpdateHandler
 	implements TypeUpdateActions
 {
+	addEnumValue(
+		context: RepositoryContext,
+		resource: Writable<Type>,
+		{ fieldName, value }: TypeAddEnumValueAction,
+	) {
+		resource.fieldDefinitions.forEach((field) => {
+			if (field.name === fieldName) {
+				// TODO, should be done better i suppose
+				if (field.type.name === "Enum") {
+					field.type.values.push(value);
+				} else if (
+					field.type.name === "Set" &&
+					field.type.elementType.name === "Enum"
+				) {
+					field.type.elementType.values.push(value);
+				} else {
+					throw new Error("Type is not a Enum (or Set of Enum)");
+				}
+			}
+		});
+	}
+
 	addFieldDefinition(
 		context: RepositoryContext,
 		resource: Writable<Type>,
@@ -38,30 +60,34 @@ export class TypeUpdateHandler
 		resource.fieldDefinitions.push(fieldDefinition);
 	}
 
-	removeFieldDefinition(
+	changeEnumValueLabel(
 		context: RepositoryContext,
 		resource: Writable<Type>,
-		{ fieldName }: TypeRemoveFieldDefinitionAction,
+		{ fieldName, value }: TypeChangeEnumValueLabelAction,
 	) {
-		resource.fieldDefinitions = resource.fieldDefinitions.filter(
-			(f) => f.name !== fieldName,
-		);
-	}
-
-	setDescription(
-		context: RepositoryContext,
-		resource: Writable<Type>,
-		{ description }: TypeSetDescriptionAction,
-	) {
-		resource.description = description;
-	}
-
-	changeName(
-		context: RepositoryContext,
-		resource: Writable<Type>,
-		{ name }: TypeChangeNameAction,
-	) {
-		resource.name = name;
+		resource.fieldDefinitions.forEach((field) => {
+			if (field.name === fieldName) {
+				// TODO, should be done better i suppose
+				if (field.type.name === "Enum") {
+					field.type.values.forEach((v) => {
+						if (v.key === value.key) {
+							v.label = value.label;
+						}
+					});
+				} else if (
+					field.type.name === "Set" &&
+					field.type.elementType.name === "Enum"
+				) {
+					field.type.elementType.values.forEach((v) => {
+						if (v.key === value.key) {
+							v.label = value.label;
+						}
+					});
+				} else {
+					throw new Error("Type is not a Enum (or Set of Enum)");
+				}
+			}
+		});
 	}
 
 	changeFieldDefinitionOrder(
@@ -108,55 +134,29 @@ export class TypeUpdateHandler
 		resource.fieldDefinitions.push(...current);
 	}
 
-	addEnumValue(
+	changeName(
 		context: RepositoryContext,
 		resource: Writable<Type>,
-		{ fieldName, value }: TypeAddEnumValueAction,
+		{ name }: TypeChangeNameAction,
 	) {
-		resource.fieldDefinitions.forEach((field) => {
-			if (field.name === fieldName) {
-				// TODO, should be done better i suppose
-				if (field.type.name === "Enum") {
-					field.type.values.push(value);
-				} else if (
-					field.type.name === "Set" &&
-					field.type.elementType.name === "Enum"
-				) {
-					field.type.elementType.values.push(value);
-				} else {
-					throw new Error("Type is not a Enum (or Set of Enum)");
-				}
-			}
-		});
+		resource.name = name;
 	}
 
-	changeEnumValueLabel(
+	removeFieldDefinition(
 		context: RepositoryContext,
 		resource: Writable<Type>,
-		{ fieldName, value }: TypeChangeEnumValueLabelAction,
+		{ fieldName }: TypeRemoveFieldDefinitionAction,
 	) {
-		resource.fieldDefinitions.forEach((field) => {
-			if (field.name === fieldName) {
-				// TODO, should be done better i suppose
-				if (field.type.name === "Enum") {
-					field.type.values.forEach((v) => {
-						if (v.key === value.key) {
-							v.label = value.label;
-						}
-					});
-				} else if (
-					field.type.name === "Set" &&
-					field.type.elementType.name === "Enum"
-				) {
-					field.type.elementType.values.forEach((v) => {
-						if (v.key === value.key) {
-							v.label = value.label;
-						}
-					});
-				} else {
-					throw new Error("Type is not a Enum (or Set of Enum)");
-				}
-			}
-		});
+		resource.fieldDefinitions = resource.fieldDefinitions.filter(
+			(f) => f.name !== fieldName,
+		);
+	}
+
+	setDescription(
+		context: RepositoryContext,
+		resource: Writable<Type>,
+		{ description }: TypeSetDescriptionAction,
+	) {
+		resource.description = description;
 	}
 }

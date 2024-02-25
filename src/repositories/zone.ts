@@ -48,6 +48,14 @@ class ZoneUpdateHandler
 		resource.locations.push(location);
 	}
 
+	changeName(
+		context: RepositoryContext,
+		resource: Writable<Zone>,
+		{ name }: ZoneChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
 	removeLocation(
 		context: RepositoryContext,
 		resource: Writable<Zone>,
@@ -57,14 +65,6 @@ class ZoneUpdateHandler
 			(loc) =>
 				!(loc.country === location.country && loc.state === location.state),
 		);
-	}
-
-	changeName(
-		context: RepositoryContext,
-		resource: Writable<Zone>,
-		{ name }: ZoneChangeNameAction,
-	) {
-		resource.name = name;
 	}
 
 	setDescription(

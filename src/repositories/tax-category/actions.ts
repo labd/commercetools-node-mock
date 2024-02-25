@@ -37,6 +37,14 @@ export class TaxCategoryUpdateHandler
 		resource.rates.push(taxRateFromTaxRateDraft(taxRate));
 	}
 
+	changeName(
+		context: RepositoryContext,
+		resource: Writable<TaxCategory>,
+		{ name }: TaxCategoryChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
 	removeTaxRate(
 		context: RepositoryContext,
 		resource: Writable<TaxCategory>,
@@ -82,13 +90,5 @@ export class TaxCategoryUpdateHandler
 		{ key }: TaxCategorySetKeyAction,
 	) {
 		resource.key = key;
-	}
-
-	changeName(
-		context: RepositoryContext,
-		resource: Writable<TaxCategory>,
-		{ name }: TaxCategoryChangeNameAction,
-	) {
-		resource.name = name;
 	}
 }

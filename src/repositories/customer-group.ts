@@ -43,20 +43,27 @@ class CustomerGroupUpdateHandler
 	extends AbstractUpdateHandler
 	implements UpdateHandlerInterface<CustomerGroup, CustomerGroupUpdateAction>
 {
-	setKey(
-		context: RepositoryContext,
-		resource: Writable<CustomerGroup>,
-		{ key }: CustomerGroupSetKeyAction,
-	) {
-		resource.key = key;
-	}
-
 	changeName(
 		context: RepositoryContext,
 		resource: Writable<CustomerGroup>,
 		{ name }: CustomerGroupChangeNameAction,
 	) {
 		resource.name = name;
+	}
+
+	setCustomField(
+		context: RepositoryContext,
+		resource: Writable<CustomerGroup>,
+		{ name, value }: CustomerGroupSetCustomFieldAction,
+	) {
+		if (!resource.custom) {
+			return;
+		}
+		if (value === null) {
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
 	}
 
 	setCustomType(
@@ -75,18 +82,11 @@ class CustomerGroupUpdateHandler
 		}
 	}
 
-	setCustomField(
+	setKey(
 		context: RepositoryContext,
 		resource: Writable<CustomerGroup>,
-		{ name, value }: CustomerGroupSetCustomFieldAction,
+		{ key }: CustomerGroupSetKeyAction,
 	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		resource.key = key;
 	}
 }

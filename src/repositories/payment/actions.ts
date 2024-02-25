@@ -115,27 +115,6 @@ export class PaymentUpdateHandler
 		}
 	}
 
-	transitionState(
-		context: RepositoryContext,
-		resource: Writable<Payment>,
-		{ state }: PaymentTransitionStateAction,
-	) {
-		const stateObj = this._storage.getByResourceIdentifier(
-			context.projectKey,
-			state,
-		) as State | null;
-
-		if (!stateObj) {
-			throw new Error(`State ${state} not found`);
-		}
-
-		resource.paymentStatus.state = {
-			typeId: "state",
-			id: stateObj.id,
-			obj: stateObj,
-		};
-	}
-
 	setAnonymousId(
 		_context: RepositoryContext,
 		resource: Writable<Payment>,
@@ -215,6 +194,14 @@ export class PaymentUpdateHandler
 		resource.key = key;
 	}
 
+	setMethodInfoInterface(
+		_context: RepositoryContext,
+		resource: Writable<Payment>,
+		args: PaymentSetMethodInfoInterfaceAction,
+	) {
+		resource.paymentMethodInfo.paymentInterface = args.interface;
+	}
+
 	setMethodInfoMethod(
 		_context: RepositoryContext,
 		resource: Writable<Payment>,
@@ -229,14 +216,6 @@ export class PaymentUpdateHandler
 		{ name }: PaymentSetMethodInfoNameAction,
 	) {
 		resource.paymentMethodInfo.name = name;
-	}
-
-	setMethodInfoInterface(
-		_context: RepositoryContext,
-		resource: Writable<Payment>,
-		args: PaymentSetMethodInfoInterfaceAction,
-	) {
-		resource.paymentMethodInfo.paymentInterface = args.interface;
 	}
 
 	setStatusInterfaceCode(
@@ -301,5 +280,26 @@ export class PaymentUpdateHandler
 				};
 			}
 		}
+	}
+
+	transitionState(
+		context: RepositoryContext,
+		resource: Writable<Payment>,
+		{ state }: PaymentTransitionStateAction,
+	) {
+		const stateObj = this._storage.getByResourceIdentifier(
+			context.projectKey,
+			state,
+		) as State | null;
+
+		if (!stateObj) {
+			throw new Error(`State ${state} not found`);
+		}
+
+		resource.paymentStatus.state = {
+			typeId: "state",
+			id: stateObj.id,
+			obj: stateObj,
+		};
 	}
 }

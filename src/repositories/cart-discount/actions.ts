@@ -27,45 +27,12 @@ export class CartDiscountUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<CartDiscount, CartDiscountUpdateAction>>
 {
-	setKey(
+	changeIsActive(
 		context: RepositoryContext,
 		resource: Writable<CartDiscount>,
-		{ key }: CartDiscountSetKeyAction,
+		{ isActive }: CartDiscountChangeIsActiveAction,
 	) {
-		resource.key = key;
-	}
-
-	setDescription(
-		context: RepositoryContext,
-		resource: Writable<CartDiscount>,
-		{ description }: CartDiscountSetDescriptionAction,
-	) {
-		resource.description = description;
-	}
-
-	setValidFrom(
-		context: RepositoryContext,
-		resource: Writable<CartDiscount>,
-		{ validFrom }: CartDiscountSetValidFromAction,
-	) {
-		resource.validFrom = validFrom;
-	}
-
-	setValidUntil(
-		context: RepositoryContext,
-		resource: Writable<CartDiscount>,
-		{ validUntil }: CartDiscountSetValidUntilAction,
-	) {
-		resource.validUntil = validUntil;
-	}
-
-	setValidFromAndUntil(
-		context: RepositoryContext,
-		resource: Writable<CartDiscount>,
-		{ validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction,
-	) {
-		resource.validFrom = validFrom;
-		resource.validUntil = validUntil;
+		resource.isActive = isActive;
 	}
 
 	changeSortOrder(
@@ -74,14 +41,6 @@ export class CartDiscountUpdateHandler
 		{ sortOrder }: CartDiscountChangeSortOrderAction,
 	) {
 		resource.sortOrder = sortOrder;
-	}
-
-	changeIsActive(
-		context: RepositoryContext,
-		resource: Writable<CartDiscount>,
-		{ isActive }: CartDiscountChangeIsActiveAction,
-	) {
-		resource.isActive = isActive;
 	}
 
 	changeTarget(
@@ -144,5 +103,46 @@ export class CartDiscountUpdateHandler
 				fields: fields || {},
 			};
 		}
+	}
+
+	setDescription(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ description }: CartDiscountSetDescriptionAction,
+	) {
+		resource.description = description;
+	}
+
+	setKey(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ key }: CartDiscountSetKeyAction,
+	) {
+		resource.key = key;
+	}
+
+	setValidFrom(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ validFrom }: CartDiscountSetValidFromAction,
+	) {
+		resource.validFrom = validFrom;
+	}
+
+	setValidFromAndUntil(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ validFrom, validUntil }: CartDiscountSetValidFromAndUntilAction,
+	) {
+		resource.validFrom = validFrom;
+		resource.validUntil = validUntil;
+	}
+
+	setValidUntil(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ validUntil }: CartDiscountSetValidUntilAction,
+	) {
+		resource.validUntil = validUntil;
 	}
 }

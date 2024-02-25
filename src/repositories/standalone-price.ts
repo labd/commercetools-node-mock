@@ -70,20 +70,20 @@ class StandalonePriceUpdateHandler
 			UpdateHandlerInterface<StandalonePrice, StandalonePriceUpdateAction>
 		>
 {
-	setActive(
-		context: RepositoryContext,
-		resource: Writable<StandalonePrice>,
-		action: StandalonePriceChangeActiveAction,
-	) {
-		resource.active = action.active;
-	}
-
 	changeValue(
 		context: RepositoryContext,
 		resource: Writable<StandalonePrice>,
 		action: StandalonePriceChangeValueAction,
 	) {
 		resource.value = createTypedMoney(action.value);
+	}
+
+	setActive(
+		context: RepositoryContext,
+		resource: Writable<StandalonePrice>,
+		action: StandalonePriceChangeActiveAction,
+	) {
+		resource.active = action.active;
 	}
 
 	setDiscountedPrice(

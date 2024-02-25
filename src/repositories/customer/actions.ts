@@ -27,46 +27,6 @@ export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
 {
-	changeEmail(
-		_context: RepositoryContext,
-		resource: Writable<Customer>,
-		{ email }: CustomerChangeEmailAction,
-	) {
-		resource.email = email;
-	}
-
-	setFirstName(
-		_context: RepositoryContext,
-		resource: Writable<Customer>,
-		{ firstName }: CustomerSetFirstNameAction,
-	) {
-		resource.firstName = firstName;
-	}
-
-	setLastName(
-		_context: RepositoryContext,
-		resource: Writable<Customer>,
-		{ lastName }: CustomerSetLastNameAction,
-	) {
-		resource.lastName = lastName;
-	}
-
-	setCompanyName(
-		_context: RepositoryContext,
-		resource: Writable<Customer>,
-		{ companyName }: CustomerSetCompanyNameAction,
-	) {
-		resource.companyName = companyName;
-	}
-
-	setVatId(
-		_context: RepositoryContext,
-		resource: Writable<Customer>,
-		{ vatId }: CustomerSetVatIdAction,
-	) {
-		resource.vatId = vatId;
-	}
-
 	changeAddress(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -106,6 +66,14 @@ export class CustomerUpdateHandler
 		}
 	}
 
+	changeEmail(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ email }: CustomerChangeEmailAction,
+	) {
+		resource.email = email;
+	}
+
 	setAuthenticationMode(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -139,15 +107,12 @@ export class CustomerUpdateHandler
 		);
 	}
 
-	setCustomField(
+	setCompanyName(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
-		{ name, value }: CustomerSetCustomFieldAction,
+		{ companyName }: CustomerSetCompanyNameAction,
 	) {
-		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
-		}
-		resource.custom.fields[name] = value;
+		resource.companyName = companyName;
 	}
 
 	setCustomerNumber(
@@ -161,5 +126,40 @@ export class CustomerUpdateHandler
 			);
 		}
 		resource.customerNumber = customerNumber;
+	}
+
+	setCustomField(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ name, value }: CustomerSetCustomFieldAction,
+	) {
+		if (!resource.custom) {
+			throw new Error("Resource has no custom field");
+		}
+		resource.custom.fields[name] = value;
+	}
+
+	setFirstName(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ firstName }: CustomerSetFirstNameAction,
+	) {
+		resource.firstName = firstName;
+	}
+
+	setLastName(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ lastName }: CustomerSetLastNameAction,
+	) {
+		resource.lastName = lastName;
+	}
+
+	setVatId(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ vatId }: CustomerSetVatIdAction,
+	) {
+		resource.vatId = vatId;
 	}
 }

@@ -58,6 +58,22 @@ class ExtensionUpdateHandler
 	extends AbstractUpdateHandler
 	implements UpdateHandlerInterface<Extension, ExtensionUpdateAction>
 {
+	changeDestination(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionChangeDestinationAction,
+	): void {
+		resource.destination = action.destination;
+	}
+
+	changeTriggers(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionChangeTriggersAction,
+	): void {
+		resource.triggers = action.triggers;
+	}
+
 	setKey(
 		context: RepositoryContext,
 		resource: Writable<Extension>,
@@ -72,21 +88,5 @@ class ExtensionUpdateHandler
 		action: ExtensionSetTimeoutInMsAction,
 	): void {
 		resource.timeoutInMs = action.timeoutInMs;
-	}
-
-	changeTriggers(
-		context: RepositoryContext,
-		resource: Writable<Extension>,
-		action: ExtensionChangeTriggersAction,
-	): void {
-		resource.triggers = action.triggers;
-	}
-
-	changeDestination(
-		context: RepositoryContext,
-		resource: Writable<Extension>,
-		action: ExtensionChangeDestinationAction,
-	): void {
-		resource.destination = action.destination;
 	}
 }

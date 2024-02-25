@@ -32,6 +32,18 @@ export class CategoryUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Category, CategoryUpdateAction>>
 {
+	addAsset(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ asset }: CategoryAddAssetAction,
+	) {
+		if (!resource.assets) {
+			resource.assets = [this.assetFromAssetDraft(asset, context)];
+		} else {
+			resource.assets.push(this.assetFromAssetDraft(asset, context));
+		}
+	}
+
 	changeAssetName(
 		context: RepositoryContext,
 		resource: Writable<Category>,
@@ -45,14 +57,6 @@ export class CategoryUpdateHandler
 				asset.name = name;
 			}
 		});
-	}
-
-	changeSlug(
-		context: RepositoryContext,
-		resource: Writable<Category>,
-		{ slug }: CategoryChangeSlugAction,
-	) {
-		resource.slug = slug;
 	}
 
 	changeName(
@@ -81,12 +85,38 @@ export class CategoryUpdateHandler
 		};
 	}
 
-	setKey(
+	changeSlug(
 		context: RepositoryContext,
 		resource: Writable<Category>,
-		{ key }: CategorySetKeyAction,
+		{ slug }: CategoryChangeSlugAction,
 	) {
-		resource.key = key;
+		resource.slug = slug;
+	}
+
+	removeAsset(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ assetId, assetKey }: CategoryRemoveAssetAction,
+	) {
+		if (!resource.assets) {
+			return;
+		}
+
+		if (assetId) {
+			resource.assets = resource.assets.filter(function (obj) {
+				return obj.id !== assetId;
+			});
+
+			return;
+		}
+
+		if (assetKey) {
+			resource.assets = resource.assets.filter(function (obj) {
+				return obj.key !== assetKey;
+			});
+
+			return;
+		}
 	}
 
 	setAssetDescription(
@@ -119,12 +149,51 @@ export class CategoryUpdateHandler
 		});
 	}
 
+	setCustomField(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ name, value }: CategorySetCustomFieldAction,
+	) {
+		if (!resource.custom) {
+			return;
+		}
+		if (value === null) {
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ type, fields }: CategorySetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
+	}
+
 	setDescription(
 		context: RepositoryContext,
 		resource: Writable<Category>,
 		{ description }: CategorySetDescriptionAction,
 	) {
 		resource.description = description;
+	}
+
+	setKey(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ key }: CategorySetKeyAction,
+	) {
+		resource.key = key;
 	}
 
 	setMetaDescription(
@@ -149,75 +218,6 @@ export class CategoryUpdateHandler
 		{ metaTitle }: CategorySetMetaTitleAction,
 	) {
 		resource.metaTitle = metaTitle;
-	}
-
-	setCustomType(
-		context: RepositoryContext,
-		resource: Writable<Category>,
-		{ type, fields }: CategorySetCustomTypeAction,
-	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
-	}
-
-	setCustomField(
-		context: RepositoryContext,
-		resource: Writable<Category>,
-		{ name, value }: CategorySetCustomFieldAction,
-	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
-	}
-
-	removeAsset(
-		context: RepositoryContext,
-		resource: Writable<Category>,
-		{ assetId, assetKey }: CategoryRemoveAssetAction,
-	) {
-		if (!resource.assets) {
-			return;
-		}
-
-		if (assetId) {
-			resource.assets = resource.assets.filter(function (obj) {
-				return obj.id !== assetId;
-			});
-
-			return;
-		}
-
-		if (assetKey) {
-			resource.assets = resource.assets.filter(function (obj) {
-				return obj.key !== assetKey;
-			});
-
-			return;
-		}
-	}
-
-	addAsset(
-		context: RepositoryContext,
-		resource: Writable<Category>,
-		{ asset }: CategoryAddAssetAction,
-	) {
-		if (!resource.assets) {
-			resource.assets = [this.assetFromAssetDraft(asset, context)];
-		} else {
-			resource.assets.push(this.assetFromAssetDraft(asset, context));
-		}
 	}
 
 	assetFromAssetDraft = (

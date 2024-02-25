@@ -43,20 +43,20 @@ class AttributeGroupUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<AttributeGroup, AttributeGroupUpdateAction>>
 {
-	setAttributes(
-		_context: RepositoryContext,
-		resource: Writable<AttributeGroup>,
-		{ attributes }: AttributeGroupSetAttributesAction,
-	) {
-		resource.attributes = attributes;
-	}
-
 	changeName(
 		_context: RepositoryContext,
 		resource: Writable<AttributeGroup>,
 		{ name }: AttributeGroupChangeNameAction,
 	) {
 		resource.name = name;
+	}
+
+	setAttributes(
+		_context: RepositoryContext,
+		resource: Writable<AttributeGroup>,
+		{ attributes }: AttributeGroupSetAttributesAction,
+	) {
+		resource.attributes = attributes;
 	}
 
 	setDescription(

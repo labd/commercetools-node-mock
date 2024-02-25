@@ -50,6 +50,14 @@ class ChannelUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Channel, ChannelUpdateAction>>
 {
+	changeDescription(
+		context: RepositoryContext,
+		resource: Writable<Channel>,
+		{ description }: ChannelChangeDescriptionAction,
+	) {
+		resource.description = description;
+	}
+
 	changeKey(
 		context: RepositoryContext,
 		resource: Writable<Channel>,
@@ -66,14 +74,6 @@ class ChannelUpdateHandler
 		resource.name = name;
 	}
 
-	changeDescription(
-		context: RepositoryContext,
-		resource: Writable<Channel>,
-		{ description }: ChannelChangeDescriptionAction,
-	) {
-		resource.description = description;
-	}
-
 	setAddress(
 		context: RepositoryContext,
 		resource: Writable<Channel>,
@@ -86,12 +86,19 @@ class ChannelUpdateHandler
 		);
 	}
 
-	setGeoLocation(
+	setCustomField(
 		context: RepositoryContext,
 		resource: Writable<Channel>,
-		{ geoLocation }: ChannelSetGeoLocationAction,
+		{ name, value }: ChannelSetCustomFieldAction,
 	) {
-		resource.geoLocation = geoLocation;
+		if (!resource.custom) {
+			return;
+		}
+		if (value === null) {
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
 	}
 
 	setCustomType(
@@ -110,18 +117,11 @@ class ChannelUpdateHandler
 		}
 	}
 
-	setCustomField(
+	setGeoLocation(
 		context: RepositoryContext,
 		resource: Writable<Channel>,
-		{ name, value }: ChannelSetCustomFieldAction,
+		{ geoLocation }: ChannelSetGeoLocationAction,
 	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		resource.geoLocation = geoLocation;
 	}
 }

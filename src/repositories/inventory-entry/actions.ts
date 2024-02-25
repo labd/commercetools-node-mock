@@ -29,14 +29,6 @@ export class InventoryEntryUpdateHandler
 		resource.availableQuantity = quantity;
 	}
 
-	setExpectedDelivery(
-		context: RepositoryContext,
-		resource: Writable<InventoryEntry>,
-		{ expectedDelivery }: InventoryEntrySetExpectedDeliveryAction,
-	) {
-		resource.expectedDelivery = new Date(expectedDelivery!).toISOString();
-	}
-
 	setCustomField(
 		context: RepositoryContext,
 		resource: InventoryEntry,
@@ -72,6 +64,14 @@ export class InventoryEntryUpdateHandler
 				fields: fields || {},
 			};
 		}
+	}
+
+	setExpectedDelivery(
+		context: RepositoryContext,
+		resource: Writable<InventoryEntry>,
+		{ expectedDelivery }: InventoryEntrySetExpectedDeliveryAction,
+	) {
+		resource.expectedDelivery = new Date(expectedDelivery!).toISOString();
 	}
 
 	setRestockableInDays(

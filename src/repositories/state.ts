@@ -1,9 +1,12 @@
 import type {
 	State,
+	StateAddRolesAction,
 	StateChangeInitialAction,
 	StateChangeKeyAction,
+	StateChangeTypeAction,
 	StateDraft,
 	StateReference,
+	StateRemoveRolesAction,
 	StateSetDescriptionAction,
 	StateSetNameAction,
 	StateSetRolesAction,
@@ -48,14 +51,21 @@ export class StateRepository extends AbstractResourceRepository<"state"> {
 
 class StateUpdateHandler
 	extends AbstractUpdateHandler
-	implements Partial<UpdateHandlerInterface<State, StateUpdateAction>>
+	implements UpdateHandlerInterface<State, StateUpdateAction>
 {
-	changeKey(
+	addRoles(
 		context: RepositoryContext,
 		resource: Writable<State>,
-		{ key }: StateChangeKeyAction,
+		action: StateAddRolesAction,
 	) {
-		resource.key = key;
+		if (!resource.roles) {
+			resource.roles = [];
+		}
+		for (const role of action.roles) {
+			if (!resource.roles.includes(role)) {
+				resource.roles.push(role);
+			}
+		}
 	}
 
 	changeInitial(
@@ -64,6 +74,32 @@ class StateUpdateHandler
 		{ initial }: StateChangeInitialAction,
 	) {
 		resource.initial = initial;
+	}
+
+	changeKey(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		{ key }: StateChangeKeyAction,
+	) {
+		resource.key = key;
+	}
+
+	changeType(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		action: StateChangeTypeAction,
+	) {
+		resource.type = action.type;
+	}
+
+	removeRoles(
+		context: RepositoryContext,
+		resource: Writable<State>,
+		action: StateRemoveRolesAction,
+	) {
+		resource.roles = resource.roles?.filter(
+			(role) => !action.roles.includes(role),
+		);
 	}
 
 	setDescription(

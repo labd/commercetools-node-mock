@@ -114,29 +114,6 @@ export class OrderUpdateHandler
 		resource.paymentState = paymentState;
 	}
 
-	transitionState(
-		context: RepositoryContext,
-		resource: Writable<Order>,
-		{ state }: OrderTransitionStateAction,
-	) {
-		const resolvedType = this._storage.getByResourceIdentifier(
-			context.projectKey,
-			state,
-		) as State | null;
-
-		if (!resolvedType) {
-			throw new Error(
-				`No state found with key=${state.key} or id=${state.key}`,
-			);
-		}
-
-		resource.state = {
-			typeId: "state",
-			id: resolvedType.id,
-			obj: { ...resolvedType, key: state.key ?? "" },
-		};
-	}
-
 	setBillingAddress(
 		context: RepositoryContext,
 		resource: Writable<Order>,
@@ -240,6 +217,29 @@ export class OrderUpdateHandler
 		resource.store = {
 			typeId: "store",
 			key: storeReference.key,
+		};
+	}
+
+	transitionState(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ state }: OrderTransitionStateAction,
+	) {
+		const resolvedType = this._storage.getByResourceIdentifier(
+			context.projectKey,
+			state,
+		) as State | null;
+
+		if (!resolvedType) {
+			throw new Error(
+				`No state found with key=${state.key} or id=${state.key}`,
+			);
+		}
+
+		resource.state = {
+			typeId: "state",
+			id: resolvedType.id,
+			obj: { ...resolvedType, key: state.key ?? "" },
 		};
 	}
 

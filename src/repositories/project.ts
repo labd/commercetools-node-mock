@@ -55,20 +55,15 @@ class ProjectUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Project, ProjectUpdateAction>>
 {
-	changeName(
+	changeCartsConfiguration(
 		context: RepositoryContext,
 		resource: Writable<Project>,
-		{ name }: ProjectChangeNameAction,
+		{ cartsConfiguration }: ProjectChangeCartsConfigurationAction,
 	) {
-		resource.name = name;
-	}
-
-	changeCurrencies(
-		context: RepositoryContext,
-		resource: Writable<Project>,
-		{ currencies }: ProjectChangeCurrenciesAction,
-	) {
-		resource.currencies = currencies;
+		resource.carts = cartsConfiguration || {
+			countryTaxRateFallbackEnabled: false,
+			deleteDaysAfterLastModification: 90,
+		};
 	}
 
 	changeCountries(
@@ -77,6 +72,25 @@ class ProjectUpdateHandler
 		{ countries }: ProjectChangeCountriesAction,
 	) {
 		resource.countries = countries;
+	}
+
+	changeCountryTaxRateFallbackEnabled(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{
+			countryTaxRateFallbackEnabled,
+		}: ProjectChangeCountryTaxRateFallbackEnabledAction,
+	) {
+		resource.carts.countryTaxRateFallbackEnabled =
+			countryTaxRateFallbackEnabled;
+	}
+
+	changeCurrencies(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ currencies }: ProjectChangeCurrenciesAction,
+	) {
+		resource.currencies = currencies;
 	}
 
 	changeLanguages(
@@ -97,18 +111,12 @@ class ProjectUpdateHandler
 			messagesConfiguration.deleteDaysAfterCreation;
 	}
 
-	changeProductSearchIndexingEnabled(
+	changeName(
 		context: RepositoryContext,
 		resource: Writable<Project>,
-		{ enabled }: ProjectChangeProductSearchIndexingEnabledAction,
+		{ name }: ProjectChangeNameAction,
 	) {
-		if (!resource.searchIndexing?.products) {
-			throw new Error("Invalid project state");
-		}
-		resource.searchIndexing.products.status = enabled
-			? "Activated"
-			: "Deactivated";
-		resource.searchIndexing.products.lastModifiedAt = new Date().toISOString();
+		resource.name = name;
 	}
 
 	changeOrderSearchStatus(
@@ -123,12 +131,18 @@ class ProjectUpdateHandler
 		resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString();
 	}
 
-	setShippingRateInputType(
+	changeProductSearchIndexingEnabled(
 		context: RepositoryContext,
 		resource: Writable<Project>,
-		{ shippingRateInputType }: ProjectSetShippingRateInputTypeAction,
+		{ enabled }: ProjectChangeProductSearchIndexingEnabledAction,
 	) {
-		resource.shippingRateInputType = shippingRateInputType;
+		if (!resource.searchIndexing?.products) {
+			throw new Error("Invalid project state");
+		}
+		resource.searchIndexing.products.status = enabled
+			? "Activated"
+			: "Deactivated";
+		resource.searchIndexing.products.lastModifiedAt = new Date().toISOString();
 	}
 
 	setExternalOAuth(
@@ -139,25 +153,11 @@ class ProjectUpdateHandler
 		resource.externalOAuth = externalOAuth;
 	}
 
-	changeCountryTaxRateFallbackEnabled(
+	setShippingRateInputType(
 		context: RepositoryContext,
 		resource: Writable<Project>,
-		{
-			countryTaxRateFallbackEnabled,
-		}: ProjectChangeCountryTaxRateFallbackEnabledAction,
+		{ shippingRateInputType }: ProjectSetShippingRateInputTypeAction,
 	) {
-		resource.carts.countryTaxRateFallbackEnabled =
-			countryTaxRateFallbackEnabled;
-	}
-
-	changeCartsConfiguration(
-		context: RepositoryContext,
-		resource: Writable<Project>,
-		{ cartsConfiguration }: ProjectChangeCartsConfigurationAction,
-	) {
-		resource.carts = cartsConfiguration || {
-			countryTaxRateFallbackEnabled: false,
-			deleteDaysAfterLastModification: 90,
-		};
+		resource.shippingRateInputType = shippingRateInputType;
 	}
 }

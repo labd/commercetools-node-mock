@@ -84,24 +84,12 @@ export class ProductDiscountUpdateHandler
 	implements
 		UpdateHandlerInterface<ProductDiscount, ProductDiscountUpdateAction>
 {
-	setKey(
+	changeIsActive(
 		context: RepositoryContext,
 		resource: Writable<ProductDiscount>,
-		{ key }: ProductDiscountSetKeyAction,
+		{ isActive }: ProductDiscountChangeIsActiveAction,
 	) {
-		resource.key = key;
-	}
-
-	setDescription(
-		context: RepositoryContext,
-		resource: Writable<ProductDiscount>,
-		{ description }: ProductDiscountSetDescriptionAction,
-	) {
-		if (description && Object.keys(description).length > 0) {
-			resource.description = description;
-		} else {
-			resource.description = undefined;
-		}
+		resource.isActive = isActive;
 	}
 
 	changeName(
@@ -110,14 +98,6 @@ export class ProductDiscountUpdateHandler
 		{ name }: ProductDiscountChangeNameAction,
 	) {
 		resource.name = name;
-	}
-
-	changeValue(
-		context: RepositoryContext,
-		resource: Writable<ProductDiscount>,
-		{ value }: ProductDiscountChangeValueAction,
-	) {
-		resource.value = transformValueDraft(value);
 	}
 
 	changePredicate(
@@ -136,12 +116,32 @@ export class ProductDiscountUpdateHandler
 		resource.sortOrder = sortOrder;
 	}
 
-	changeIsActive(
+	changeValue(
 		context: RepositoryContext,
 		resource: Writable<ProductDiscount>,
-		{ isActive }: ProductDiscountChangeIsActiveAction,
+		{ value }: ProductDiscountChangeValueAction,
 	) {
-		resource.isActive = isActive;
+		resource.value = transformValueDraft(value);
+	}
+
+	setDescription(
+		context: RepositoryContext,
+		resource: Writable<ProductDiscount>,
+		{ description }: ProductDiscountSetDescriptionAction,
+	) {
+		if (description && Object.keys(description).length > 0) {
+			resource.description = description;
+		} else {
+			resource.description = undefined;
+		}
+	}
+
+	setKey(
+		context: RepositoryContext,
+		resource: Writable<ProductDiscount>,
+		{ key }: ProductDiscountSetKeyAction,
+	) {
+		resource.key = key;
 	}
 
 	setValidFrom(
@@ -152,20 +152,20 @@ export class ProductDiscountUpdateHandler
 		resource.validFrom = validFrom;
 	}
 
-	setValidUntil(
-		context: RepositoryContext,
-		resource: Writable<ProductDiscount>,
-		{ validUntil }: ProductDiscountSetValidUntilAction,
-	) {
-		resource.validUntil = validUntil;
-	}
-
 	setValidFromAndUntil(
 		context: RepositoryContext,
 		resource: Writable<ProductDiscount>,
 		{ validFrom, validUntil }: ProductDiscountSetValidFromAndUntilAction,
 	) {
 		resource.validFrom = validFrom;
+		resource.validUntil = validUntil;
+	}
+
+	setValidUntil(
+		context: RepositoryContext,
+		resource: Writable<ProductDiscount>,
+		{ validUntil }: ProductDiscountSetValidUntilAction,
+	) {
 		resource.validUntil = validUntil;
 	}
 }

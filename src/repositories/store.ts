@@ -79,12 +79,43 @@ class StoreUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Store, StoreUpdateAction>>
 {
-	setName(
+	setCountries(
 		context: RepositoryContext,
 		resource: Writable<Store>,
-		{ name }: StoreSetNameAction,
+		{ countries }: StoreSetCountriesAction,
 	) {
-		resource.name = name;
+		resource.countries = countries ?? [];
+	}
+
+	setCustomField(
+		context: RepositoryContext,
+		resource: Writable<Store>,
+		{ name, value }: StoreSetCustomFieldAction,
+	) {
+		if (!resource.custom) {
+			return;
+		}
+		if (value === null) {
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<Store>,
+		{ type, fields }: StoreSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
 	}
 
 	setDistributionChannels(
@@ -107,42 +138,11 @@ class StoreUpdateHandler
 		resource.languages = languages ?? [];
 	}
 
-	setCustomType(
+	setName(
 		context: RepositoryContext,
 		resource: Writable<Store>,
-		{ type, fields }: StoreSetCustomTypeAction,
+		{ name }: StoreSetNameAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
-	}
-
-	setCustomField(
-		context: RepositoryContext,
-		resource: Writable<Store>,
-		{ name, value }: StoreSetCustomFieldAction,
-	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
-	}
-
-	setCountries(
-		context: RepositoryContext,
-		resource: Writable<Store>,
-		{ countries }: StoreSetCountriesAction,
-	) {
-		resource.countries = countries ?? [];
+		resource.name = name;
 	}
 }

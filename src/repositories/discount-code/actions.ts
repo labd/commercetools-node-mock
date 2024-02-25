@@ -28,14 +28,6 @@ export class DiscountCodeUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<DiscountCode, DiscountCodeUpdateAction>>
 {
-	changeIsActive(
-		context: RepositoryContext,
-		resource: Writable<DiscountCode>,
-		{ isActive }: DiscountCodeChangeIsActiveAction,
-	) {
-		resource.isActive = isActive;
-	}
-
 	changeCartDiscounts(
 		context: RepositoryContext,
 		resource: Writable<DiscountCode>,
@@ -49,12 +41,12 @@ export class DiscountCodeUpdateHandler
 		);
 	}
 
-	setDescription(
+	changeIsActive(
 		context: RepositoryContext,
 		resource: Writable<DiscountCode>,
-		{ description }: DiscountCodeSetDescriptionAction,
+		{ isActive }: DiscountCodeChangeIsActiveAction,
 	) {
-		resource.description = description;
+		resource.isActive = isActive;
 	}
 
 	setCartPredicate(
@@ -65,12 +57,43 @@ export class DiscountCodeUpdateHandler
 		resource.cartPredicate = cartPredicate;
 	}
 
-	setName(
+	setCustomField(
 		context: RepositoryContext,
 		resource: Writable<DiscountCode>,
-		{ name }: DiscountCodeSetNameAction,
+		{ name, value }: DiscountCodeSetCustomFieldAction,
 	) {
-		resource.name = name;
+		if (!resource.custom) {
+			return;
+		}
+		if (value === null) {
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<DiscountCode>,
+		{ type, fields }: DiscountCodeSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
+	}
+
+	setDescription(
+		context: RepositoryContext,
+		resource: Writable<DiscountCode>,
+		{ description }: DiscountCodeSetDescriptionAction,
+	) {
+		resource.description = description;
 	}
 
 	setMaxApplications(
@@ -91,20 +114,20 @@ export class DiscountCodeUpdateHandler
 		resource.maxApplicationsPerCustomer = maxApplicationsPerCustomer;
 	}
 
+	setName(
+		context: RepositoryContext,
+		resource: Writable<DiscountCode>,
+		{ name }: DiscountCodeSetNameAction,
+	) {
+		resource.name = name;
+	}
+
 	setValidFrom(
 		context: RepositoryContext,
 		resource: Writable<DiscountCode>,
 		{ validFrom }: DiscountCodeSetValidFromAction,
 	) {
 		resource.validFrom = validFrom;
-	}
-
-	setValidUntil(
-		context: RepositoryContext,
-		resource: Writable<DiscountCode>,
-		{ validUntil }: DiscountCodeSetValidUntilAction,
-	) {
-		resource.validUntil = validUntil;
 	}
 
 	setValidFromAndUntil(
@@ -116,34 +139,11 @@ export class DiscountCodeUpdateHandler
 		resource.validUntil = validUntil;
 	}
 
-	setCustomType(
+	setValidUntil(
 		context: RepositoryContext,
 		resource: Writable<DiscountCode>,
-		{ type, fields }: DiscountCodeSetCustomTypeAction,
+		{ validUntil }: DiscountCodeSetValidUntilAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
-	}
-
-	setCustomField(
-		context: RepositoryContext,
-		resource: Writable<DiscountCode>,
-		{ name, value }: DiscountCodeSetCustomFieldAction,
-	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		resource.validUntil = validUntil;
 	}
 }

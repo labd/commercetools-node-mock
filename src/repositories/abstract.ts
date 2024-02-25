@@ -53,6 +53,8 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 		resource: R,
 	): void;
 
+	abstract postProcessResource(resource: any): any;
+
 	processUpdateActions(
 		context: RepositoryContext,
 		resource: R,
@@ -82,8 +84,6 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 		}
 		return result;
 	}
-
-	abstract postProcessResource(resource: any): any;
 }
 
 export abstract class AbstractResourceRepository<
@@ -102,18 +102,18 @@ export abstract class AbstractResourceRepository<
 		return this._typeId;
 	}
 
-	postProcessResource(resource: ResourceMap[T]): ResourceMap[T] {
-		return resource;
-	}
-
-	query(context: RepositoryContext, params: QueryParams = {}) {
-		const result = this._storage.query(context.projectKey, this.getTypeId(), {
-			...params,
-		});
-
-		// @ts-ignore
-		result.results = result.results.map(this.postProcessResource);
-		return result;
+	delete(
+		context: RepositoryContext,
+		id: string,
+		params: GetParams = {},
+	): ResourceMap[T] | null {
+		const resource = this._storage.delete(
+			context.projectKey,
+			this.getTypeId(),
+			id,
+			params,
+		);
+		return resource ? this.postProcessResource(resource) : null;
 	}
 
 	get(
@@ -144,18 +144,18 @@ export abstract class AbstractResourceRepository<
 		return resource ? this.postProcessResource(resource) : null;
 	}
 
-	delete(
-		context: RepositoryContext,
-		id: string,
-		params: GetParams = {},
-	): ResourceMap[T] | null {
-		const resource = this._storage.delete(
-			context.projectKey,
-			this.getTypeId(),
-			id,
-			params,
-		);
-		return resource ? this.postProcessResource(resource) : null;
+	postProcessResource(resource: ResourceMap[T]): ResourceMap[T] {
+		return resource;
+	}
+
+	query(context: RepositoryContext, params: QueryParams = {}) {
+		const result = this._storage.query(context.projectKey, this.getTypeId(), {
+			...params,
+		});
+
+		// @ts-ignore
+		result.results = result.results.map(this.postProcessResource);
+		return result;
 	}
 
 	saveNew(

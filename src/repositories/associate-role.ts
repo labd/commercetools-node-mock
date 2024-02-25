@@ -61,6 +61,28 @@ class AssociateRoleUpdateHandler
 		}
 	}
 
+	changeBuyerAssignable(
+		context: RepositoryContext,
+		resource: Writable<AssociateRole>,
+		{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction,
+	) {
+		resource.buyerAssignable = buyerAssignable;
+	}
+
+	removePermission(
+		context: RepositoryContext,
+		resource: Writable<AssociateRole>,
+		{ permission }: AssociateRoleRemovePermissionAction,
+	) {
+		if (!resource.permissions) {
+			return;
+		}
+
+		resource.permissions = resource.permissions.filter((p) => {
+			p !== permission;
+		});
+	}
+
 	setBuyerAssignable(
 		context: RepositoryContext,
 		resource: Writable<AssociateRole>,
@@ -99,27 +121,5 @@ class AssociateRoleUpdateHandler
 		{ permissions }: AssociateRoleSetPermissionsAction,
 	) {
 		resource.permissions = permissions || [];
-	}
-
-	changeBuyerAssignable(
-		context: RepositoryContext,
-		resource: Writable<AssociateRole>,
-		{ buyerAssignable }: AssociateRoleChangeBuyerAssignableAction,
-	) {
-		resource.buyerAssignable = buyerAssignable;
-	}
-
-	removePermission(
-		context: RepositoryContext,
-		resource: Writable<AssociateRole>,
-		{ permission }: AssociateRoleRemovePermissionAction,
-	) {
-		if (!resource.permissions) {
-			return;
-		}
-
-		resource.permissions = resource.permissions.filter((p) => {
-			p !== permission;
-		});
 	}
 }

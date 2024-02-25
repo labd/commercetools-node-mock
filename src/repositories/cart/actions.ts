@@ -51,6 +51,21 @@ export class CartUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Cart, CartUpdateAction>>
 {
+	addItemShippingAddress(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ action, address }: CartAddItemShippingAddressAction,
+	) {
+		const newAddress = createAddress(
+			address,
+			context.projectKey,
+			this._storage,
+		);
+		if (newAddress) {
+			resource.itemShippingAddresses.push(newAddress);
+		}
+	}
+
 	addLineItem(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -164,31 +179,6 @@ export class CartUpdateHandler
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 	}
 
-	recalculate() {
-		// Dummy action when triggering a recalculation of the cart
-		//
-		// From commercetools documentation:
-		// This update action does not set any Cart field in particular,
-		// but it triggers several Cart updates to bring prices and discounts to the latest state.
-		// Those can become stale over time when no Cart updates have been performed for a while
-		// and prices on related Products have changed in the meanwhile.
-	}
-
-	addItemShippingAddress(
-		context: RepositoryContext,
-		resource: Writable<Cart>,
-		{ action, address }: CartAddItemShippingAddressAction,
-	) {
-		const newAddress = createAddress(
-			address,
-			context.projectKey,
-			this._storage,
-		);
-		if (newAddress) {
-			resource.itemShippingAddresses.push(newAddress);
-		}
-	}
-
 	changeLineItemQuantity(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -237,6 +227,26 @@ export class CartUpdateHandler
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 	}
 
+	recalculate() {
+		// Dummy action when triggering a recalculation of the cart
+		//
+		// From commercetools documentation:
+		// This update action does not set any Cart field in particular,
+		// but it triggers several Cart updates to bring prices and discounts to the latest state.
+		// Those can become stale over time when no Cart updates have been performed for a while
+		// and prices on related Products have changed in the meanwhile.
+	}
+
+	removeDiscountCode(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ discountCode }: CartRemoveDiscountCodeAction,
+	) {
+		resource.discountCodes = resource.discountCodes.filter(
+			(code) => code.discountCode.id !== discountCode.id,
+		);
+	}
+
 	removeLineItem(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -281,32 +291,6 @@ export class CartUpdateHandler
 			context.projectKey,
 			this._storage,
 		);
-	}
-
-	setShippingMethod(
-		context: RepositoryContext,
-		resource: Writable<Cart>,
-		{ shippingMethod }: CartSetShippingMethodAction,
-	) {
-		if (shippingMethod) {
-			const method = this._storage.getByResourceIdentifier<"shipping-method">(
-				context.projectKey,
-				shippingMethod,
-			);
-
-			// Based on the address we should select a shipping zone and
-			// use that to define the price.
-			// @ts-ignore
-			resource.shippingInfo = {
-				shippingMethod: {
-					typeId: "shipping-method",
-					id: method.id,
-				},
-				shippingMethodName: method.name,
-			};
-		} else {
-			resource.shippingInfo = undefined;
-		}
 	}
 
 	setCountry(
@@ -412,14 +396,6 @@ export class CartUpdateHandler
 		}));
 	}
 
-	setLocale(
-		context: RepositoryContext,
-		resource: Writable<Cart>,
-		{ locale }: CartSetLocaleAction,
-	) {
-		resource.locale = locale;
-	}
-
 	setLineItemShippingDetails(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -452,6 +428,14 @@ export class CartUpdateHandler
 		} as ItemShippingDetails;
 	}
 
+	setLocale(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ locale }: CartSetLocaleAction,
+	) {
+		resource.locale = locale;
+	}
+
 	setShippingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -477,13 +461,29 @@ export class CartUpdateHandler
 		};
 	}
 
-	removeDiscountCode(
+	setShippingMethod(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
-		{ discountCode }: CartRemoveDiscountCodeAction,
+		{ shippingMethod }: CartSetShippingMethodAction,
 	) {
-		resource.discountCodes = resource.discountCodes.filter(
-			(code) => code.discountCode.id !== discountCode.id,
-		);
+		if (shippingMethod) {
+			const method = this._storage.getByResourceIdentifier<"shipping-method">(
+				context.projectKey,
+				shippingMethod,
+			);
+
+			// Based on the address we should select a shipping zone and
+			// use that to define the price.
+			// @ts-ignore
+			resource.shippingInfo = {
+				shippingMethod: {
+					typeId: "shipping-method",
+					id: method.id,
+				},
+				shippingMethodName: method.name,
+			};
+		} else {
+			resource.shippingInfo = undefined;
+		}
 	}
 }

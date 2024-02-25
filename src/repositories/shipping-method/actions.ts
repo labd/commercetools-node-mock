@@ -62,22 +62,6 @@ export class ShippingMethodUpdateHandler
 		});
 	}
 
-	removeShippingRate(
-		_context: RepositoryContext,
-		resource: Writable<ShippingMethod>,
-		{ shippingRate, zone }: ShippingMethodRemoveShippingRateAction,
-	) {
-		const rate = transformShippingRate(shippingRate);
-
-		resource.zoneRates.forEach((zoneRate) => {
-			if (zoneRate.zone.id === zone.id) {
-				zoneRate.shippingRates = zoneRate.shippingRates.filter(
-					(otherRate) => !deepEqual(rate, otherRate),
-				);
-			}
-		});
-	}
-
 	addZone(
 		context: RepositoryContext,
 		resource: Writable<ShippingMethod>,
@@ -99,6 +83,38 @@ export class ShippingMethodUpdateHandler
 		});
 	}
 
+	changeIsDefault(
+		_context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ isDefault }: ShippingMethodChangeIsDefaultAction,
+	) {
+		resource.isDefault = isDefault;
+	}
+
+	changeName(
+		_context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ name }: ShippingMethodChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
+	removeShippingRate(
+		_context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ shippingRate, zone }: ShippingMethodRemoveShippingRateAction,
+	) {
+		const rate = transformShippingRate(shippingRate);
+
+		resource.zoneRates.forEach((zoneRate) => {
+			if (zoneRate.zone.id === zone.id) {
+				zoneRate.shippingRates = zoneRate.shippingRates.filter(
+					(otherRate) => !deepEqual(rate, otherRate),
+				);
+			}
+		});
+	}
+
 	removeZone(
 		_context: RepositoryContext,
 		resource: Writable<ShippingMethod>,
@@ -109,12 +125,35 @@ export class ShippingMethodUpdateHandler
 		);
 	}
 
-	setKey(
-		_context: RepositoryContext,
+	setCustomField(
+		context: RepositoryContext,
 		resource: Writable<ShippingMethod>,
-		{ key }: ShippingMethodSetKeyAction,
+		{ name, value }: ShippingMethodSetCustomFieldAction,
 	) {
-		resource.key = key;
+		if (!resource.custom) {
+			return;
+		}
+		if (value === null) {
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ type, fields }: ShippingMethodSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
 	}
 
 	setDescription(
@@ -123,6 +162,14 @@ export class ShippingMethodUpdateHandler
 		{ description }: ShippingMethodSetDescriptionAction,
 	) {
 		resource.description = description;
+	}
+
+	setKey(
+		_context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ key }: ShippingMethodSetKeyAction,
+	) {
+		resource.key = key;
 	}
 
 	setLocalizedDescription(
@@ -147,52 +194,5 @@ export class ShippingMethodUpdateHandler
 		{ predicate }: ShippingMethodSetPredicateAction,
 	) {
 		resource.predicate = predicate;
-	}
-
-	changeIsDefault(
-		_context: RepositoryContext,
-		resource: Writable<ShippingMethod>,
-		{ isDefault }: ShippingMethodChangeIsDefaultAction,
-	) {
-		resource.isDefault = isDefault;
-	}
-
-	changeName(
-		_context: RepositoryContext,
-		resource: Writable<ShippingMethod>,
-		{ name }: ShippingMethodChangeNameAction,
-	) {
-		resource.name = name;
-	}
-
-	setCustomType(
-		context: RepositoryContext,
-		resource: Writable<ShippingMethod>,
-		{ type, fields }: ShippingMethodSetCustomTypeAction,
-	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
-	}
-
-	setCustomField(
-		context: RepositoryContext,
-		resource: Writable<ShippingMethod>,
-		{ name, value }: ShippingMethodSetCustomFieldAction,
-	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
 	}
 }

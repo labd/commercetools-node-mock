@@ -62,45 +62,6 @@ class ProductTypeUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<ProductType, ProductTypeUpdateAction>>
 {
-	changeLocalizedEnumValueLabel(
-		context: RepositoryContext,
-		resource: Writable<ProductType>,
-		{ attributeName, newValue }: ProductTypeChangeLocalizedEnumValueLabelAction,
-	) {
-		const updateAttributeType = (type: Writable<AttributeType>) => {
-			switch (type.name) {
-				case "lenum":
-					type.values.forEach((v) => {
-						if (v.key === newValue.key) {
-							v.label = newValue.label;
-						}
-					});
-					return;
-				case "set":
-					updateAttributeType(type.elementType);
-					return;
-			}
-		};
-
-		resource.attributes?.forEach((value) => {
-			if (value.name === attributeName) {
-				updateAttributeType(value.type);
-			}
-		});
-	}
-
-	changeLabel(
-		context: RepositoryContext,
-		resource: Writable<ProductType>,
-		{ attributeName, label }: ProductTypeChangeLabelAction,
-	) {
-		resource.attributes?.forEach((value) => {
-			if (value.name === attributeName) {
-				value.label = label;
-			}
-		});
-	}
-
 	addAttributeDefinition(
 		context: RepositoryContext,
 		resource: Writable<ProductType>,
@@ -139,6 +100,45 @@ class ProductTypeUpdateHandler
 		if (current) {
 			resource.attributes.push(...current);
 		}
+	}
+
+	changeLabel(
+		context: RepositoryContext,
+		resource: Writable<ProductType>,
+		{ attributeName, label }: ProductTypeChangeLabelAction,
+	) {
+		resource.attributes?.forEach((value) => {
+			if (value.name === attributeName) {
+				value.label = label;
+			}
+		});
+	}
+
+	changeLocalizedEnumValueLabel(
+		context: RepositoryContext,
+		resource: Writable<ProductType>,
+		{ attributeName, newValue }: ProductTypeChangeLocalizedEnumValueLabelAction,
+	) {
+		const updateAttributeType = (type: Writable<AttributeType>) => {
+			switch (type.name) {
+				case "lenum":
+					type.values.forEach((v) => {
+						if (v.key === newValue.key) {
+							v.label = newValue.label;
+						}
+					});
+					return;
+				case "set":
+					updateAttributeType(type.elementType);
+					return;
+			}
+		};
+
+		resource.attributes?.forEach((value) => {
+			if (value.name === attributeName) {
+				updateAttributeType(value.type);
+			}
+		});
 	}
 
 	removeAttributeDefinition(

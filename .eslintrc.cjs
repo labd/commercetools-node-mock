@@ -29,4 +29,41 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: ["**/repositories/**/actions.ts", "**/repositories/*.ts"],
+			plugins: ["sort-class-members"],
+			rules: {
+				"sort-class-members/sort-class-members": [
+					2,
+					{
+						order: [
+							"constructor",
+							{
+								type: "method",
+								sort: "alphabetical",
+								static: true,
+							},
+							{
+								type: "method",
+								sort: "alphabetical",
+								abstract: true,
+							},
+							{
+								type: "method",
+								sort: "alphabetical",
+								accessibility: "public",
+							},
+							{
+								type: "method",
+								sort: "alphabetical",
+								accessibility: "private",
+							},
+						],
+						accessorPairPositioning: "getThenSet",
+					},
+				],
+			},
+		},
+	],
 };
