@@ -370,4 +370,22 @@ describe("Customer Update Actions", () => {
 			"A Customer number already exists and cannot be set again.",
 		);
 	});
+
+	test("setKey", async () => {
+		assert(customer, "customer not created");
+
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: "setKey", key: "C001" },
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.key).toBe("C001");
+	});
 });
