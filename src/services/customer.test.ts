@@ -400,9 +400,7 @@ describe("Customer Update Actions", () => {
 			.post(`/dummy/customers/${customer.id}`)
 			.send({
 				version: 1,
-				actions: [
-					{ action: "setKey", key: "C001" },
-				],
+				actions: [{ action: "setKey", key: "C001" }],
 			});
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(2);
