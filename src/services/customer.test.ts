@@ -217,6 +217,26 @@ describe("Customer Update Actions", () => {
 		expect(response.body.lastName).toBe("Smith");
 	});
 
+	test("setSalutation", async () => {
+		assert(customer, "customer not created");
+
+		customer = {
+			...customer,
+			salutation: "Mr.",
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: "setSalutation", salutation: "Mrs." }],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.salutation).toBe("Mrs.");
+	});
+
 	test("setCompanyName", async () => {
 		assert(customer, "customer not created");
 

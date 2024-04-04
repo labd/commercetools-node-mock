@@ -8,6 +8,7 @@ import type {
 	CustomerSetCustomerNumberAction,
 	CustomerSetFirstNameAction,
 	CustomerSetLastNameAction,
+	CustomerSetSalutationAction,
 	CustomerSetVatIdAction,
 	CustomerUpdateAction,
 	InvalidInputError,
@@ -153,6 +154,14 @@ export class CustomerUpdateHandler
 		{ lastName }: CustomerSetLastNameAction,
 	) {
 		resource.lastName = lastName;
+	}
+
+	setSalutation(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ salutation }: CustomerSetSalutationAction,
+	) {
+		resource.salutation = salutation;
 	}
 
 	setVatId(
