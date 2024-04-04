@@ -7,6 +7,7 @@ import type {
 	CustomerSetCustomFieldAction,
 	CustomerSetCustomerNumberAction,
 	CustomerSetFirstNameAction,
+	CustomerSetKeyAction,
 	CustomerSetLastNameAction,
 	CustomerSetSalutationAction,
 	CustomerSetVatIdAction,
@@ -146,6 +147,14 @@ export class CustomerUpdateHandler
 		{ firstName }: CustomerSetFirstNameAction,
 	) {
 		resource.firstName = firstName;
+	}
+
+	setKey(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ key }: CustomerSetKeyAction,
+	) {
+		resource.key = key;
 	}
 
 	setLastName(
