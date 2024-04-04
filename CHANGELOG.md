@@ -1,5 +1,11 @@
 ## 2.15.0
 
+## 2.19.0
+
+### Minor Changes
+
+- [#166](https://github.com/labd/commercetools-node-mock/pull/166) [`851ab0b`](https://github.com/labd/commercetools-node-mock/commit/851ab0bcf61d09e1a375d9d0958b9c2a03035f6c) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for customer setSalutation action
+
 ## 2.18.2
 
 ### Patch Changes
