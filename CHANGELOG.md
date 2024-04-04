@@ -1,4 +1,10 @@
-## 2.15.0
+## 2.19.0
+
+### Minor Changes
+
+- [#166](https://github.com/labd/commercetools-node-mock/pull/166) [`851ab0b`](https://github.com/labd/commercetools-node-mock/commit/851ab0bcf61d09e1a375d9d0958b9c2a03035f6c) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for customer setSalutation action
+
+- [#164](https://github.com/labd/commercetools-node-mock/pull/164) [`879a26c`](https://github.com/labd/commercetools-node-mock/commit/879a26c266852ed06a6306f37518c0c16f772d55) Thanks [@stephanbeek](https://github.com/stephanbeek)! - add support for customer setKey action
 
 ## 2.18.2
 
@@ -47,6 +53,8 @@
 - [#154](https://github.com/labd/commercetools-node-mock/pull/154) [`282bf59`](https://github.com/labd/commercetools-node-mock/commit/282bf5967a0cac36e97f6a17a11c1e3314962320) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for customer setCustomerNumber action
 
 - [#152](https://github.com/labd/commercetools-node-mock/pull/152) [`7c83048`](https://github.com/labd/commercetools-node-mock/commit/7c8304875c57acd214eb0190808325f14714327a) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Adds variant IDs when creating ShoppingListLineItems. Implement Variant expansion on ShoppingListLineItems. Implement ShoppingList update actions.
+
+## 2.15.0
 
 ### Minor Changes
 
