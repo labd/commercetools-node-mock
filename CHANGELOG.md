@@ -6,6 +6,8 @@
 
 - [#166](https://github.com/labd/commercetools-node-mock/pull/166) [`851ab0b`](https://github.com/labd/commercetools-node-mock/commit/851ab0bcf61d09e1a375d9d0958b9c2a03035f6c) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for customer setSalutation action
 
+- [#164](https://github.com/labd/commercetools-node-mock/pull/164) [`879a26c`](https://github.com/labd/commercetools-node-mock/commit/879a26c266852ed06a6306f37518c0c16f772d55) Thanks [@stephanbeek](https://github.com/stephanbeek)! - add support for customer setKey action
+
 ## 2.18.2
 
 ### Patch Changes
