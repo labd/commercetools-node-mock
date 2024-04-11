@@ -321,6 +321,41 @@ describe("Order Update Actions", () => {
 		expect(responseAgain.body.locale).toBe("nl-NL");
 	});
 
+	test("setCustomerEmail", async () => {
+		assert(order, "order not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: "setCustomerEmail", email: "john@doe.com" }],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.customerEmail).toBe("john@doe.com");
+	});
+
+	test("setCustomerId", async () => {
+		assert(order, "order not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "setCustomerId",
+						customerId: "9e3479fc-cc92-4d10-820a-a080b45ddcc1",
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.customerId).toBe(
+			"9e3479fc-cc92-4d10-820a-a080b45ddcc1",
+		);
+	});
+
 	test("setOrderNumber", async () => {
 		assert(order, "order not created");
 

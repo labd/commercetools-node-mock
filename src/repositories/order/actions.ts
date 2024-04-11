@@ -10,6 +10,7 @@ import type {
 	OrderSetCustomFieldAction,
 	OrderSetCustomTypeAction,
 	OrderSetCustomerEmailAction,
+	OrderSetCustomerIdAction,
 	OrderSetLocaleAction,
 	OrderSetOrderNumberAction,
 	OrderSetShippingAddressAction,
@@ -132,6 +133,14 @@ export class OrderUpdateHandler
 		{ email }: OrderSetCustomerEmailAction,
 	) {
 		resource.customerEmail = email;
+	}
+
+	setCustomerId(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ customerId }: OrderSetCustomerIdAction,
+	) {
+		resource.customerId = customerId;
 	}
 
 	setCustomField(
