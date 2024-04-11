@@ -1,5 +1,11 @@
 ## 2.19.0
 
+## 2.20.0
+
+### Minor Changes
+
+- [#169](https://github.com/labd/commercetools-node-mock/pull/169) [`09da22d`](https://github.com/labd/commercetools-node-mock/commit/09da22dd853eda9018b8a2109a1019f4e823cffb) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for customer setCustomerId action
+
 ### Minor Changes
 
 - [#166](https://github.com/labd/commercetools-node-mock/pull/166) [`851ab0b`](https://github.com/labd/commercetools-node-mock/commit/851ab0bcf61d09e1a375d9d0958b9c2a03035f6c) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for customer setSalutation action
