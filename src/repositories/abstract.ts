@@ -164,7 +164,9 @@ export abstract class AbstractResourceRepository<
 		});
 
 		const data = result.results.map((r) =>
-			this.postProcessResource(context, r as ResourceMap[T]),
+			this.postProcessResource(context, r as ResourceMap[T], {
+				expand: params.expand,
+			}),
 		);
 		return {
 			...result,

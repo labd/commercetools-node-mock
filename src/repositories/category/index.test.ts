@@ -88,5 +88,19 @@ describe("Order repository", () => {
 			{ id: level1.id, typeId: "category", obj: level1 },
 			{ id: root.id, typeId: "category", obj: root },
 		]);
+
+		const queryResult = repository.query(
+			{ projectKey: "dummy" },
+			{
+				where: [`id="${level3.id}"`],
+				expand: ["ancestors[*]"],
+			},
+		);
+		expect(queryResult.results[0].ancestors).toHaveLength(3);
+		expect(queryResult.results[0].ancestors).toEqual([
+			{ id: level2.id, typeId: "category", obj: level2 },
+			{ id: level1.id, typeId: "category", obj: level1 },
+			{ id: root.id, typeId: "category", obj: root },
+		]);
 	});
 });
