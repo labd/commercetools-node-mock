@@ -35,7 +35,10 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 		return this.saveNew(context, resource);
 	}
 
-	postProcessResource(resource: Extension): Extension {
+	postProcessResource(
+		context: RepositoryContext,
+		resource: Extension,
+	): Extension {
 		if (resource) {
 			const extension = resource as Extension;
 			if (

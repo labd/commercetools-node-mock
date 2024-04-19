@@ -31,10 +31,10 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
 	get(context: RepositoryContext): Project | null {
 		const resource = this._storage.getProject(context.projectKey);
-		return this.postProcessResource(resource);
+		return this.postProcessResource(context, resource);
 	}
 
-	postProcessResource(resource: Project): Project {
+	postProcessResource(context: RepositoryContext, resource: Project): Project {
 		if (resource) {
 			return maskSecretValue(resource, "externalOAuth.authorizationHeader");
 		}

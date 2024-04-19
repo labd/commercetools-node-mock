@@ -144,6 +144,8 @@ describe("categories changeParent", () => {
 			typeId: "category",
 			id: category1?.id,
 		});
+		expect(changeNameResponse.body.ancestors).toHaveLength(1);
+		expect(changeNameResponse.body.ancestors[0].id).toEqual(category1?.id);
 	});
 });
 

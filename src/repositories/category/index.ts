@@ -1,7 +1,12 @@
-import type { Category, CategoryDraft } from "@commercetools/platform-sdk";
+import type {
+	Category,
+	CategoryDraft,
+	CategoryReference,
+} from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { getBaseResourceProperties } from "~src/helpers";
 import { AbstractStorage } from "~src/storage/abstract";
+import { Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -26,7 +31,7 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 			parent: draft.parent
 				? { typeId: "category", id: draft.parent.id! }
 				: undefined,
-			ancestors: [], // TODO
+			ancestors: [], // Resolved at runtime
 			assets:
 				draft.assets?.map((d) => ({
 					id: uuidv4(),
@@ -48,5 +53,24 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 			),
 		};
 		return this.saveNew(context, resource);
+	}
+
+	postProcessResource(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+	): Category {
+		let node: Category = resource;
+		const ancestors: CategoryReference[] = [];
+
+		while (node.parent) {
+			node = this._storage.getByResourceIdentifier<"category">(
+				context.projectKey,
+				node.parent,
+			);
+			ancestors.push({ typeId: "category", id: node.id });
+		}
+
+		resource.ancestors = ancestors;
+		return resource;
 	}
 }

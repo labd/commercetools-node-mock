@@ -53,7 +53,7 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 		resource: R,
 	): void;
 
-	abstract postProcessResource(resource: any): any;
+	abstract postProcessResource(context: RepositoryContext, resource: any): any;
 
 	processUpdateActions(
 		context: RepositoryContext,
@@ -78,7 +78,7 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 			this.saveUpdate(context, version, updatedResource);
 		}
 
-		const result = this.postProcessResource(updatedResource);
+		const result = this.postProcessResource(context, updatedResource);
 		if (!result) {
 			throw new Error("invalid post process action");
 		}
@@ -113,7 +113,7 @@ export abstract class AbstractResourceRepository<
 			id,
 			params,
 		);
-		return resource ? this.postProcessResource(resource) : null;
+		return resource ? this.postProcessResource(context, resource) : null;
 	}
 
 	get(
@@ -127,7 +127,7 @@ export abstract class AbstractResourceRepository<
 			id,
 			params,
 		);
-		return resource ? this.postProcessResource(resource) : null;
+		return resource ? this.postProcessResource(context, resource) : null;
 	}
 
 	getByKey(
@@ -141,10 +141,13 @@ export abstract class AbstractResourceRepository<
 			key,
 			params,
 		);
-		return resource ? this.postProcessResource(resource) : null;
+		return resource ? this.postProcessResource(context, resource) : null;
 	}
 
-	postProcessResource(resource: ResourceMap[T]): ResourceMap[T] {
+	postProcessResource(
+		context: RepositoryContext,
+		resource: ResourceMap[T],
+	): ResourceMap[T] {
 		return resource;
 	}
 
@@ -153,9 +156,13 @@ export abstract class AbstractResourceRepository<
 			...params,
 		});
 
-		// @ts-ignore
-		result.results = result.results.map(this.postProcessResource);
-		return result;
+		const data = result.results.map((r) =>
+			this.postProcessResource(context, r as ResourceMap[T]),
+		);
+		return {
+			...result,
+			results: data,
+		};
 	}
 
 	saveNew(
