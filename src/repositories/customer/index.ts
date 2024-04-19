@@ -6,13 +6,14 @@ import type {
 	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
-import { getBaseResourceProperties } from "~src/helpers";
+import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
 import { createPasswordResetToken, hashPassword } from "~src/lib/password";
 import { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract";
+import { createCustomFields } from "../helpers";
 import { CustomerUpdateHandler } from "./actions";
 
 export class CustomerRepository extends AbstractResourceRepository<"customer"> {
@@ -43,14 +44,44 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		}
 
+		const addresses =
+			draft.addresses?.map((address) => ({
+				...address,
+				id: generateRandomString(5),
+			})) ?? [];
+
+		const defaultBillingAddressId =
+			addresses.length > 0 && draft.defaultBillingAddress !== undefined
+				? addresses[draft.defaultBillingAddress].id
+				: undefined;
+		const defaultShippingAddressId =
+			addresses.length > 0 && draft.defaultShippingAddress !== undefined
+				? addresses[draft.defaultShippingAddress].id
+				: undefined;
+
 		const resource: Customer = {
 			...getBaseResourceProperties(),
+			key: draft.key,
 			authenticationMode: draft.authenticationMode || "Password",
+			firstName: draft.firstName,
+			lastName: draft.lastName,
+			middleName: draft.middleName,
+			title: draft.title,
+			dateOfBirth: draft.dateOfBirth,
+			companyName: draft.companyName,
 			email: draft.email.toLowerCase(),
 			password: draft.password ? hashPassword(draft.password) : undefined,
 			isEmailVerified: draft.isEmailVerified || false,
-			addresses: [],
+			addresses: addresses,
 			customerNumber: draft.customerNumber,
+			externalId: draft.externalId,
+			defaultBillingAddressId: defaultBillingAddressId,
+			defaultShippingAddressId: defaultShippingAddressId,
+			custom: createCustomFields(
+				draft.custom,
+				context.projectKey,
+				this._storage,
+			),
 		};
 		return this.saveNew(context, resource);
 	}
