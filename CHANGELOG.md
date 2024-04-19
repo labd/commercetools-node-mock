@@ -1,5 +1,11 @@
 ## 2.20.0
 
+## 2.20.2
+
+### Patch Changes
+
+- [`756c94b`](https://github.com/labd/commercetools-node-mock/commit/756c94b413792dc4512c124562129d95ce10a8d1) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Properly handle expanding ancestors on Category
+
 ## 2.20.1
 
 ### Patch Changes
