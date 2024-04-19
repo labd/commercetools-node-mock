@@ -1,5 +1,11 @@
 ## 2.20.0
 
+## 2.21.2
+
+### Patch Changes
+
+- [`222fa1c`](https://github.com/labd/commercetools-node-mock/commit/222fa1c983b0e8b04e81ba63133eb5157c523a16) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Handle `var.*` in query endpoints correctly
+
 ## 2.21.1
 
 ### Patch Changes
