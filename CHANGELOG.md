@@ -1,5 +1,15 @@
 ## 2.20.0
 
+## 2.21.0
+
+### Minor Changes
+
+- [`7454fda`](https://github.com/labd/commercetools-node-mock/commit/7454fda28162609081cc05a44c9b06c61a5b0776) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve the customer create endpoint
+
+### Patch Changes
+
+- [`5f7dee5`](https://github.com/labd/commercetools-node-mock/commit/5f7dee552e858d565d0812788b5073516b63aabb) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Handle category expand when doing queries
+
 ## 2.20.2
 
 ### Patch Changes
