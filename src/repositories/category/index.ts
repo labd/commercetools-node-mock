@@ -28,6 +28,9 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 			key: draft.key,
 			name: draft.name,
 			slug: draft.slug,
+			description: draft.description,
+			metaDescription: draft.metaDescription,
+			metaKeywords: draft.metaKeywords,
 			orderHint: draft.orderHint || "",
 			externalId: draft.externalId || "",
 			parent: draft.parent
