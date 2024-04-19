@@ -113,7 +113,9 @@ export abstract class AbstractResourceRepository<
 			id,
 			params,
 		);
-		return resource ? this.postProcessResource(context, resource) : null;
+		return resource
+			? this.postProcessResource(context, resource, params)
+			: null;
 	}
 
 	get(
@@ -127,7 +129,9 @@ export abstract class AbstractResourceRepository<
 			id,
 			params,
 		);
-		return resource ? this.postProcessResource(context, resource) : null;
+		return resource
+			? this.postProcessResource(context, resource, params)
+			: null;
 	}
 
 	getByKey(
@@ -141,12 +145,15 @@ export abstract class AbstractResourceRepository<
 			key,
 			params,
 		);
-		return resource ? this.postProcessResource(context, resource) : null;
+		return resource
+			? this.postProcessResource(context, resource, params)
+			: null;
 	}
 
 	postProcessResource(
 		context: RepositoryContext,
 		resource: ResourceMap[T],
+		params?: GetParams,
 	): ResourceMap[T] {
 		return resource;
 	}

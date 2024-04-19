@@ -5,10 +5,12 @@ import type {
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { getBaseResourceProperties } from "~src/helpers";
+import { parseExpandClause } from "~src/lib/expandParser";
 import { AbstractStorage } from "~src/storage/abstract";
 import { Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
+	GetParams,
 	type RepositoryContext,
 } from "../abstract";
 import { createCustomFields } from "../helpers";
@@ -58,16 +60,31 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 	postProcessResource(
 		context: RepositoryContext,
 		resource: Writable<Category>,
+		params?: GetParams,
 	): Category {
 		let node: Category = resource;
 		const ancestors: CategoryReference[] = [];
+
+		// TODO: The expand clause here is a hack, the current expand architecture
+		// is not able to handle the case for 'dynamic' fields like ancestors which
+		// are resolved at runtime.  We should do the expand resolution post query
+		// execution for all resources
+
+		const expandClauses = params?.expand?.map(parseExpandClause) ?? [];
+		const addExpand = expandClauses?.find(
+			(c) => c.element === "ancestors" && c.index === "*",
+		);
 
 		while (node.parent) {
 			node = this._storage.getByResourceIdentifier<"category">(
 				context.projectKey,
 				node.parent,
 			);
-			ancestors.push({ typeId: "category", id: node.id });
+			ancestors.push({
+				typeId: "category",
+				id: node.id,
+				obj: addExpand ? node : undefined,
+			});
 		}
 
 		resource.ancestors = ancestors;

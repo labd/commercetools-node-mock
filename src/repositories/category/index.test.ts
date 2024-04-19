@@ -78,5 +78,15 @@ describe("Order repository", () => {
 			{ id: level1.id, typeId: "category" },
 			{ id: root.id, typeId: "category" },
 		]);
+
+		const expandResult = repository.get({ projectKey: "dummy" }, level3.id, {
+			expand: ["ancestors[*]"],
+		});
+		expect(expandResult?.ancestors).toHaveLength(3);
+		expect(expandResult?.ancestors).toEqual([
+			{ id: level2.id, typeId: "category", obj: level2 },
+			{ id: level1.id, typeId: "category", obj: level1 },
+			{ id: root.id, typeId: "category", obj: root },
+		]);
 	});
 });
