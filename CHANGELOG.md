@@ -1,5 +1,11 @@
 ## 2.20.0
 
+## 2.21.1
+
+### Patch Changes
+
+- [`3ed13bb`](https://github.com/labd/commercetools-node-mock/commit/3ed13bbb170852c6b2594fd93cd9900c3445237f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add missing fields to category creation
+
 ## 2.21.0
 
 ### Minor Changes
