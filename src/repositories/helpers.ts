@@ -60,7 +60,6 @@ export const createCustomFields = (
 	if (!draft) return undefined;
 	if (!draft.type) return undefined;
 	if (!draft.type.typeId) return undefined;
-	if (!draft.fields) return undefined;
 	const typeResource = storage.getByResourceIdentifier(
 		projectKey,
 		draft.type,
@@ -77,7 +76,7 @@ export const createCustomFields = (
 			typeId: draft.type.typeId,
 			id: typeResource.id,
 		},
-		fields: draft.fields,
+		fields: draft.fields ?? {},
 	};
 };
 

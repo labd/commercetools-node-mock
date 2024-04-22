@@ -1,4 +1,6 @@
 import {
+	CartSetAnonymousIdAction,
+	CartSetCustomerIdAction,
 	CartUpdateAction,
 	type Address,
 	type AddressDraft,
@@ -281,6 +283,15 @@ export class CartUpdateHandler
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 	}
 
+	setAnonymousId(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ anonymousId }: CartSetAnonymousIdAction,
+	) {
+		resource.anonymousId = anonymousId;
+		resource.customerId = undefined;
+	}
+
 	setBillingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -307,6 +318,15 @@ export class CartUpdateHandler
 		{ email }: CartSetCustomerEmailAction,
 	) {
 		resource.customerEmail = email;
+	}
+
+	setCustomerId(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ customerId }: CartSetCustomerIdAction,
+	) {
+		resource.anonymousId = undefined;
+		resource.customerId = customerId;
 	}
 
 	setCustomField(
