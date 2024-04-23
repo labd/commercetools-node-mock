@@ -1,5 +1,13 @@
 ## 2.20.0
 
+## 2.22.0
+
+### Minor Changes
+
+- [#176](https://github.com/labd/commercetools-node-mock/pull/176) [`0999495`](https://github.com/labd/commercetools-node-mock/commit/09994959ee23d259095eb733fbfdf14e6da7103e) Thanks [@tleguijt](https://github.com/tleguijt)! - Add support for cart setCustomerId and setAnonymousId action
+
+- [#176](https://github.com/labd/commercetools-node-mock/pull/176) [`0999495`](https://github.com/labd/commercetools-node-mock/commit/09994959ee23d259095eb733fbfdf14e6da7103e) Thanks [@tleguijt](https://github.com/tleguijt)! - Include `custom` when creating order from cart
+
 ## 2.21.2
 
 ### Patch Changes
