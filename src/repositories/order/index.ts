@@ -82,6 +82,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 						typeId: "store",
 					}
 				: undefined,
+			custom: cart.custom,
 			lastMessageSequenceNumber: 0,
 		};
 		return this.saveNew(context, resource);
