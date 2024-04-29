@@ -303,6 +303,26 @@ describe("Cart Update Actions", () => {
 		expect(response.body.lineItems).toHaveLength(0);
 	});
 
+	test("changeTaxRoundingMode", async () => {
+		assert(cart, "cart not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "changeTaxRoundingMode",
+						taxRoundingMode: "HalfUp",
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.taxRoundingMode).toBe("HalfUp");
+	});
+
 	test("recalculate", async () => {
 		await supertest(ctMock.app)
 			.post(`/dummy/products`)

@@ -8,6 +8,7 @@ import {
 	type CartAddItemShippingAddressAction,
 	type CartAddLineItemAction,
 	type CartChangeLineItemQuantityAction,
+	type CartChangeTaxRoundingModeAction,
 	type CartRemoveDiscountCodeAction,
 	type CartRemoveLineItemAction,
 	type CartSetBillingAddressAction,
@@ -227,6 +228,14 @@ export class CartUpdateHandler
 
 		// Update cart total price
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+	}
+
+	changeTaxRoundingMode(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ taxRoundingMode }: CartChangeTaxRoundingModeAction,
+	) {
+		resource.taxRoundingMode = taxRoundingMode;
 	}
 
 	recalculate() {
