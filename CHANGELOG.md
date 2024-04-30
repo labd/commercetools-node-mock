@@ -1,5 +1,11 @@
 ## 2.20.0
 
+## 2.22.1
+
+### Patch Changes
+
+- [#178](https://github.com/labd/commercetools-node-mock/pull/178) [`871e39a`](https://github.com/labd/commercetools-node-mock/commit/871e39afedbabd26d93965436ad87723ca6a1c16) Thanks [@leongraumans](https://github.com/leongraumans)! - Add changeTaxRoundingMode to cart mock
+
 ## 2.22.0
 
 ### Minor Changes
