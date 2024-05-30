@@ -127,6 +127,7 @@ describe("Predicate filter", () => {
 		expect(match(`numberProperty >= 1234`)).toBeTruthy();
 		expect(match(`numberProperty >= 1235`)).toBeFalsy();
 	});
+
 	test("numberProperty < ...", async () => {
 		expect(match(`numberProperty < 1235`)).toBeTruthy();
 		expect(match(`numberProperty < 1234`)).toBeFalsy();
@@ -180,6 +181,16 @@ describe("Predicate filter", () => {
 		expect(match(`nested(array(stringProperty="bar"))`)).toBeTruthy();
 		expect(match(`nested(array(stringProperty="foobar"))`)).toBeFalsy();
 
+		// Different comparison operators
+		expect(match(`nested(array(numberProperty>=2345))`)).toBeTruthy();
+		expect(match(`nested(array(numberProperty>=2346))`)).toBeFalsy();
+		expect(match(`nested(array(numberProperty>2344))`)).toBeTruthy();
+		expect(match(`nested(array(numberProperty>2345))`)).toBeFalsy();
+		expect(match(`nested(array(numberProperty<=1234))`)).toBeTruthy();
+		expect(match(`nested(array(numberProperty<=1233))`)).toBeFalsy();
+		expect(match(`nested(array(numberProperty<1235))`)).toBeTruthy();
+		expect(match(`nested(array(numberProperty<1234))`)).toBeFalsy();
+
 		// One level deeper
 		expect(
 			match(`nested(array(objectProperty(stringProperty="foo")))`),
@@ -189,6 +200,35 @@ describe("Predicate filter", () => {
 		).toBeTruthy();
 		expect(
 			match(`nested(array(objectProperty(stringProperty="foobar")))`),
+		).toBeFalsy();
+	});
+
+	test("nested array multiple filters on property", async () => {
+		expect(
+			match(
+				`nested(array(stringProperty="foo" and numberProperty=2345 and objectProperty(stringProperty="foo")))`,
+			),
+		).toBeFalsy();
+		expect(
+			match(`nested(array(stringProperty="foo" or numberProperty=2345))`),
+		).toBeTruthy();
+		expect(
+			match(
+				`nested(array(stringProperty="foo" and numberProperty > 1233 and numberProperty < 1235))`,
+			),
+		).toBeTruthy();
+		expect(
+			match(
+				`nested(array(stringProperty="foo" and numberProperty >= 1234 and numberProperty <= 1234))`,
+			),
+		).toBeTruthy();
+		expect(
+			match(`nested(array(stringProperty="foo" and numberProperty != 1233))`),
+		).toBeTruthy();
+		expect(
+			match(
+				`nested(array(stringProperty="foobar" and numberProperty > 1234 and numberProperty < 1237))`,
+			),
 		).toBeFalsy();
 	});
 
