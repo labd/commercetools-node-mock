@@ -1,5 +1,17 @@
 ## 2.20.0
 
+## 2.23.0
+
+### Minor Changes
+
+- [#181](https://github.com/labd/commercetools-node-mock/pull/181) [`934673b`](https://github.com/labd/commercetools-node-mock/commit/934673b89c99f7d447d4f89ecf6a2491464c2644) Thanks [@TiagoUmemura](https://github.com/TiagoUmemura)! - update express version to 4.19.2
+
+### Patch Changes
+
+- [#182](https://github.com/labd/commercetools-node-mock/pull/182) [`f306d61`](https://github.com/labd/commercetools-node-mock/commit/f306d618f9b4b4b6cd4c28bbfa0ccf80a02a618e) Thanks [@jsm1t](https://github.com/jsm1t)! - fixes matching of queries for array objects in predicate parser
+
+- [#183](https://github.com/labd/commercetools-node-mock/pull/183) [`0d0f617`](https://github.com/labd/commercetools-node-mock/commit/0d0f6178210330ddde18907180a9737dd666b78c) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix eslint & prettier errors
+
 ## 2.22.1
 
 ### Patch Changes
