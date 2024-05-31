@@ -5,27 +5,8 @@ env:
   CI: true
 
 jobs:
-  lint:
-    name: Lint codebase
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 9
-          run_install: true
-
-      - name: Check formatting and typing
-        run: pnpm check
+  validate:
+    uses: ./.github/workflows/validate.yaml
 
   build:
     name: Build, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
