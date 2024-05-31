@@ -473,8 +473,8 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 
 		throw new PredicateError(
 			`Unexpected end of input, expected SphereIdentifierChar, comparison ` +
-			`operator, not, in, contains, is, within or matches` +
-			` (line ${lines.length}, column ${column})`,
+				`operator, not, in, contains, is, within or matches` +
+				` (line ${lines.length}, column ${column})`,
 		);
 	}
 	return result;
