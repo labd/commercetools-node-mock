@@ -98,10 +98,13 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		}
 		const expiresAt = new Date(Date.now() + 30 * 60);
 		const customer = results.results[0] as Customer;
-		const { version: _, ...rest } = getBaseResourceProperties();
+		const rest = getBaseResourceProperties();
+
 		const token = createPasswordResetToken(customer);
 		return {
-			...rest,
+			id: rest.id,
+			createdAt: rest.createdAt,
+			lastModifiedAt: rest.lastModifiedAt,
 			customerId: customer.id,
 			expiresAt: expiresAt.toISOString(),
 			value: token,
