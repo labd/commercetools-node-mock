@@ -1,5 +1,3 @@
-## 2.20.0
-
 ## 2.23.1
 
 ### Patch Changes
@@ -65,6 +63,8 @@
 ### Patch Changes
 
 - [`08e651b`](https://github.com/labd/commercetools-node-mock/commit/08e651b5d60554b5bd40862b134ece0b11833a91) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Return proper values for Category.ancestors
+
+## 2.20.0
 
 ### Minor Changes
 
