@@ -93,7 +93,11 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 		});
 
 		// @ts-ignore
-		result.results = result.results.map(this.postProcessResource);
+		result.results = result.results.map((r) =>
+			this.postProcessResource(context, r as CustomObject, {
+				expand: params.expand,
+			}),
+		);
 		return result;
 	}
 }
