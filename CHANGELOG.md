@@ -1,4 +1,8 @@
-## 2.20.0
+## 2.23.1
+
+### Patch Changes
+
+- [#186](https://github.com/labd/commercetools-node-mock/pull/186) [`5cdc614`](https://github.com/labd/commercetools-node-mock/commit/5cdc614346d5a69000e0d0cb895531d3a0398a20) Thanks [@mikedebock](https://github.com/mikedebock)! - Fix customObject withContainer postProcessResource arguments
 
 ## 2.23.0
 
@@ -59,6 +63,8 @@
 ### Patch Changes
 
 - [`08e651b`](https://github.com/labd/commercetools-node-mock/commit/08e651b5d60554b5bd40862b134ece0b11833a91) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Return proper values for Category.ancestors
+
+## 2.20.0
 
 ### Minor Changes
 
