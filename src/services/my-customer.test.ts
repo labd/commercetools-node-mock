@@ -231,7 +231,7 @@ describe("/me", () => {
 			email: "user@example.com",
 			password: hashPassword("p4ssw0rd"),
 			addresses: [],
-			isEmailVerified: true,
+			isEmailVerified: false,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
 		};
@@ -257,7 +257,6 @@ describe("/me", () => {
 			.post("/dummy/me/email/confirm")
 			.send({
 				tokenValue: "invalid-token",
-				newPassword: "somethingNew",
 			});
 		expect(response.status).toBe(400);
 		expect(response.body).toEqual({
