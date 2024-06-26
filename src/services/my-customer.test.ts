@@ -224,6 +224,54 @@ describe("/me", () => {
 		});
 	});
 
+	test("verify email flow", async () => {
+		const customer = {
+			...getBaseResourceProperties(),
+			id: "customer-uuid",
+			email: "user@example.com",
+			password: hashPassword("p4ssw0rd"),
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: "Password", //default in Commercetools
+			version: 1,
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const token = await supertest(ctMock.app)
+			.post("/dummy/customers/email-token")
+			.send({
+				id: "customer-uuid",
+			})
+			.then((response) => response.body as CustomerToken);
+
+		const response = await supertest(ctMock.app)
+			.post("/dummy/me/email/confirm")
+			.send({
+				tokenValue: token.value,
+			});
+		expect(response.status).toBe(200);
+	});
+
+	test("fail verify email flow", async () => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/me/email/confirm")
+			.send({
+				tokenValue: "invalid-token",
+				newPassword: "somethingNew",
+			});
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+			statusCode: 400,
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+				},
+			],
+		});
+	});
+
 	test("setCustomField", async () => {
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/me`)

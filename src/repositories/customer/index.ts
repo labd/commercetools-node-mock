@@ -7,7 +7,11 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
-import { createPasswordResetToken, hashPassword } from "~src/lib/password";
+import {
+	createEmailVerifyToken,
+	createPasswordResetToken,
+	hashPassword,
+} from "~src/lib/password";
 import { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
@@ -101,6 +105,31 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		const rest = getBaseResourceProperties();
 
 		const token = createPasswordResetToken(customer);
+		return {
+			id: rest.id,
+			createdAt: rest.createdAt,
+			lastModifiedAt: rest.lastModifiedAt,
+			customerId: customer.id,
+			expiresAt: expiresAt.toISOString(),
+			value: token,
+		};
+	}
+
+	verifyEmailToken(context: RepositoryContext, id: string): CustomerToken {
+		const results = this._storage.query(context.projectKey, this.getTypeId(), {
+			where: [`id="${id.toLocaleLowerCase()}"`],
+		});
+		if (results.count === 0) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID '${id}' was not found.`,
+			});
+		}
+		const expiresAt = new Date(Date.now() + 30 * 60);
+		const customer = results.results[0] as Customer;
+		const rest = getBaseResourceProperties();
+
+		const token = createEmailVerifyToken(customer);
 		return {
 			id: rest.id,
 			createdAt: rest.createdAt,
