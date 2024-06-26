@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.24.0
+
+### Minor Changes
+
+- [#188](https://github.com/labd/commercetools-node-mock/pull/188) [`a21f259`](https://github.com/labd/commercetools-node-mock/commit/a21f25920e77842b390384458847f2e909eac35a) Thanks [@pvaneveld](https://github.com/pvaneveld)! - add support for the customer email verify flow
+
 ### Patch Changes
 
 - [#186](https://github.com/labd/commercetools-node-mock/pull/186) [`5cdc614`](https://github.com/labd/commercetools-node-mock/commit/5cdc614346d5a69000e0d0cb895531d3a0398a20) Thanks [@mikedebock](https://github.com/mikedebock)! - Fix customObject withContainer postProcessResource arguments
