@@ -35,6 +35,7 @@ export class MyCustomerService extends AbstractService {
 		router.post("/login", this.signIn.bind(this));
 		router.post("/password", this.changePassword.bind(this));
 		router.post("/password/reset", this.resetPassword.bind(this));
+		router.post("/email/confirm", this.emailConfirm.bind(this));
 
 		parent.use(`/${basePath}`, router);
 	}
@@ -98,6 +99,15 @@ export class MyCustomerService extends AbstractService {
 
 	resetPassword(request: Request, response: Response) {
 		const customer = this.repository.resetPassword(
+			getRepositoryContext(request),
+			request.body,
+		);
+
+		return response.status(200).send(customer);
+	}
+
+	emailConfirm(request: Request, response: Response) {
+		const customer = this.repository.confirmEmail(
 			getRepositoryContext(request),
 			request.body,
 		);

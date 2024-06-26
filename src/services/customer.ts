@@ -39,5 +39,14 @@ export class CustomerService extends AbstractService {
 			);
 			return response.status(200).send(token);
 		});
+
+		parent.post("/email-token", (request, response) => {
+			const id = request.body.id;
+			const token = this.repository.verifyEmailToken(
+				getRepositoryContext(request),
+				id,
+			);
+			return response.status(200).send(token);
+		});
 	}
 }
