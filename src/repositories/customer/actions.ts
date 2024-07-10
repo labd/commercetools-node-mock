@@ -9,6 +9,7 @@ import type {
 	CustomerSetFirstNameAction,
 	CustomerSetKeyAction,
 	CustomerSetLastNameAction,
+	CustomerSetLocaleAction,
 	CustomerSetSalutationAction,
 	CustomerSetVatIdAction,
 	CustomerUpdateAction,
@@ -163,6 +164,14 @@ export class CustomerUpdateHandler
 		{ lastName }: CustomerSetLastNameAction,
 	) {
 		resource.lastName = lastName;
+	}
+
+	setLocale(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ locale }: CustomerSetLocaleAction,
+	) {
+		resource.locale = locale;
 	}
 
 	setSalutation(
