@@ -177,6 +177,26 @@ describe("Customer Update Actions", () => {
 		expect(response.body.custom.fields.isValidCouponCode).toBe(false);
 	});
 
+	test("setExternalId", async () => {
+		assert(customer, "customer not created");
+
+		customer = {
+			...customer,
+			firstName: "John",
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: "setExternalId", externalId: "123-xx-123" }],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.externalId).toBe("123-xx-123");
+	});
+
 	test("setFirstName", async () => {
 		assert(customer, "customer not created");
 
