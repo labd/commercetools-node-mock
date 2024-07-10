@@ -237,6 +237,26 @@ describe("Customer Update Actions", () => {
 		expect(response.body.lastName).toBe("Smith");
 	});
 
+	test("setLocale", async () => {
+		assert(customer, "customer not created");
+
+		customer = {
+			...customer,
+			salutation: "Mr.",
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: "setLocale", locale: "de-DE" }],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.locale).toBe("de-DE");
+	});
+
 	test("setSalutation", async () => {
 		assert(customer, "customer not created");
 
