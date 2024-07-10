@@ -6,6 +6,7 @@ import type {
 	CustomerSetCompanyNameAction,
 	CustomerSetCustomFieldAction,
 	CustomerSetCustomerNumberAction,
+	CustomerSetExternalIdAction,
 	CustomerSetFirstNameAction,
 	CustomerSetKeyAction,
 	CustomerSetLastNameAction,
@@ -139,6 +140,14 @@ export class CustomerUpdateHandler
 			throw new Error("Resource has no custom field");
 		}
 		resource.custom.fields[name] = value;
+	}
+
+	setExternalId(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ externalId }: CustomerSetExternalIdAction,
+	) {
+		resource.externalId = externalId;
 	}
 
 	setFirstName(
