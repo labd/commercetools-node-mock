@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.26.0
+
+### Minor Changes
+
+- [#191](https://github.com/labd/commercetools-node-mock/pull/191) [`ffcbd97`](https://github.com/labd/commercetools-node-mock/commit/ffcbd97af8921af1c97f616fdb4b474744f73ae8) Thanks [@pvaneveld](https://github.com/pvaneveld)! - add support for customer setLocale action
+
 ## 2.25.0
 
 ### Minor Changes
