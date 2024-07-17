@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.25.0
+
+### Minor Changes
+
+- [#190](https://github.com/labd/commercetools-node-mock/pull/190) [`7cce673`](https://github.com/labd/commercetools-node-mock/commit/7cce673e23b76acccd51e2682ffc36c13efa245b) Thanks [@pvaneveld](https://github.com/pvaneveld)! - add support for "setExternalId" customer update action
+
 ## 2.24.0
 
 ### Minor Changes
