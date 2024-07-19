@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.26.1
+
+### Patch Changes
+
+- [#194](https://github.com/labd/commercetools-node-mock/pull/194) [`cb84e0a`](https://github.com/labd/commercetools-node-mock/commit/cb84e0a16c3602c770ba906619b13e86d49fa5bd) Thanks [@pvaneveld](https://github.com/pvaneveld)! - Add support for customer set custom type
+
 ## 2.26.0
 
 ### Minor Changes
