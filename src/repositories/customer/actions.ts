@@ -5,6 +5,7 @@ import type {
 	CustomerSetAuthenticationModeAction,
 	CustomerSetCompanyNameAction,
 	CustomerSetCustomFieldAction,
+	CustomerSetCustomTypeAction,
 	CustomerSetCustomerNumberAction,
 	CustomerSetExternalIdAction,
 	CustomerSetFirstNameAction,
@@ -25,7 +26,7 @@ import {
 	UpdateHandlerInterface,
 	type RepositoryContext,
 } from "../abstract";
-import { createAddress } from "../helpers";
+import { createAddress, createCustomFields } from "../helpers";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
@@ -141,6 +142,22 @@ export class CustomerUpdateHandler
 			throw new Error("Resource has no custom field");
 		}
 		resource.custom.fields[name] = value;
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ type, fields }: CustomerSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
 	}
 
 	setExternalId(
