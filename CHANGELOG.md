@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.27.0
+
+### Minor Changes
+
+- [`2b5dc4c`](https://github.com/labd/commercetools-node-mock/commit/2b5dc4c2acf59b8f38c16073321865a2bcad381f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Implement customer reset flow for global scope
+
 ## 2.26.1
 
 ### Patch Changes
