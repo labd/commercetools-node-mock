@@ -84,7 +84,22 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: validate
     steps:
-      - uses: ./.github/workflows/validate.yaml
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          run_install: true
+
+      - name: Run build
+        run: pnpm build
 
       - name: Create and publish versions
         uses: changesets/action@v1
