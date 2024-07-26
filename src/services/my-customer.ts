@@ -98,7 +98,7 @@ export class MyCustomerService extends AbstractService {
 	}
 
 	resetPassword(request: Request, response: Response) {
-		const customer = this.repository.resetPassword(
+		const customer = this.repository.passwordReset(
 			getRepositoryContext(request),
 			request.body,
 		);

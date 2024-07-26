@@ -1,11 +1,13 @@
-import { Customer } from "@commercetools/platform-sdk";
+import { Customer, CustomerToken } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { hashPassword } from "~src/lib/password";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index";
 
+const ctMock = new CommercetoolsMock();
+
 describe("Customer Update Actions", () => {
-	const ctMock = new CommercetoolsMock();
 	let customer: Customer | undefined;
 
 	beforeEach(async () => {
@@ -445,5 +447,63 @@ describe("Customer Update Actions", () => {
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(2);
 		expect(response.body.key).toBe("C001");
+	});
+});
+
+describe("Customer Password Reset", () => {
+	afterEach(() => {
+		ctMock.clear();
+	});
+
+	beforeEach(() => {
+		ctMock.project("dummy").add("customer", {
+			id: "123",
+			createdAt: "2021-03-18T14:00:00.000Z",
+			version: 2,
+			lastModifiedAt: "2021-03-18T14:00:00.000Z",
+			email: "foo@example.org",
+			password: hashPassword("p4ssw0rd"),
+			addresses: [],
+			isEmailVerified: true,
+			authenticationMode: "password",
+			custom: { type: { typeId: "type", id: "" }, fields: {} },
+		});
+	});
+
+	test("reset password flow", async () => {
+		const token = await supertest(ctMock.app)
+			.post("/dummy/customers/password-token")
+			.send({
+				email: "foo@example.org",
+			})
+			.then((response) => response.body as CustomerToken);
+
+		const response = await supertest(ctMock.app)
+			.post("/dummy/customers/password/reset")
+			.send({
+				tokenValue: token.value,
+				newPassword: "somethingNew",
+			});
+		expect(response.status).toBe(200);
+	});
+
+	test("fail reset password flow", async () => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/customers/password/reset")
+			.send({
+				tokenValue: "invalid-token",
+				newPassword: "somethingNew",
+			});
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+			statusCode: 400,
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+				},
+			],
+		});
 	});
 });
