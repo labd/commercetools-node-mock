@@ -16,9 +16,11 @@ describe("Product search filter", () => {
     },
     name: {
       "nl-NL": "test",
+      "en-US": "my english test",
     },
     slug: {
       "nl-NL": "test",
+      "en-US": "test",
     },
     variants: [],
     searchKeywords: {},
@@ -226,6 +228,15 @@ describe("Product search filter", () => {
         caseInsensitive: false,
       }
     }).isMatch).toBeFalsy();
+
+    expect(match({
+      wildcard: {
+        field: "name",
+        value: "*english Test*",
+        language: "en-US",
+        caseInsensitive: true,
+      }
+    }).isMatch).toBeTruthy();
   });
 
   test("by price range", async () => {

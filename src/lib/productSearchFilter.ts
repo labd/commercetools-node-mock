@@ -98,9 +98,10 @@ export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilter
   }
 
   if (isSearchFullTextExpression(searchQuery)) {
-    // TODO: Implement better fulltext search
-    // https://github.com/bevacqua/fuzzysearch
-    // With scoring (& therefore boosting): https://github.com/farzher/fuzzysort
+    // TODO: Implement better fulltext search, doesn't support all uses cases, see: https://docs.commercetools.com/api/search-query-language#fulltext
+    // Potential options to replace with:
+    // - https://github.com/bevacqua/fuzzysearch
+    // - With scoring (& therefore boosting): https://github.com/farzher/fuzzysort
     return generateFieldMatchFunc((value: any) => value.includes(searchQuery.fullText.value), searchQuery.fullText);
   }
 
@@ -114,7 +115,7 @@ export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilter
   }
 
   if (isSearchWildCardExpression(searchQuery)) {
-    // TODO: Implement better wildcard search
+    // TODO: Implement better (actual) wildcard search
     const generateWildcardMatchFunc = (value: any) => {
       const wildCardValues = searchQuery.wildcard.value.split("*").filter((v: string) => !!v);
 
