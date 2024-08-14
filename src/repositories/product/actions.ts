@@ -26,6 +26,8 @@ import type {
 	ProductSetMetaDescriptionAction,
 	ProductSetMetaKeywordsAction,
 	ProductSetMetaTitleAction,
+	ProductSetProductPriceCustomFieldAction,
+	ProductSetProductPriceCustomTypeAction,
 	ProductSetTaxCategoryAction,
 	ProductTransitionStateAction,
 	ProductUpdateAction,
@@ -35,8 +37,11 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import type { Writable } from "~src/types";
-import { AbstractUpdateHandler, RepositoryContext } from "../abstract";
-import { getReferenceFromResourceIdentifier } from "../helpers";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
+import {
+	createCustomFields,
+	getReferenceFromResourceIdentifier,
+} from "../helpers";
 import {
 	checkForStagedChanges,
 	getVariant,
@@ -853,6 +858,47 @@ export class ProductUpdateHandler
 		return resource;
 	}
 
+	setProductPriceCustomField(
+		context: RepositoryContext,
+		resource: Writable<Product>,
+		{ name, value }: ProductSetProductPriceCustomFieldAction,
+	) {
+		resource.masterData.staged.masterVariant.prices?.map((price) => {
+			console.info("here for price", price);
+			if (!price.custom) {
+				return;
+			}
+			if (value === null) {
+				delete price.custom.fields[name];
+			} else {
+				price.custom.fields[name] = value;
+			}
+		});
+		return resource;
+	}
+
+	setProductPriceCustomType(
+		context: RepositoryContext,
+		resource: Writable<Product>,
+		{ type, fields }: ProductSetProductPriceCustomTypeAction,
+	) {
+		resource.masterData.staged.masterVariant.prices?.map((price) => {
+			console.info("im hereeee for type", type);
+			console.info("and for price", price);
+			if (type) {
+				price.custom = createCustomFields(
+					{ type, fields },
+					context.projectKey,
+					this._storage,
+				);
+			} else {
+				price.custom = undefined;
+			}
+		});
+		console.info("resourceeeeee", resource);
+		return resource;
+	}
+
 	setTaxCategory(
 		context: RepositoryContext,
 		resource: Writable<Product>,
@@ -919,8 +965,6 @@ export class ProductUpdateHandler
 	}
 
 	// 'setPrices': () => {},
-	// 'setProductPriceCustomType': () => {},
-	// 'setProductPriceCustomField': () => {},
 	// 'setDiscountedPrice': () => {},
 	// 'setAttributeInAllVariants': () => {},
 	// 'setCategoryOrderHint': () => {},
