@@ -864,7 +864,6 @@ export class ProductUpdateHandler
 		{ name, value }: ProductSetProductPriceCustomFieldAction,
 	) {
 		resource.masterData.staged.masterVariant.prices?.map((price) => {
-			console.info("here for price", price);
 			if (!price.custom) {
 				return;
 			}
@@ -883,8 +882,6 @@ export class ProductUpdateHandler
 		{ type, fields }: ProductSetProductPriceCustomTypeAction,
 	) {
 		resource.masterData.staged.masterVariant.prices?.map((price) => {
-			console.info("im hereeee for type", type);
-			console.info("and for price", price);
 			if (type) {
 				price.custom = createCustomFields(
 					{ type, fields },
@@ -895,7 +892,6 @@ export class ProductUpdateHandler
 				price.custom = undefined;
 			}
 		});
-		console.info("resourceeeeee", resource);
 		return resource;
 	}
 
