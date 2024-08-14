@@ -2,6 +2,7 @@ import type {
 	Category,
 	CategoryDraft,
 	Image,
+	Price,
 	PriceDraft,
 	Product,
 	ProductData,
@@ -120,6 +121,12 @@ const publishedProductDraft: ProductDraft = {
 					currencyCode: "EUR",
 					centAmount: 1000,
 				},
+				custom: {
+					type: { typeId: "type", id: "product-price-custom-type" },
+					fields: {
+						myCustomField: null,
+					},
+				},
 			},
 		],
 	},
@@ -140,6 +147,12 @@ const publishedProductDraft: ProductDraft = {
 					value: {
 						currencyCode: "EUR",
 						centAmount: 2000,
+					},
+					custom: {
+						type: { typeId: "type", id: "product-price-custom-type" },
+						fields: {
+							myCustomField: null,
+						},
 					},
 				},
 			],
@@ -203,6 +216,12 @@ const unpublishedProductDraft: ProductDraft = {
 					currencyCode: "EUR",
 					centAmount: 1000,
 				},
+				custom: {
+					type: { typeId: "type", id: "product-price-custom-type" },
+					fields: {
+						myCustomField: null,
+					},
+				},
 			},
 		],
 	},
@@ -223,6 +242,12 @@ const unpublishedProductDraft: ProductDraft = {
 					value: {
 						currencyCode: "EUR",
 						centAmount: 2000,
+					},
+					custom: {
+						type: { typeId: "type", id: "product-price-custom-type" },
+						fields: {
+							myCustomField: null,
+						},
 					},
 				},
 			],
@@ -1417,5 +1442,49 @@ describe("Product update actions", () => {
 			typeId: "state",
 			id: productState2.id,
 		});
+	});
+
+	test("setProductPriceCustomField", async () => {
+		assert(productPublished, "product not created");
+
+		productPublished.masterData.current.masterVariant.prices?.push({
+			key: "new_price_eur",
+			country: "NL",
+			value: {
+				currencyCode: "EUR",
+				centAmount: 9999,
+			},
+			custom: {
+				type: { typeId: "type", id: "product-price-custom-type" },
+				fields: {
+					myCustomField: null,
+				},
+			},
+		} as unknown as Price);
+
+		const priceId =
+			productPublished.masterData.current.masterVariant.prices?.find((price) =>
+				price.key?.startsWith("new_price"),
+			)?.id;
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "setProductPriceCustomField",
+						name: "myCustomField",
+						value: "123",
+						priceId,
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		console.info(JSON.stringify(response.body.masterData.current, null, 2));
+		expect(
+			response.body.masterData.staged.masterVariant.prices?.[0].custom.fields
+				?.myCustomField,
+		).toBe("123");
 	});
 });
