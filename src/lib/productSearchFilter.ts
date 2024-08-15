@@ -29,6 +29,7 @@ type ProductSearchFilterFunc = (
   markMatchingVariants: boolean,
 ) => boolean;
 
+// TODO: fieldType checking, better text/wildcard search, result boosting
 export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilterFunc => {
   if (isSearchAndExpression(searchQuery)) {
     return (obj, markMatchingVariant) => searchQuery.and.every((expr) => {
