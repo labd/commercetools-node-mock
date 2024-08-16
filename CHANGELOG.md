@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.28.0
+
+### Minor Changes
+
+- [#202](https://github.com/labd/commercetools-node-mock/pull/202) [`8737a6a`](https://github.com/labd/commercetools-node-mock/commit/8737a6aff198eb26f82ddbc2de32e664bb82e742) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Fixed issues with business units, updated sdk to latest
+
 ## 2.27.0
 
 ### Minor Changes
