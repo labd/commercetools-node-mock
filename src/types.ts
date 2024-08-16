@@ -45,6 +45,7 @@ export type ResourceMap = {
 	"product-price": ctp.StandalonePrice;
 	"product-projection": ctp.ProductProjection;
 	"product-selection": ctp.ProductSelection;
+	"product-tailoring": ctp.ProductTailoring;
 	"product-type": ctp.ProductType;
 	"product": ctp.Product;
 	"quote-request": ctp.QuoteRequest;
@@ -85,6 +86,7 @@ export type PagedQueryResponseMap = {
 	"product-price": ctp.StandalonePricePagedQueryResponse;
 	"product-projection": ctp.ProductProjectionPagedQueryResponse;
 	"product-selection": ctp.ProductSelectionPagedQueryResponse;
+	"product-tailoring": ctp.ProductTailoringPagedQueryResponse;
 	"product-type": ctp.ProductTypePagedQueryResponse;
 	"product": ctp.ProductPagedQueryResponse;
 	"quote-request": ctp.QuoteRequestPagedQueryResponse;

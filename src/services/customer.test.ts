@@ -20,6 +20,7 @@ describe("Customer Update Actions", () => {
 			isEmailVerified: true,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
+			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
 	});
@@ -467,6 +468,7 @@ describe("Customer Password Reset", () => {
 			isEmailVerified: true,
 			authenticationMode: "password",
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
+			stores: [],
 		});
 	});
 

@@ -30,6 +30,7 @@ import {
 	type ProductPagedQueryResponse,
 	type ProductVariant,
 } from "@commercetools/platform-sdk";
+import { DirectDiscount } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
 import type { Writable } from "~src/types";
@@ -419,10 +420,13 @@ export class CartUpdateHandler
 		{ discounts }: CartSetDirectDiscountsAction,
 	) {
 		// Doesn't apply any discounts logic, just sets the directDiscounts field
-		resource.directDiscounts = discounts.map((discount) => ({
-			...discount,
-			id: uuidv4(),
-		}));
+		resource.directDiscounts = discounts.map(
+			(discount) =>
+				({
+					...discount,
+					id: uuidv4(),
+				}) as DirectDiscount,
+		);
 	}
 
 	setLineItemShippingDetails(
