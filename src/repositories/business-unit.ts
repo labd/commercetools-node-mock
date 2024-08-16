@@ -20,8 +20,8 @@ import {
 	type Company,
 	type Division,
 } from "@commercetools/platform-sdk";
-import { generateRandomString, getBaseResourceProperties } from "../helpers";
 import { AbstractStorage } from "~src/storage";
+import { generateRandomString, getBaseResourceProperties } from "../helpers";
 import { Writable } from "../types";
 import {
 	AbstractResourceRepository,
