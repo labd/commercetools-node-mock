@@ -38,6 +38,7 @@ describe("Me", () => {
 				id: expect.anything(),
 				createdAt: expect.anything(),
 				lastModifiedAt: expect.anything(),
+				stores: [],
 			},
 		});
 	});
@@ -98,6 +99,7 @@ describe("/me", () => {
 					typeId: "type",
 				},
 			},
+			stores: [],
 		});
 	});
 
@@ -121,6 +123,7 @@ describe("/me", () => {
 					typeId: "type",
 				},
 			},
+			stores: [],
 		});
 
 		const newResponse = await supertest(ctMock.app).get("/dummy/me");
