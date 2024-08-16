@@ -91,6 +91,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				context.projectKey,
 				this._storage,
 			),
+			stores: [],
 		};
 		return this.saveNew(context, resource);
 	}

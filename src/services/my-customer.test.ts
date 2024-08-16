@@ -1,4 +1,5 @@
 import type {
+	Customer,
 	CustomerChangePassword,
 	CustomerToken,
 	MyCustomerDraft,
@@ -73,6 +74,7 @@ describe("/me", () => {
 			isEmailVerified: true,
 			authenticationMode: "password",
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
+			stores: [],
 		});
 	});
 
@@ -126,7 +128,7 @@ describe("/me", () => {
 	});
 
 	test("Change my password", async () => {
-		const customer = {
+		const customer: Customer = {
 			...getBaseResourceProperties(),
 			id: "customer-uuid",
 			email: "user@example.com",
@@ -135,6 +137,7 @@ describe("/me", () => {
 			isEmailVerified: true,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
+			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
 
@@ -176,7 +179,7 @@ describe("/me", () => {
 	});
 
 	test("reset password flow", async () => {
-		const customer = {
+		const customer: Customer = {
 			...getBaseResourceProperties(),
 			id: "customer-uuid",
 			email: "user@example.com",
@@ -185,6 +188,7 @@ describe("/me", () => {
 			isEmailVerified: true,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
+			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
 
@@ -225,7 +229,7 @@ describe("/me", () => {
 	});
 
 	test("verify email flow", async () => {
-		const customer = {
+		const customer: Customer = {
 			...getBaseResourceProperties(),
 			id: "customer-uuid",
 			email: "user@example.com",
@@ -234,6 +238,7 @@ describe("/me", () => {
 			isEmailVerified: false,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
+			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
 

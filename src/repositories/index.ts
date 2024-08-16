@@ -1,3 +1,4 @@
+import { ProductTailoringRepository } from "~src/repositories/product-tailoring";
 import { AbstractStorage } from "../storage";
 import { AssociateRoleRepository } from "./associate-role";
 import { AttributeGroupRepository } from "./attribute-group";
@@ -66,6 +67,7 @@ export const createRepositories = (storage: AbstractStorage) => ({
 	"product-discount": new ProductDiscountRepository(storage),
 	"product-projection": new ProductProjectionRepository(storage),
 	"product-selection": new ProductSelectionRepository(storage),
+	"product-tailoring": new ProductTailoringRepository(storage),
 	"project": new ProjectRepository(storage),
 	"review": new ReviewRepository(storage),
 	"quote": new QuoteRepository(storage),
