@@ -1,4 +1,5 @@
 import {
+	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
 	BusinessUnitUpdateAction,
@@ -19,8 +20,8 @@ import {
 	type Company,
 	type Division,
 } from "@commercetools/platform-sdk";
-import { getBaseResourceProperties } from "../helpers";
-import { AbstractStorage } from "../storage/abstract";
+import { generateRandomString, getBaseResourceProperties } from "../helpers";
+import { AbstractStorage } from "~src/storage";
 import { Writable } from "../types";
 import {
 	AbstractResourceRepository,
@@ -43,6 +44,28 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 	}
 
 	create(context: RepositoryContext, draft: BusinessUnitDraft): BusinessUnit {
+		const addresses =
+			draft.addresses?.map((address) => ({
+				...address,
+				id: generateRandomString(5),
+			})) ?? [];
+
+		const defaultBillingAddressId =
+			addresses.length > 0 && draft.defaultBillingAddress !== undefined
+				? addresses[draft.defaultBillingAddress].id
+				: undefined;
+		const defaultShippingAddressId =
+			addresses.length > 0 && draft.defaultShippingAddress !== undefined
+				? addresses[draft.defaultShippingAddress].id
+				: undefined;
+
+		const shippingAddressIds = draft.shippingAddresses?.map(
+			(i) => addresses[i].id,
+		);
+		const billingAddressIds = draft.billingAddresses?.map(
+			(i) => addresses[i].id,
+		);
+
 		const resource = {
 			...getBaseResourceProperties(),
 			key: draft.key,
@@ -53,18 +76,19 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			storeMode: draft.storeMode,
 			name: draft.name,
 			contactEmail: draft.contactEmail,
-			addresses: draft.addresses?.map((a) =>
-				createAddress(a, context.projectKey, this._storage),
-			),
+			addresses: addresses,
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
-			shippingAddressIds: draft.shippingAddresses,
-			defaultShippingAddressId: draft.defaultShippingAddress,
-			billingAddressIds: draft.billingAddresses,
+			shippingAddressIds: shippingAddressIds,
+			billingAddressIds: billingAddressIds,
+			defaultShippingAddressId: defaultShippingAddressId,
+			defaultBillingAddressId: defaultBillingAddressId,
 			associateMode: draft.associateMode,
+			approvalRuleMode: draft.approvalRuleMode,
+
 			associates: draft.associates?.map((a) =>
 				createAssociate(a, context.projectKey, this._storage),
 			),
@@ -168,6 +192,14 @@ class BusinessUnitUpdateHandler
 		if (newAddress) {
 			resource.addresses.push(newAddress);
 		}
+	}
+
+	changeApprovalRuleMode(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ approvalRuleMode }: BusinessUnitChangeApprovalRuleModeAction,
+	) {
+		resource.approvalRuleMode = approvalRuleMode;
 	}
 
 	changeAssociateMode(
