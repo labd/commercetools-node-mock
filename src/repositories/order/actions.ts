@@ -11,6 +11,7 @@ import type {
 	OrderSetCustomTypeAction,
 	OrderSetCustomerEmailAction,
 	OrderSetCustomerIdAction,
+	OrderSetDeliveryCustomFieldAction,
 	OrderSetLocaleAction,
 	OrderSetOrderNumberAction,
 	OrderSetShippingAddressAction,
@@ -23,6 +24,7 @@ import type {
 	Store,
 	SyncInfo,
 } from "@commercetools/platform-sdk";
+import assert from "assert";
 import { getBaseResourceProperties } from "~src/helpers";
 import type { Writable } from "~src/types";
 import {
@@ -177,6 +179,26 @@ export class OrderUpdateHandler
 				},
 				fields: fields || {},
 			};
+		}
+	}
+
+	setDeliveryCustomField(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ deliveryId, name, value }: OrderSetDeliveryCustomFieldAction,
+	) {
+		assert(resource.shippingInfo, "shippingInfo is not defined");
+
+		if (Array.isArray(resource.shippingInfo.deliveries)) {
+			resource.shippingInfo.deliveries.map((delivery) => {
+				if (delivery.id !== deliveryId) throw "No matching delivery id found";
+				if (delivery.custom) {
+					const update = delivery.custom.fields;
+					update[name] = value;
+					Object.assign(delivery.custom.fields, update);
+				}
+				return delivery;
+			});
 		}
 	}
 
