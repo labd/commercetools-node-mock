@@ -1,4 +1,10 @@
-import { InvalidInputError, Product, ProductPagedSearchResponse, ProductProjection, ProductSearchRequest } from "@commercetools/platform-sdk";
+import {
+	InvalidInputError,
+	Product,
+	ProductPagedSearchResponse,
+	ProductProjection,
+	ProductSearchRequest,
+} from "@commercetools/platform-sdk";
 import { AbstractStorage } from "./storage";
 import { CommercetoolsError } from "./exceptions";
 import { parseSearchQuery } from "./lib/productSearchFilter";

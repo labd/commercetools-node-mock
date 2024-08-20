@@ -4,6 +4,8 @@ import type {
 	Product,
 	ProductData,
 	ProductDraft,
+	ProductPagedSearchResponse,
+	ProductSearchRequest,
 	ProductTypeReference,
 	StateReference,
 	TaxCategoryReference,
@@ -13,13 +15,17 @@ import { getBaseResourceProperties } from "~src/helpers";
 import { AbstractStorage } from "~src/storage/abstract";
 import { AbstractResourceRepository, RepositoryContext } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";
+import { ProductSearch } from "~src/product-search";
 import { ProductUpdateHandler } from "./actions";
 import { variantFromDraft } from "./helpers";
 
 export class ProductRepository extends AbstractResourceRepository<"product"> {
+	protected _searchService: ProductSearch;
+
 	constructor(storage: AbstractStorage) {
 		super("product", storage);
 		this.actions = new ProductUpdateHandler(storage);
+		this._searchService = new ProductSearch(storage);
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): Product {
@@ -126,5 +132,9 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		};
 
 		return this.saveNew(context, resource);
+	}
+
+	search(context: RepositoryContext, searchRequest: ProductSearchRequest): ProductPagedSearchResponse {
+		return this._searchService.search(context.projectKey, searchRequest);
 	}
 }
