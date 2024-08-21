@@ -1418,4 +1418,76 @@ describe("Product update actions", () => {
 			id: productState2.id,
 		});
 	});
+
+	// work in progress..
+	test("setProductPriceCustomField", async () => {
+		assert(productPublished, "product not created");
+		const priceId =
+			productPublished?.masterData.current.masterVariant.prices?.[0].id;
+		assert(priceId);
+
+		const masterData = {
+			name: { "nl-NL": "Dummy" },
+			slug: { "nl-NL": "Dummy" },
+			categories: [],
+			masterVariant: {
+				id: 0,
+				sku: "MYSKU",
+				prices: [
+					{
+						id: "743ca006-e114-42ed-af78-9c4686ae19e7",
+						key: "base_price_eur",
+						country: "NL",
+						value: {
+							fractionDigits: 2,
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 2000,
+						},
+						custom: { type: { typeId: "type", id: "" }, fields: {} },
+					},
+				],
+			},
+			variants: [],
+		};
+
+		ctMock.project("dummy").add("product", {
+			...productPublished,
+			// @ts-ignore
+			masterData: {
+				// @ts-ignore
+				current: masterData,
+				staged: {
+					...productPublished.masterData.staged,
+				},
+			},
+		});
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "setProductPriceCustomType",
+						priceId: priceId,
+						type: {
+							typeId: "type",
+							key: "cart",
+						},
+					},
+					{
+						action: "setProductPriceCustomField",
+						name: "myCustomField",
+						value: "123",
+						priceId,
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(
+			response.body.masterData.current.masterVariant.prices?.[0].custom.fields
+				?.myCustomField,
+		).toBe("123");
+	});
 });
