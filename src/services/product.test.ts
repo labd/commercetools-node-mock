@@ -1473,7 +1473,7 @@ describe("Product update actions", () => {
 						priceId: priceId,
 						type: {
 							typeId: "type",
-							key: "cart",
+							key: "product",
 						},
 					},
 					{
