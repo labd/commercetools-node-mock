@@ -861,37 +861,65 @@ export class ProductUpdateHandler
 	setProductPriceCustomField(
 		context: RepositoryContext,
 		resource: Writable<Product>,
-		{ name, value }: ProductSetProductPriceCustomFieldAction,
+		{ name, value, staged }: ProductSetProductPriceCustomFieldAction,
 	) {
-		resource.masterData.staged.masterVariant.prices?.map((price) => {
-			if (!price.custom) {
-				return;
-			}
-			if (value === null) {
-				delete price.custom.fields[name];
-			} else {
-				price.custom.fields[name] = value;
-			}
-		});
+		const updatePriceCustomFields = (prices?: Writable<Price[]>) =>
+			prices?.map((price) => {
+				if (!price.custom) return price;
+
+				if (value === null) {
+					delete price.custom.fields[name];
+				} else {
+					price.custom.fields[name] = value;
+				}
+				return price;
+			});
+
+		resource.masterData.staged.masterVariant.prices = updatePriceCustomFields(
+			resource.masterData.staged.masterVariant.prices,
+		);
+
+		const onlyStaged = staged !== undefined ? staged : true;
+		if (!onlyStaged) {
+			resource.masterData.current.masterVariant.prices =
+				updatePriceCustomFields(
+					resource.masterData.current.masterVariant.prices,
+				);
+		}
+		checkForStagedChanges(resource);
 		return resource;
 	}
 
 	setProductPriceCustomType(
 		context: RepositoryContext,
 		resource: Writable<Product>,
-		{ type, fields }: ProductSetProductPriceCustomTypeAction,
+		{ type, fields, staged }: ProductSetProductPriceCustomTypeAction,
 	) {
-		resource.masterData.staged.masterVariant.prices?.map((price) => {
-			if (type) {
-				price.custom = createCustomFields(
-					{ type, fields },
-					context.projectKey,
-					this._storage,
-				);
-			} else {
-				price.custom = undefined;
-			}
-		});
+		const updatePriceCustomType = (prices?: Writable<Price[]>) =>
+			prices?.map((price) => {
+				if (type) {
+					price.custom = createCustomFields(
+						{ type, fields },
+						context.projectKey,
+						this._storage,
+					);
+				} else {
+					price.custom = undefined;
+				}
+				return price;
+			});
+
+		resource.masterData.staged.masterVariant.prices = updatePriceCustomType(
+			resource.masterData.staged.masterVariant.prices,
+		);
+
+		const onlyStaged = staged !== undefined ? staged : true;
+		if (!onlyStaged) {
+			resource.masterData.current.masterVariant.prices = updatePriceCustomType(
+				resource.masterData.current.masterVariant.prices,
+			);
+		}
+		checkForStagedChanges(resource);
 		return resource;
 	}
 
