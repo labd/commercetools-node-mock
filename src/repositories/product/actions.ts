@@ -26,6 +26,8 @@ import type {
 	ProductSetMetaDescriptionAction,
 	ProductSetMetaKeywordsAction,
 	ProductSetMetaTitleAction,
+	ProductSetProductPriceCustomFieldAction,
+	ProductSetProductPriceCustomTypeAction,
 	ProductSetTaxCategoryAction,
 	ProductTransitionStateAction,
 	ProductUpdateAction,
@@ -35,8 +37,11 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import type { Writable } from "~src/types";
-import { AbstractUpdateHandler, RepositoryContext } from "../abstract";
-import { getReferenceFromResourceIdentifier } from "../helpers";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
+import {
+	createCustomFields,
+	getReferenceFromResourceIdentifier,
+} from "../helpers";
 import {
 	checkForStagedChanges,
 	getVariant,
@@ -853,6 +858,87 @@ export class ProductUpdateHandler
 		return resource;
 	}
 
+	setProductPriceCustomField(
+		context: RepositoryContext,
+		resource: Writable<Product>,
+		{ name, value, staged, priceId }: ProductSetProductPriceCustomFieldAction,
+	) {
+		const updatePriceCustomFields = (data: Writable<ProductData>) => {
+			const price = [data.masterVariant, ...(data.variants ?? [])]
+				.flatMap((variant) => variant.prices ?? [])
+				.find((price) => price.id === priceId);
+
+			if (!price) {
+				throw new Error(
+					`Price with id ${priceId} not found on product ${resource.id}`,
+				);
+			}
+			if (price.custom) {
+				if (value === null) {
+					delete price.custom.fields[name];
+				} else {
+					price.custom.fields[name] = value;
+				}
+			}
+			return data;
+		};
+
+		resource.masterData.staged = updatePriceCustomFields(
+			resource.masterData.staged,
+		);
+
+		const onlyStaged = staged !== undefined ? staged : true;
+		if (!onlyStaged) {
+			resource.masterData.current = updatePriceCustomFields(
+				resource.masterData.current,
+			);
+		}
+		checkForStagedChanges(resource);
+		return resource;
+	}
+
+	setProductPriceCustomType(
+		context: RepositoryContext,
+		resource: Writable<Product>,
+		{ type, fields, staged, priceId }: ProductSetProductPriceCustomTypeAction,
+	) {
+		const updatePriceCustomType = (data: Writable<ProductData>) => {
+			const price = [data.masterVariant, ...(data.variants ?? [])]
+				.flatMap((variant) => variant.prices ?? [])
+				.find((price) => price.id === priceId);
+
+			if (price) {
+				if (type) {
+					price.custom = createCustomFields(
+						{ type, fields },
+						context.projectKey,
+						this._storage,
+					);
+				} else {
+					price.custom = undefined;
+				}
+			} else {
+				throw new Error(
+					`Price with id ${priceId} not found on product ${resource.id}`,
+				);
+			}
+			return data;
+		};
+
+		resource.masterData.staged = updatePriceCustomType(
+			resource.masterData.staged,
+		);
+
+		const onlyStaged = staged !== undefined ? staged : true;
+		if (!onlyStaged) {
+			resource.masterData.current = updatePriceCustomType(
+				resource.masterData.current,
+			);
+		}
+		checkForStagedChanges(resource);
+		return resource;
+	}
+
 	setTaxCategory(
 		context: RepositoryContext,
 		resource: Writable<Product>,
@@ -919,8 +1005,6 @@ export class ProductUpdateHandler
 	}
 
 	// 'setPrices': () => {},
-	// 'setProductPriceCustomType': () => {},
-	// 'setProductPriceCustomField': () => {},
 	// 'setDiscountedPrice': () => {},
 	// 'setAttributeInAllVariants': () => {},
 	// 'setCategoryOrderHint': () => {},

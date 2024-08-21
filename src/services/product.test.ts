@@ -12,6 +12,8 @@ import type {
 	StateDraft,
 	TaxCategory,
 	TaxCategoryDraft,
+	Type,
+	TypeDraft,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
@@ -76,6 +78,30 @@ const productState2Draft: StateDraft = {
 	description: {
 		"nl-NL": "Product another state",
 	},
+};
+
+const productPriceTypeDraft: TypeDraft = {
+	key: "product-price",
+	name: {
+		en: "ProductPriceType",
+	},
+	description: {
+		en: "Product Price Type",
+	},
+	resourceTypeIds: ["product-price"],
+	fieldDefinitions: [
+		{
+			name: "lastModifiedAt",
+			label: {
+				en: "Last modified at",
+			},
+			required: false,
+			type: {
+				name: "DateTime",
+			},
+			inputHint: "SingleLine",
+		},
+	],
 };
 
 const publishedProductDraft: ProductDraft = {
@@ -250,6 +276,7 @@ let taxCategory1: TaxCategory;
 let taxCategory2: TaxCategory;
 let productState1: State;
 let productState2: State;
+let productPriceType: Type;
 
 async function beforeAllProductTests(mock: CommercetoolsMock) {
 	let response;
@@ -308,6 +335,12 @@ async function beforeAllProductTests(mock: CommercetoolsMock) {
 
 	expect(response.status).toBe(201);
 	productState2 = response.body;
+
+	response = await supertest(mock.app)
+		.post("/dummy/types")
+		.send(productPriceTypeDraft);
+	expect(response.status).toBe(201);
+	productPriceType = response.body;
 }
 
 describe("Product", () => {
@@ -1417,5 +1450,39 @@ describe("Product update actions", () => {
 			typeId: "state",
 			id: productState2.id,
 		});
+	});
+
+	test("setProductPriceCustomField", async () => {
+		assert(productPublished, "product not created");
+		const priceId =
+			productPublished?.masterData.current.masterVariant.prices?.[0].id;
+		assert(priceId);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "setProductPriceCustomType",
+						priceId,
+						type: {
+							typeId: "type",
+							key: productPriceType.key,
+						},
+					},
+					{
+						action: "setProductPriceCustomField",
+						name: "myCustomField",
+						value: "MyRandomValue",
+						priceId,
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(
+			response.body.masterData.staged.masterVariant.prices?.[0].custom.fields
+				?.myCustomField,
+		).toBe("MyRandomValue");
 	});
 });
