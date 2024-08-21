@@ -863,28 +863,35 @@ export class ProductUpdateHandler
 		resource: Writable<Product>,
 		{ name, value, staged, priceId }: ProductSetProductPriceCustomFieldAction,
 	) {
-		const updatePriceCustomFields = (prices?: Writable<Price[]>) => {
-			const price = prices?.find((p) => p.id === priceId);
-			if (price?.custom) {
+		const updatePriceCustomFields = (data: Writable<ProductData>) => {
+			const price = [data.masterVariant, ...(data.variants ?? [])]
+				.flatMap((variant) => variant.prices ?? [])
+				.find((price) => price.id === priceId);
+
+			if (!price) {
+				throw new Error(
+					`Price with id ${priceId} not found on product ${resource.id}`,
+				);
+			}
+			if (price.custom) {
 				if (value === null) {
 					delete price.custom.fields[name];
 				} else {
 					price.custom.fields[name] = value;
 				}
 			}
-			return prices;
+			return data;
 		};
 
-		resource.masterData.staged.masterVariant.prices = updatePriceCustomFields(
-			resource.masterData.staged.masterVariant.prices,
+		resource.masterData.staged = updatePriceCustomFields(
+			resource.masterData.staged,
 		);
 
 		const onlyStaged = staged !== undefined ? staged : true;
 		if (!onlyStaged) {
-			resource.masterData.current.masterVariant.prices =
-				updatePriceCustomFields(
-					resource.masterData.current.masterVariant.prices,
-				);
+			resource.masterData.current = updatePriceCustomFields(
+				resource.masterData.current,
+			);
 		}
 		checkForStagedChanges(resource);
 		return resource;
@@ -895,8 +902,11 @@ export class ProductUpdateHandler
 		resource: Writable<Product>,
 		{ type, fields, staged, priceId }: ProductSetProductPriceCustomTypeAction,
 	) {
-		const updatePriceCustomType = (prices?: Writable<Price[]>) => {
-			const price = prices?.find((p) => p.id === priceId);
+		const updatePriceCustomType = (data: Writable<ProductData>) => {
+			const price = [data.masterVariant, ...(data.variants ?? [])]
+				.flatMap((variant) => variant.prices ?? [])
+				.find((price) => price.id === priceId);
+
 			if (price) {
 				if (type) {
 					price.custom = createCustomFields(
@@ -907,18 +917,22 @@ export class ProductUpdateHandler
 				} else {
 					price.custom = undefined;
 				}
+			} else {
+				throw new Error(
+					`Price with id ${priceId} not found on product ${resource.id}`,
+				);
 			}
-			return prices;
+			return data;
 		};
 
-		resource.masterData.staged.masterVariant.prices = updatePriceCustomType(
-			resource.masterData.staged.masterVariant.prices,
+		resource.masterData.staged = updatePriceCustomType(
+			resource.masterData.staged,
 		);
 
 		const onlyStaged = staged !== undefined ? staged : true;
 		if (!onlyStaged) {
-			resource.masterData.current.masterVariant.prices = updatePriceCustomType(
-				resource.masterData.current.masterVariant.prices,
+			resource.masterData.current = updatePriceCustomType(
+				resource.masterData.current,
 			);
 		}
 		checkForStagedChanges(resource);
