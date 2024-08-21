@@ -12,6 +12,8 @@ import type {
 	StateDraft,
 	TaxCategory,
 	TaxCategoryDraft,
+	Type,
+	TypeDraft,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
@@ -78,6 +80,30 @@ const productState2Draft: StateDraft = {
 	},
 };
 
+const productPriceTypeDraft: TypeDraft = {
+	key: "product-price",
+	name: {
+		en: "ProductPriceType",
+	},
+	description: {
+		en: "Product Price Type",
+	},
+	resourceTypeIds: ["product-price"],
+	fieldDefinitions: [
+		{
+			name: "lastModifiedAt",
+			label: {
+				en: "Last modified at",
+			},
+			required: false,
+			type: {
+				name: "DateTime",
+			},
+			inputHint: "SingleLine",
+		},
+	],
+};
+
 const publishedProductDraft: ProductDraft = {
 	name: {
 		"nl-NL": "test published product",
@@ -120,6 +146,13 @@ const publishedProductDraft: ProductDraft = {
 					currencyCode: "EUR",
 					centAmount: 1000,
 				},
+				custom: {
+					type: {
+						typeId: "type",
+						key: productPriceTypeDraft.key,
+					},
+					fields: {},
+				},
 			},
 		],
 	},
@@ -140,6 +173,13 @@ const publishedProductDraft: ProductDraft = {
 					value: {
 						currencyCode: "EUR",
 						centAmount: 2000,
+					},
+					custom: {
+						type: {
+							typeId: "type",
+							key: productPriceTypeDraft.key,
+						},
+						fields: {},
 					},
 				},
 			],
@@ -250,6 +290,7 @@ let taxCategory1: TaxCategory;
 let taxCategory2: TaxCategory;
 let productState1: State;
 let productState2: State;
+let productPriceType: Type;
 
 async function beforeAllProductTests(mock: CommercetoolsMock) {
 	let response;
@@ -308,6 +349,12 @@ async function beforeAllProductTests(mock: CommercetoolsMock) {
 
 	expect(response.status).toBe(201);
 	productState2 = response.body;
+
+	response = await supertest(mock.app)
+		.post("/dummy/types")
+		.send(productPriceTypeDraft);
+	expect(response.status).toBe(201);
+	productPriceType = response.body;
 }
 
 describe("Product", () => {
@@ -1419,49 +1466,11 @@ describe("Product update actions", () => {
 		});
 	});
 
-	// work in progress..
 	test("setProductPriceCustomField", async () => {
 		assert(productPublished, "product not created");
 		const priceId =
 			productPublished?.masterData.current.masterVariant.prices?.[0].id;
 		assert(priceId);
-
-		const masterData = {
-			name: { "nl-NL": "Dummy" },
-			slug: { "nl-NL": "Dummy" },
-			categories: [],
-			masterVariant: {
-				id: 0,
-				sku: "MYSKU",
-				prices: [
-					{
-						id: "743ca006-e114-42ed-af78-9c4686ae19e7",
-						key: "base_price_eur",
-						country: "NL",
-						value: {
-							fractionDigits: 2,
-							type: "centPrecision",
-							currencyCode: "EUR",
-							centAmount: 2000,
-						},
-						custom: { type: { typeId: "type", id: "" }, fields: {} },
-					},
-				],
-			},
-			variants: [],
-		};
-
-		ctMock.project("dummy").add("product", {
-			...productPublished,
-			// @ts-ignore
-			masterData: {
-				// @ts-ignore
-				current: masterData,
-				staged: {
-					...productPublished.masterData.staged,
-				},
-			},
-		});
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/products/${productPublished.id}`)
@@ -1470,24 +1479,24 @@ describe("Product update actions", () => {
 				actions: [
 					{
 						action: "setProductPriceCustomType",
-						priceId: priceId,
+						priceId,
 						type: {
 							typeId: "type",
-							key: "product",
+							key: productPriceType.key,
 						},
 					},
 					{
 						action: "setProductPriceCustomField",
 						name: "myCustomField",
-						value: "123",
+						value: "MyRandomValue",
 						priceId,
 					},
 				],
 			});
 		expect(response.status).toBe(200);
 		expect(
-			response.body.masterData.current.masterVariant.prices?.[0].custom.fields
+			response.body.masterData.staged.masterVariant.prices?.[0].custom.fields
 				?.myCustomField,
-		).toBe("123");
+		).toBe("MyRandomValue");
 	});
 });
