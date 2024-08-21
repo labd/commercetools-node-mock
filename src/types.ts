@@ -1,6 +1,6 @@
 import type * as ctp from "@commercetools/platform-sdk";
-import type { RepositoryMap } from "./repositories";
-import type AbstractService from "./services/abstract";
+import { RepositoryMap } from "./repositories";
+import AbstractService from "./services/abstract";
 
 export const isType = <T>(x: T) => x;
 
