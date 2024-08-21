@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.29.0
+
+### Minor Changes
+
+- [#199](https://github.com/labd/commercetools-node-mock/pull/199) [`be62944`](https://github.com/labd/commercetools-node-mock/commit/be62944a5e47e03ce9ed59ea24cfee790d95320e) Thanks [@leongraumans](https://github.com/leongraumans)! - add support for "setProductPriceCustomField" product update action
+
 ## 2.28.1
 
 ### Patch Changes
