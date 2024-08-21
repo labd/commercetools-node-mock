@@ -861,19 +861,19 @@ export class ProductUpdateHandler
 	setProductPriceCustomField(
 		context: RepositoryContext,
 		resource: Writable<Product>,
-		{ name, value, staged }: ProductSetProductPriceCustomFieldAction,
+		{ name, value, staged, priceId }: ProductSetProductPriceCustomFieldAction,
 	) {
-		const updatePriceCustomFields = (prices?: Writable<Price[]>) =>
-			prices?.map((price) => {
-				if (!price.custom) return price;
-
+		const updatePriceCustomFields = (prices?: Writable<Price[]>) => {
+			const price = prices?.find((p) => p.id === priceId);
+			if (price?.custom) {
 				if (value === null) {
 					delete price.custom.fields[name];
 				} else {
 					price.custom.fields[name] = value;
 				}
-				return price;
-			});
+			}
+			return prices;
+		};
 
 		resource.masterData.staged.masterVariant.prices = updatePriceCustomFields(
 			resource.masterData.staged.masterVariant.prices,
@@ -893,10 +893,11 @@ export class ProductUpdateHandler
 	setProductPriceCustomType(
 		context: RepositoryContext,
 		resource: Writable<Product>,
-		{ type, fields, staged }: ProductSetProductPriceCustomTypeAction,
+		{ type, fields, staged, priceId }: ProductSetProductPriceCustomTypeAction,
 	) {
-		const updatePriceCustomType = (prices?: Writable<Price[]>) =>
-			prices?.map((price) => {
+		const updatePriceCustomType = (prices?: Writable<Price[]>) => {
+			const price = prices?.find((p) => p.id === priceId);
+			if (price) {
 				if (type) {
 					price.custom = createCustomFields(
 						{ type, fields },
@@ -906,8 +907,9 @@ export class ProductUpdateHandler
 				} else {
 					price.custom = undefined;
 				}
-				return price;
-			});
+			}
+			return prices;
+		};
 
 		resource.masterData.staged.masterVariant.prices = updatePriceCustomType(
 			resource.masterData.staged.masterVariant.prices,
