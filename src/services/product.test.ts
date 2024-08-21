@@ -146,13 +146,6 @@ const publishedProductDraft: ProductDraft = {
 					currencyCode: "EUR",
 					centAmount: 1000,
 				},
-				custom: {
-					type: {
-						typeId: "type",
-						key: productPriceTypeDraft.key,
-					},
-					fields: {},
-				},
 			},
 		],
 	},
@@ -173,13 +166,6 @@ const publishedProductDraft: ProductDraft = {
 					value: {
 						currencyCode: "EUR",
 						centAmount: 2000,
-					},
-					custom: {
-						type: {
-							typeId: "type",
-							key: productPriceTypeDraft.key,
-						},
-						fields: {},
 					},
 				},
 			],
