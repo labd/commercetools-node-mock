@@ -2,6 +2,7 @@ import type { Order, Payment, State } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { generateRandomString } from "~src/helpers";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index";
 
 describe("Order Query", () => {
@@ -400,6 +401,166 @@ describe("Order Update Actions", () => {
 		expect(response.body.version).toBe(3);
 		expect(response.body.orderState).toBe("Cancelled");
 		expect(response.body.paymentState).toBe("Failed");
+	});
+
+	test("setDeliveryCustomField", async () => {
+		const order: Order = {
+			...getBaseResourceProperties(),
+			customLineItems: [],
+			lastMessageSequenceNumber: 0,
+			lineItems: [],
+			orderNumber: "1389",
+			orderState: "Open",
+			origin: "Customer",
+			paymentInfo: {
+				payments: [
+					{
+						typeId: "payment",
+						id: generateRandomString(10),
+					},
+				],
+			},
+			refusedGifts: [],
+			shippingInfo: {
+				shippingMethodName: "Home delivery (package)",
+				price: {
+					type: "centPrecision",
+					currencyCode: "EUR",
+					centAmount: 999,
+					fractionDigits: 2,
+				},
+				shippingRate: {
+					price: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						centAmount: 999,
+						fractionDigits: 2,
+					},
+					tiers: [
+						{
+							type: "CartScore",
+							score: 24,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 1998,
+								fractionDigits: 2,
+							},
+						},
+						{
+							type: "CartScore",
+							score: 47,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 2997,
+								fractionDigits: 2,
+							},
+						},
+						{
+							type: "CartScore",
+							score: 70,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 3996,
+								fractionDigits: 2,
+							},
+						},
+						{
+							type: "CartScore",
+							score: 93,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 4995,
+								fractionDigits: 2,
+							},
+						},
+					],
+				},
+				deliveries: [
+					{
+						id: "6a458cad-dd46-4f5f-8b73-debOede6a17d",
+						key: "CT-Z243002",
+						createdAt: "2024-07-29T13:37:48.047Z",
+						items: [
+							{
+								id: "5d209544-2892-45c9-bef0-dde4e250188e",
+								quantity: 1,
+							},
+						],
+						parcels: [],
+						custom: {
+							type: {
+								typeId: "type",
+								id: "c493b7bb-d415-450c-b421-e128a8b26569",
+							},
+							fields: {
+								location: "test",
+								status: "created",
+								carrier: "test_carrier",
+							},
+						},
+					},
+				],
+				shippingMethodState: "MatchesCart",
+			},
+			shipping: [],
+			shippingMode: "Single",
+			syncInfo: [],
+			totalPrice: {
+				type: "centPrecision",
+				fractionDigits: 2,
+				centAmount: 2000,
+				currencyCode: "EUR",
+			},
+		};
+		ctMock.project("dummy").add("order", order);
+
+		const response = await supertest(ctMock.app).get(
+			`/dummy/orders/order-number=${order.orderNumber}`,
+		);
+
+		// check if status is set
+		const _updateResponse = await supertest(ctMock.app)
+			.post(`/dummy/orders/${response.body.id}`)
+			.send({
+				version: 0,
+				actions: [
+					{
+						action: "setDeliveryCustomField",
+						deliveryId: "6a458cad-dd46-4f5f-8b73-debOede6a17d",
+						name: "status",
+						value: "delayed",
+					},
+				],
+			});
+		expect(_updateResponse.status).toBe(200);
+		expect(_updateResponse.body.version).toBe(1);
+		expect(
+			_updateResponse.body.shippingInfo.deliveries[0].custom.fields.status,
+		).toBe("delayed");
+
+		// check if other field can be set
+		const _updateResponse2 = await supertest(ctMock.app)
+			.post(`/dummy/orders/${response.body.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "setDeliveryCustomField",
+						deliveryId: "6a458cad-dd46-4f5f-8b73-debOede6a17d",
+						name: "carrier",
+						value: "dhl",
+					},
+				],
+			});
+		expect(_updateResponse2.status).toBe(200);
+		expect(_updateResponse2.body.version).toBe(2);
+		expect(
+			_updateResponse2.body.shippingInfo.deliveries[0].custom.fields.carrier,
+		).toBe("dhl");
 	});
 
 	test("updateSyncInfo", async () => {
