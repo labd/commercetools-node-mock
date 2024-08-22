@@ -1520,8 +1520,8 @@ describe("Product update actions", () => {
 			}
 			{
 				const body: ProductSearchRequest = {
-					limit: 24,
-					offset: 24,
+					limit: 88,
+					offset: 88,
 				};
 
 				const response = await supertest(ctMock.app)
@@ -1529,8 +1529,8 @@ describe("Product update actions", () => {
 					.send(body);
 
 				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
-				expect(pagedSearchResponse.limit).toBe(24);
-				expect(pagedSearchResponse.offset).toBe(24);
+				expect(pagedSearchResponse.limit).toBe(88);
+				expect(pagedSearchResponse.offset).toBe(88);
 				expect(pagedSearchResponse.total).toBeGreaterThan(0);
 
 				// No results, since we start at offset 2400

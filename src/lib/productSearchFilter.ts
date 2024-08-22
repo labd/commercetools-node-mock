@@ -113,7 +113,7 @@ export const parseSearchQuery = (
 		// - https://github.com/bevacqua/fuzzysearch
 		// - With scoring (& therefore boosting): https://github.com/farzher/fuzzysort
 		return generateFieldMatchFunc(
-			(value: any) => value.includes(searchQuery.fullText.value),
+			(value: any) => value?.includes(searchQuery.fullText.value),
 			searchQuery.fullText,
 		);
 	}
