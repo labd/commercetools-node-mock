@@ -67,12 +67,22 @@ export class ProductSearch {
 			});
 		}
 
-		// TODO: Calculate facets
-		// TODO: sorting based on boosts
+		// @TODO: Determine whether or not to spoof facets and implement sorting
+		// Deliberately no facet support, since we do not know which products return
+		// Deliberately no sorting support
 
 		const offset = params.offset || 0;
 		const limit = params.limit || 20;
-		const results = resources.slice(offset, offset + limit);
+		const productProjectionsResult = resources.slice(offset, offset + limit);
+
+		// Transform to ProductSearchResult
+		const results: ProductSearchResult[] = productProjectionsResult.map(
+			(product) => ({
+				productProjection: product,
+				id: product.id,
+				// @TODO: possibly add matchingVariants support
+			}),
+		);
 
 		return {
 			total: resources.length,

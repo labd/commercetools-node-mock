@@ -1,4 +1,4 @@
-import type {
+import {
 	Category,
 	CategoryDraft,
 	Image,
@@ -6,6 +6,9 @@ import type {
 	Product,
 	ProductData,
 	ProductDraft,
+	ProductPagedSearchResponse,
+	ProductSearchRequest,
+	ProductSearchResult,
 	ProductType,
 	ProductTypeDraft,
 	State,
@@ -1416,6 +1419,64 @@ describe("Product update actions", () => {
 		expect(response.body.state).toMatchObject({
 			typeId: "state",
 			id: productState2.id,
+		});
+	});
+
+	// Test the general product search implementation
+	describe("Product Search - Generic", () => {
+		test("Pagination", async () => {
+			{
+				const body: ProductSearchRequest = {
+					limit: 24,
+				};
+				const response = await supertest(ctMock.app)
+					.post("/dummy/products/search")
+					.send(body);
+
+				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+				expect(pagedSearchResponse.limit).toBe(24);
+				expect(pagedSearchResponse.offset).toBe(0);
+				expect(pagedSearchResponse.total).toBeGreaterThan(0);
+
+				// Deliberately not supported fow now
+				expect(pagedSearchResponse.facets).toEqual([]);
+
+				const results: ProductSearchResult[] = pagedSearchResponse.results;
+				expect(results).toBeDefined();
+				expect(results.length).toBeGreaterThan(0);
+
+				// Find product with sku "1337" to be part of the search results
+				const productFound = results.find(
+					(result) => result?.productProjection?.masterVariant?.sku === "1337",
+				);
+				expect(productFound).toBeDefined();
+			}
+			{
+				const body: ProductSearchRequest = {
+					limit: 24,
+					offset: 24,
+				};
+
+				const response = await supertest(ctMock.app)
+					.post("/dummy/products/search")
+					.send(body);
+
+				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+				expect(pagedSearchResponse.limit).toBe(24);
+				expect(pagedSearchResponse.offset).toBe(24);
+				expect(pagedSearchResponse.total).toBeGreaterThan(0);
+
+				// No results, since we start at offset 24
+				const results: ProductSearchResult[] = pagedSearchResponse.results;
+				expect(results).toBeDefined();
+				expect(results.length).toBe(0);
+
+				// Product with sku "1337" should not be part of the results
+				const productFound = results.find(
+					(result) => result?.productProjection?.masterVariant?.sku === "1337",
+				);
+				expect(productFound).toBeUndefined();
+			}
 		});
 	});
 });
