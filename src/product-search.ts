@@ -4,11 +4,12 @@ import {
 	ProductPagedSearchResponse,
 	ProductProjection,
 	ProductSearchRequest,
+	ProductSearchResult,
 } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "./storage";
 import { CommercetoolsError } from "./exceptions";
 import { parseSearchQuery } from "./lib/productSearchFilter";
 import { applyPriceSelector } from "./priceSelector";
+import { AbstractStorage } from "./storage";
 
 export class ProductSearch {
 	protected _storage: AbstractStorage;
@@ -23,7 +24,9 @@ export class ProductSearch {
 	): ProductPagedSearchResponse {
 		let resources = this._storage
 			.all(projectKey, "product")
-			.map((r) => this.transform(r, params.productProjectionParameters?.staged ?? false))
+			.map((r) =>
+				this.transform(r, params.productProjectionParameters?.staged ?? false),
+			)
 			.filter((p) => {
 				if (!params.productProjectionParameters?.staged ?? false) {
 					return p.published;
@@ -33,7 +36,7 @@ export class ProductSearch {
 
 		const markMatchingVariant = params.markMatchingVariants ?? false;
 
-		// Apply filters pre facetting
+		// Apply filters pre faceting
 		if (params.query) {
 			try {
 				const matchFunc = parseSearchQuery(params.query);

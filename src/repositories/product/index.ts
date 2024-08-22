@@ -12,10 +12,10 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
+import { ProductSearch } from "~src/product-search";
 import { AbstractStorage } from "~src/storage/abstract";
 import { AbstractResourceRepository, RepositoryContext } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";
-import { ProductSearch } from "~src/product-search";
 import { ProductUpdateHandler } from "./actions";
 import { variantFromDraft } from "./helpers";
 
@@ -134,7 +134,10 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		return this.saveNew(context, resource);
 	}
 
-	search(context: RepositoryContext, searchRequest: ProductSearchRequest): ProductPagedSearchResponse {
+	search(
+		context: RepositoryContext,
+		searchRequest: ProductSearchRequest,
+	): ProductPagedSearchResponse {
 		return this._searchService.search(context.projectKey, searchRequest);
 	}
 }
