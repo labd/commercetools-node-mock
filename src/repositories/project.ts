@@ -1,5 +1,6 @@
 import type {
 	Project,
+	ProjectChangeBusinessUnitStatusOnCreationAction,
 	ProjectChangeCartsConfigurationAction,
 	ProjectChangeCountriesAction,
 	ProjectChangeCountryTaxRateFallbackEnabledAction,
@@ -13,6 +14,7 @@ import type {
 	ProjectSetShippingRateInputTypeAction,
 	ProjectUpdateAction,
 } from "@commercetools/platform-sdk";
+import { ProjectSetBusinessUnitAssociateRoleOnCreationAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/project";
 import { maskSecretValue } from "../lib/masking";
 import { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
@@ -111,6 +113,20 @@ class ProjectUpdateHandler
 			messagesConfiguration.deleteDaysAfterCreation;
 	}
 
+	changeMyBusinessUnitStatusOnCreation(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ status }: ProjectChangeBusinessUnitStatusOnCreationAction,
+	) {
+		if (resource.businessUnits === undefined) {
+			resource.businessUnits = {
+				myBusinessUnitStatusOnCreation: "Inactive",
+			};
+		}
+
+		resource.businessUnits.myBusinessUnitStatusOnCreation = status;
+	}
+
 	changeName(
 		context: RepositoryContext,
 		resource: Writable<Project>,
@@ -151,6 +167,24 @@ class ProjectUpdateHandler
 		{ externalOAuth }: ProjectSetExternalOAuthAction,
 	) {
 		resource.externalOAuth = externalOAuth;
+	}
+
+	setMyBusinessUnitAssociateRoleOnCreation(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ associateRole }: ProjectSetBusinessUnitAssociateRoleOnCreationAction,
+	) {
+		if (resource.businessUnits === undefined) {
+			resource.businessUnits = {
+				//Default status, so we set it here also
+				myBusinessUnitStatusOnCreation: "Inactive",
+			};
+		}
+
+		resource.businessUnits.myBusinessUnitAssociateRoleOnCreation = {
+			typeId: associateRole.typeId,
+			key: associateRole.key ?? "unknown",
+		};
 	}
 
 	setShippingRateInputType(
