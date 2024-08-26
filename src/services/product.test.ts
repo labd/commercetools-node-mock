@@ -1494,6 +1494,13 @@ describe("Product update actions", () => {
 		test("Pagination", async () => {
 			{
 				const body: ProductSearchRequest = {
+					productProjectionParameters: {
+						storeProjection: "dummy-store",
+						localeProjection: ["en-US"],
+						priceCurrency: "EUR",
+						priceChannel: "dummy-channel",
+						expand: ["categories[*]", "categories[*].ancestors[*]"],
+					},
 					limit: 24,
 				};
 				const response = await supertest(ctMock.app)
@@ -1517,6 +1524,13 @@ describe("Product update actions", () => {
 					(result) => result?.productProjection?.masterVariant?.sku === "1337",
 				);
 				expect(productFound).toBeDefined();
+
+				const priceCurrencyMatch = results.find((result) =>
+					result?.productProjection?.masterVariant?.prices?.find(
+						(price) => price?.value?.currencyCode === "EUR",
+					),
+				);
+				expect(priceCurrencyMatch).toBeDefined();
 			}
 			{
 				const body: ProductSearchRequest = {
@@ -1533,7 +1547,7 @@ describe("Product update actions", () => {
 				expect(pagedSearchResponse.offset).toBe(88);
 				expect(pagedSearchResponse.total).toBeGreaterThan(0);
 
-				// No results, since we start at offset 2400
+				// No results, since we start at offset 88
 				const results: ProductSearchResult[] = pagedSearchResponse.results;
 				expect(results).toBeDefined();
 				expect(results.length).toBe(0);

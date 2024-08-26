@@ -75,15 +75,26 @@ export class ProductSearch {
 		const limit = params.limit || 20;
 		const productProjectionsResult = resources.slice(offset, offset + limit);
 
+		/**
+		 * Do not supply productProjection if productProjectionParameters are not given
+		 * https://docs.commercetools.com/api/projects/product-search#with-product-projection-parameters
+		 */
+		const productProjectionsParameterGiven =
+			!!params?.productProjectionParameters;
+
 		// Transform to ProductSearchResult
 		const results: ProductSearchResult[] = productProjectionsResult.map(
 			(product) => ({
-				productProjection: product,
+				productProjection: productProjectionsParameterGiven
+					? product
+					: undefined,
 				id: product.id,
-				// @TODO: possibly add matchingVariants support
+				/**
+				 * @TODO: possibly add support for optional matchingVariants
+				 * 		https://docs.commercetools.com/api/projects/product-search#productsearchmatchingvariants
+				 */
 			}),
 		);
-
 		return {
 			total: resources.length,
 			offset: offset,
