@@ -7,7 +7,7 @@ import {
 	ProductSearchResult,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "./exceptions";
-import { parseSearchQuery } from "./lib/productSearchFilter";
+import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
 import { applyPriceSelector } from "./priceSelector";
 import { AbstractStorage } from "./storage";
 
@@ -22,7 +22,7 @@ export class ProductSearch {
 		projectKey: string,
 		params: ProductSearchRequest,
 	): ProductPagedSearchResponse {
-		let resources = this._storage
+		const resources = this._storage
 			.all(projectKey, "product")
 			.map((r) =>
 				this.transform(r, params.productProjectionParameters?.staged ?? false),
@@ -34,17 +34,10 @@ export class ProductSearch {
 				return true;
 			});
 
-		const markMatchingVariant = params.markMatchingVariants ?? false;
-
-		// Apply filters pre faceting
+		// Validate query, if given
 		if (params.query) {
 			try {
-				const matchFunc = parseSearchQuery(params.query);
-
-				// Filters can modify the output. So clone the resources first.
-				resources = resources.filter((resource) =>
-					matchFunc(resource, markMatchingVariant),
-				);
+				validateSearchQuery(params.query);
 			} catch (err) {
 				console.error(err);
 				throw new CommercetoolsError<InvalidInputError>(
@@ -67,9 +60,8 @@ export class ProductSearch {
 			});
 		}
 
-		// @TODO: Determine whether or not to spoof facets and implement sorting
-		// Deliberately no facet support, since we do not know which products return
-		// Deliberately no sorting support
+		// @TODO: Determine whether or not to spoof search, facet filtering, wildcard, boosting and/or sorting.
+		//        For now this is deliberately not supported.
 
 		const offset = params.offset || 0;
 		const limit = params.limit || 20;
@@ -95,6 +87,7 @@ export class ProductSearch {
 				 */
 			}),
 		);
+
 		return {
 			total: resources.length,
 			offset: offset,
