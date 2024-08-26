@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.29.1
+
+### Patch Changes
+
+- [#207](https://github.com/labd/commercetools-node-mock/pull/207) [`28bca80`](https://github.com/labd/commercetools-node-mock/commit/28bca80473015efaae94e918f4c998f6ddd06629) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added additional options to project settings
+
 ## 2.29.0
 
 ### Minor Changes
