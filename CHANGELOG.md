@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.30.0
+
+### Minor Changes
+
+- [#209](https://github.com/labd/commercetools-node-mock/pull/209) [`2b74155`](https://github.com/labd/commercetools-node-mock/commit/2b741559ba28f16725ed2f8d940378d305b2f06f) Thanks [@borisvankatwijk](https://github.com/borisvankatwijk)! - Addition of "products/search" POST endpoint. Also known as "Storefront Search -> Product Search".
+
 ## 2.29.1
 
 ### Patch Changes
