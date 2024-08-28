@@ -77,7 +77,7 @@ export class ProductProjectionSearch {
 			currency: params.priceCurrency,
 		});
 
-		// Apply filters pre facetting
+		// Apply filters pre faceting
 		if (params.filter) {
 			try {
 				const filters = params.filter.map(parseFilterExpression);

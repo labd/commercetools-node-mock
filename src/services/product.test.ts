@@ -1,4 +1,4 @@
-import type {
+import {
 	Category,
 	CategoryDraft,
 	Image,
@@ -6,6 +6,9 @@ import type {
 	Product,
 	ProductData,
 	ProductDraft,
+	ProductPagedSearchResponse,
+	ProductSearchRequest,
+	ProductSearchResult,
 	ProductType,
 	ProductTypeDraft,
 	State,
@@ -1484,5 +1487,77 @@ describe("Product update actions", () => {
 			response.body.masterData.staged.masterVariant.prices?.[0].custom.fields
 				?.myCustomField,
 		).toBe("MyRandomValue");
+	});
+
+	// Test the general product search implementation
+	describe("Product Search - Generic", () => {
+		test("Pagination", async () => {
+			{
+				const body: ProductSearchRequest = {
+					productProjectionParameters: {
+						storeProjection: "dummy-store",
+						localeProjection: ["en-US"],
+						priceCurrency: "EUR",
+						priceChannel: "dummy-channel",
+						expand: ["categories[*]", "categories[*].ancestors[*]"],
+					},
+					limit: 24,
+				};
+				const response = await supertest(ctMock.app)
+					.post("/dummy/products/search")
+					.send(body);
+
+				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+				expect(pagedSearchResponse.limit).toBe(24);
+				expect(pagedSearchResponse.offset).toBe(0);
+				expect(pagedSearchResponse.total).toBeGreaterThan(0);
+
+				// Deliberately not supported fow now
+				expect(pagedSearchResponse.facets).toEqual([]);
+
+				const results: ProductSearchResult[] = pagedSearchResponse.results;
+				expect(results).toBeDefined();
+				expect(results.length).toBeGreaterThan(0);
+
+				// Find product with sku "1337" to be part of the search results
+				const productFound = results.find(
+					(result) => result?.productProjection?.masterVariant?.sku === "1337",
+				);
+				expect(productFound).toBeDefined();
+
+				const priceCurrencyMatch = results.find((result) =>
+					result?.productProjection?.masterVariant?.prices?.find(
+						(price) => price?.value?.currencyCode === "EUR",
+					),
+				);
+				expect(priceCurrencyMatch).toBeDefined();
+			}
+			{
+				const body: ProductSearchRequest = {
+					limit: 88,
+					offset: 88,
+				};
+
+				const response = await supertest(ctMock.app)
+					.post("/dummy/products/search")
+					.send(body);
+
+				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+				expect(pagedSearchResponse.limit).toBe(88);
+				expect(pagedSearchResponse.offset).toBe(88);
+				expect(pagedSearchResponse.total).toBeGreaterThan(0);
+
+				// No results, since we start at offset 88
+				const results: ProductSearchResult[] = pagedSearchResponse.results;
+				expect(results).toBeDefined();
+				expect(results.length).toBe(0);
+
+				// Product with sku "1337" should not be part of the results
+				const productFound = results.find(
+					(result) => result?.productProjection?.masterVariant?.sku === "1337",
+				);
+				expect(productFound).toBeUndefined();
+			}
+		});
 	});
 });

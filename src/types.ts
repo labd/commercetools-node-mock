@@ -10,11 +10,11 @@ export type ShallowWritable<T> = { -readonly [P in keyof T]: T[P] };
 export type ServiceTypes =
 	| ctp.ReferenceTypeId
 	| "product-projection"
+	| "product-search"
 	| "my-cart"
 	| "my-order"
 	| "my-payment"
-	| "my-customer"
-	| "product-projection";
+	| "my-customer";
 
 export type Services = Partial<{
 	[index in ServiceTypes]: AbstractService;
