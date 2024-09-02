@@ -19,6 +19,7 @@ import type {
 	OrderTransitionStateAction,
 	OrderUpdateAction,
 	OrderUpdateSyncInfoAction,
+	OrderChangeShipmentStateAction,
 	ReturnInfo,
 	State,
 	Store,
@@ -115,6 +116,14 @@ export class OrderUpdateHandler
 		{ paymentState }: OrderChangePaymentStateAction,
 	) {
 		resource.paymentState = paymentState;
+	}
+
+	changeShipmentState(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ shipmentState }: OrderChangeShipmentStateAction
+	) {
+		resource.shipmentState = shipmentState
 	}
 
 	setBillingAddress(

@@ -403,6 +403,22 @@ describe("Order Update Actions", () => {
 		expect(response.body.paymentState).toBe("Failed");
 	});
 
+	test("changeShipmentState", async () => {
+		assert(order, "order not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: "changeShipmentState", shipmentState: "Delayed" },
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.shipmentState).toBe("Delayed");
+	});
+
 	test("setDeliveryCustomField", async () => {
 		const order: Order = {
 			...getBaseResourceProperties(),
