@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.30.1
+
+### Patch Changes
+
+- [#211](https://github.com/labd/commercetools-node-mock/pull/211) [`91b0255`](https://github.com/labd/commercetools-node-mock/commit/91b0255239141c6f251c648414204d834481b0d5) Thanks [@yugaWicaksono](https://github.com/yugaWicaksono)! - Added missing test OrderChangeShipmentStateAction in order action
+
 ## 2.30.0
 
 ### Minor Changes
