@@ -410,9 +410,7 @@ describe("Order Update Actions", () => {
 			.post(`/dummy/orders/${order.id}`)
 			.send({
 				version: 1,
-				actions: [
-					{ action: "changeShipmentState", shipmentState: "Delayed" },
-				],
+				actions: [{ action: "changeShipmentState", shipmentState: "Delayed" }],
 			});
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(2);
