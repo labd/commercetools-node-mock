@@ -18,10 +18,10 @@ import type {
   SearchWildCardExpression,
   _SearchQuery,
   _SearchQueryExpression,
-  _SearchQueryExpressionValue
+  _SearchQueryExpressionValue,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "../types";
 import { nestedLookup } from "~src/helpers";
+import type { Writable } from "../types";
 import { getVariants } from "./projectionSearchFilter";
 
 type ProductSearchFilterFunc = (
@@ -31,38 +31,44 @@ type ProductSearchFilterFunc = (
 
 // @TODO: Implement field boosting:
 // https://docs.commercetools.com/merchant-center/advanced-product-search#boost-field
-export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilterFunc => {
+export const parseSearchQuery = (
+  searchQuery: _SearchQuery,
+): ProductSearchFilterFunc => {
   if (isSearchAndExpression(searchQuery)) {
-    return (obj, markMatchingVariant) => searchQuery.and.every((expr) => {
-      const filterFunc = parseSearchQuery(expr);
+    return (obj, markMatchingVariant) =>
+      searchQuery.and.every((expr) => {
+        const filterFunc = parseSearchQuery(expr);
 
-      return filterFunc(obj, markMatchingVariant);
-    });
+        return filterFunc(obj, markMatchingVariant);
+      });
   }
 
   if (isSearchOrExpression(searchQuery)) {
-    return (obj, markMatchingVariant) => searchQuery.or.some((expr) => {
-      const filterFunc = parseSearchQuery(expr);
+    return (obj, markMatchingVariant) =>
+      searchQuery.or.some((expr) => {
+        const filterFunc = parseSearchQuery(expr);
 
-      return filterFunc(obj, markMatchingVariant);
-    });
+        return filterFunc(obj, markMatchingVariant);
+      });
   }
 
   if (isSearchNotExpression(searchQuery)) {
-    return (obj, markMatchingVariant) => !parseSearchQuery(searchQuery.not)(obj, markMatchingVariant);
+    return (obj, markMatchingVariant) =>
+      !parseSearchQuery(searchQuery.not)(obj, markMatchingVariant);
   }
 
   if (isSearchFilterExpression(searchQuery)) {
-    // Matching resources of a query are checked for their relevancy to the search. 
+    // Matching resources of a query are checked for their relevancy to the search.
     // The relevancy is expressed by an internal score.
     // All expressions except filter expressions contribute to that score.
     // All sub-expressions of a filter are implicitly connected with an and expression.
     // NOTE: for now just implementing it like a AND expression
-    return (obj, markMatchingVariant) => searchQuery.filter.every((expr) => {
-      const filterFunc = parseSearchQuery(expr);
+    return (obj, markMatchingVariant) =>
+      searchQuery.filter.every((expr) => {
+        const filterFunc = parseSearchQuery(expr);
 
-      return filterFunc(obj, markMatchingVariant);
-    });
+        return filterFunc(obj, markMatchingVariant);
+      });
   }
 
   if (isSearchRangeExpression(searchQuery)) {
@@ -86,13 +92,16 @@ export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilter
       }
 
       return rangeFilters.every((filter) => filter);
-    }
+    };
 
     return generateFieldMatchFunc(generateRangeMatchFunc, searchQuery.range);
   }
 
   if (isSearchExactExpression(searchQuery)) {
-    return generateFieldMatchFunc((value: any) => value === searchQuery.exact.value, searchQuery.exact);
+    return generateFieldMatchFunc(
+      (value: any) => value === searchQuery.exact.value,
+      searchQuery.exact,
+    );
   }
 
   if (isSearchExistsExpression(searchQuery)) {
@@ -100,48 +109,77 @@ export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilter
   }
 
   if (isSearchFullTextExpression(searchQuery)) {
-    // @TODO: Implement fulltext search, to fully support functionality offered by commercetools: 
+    // @TODO: Implement fulltext search, to fully support functionality offered by commercetools:
     // https://docs.commercetools.com/api/search-query-language#fulltext
-    return generateFieldMatchFunc((value: any) => value.includes(searchQuery.fullText.value), searchQuery.fullText);
+    return generateFieldMatchFunc(
+      (value: any) => value.includes(searchQuery.fullText.value),
+      searchQuery.fullText,
+    );
   }
 
   if (isSearchFullTextPrefixExpression(searchQuery)) {
-    // @TODO: Implement fulltext search, to fully support functionality offered by commercetools: 
+    // @TODO: Implement fulltext search, to fully support functionality offered by commercetools:
     // https://docs.commercetools.com/api/search-query-language#fulltext
-    return generateFieldMatchFunc((value: any) => value.startsWith(searchQuery.fullTextPrefix.value), searchQuery.fullTextPrefix);
+    return generateFieldMatchFunc(
+      (value: any) => value.startsWith(searchQuery.fullTextPrefix.value),
+      searchQuery.fullTextPrefix,
+    );
   }
 
   if (isSearchPrefixExpression(searchQuery)) {
-    return generateFieldMatchFunc((value: any) => value.startsWith(searchQuery.prefix.value), searchQuery.prefix);
+    return generateFieldMatchFunc(
+      (value: any) => value.startsWith(searchQuery.prefix.value),
+      searchQuery.prefix,
+    );
   }
 
   if (isSearchWildCardExpression(searchQuery)) {
-    // @TODO: Fully implement wildcard search, as specified: 
+    // @TODO: Fully implement wildcard search, as specified:
     // https://docs.commercetools.com/api/search-query-language#fulltext
     const generateWildcardMatchFunc = (value: any) => {
-      const wildCardValues = searchQuery.wildcard.value.split("*").filter((v: string) => !!v);
+      const wildCardValues = searchQuery.wildcard.value
+        .split("*")
+        .filter((v: string) => !!v);
 
       if (searchQuery.wildcard.caseInsensitive) {
-        return wildCardValues.every((wildCardValue: string) => value.toLowerCase().includes(wildCardValue.toLowerCase()));
+        return wildCardValues.every((wildCardValue: string) =>
+          value.toLowerCase().includes(wildCardValue.toLowerCase()),
+        );
       }
 
-      return wildCardValues.every((wildCardValue: string) => value.includes(wildCardValue));
+      return wildCardValues.every((wildCardValue: string) =>
+        value.includes(wildCardValue),
+      );
     };
 
-    return generateFieldMatchFunc(generateWildcardMatchFunc, searchQuery.wildcard);
+    return generateFieldMatchFunc(
+      generateWildcardMatchFunc,
+      searchQuery.wildcard,
+    );
   }
 
   throw new Error("Unsupported search query expression");
 };
 
-const generateFieldMatchFunc = (matchFunc: (value: any) => boolean, searchQuery: _SearchQueryExpressionValue) => {
-  const generateMatchFunc = (obj: ProductProjection, markMatchingVariants: boolean) => {
+const generateFieldMatchFunc = (
+  matchFunc: (value: any) => boolean,
+  searchQuery: _SearchQueryExpressionValue,
+) => {
+  const generateMatchFunc = (
+    obj: ProductProjection,
+    markMatchingVariants: boolean,
+  ) => {
     if (searchQuery.field.startsWith("variants.")) {
-      const variantField = searchQuery.field.substring(searchQuery.field.indexOf(".") + 1);
+      const variantField = searchQuery.field.substring(
+        searchQuery.field.indexOf(".") + 1,
+      );
 
       const variants = getVariants(obj) as Writable<ProductVariant>[];
       for (const variant of variants) {
-        const value = resolveFieldValue(variant, { ...searchQuery, field: variantField });
+        const value = resolveFieldValue(variant, {
+          ...searchQuery,
+          field: variantField,
+        });
 
         if (matchFunc(value)) {
           if (markMatchingVariants) {
@@ -159,14 +197,17 @@ const generateFieldMatchFunc = (matchFunc: (value: any) => boolean, searchQuery:
     }
 
     return matchFunc(resolveFieldValue(obj, searchQuery));
-  }
+  };
 
   return generateMatchFunc;
 };
 
-const resolveFieldValue = (obj: any, searchQuery: _SearchQueryExpressionValue) => {
+const resolveFieldValue = (
+  obj: any,
+  searchQuery: _SearchQueryExpressionValue,
+) => {
   if (searchQuery.field === undefined) {
-    throw new Error("Missing field path in query expression")
+    throw new Error("Missing field path in query expression");
   }
 
   let fieldPath = searchQuery.field;
@@ -179,7 +220,8 @@ const resolveFieldValue = (obj: any, searchQuery: _SearchQueryExpressionValue) =
   if (fieldPath.startsWith("attributes.")) {
     const [, attrName, ...rest] = fieldPath.split(".");
     if (!obj.attributes) {
-      return undefined; 0
+      return undefined;
+      0;
     }
 
     for (const attr of obj.attributes) {
@@ -198,18 +240,24 @@ const resolveFieldValue = (obj: any, searchQuery: _SearchQueryExpressionValue) =
   return nestedLookupByLanguage(obj, fieldPath, language);
 };
 
-const nestedLookupByLanguage = (obj: any, path: string, language?: string): any => {
+const nestedLookupByLanguage = (
+  obj: any,
+  path: string,
+  language?: string,
+): any => {
   const value = nestedLookup(obj, path);
 
   if (language && value && typeof value === "object") {
     // Due to Commercetools supporting "en", but also "en-US" as language, we need to find the best match
-    const matchingLanguageKey = Object.keys(value).find((key) => key.toLowerCase().startsWith(language.toLowerCase()));
+    const matchingLanguageKey = Object.keys(value).find((key) =>
+      key.toLowerCase().startsWith(language.toLowerCase()),
+    );
 
     return matchingLanguageKey ? value[matchingLanguageKey] : undefined;
   }
 
   return value;
-}
+};
 
 // type guards
 const isSearchAndExpression = (
