@@ -1,14 +1,23 @@
 import type {
 	Customer,
+	CustomerCreatePasswordResetToken,
 	CustomerDraft,
+	CustomerResetPassword,
 	CustomerToken,
 	DuplicateFieldError,
+	MyCustomerResetPassword,
 	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
-import { createPasswordResetToken, hashPassword } from "~src/lib/password";
+import {
+	createEmailVerifyToken,
+	createPasswordResetToken,
+	hashPassword,
+	validatePasswordResetToken,
+} from "~src/lib/password";
 import { AbstractStorage } from "~src/storage/abstract";
+import { Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -82,25 +91,93 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				context.projectKey,
 				this._storage,
 			),
+			stores: [],
 		};
 		return this.saveNew(context, resource);
 	}
 
-	passwordResetToken(context: RepositoryContext, email: string): CustomerToken {
+	passwordResetToken(
+		context: RepositoryContext,
+		request: CustomerCreatePasswordResetToken,
+	): CustomerToken {
 		const results = this._storage.query(context.projectKey, this.getTypeId(), {
-			where: [`email="${email.toLocaleLowerCase()}"`],
+			where: [`email="${request.email.toLocaleLowerCase()}"`],
 		});
 		if (results.count === 0) {
 			throw new CommercetoolsError<ResourceNotFoundError>({
 				code: "ResourceNotFound",
-				message: `The Customer with ID '${email}' was not found.`,
+				message: `The Customer with ID '${request.email}' was not found.`,
+			});
+		}
+
+		const ttlMinutes = request.ttlMinutes ?? 34560; // 34560 is CT default
+
+		const expiresAt = new Date(new Date().getTime() + ttlMinutes * 60 * 1000);
+		const customer = results.results[0] as Customer;
+		const rest = getBaseResourceProperties();
+
+		const token = createPasswordResetToken(customer, expiresAt);
+
+		return {
+			id: rest.id,
+			createdAt: rest.createdAt,
+			lastModifiedAt: rest.lastModifiedAt,
+			customerId: customer.id,
+			expiresAt: expiresAt.toISOString(),
+			value: token,
+		};
+	}
+
+	passwordReset(
+		context: RepositoryContext,
+		resetPassword: CustomerResetPassword | MyCustomerResetPassword,
+	) {
+		const { newPassword, tokenValue } = resetPassword;
+
+		const customerId = validatePasswordResetToken(tokenValue);
+		if (!customerId) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
+			});
+		}
+
+		const customer = this._storage.get(
+			context.projectKey,
+			"customer",
+			customerId,
+		) as Writable<Customer> | undefined;
+
+		if (!customer) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
+			});
+		}
+
+		customer.password = hashPassword(newPassword);
+		customer.version += 1;
+
+		// Update storage
+		this._storage.add(context.projectKey, "customer", customer);
+		return customer;
+	}
+
+	verifyEmailToken(context: RepositoryContext, id: string): CustomerToken {
+		const results = this._storage.query(context.projectKey, this.getTypeId(), {
+			where: [`id="${id.toLocaleLowerCase()}"`],
+		});
+		if (results.count === 0) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID '${id}' was not found.`,
 			});
 		}
 		const expiresAt = new Date(Date.now() + 30 * 60);
 		const customer = results.results[0] as Customer;
 		const rest = getBaseResourceProperties();
 
-		const token = createPasswordResetToken(customer);
+		const token = createEmailVerifyToken(customer);
 		return {
 			id: rest.id,
 			createdAt: rest.createdAt,

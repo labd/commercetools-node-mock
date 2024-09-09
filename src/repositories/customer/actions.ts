@@ -5,10 +5,13 @@ import type {
 	CustomerSetAuthenticationModeAction,
 	CustomerSetCompanyNameAction,
 	CustomerSetCustomFieldAction,
+	CustomerSetCustomTypeAction,
 	CustomerSetCustomerNumberAction,
+	CustomerSetExternalIdAction,
 	CustomerSetFirstNameAction,
 	CustomerSetKeyAction,
 	CustomerSetLastNameAction,
+	CustomerSetLocaleAction,
 	CustomerSetSalutationAction,
 	CustomerSetVatIdAction,
 	CustomerUpdateAction,
@@ -23,7 +26,7 @@ import {
 	UpdateHandlerInterface,
 	type RepositoryContext,
 } from "../abstract";
-import { createAddress } from "../helpers";
+import { createAddress, createCustomFields } from "../helpers";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
@@ -141,6 +144,30 @@ export class CustomerUpdateHandler
 		resource.custom.fields[name] = value;
 	}
 
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ type, fields }: CustomerSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
+	}
+
+	setExternalId(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ externalId }: CustomerSetExternalIdAction,
+	) {
+		resource.externalId = externalId;
+	}
+
 	setFirstName(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -163,6 +190,14 @@ export class CustomerUpdateHandler
 		{ lastName }: CustomerSetLastNameAction,
 	) {
 		resource.lastName = lastName;
+	}
+
+	setLocale(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ locale }: CustomerSetLocaleAction,
+	) {
+		resource.locale = locale;
 	}
 
 	setSalutation(

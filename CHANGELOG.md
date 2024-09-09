@@ -1,4 +1,74 @@
-## 2.20.0
+## 2.23.1
+
+## 2.30.1
+
+### Patch Changes
+
+- [#211](https://github.com/labd/commercetools-node-mock/pull/211) [`91b0255`](https://github.com/labd/commercetools-node-mock/commit/91b0255239141c6f251c648414204d834481b0d5) Thanks [@yugaWicaksono](https://github.com/yugaWicaksono)! - Added missing test OrderChangeShipmentStateAction in order action
+
+## 2.30.0
+
+### Minor Changes
+
+- [#209](https://github.com/labd/commercetools-node-mock/pull/209) [`2b74155`](https://github.com/labd/commercetools-node-mock/commit/2b741559ba28f16725ed2f8d940378d305b2f06f) Thanks [@borisvankatwijk](https://github.com/borisvankatwijk)! - Addition of "products/search" POST endpoint. Also known as "Storefront Search -> Product Search".
+
+## 2.29.1
+
+### Patch Changes
+
+- [#207](https://github.com/labd/commercetools-node-mock/pull/207) [`28bca80`](https://github.com/labd/commercetools-node-mock/commit/28bca80473015efaae94e918f4c998f6ddd06629) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added additional options to project settings
+
+## 2.29.0
+
+### Minor Changes
+
+- [#199](https://github.com/labd/commercetools-node-mock/pull/199) [`be62944`](https://github.com/labd/commercetools-node-mock/commit/be62944a5e47e03ce9ed59ea24cfee790d95320e) Thanks [@leongraumans](https://github.com/leongraumans)! - add support for "setProductPriceCustomField" product update action
+
+## 2.28.1
+
+### Patch Changes
+
+- [#204](https://github.com/labd/commercetools-node-mock/pull/204) [`a4e5a6c`](https://github.com/labd/commercetools-node-mock/commit/a4e5a6c4502e353b607e1fd3c854ef78c52951fc) Thanks [@yugaWicaksono](https://github.com/yugaWicaksono)! - Added missing test to cover OrderSetDeliveryCustomFieldAction in the form of method setDeliveryCustomField inside of OrderUpdateHandler
+
+## 2.28.0
+
+### Minor Changes
+
+- [#202](https://github.com/labd/commercetools-node-mock/pull/202) [`8737a6a`](https://github.com/labd/commercetools-node-mock/commit/8737a6aff198eb26f82ddbc2de32e664bb82e742) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Fixed issues with business units, updated sdk to latest
+
+## 2.27.0
+
+### Minor Changes
+
+- [`2b5dc4c`](https://github.com/labd/commercetools-node-mock/commit/2b5dc4c2acf59b8f38c16073321865a2bcad381f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Implement customer reset flow for global scope
+
+## 2.26.1
+
+### Patch Changes
+
+- [#194](https://github.com/labd/commercetools-node-mock/pull/194) [`cb84e0a`](https://github.com/labd/commercetools-node-mock/commit/cb84e0a16c3602c770ba906619b13e86d49fa5bd) Thanks [@pvaneveld](https://github.com/pvaneveld)! - Add support for customer set custom type
+
+## 2.26.0
+
+### Minor Changes
+
+- [#191](https://github.com/labd/commercetools-node-mock/pull/191) [`ffcbd97`](https://github.com/labd/commercetools-node-mock/commit/ffcbd97af8921af1c97f616fdb4b474744f73ae8) Thanks [@pvaneveld](https://github.com/pvaneveld)! - add support for customer setLocale action
+
+## 2.25.0
+
+### Minor Changes
+
+- [#190](https://github.com/labd/commercetools-node-mock/pull/190) [`7cce673`](https://github.com/labd/commercetools-node-mock/commit/7cce673e23b76acccd51e2682ffc36c13efa245b) Thanks [@pvaneveld](https://github.com/pvaneveld)! - add support for "setExternalId" customer update action
+
+## 2.24.0
+
+### Minor Changes
+
+- [#188](https://github.com/labd/commercetools-node-mock/pull/188) [`a21f259`](https://github.com/labd/commercetools-node-mock/commit/a21f25920e77842b390384458847f2e909eac35a) Thanks [@pvaneveld](https://github.com/pvaneveld)! - add support for the customer email verify flow
+
+### Patch Changes
+
+- [#186](https://github.com/labd/commercetools-node-mock/pull/186) [`5cdc614`](https://github.com/labd/commercetools-node-mock/commit/5cdc614346d5a69000e0d0cb895531d3a0398a20) Thanks [@mikedebock](https://github.com/mikedebock)! - Fix customObject withContainer postProcessResource arguments
 
 ## 2.23.0
 
@@ -59,6 +129,8 @@
 ### Patch Changes
 
 - [`08e651b`](https://github.com/labd/commercetools-node-mock/commit/08e651b5d60554b5bd40862b134ece0b11833a91) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Return proper values for Category.ancestors
+
+## 2.20.0
 
 ### Minor Changes
 

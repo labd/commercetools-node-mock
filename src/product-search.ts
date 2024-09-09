@@ -1,8 +1,16 @@
-import { InvalidInputError, Product, ProductPagedSearchResponse, ProductProjection, ProductSearchRequest } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "./storage";
+import {
+	InvalidInputError,
+	Product,
+	ProductPagedSearchResponse,
+	ProductProjection,
+	ProductSearchRequest,
+	ProductSearchResult,
+} from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "./exceptions";
-import { parseSearchQuery } from "./lib/productSearchFilter";
+import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
 import { applyPriceSelector } from "./priceSelector";
+import { AbstractStorage } from "./storage";
+import { parseSearchQuery } from "./lib/productSearchFilter";
 
 export class ProductSearch {
 	protected _storage: AbstractStorage;
@@ -17,7 +25,9 @@ export class ProductSearch {
 	): ProductPagedSearchResponse {
 		let resources = this._storage
 			.all(projectKey, "product")
-			.map((r) => this.transform(r, params.productProjectionParameters?.staged ?? false))
+			.map((r) =>
+				this.transform(r, params.productProjectionParameters?.staged ?? false),
+			)
 			.filter((p) => {
 				if (!params.productProjectionParameters?.staged ?? false) {
 					return p.published;
@@ -30,6 +40,8 @@ export class ProductSearch {
 		// Apply filters pre facetting
 		if (params.query) {
 			try {
+				validateSearchQuery(params.query);
+
 				const matchFunc = parseSearchQuery(params.query);
 
 				// Filters can modify the output. So clone the resources first.
@@ -58,12 +70,33 @@ export class ProductSearch {
 			});
 		}
 
-		// TODO: Calculate facets
-		// TODO: sorting based on boosts
+		// @TODO: Determine whether or not to spoof search, facet filtering, wildcard, boosting and/or sorting.
+		//        For now this is deliberately not supported.
 
 		const offset = params.offset || 0;
 		const limit = params.limit || 20;
-		const results = resources.slice(offset, offset + limit);
+		const productProjectionsResult = resources.slice(offset, offset + limit);
+
+		/**
+		 * Do not supply productProjection if productProjectionParameters are not given
+		 * https://docs.commercetools.com/api/projects/product-search#with-product-projection-parameters
+		 */
+		const productProjectionsParameterGiven =
+			!!params?.productProjectionParameters;
+
+		// Transform to ProductSearchResult
+		const results: ProductSearchResult[] = productProjectionsResult.map(
+			(product) => ({
+				productProjection: productProjectionsParameterGiven
+					? product
+					: undefined,
+				id: product.id,
+				/**
+				 * @TODO: possibly add support for optional matchingVariants
+				 * 		https://docs.commercetools.com/api/projects/product-search#productsearchmatchingvariants
+				 */
+			}),
+		);
 
 		return {
 			total: resources.length,

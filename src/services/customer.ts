@@ -16,6 +16,12 @@ export class CustomerService extends AbstractService {
 		return "customers";
 	}
 
+	extraRoutes(parent: Router) {
+		parent.post("/password-token", this.passwordResetToken.bind(this));
+		parent.post("/password/reset", this.passwordReset.bind(this));
+		parent.post("/email-token", this.confirmEmailToken.bind(this));
+	}
+
 	post(request: Request, response: Response) {
 		const draft = request.body;
 		const resource = this.repository.create(
@@ -30,14 +36,30 @@ export class CustomerService extends AbstractService {
 		return response.status(this.createStatusCode).send(result);
 	}
 
-	extraRoutes(parent: Router) {
-		parent.post("/password-token", (request, response) => {
-			const email = request.body.email;
-			const token = this.repository.passwordResetToken(
-				getRepositoryContext(request),
-				email,
-			);
-			return response.status(200).send(token);
-		});
+	passwordResetToken(request: Request, response: Response) {
+		const customer = this.repository.passwordResetToken(
+			getRepositoryContext(request),
+			request.body,
+		);
+
+		return response.status(200).send(customer);
+	}
+
+	passwordReset(request: Request, response: Response) {
+		const customer = this.repository.passwordReset(
+			getRepositoryContext(request),
+			request.body,
+		);
+
+		return response.status(200).send(customer);
+	}
+
+	confirmEmailToken(request: Request, response: Response) {
+		const id = request.body.id;
+		const token = this.repository.verifyEmailToken(
+			getRepositoryContext(request),
+			id,
+		);
+		return response.status(200).send(token);
 	}
 }

@@ -2,11 +2,11 @@ import {
 	Customer,
 	InvalidCurrentPasswordError,
 	MyCustomerChangePassword,
+	MyCustomerEmailVerify,
 	ResourceNotFoundError,
-	type MyCustomerResetPassword,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
-import { hashPassword, validatePasswordResetToken } from "../lib/password";
+import { hashPassword, validateEmailVerifyToken } from "../lib/password";
 import { Writable } from "../types";
 import { type RepositoryContext } from "./abstract";
 import { CustomerRepository } from "./customer";
@@ -45,6 +45,41 @@ export class MyCustomerRepository extends CustomerRepository {
 		return customer;
 	}
 
+	confirmEmail(
+		context: RepositoryContext,
+		resetPassword: MyCustomerEmailVerify,
+	) {
+		const { tokenValue } = resetPassword;
+
+		const customerId = validateEmailVerifyToken(tokenValue);
+		if (!customerId) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
+			});
+		}
+
+		const customer = this._storage.get(
+			context.projectKey,
+			"customer",
+			customerId,
+		) as Writable<Customer> | undefined;
+
+		if (!customer) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
+			});
+		}
+
+		customer.isEmailVerified = true;
+		customer.version += 1;
+
+		// Update storage
+		this._storage.add(context.projectKey, "customer", customer);
+		return customer;
+	}
+
 	deleteMe(context: RepositoryContext): Customer | undefined {
 		// grab the first customer you can find for now. In the future we should
 		// use the customer id from the scope of the token
@@ -75,40 +110,5 @@ export class MyCustomerRepository extends CustomerRepository {
 		}
 
 		return;
-	}
-
-	resetPassword(
-		context: RepositoryContext,
-		resetPassword: MyCustomerResetPassword,
-	) {
-		const { newPassword, tokenValue } = resetPassword;
-
-		const customerId = validatePasswordResetToken(tokenValue);
-		if (!customerId) {
-			throw new CommercetoolsError<ResourceNotFoundError>({
-				code: "ResourceNotFound",
-				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
-			});
-		}
-
-		const customer = this._storage.get(
-			context.projectKey,
-			"customer",
-			customerId,
-		) as Writable<Customer> | undefined;
-
-		if (!customer) {
-			throw new CommercetoolsError<ResourceNotFoundError>({
-				code: "ResourceNotFound",
-				message: `The Customer with ID 'Token(${tokenValue})' was not found.`,
-			});
-		}
-
-		customer.password = hashPassword(newPassword);
-		customer.version += 1;
-
-		// Update storage
-		this._storage.add(context.projectKey, "customer", customer);
-		return customer;
 	}
 }

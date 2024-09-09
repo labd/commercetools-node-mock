@@ -1,4 +1,5 @@
 import type {
+	Customer,
 	CustomerChangePassword,
 	CustomerToken,
 	MyCustomerDraft,
@@ -37,6 +38,7 @@ describe("Me", () => {
 				id: expect.anything(),
 				createdAt: expect.anything(),
 				lastModifiedAt: expect.anything(),
+				stores: [],
 			},
 		});
 	});
@@ -73,6 +75,7 @@ describe("/me", () => {
 			isEmailVerified: true,
 			authenticationMode: "password",
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
+			stores: [],
 		});
 	});
 
@@ -96,6 +99,7 @@ describe("/me", () => {
 					typeId: "type",
 				},
 			},
+			stores: [],
 		});
 	});
 
@@ -119,6 +123,7 @@ describe("/me", () => {
 					typeId: "type",
 				},
 			},
+			stores: [],
 		});
 
 		const newResponse = await supertest(ctMock.app).get("/dummy/me");
@@ -126,7 +131,7 @@ describe("/me", () => {
 	});
 
 	test("Change my password", async () => {
-		const customer = {
+		const customer: Customer = {
 			...getBaseResourceProperties(),
 			id: "customer-uuid",
 			email: "user@example.com",
@@ -135,6 +140,7 @@ describe("/me", () => {
 			isEmailVerified: true,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
+			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
 
@@ -176,7 +182,7 @@ describe("/me", () => {
 	});
 
 	test("reset password flow", async () => {
-		const customer = {
+		const customer: Customer = {
 			...getBaseResourceProperties(),
 			id: "customer-uuid",
 			email: "user@example.com",
@@ -185,6 +191,7 @@ describe("/me", () => {
 			isEmailVerified: true,
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
+			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
 
@@ -210,6 +217,54 @@ describe("/me", () => {
 			.send({
 				tokenValue: "invalid-token",
 				newPassword: "somethingNew",
+			});
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+			statusCode: 400,
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: `The Customer with ID 'Token(invalid-token)' was not found.`,
+				},
+			],
+		});
+	});
+
+	test("verify email flow", async () => {
+		const customer: Customer = {
+			...getBaseResourceProperties(),
+			id: "customer-uuid",
+			email: "user@example.com",
+			password: hashPassword("p4ssw0rd"),
+			addresses: [],
+			isEmailVerified: false,
+			authenticationMode: "Password", //default in Commercetools
+			version: 1,
+			stores: [],
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const token = await supertest(ctMock.app)
+			.post("/dummy/customers/email-token")
+			.send({
+				id: "customer-uuid",
+			})
+			.then((response) => response.body as CustomerToken);
+
+		const response = await supertest(ctMock.app)
+			.post("/dummy/me/email/confirm")
+			.send({
+				tokenValue: token.value,
+			});
+		expect(response.status).toBe(200);
+	});
+
+	test("fail verify email flow", async () => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/me/email/confirm")
+			.send({
+				tokenValue: "invalid-token",
 			});
 		expect(response.status).toBe(400);
 		expect(response.body).toEqual({

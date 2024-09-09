@@ -75,6 +75,25 @@ describe("CustomObject retrieve", () => {
 		expect(customObject.value).toBe("my-value");
 	});
 
+	test("query with container", async () => {
+		const response = await supertest(ctMock.app)
+			.get("/dummy/custom-objects/my-container")
+			.send();
+
+		expect(response.status).toBe(200);
+		const customObjects = response.body;
+		expect(customObjects).toMatchObject({
+			results: [
+				{
+					container: "my-container",
+					key: "my-key",
+					value: "my-value",
+				},
+			],
+			total: 1,
+		});
+	});
+
 	test("Update match current (no conflict)", async () => {
 		const response = await supertest(ctMock.app)
 			.post("/dummy/custom-objects")

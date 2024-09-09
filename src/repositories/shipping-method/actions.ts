@@ -4,6 +4,7 @@ import {
 	type ShippingMethod,
 	type ShippingMethodAddShippingRateAction,
 	type ShippingMethodAddZoneAction,
+	type ShippingMethodChangeActiveAction,
 	type ShippingMethodChangeIsDefaultAction,
 	type ShippingMethodChangeNameAction,
 	type ShippingMethodRemoveZoneAction,
@@ -18,7 +19,7 @@ import {
 	type ZoneReference,
 } from "@commercetools/platform-sdk";
 import deepEqual from "deep-equal";
-import type { Writable } from "../../types";
+import type { Writable } from "~src/types";
 import {
 	AbstractUpdateHandler,
 	RepositoryContext,
@@ -81,6 +82,14 @@ export class ShippingMethodUpdateHandler
 			zone: zoneReference,
 			shippingRates: [],
 		});
+	}
+
+	changeActive(
+		_context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ active }: ShippingMethodChangeActiveAction,
+	) {
+		resource.active = active;
 	}
 
 	changeIsDefault(
