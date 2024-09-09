@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.31.0
+
+### Minor Changes
+
+- [#213](https://github.com/labd/commercetools-node-mock/pull/213) [`aefebc7`](https://github.com/labd/commercetools-node-mock/commit/aefebc73ae155de4a646bd6cc0e5ab17b3be5a73) Thanks [@jsm1t](https://github.com/jsm1t)! - Add filtering with search query to product search
+
 ## 2.30.1
 
 ### Patch Changes
