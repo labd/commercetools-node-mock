@@ -7,6 +7,7 @@ import {
 	ProductSearchResult,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "./exceptions";
+import { parseSearchQuery } from "./lib/productSearchFilter";
 import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
 import { applyPriceSelector } from "./priceSelector";
 import { AbstractStorage } from "./storage";
@@ -22,7 +23,7 @@ export class ProductSearch {
 		projectKey: string,
 		params: ProductSearchRequest,
 	): ProductPagedSearchResponse {
-		const resources = this._storage
+		let resources = this._storage
 			.all(projectKey, "product")
 			.map((r) =>
 				this.transform(r, params.productProjectionParameters?.staged ?? false),
@@ -34,10 +35,19 @@ export class ProductSearch {
 				return true;
 			});
 
-		// Validate query, if given
+		const markMatchingVariant = params.markMatchingVariants ?? false;
+
+		// Apply filters pre facetting
 		if (params.query) {
 			try {
 				validateSearchQuery(params.query);
+
+				const matchFunc = parseSearchQuery(params.query);
+
+				// Filters can modify the output. So clone the resources first.
+				resources = resources.filter((resource) =>
+					matchFunc(resource, markMatchingVariant),
+				);
 			} catch (err) {
 				console.error(err);
 				throw new CommercetoolsError<InvalidInputError>(
