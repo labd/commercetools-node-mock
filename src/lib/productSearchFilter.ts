@@ -221,7 +221,6 @@ const resolveFieldValue = (
 		const [, attrName, ...rest] = fieldPath.split(".");
 		if (!obj.attributes) {
 			return undefined;
-			0;
 		}
 
 		for (const attr of obj.attributes) {
