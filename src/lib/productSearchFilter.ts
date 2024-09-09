@@ -29,7 +29,8 @@ type ProductSearchFilterFunc = (
   markMatchingVariants: boolean,
 ) => boolean;
 
-// TODO: fieldType checking, better text/wildcard search, result boosting
+// @TODO: Implement field boosting:
+// https://docs.commercetools.com/merchant-center/advanced-product-search#boost-field
 export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilterFunc => {
   if (isSearchAndExpression(searchQuery)) {
     return (obj, markMatchingVariant) => searchQuery.and.every((expr) => {
@@ -99,15 +100,14 @@ export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilter
   }
 
   if (isSearchFullTextExpression(searchQuery)) {
-    // TODO: Implement better fulltext search, doesn't support all uses cases, see: https://docs.commercetools.com/api/search-query-language#fulltext
-    // Potential options to replace with:
-    // - https://github.com/bevacqua/fuzzysearch
-    // - With scoring (& therefore boosting): https://github.com/farzher/fuzzysort
+    // @TODO: Implement fulltext search, to fully support functionality offered by commercetools: 
+    // https://docs.commercetools.com/api/search-query-language#fulltext
     return generateFieldMatchFunc((value: any) => value.includes(searchQuery.fullText.value), searchQuery.fullText);
   }
 
   if (isSearchFullTextPrefixExpression(searchQuery)) {
-    // TODO: Implement better fulltext prefix search
+    // @TODO: Implement fulltext search, to fully support functionality offered by commercetools: 
+    // https://docs.commercetools.com/api/search-query-language#fulltext
     return generateFieldMatchFunc((value: any) => value.startsWith(searchQuery.fullTextPrefix.value), searchQuery.fullTextPrefix);
   }
 
@@ -116,7 +116,8 @@ export const parseSearchQuery = (searchQuery: _SearchQuery): ProductSearchFilter
   }
 
   if (isSearchWildCardExpression(searchQuery)) {
-    // TODO: Implement better (actual) wildcard search
+    // @TODO: Fully implement wildcard search, as specified: 
+    // https://docs.commercetools.com/api/search-query-language#fulltext
     const generateWildcardMatchFunc = (value: any) => {
       const wildCardValues = searchQuery.wildcard.value.split("*").filter((v: string) => !!v);
 
