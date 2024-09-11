@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.31.1
+
+### Patch Changes
+
+- [#215](https://github.com/labd/commercetools-node-mock/pull/215) [`4162caa`](https://github.com/labd/commercetools-node-mock/commit/4162caa9560b24981f1de8d58df5f3384a3d5464) Thanks [@alexfaxe](https://github.com/alexfaxe)! - Adds support for custom fields in 'addLineItem'
+
 ## 2.31.0
 
 ### Minor Changes
