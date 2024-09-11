@@ -72,7 +72,7 @@ export class CartUpdateHandler
 	addLineItem(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
-		{ productId, variantId, sku, quantity = 1 }: CartAddLineItemAction,
+		{ productId, variantId, sku, custom, quantity = 1 }: CartAddLineItemAction,
 	) {
 		let product: Product | null = null;
 
@@ -175,6 +175,7 @@ export class CartUpdateHandler
 				lineItemMode: "Standard",
 				priceMode: "Platform",
 				state: [],
+				custom: createCustomFields(custom, context.projectKey, this._storage),
 			});
 		}
 
