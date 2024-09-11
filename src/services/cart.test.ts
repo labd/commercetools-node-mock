@@ -299,12 +299,25 @@ describe("Cart Update Actions", () => {
 			.post(`/dummy/carts/${cart.id}`)
 			.send({
 				version: 1,
-				actions: [{ action: "addLineItem", sku: "1337", quantity: 2, custom: { type: { typeId: 'type', key: 'my-type' }, fields: { foo: 'bar' }} }],
+				actions: [
+					{
+						action: "addLineItem",
+						sku: "1337",
+						quantity: 2,
+						custom: {
+							type: { typeId: "type", key: "my-type" },
+							fields: { foo: "bar" },
+						},
+					},
+				],
 			});
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(2);
 		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].custom).toEqual({ type: { typeId: 'type', id: expect.any(String) }, fields: { foo: 'bar' } });
+		expect(response.body.lineItems[0].custom).toEqual({
+			type: { typeId: "type", id: expect.any(String) },
+			fields: { foo: "bar" },
+		});
 	});
 
 	test("addLineItem unknown product", async () => {
