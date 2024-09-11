@@ -106,6 +106,7 @@ describe("OAuth2Server", () => {
 				addresses: [],
 				authenticationMode: "password",
 				isEmailVerified: true,
+				stores: [],
 			});
 
 			const response = await supertest(app)

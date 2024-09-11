@@ -10,11 +10,11 @@ export type ShallowWritable<T> = { -readonly [P in keyof T]: T[P] };
 export type ServiceTypes =
 	| ctp.ReferenceTypeId
 	| "product-projection"
+	| "product-search"
 	| "my-cart"
 	| "my-order"
 	| "my-payment"
-	| "my-customer"
-	| "product-projection";
+	| "my-customer";
 
 export type Services = Partial<{
 	[index in ServiceTypes]: AbstractService;
@@ -45,6 +45,7 @@ export type ResourceMap = {
 	"product-price": ctp.StandalonePrice;
 	"product-projection": ctp.ProductProjection;
 	"product-selection": ctp.ProductSelection;
+	"product-tailoring": ctp.ProductTailoring;
 	"product-type": ctp.ProductType;
 	"product": ctp.Product;
 	"quote-request": ctp.QuoteRequest;
@@ -85,6 +86,7 @@ export type PagedQueryResponseMap = {
 	"product-price": ctp.StandalonePricePagedQueryResponse;
 	"product-projection": ctp.ProductProjectionPagedQueryResponse;
 	"product-selection": ctp.ProductSelectionPagedQueryResponse;
+	"product-tailoring": ctp.ProductTailoringPagedQueryResponse;
 	"product-type": ctp.ProductTypePagedQueryResponse;
 	"product": ctp.ProductPagedQueryResponse;
 	"quote-request": ctp.QuoteRequestPagedQueryResponse;

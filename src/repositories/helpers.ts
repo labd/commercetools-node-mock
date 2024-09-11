@@ -27,7 +27,6 @@ import {
 	type StoreReference,
 	type StoreResourceIdentifier,
 	type Type,
-	type TypedMoney,
 	type _Money,
 } from "@commercetools/platform-sdk";
 import type { Request } from "express";
@@ -133,7 +132,7 @@ export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
 	};
 };
 
-export const createTypedMoney = (value: _Money): TypedMoney => {
+export const createTypedMoney = (value: _Money): CentPrecisionMoney => {
 	const result = createCentPrecisionMoney(value);
 	return result;
 };

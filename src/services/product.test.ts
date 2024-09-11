@@ -1,4 +1,4 @@
-import type {
+import {
 	Category,
 	CategoryDraft,
 	Image,
@@ -6,12 +6,17 @@ import type {
 	Product,
 	ProductData,
 	ProductDraft,
+	ProductPagedSearchResponse,
+	ProductSearchRequest,
+	ProductSearchResult,
 	ProductType,
 	ProductTypeDraft,
 	State,
 	StateDraft,
 	TaxCategory,
 	TaxCategoryDraft,
+	Type,
+	TypeDraft,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
@@ -76,6 +81,30 @@ const productState2Draft: StateDraft = {
 	description: {
 		"nl-NL": "Product another state",
 	},
+};
+
+const productPriceTypeDraft: TypeDraft = {
+	key: "product-price",
+	name: {
+		en: "ProductPriceType",
+	},
+	description: {
+		en: "Product Price Type",
+	},
+	resourceTypeIds: ["product-price"],
+	fieldDefinitions: [
+		{
+			name: "lastModifiedAt",
+			label: {
+				en: "Last modified at",
+			},
+			required: false,
+			type: {
+				name: "DateTime",
+			},
+			inputHint: "SingleLine",
+		},
+	],
 };
 
 const publishedProductDraft: ProductDraft = {
@@ -250,6 +279,7 @@ let taxCategory1: TaxCategory;
 let taxCategory2: TaxCategory;
 let productState1: State;
 let productState2: State;
+let productPriceType: Type;
 
 async function beforeAllProductTests(mock: CommercetoolsMock) {
 	let response;
@@ -308,6 +338,12 @@ async function beforeAllProductTests(mock: CommercetoolsMock) {
 
 	expect(response.status).toBe(201);
 	productState2 = response.body;
+
+	response = await supertest(mock.app)
+		.post("/dummy/types")
+		.send(productPriceTypeDraft);
+	expect(response.status).toBe(201);
+	productPriceType = response.body;
 }
 
 describe("Product", () => {
@@ -1416,6 +1452,112 @@ describe("Product update actions", () => {
 		expect(response.body.state).toMatchObject({
 			typeId: "state",
 			id: productState2.id,
+		});
+	});
+
+	test("setProductPriceCustomField", async () => {
+		assert(productPublished, "product not created");
+		const priceId =
+			productPublished?.masterData.current.masterVariant.prices?.[0].id;
+		assert(priceId);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/products/${productPublished.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "setProductPriceCustomType",
+						priceId,
+						type: {
+							typeId: "type",
+							key: productPriceType.key,
+						},
+					},
+					{
+						action: "setProductPriceCustomField",
+						name: "myCustomField",
+						value: "MyRandomValue",
+						priceId,
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(
+			response.body.masterData.staged.masterVariant.prices?.[0].custom.fields
+				?.myCustomField,
+		).toBe("MyRandomValue");
+	});
+
+	// Test the general product search implementation
+	describe("Product Search - Generic", () => {
+		test("Pagination", async () => {
+			{
+				const body: ProductSearchRequest = {
+					productProjectionParameters: {
+						storeProjection: "dummy-store",
+						localeProjection: ["en-US"],
+						priceCurrency: "EUR",
+						priceChannel: "dummy-channel",
+						expand: ["categories[*]", "categories[*].ancestors[*]"],
+					},
+					limit: 24,
+				};
+				const response = await supertest(ctMock.app)
+					.post("/dummy/products/search")
+					.send(body);
+
+				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+				expect(pagedSearchResponse.limit).toBe(24);
+				expect(pagedSearchResponse.offset).toBe(0);
+				expect(pagedSearchResponse.total).toBeGreaterThan(0);
+
+				// Deliberately not supported fow now
+				expect(pagedSearchResponse.facets).toEqual([]);
+
+				const results: ProductSearchResult[] = pagedSearchResponse.results;
+				expect(results).toBeDefined();
+				expect(results.length).toBeGreaterThan(0);
+
+				// Find product with sku "1337" to be part of the search results
+				const productFound = results.find(
+					(result) => result?.productProjection?.masterVariant?.sku === "1337",
+				);
+				expect(productFound).toBeDefined();
+
+				const priceCurrencyMatch = results.find((result) =>
+					result?.productProjection?.masterVariant?.prices?.find(
+						(price) => price?.value?.currencyCode === "EUR",
+					),
+				);
+				expect(priceCurrencyMatch).toBeDefined();
+			}
+			{
+				const body: ProductSearchRequest = {
+					limit: 88,
+					offset: 88,
+				};
+
+				const response = await supertest(ctMock.app)
+					.post("/dummy/products/search")
+					.send(body);
+
+				const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+				expect(pagedSearchResponse.limit).toBe(88);
+				expect(pagedSearchResponse.offset).toBe(88);
+				expect(pagedSearchResponse.total).toBeGreaterThan(0);
+
+				// No results, since we start at offset 88
+				const results: ProductSearchResult[] = pagedSearchResponse.results;
+				expect(results).toBeDefined();
+				expect(results.length).toBe(0);
+
+				// Product with sku "1337" should not be part of the results
+				const productFound = results.find(
+					(result) => result?.productProjection?.masterVariant?.sku === "1337",
+				);
+				expect(productFound).toBeUndefined();
+			}
 		});
 	});
 });
