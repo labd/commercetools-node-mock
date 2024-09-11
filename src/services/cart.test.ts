@@ -259,6 +259,67 @@ describe("Cart Update Actions", () => {
 		expect(response.body.totalPrice.centAmount).toEqual(total);
 	});
 
+	test("addLineItem with custom field", async () => {
+		const product = await supertest(ctMock.app)
+			.post(`/dummy/products`)
+			.send(productDraft)
+			.then((x) => x.body);
+
+		const type = await supertest(ctMock.app)
+			.post(`/dummy/types`)
+			.send({
+				key: "my-type",
+				name: {
+					en: "My Type",
+				},
+				description: {
+					en: "My Type Description",
+				},
+				fieldDefinitions: [
+					{
+						name: "foo",
+						label: {
+							en: "foo",
+						},
+						required: false,
+						type: {
+							name: "String",
+						},
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		assert(type, "type not created");
+		assert(cart, "cart not created");
+		assert(product, "product not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addLineItem",
+						sku: "1337",
+						quantity: 2,
+						custom: {
+							type: { typeId: "type", key: "my-type" },
+							fields: { foo: "bar" },
+						},
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.lineItems).toHaveLength(1);
+		expect(response.body.lineItems[0].custom).toEqual({
+			type: { typeId: "type", id: expect.any(String) },
+			fields: { foo: "bar" },
+		});
+	});
+
 	test("addLineItem unknown product", async () => {
 		assert(cart, "cart not created");
 
