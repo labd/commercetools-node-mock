@@ -74,6 +74,7 @@ describe("Shipping method", () => {
 			},
 			version: 1,
 			zoneRates: [],
+			active: true,
 		});
 	});
 

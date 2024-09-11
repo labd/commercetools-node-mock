@@ -1,5 +1,47 @@
 ## 2.23.1
 
+## 2.31.0
+
+### Minor Changes
+
+- [#213](https://github.com/labd/commercetools-node-mock/pull/213) [`aefebc7`](https://github.com/labd/commercetools-node-mock/commit/aefebc73ae155de4a646bd6cc0e5ab17b3be5a73) Thanks [@jsm1t](https://github.com/jsm1t)! - Add filtering with search query to product search
+
+## 2.30.1
+
+### Patch Changes
+
+- [#211](https://github.com/labd/commercetools-node-mock/pull/211) [`91b0255`](https://github.com/labd/commercetools-node-mock/commit/91b0255239141c6f251c648414204d834481b0d5) Thanks [@yugaWicaksono](https://github.com/yugaWicaksono)! - Added missing test OrderChangeShipmentStateAction in order action
+
+## 2.30.0
+
+### Minor Changes
+
+- [#209](https://github.com/labd/commercetools-node-mock/pull/209) [`2b74155`](https://github.com/labd/commercetools-node-mock/commit/2b741559ba28f16725ed2f8d940378d305b2f06f) Thanks [@borisvankatwijk](https://github.com/borisvankatwijk)! - Addition of "products/search" POST endpoint. Also known as "Storefront Search -> Product Search".
+
+## 2.29.1
+
+### Patch Changes
+
+- [#207](https://github.com/labd/commercetools-node-mock/pull/207) [`28bca80`](https://github.com/labd/commercetools-node-mock/commit/28bca80473015efaae94e918f4c998f6ddd06629) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added additional options to project settings
+
+## 2.29.0
+
+### Minor Changes
+
+- [#199](https://github.com/labd/commercetools-node-mock/pull/199) [`be62944`](https://github.com/labd/commercetools-node-mock/commit/be62944a5e47e03ce9ed59ea24cfee790d95320e) Thanks [@leongraumans](https://github.com/leongraumans)! - add support for "setProductPriceCustomField" product update action
+
+## 2.28.1
+
+### Patch Changes
+
+- [#204](https://github.com/labd/commercetools-node-mock/pull/204) [`a4e5a6c`](https://github.com/labd/commercetools-node-mock/commit/a4e5a6c4502e353b607e1fd3c854ef78c52951fc) Thanks [@yugaWicaksono](https://github.com/yugaWicaksono)! - Added missing test to cover OrderSetDeliveryCustomFieldAction in the form of method setDeliveryCustomField inside of OrderUpdateHandler
+
+## 2.28.0
+
+### Minor Changes
+
+- [#202](https://github.com/labd/commercetools-node-mock/pull/202) [`8737a6a`](https://github.com/labd/commercetools-node-mock/commit/8737a6aff198eb26f82ddbc2de32e664bb82e742) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Fixed issues with business units, updated sdk to latest
+
 ## 2.27.0
 
 ### Minor Changes
