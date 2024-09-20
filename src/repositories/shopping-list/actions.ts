@@ -36,7 +36,13 @@ export class ShoppingListUpdateHandler
 	addLineItem(
 		context: RepositoryContext,
 		resource: Writable<ShoppingList>,
-		{ productId, variantId, sku, quantity = 1 }: ShoppingListAddLineItemAction,
+		{
+			productId,
+			variantId,
+			sku,
+			quantity = 1,
+			addedAt,
+		}: ShoppingListAddLineItemAction,
 	) {
 		let product: Product | null = null;
 
@@ -90,7 +96,7 @@ export class ShoppingListUpdateHandler
 		} else {
 			// add line item
 			resource.lineItems.push({
-				addedAt: new Date().toISOString(),
+				addedAt: addedAt ? addedAt : new Date().toISOString(),
 				id: uuidv4(),
 				productId: product.id,
 				productSlug: product.masterData.current.slug,
