@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.31.2
+
+### Patch Changes
+
+- [#217](https://github.com/labd/commercetools-node-mock/pull/217) [`d5709d1`](https://github.com/labd/commercetools-node-mock/commit/d5709d1fb5c45684b3f2ce2009c3fbebd2f9b2e2) Thanks [@callumhemming](https://github.com/callumhemming)! - allows addedAt override in add to cart and add to wishlist
+
 ## 2.31.1
 
 ### Patch Changes
