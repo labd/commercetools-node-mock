@@ -73,7 +73,14 @@ export class CartUpdateHandler
 	addLineItem(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
-		{ productId, variantId, sku, custom, quantity = 1 }: CartAddLineItemAction,
+		{
+			productId,
+			variantId,
+			sku,
+			custom,
+			quantity = 1,
+			addedAt,
+		}: CartAddLineItemAction,
 	) {
 		let product: Product | null = null;
 
@@ -157,6 +164,7 @@ export class CartUpdateHandler
 			}
 			resource.lineItems.push({
 				id: uuidv4(),
+				addedAt: addedAt ? addedAt : new Date().toISOString(),
 				productId: product.id,
 				productKey: product.key,
 				productSlug: product.masterData.current.slug,
