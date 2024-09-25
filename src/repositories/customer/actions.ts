@@ -1,5 +1,9 @@
 import type {
+	BaseAddress,
 	Customer,
+	CustomerAddAddressAction,
+	CustomerAddBillingAddressIdAction,
+	CustomerAddShippingAddressIdAction,
 	CustomerChangeAddressAction,
 	CustomerChangeEmailAction,
 	CustomerSetAuthenticationModeAction,
@@ -19,6 +23,7 @@ import type {
 	InvalidJsonInputError,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
+import { generateRandomString } from "~src/helpers";
 import { hashPassword } from "~src/lib/password";
 import type { Writable } from "~src/types";
 import {
@@ -32,6 +37,83 @@ export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
 {
+	addAddress(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ address }: CustomerAddAddressAction,
+	) {
+		resource.addresses.push({
+			...address,
+			id: address.id ?? generateRandomString(5),
+		} as BaseAddress);
+	}
+
+	addBillingAddressId(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ addressId, addressKey }: CustomerAddBillingAddressIdAction,
+	) {
+		const address = resource.addresses.find((a) => {
+			if (a.id != undefined && addressId != undefined && a.id === addressId) {
+				return true;
+			}
+
+			return (
+				a.key != undefined && addressKey != undefined && a.key === addressKey
+			);
+		});
+
+		if (!address) {
+			throw new CommercetoolsError<InvalidInputError>(
+				{
+					code: "InvalidInput",
+					message: `Address with id '${addressId}' or key '${addressKey}' not found.`,
+				},
+				400,
+			);
+		}
+
+		const billingAddressId = String(address.id);
+		if (resource.billingAddressIds?.length) {
+			resource.billingAddressIds.push(billingAddressId);
+		} else if (address) {
+			resource.billingAddressIds = [billingAddressId];
+		}
+	}
+
+	addShippingAddressId(
+		_context: RepositoryContext,
+		resource: Writable<Customer>,
+		{ addressId, addressKey }: CustomerAddShippingAddressIdAction,
+	) {
+		const address = resource.addresses.find((a) => {
+			if (a.id != undefined && addressId != undefined && a.id === addressId) {
+				return true;
+			}
+
+			return (
+				a.key != undefined && addressKey != undefined && a.key === addressKey
+			);
+		});
+
+		if (!address) {
+			throw new CommercetoolsError<InvalidInputError>(
+				{
+					code: "InvalidInput",
+					message: `Address with id '${addressId}' or key '${addressKey}' not found.`,
+				},
+				400,
+			);
+		}
+
+		const shippingAddressId = String(address.id);
+		if (resource.shippingAddressIds?.length) {
+			resource.shippingAddressIds.push(shippingAddressId);
+		} else if (address) {
+			resource.shippingAddressIds = [shippingAddressId];
+		}
+	}
+
 	changeAddress(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
