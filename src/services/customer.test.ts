@@ -320,6 +320,131 @@ describe("Customer Update Actions", () => {
 		expect(response.body.vatId).toBe("ABCD");
 	});
 
+	test("addAddress", async () => {
+		assert(customer, "customer not created");
+
+		customer = {
+			...customer,
+			addresses: [
+				{
+					...getBaseResourceProperties(),
+					id: "address-uuid",
+					firstName: "John",
+					lastName: "Doe",
+					streetName: "Main Street",
+					streetNumber: "1",
+					postalCode: "12345",
+					country: "DE",
+				},
+			],
+			defaultBillingAddressId: "address-uuid",
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addAddress",
+						address: {
+							firstName: "Foo",
+							lastName: "Bar",
+							streetName: "Baz Street",
+							streetNumber: "99",
+							postalCode: "12ab",
+							country: "NL",
+						},
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.addresses).toMatchObject([
+			{
+				id: "address-uuid",
+				firstName: "John",
+				lastName: "Doe",
+				streetName: "Main Street",
+				streetNumber: "1",
+				postalCode: "12345",
+				country: "DE",
+			},
+			{
+				id: expect.any(String),
+				firstName: "Foo",
+				lastName: "Bar",
+				streetName: "Baz Street",
+				streetNumber: "99",
+				postalCode: "12ab",
+				country: "NL",
+			},
+		]);
+	});
+
+	test("addBillingAddressId", async () => {
+		assert(customer, "customer not created");
+
+		customer = {
+			...customer,
+			addresses: [
+				{
+					key: "address-key",
+					firstName: "John",
+					lastName: "Doe",
+					streetName: "Main Street",
+					streetNumber: "1",
+					postalCode: "12345",
+					country: "DE",
+				},
+			],
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: "addBillingAddressId", addressKey: "address-key" }],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.billingAddressIds).toHaveLength(1);
+	});
+
+	test("addShippingAddressId", async () => {
+		assert(customer, "customer not created");
+
+		customer = {
+			...customer,
+			addresses: [
+				{
+					key: "address-key",
+					firstName: "John",
+					lastName: "Doe",
+					streetName: "Main Street",
+					streetNumber: "1",
+					postalCode: "12345",
+					country: "DE",
+				},
+			],
+		};
+		ctMock.project("dummy").add("customer", customer);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/${customer.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: "addShippingAddressId", addressKey: "address-key" },
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.shippingAddressIds).toHaveLength(1);
+	});
+
 	test("changeAddress", async () => {
 		assert(customer, "customer not created");
 
