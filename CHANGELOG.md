@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.32.0
+
+### Minor Changes
+
+- [#219](https://github.com/labd/commercetools-node-mock/pull/219) [`0fd9b7b`](https://github.com/labd/commercetools-node-mock/commit/0fd9b7b4b43ac79f083dc9cdc220efc185aaa56a) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for "addAddress", "addBillingAddressId" and "addShippingAddressId" customer update actions
+
 ## 2.31.2
 
 ### Patch Changes
