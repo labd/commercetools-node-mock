@@ -15,6 +15,7 @@ import type {
 	OrderSetDeliveryCustomFieldAction,
 	OrderSetLocaleAction,
 	OrderSetOrderNumberAction,
+	OrderSetPurchaseOrderNumberAction,
 	OrderSetShippingAddressAction,
 	OrderSetStoreAction,
 	OrderTransitionStateAction,
@@ -225,6 +226,14 @@ export class OrderUpdateHandler
 		{ orderNumber }: OrderSetOrderNumberAction,
 	) {
 		resource.orderNumber = orderNumber;
+	}
+
+	setPurchaseOrderNumber(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ purchaseOrderNumber }: OrderSetPurchaseOrderNumberAction,
+	) {
+		resource.purchaseOrderNumber = purchaseOrderNumber;
 	}
 
 	setShippingAddress(
