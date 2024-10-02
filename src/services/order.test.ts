@@ -371,6 +371,22 @@ describe("Order Update Actions", () => {
 		expect(response.body.orderNumber).toBe("5000123");
 	});
 
+	test("setPurchaseOrderNumber", async () => {
+		assert(order, "order not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: "setPurchaseOrderNumber", purchaseOrderNumber: "abc123" },
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.purchaseOrderNumber).toBe("abc123");
+	});
+
 	test("changeOrderState", async () => {
 		assert(order, "order not created");
 
