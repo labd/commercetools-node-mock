@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.33.0
+
+### Minor Changes
+
+- [#221](https://github.com/labd/commercetools-node-mock/pull/221) [`70fee89`](https://github.com/labd/commercetools-node-mock/commit/70fee89ccae1eff09a4534bf118a2c3e120daf5e) Thanks [@mikedebock](https://github.com/mikedebock)! - add support for "setPurchaseOrderNumber" order update action
+
 ## 2.32.0
 
 ### Minor Changes
