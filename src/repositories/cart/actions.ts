@@ -2,6 +2,7 @@ import {
 	CartSetAnonymousIdAction,
 	CartSetCustomerIdAction,
 	CartUpdateAction,
+	CentPrecisionMoney,
 	type Address,
 	type AddressDraft,
 	type Cart,
@@ -30,7 +31,11 @@ import {
 	type ProductPagedQueryResponse,
 	type ProductVariant,
 } from "@commercetools/platform-sdk";
-import { DirectDiscount } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
+import {
+	DirectDiscount,
+	TaxPortion,
+	TaxedItemPrice,
+} from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
 import type { Writable } from "~src/types";
@@ -509,13 +514,85 @@ export class CartUpdateHandler
 		{ shippingMethod }: CartSetShippingMethodAction,
 	) {
 		if (shippingMethod) {
-			const method = this._storage.getByResourceIdentifier<"shipping-method">(
+			const method = this._storage.expand(
 				context.projectKey,
-				shippingMethod,
+				this._storage.getByResourceIdentifier<"shipping-method">(
+					context.projectKey,
+					shippingMethod,
+				),
+				"zoneRates[*].zone",
 			);
 
-			// Based on the address we should select a shipping zone and
+			// TODO: move price & tax calculation to helper function
+
+			const taxCategory = this._storage.getByResourceIdentifier<"tax-category">(
+				context.projectKey,
+				method.taxCategory,
+			);
+
+			// FIXME: handle undefineds -- whats the convention in this package?
+			const country = resource.shippingAddress!.country;
+
+			const taxRate = taxCategory.rates.find(
+				(rate) => rate.country === country,
+			)!;
+
+			// TODO: are zones on a single shipping method mutually exclusive in terms of countries in the set? If not, need different approach
+
+			// Based on the address we select a shipping zone and
 			// use that to define the price.
+			const shippingRates = method.zoneRates.find((rate) =>
+				// TODO: match state in addition to country
+				rate.zone.obj!.locations.some((loc) => loc.country === country),
+			)!.shippingRates;
+
+			// TODO: how to pick which shipping rate in array to use?
+			const shippingRate = shippingRates[0];
+
+			// TODO: don't do anything when external tax rate is set
+			// TODO: use Decimal.js for math
+			// TODO: round https://docs.commercetools.com/api/projects/carts#roundingmode
+			// TODO: support TaxCalculationMode (double check if applicable here)
+			const totalGross: CentPrecisionMoney = taxRate.includedInPrice
+				? shippingRate.price
+				: {
+						...shippingRate.price,
+						centAmount: shippingRate.price.centAmount * (1 + taxRate.amount),
+					};
+
+			const totalNet: CentPrecisionMoney = taxRate.includedInPrice
+				? {
+						...shippingRate.price,
+						centAmount: shippingRate.price.centAmount / (1 + taxRate.amount),
+					}
+				: shippingRate.price;
+
+			const taxPortions: TaxPortion[] = [
+				{
+					name: taxRate.name,
+					rate: taxRate.amount,
+					amount: {
+						...shippingRate.price,
+						centAmount: totalGross.centAmount - totalNet.centAmount,
+					},
+				},
+			];
+
+			const totalTax: CentPrecisionMoney = {
+				...shippingRate.price,
+				centAmount: taxPortions.reduce(
+					(acc, portion) => acc + portion.amount.centAmount,
+					0,
+				),
+			};
+
+			const taxedPrice: TaxedItemPrice = {
+				totalNet,
+				totalGross,
+				taxPortions,
+				totalTax,
+			};
+
 			// @ts-ignore
 			resource.shippingInfo = {
 				shippingMethod: {
@@ -523,6 +600,12 @@ export class CartUpdateHandler
 					id: method.id,
 				},
 				shippingMethodName: method.name,
+				// TODO: unclear if price should be gross or net, and what they mean by "and [...] the sum of LineItem prices" (from observation, it seems to just be the shipping rate price, no LineItems involved)
+				price: shippingRate.price,
+				shippingRate,
+				taxedPrice,
+				taxRate,
+				taxCategory: method.taxCategory,
 			};
 		} else {
 			resource.shippingInfo = undefined;
