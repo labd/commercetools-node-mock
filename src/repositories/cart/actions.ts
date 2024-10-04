@@ -12,6 +12,7 @@ import {
 	type CartRemoveDiscountCodeAction,
 	type CartRemoveLineItemAction,
 	type CartSetBillingAddressAction,
+	type CartSetBillingAddressCustomTypeAction,
 	type CartSetCountryAction,
 	type CartSetCustomFieldAction,
 	type CartSetCustomShippingMethodAction,
@@ -21,6 +22,7 @@ import {
 	type CartSetLineItemShippingDetailsAction,
 	type CartSetLocaleAction,
 	type CartSetShippingAddressAction,
+	type CartSetShippingAddressCustomTypeAction,
 	type CartSetShippingMethodAction,
 	type CustomFields,
 	type GeneralError,
@@ -323,6 +325,38 @@ export class CartUpdateHandler
 		);
 	}
 
+	setBillingAddressCustomType(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		custom: CartSetBillingAddressCustomTypeAction,
+	) {
+		if (!resource.billingAddress) {
+			throw new Error("Resource has no billing address");
+		}
+
+		if (!custom.type) {
+			resource.billingAddress.custom = undefined;
+			return;
+		}
+
+		const resolvedType = this._storage.getByResourceIdentifier<"type">(
+			context.projectKey,
+			custom.type,
+		);
+
+		if (!resolvedType) {
+			throw new Error(`Type ${custom.type} not found`);
+		}
+
+		resource.billingAddress.custom = {
+			type: {
+				typeId: "type",
+				id: resolvedType.id,
+			},
+			fields: custom.fields || {},
+		};
+	}
+
 	setCountry(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -500,6 +534,38 @@ export class CartUpdateHandler
 		resource.shippingAddress = {
 			...address,
 			custom: custom,
+		};
+	}
+
+	setShippingAddressCustomType(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		custom: CartSetShippingAddressCustomTypeAction,
+	) {
+		if (!resource.shippingAddress) {
+			throw new Error("Resource has no shipping address");
+		}
+
+		if (!custom.type) {
+			resource.shippingAddress.custom = undefined;
+			return;
+		}
+
+		const resolvedType = this._storage.getByResourceIdentifier<"type">(
+			context.projectKey,
+			custom.type,
+		);
+
+		if (!resolvedType) {
+			throw new Error(`Type ${custom.type} not found`);
+		}
+
+		resource.shippingAddress.custom = {
+			type: {
+				typeId: "type",
+				id: resolvedType.id,
+			},
+			fields: custom.fields || {},
 		};
 	}
 
