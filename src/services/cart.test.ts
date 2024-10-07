@@ -605,6 +605,140 @@ describe("Cart Update Actions", () => {
 		expect(response.body.shippingAddress).toEqual(address);
 	});
 
+	test("setBillingAddressCustomType", async () => {
+		assert(cart, "cart not created");
+
+		const address: Address = {
+			streetName: "Street name",
+			city: "Utrecht",
+			country: "NL",
+		};
+
+		const type = await supertest(ctMock.app)
+			.post(`/dummy/types`)
+			.send({
+				key: "my-type",
+				name: {
+					en: "My Type",
+				},
+				description: {
+					en: "My Type Description",
+				},
+				fieldDefinitions: [
+					{
+						name: "foo",
+						label: {
+							en: "foo",
+						},
+						required: false,
+						type: {
+							name: "String",
+						},
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		assert(type, "type not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: "setBillingAddress", address },
+					{
+						action: "setBillingAddressCustomType",
+						type: {
+							typeId: "type",
+							type: "my-type",
+							key: "my-type",
+						},
+						fields: {
+							foo: "bar",
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(3);
+		expect(response.body.billingAddress).toEqual({
+			...address,
+			custom: {
+				type: { typeId: "type", id: type.id },
+				fields: { foo: "bar" },
+			},
+		});
+	});
+	test("setShippingAddressCustomType", async () => {
+		assert(cart, "cart not created");
+
+		const address: Address = {
+			streetName: "Street name",
+			city: "Utrecht",
+			country: "NL",
+		};
+
+		const type = await supertest(ctMock.app)
+			.post(`/dummy/types`)
+			.send({
+				key: "my-type",
+				name: {
+					en: "My Type",
+				},
+				description: {
+					en: "My Type Description",
+				},
+				fieldDefinitions: [
+					{
+						name: "foo",
+						label: {
+							en: "foo",
+						},
+						required: false,
+						type: {
+							name: "String",
+						},
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		assert(type, "type not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{ action: "setShippingAddress", address },
+					{
+						action: "setShippingAddressCustomType",
+						type: {
+							typeId: "type",
+							type: "my-type",
+							key: "my-type",
+						},
+						fields: {
+							foo: "bar",
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(3);
+		expect(response.body.shippingAddress).toEqual({
+			...address,
+			custom: {
+				type: { typeId: "type", id: type.id },
+				fields: { foo: "bar" },
+			},
+		});
+	});
 	test("setLineItemShippingDetails", async () => {
 		const product = await supertest(ctMock.app)
 			.post(`/dummy/products`)
