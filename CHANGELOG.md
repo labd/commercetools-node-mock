@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.33.1
+
+### Patch Changes
+
+- [#224](https://github.com/labd/commercetools-node-mock/pull/224) [`1177aa1`](https://github.com/labd/commercetools-node-mock/commit/1177aa1b26cb52e443868da18d79cb5f254ed462) Thanks [@webwiebe](https://github.com/webwiebe)! - Added the setShippingAddressCustomType and setBillingAddressCustomType actions to the cart repository
+
 ## 2.33.0
 
 ### Minor Changes
