@@ -1,10 +1,16 @@
 import { type InvalidTokenError } from "@commercetools/platform-sdk";
 import got from "got";
-import { expect, test } from "vitest";
+import { afterEach, expect, test } from "vitest";
 import { CommercetoolsMock } from "./index";
 
+let ctMock: CommercetoolsMock;
+
+afterEach(() => {
+	ctMock.stop();
+});
+
 test("node:fetch client", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
 		apiHost: "https://localhost",
@@ -44,11 +50,10 @@ test("node:fetch client", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("got client", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
 		apiHost: "https://localhost",
@@ -86,11 +91,10 @@ test("got client", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.validateCredentials: true (error)", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
 	});
@@ -108,11 +112,10 @@ test("Options.validateCredentials: true (error)", async () => {
 	);
 	expect(response.statusCode).toBe(401);
 	expect(response.body.message).toBe("invalid_token");
-	ctMock.stop();
 });
 
 test("Options.validateCredentials: false", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: false,
 	});
@@ -135,7 +138,6 @@ test("Options.validateCredentials: false", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.enableAuthentication: false", async () => {
@@ -159,11 +161,10 @@ test("Options.enableAuthentication: false", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.apiHost: is overridden is set", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: false,
 		validateCredentials: false,
 		apiHost: "http://api.localhost",
@@ -181,11 +182,10 @@ test("Options.apiHost: is overridden is set", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.authHost: is set", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
 		authHost: "http://auth.localhost",
@@ -211,7 +211,7 @@ test("Options.authHost: is set", async () => {
 });
 
 test("apiHost mock proxy: querystring", async () => {
-	const ctMock = new CommercetoolsMock({
+	ctMock = new CommercetoolsMock({
 		enableAuthentication: false,
 		validateCredentials: false,
 		apiHost: "http://api.localhost",
@@ -234,5 +234,4 @@ test("apiHost mock proxy: querystring", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
