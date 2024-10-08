@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.34.0
+
+### Minor Changes
+
+- [#226](https://github.com/labd/commercetools-node-mock/pull/226) [`a86d8c3`](https://github.com/labd/commercetools-node-mock/commit/a86d8c340380b2b15cd648215e9d4fb22ffa5e05) Thanks [@alexfaxe](https://github.com/alexfaxe)! - Removes the light-my-request dependency
+
 ## 2.33.1
 
 ### Patch Changes
