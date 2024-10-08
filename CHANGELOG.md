@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.34.1
+
+### Patch Changes
+
+- [#228](https://github.com/labd/commercetools-node-mock/pull/228) [`de9d25d`](https://github.com/labd/commercetools-node-mock/commit/de9d25de1744100245dfee881bddfd32679112ea) Thanks [@alexfaxe](https://github.com/alexfaxe)! - Reverts breaking change
+
 ## 2.34.0
 
 ### Minor Changes
