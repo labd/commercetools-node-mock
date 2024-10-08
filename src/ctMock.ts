@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response } from "express";
+import inject from "light-my-request";
 import morgan from "morgan";
 import { http, HttpResponse } from "msw";
 import { setupServer, SetupServer, SetupServerApi } from "msw/node";
-import supertest from "supertest";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants";
 import { CommercetoolsError } from "./exceptions";
 import { copyHeaders } from "./lib/proxy";
@@ -193,12 +193,12 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await supertest(app)
+				const res = await inject(app)
 					.post(url.pathname + "?" + url.searchParams.toString())
-					.send(body)
-					.set(headers);
-
-				return new HttpResponse(JSON.stringify(res.body), {
+					.body(body)
+					.headers(headers)
+					.end();
+				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
 				});
@@ -208,10 +208,11 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await supertest(app)
+				const res = await inject(app)
 					.get(url.pathname + "?" + url.searchParams.toString())
-					.send(body)
-					.set(headers);
+					.body(body)
+					.headers(headers)
+					.end();
 
 				if (res.statusCode === 200) {
 					const parsedBody = JSON.parse(res.body);
@@ -238,11 +239,12 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await supertest(app)
+				const res = await inject(app)
 					.get(url.pathname + "?" + url.searchParams.toString())
-					.send(body)
-					.set(headers);
-				return new HttpResponse(JSON.stringify(res.body), {
+					.body(body)
+					.headers(headers)
+					.end();
+				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
 				});
@@ -252,10 +254,11 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await supertest(app)
+				const res = await inject(app)
 					.post(url.pathname + "?" + url.searchParams.toString())
-					.send(body)
-					.set(headers);
+					.body(body)
+					.headers(headers)
+					.end();
 				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
@@ -266,10 +269,11 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await supertest(app)
+				const res = await inject(app)
 					.delete(url.pathname + "?" + url.searchParams.toString())
-					.send(body)
-					.set(headers);
+					.body(body)
+					.headers(headers)
+					.end();
 				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
