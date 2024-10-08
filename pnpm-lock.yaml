@@ -20,9 +20,6 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.19.2
-      light-my-request:
-        specifier: ^5.11.1
-        version: 5.11.1
       lodash.isequal:
         specifier: ^4.5.0
         version: 4.5.0
@@ -2069,9 +2066,6 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  light-my-request@5.11.1:
-    resolution: {integrity: sha512-KXAh2m6VRlkWCk2KfmHE7tLBXKh30JE0tXUJY4dNxje4oLmPKUqlUfImiEQZLphx+Z9KTQcVv4DjGnJxkVOIbA==}
-
   lilconfig@3.1.1:
     resolution: {integrity: sha512-O18pf7nyvHTckunPWCV1XUNXU1piu01y2b7ATJ0ppkUkk8ocqVWBrYjJBCwHDjD/ZWcfyrA0P4gKhzWGi5EINQ==}
     engines: {node: '>=14'}
@@ -2539,9 +2533,6 @@ packages:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
-  process-warning@2.3.2:
-    resolution: {integrity: sha512-n9wh8tvBe5sFmsqlg+XQhaQLumwpqoAUruLwjCopgTmUBjJ/fjtBsJzKleCaIGBOMXYEhp1YfKl4d7rJ5ZKJGA==}
-
   proxy-addr@2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
@@ -2692,9 +2683,6 @@ packages:
 
   set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
-
-  set-cookie-parser@2.6.0:
-    resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==}
 
   set-function-length@1.2.1:
     resolution: {integrity: sha512-j4t6ccc+VsKwYHso+kElc5neZpjtq9EnRICFZtWyBsLojhmeF/ZBd/elqm22WJh/BziDe/SBiOeAt0m2mfLD0g==}
@@ -5415,12 +5403,6 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  light-my-request@5.11.1:
-    dependencies:
-      cookie: 0.6.0
-      process-warning: 2.3.2
-      set-cookie-parser: 2.6.0
-
   lilconfig@3.1.1: {}
 
   lines-and-columns@1.2.4: {}
@@ -5831,8 +5813,6 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 18.2.0
 
-  process-warning@2.3.2: {}
-
   proxy-addr@2.0.7:
     dependencies:
       forwarded: 0.2.0
@@ -6009,8 +5989,6 @@ snapshots:
       - supports-color
 
   set-blocking@2.0.0: {}
-
-  set-cookie-parser@2.6.0: {}
 
   set-function-length@1.2.1:
     dependencies:
