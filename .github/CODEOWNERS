@@ -1,0 +1,3 @@
+src/ctMock.ts @labd/commercetools-sdks
+src/storage/* @labd/commercetools-sdks
+src/oauth/* @labd/commercetools-sdks

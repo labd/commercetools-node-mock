@@ -1,5 +1,23 @@
 ## 2.23.1
 
+## 2.34.1
+
+### Patch Changes
+
+- [#228](https://github.com/labd/commercetools-node-mock/pull/228) [`de9d25d`](https://github.com/labd/commercetools-node-mock/commit/de9d25de1744100245dfee881bddfd32679112ea) Thanks [@alexfaxe](https://github.com/alexfaxe)! - Reverts breaking change
+
+## 2.34.0
+
+### Minor Changes
+
+- [#226](https://github.com/labd/commercetools-node-mock/pull/226) [`a86d8c3`](https://github.com/labd/commercetools-node-mock/commit/a86d8c340380b2b15cd648215e9d4fb22ffa5e05) Thanks [@alexfaxe](https://github.com/alexfaxe)! - Removes the light-my-request dependency
+
+## 2.33.1
+
+### Patch Changes
+
+- [#224](https://github.com/labd/commercetools-node-mock/pull/224) [`1177aa1`](https://github.com/labd/commercetools-node-mock/commit/1177aa1b26cb52e443868da18d79cb5f254ed462) Thanks [@webwiebe](https://github.com/webwiebe)! - Added the setShippingAddressCustomType and setBillingAddressCustomType actions to the cart repository
+
 ## 2.33.0
 
 ### Minor Changes
