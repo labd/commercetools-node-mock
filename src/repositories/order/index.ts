@@ -15,7 +15,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import assert from "assert";
 import { CommercetoolsError } from "~src/exceptions";
-import { getBaseResourceProperties } from "~src/helpers";
+import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
 import { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
@@ -65,25 +65,37 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 
 		const resource: Order = {
 			...getBaseResourceProperties(),
-			orderNumber,
+			anonymousId: cart.anonymousId,
+			billingAddress: cart.billingAddress,
 			cart: cartReference,
-			orderState: "Open",
-			lineItems: [],
-			customLineItems: [],
-			totalPrice: cart.totalPrice,
-			refusedGifts: [],
-			origin: "Customer",
-			syncInfo: [],
-			shippingMode: cart.shippingMode,
-			shipping: cart.shipping,
-			store: context.storeKey
-				? {
-						key: context.storeKey,
-						typeId: "store",
-					}
-				: undefined,
+			country: cart.country,
 			custom: cart.custom,
+			customerEmail: cart.customerEmail,
+			customerGroup: cart.customerGroup,
+			customerId: cart.customerId,
+			customLineItems: [],
+			directDiscounts: cart.directDiscounts,
+			discountCodes: cart.discountCodes,
+			discountOnTotalPrice: cart.discountOnTotalPrice,
 			lastMessageSequenceNumber: 0,
+			lineItems: cart.lineItems,
+			locale: cart.locale,
+			orderNumber: orderNumber ?? generateRandomString(10),
+			orderState: "Open",
+			origin: "Customer",
+			paymentInfo: cart.paymentInfo,
+			refusedGifts: [],
+			shipping: cart.shipping,
+			shippingAddress: cart.shippingAddress,
+			shippingMode: cart.shippingMode,
+			syncInfo: [],
+			taxCalculationMode: cart.taxCalculationMode,
+			taxedPrice: cart.taxedPrice,
+			taxedShippingPrice: cart.taxedShippingPrice,
+			taxMode: cart.taxMode,
+			taxRoundingMode: cart.taxRoundingMode,
+			totalPrice: cart.totalPrice,
+			store: cart.store,
 		};
 		return this.saveNew(context, resource);
 	}
