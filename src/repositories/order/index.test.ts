@@ -95,6 +95,54 @@ describe("Order repository", () => {
 		expect(result.store?.key).toBe("some-store");
 	});
 
+	test("create from cart - without store context", async () => {
+		const cart: Cart = {
+			id: "b3875a58-4ab2-4aaa-b399-184ce7561c27",
+			version: 1,
+			createdAt: "2021-09-02T12:23:30.036Z",
+			lastModifiedAt: "2021-09-02T12:23:30.546Z",
+			store: {
+				key: "some-store",
+				typeId: "store",
+			},
+			discountCodes: [],
+			directDiscounts: [],
+			inventoryMode: "None",
+			itemShippingAddresses: [],
+			lineItems: [],
+			customLineItems: [],
+			totalPrice: {
+				type: "centPrecision",
+				currencyCode: "EUR",
+				centAmount: 10000,
+				fractionDigits: 2,
+			},
+			cartState: "Active",
+			shippingMode: "Single",
+			shipping: [],
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "UnitPriceLevel",
+			refusedGifts: [],
+			origin: "Customer",
+		};
+
+		storage.add("dummy", "cart", cart);
+
+		const result = repository.create(
+			{ projectKey: "dummy" },
+			{
+				cart: {
+					id: cart.id,
+					typeId: "cart",
+				},
+				version: cart.version,
+			},
+		);
+		expect(result.cart?.id).toBe(cart.id);
+		expect(result.store?.key).toBe("some-store");
+	});
+
 	test("import exiting product", async () => {
 		storage.add("dummy", "product", {
 			id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
