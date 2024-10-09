@@ -95,12 +95,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			taxMode: cart.taxMode,
 			taxRoundingMode: cart.taxRoundingMode,
 			totalPrice: cart.totalPrice,
-			store: context.storeKey
-				? {
-						key: context.storeKey,
-						typeId: "store",
-					}
-				: cart.store,
+			store: cart.store,
 		};
 		return this.saveNew(context, resource);
 	}
