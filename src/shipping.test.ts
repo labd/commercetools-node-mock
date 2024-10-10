@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
 	markMatchingShippingRate,
 	markMatchingShippingRatePriceTiers,
-} from "./shippingCalculator";
+} from "./shipping";
 
 // describe('markMatchingShippingMethods', () => {
 // 	const zones: Record<string, Zone> = {
