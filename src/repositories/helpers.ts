@@ -3,6 +3,7 @@ import {
 	BusinessUnitKeyReference,
 	BusinessUnitReference,
 	BusinessUnitResourceIdentifier,
+	RoundingMode,
 	type Address,
 	type Associate,
 	type AssociateDraft,
@@ -29,6 +30,7 @@ import {
 	type Type,
 	type _Money,
 } from "@commercetools/platform-sdk";
+import { Decimal } from "decimal.js/decimal";
 import type { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
@@ -83,6 +85,25 @@ export const createPrice = (draft: PriceDraft): Price => ({
 	id: uuidv4(),
 	value: createTypedMoney(draft.value),
 });
+
+/**
+ * Rounds a decimal to the nearest whole number using the specified
+ * (Commercetools) rounding mode.
+ *
+ * @see https://docs.commercetools.com/api/projects/carts#roundingmode
+ */
+export const roundDecimal = (decimal: Decimal, roundingMode: RoundingMode) => {
+	switch (roundingMode) {
+		case "HalfEven":
+			return decimal.toDecimalPlaces(0, Decimal.ROUND_HALF_EVEN);
+		case "HalfUp":
+			return decimal.toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
+		case "HalfDown":
+			return decimal.toDecimalPlaces(0, Decimal.ROUND_HALF_DOWN);
+		default:
+			throw new Error(`Unknown rounding mode: ${roundingMode}`);
+	}
+};
 
 export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
 	// Taken from https://docs.adyen.com/development-resources/currency-codes
