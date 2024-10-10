@@ -32,6 +32,7 @@
 	"dependencies": {
 		"basic-auth": "^2.0.1",
 		"body-parser": "^1.20.2",
+		"decimal.js": "10.4.3",
 		"deep-equal": "^2.2.3",
 		"express": "^4.19.2",
 		"light-my-request": "^5.11.1",

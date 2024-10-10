@@ -41,6 +41,7 @@ import {
 	TaxPortion,
 	TaxedItemPrice,
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
+import { Decimal } from "decimal.js/decimal";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
 import { getShippingMethodsMatchingCart } from "~src/shipping";
@@ -55,6 +56,7 @@ import {
 	createCentPrecisionMoney,
 	createCustomFields,
 	createTypedMoney,
+	roundDecimal,
 } from "../helpers";
 import {
 	calculateCartTotalPrice,
@@ -682,21 +684,23 @@ export class CartUpdateHandler
 
 			// TODO: handle freeAbove
 
-			// TODO: move price & tax calculation to helper function
-			// TODO: use Decimal.js for math
-			// TODO: round https://docs.commercetools.com/api/projects/carts#roundingmode
-			// TODO: support TaxCalculationMode (double check if applicable here)
 			const totalGross: CentPrecisionMoney = taxRate.includedInPrice
 				? shippingPrice
 				: {
 						...shippingPrice,
-						centAmount: shippingPrice.centAmount * (1 + taxRate.amount),
+						centAmount: roundDecimal(
+							new Decimal(shippingPrice.centAmount).mul(1 + taxRate.amount),
+							resource.taxRoundingMode,
+						).toNumber(),
 					};
 
 			const totalNet: CentPrecisionMoney = taxRate.includedInPrice
 				? {
 						...shippingPrice,
-						centAmount: shippingPrice.centAmount / (1 + taxRate.amount),
+						centAmount: roundDecimal(
+							new Decimal(shippingPrice.centAmount).div(1 + taxRate.amount),
+							resource.taxRoundingMode,
+						).toNumber(),
 					}
 				: shippingPrice;
 
