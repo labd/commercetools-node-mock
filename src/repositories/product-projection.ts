@@ -66,7 +66,7 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 			.all(context.projectKey, "product")
 			.map((r) => this._searchService.transform(r, params.staged ?? false))
 			.filter((p) => {
-				if (!params.staged ?? false) {
+				if (!(params.staged ?? false)) {
 					return p.published;
 				}
 				return true;
