@@ -3,6 +3,9 @@ import {
 	CartSetCustomerIdAction,
 	CartUpdateAction,
 	CentPrecisionMoney,
+	InvalidOperationError,
+	MissingTaxRateForCountryError,
+	ShippingMethodDoesNotMatchCartError,
 	type Address,
 	type AddressDraft,
 	type Cart,
@@ -40,6 +43,7 @@ import {
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
+import { getShippingMethodsMatchingCart } from "~src/shipping";
 import type { Writable } from "~src/types";
 import {
 	AbstractUpdateHandler,
@@ -580,72 +584,135 @@ export class CartUpdateHandler
 		{ shippingMethod }: CartSetShippingMethodAction,
 	) {
 		if (shippingMethod) {
-			const method = this._storage.expand(
+			if (resource.taxMode === "External") {
+				throw new Error("External tax rate is not supported");
+			}
+
+			const country = resource.shippingAddress?.country;
+
+			if (!country) {
+				throw new CommercetoolsError<InvalidOperationError>({
+					code: "InvalidOperation",
+					message: `The cart with ID '${resource.id}' does not have a shipping address set.`,
+				});
+			}
+
+			// Bit of a hack: calling this checks that the resource identifier is
+			// valid (i.e. id xor key) and that the shipping method exists.
+			this._storage.getByResourceIdentifier<"shipping-method">(
 				context.projectKey,
-				this._storage.getByResourceIdentifier<"shipping-method">(
-					context.projectKey,
-					shippingMethod,
-				),
-				"zoneRates[*].zone",
+				shippingMethod,
 			);
 
-			// TODO: move price & tax calculation to helper function
+			// getShippingMethodsMatchingCart does the work of determining whether the
+			// shipping method is allowed for the cart, and which shipping rate to use
+			const shippingMethods = getShippingMethodsMatchingCart(
+				context,
+				this._storage,
+				resource,
+				{
+					expand: ["zoneRates[*].zone"],
+				},
+			);
+
+			const method = shippingMethods.results.find((candidate) =>
+				shippingMethod.id
+					? candidate.id === shippingMethod.id
+					: candidate.key === shippingMethod.key,
+			);
+
+			// Not finding the method in the results means it's not allowed, since
+			// getShippingMethodsMatchingCart only returns allowed methods and we
+			// already checked that the method exists.
+			if (!method) {
+				throw new CommercetoolsError<ShippingMethodDoesNotMatchCartError>({
+					code: "ShippingMethodDoesNotMatchCart",
+					message: `The shipping method with ${shippingMethod.id ? `ID '${shippingMethod.id}'` : `key '${shippingMethod.key}'`} is not allowed for the cart with ID '${resource.id}'.`,
+				});
+			}
 
 			const taxCategory = this._storage.getByResourceIdentifier<"tax-category">(
 				context.projectKey,
 				method.taxCategory,
 			);
 
-			// FIXME: handle undefineds -- whats the convention in this package?
-			const country = resource.shippingAddress!.country;
-
+			// TODO: match state in addition to country
 			const taxRate = taxCategory.rates.find(
 				(rate) => rate.country === country,
-			)!;
+			);
 
-			// TODO: are zones on a single shipping method mutually exclusive in terms of countries in the set? If not, need different approach
+			if (!taxRate) {
+				throw new CommercetoolsError<MissingTaxRateForCountryError>({
+					code: "MissingTaxRateForCountry",
+					message: `Tax category '${taxCategory.id}' is missing a tax rate for country '${country}'.`,
+					taxCategoryId: taxCategory.id,
+				});
+			}
 
-			// Based on the address we select a shipping zone and
-			// use that to define the price.
-			const shippingRates = method.zoneRates.find((rate) =>
-				// TODO: match state in addition to country
+			// TODO: are zones on a single shipping method mutually exclusive in terms of countries in the set? If not, need to determine what to do in case of multiple matches.
+			const zoneRate = method.zoneRates.find((rate) =>
 				rate.zone.obj!.locations.some((loc) => loc.country === country),
-			)!.shippingRates;
+			);
 
-			// TODO: how to pick which shipping rate in array to use?
-			const shippingRate = shippingRates[0];
+			if (!zoneRate) {
+				// This shouldn't happen because getShippingMethodsMatchingCart already
+				// filtered out shipping methods without any zones matching the address
+				throw new Error("Zone rate not found");
+			}
 
-			// TODO: don't do anything when external tax rate is set
+			// TODO: how to pick which shipping rate in array to use? All in array are
+			// matching, but could there be multiple matching rates for a single zone?
+			const shippingRate = zoneRate.shippingRates[0];
+			if (!shippingRate) {
+				// This shouldn't happen because getShippingMethodsMatchingCart already
+				// filtered out shipping methods without any matching rates
+				throw new Error("Shipping rate not found");
+			}
+
+			const shippingRateTier = shippingRate.tiers.find(
+				(tier) => tier.isMatching,
+			);
+			if (shippingRateTier && shippingRateTier.type !== "CartValue") {
+				throw new Error("Non-CartValue shipping rate tier is not supported");
+			}
+
+			const shippingPrice = shippingRateTier
+				? createCentPrecisionMoney(shippingRateTier.price)
+				: shippingRate.price;
+
+			// TODO: handle freeAbove
+
+			// TODO: move price & tax calculation to helper function
 			// TODO: use Decimal.js for math
 			// TODO: round https://docs.commercetools.com/api/projects/carts#roundingmode
 			// TODO: support TaxCalculationMode (double check if applicable here)
 			const totalGross: CentPrecisionMoney = taxRate.includedInPrice
-				? shippingRate.price
+				? shippingPrice
 				: {
-						...shippingRate.price,
-						centAmount: shippingRate.price.centAmount * (1 + taxRate.amount),
+						...shippingPrice,
+						centAmount: shippingPrice.centAmount * (1 + taxRate.amount),
 					};
 
 			const totalNet: CentPrecisionMoney = taxRate.includedInPrice
 				? {
-						...shippingRate.price,
-						centAmount: shippingRate.price.centAmount / (1 + taxRate.amount),
+						...shippingPrice,
+						centAmount: shippingPrice.centAmount / (1 + taxRate.amount),
 					}
-				: shippingRate.price;
+				: shippingPrice;
 
 			const taxPortions: TaxPortion[] = [
 				{
 					name: taxRate.name,
 					rate: taxRate.amount,
 					amount: {
-						...shippingRate.price,
+						...shippingPrice,
 						centAmount: totalGross.centAmount - totalNet.centAmount,
 					},
 				},
 			];
 
 			const totalTax: CentPrecisionMoney = {
-				...shippingRate.price,
+				...shippingPrice,
 				centAmount: taxPortions.reduce(
 					(acc, portion) => acc + portion.amount.centAmount,
 					0,
@@ -666,8 +733,7 @@ export class CartUpdateHandler
 					id: method.id,
 				},
 				shippingMethodName: method.name,
-				// TODO: unclear if price should be gross or net, and what they mean by "and [...] the sum of LineItem prices" (from observation, it seems to just be the shipping rate price, no LineItems involved)
-				price: shippingRate.price,
+				price: shippingPrice,
 				shippingRate,
 				taxedPrice,
 				taxRate,

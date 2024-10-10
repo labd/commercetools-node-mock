@@ -962,6 +962,7 @@ describe("Cart Update Actions", () => {
 			// TODO: add more assertions for the rest of the shippingInfo
 			expect(response.body.shippingInfo.shippingRate).toMatchInlineSnapshot(`
 				{
+				  "isMatching": true,
 				  "price": {
 				    "centAmount": 499,
 				    "currencyCode": "EUR",
