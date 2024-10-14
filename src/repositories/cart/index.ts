@@ -39,8 +39,13 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 
 		const resource: Writable<Cart> = {
 			...getBaseResourceProperties(),
+			anonymousId: draft.anonymousId,
+			billingAddress: draft.billingAddress
+				? createAddress(draft.billingAddress, context.projectKey, this._storage)
+				: undefined,
 			cartState: "Active",
 			country: draft.country,
+			customerEmail: draft.customerEmail,
 			customLineItems: [],
 			directDiscounts: [],
 			discountCodes: [],
@@ -58,11 +63,13 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				fractionDigits: 0,
 			},
 			shippingMode: "Single",
-			shippingAddress: createAddress(
-				draft.shippingAddress,
-				context.projectKey,
-				this._storage,
-			),
+			shippingAddress: draft.shippingAddress
+				? createAddress(
+						draft.shippingAddress,
+						context.projectKey,
+						this._storage,
+					)
+				: undefined,
 			shipping: [],
 			origin: draft.origin ?? "Customer",
 			refusedGifts: [],
@@ -73,6 +80,9 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			),
 		};
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+		resource.store = context.storeKey
+			? { typeId: "store", key: context.storeKey }
+			: undefined;
 
 		return this.saveNew(context, resource);
 	}
