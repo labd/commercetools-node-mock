@@ -648,11 +648,13 @@ describe("Cart Update Actions", () => {
 
 	test("setBillingAddressCustomType", async () => {
 		assert(cart, "cart not created");
+
 		const address: Address = {
 			streetName: "Street name",
 			city: "Utrecht",
 			country: "NL",
 		};
+
 		const type = await supertest(ctMock.app)
 			.post(`/dummy/types`)
 			.send({
@@ -678,7 +680,9 @@ describe("Cart Update Actions", () => {
 				],
 			})
 			.then((x) => x.body);
+
 		assert(type, "type not created");
+
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/carts/${cart.id}`)
 			.send({
@@ -698,6 +702,7 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
+
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(3);
 		expect(response.body.billingAddress).toEqual({
@@ -711,11 +716,13 @@ describe("Cart Update Actions", () => {
 
 	test("setShippingAddressCustomType", async () => {
 		assert(cart, "cart not created");
+
 		const address: Address = {
 			streetName: "Street name",
 			city: "Utrecht",
 			country: "NL",
 		};
+
 		const type = await supertest(ctMock.app)
 			.post(`/dummy/types`)
 			.send({
@@ -741,7 +748,9 @@ describe("Cart Update Actions", () => {
 				],
 			})
 			.then((x) => x.body);
+
 		assert(type, "type not created");
+
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/carts/${cart.id}`)
 			.send({
@@ -761,6 +770,7 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
+
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(3);
 		expect(response.body.shippingAddress).toEqual({
