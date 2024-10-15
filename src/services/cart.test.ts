@@ -784,6 +784,7 @@ describe("Cart Update Actions", () => {
 
 	describe("setShippingMethod", () => {
 		let standardShippingMethod: ShippingMethod;
+		let standardExcludedShippingMethod: ShippingMethod;
 		beforeEach(async () => {
 			assert(cart, "cart not created");
 			const nlZone = await createZone("NL");
@@ -824,6 +825,24 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
+			const standardExcludedTax = await createTaxCategory({
+				name: "Tax category that is excluded from price",
+				key: "standard-excluded",
+				rates: [
+					{
+						name: "FR standard-excluded tax rate",
+						amount: 0.2,
+						includedInPrice: false,
+						country: "FR",
+					},
+					{
+						name: "NL standard-excluded tax rate",
+						amount: 0.21,
+						includedInPrice: false,
+						country: "NL",
+					},
+				],
+			});
 			standardShippingMethod = await createShippingMethod({
 				isDefault: false,
 				key: "standard",
@@ -831,6 +850,50 @@ describe("Cart Update Actions", () => {
 				taxCategory: {
 					typeId: "tax-category",
 					id: standardTax.id,
+				},
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone",
+							id: nlZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 499,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+					{
+						zone: {
+							typeId: "zone",
+							id: frZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 699,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+				],
+			});
+
+			standardExcludedShippingMethod = await createShippingMethod({
+				isDefault: false,
+				key: "standard-excluded",
+				name: "Standard shipping with tax excluded from price",
+				taxCategory: {
+					typeId: "tax-category",
+					id: standardExcludedTax.id,
 				},
 				zoneRates: [
 					{
@@ -953,8 +1016,9 @@ describe("Cart Update Actions", () => {
 			);
 		});
 
-		test("correctly sets shippingInfo rates + tax", async () => {
+		test("correctly sets shippingInfo rates + tax when includedInPrice: true", async () => {
 			assert(cart, "cart not created");
+			assert(standardShippingMethod, "shipping method not created");
 
 			const shippingMethod: ShippingMethodResourceIdentifier = {
 				typeId: "shipping-method",
@@ -1015,6 +1079,76 @@ describe("Cart Update Actions", () => {
 				totalTax: {
 					type: "centPrecision",
 					centAmount: 87,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+			});
+		});
+
+		test("correctly sets shippingInfo rates + tax when includedInPrice: false", async () => {
+			assert(cart, "cart not created");
+			assert(standardExcludedShippingMethod, "shipping method not created");
+
+			const shippingMethod: ShippingMethodResourceIdentifier = {
+				typeId: "shipping-method",
+				id: standardExcludedShippingMethod.id,
+			};
+
+			const response = await supertest(ctMock.app)
+				.post(`/dummy/carts/${cart.id}`)
+				.send({
+					version: 2,
+					actions: [{ action: "setShippingMethod", shippingMethod }],
+				});
+			expect(response.status).toBe(200);
+			expect(response.body.version).toBe(3);
+			expect(response.body.shippingInfo.shippingRate.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			// TODO: should this be gross or net? docs unclear (currently always net)
+			expect(response.body.shippingInfo.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			expect(response.body.shippingInfo.taxRate).toMatchObject({
+				name: "NL standard-excluded tax rate",
+				amount: 0.21,
+				includedInPrice: false,
+				country: "NL",
+			});
+			expect(response.body.shippingInfo.taxedPrice).toMatchObject({
+				totalNet: {
+					type: "centPrecision",
+					centAmount: 499,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				totalGross: {
+					type: "centPrecision",
+					centAmount: 604,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				taxPortions: [
+					{
+						name: "NL standard-excluded tax rate",
+						rate: 0.21,
+						amount: {
+							type: "centPrecision",
+							centAmount: 105,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+				],
+				totalTax: {
+					type: "centPrecision",
+					centAmount: 105,
 					currencyCode: "EUR",
 					fractionDigits: 2,
 				},
