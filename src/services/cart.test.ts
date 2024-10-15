@@ -969,19 +969,56 @@ describe("Cart Update Actions", () => {
 				});
 			expect(response.status).toBe(200);
 			expect(response.body.version).toBe(3);
-			// TODO: add more assertions for the rest of the shippingInfo
-			expect(response.body.shippingInfo.shippingRate).toMatchInlineSnapshot(`
-				{
-				  "isMatching": true,
-				  "price": {
-				    "centAmount": 499,
-				    "currencyCode": "EUR",
-				    "fractionDigits": 2,
-				    "type": "centPrecision",
-				  },
-				  "tiers": [],
-				}
-			`);
+			expect(response.body.shippingInfo.shippingRate.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			expect(response.body.shippingInfo.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			expect(response.body.shippingInfo.taxRate).toMatchObject({
+				name: "NL standard tax rate",
+				amount: 0.21,
+				includedInPrice: true,
+				country: "NL",
+			});
+			expect(response.body.shippingInfo.taxedPrice).toMatchObject({
+				totalNet: {
+					type: "centPrecision",
+					centAmount: 412,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				totalGross: {
+					type: "centPrecision",
+					centAmount: 499,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				taxPortions: [
+					{
+						name: "NL standard tax rate",
+						rate: 0.21,
+						amount: {
+							type: "centPrecision",
+							centAmount: 87,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+				],
+				totalTax: {
+					type: "centPrecision",
+					centAmount: 87,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+			});
 		});
 	});
 
