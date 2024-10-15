@@ -1,5 +1,17 @@
 ## 2.23.1
 
+## 2.34.3
+
+### Patch Changes
+
+- [#232](https://github.com/labd/commercetools-node-mock/pull/232) [`860a1b5`](https://github.com/labd/commercetools-node-mock/commit/860a1b538aa674b8b39b089cb540cd2b9e11e886) Thanks [@davidweterings](https://github.com/davidweterings)! - Set store key reference on create cart
+
+## 2.34.2
+
+### Patch Changes
+
+- [#230](https://github.com/labd/commercetools-node-mock/pull/230) [`a8ae588`](https://github.com/labd/commercetools-node-mock/commit/a8ae5889389f3102bbe1ae81fc3eda8db1f27cf5) Thanks [@webwiebe](https://github.com/webwiebe)! - copy properties from cart to order on create from cart
+
 ## 2.34.1
 
 ### Patch Changes
