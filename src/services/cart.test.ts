@@ -1108,7 +1108,7 @@ describe("Cart Update Actions", () => {
 				fractionDigits: 2,
 				type: "centPrecision",
 			});
-			// TODO: should this be gross or net? docs unclear (currently always net)
+			// TODO: should this be gross or net? docs unclear (currently always just returns the shipping rate (tier) price)
 			expect(response.body.shippingInfo.price).toMatchObject({
 				centAmount: 499,
 				currencyCode: "EUR",
