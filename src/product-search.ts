@@ -29,7 +29,7 @@ export class ProductSearch {
 				this.transform(r, params.productProjectionParameters?.staged ?? false),
 			)
 			.filter((p) => {
-				if (!params.productProjectionParameters?.staged ?? false) {
+				if (!(params.productProjectionParameters?.staged ?? false)) {
 					return p.published;
 				}
 				return true;

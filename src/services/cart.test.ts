@@ -3,6 +3,12 @@ import type {
 	Cart,
 	CentPrecisionMoney,
 	ProductDraft,
+	ShippingMethod,
+	ShippingMethodDraft,
+	ShippingMethodResourceIdentifier,
+	TaxCategory,
+	TaxCategoryDraft,
+	Zone,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
@@ -87,6 +93,41 @@ describe("Cart Update Actions", () => {
 		});
 		expect(response.status).toBe(201);
 		cart = response.body;
+	};
+
+	const createZone = async (country: string): Promise<Zone> => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/zones")
+			.send({
+				name: country,
+				locations: [
+					{
+						country,
+					},
+				],
+			});
+		expect(response.status).toBe(201);
+		return response.body;
+	};
+
+	const createTaxCategory = async (
+		draft: TaxCategoryDraft,
+	): Promise<TaxCategory> => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/tax-categories")
+			.send(draft);
+		expect(response.status).toBe(201);
+		return response.body;
+	};
+
+	const createShippingMethod = async (
+		draft: ShippingMethodDraft,
+	): Promise<ShippingMethod> => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/shipping-methods")
+			.send(draft);
+		expect(response.status).toBe(201);
+		return response.body;
 	};
 
 	const productDraft: ProductDraft = {
@@ -672,6 +713,7 @@ describe("Cart Update Actions", () => {
 			},
 		});
 	});
+
 	test("setShippingAddressCustomType", async () => {
 		assert(cart, "cart not created");
 
@@ -739,6 +781,381 @@ describe("Cart Update Actions", () => {
 			},
 		});
 	});
+
+	describe("setShippingMethod", () => {
+		let standardShippingMethod: ShippingMethod;
+		let standardExcludedShippingMethod: ShippingMethod;
+		beforeEach(async () => {
+			assert(cart, "cart not created");
+			const nlZone = await createZone("NL");
+			const frZone = await createZone("FR");
+			const standardTax = await createTaxCategory({
+				name: "Standard tax category",
+				key: "standard",
+				rates: [
+					{
+						name: "FR standard tax rate",
+						amount: 0.2,
+						includedInPrice: true,
+						country: "FR",
+					},
+					{
+						name: "NL standard tax rate",
+						amount: 0.21,
+						includedInPrice: true,
+						country: "NL",
+					},
+				],
+			});
+			await createTaxCategory({
+				name: "Reduced tax category",
+				key: "reduced",
+				rates: [
+					{
+						name: "FR reduced tax rate",
+						amount: 0.1,
+						includedInPrice: true,
+						country: "FR",
+					},
+					{
+						name: "NL reduced tax rate",
+						amount: 0.09,
+						includedInPrice: true,
+						country: "NL",
+					},
+				],
+			});
+			const standardExcludedTax = await createTaxCategory({
+				name: "Tax category that is excluded from price",
+				key: "standard-excluded",
+				rates: [
+					{
+						name: "FR standard-excluded tax rate",
+						amount: 0.2,
+						includedInPrice: false,
+						country: "FR",
+					},
+					{
+						name: "NL standard-excluded tax rate",
+						amount: 0.21,
+						includedInPrice: false,
+						country: "NL",
+					},
+				],
+			});
+			standardShippingMethod = await createShippingMethod({
+				isDefault: false,
+				key: "standard",
+				name: "Standard shipping",
+				taxCategory: {
+					typeId: "tax-category",
+					id: standardTax.id,
+				},
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone",
+							id: nlZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 499,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+					{
+						zone: {
+							typeId: "zone",
+							id: frZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 699,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+				],
+			});
+
+			standardExcludedShippingMethod = await createShippingMethod({
+				isDefault: false,
+				key: "standard-excluded",
+				name: "Standard shipping with tax excluded from price",
+				taxCategory: {
+					typeId: "tax-category",
+					id: standardExcludedTax.id,
+				},
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone",
+							id: nlZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 499,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+					{
+						zone: {
+							typeId: "zone",
+							id: frZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 699,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+				],
+			});
+			await createShippingMethod({
+				isDefault: false,
+				key: "express",
+				name: "Express shipping",
+				taxCategory: {
+					typeId: "tax-category",
+					id: standardTax.id,
+				},
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone",
+							id: nlZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 899,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+					{
+						zone: {
+							typeId: "zone",
+							id: frZone.id,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 1099,
+									fractionDigits: 2,
+								},
+							},
+						],
+					},
+				],
+			});
+
+			expect(
+				(
+					await supertest(ctMock.app)
+						.post(`/dummy/carts/${cart.id}`)
+						.send({
+							version: 1,
+							actions: [
+								{
+									action: "setShippingAddress",
+									address: {
+										streetName: "Street name",
+										city: "Utrecht",
+										country: "NL",
+									},
+								},
+							],
+						})
+				).status,
+			).toBe(200);
+		});
+
+		test("correctly sets shipping method", async () => {
+			assert(cart, "cart not created");
+
+			const shippingMethod: ShippingMethodResourceIdentifier = {
+				typeId: "shipping-method",
+				id: standardShippingMethod.id,
+			};
+
+			const response = await supertest(ctMock.app)
+				.post(`/dummy/carts/${cart.id}`)
+				.send({
+					version: 2,
+					actions: [{ action: "setShippingMethod", shippingMethod }],
+				});
+			expect(response.status).toBe(200);
+			expect(response.body.version).toBe(3);
+			expect(response.body.shippingInfo.shippingMethod.id).toEqual(
+				standardShippingMethod.id,
+			);
+		});
+
+		test("correctly sets shippingInfo rates + tax when includedInPrice: true", async () => {
+			assert(cart, "cart not created");
+			assert(standardShippingMethod, "shipping method not created");
+
+			const shippingMethod: ShippingMethodResourceIdentifier = {
+				typeId: "shipping-method",
+				id: standardShippingMethod.id,
+			};
+
+			const response = await supertest(ctMock.app)
+				.post(`/dummy/carts/${cart.id}`)
+				.send({
+					version: 2,
+					actions: [{ action: "setShippingMethod", shippingMethod }],
+				});
+			expect(response.status).toBe(200);
+			expect(response.body.version).toBe(3);
+			expect(response.body.shippingInfo.shippingRate.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			expect(response.body.shippingInfo.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			expect(response.body.shippingInfo.taxRate).toMatchObject({
+				name: "NL standard tax rate",
+				amount: 0.21,
+				includedInPrice: true,
+				country: "NL",
+			});
+			expect(response.body.shippingInfo.taxedPrice).toMatchObject({
+				totalNet: {
+					type: "centPrecision",
+					centAmount: 412,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				totalGross: {
+					type: "centPrecision",
+					centAmount: 499,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				taxPortions: [
+					{
+						name: "NL standard tax rate",
+						rate: 0.21,
+						amount: {
+							type: "centPrecision",
+							centAmount: 87,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+				],
+				totalTax: {
+					type: "centPrecision",
+					centAmount: 87,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+			});
+		});
+
+		test("correctly sets shippingInfo rates + tax when includedInPrice: false", async () => {
+			assert(cart, "cart not created");
+			assert(standardExcludedShippingMethod, "shipping method not created");
+
+			const shippingMethod: ShippingMethodResourceIdentifier = {
+				typeId: "shipping-method",
+				id: standardExcludedShippingMethod.id,
+			};
+
+			const response = await supertest(ctMock.app)
+				.post(`/dummy/carts/${cart.id}`)
+				.send({
+					version: 2,
+					actions: [{ action: "setShippingMethod", shippingMethod }],
+				});
+			expect(response.status).toBe(200);
+			expect(response.body.version).toBe(3);
+			expect(response.body.shippingInfo.shippingRate.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			// TODO: should this be gross or net? docs unclear (currently always just returns the shipping rate (tier) price)
+			expect(response.body.shippingInfo.price).toMatchObject({
+				centAmount: 499,
+				currencyCode: "EUR",
+				fractionDigits: 2,
+				type: "centPrecision",
+			});
+			expect(response.body.shippingInfo.taxRate).toMatchObject({
+				name: "NL standard-excluded tax rate",
+				amount: 0.21,
+				includedInPrice: false,
+				country: "NL",
+			});
+			expect(response.body.shippingInfo.taxedPrice).toMatchObject({
+				totalNet: {
+					type: "centPrecision",
+					centAmount: 499,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				totalGross: {
+					type: "centPrecision",
+					centAmount: 604,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+				taxPortions: [
+					{
+						name: "NL standard-excluded tax rate",
+						rate: 0.21,
+						amount: {
+							type: "centPrecision",
+							centAmount: 105,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+				],
+				totalTax: {
+					type: "centPrecision",
+					centAmount: 105,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+			});
+		});
+	});
+
 	test("setLineItemShippingDetails", async () => {
 		const product = await supertest(ctMock.app)
 			.post(`/dummy/products`)
