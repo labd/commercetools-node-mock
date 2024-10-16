@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.35.0
+
+### Minor Changes
+
+- [#234](https://github.com/labd/commercetools-node-mock/pull/234) [`83dd885`](https://github.com/labd/commercetools-node-mock/commit/83dd885ad5ff6f121c7a9d1ac3f55ef084b7170c) Thanks [@mickdekkers](https://github.com/mickdekkers)! - Populate cart.shippingInfo when setShippingMethod is called
+
 ## 2.34.3
 
 ### Patch Changes
