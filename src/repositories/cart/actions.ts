@@ -651,7 +651,9 @@ export class CartUpdateHandler
 				});
 			}
 
-			// TODO: are zones on a single shipping method mutually exclusive in terms of countries in the set? If not, need to determine what to do in case of multiple matches.
+			// There should only be one zone rate matching the address, since
+			// Locations cannot be assigned to more than one zone.
+			// See https://docs.commercetools.com/api/projects/zones#location
 			const zoneRate = method.zoneRates.find((rate) =>
 				rate.zone.obj!.locations.some((loc) => loc.country === country),
 			);
@@ -662,8 +664,9 @@ export class CartUpdateHandler
 				throw new Error("Zone rate not found");
 			}
 
-			// TODO: how to pick which shipping rate in array to use? All in array are
-			// matching, but could there be multiple matching rates for a single zone?
+			// Shipping rates are defined by currency, and getShippingMethodsMatchingCart
+			// also matches on currency, so there should only be one in the array.
+			// See https://docs.commercetools.com/api/projects/shippingMethods#zonerate
 			const shippingRate = zoneRate.shippingRates[0];
 			if (!shippingRate) {
 				// This shouldn't happen because getShippingMethodsMatchingCart already
