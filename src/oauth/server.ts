@@ -287,15 +287,52 @@ export class OAuth2Server {
 		response: Response,
 		next: NextFunction,
 	) {
-		return next(
-			new CommercetoolsError<InvalidClientError>(
+		const projectKey = request.params.projectKey;
+		const storeKey = request.params.storeKey;
+		const grantType = request.query.grant_type || request.body.grant_type;
+		if (!grantType) {
+			return next(
+				new CommercetoolsError<InvalidRequestError>(
+					{
+						code: "invalid_request",
+						message: "Missing required parameter: grant_type.",
+					},
+					400,
+				),
+			);
+		}
+
+		if (grantType === "password") {
+			const username = request.query.username || request.body.username;
+			const password = hashPassword(
+				request.query.password || request.body.password,
+			);
+			const scope =
+				request.query.scope?.toString() || request.body.scope?.toString();
+
+			const result = this.customerRepository.query(
+				{ projectKey, storeKey },
 				{
-					code: "invalid_client",
-					message: "Not implemented yet in commercetools-mock",
+					where: [`email = "${username}"`, `password = "${password}"`],
 				},
-				401,
-			),
-		);
+			);
+
+			if (result.count === 0) {
+				return next(
+					new CommercetoolsError<any>(
+						{
+							code: "invalid_customer_account_credentials",
+							message: "Customer account with the given credentials not found.",
+						},
+						400,
+					),
+				);
+			}
+
+			const customer = result.results[0];
+			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
+			return response.status(200).send(token);
+		}
 	}
 
 	async anonymousTokenHandler(
