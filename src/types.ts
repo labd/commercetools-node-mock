@@ -14,7 +14,8 @@ export type ServiceTypes =
 	| "my-cart"
 	| "my-order"
 	| "my-payment"
-	| "my-customer";
+	| "my-customer"
+	| "my-business-unit";
 
 export type Services = Partial<{
 	[index in ServiceTypes]: AbstractService;
