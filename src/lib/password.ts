@@ -1,4 +1,4 @@
-import { Customer } from "@commercetools/platform-sdk";
+import type { Customer } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 
 const PWRESET_SECRET = "pwreset";

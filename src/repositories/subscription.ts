@@ -7,14 +7,10 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractStorage } from "../storage/abstract";
-import { Writable } from "../types";
-import {
-	AbstractResourceRepository,
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "./abstract";
+import type { AbstractStorage } from "../storage/abstract";
+import type { Writable } from "../types";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
+import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 
 export class SubscriptionRepository extends AbstractResourceRepository<"subscription"> {
 	constructor(storage: AbstractStorage) {

@@ -2,8 +2,9 @@ import type {
 	QuoteRequest,
 	QuoteRequestDraft,
 } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "~src/storage";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import type { AbstractStorage } from "~src/storage";
+import type { RepositoryContext } from "./abstract";
+import { AbstractResourceRepository } from "./abstract";
 
 export class QuoteRequestRepository extends AbstractResourceRepository<"quote-request"> {
 	constructor(storage: AbstractStorage) {

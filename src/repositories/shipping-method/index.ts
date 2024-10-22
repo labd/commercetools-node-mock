@@ -7,12 +7,9 @@ import {
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../../helpers";
 import { getShippingMethodsMatchingCart } from "../../shipping";
-import { AbstractStorage } from "../../storage/abstract";
-import {
-	AbstractResourceRepository,
-	GetParams,
-	RepositoryContext,
-} from "../abstract";
+import type { AbstractStorage } from "../../storage/abstract";
+import type { GetParams, RepositoryContext } from "../abstract";
+import { AbstractResourceRepository } from "../abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,

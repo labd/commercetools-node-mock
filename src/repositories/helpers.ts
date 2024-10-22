@@ -1,9 +1,11 @@
-import {
+import type {
 	AssociateRoleReference,
 	BusinessUnitKeyReference,
 	BusinessUnitReference,
 	BusinessUnitResourceIdentifier,
 	RoundingMode,
+} from "@commercetools/platform-sdk";
+import {
 	type Address,
 	type Associate,
 	type AssociateDraft,
@@ -34,7 +36,7 @@ import { Decimal } from "decimal.js/decimal";
 import type { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
-import { AbstractStorage } from "../storage";
+import type { AbstractStorage } from "../storage";
 import { type RepositoryContext } from "./abstract";
 
 export const createAddress = (

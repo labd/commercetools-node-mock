@@ -1,10 +1,10 @@
 import type { Update } from "@commercetools/platform-sdk";
 import { Router, type Request, type Response } from "express";
-import { ParsedQs } from "qs";
+import type { ParsedQs } from "qs";
 import { updateRequestSchema } from "~src/schemas/update-request";
 import { validateData } from "~src/validate";
 import { queryParamsArray } from "../helpers";
-import {
+import type {
 	AbstractResourceRepository,
 	QueryParams,
 } from "../repositories/abstract";

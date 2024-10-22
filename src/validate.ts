@@ -1,5 +1,5 @@
-import { InvalidJsonInputError } from "@commercetools/platform-sdk";
-import { z } from "zod";
+import type { InvalidJsonInputError } from "@commercetools/platform-sdk";
+import type { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { CommercetoolsError } from "./exceptions";
 

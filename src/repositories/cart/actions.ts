@@ -1,4 +1,4 @@
-import {
+import type {
 	CartSetAnonymousIdAction,
 	CartSetCustomerIdAction,
 	CartUpdateAction,
@@ -6,6 +6,8 @@ import {
 	InvalidOperationError,
 	MissingTaxRateForCountryError,
 	ShippingMethodDoesNotMatchCartError,
+} from "@commercetools/platform-sdk";
+import {
 	type Address,
 	type AddressDraft,
 	type Cart,
@@ -36,7 +38,7 @@ import {
 	type ProductPagedQueryResponse,
 	type ProductVariant,
 } from "@commercetools/platform-sdk";
-import {
+import type {
 	DirectDiscount,
 	TaxPortion,
 	TaxedItemPrice,
@@ -46,11 +48,8 @@ import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
 import { getShippingMethodsMatchingCart } from "~src/shipping";
 import type { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	UpdateHandlerInterface,
-	type RepositoryContext,
-} from "../abstract";
+import type { UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
 import {
 	createAddress,
 	createCentPrecisionMoney,

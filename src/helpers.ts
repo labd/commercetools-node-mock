@@ -1,5 +1,5 @@
-import { OutgoingHttpHeaders } from "node:http";
-import { ParsedQs } from "qs";
+import type { OutgoingHttpHeaders } from "node:http";
+import type { ParsedQs } from "qs";
 import { v4 as uuidv4 } from "uuid";
 
 export const getBaseResourceProperties = () => ({

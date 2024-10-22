@@ -1,4 +1,7 @@
-import { ShippingRate, ShippingRateDraft } from "@commercetools/platform-sdk";
+import type {
+	ShippingRate,
+	ShippingRateDraft,
+} from "@commercetools/platform-sdk";
 import { createTypedMoney } from "../helpers";
 
 export const transformShippingRate = (

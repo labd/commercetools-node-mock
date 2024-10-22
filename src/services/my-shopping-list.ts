@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { ShoppingListRepository } from "../repositories/shopping-list";
+import type { Router } from "express";
+import type { ShoppingListRepository } from "../repositories/shopping-list";
 import AbstractService from "./abstract";
 
 export class MyShoppingListService extends AbstractService {

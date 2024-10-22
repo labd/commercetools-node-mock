@@ -1,4 +1,4 @@
-import {
+import type {
 	InvalidInputError,
 	Product,
 	ProductPagedSearchResponse,
@@ -10,7 +10,7 @@ import { CommercetoolsError } from "./exceptions";
 import { parseSearchQuery } from "./lib/productSearchFilter";
 import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
 import { applyPriceSelector } from "./priceSelector";
-import { AbstractStorage } from "./storage";
+import type { AbstractStorage } from "./storage";
 
 export class ProductSearch {
 	protected _storage: AbstractStorage;

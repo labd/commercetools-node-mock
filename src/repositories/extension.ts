@@ -7,14 +7,14 @@ import type {
 	ExtensionSetTimeoutInMsAction,
 	ExtensionUpdateAction,
 } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "~src/storage";
+import type { AbstractStorage } from "~src/storage";
 import { getBaseResourceProperties } from "../helpers";
 import { maskSecretValue } from "../lib/masking";
 import type { Writable } from "../types";
+import type { UpdateHandlerInterface } from "./abstract";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
-	UpdateHandlerInterface,
 	type RepositoryContext,
 } from "./abstract";
 

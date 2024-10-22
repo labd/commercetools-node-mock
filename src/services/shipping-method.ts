@@ -1,7 +1,7 @@
-import { Request, Response, Router } from "express";
+import type { Request, Response, Router } from "express";
 import { queryParamsValue } from "../helpers";
 import { getRepositoryContext } from "../repositories/helpers";
-import { ShippingMethodRepository } from "../repositories/shipping-method";
+import type { ShippingMethodRepository } from "../repositories/shipping-method";
 import AbstractService from "./abstract";
 
 export class ShippingMethodService extends AbstractService {

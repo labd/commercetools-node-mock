@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { DiscountCodeRepository } from "../repositories/discount-code/index";
+import type { Router } from "express";
+import type { DiscountCodeRepository } from "../repositories/discount-code/index";
 import AbstractService from "./abstract";
 
 export class DiscountCodeService extends AbstractService {

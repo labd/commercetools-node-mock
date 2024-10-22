@@ -1,6 +1,8 @@
-import {
+import type {
 	ShippingMethodChangeTaxCategoryAction,
 	ShippingMethodRemoveShippingRateAction,
+} from "@commercetools/platform-sdk";
+import {
 	type ShippingMethod,
 	type ShippingMethodAddShippingRateAction,
 	type ShippingMethodAddZoneAction,
@@ -20,11 +22,8 @@ import {
 } from "@commercetools/platform-sdk";
 import deepEqual from "deep-equal";
 import type { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "../abstract";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,

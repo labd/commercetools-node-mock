@@ -1,7 +1,7 @@
-import { Request, Response, Router } from "express";
+import type { Request, Response, Router } from "express";
 import { queryParamsArray, queryParamsValue } from "../helpers";
 import { getRepositoryContext } from "../repositories/helpers";
-import {
+import type {
 	ProductProjectionQueryParams,
 	ProductProjectionRepository,
 } from "./../repositories/product-projection";

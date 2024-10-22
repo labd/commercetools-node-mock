@@ -1,13 +1,16 @@
-import {
+import type {
 	ChannelReference,
 	ProductReference,
+} from "@commercetools/platform-sdk";
+import {
 	type Review,
 	type ReviewDraft,
 	type StateReference,
 } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "~src/storage";
+import type { AbstractStorage } from "~src/storage";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import type { RepositoryContext } from "./abstract";
+import { AbstractResourceRepository } from "./abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,

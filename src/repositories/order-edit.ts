@@ -3,9 +3,10 @@ import type {
 	OrderEditDraft,
 	OrderEditResult,
 } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "~src/storage";
+import type { AbstractStorage } from "~src/storage";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractResourceRepository, RepositoryContext } from "./abstract";
+import type { RepositoryContext } from "./abstract";
+import { AbstractResourceRepository } from "./abstract";
 
 export class OrderEditRepository extends AbstractResourceRepository<"order-edit"> {
 	constructor(storage: AbstractStorage) {

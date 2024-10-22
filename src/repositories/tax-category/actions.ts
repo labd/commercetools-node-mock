@@ -9,7 +9,8 @@ import type {
 	TaxCategoryUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Writable } from "~src/types";
-import { AbstractUpdateHandler, RepositoryContext } from "../abstract";
+import type { RepositoryContext } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 import { taxRateFromTaxRateDraft } from "./helpers";
 
 type TaxCategoryUpdateHandlerMethod<T> = (

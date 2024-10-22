@@ -12,14 +12,10 @@ import type {
 	StoreUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractStorage } from "../storage/abstract";
+import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
-import {
-	AbstractResourceRepository,
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "./abstract";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
+import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,

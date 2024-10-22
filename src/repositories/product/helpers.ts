@@ -1,4 +1,4 @@
-import {
+import type {
 	ChannelReference,
 	Price,
 	PriceDraft,
@@ -9,9 +9,9 @@ import {
 } from "@commercetools/platform-sdk";
 import deepEqual from "deep-equal";
 import { v4 as uuidv4 } from "uuid";
-import { AbstractStorage } from "~src/storage";
-import { Writable } from "~src/types";
-import { RepositoryContext } from "../abstract";
+import type { AbstractStorage } from "~src/storage";
+import type { Writable } from "~src/types";
+import type { RepositoryContext } from "../abstract";
 import {
 	createTypedMoney,
 	getReferenceFromResourceIdentifier,

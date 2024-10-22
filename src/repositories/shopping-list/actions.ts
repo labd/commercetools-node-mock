@@ -21,12 +21,9 @@ import type {
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
-import { Writable } from "../../types";
-import {
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "../abstract";
+import type { Writable } from "../../types";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 
 export class ShoppingListUpdateHandler
 	extends AbstractUpdateHandler

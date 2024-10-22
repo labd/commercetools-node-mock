@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { StandAlonePriceRepository } from "../repositories/standalone-price";
+import type { Router } from "express";
+import type { StandAlonePriceRepository } from "../repositories/standalone-price";
 import AbstractService from "./abstract";
 
 export class StandAlonePriceService extends AbstractService {

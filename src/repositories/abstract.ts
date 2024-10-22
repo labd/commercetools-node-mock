@@ -9,8 +9,8 @@ import type {
 import deepEqual from "deep-equal";
 import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
-import { AbstractStorage } from "../storage";
-import {
+import type { AbstractStorage } from "../storage";
+import type {
 	ResourceMap,
 	ResourceType,
 	ShallowWritable,

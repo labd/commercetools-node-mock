@@ -1,10 +1,11 @@
-import { Update } from "@commercetools/platform-sdk";
-import { Request, Response, Router } from "express";
+import type { Update } from "@commercetools/platform-sdk";
+import type { Request, Response } from "express";
+import { Router } from "express";
 import { updateRequestSchema } from "~src/schemas/update-request";
 import { validateData } from "~src/validate";
 import { hashPassword } from "../lib/password";
 import { getRepositoryContext } from "../repositories/helpers";
-import { MyCustomerRepository } from "../repositories/my-customer";
+import type { MyCustomerRepository } from "../repositories/my-customer";
 import AbstractService from "./abstract";
 
 export class MyCustomerService extends AbstractService {

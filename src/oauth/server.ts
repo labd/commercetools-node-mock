@@ -1,4 +1,4 @@
-import { InvalidTokenError } from "@commercetools/platform-sdk";
+import type { InvalidTokenError } from "@commercetools/platform-sdk";
 import auth from "basic-auth";
 import bodyParser from "body-parser";
 import express, {
@@ -6,14 +6,11 @@ import express, {
 	type Request,
 	type Response,
 } from "express";
-import {
-	AuthError,
-	CommercetoolsError,
-	InvalidRequestError,
-} from "~src/exceptions";
+import type { AuthError, InvalidRequestError } from "~src/exceptions";
+import { CommercetoolsError } from "~src/exceptions";
 import { hashPassword } from "../lib/password";
-import { CustomerRepository } from "../repositories/customer";
-import { InvalidClientError, UnsupportedGrantType } from "./errors";
+import type { CustomerRepository } from "../repositories/customer";
+import type { InvalidClientError, UnsupportedGrantType } from "./errors";
 import { getBearerToken } from "./helpers";
 import { OAuth2Store } from "./store";
 

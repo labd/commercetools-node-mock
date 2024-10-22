@@ -1,8 +1,8 @@
 import { getBaseResourceProperties } from "./helpers";
-import { RepositoryMap } from "./repositories";
-import { GetParams } from "./repositories/abstract";
-import { AbstractStorage } from "./storage";
-import { ResourceMap, ResourceType } from "./types";
+import type { RepositoryMap } from "./repositories";
+import type { GetParams } from "./repositories/abstract";
+import type { AbstractStorage } from "./storage";
+import type { ResourceMap, ResourceType } from "./types";
 
 export class ProjectAPI {
 	private projectKey: string;

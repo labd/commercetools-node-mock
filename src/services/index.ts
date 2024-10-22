@@ -1,4 +1,4 @@
-import { createRepositories } from "../repositories";
+import type { createRepositories } from "../repositories";
 import { AssociateRoleServices } from "./associate-roles";
 import { AttributeGroupService } from "./attribute-group";
 import { BusinessUnitServices } from "./business-units";

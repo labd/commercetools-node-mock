@@ -16,12 +16,9 @@ import type {
 import assert from "assert";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
-import { AbstractStorage } from "~src/storage/abstract";
-import {
-	AbstractResourceRepository,
-	RepositoryContext,
-	type QueryParams,
-} from "../abstract";
+import type { AbstractStorage } from "~src/storage/abstract";
+import type { RepositoryContext } from "../abstract";
+import { AbstractResourceRepository, type QueryParams } from "../abstract";
 import {
 	createAddress,
 	createCentPrecisionMoney,

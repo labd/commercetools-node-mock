@@ -15,16 +15,12 @@ import type {
 	ProjectSetShippingRateInputTypeAction,
 	ProjectUpdateAction,
 } from "@commercetools/platform-sdk";
-import { ProjectSetBusinessUnitAssociateRoleOnCreationAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/project";
+import type { ProjectSetBusinessUnitAssociateRoleOnCreationAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/project";
 import { maskSecretValue } from "../lib/masking";
-import { AbstractStorage } from "../storage/abstract";
+import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
-import {
-	AbstractRepository,
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "./abstract";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
+import { AbstractRepository, AbstractUpdateHandler } from "./abstract";
 
 export class ProjectRepository extends AbstractRepository<Project> {
 	constructor(storage: AbstractStorage) {

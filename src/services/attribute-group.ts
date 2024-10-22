@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { AttributeGroupRepository } from "../repositories/attribute-group";
+import type { Router } from "express";
+import type { AttributeGroupRepository } from "../repositories/attribute-group";
 import AbstractService from "./abstract";
 
 export class AttributeGroupService extends AbstractService {

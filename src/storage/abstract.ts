@@ -4,7 +4,11 @@ import type {
 	QueryParam,
 	ResourceIdentifier,
 } from "@commercetools/platform-sdk";
-import { PagedQueryResponseMap, ResourceMap, ResourceType } from "../types";
+import type {
+	PagedQueryResponseMap,
+	ResourceMap,
+	ResourceType,
+} from "../types";
 
 export type GetParams = {
 	expand?: string[];

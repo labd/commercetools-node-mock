@@ -1,9 +1,9 @@
-import { Update } from "@commercetools/platform-sdk";
-import { Request, Response, Router } from "express";
+import type { Update } from "@commercetools/platform-sdk";
+import type { Request, Response, Router } from "express";
 import { updateRequestSchema } from "~src/schemas/update-request";
 import { validateData } from "~src/validate";
 import { getRepositoryContext } from "../repositories/helpers";
-import { ProjectRepository } from "../repositories/project";
+import type { ProjectRepository } from "../repositories/project";
 
 export class ProjectService {
 	public repository: ProjectRepository;

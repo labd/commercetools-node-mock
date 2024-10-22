@@ -1,4 +1,4 @@
-import { Cart, LineItem, Price } from "@commercetools/platform-sdk";
+import type { Cart, LineItem, Price } from "@commercetools/platform-sdk";
 
 export const selectPrice = ({
 	prices,

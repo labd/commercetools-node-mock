@@ -1,10 +1,12 @@
-import {
+import type {
 	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
 	BusinessUnitUpdateAction,
 	CompanyDraft,
 	DivisionDraft,
+} from "@commercetools/platform-sdk";
+import {
 	type Associate,
 	type BusinessUnit,
 	type BusinessUnitAddAddressAction,
@@ -20,13 +22,13 @@ import {
 	type Company,
 	type Division,
 } from "@commercetools/platform-sdk";
-import { AbstractStorage } from "~src/storage";
+import type { AbstractStorage } from "~src/storage";
 import { generateRandomString, getBaseResourceProperties } from "../helpers";
-import { Writable } from "../types";
+import type { Writable } from "../types";
+import type { UpdateHandlerInterface } from "./abstract";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
-	UpdateHandlerInterface,
 	type RepositoryContext,
 } from "./abstract";
 import {

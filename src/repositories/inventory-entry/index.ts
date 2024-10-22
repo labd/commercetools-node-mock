@@ -3,7 +3,7 @@ import type {
 	InventoryEntryDraft,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "~src/helpers";
-import { AbstractStorage } from "~src/storage/abstract";
+import type { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,

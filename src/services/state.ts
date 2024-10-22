@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { StateRepository } from "../repositories/state";
+import type { Router } from "express";
+import type { StateRepository } from "../repositories/state";
 import AbstractService from "./abstract";
 
 export class StateService extends AbstractService {

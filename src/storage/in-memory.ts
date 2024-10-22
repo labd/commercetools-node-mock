@@ -1,7 +1,9 @@
-import {
+import type {
 	InvalidJsonInputError,
 	ReferencedResourceNotFoundError,
 	ShoppingListLineItem,
+} from "@commercetools/platform-sdk";
+import {
 	type AssociateRole,
 	type AttributeGroup,
 	type BusinessUnit,
@@ -44,18 +46,14 @@ import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
 import { parseExpandClause } from "../lib/expandParser";
 import { parseQueryExpression } from "../lib/predicateParser";
-import {
+import type {
 	PagedQueryResponseMap,
 	ResourceMap,
 	ResourceType,
 	Writable,
 } from "../types";
-import {
-	AbstractStorage,
-	GetParams,
-	ProjectStorage,
-	QueryParams,
-} from "./abstract";
+import type { GetParams, ProjectStorage, QueryParams } from "./abstract";
+import { AbstractStorage } from "./abstract";
 
 export class InMemoryStorage extends AbstractStorage {
 	protected resources: {

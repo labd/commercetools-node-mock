@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { AssociateRoleRepository } from "../repositories/associate-role";
+import type { Router } from "express";
+import type { AssociateRoleRepository } from "../repositories/associate-role";
 import AbstractService from "./abstract";
 
 export class AssociateRoleServices extends AbstractService {

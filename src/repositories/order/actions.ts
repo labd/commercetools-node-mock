@@ -29,11 +29,8 @@ import type {
 import assert from "assert";
 import { getBaseResourceProperties } from "~src/helpers";
 import type { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "../abstract";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 import { createAddress } from "../helpers";
 
 export class OrderUpdateHandler

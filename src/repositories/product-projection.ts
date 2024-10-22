@@ -9,11 +9,8 @@ import { parseQueryExpression } from "../lib/predicateParser";
 import { applyPriceSelector } from "../priceSelector";
 import { ProductProjectionSearch } from "../product-projection-search";
 import { type AbstractStorage } from "../storage";
-import {
-	AbstractResourceRepository,
-	GetParams,
-	RepositoryContext,
-} from "./abstract";
+import type { GetParams, RepositoryContext } from "./abstract";
+import { AbstractResourceRepository } from "./abstract";
 
 export type ProductProjectionQueryParams = {
 	staged?: boolean;

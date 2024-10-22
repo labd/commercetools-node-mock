@@ -9,14 +9,10 @@ import type {
 	ZoneUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractStorage } from "../storage/abstract";
+import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
-import {
-	AbstractResourceRepository,
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "./abstract";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
+import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 
 export class ZoneRepository extends AbstractResourceRepository<"zone"> {
 	constructor(storage: AbstractStorage) {

@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { getBaseResourceProperties } from "../helpers";
 import { hashPassword } from "../lib/password";
 import { CustomerRepository } from "../repositories/customer";
-import { AbstractStorage, InMemoryStorage } from "../storage";
+import type { AbstractStorage } from "../storage";
+import { InMemoryStorage } from "../storage";
 import { OAuth2Server } from "./server";
 
 describe("OAuth2Server", () => {

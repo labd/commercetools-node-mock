@@ -4,14 +4,11 @@ import type {
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
-import { AbstractStorage } from "~src/storage";
+import type { AbstractStorage } from "~src/storage";
 import { cloneObject, getBaseResourceProperties } from "../helpers";
 import type { Writable } from "../types";
-import {
-	AbstractResourceRepository,
-	QueryParams,
-	type RepositoryContext,
-} from "./abstract";
+import type { QueryParams } from "./abstract";
+import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
 import { checkConcurrentModification } from "./errors";
 
 export class CustomObjectRepository extends AbstractResourceRepository<"key-value-document"> {

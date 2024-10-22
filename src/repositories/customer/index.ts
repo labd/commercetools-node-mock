@@ -18,8 +18,8 @@ import {
 	hashPassword,
 	validatePasswordResetToken,
 } from "~src/lib/password";
-import { AbstractStorage } from "~src/storage/abstract";
-import { Writable } from "~src/types";
+import type { AbstractStorage } from "~src/storage/abstract";
+import type { Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,

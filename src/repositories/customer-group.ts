@@ -8,12 +8,12 @@ import type {
 	CustomerGroupUpdateAction,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../helpers";
-import { AbstractStorage } from "../storage/abstract";
+import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
+import type { UpdateHandlerInterface } from "./abstract";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
-	UpdateHandlerInterface,
 	type RepositoryContext,
 } from "./abstract";
 import { createCustomFields } from "./helpers";

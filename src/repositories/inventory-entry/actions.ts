@@ -8,11 +8,8 @@ import type {
 	InventoryEntryUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	UpdateHandlerInterface,
-	type RepositoryContext,
-} from "../abstract";
+import type { UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
 
 export class InventoryEntryUpdateHandler
 	extends AbstractUpdateHandler

@@ -13,8 +13,9 @@ import type {
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
 import { ProductSearch } from "~src/product-search";
-import { AbstractStorage } from "~src/storage/abstract";
-import { AbstractResourceRepository, RepositoryContext } from "../abstract";
+import type { AbstractStorage } from "~src/storage/abstract";
+import type { RepositoryContext } from "../abstract";
+import { AbstractResourceRepository } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";
 import { ProductUpdateHandler } from "./actions";
 import { variantFromDraft } from "./helpers";

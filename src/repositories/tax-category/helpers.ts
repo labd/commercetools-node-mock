@@ -1,4 +1,4 @@
-import { TaxRate, TaxRateDraft } from "@commercetools/platform-sdk";
+import type { TaxRate, TaxRateDraft } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 
 export const taxRateFromTaxRateDraft = (draft: TaxRateDraft): TaxRate => ({

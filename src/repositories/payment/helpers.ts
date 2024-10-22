@@ -1,7 +1,10 @@
-import { Transaction, TransactionDraft } from "@commercetools/platform-sdk";
+import type {
+	Transaction,
+	TransactionDraft,
+} from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { AbstractStorage } from "~src/storage";
-import { RepositoryContext } from "../abstract";
+import type { AbstractStorage } from "~src/storage";
+import type { RepositoryContext } from "../abstract";
 import { createCentPrecisionMoney, createCustomFields } from "../helpers";
 
 export const transactionFromTransactionDraft = (

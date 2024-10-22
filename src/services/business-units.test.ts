@@ -1,4 +1,4 @@
-import { BusinessUnit } from "@commercetools/platform-sdk";
+import type { BusinessUnit } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../ctMock";

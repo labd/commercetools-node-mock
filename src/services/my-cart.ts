@@ -1,5 +1,6 @@
-import { Request, Response, Router } from "express";
-import { CartRepository } from "../repositories/cart";
+import type { Request, Response } from "express";
+import { Router } from "express";
+import type { CartRepository } from "../repositories/cart";
 import AbstractService from "./abstract";
 
 export class MyCartService extends AbstractService {

@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { InventoryEntryRepository } from "../repositories/inventory-entry";
+import type { Router } from "express";
+import type { InventoryEntryRepository } from "../repositories/inventory-entry";
 import AbstractService from "./abstract";
 
 export class InventoryEntryService extends AbstractService {

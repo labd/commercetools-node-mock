@@ -26,11 +26,8 @@ import type {
 	Transaction,
 } from "@commercetools/platform-sdk";
 import type { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "../abstract";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 import {
 	createCentPrecisionMoney,
 	createCustomFields,

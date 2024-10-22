@@ -6,11 +6,11 @@ import type {
 import { v4 as uuidv4 } from "uuid";
 import { getBaseResourceProperties } from "~src/helpers";
 import { parseExpandClause } from "~src/lib/expandParser";
-import { AbstractStorage } from "~src/storage/abstract";
-import { Writable } from "~src/types";
+import type { AbstractStorage } from "~src/storage/abstract";
+import type { Writable } from "~src/types";
+import type { GetParams } from "../abstract";
 import {
 	AbstractResourceRepository,
-	GetParams,
 	type RepositoryContext,
 } from "../abstract";
 import { createCustomFields } from "../helpers";

@@ -1,4 +1,4 @@
-import {
+import type {
 	Cart,
 	CartValueTier,
 	InvalidOperationError,
@@ -6,8 +6,8 @@ import {
 	ShippingRatePriceTier,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "./exceptions";
-import { GetParams, RepositoryContext } from "./repositories/abstract";
-import { AbstractStorage } from "./storage/abstract";
+import type { GetParams, RepositoryContext } from "./repositories/abstract";
+import type { AbstractStorage } from "./storage/abstract";
 
 export const markMatchingShippingRate = (
 	cart: Cart,

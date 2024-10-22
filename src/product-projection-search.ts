@@ -11,16 +11,18 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "./exceptions";
 import { nestedLookup } from "./helpers";
-import {
+import type {
 	FilterExpression,
 	RangeExpression,
+} from "./lib/projectionSearchFilter";
+import {
 	generateFacetFunc,
 	getVariants,
 	parseFilterExpression,
 	resolveVariantValue,
 } from "./lib/projectionSearchFilter";
 import { applyPriceSelector } from "./priceSelector";
-import { AbstractStorage } from "./storage";
+import type { AbstractStorage } from "./storage";
 import type { Writable } from "./types";
 
 export type ProductProjectionSearchParams = {

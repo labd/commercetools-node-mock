@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
-import { Location, haversineDistance } from "./haversine";
+import type { Location } from "./haversine";
+import { haversineDistance } from "./haversine";
 
 test("haversine", () => {
 	// Lab Digital

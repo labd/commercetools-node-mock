@@ -7,9 +7,10 @@ import type {
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "../../helpers";
-import { AbstractStorage } from "../../storage/abstract";
-import { Writable } from "../../types";
-import { AbstractResourceRepository, RepositoryContext } from "../abstract";
+import type { AbstractStorage } from "../../storage/abstract";
+import type { Writable } from "../../types";
+import type { RepositoryContext } from "../abstract";
+import { AbstractResourceRepository } from "../abstract";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,

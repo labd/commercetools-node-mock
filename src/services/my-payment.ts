@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { PaymentRepository } from "../repositories/payment";
+import type { Router } from "express";
+import type { PaymentRepository } from "../repositories/payment";
 import AbstractService from "./abstract";
 
 export class MyPaymentService extends AbstractService {

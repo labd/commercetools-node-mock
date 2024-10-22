@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { CartDiscountRepository } from "../repositories/cart-discount";
+import type { Router } from "express";
+import type { CartDiscountRepository } from "../repositories/cart-discount";
 import AbstractService from "./abstract";
 
 export class CartDiscountService extends AbstractService {

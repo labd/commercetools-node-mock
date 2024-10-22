@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { BusinessUnitRepository } from "~src/repositories/business-unit";
+import type { BusinessUnitRepository } from "~src/repositories/business-unit";
 import AbstractService from "./abstract";
 
 export class MyBusinessUnitService extends AbstractService {

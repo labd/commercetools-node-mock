@@ -10,7 +10,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
-import { AbstractStorage } from "~src/storage/abstract";
+import type { AbstractStorage } from "~src/storage/abstract";
 import type { Writable } from "~src/types";
 import {
 	AbstractResourceRepository,

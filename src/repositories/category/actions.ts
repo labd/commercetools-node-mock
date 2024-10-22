@@ -1,4 +1,4 @@
-import {
+import type {
 	Asset,
 	AssetDraft,
 	Category,
@@ -20,12 +20,9 @@ import {
 	CategoryUpdateAction,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	RepositoryContext,
-	UpdateHandlerInterface,
-} from "../abstract";
+import type { Writable } from "~src/types";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 import { createCustomFields } from "../helpers";
 
 export class CategoryUpdateHandler

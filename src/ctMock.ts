@@ -1,21 +1,25 @@
-import express, { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+import express from "express";
 import inject from "light-my-request";
 import morgan from "morgan";
 import { http, HttpResponse } from "msw";
-import { setupServer, SetupServer, SetupServerApi } from "msw/node";
+import type { SetupServer, SetupServerApi } from "msw/node";
+import { setupServer } from "msw/node";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants";
 import { CommercetoolsError } from "./exceptions";
 import { copyHeaders } from "./lib/proxy";
 import { OAuth2Server } from "./oauth/server";
 import { ProjectAPI } from "./projectAPI";
-import { AbstractStorage, InMemoryStorage } from "./storage";
-import { Services } from "./types";
+import type { AbstractStorage } from "./storage";
+import { InMemoryStorage } from "./storage";
+import type { Services } from "./types";
 
 // Services
 import { warnDeprecation } from "./deprecation";
 import { mapHeaderType } from "./helpers";
-import { createRepositories, RepositoryMap } from "./repositories";
-import { ProjectRepository } from "./repositories/project";
+import type { RepositoryMap } from "./repositories";
+import { createRepositories } from "./repositories";
+import type { ProjectRepository } from "./repositories/project";
 import { createServices } from "./services";
 import { ProjectService } from "./services/project";
 

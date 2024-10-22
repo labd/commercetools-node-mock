@@ -3,8 +3,9 @@ import type {
 	TaxCategoryDraft,
 } from "@commercetools/platform-sdk";
 import { getBaseResourceProperties } from "~src/helpers";
-import { AbstractStorage } from "~src/storage/abstract";
-import { AbstractResourceRepository, RepositoryContext } from "../abstract";
+import type { AbstractStorage } from "~src/storage/abstract";
+import type { RepositoryContext } from "../abstract";
+import { AbstractResourceRepository } from "../abstract";
 import { TaxCategoryUpdateHandler } from "./actions";
 import { taxRateFromTaxRateDraft } from "./helpers";
 

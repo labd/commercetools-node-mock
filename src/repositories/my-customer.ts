@@ -1,4 +1,4 @@
-import {
+import type {
 	Customer,
 	InvalidCurrentPasswordError,
 	MyCustomerChangePassword,
@@ -7,7 +7,7 @@ import {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { hashPassword, validateEmailVerifyToken } from "../lib/password";
-import { Writable } from "../types";
+import type { Writable } from "../types";
 import { type RepositoryContext } from "./abstract";
 import { CustomerRepository } from "./customer";
 

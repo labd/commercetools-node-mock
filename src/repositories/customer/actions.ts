@@ -43,11 +43,8 @@ import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString } from "~src/helpers";
 import { hashPassword } from "~src/lib/password";
 import type { Writable } from "~src/types";
-import {
-	AbstractUpdateHandler,
-	UpdateHandlerInterface,
-	type RepositoryContext,
-} from "../abstract";
+import type { UpdateHandlerInterface } from "../abstract";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
 import { createAddress, createCustomFields } from "../helpers";
 
 export class CustomerUpdateHandler

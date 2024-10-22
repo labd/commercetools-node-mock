@@ -1,4 +1,7 @@
-import { ProductProjection, _SearchQuery } from "@commercetools/platform-sdk";
+import type {
+	ProductProjection,
+	_SearchQuery,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import { cloneObject } from "~src/helpers";
 import { parseSearchQuery } from "./productSearchFilter";

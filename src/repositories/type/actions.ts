@@ -14,7 +14,8 @@ import type {
 import isEqual from "lodash.isequal";
 import { CommercetoolsError } from "~src/exceptions";
 import type { Writable } from "~src/types";
-import { AbstractUpdateHandler, RepositoryContext } from "../abstract";
+import type { RepositoryContext } from "../abstract";
+import { AbstractUpdateHandler } from "../abstract";
 
 type TypeUpdateHandlerMethod<T> = (
 	context: RepositoryContext,

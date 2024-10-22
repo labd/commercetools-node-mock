@@ -1,6 +1,6 @@
-import { Request, Response, Router } from "express";
+import type { Request, Response, Router } from "express";
 import { getRepositoryContext } from "~src/repositories/helpers";
-import { ProductRepository } from "../repositories/product";
+import type { ProductRepository } from "../repositories/product";
 import AbstractService from "./abstract";
 
 export class ProductService extends AbstractService {
