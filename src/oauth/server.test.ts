@@ -130,4 +130,46 @@ describe("OAuth2Server", () => {
 			});
 		});
 	});
+
+	describe("POST /:projectKey/in-store/key=:storeKey/customers/token", () => {
+		it("should return a token for in-store customer access", async () => {
+			const projectKey = "test-project";
+			const storeKey = "test-store";
+
+			storage.add(projectKey, "customer", {
+				...getBaseResourceProperties(),
+				email: "j.doe@example.org",
+				password: hashPassword("password"),
+				addresses: [],
+				authenticationMode: "password",
+				isEmailVerified: true,
+				stores: [
+					{
+						typeId: "store",
+						key: storeKey,
+					},
+				],
+			});
+
+			const response = await supertest(app)
+				.post(`/${projectKey}/in-store/key=${storeKey}/customers/token`)
+				.auth("validClientId", "validClientSecret")
+				.query({
+					grant_type: "password",
+					username: "j.doe@example.org",
+					password: "password",
+					scope: `${projectKey}:manage_my_profile`,
+				})
+				.send();
+
+			expect(response.status).toBe(200);
+			expect(response.body).toEqual({
+				scope: expect.stringMatching(/customer_id:([^\s]+)/),
+				access_token: expect.stringMatching(/\S{8,}==$/),
+				refresh_token: expect.stringMatching(/test-project:\S{8,}==$/),
+				expires_in: 172800,
+				token_type: "Bearer",
+			});
+		});
+	});
 });
