@@ -1,5 +1,13 @@
 ## 2.23.1
 
+## 2.36.0
+
+### Minor Changes
+
+- [#237](https://github.com/labd/commercetools-node-mock/pull/237) [`a0525a4`](https://github.com/labd/commercetools-node-mock/commit/a0525a4a25daa9f32d985e6e6e1968f19860a826) Thanks [@saraghaedi](https://github.com/saraghaedi)! - implement my business unit service
+
+- [#238](https://github.com/labd/commercetools-node-mock/pull/238) [`b86edf4`](https://github.com/labd/commercetools-node-mock/commit/b86edf48ddc9fc3e43d04f0863c5aba4fc8f929c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add ability to set shipping and billing addresses when creating customer
+
 ## 2.35.0
 
 ### Minor Changes
