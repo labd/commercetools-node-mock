@@ -1,5 +1,13 @@
 ## 2.23.1
 
+## 2.37.0
+
+### Minor Changes
+
+- [#236](https://github.com/labd/commercetools-node-mock/pull/236) [`d11863d`](https://github.com/labd/commercetools-node-mock/commit/d11863d759036f82c1028184f01ac8b11cc182ac) Thanks [@saraghaedi](https://github.com/saraghaedi)! - add handler for creating in-store customer token
+
+- [#241](https://github.com/labd/commercetools-node-mock/pull/241) [`1c9f082`](https://github.com/labd/commercetools-node-mock/commit/1c9f082c6219ac2c30039fd9049bcf2bcd503213) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added support for more search indexes on projects
+
 ## 2.36.0
 
 ### Minor Changes
