@@ -5,6 +5,7 @@ import type {
 	ProjectChangeCountriesAction,
 	ProjectChangeCountryTaxRateFallbackEnabledAction,
 	ProjectChangeCurrenciesAction,
+	ProjectChangeCustomerSearchStatusAction,
 	ProjectChangeLanguagesAction,
 	ProjectChangeMessagesConfigurationAction,
 	ProjectChangeNameAction,
@@ -95,6 +96,18 @@ class ProjectUpdateHandler
 		resource.currencies = currencies;
 	}
 
+	changeCustomerSearchStatus(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ status }: ProjectChangeCustomerSearchStatusAction,
+	) {
+		if (!resource.searchIndexing?.customers) {
+			throw new Error("Invalid project state");
+		}
+		resource.searchIndexing.customers.status = status;
+		resource.searchIndexing.customers.lastModifiedAt = new Date().toISOString();
+	}
+
 	changeLanguages(
 		context: RepositoryContext,
 		resource: Writable<Project>,
@@ -150,8 +163,20 @@ class ProjectUpdateHandler
 	changeProductSearchIndexingEnabled(
 		context: RepositoryContext,
 		resource: Writable<Project>,
-		{ enabled }: ProjectChangeProductSearchIndexingEnabledAction,
+		{ enabled, mode }: ProjectChangeProductSearchIndexingEnabledAction,
 	) {
+		if (mode === "ProductsSearch") {
+			if (!resource.searchIndexing?.productsSearch) {
+				throw new Error("Invalid project state");
+			}
+			resource.searchIndexing.productsSearch.status = enabled
+				? "Activated"
+				: "Deactivated";
+			resource.searchIndexing.productsSearch.lastModifiedAt =
+				new Date().toISOString();
+			return;
+		}
+
 		if (!resource.searchIndexing?.products) {
 			throw new Error("Invalid project state");
 		}

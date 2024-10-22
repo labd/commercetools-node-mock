@@ -39,10 +39,16 @@ describe("Project", () => {
 			},
 			name: "",
 			searchIndexing: {
+				customers: {
+					status: "Deactivated",
+				},
 				orders: {
 					status: "Deactivated",
 				},
 				products: {
+					status: "Deactivated",
+				},
+				productsSearch: {
 					status: "Deactivated",
 				},
 			},
