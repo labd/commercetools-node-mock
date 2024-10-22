@@ -6,7 +6,7 @@ import type {
 	CartDiscountSetCustomFieldAction,
 	CartDiscountSetCustomTypeAction,
 	CartDiscountSetDescriptionAction,
-	CartDiscountSetKeyAction,
+	CartDiscountSetKeyAction, CartDiscountSetStoresAction,
 	CartDiscountSetValidFromAction,
 	CartDiscountSetValidFromAndUntilAction,
 	CartDiscountSetValidUntilAction,
@@ -21,6 +21,7 @@ import {
 } from "../abstract";
 
 import { CommercetoolsError } from "~src/exceptions";
+import {getStoreKeyReference} from "~src/repositories/helpers";
 
 export class CartDiscountUpdateHandler
 	extends AbstractUpdateHandler
@@ -113,12 +114,22 @@ export class CartDiscountUpdateHandler
 		resource.description = description;
 	}
 
-	setKey(
+setKey(
 		context: RepositoryContext,
 		resource: Writable<CartDiscount>,
 		{ key }: CartDiscountSetKeyAction,
 	) {
 		resource.key = key;
+	}
+
+setStores(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ stores }: CartDiscountSetStoresAction,
+	) {
+		resource.stores = stores?.map((s) =>
+			getStoreKeyReference(s, context.projectKey, this._storage),
+		);
 	}
 
 	setValidFrom(
