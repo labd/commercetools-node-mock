@@ -85,10 +85,10 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		};
 
-		const defaultBillingAddressId = draft.defaultBillingAddress
+		const defaultBillingAddressId = draft.defaultBillingAddress !== undefined
 			? lookupAdressId(addresses, draft.defaultBillingAddress)
 			: undefined;
-		const defaultShippingAddressId = draft.defaultShippingAddress
+		const defaultShippingAddressId = draft.defaultShippingAddress !== undefined
 			? lookupAdressId(addresses, draft.defaultShippingAddress)
 			: undefined;
 		const shippingAddressIds =
