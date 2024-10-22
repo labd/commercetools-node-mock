@@ -87,7 +87,13 @@ export class InMemoryStorage extends AbstractStorage {
 					products: {
 						status: "Deactivated",
 					},
+					productsSearch: {
+						status: "Deactivated",
+					},
 					orders: {
+						status: "Deactivated",
+					},
+					customers: {
 						status: "Deactivated",
 					},
 				},
