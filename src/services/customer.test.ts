@@ -1,4 +1,8 @@
-import { Customer, CustomerToken } from "@commercetools/platform-sdk";
+import {
+	Customer,
+	CustomerDraft,
+	CustomerToken,
+} from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -6,6 +10,46 @@ import { hashPassword } from "~src/lib/password";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index";
 
 const ctMock = new CommercetoolsMock();
+
+afterEach(() => {
+	ctMock.clear();
+});
+
+describe("Customer create", () => {
+	test("create new customer", async () => {
+		const draft: CustomerDraft = {
+			email: "new-user@example.com",
+			password: "supersecret",
+			authenticationMode: "Password",
+			stores: [],
+			addresses: [
+				{
+					key: "address-key",
+					firstName: "John",
+					lastName: "Doe",
+					streetName: "Main Street",
+					streetNumber: "1",
+					postalCode: "12345",
+					country: "DE",
+				},
+			],
+			billingAddresses: [0],
+			shippingAddresses: [0],
+		};
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers`)
+			.send(draft);
+
+		const customer = response.body.customer as Customer;
+		expect(response.status, JSON.stringify(customer)).toBe(201);
+		expect(customer.version).toBe(1);
+		expect(customer.defaultBillingAddressId).toBeUndefined();
+		expect(customer.defaultShippingAddressId).toBeUndefined();
+		expect(customer.billingAddressIds).toHaveLength(1);
+		expect(customer.shippingAddressIds).toHaveLength(1);
+	});
+});
 
 describe("Customer Update Actions", () => {
 	let customer: Customer | undefined;
@@ -23,10 +67,6 @@ describe("Customer Update Actions", () => {
 			stores: [],
 		};
 		ctMock.project("dummy").add("customer", customer);
-	});
-
-	afterEach(() => {
-		ctMock.clear();
 	});
 
 	test("exists", async () => {
