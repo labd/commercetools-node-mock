@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 import { v4 as uuidv4 } from "uuid";
 
 type Token = {
