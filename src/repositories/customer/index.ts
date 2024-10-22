@@ -85,12 +85,14 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		};
 
-		const defaultBillingAddressId = draft.defaultBillingAddress !== undefined
-			? lookupAdressId(addresses, draft.defaultBillingAddress)
-			: undefined;
-		const defaultShippingAddressId = draft.defaultShippingAddress !== undefined
-			? lookupAdressId(addresses, draft.defaultShippingAddress)
-			: undefined;
+		const defaultBillingAddressId =
+			draft.defaultBillingAddress !== undefined
+				? lookupAdressId(addresses, draft.defaultBillingAddress)
+				: undefined;
+		const defaultShippingAddressId =
+			draft.defaultShippingAddress !== undefined
+				? lookupAdressId(addresses, draft.defaultShippingAddress)
+				: undefined;
 		const shippingAddressIds =
 			draft.shippingAddresses?.map((addressId) =>
 				lookupAdressId(addresses, addressId),
