@@ -1,27 +1,44 @@
 import type {
+	Address,
 	BaseAddress,
 	Customer,
 	CustomerAddAddressAction,
 	CustomerAddBillingAddressIdAction,
 	CustomerAddShippingAddressIdAction,
+	CustomerAddStoreAction,
 	CustomerChangeAddressAction,
 	CustomerChangeEmailAction,
+	CustomerRemoveAddressAction,
+	CustomerRemoveBillingAddressIdAction,
+	CustomerRemoveShippingAddressIdAction,
+	CustomerRemoveStoreAction,
+	CustomerSetAddressCustomFieldAction,
+	CustomerSetAddressCustomTypeAction,
 	CustomerSetAuthenticationModeAction,
 	CustomerSetCompanyNameAction,
 	CustomerSetCustomFieldAction,
 	CustomerSetCustomTypeAction,
+	CustomerSetCustomerGroupAction,
 	CustomerSetCustomerNumberAction,
+	CustomerSetDateOfBirthAction,
+	CustomerSetDefaultBillingAddressAction,
+	CustomerSetDefaultShippingAddressAction,
 	CustomerSetExternalIdAction,
 	CustomerSetFirstNameAction,
 	CustomerSetKeyAction,
 	CustomerSetLastNameAction,
 	CustomerSetLocaleAction,
+	CustomerSetMiddleNameAction,
 	CustomerSetSalutationAction,
+	CustomerSetStoresAction,
+	CustomerSetTitleAction,
 	CustomerSetVatIdAction,
 	CustomerUpdateAction,
 	InvalidInputError,
 	InvalidJsonInputError,
+	InvalidOperationError,
 } from "@commercetools/platform-sdk";
+import assert from "node:assert";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString } from "~src/helpers";
 import { hashPassword } from "~src/lib/password";
@@ -35,7 +52,7 @@ import { createAddress, createCustomFields } from "../helpers";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
-	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
+	implements UpdateHandlerInterface<Customer, CustomerUpdateAction>
 {
 	addAddress(
 		_context: RepositoryContext,
@@ -53,31 +70,15 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		{ addressId, addressKey }: CustomerAddBillingAddressIdAction,
 	) {
-		const address = resource.addresses.find((a) => {
-			if (a.id != undefined && addressId != undefined && a.id === addressId) {
-				return true;
-			}
+		const address = this._findAddress(resource, addressId, addressKey, true);
+		assert(address?.id); // always true since we set required to true
 
-			return (
-				a.key != undefined && addressKey != undefined && a.key === addressKey
-			);
-		});
-
-		if (!address) {
-			throw new CommercetoolsError<InvalidInputError>(
-				{
-					code: "InvalidInput",
-					message: `Address with id '${addressId}' or key '${addressKey}' not found.`,
-				},
-				400,
-			);
+		if (resource.billingAddressIds === undefined) {
+			resource.billingAddressIds = [];
 		}
 
-		const billingAddressId = String(address.id);
-		if (resource.billingAddressIds?.length) {
-			resource.billingAddressIds.push(billingAddressId);
-		} else if (address) {
-			resource.billingAddressIds = [billingAddressId];
+		if (!resource.billingAddressIds.includes(address.id)) {
+			resource.billingAddressIds.push(address.id);
 		}
 	}
 
@@ -86,32 +87,25 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		{ addressId, addressKey }: CustomerAddShippingAddressIdAction,
 	) {
-		const address = resource.addresses.find((a) => {
-			if (a.id != undefined && addressId != undefined && a.id === addressId) {
-				return true;
-			}
+		const address = this._findAddress(resource, addressId, addressKey, true);
+		assert(address?.id); // always true since we set required to true
 
-			return (
-				a.key != undefined && addressKey != undefined && a.key === addressKey
-			);
-		});
-
-		if (!address) {
-			throw new CommercetoolsError<InvalidInputError>(
-				{
-					code: "InvalidInput",
-					message: `Address with id '${addressId}' or key '${addressKey}' not found.`,
-				},
-				400,
-			);
+		if (resource.shippingAddressIds === undefined) {
+			resource.shippingAddressIds = [];
 		}
 
-		const shippingAddressId = String(address.id);
-		if (resource.shippingAddressIds?.length) {
-			resource.shippingAddressIds.push(shippingAddressId);
-		} else if (address) {
-			resource.shippingAddressIds = [shippingAddressId];
+		if (!resource.shippingAddressIds.includes(address.id)) {
+			resource.shippingAddressIds.push(address.id);
 		}
+		return resource;
+	}
+
+	addStore(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerAddStoreAction,
+	) {
+		throw new Error("Method not implemented.");
 	}
 
 	changeAddress(
@@ -119,25 +113,12 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		{ addressId, addressKey, address }: CustomerChangeAddressAction,
 	) {
-		const oldAddressIndex = resource.addresses.findIndex((a) => {
-			if (a.id != undefined && addressId != undefined && a.id === addressId) {
-				return true;
-			}
+		const current = this._findAddress(resource, addressId, addressKey, true);
+		assert(current?.id); // always true since we set required to true
 
-			return (
-				a.key != undefined && addressKey != undefined && a.key === addressKey
-			);
-		});
-
-		if (oldAddressIndex === -1) {
-			throw new CommercetoolsError<InvalidInputError>(
-				{
-					code: "InvalidInput",
-					message: `Address with id '${addressId}' or key '${addressKey}' not found.`,
-				},
-				400,
-			);
-		}
+		const oldAddressIndex = resource.addresses.findIndex(
+			(a) => a.id === current.id,
+		);
 
 		const newAddress = createAddress(
 			address,
@@ -159,6 +140,85 @@ export class CustomerUpdateHandler
 		{ email }: CustomerChangeEmailAction,
 	) {
 		resource.email = email;
+	}
+
+	removeAddress(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerRemoveAddressAction,
+	) {
+		const address = this._findAddress(
+			resource,
+			action.addressId,
+			action.addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+		resource.addresses = resource.addresses.filter((a) => a.id !== address.id);
+	}
+
+	removeBillingAddressId(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerRemoveBillingAddressIdAction,
+	) {
+		const address = this._findAddress(
+			resource,
+			action.addressId,
+			action.addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+		resource.billingAddressIds = resource.billingAddressIds?.filter(
+			(id) => id !== address.id,
+		);
+		if (resource.defaultBillingAddressId === address.id) {
+			resource.defaultBillingAddressId = undefined;
+		}
+	}
+
+	removeShippingAddressId(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerRemoveShippingAddressIdAction,
+	) {
+		const address = this._findAddress(
+			resource,
+			action.addressId,
+			action.addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+		resource.shippingAddressIds = resource.shippingAddressIds?.filter(
+			(id) => id !== address.id,
+		);
+		if (resource.defaultShippingAddressId === address.id) {
+			resource.defaultShippingAddressId = undefined;
+		}
+	}
+
+	removeStore(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerRemoveStoreAction,
+	) {
+		throw new Error("Method not implemented.");
+	}
+
+	setAddressCustomField(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetAddressCustomFieldAction,
+	) {
+		throw new Error("Method not implemented.");
+	}
+
+	setAddressCustomType(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetAddressCustomTypeAction,
+	) {
+		throw new Error("Method not implemented.");
 	}
 
 	setAuthenticationMode(
@@ -202,6 +262,32 @@ export class CustomerUpdateHandler
 		resource.companyName = companyName;
 	}
 
+	setCustomerGroup(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetCustomerGroupAction,
+	) {
+		if (!action.customerGroup) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "CustomerGroup is required.",
+				},
+				400,
+			);
+		}
+
+		const group = this._storage.getByResourceIdentifier<"customer-group">(
+			context.projectKey,
+			action.customerGroup,
+		);
+
+		resource.customerGroup = {
+			typeId: "customer-group",
+			id: group.id,
+		};
+	}
+
 	setCustomerNumber(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -239,6 +325,58 @@ export class CustomerUpdateHandler
 			);
 		} else {
 			resource.custom = undefined;
+		}
+	}
+
+	setDateOfBirth(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetDateOfBirthAction,
+	) {
+		resource.dateOfBirth = action.dateOfBirth;
+	}
+
+	setDefaultBillingAddress(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetDefaultBillingAddressAction,
+	) {
+		const address = this._findAddress(
+			resource,
+			action.addressId,
+			action.addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+
+		resource.defaultBillingAddressId = address.id;
+		if (resource.billingAddressIds === undefined) {
+			resource.billingAddressIds = [];
+		}
+		if (!resource.billingAddressIds.includes(address.id)) {
+			resource.billingAddressIds.push(address.id);
+		}
+	}
+
+	setDefaultShippingAddress(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetDefaultShippingAddressAction,
+	) {
+		const address = this._findAddress(
+			resource,
+			action.addressId,
+			action.addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+
+		resource.defaultShippingAddressId = address.id;
+		if (resource.shippingAddressIds === undefined) {
+			resource.shippingAddressIds = [];
+		}
+		if (!resource.shippingAddressIds.includes(address.id)) {
+			resource.shippingAddressIds.push(address.id);
 		}
 	}
 
@@ -282,6 +420,14 @@ export class CustomerUpdateHandler
 		resource.locale = locale;
 	}
 
+	setMiddleName(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetMiddleNameAction,
+	) {
+		resource.middleName = action.middleName;
+	}
+
 	setSalutation(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -290,11 +436,72 @@ export class CustomerUpdateHandler
 		resource.salutation = salutation;
 	}
 
+	setStores(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetStoresAction,
+	) {
+		throw new Error("Method not implemented.");
+	}
+
+	setTitle(
+		context: RepositoryContext,
+		resource: Writable<Customer>,
+		action: CustomerSetTitleAction,
+	) {
+		resource.title = action.title;
+	}
+
 	setVatId(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
 		{ vatId }: CustomerSetVatIdAction,
 	) {
 		resource.vatId = vatId;
+	}
+
+	private _findAddress(
+		resource: Writable<Customer>,
+		addressId: string | undefined,
+		addressKey: string | undefined,
+		required: boolean = false,
+	): Address | undefined {
+		if (addressKey) {
+			const address = resource.addresses.find((a) => a.key === addressKey);
+			if (!address) {
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Customer does not contain an address with the key ${addressKey}.`,
+					},
+					400,
+				);
+			}
+			return address;
+		}
+
+		if (addressId) {
+			const address = resource.addresses.find((a) => a.id === addressId);
+			if (!address) {
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Customer does not contain an address with the id ${addressId}.`,
+					},
+					400,
+				);
+			}
+			return address;
+		}
+
+		if (required) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "One of address 'addressId' or 'addressKey' is required.",
+				},
+				400,
+			);
+		}
 	}
 }

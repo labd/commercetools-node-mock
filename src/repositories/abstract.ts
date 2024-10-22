@@ -1,5 +1,6 @@
 import type {
 	BaseResource,
+	InvalidInputError,
 	Project,
 	QueryParam,
 	ResourceNotFoundError,
@@ -253,6 +254,22 @@ export class AbstractUpdateHandler {
 			: (resource as Project).key;
 
 		for (const action of actions) {
+			// Validate if this action exists
+			// @ts-ignore
+			if (this[action.action] === undefined) {
+				console.info(`No handler for action ${action.action}`);
+				throw new CommercetoolsError<InvalidInputError>({
+					code: "InvalidInput",
+					message: `Invalid action ${action.action}`,
+					errors: [
+						{
+							code: "InvalidInput",
+							message: `Invalid action ${action.action}`,
+						},
+					],
+				});
+			}
+
 			// @ts-ignore
 			const updateFunc = this[action.action].bind(this);
 
