@@ -49,6 +49,40 @@ describe("Customer create", () => {
 		expect(customer.billingAddressIds).toHaveLength(1);
 		expect(customer.shippingAddressIds).toHaveLength(1);
 	});
+
+	test("create new customer with default billing & shipping address", async () => {
+		const draft: CustomerDraft = {
+			email: "new-user@example.com",
+			password: "supersecret",
+			authenticationMode: "Password",
+			stores: [],
+			addresses: [
+				{
+					key: "address-key",
+					firstName: "John",
+					lastName: "Doe",
+					streetName: "Main Street",
+					streetNumber: "1",
+					postalCode: "12345",
+					country: "DE",
+				},
+			],
+			defaultBillingAddress: 0,
+			defaultShippingAddress: 0,
+		};
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers`)
+			.send(draft);
+
+		const customer = response.body.customer as Customer;
+		expect(response.status, JSON.stringify(customer)).toBe(201);
+		expect(customer.version).toBe(1);
+		expect(customer.defaultBillingAddressId).toBeDefined();
+		expect(customer.defaultShippingAddressId).toBeDefined();
+		expect(customer.billingAddressIds).toHaveLength(0);
+		expect(customer.shippingAddressIds).toHaveLength(0);
+	});
 });
 
 describe("Customer Update Actions", () => {
