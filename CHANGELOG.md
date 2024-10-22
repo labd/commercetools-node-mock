@@ -1,5 +1,20 @@
 ## 2.23.1
 
+## 2.38.0
+
+### Minor Changes
+
+- [#245](https://github.com/labd/commercetools-node-mock/pull/245) [`ac90ac3`](https://github.com/labd/commercetools-node-mock/commit/ac90ac32d3a33c22b94a4f97fd100f379f4714f6) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve mocking of customer updates. This includes adding support for
+  `removeAddress`, `removeBillingAddressId`, `removeShippingAddressId`,
+  `setCustomerGroup`, `setDateOfBirth`, `setDefaultShippingAddress`,
+  `setDefaultBillingAddress`, `setMiddleName`, `setTitle`.
+
+- [`d9cc9b1`](https://github.com/labd/commercetools-node-mock/commit/d9cc9b1e4f712a5f77c3366ff36b15f09dd8cf99) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Use type-safe quality operators (`===`)
+
+### Patch Changes
+
+- [#243](https://github.com/labd/commercetools-node-mock/pull/243) [`3a148e0`](https://github.com/labd/commercetools-node-mock/commit/3a148e03fd1854e2eae3b5539f7fe25d57040613) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix for defaultBillingAddress & defaultShippingAddress customer create options not working
+
 ## 2.37.0
 
 ### Minor Changes
