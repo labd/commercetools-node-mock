@@ -1,10 +1,12 @@
 import type {
+	Address,
 	Customer,
 	CustomerCreatePasswordResetToken,
 	CustomerDraft,
 	CustomerResetPassword,
 	CustomerToken,
 	DuplicateFieldError,
+	InvalidInputError,
 	MyCustomerResetPassword,
 	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
@@ -53,20 +55,50 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		}
 
-		const addresses =
+		const addresses: Address[] =
 			draft.addresses?.map((address) => ({
 				...address,
 				id: generateRandomString(5),
 			})) ?? [];
 
-		const defaultBillingAddressId =
-			addresses.length > 0 && draft.defaultBillingAddress !== undefined
-				? addresses[draft.defaultBillingAddress].id
-				: undefined;
-		const defaultShippingAddressId =
-			addresses.length > 0 && draft.defaultShippingAddress !== undefined
-				? addresses[draft.defaultShippingAddress].id
-				: undefined;
+		const lookupAdressId = (
+			addresses: Address[],
+			addressId: number,
+		): string => {
+			if (addressId < addresses.length) {
+				const id = addresses[addressId].id;
+				if (!id) {
+					throw new Error("Address ID is missing");
+				}
+				return id;
+			}
+			throw new CommercetoolsError<InvalidInputError>({
+				code: "InvalidInput",
+				message: `Address with ID '${addressId}' not found.`,
+				errors: [
+					{
+						code: "InvalidInput",
+						message: `Address with ID '${addressId}' not found.`,
+						field: "addressId",
+					},
+				],
+			});
+		};
+
+		const defaultBillingAddressId = draft.defaultBillingAddress
+			? lookupAdressId(addresses, draft.defaultBillingAddress)
+			: undefined;
+		const defaultShippingAddressId = draft.defaultShippingAddress
+			? lookupAdressId(addresses, draft.defaultShippingAddress)
+			: undefined;
+		const shippingAddressIds =
+			draft.shippingAddresses?.map((addressId) =>
+				lookupAdressId(addresses, addressId),
+			) ?? [];
+		const billingAddressIds =
+			draft.billingAddresses?.map((addressId) =>
+				lookupAdressId(addresses, addressId),
+			) ?? [];
 
 		const resource: Customer = {
 			...getBaseResourceProperties(),
@@ -86,6 +118,8 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			externalId: draft.externalId,
 			defaultBillingAddressId: defaultBillingAddressId,
 			defaultShippingAddressId: defaultShippingAddressId,
+			shippingAddressIds: shippingAddressIds,
+			billingAddressIds: billingAddressIds,
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,

@@ -35,6 +35,8 @@ describe("Me", () => {
 				version: 1,
 				isEmailVerified: false,
 				addresses: [],
+				billingAddressIds: [],
+				shippingAddressIds: [],
 				id: expect.anything(),
 				createdAt: expect.anything(),
 				lastModifiedAt: expect.anything(),
