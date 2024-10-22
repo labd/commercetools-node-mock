@@ -5,22 +5,20 @@ import morgan from "morgan";
 import { http, HttpResponse } from "msw";
 import type { SetupServer, SetupServerApi } from "msw/node";
 import { setupServer } from "msw/node";
+import type { Config } from "./config";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants";
 import { CommercetoolsError } from "./exceptions";
+import { mapHeaderType } from "./helpers";
 import { copyHeaders } from "./lib/proxy";
 import { OAuth2Server } from "./oauth/server";
 import { ProjectAPI } from "./projectAPI";
-import type { AbstractStorage } from "./storage";
-import { InMemoryStorage } from "./storage";
-
-// Services
-import type { Config } from "./config";
-import { mapHeaderType } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import { createRepositories } from "./repositories";
 import type { ProjectRepository } from "./repositories/project";
 import { createServices } from "./services";
 import { ProjectService } from "./services/project";
+import type { AbstractStorage } from "./storage";
+import { InMemoryStorage } from "./storage";
 
 export type CommercetoolsMockOptions = {
 	validateCredentials: boolean;
@@ -77,7 +75,8 @@ export class CommercetoolsMock {
 
 	start() {
 		process.emitWarning(
-			"The start method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"The start() method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"DeprecationWarning",
 		);
 
 		// Order is important here when the hostnames match
@@ -87,7 +86,8 @@ export class CommercetoolsMock {
 
 	stop() {
 		process.emitWarning(
-			"The stop method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"The stop() method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"DeprecationWarning",
 		);
 		this._mswServer?.close();
 		this._mswServer = undefined;
