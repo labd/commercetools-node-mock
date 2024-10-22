@@ -75,7 +75,7 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 
 		// If all actions succeeded we write the new version
 		// to the storage.
-		if (resource.version != updatedResource.version) {
+		if (resource.version !== updatedResource.version) {
 			this.saveUpdate(context, version, updatedResource);
 		}
 

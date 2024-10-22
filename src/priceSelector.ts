@@ -31,7 +31,7 @@ export const applyPriceSelector = (
 		const variants: Writable<ProductVariant>[] = [
 			product.masterVariant,
 			...(product.variants ?? []),
-		].filter((x) => x != undefined);
+		].filter((x) => x !== undefined);
 
 		for (const variant of variants) {
 			const scopedPrices =

@@ -6,6 +6,7 @@ module.exports = {
 		tsconfigRootDir: __dirname,
 	},
 	rules: {
+		"eqeqeq": ["error", "always"],
 		"@typescript-eslint/ban-ts-comment": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-empty-function": "off",

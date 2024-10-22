@@ -399,7 +399,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 				const value = resolveValue(obj, left);
 				const other = resolveSymbol(expr, vars);
 
-				if (typeof value != "string") {
+				if (typeof value !== "string") {
 					throw new PredicateError(
 						`The field '${left.value}' does not support this expression.`,
 					);

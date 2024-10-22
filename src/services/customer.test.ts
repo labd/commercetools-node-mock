@@ -557,7 +557,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setAuthenticationMode error when setting current authMode", async () => {
 		assert(customer, "customer not created");
 		assert(
-			customer.authenticationMode == "Password",
+			customer.authenticationMode === "Password",
 			"customer not in default state",
 		);
 

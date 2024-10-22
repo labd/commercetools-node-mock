@@ -113,12 +113,12 @@ const parseFilter = (filter: string): ExpressionSet => {
 			// Convert plain symbols to a filter expression. For example
 			// variants.attribute.foobar:4 where 4 is a Symbol should result
 			// in a comparison
-			if (expressions.some((expr) => expr.type == "Symbol")) {
+			if (expressions.some((expr) => expr.type === "Symbol")) {
 				return {
 					source: left as string,
 					type: "FilterExpression",
 					children: expressions.map((e): FilterExpression => {
-						if (e.type != "Symbol") {
+						if (e.type !== "Symbol") {
 							throw new Error("Invalid expression");
 						}
 
@@ -245,7 +245,7 @@ const generateMatchFunc = (filter: string) => {
 		// const column = lines[lines.length - 1].length
 		throw new Error(`Syntax error while parsing '${filter}'.`);
 	}
-	if (result.type == "TermExpression") {
+	if (result.type === "TermExpression") {
 		throw new Error(`Syntax error while parsing '${filter}'.`);
 	}
 

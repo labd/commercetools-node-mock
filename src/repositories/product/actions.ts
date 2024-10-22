@@ -481,7 +481,7 @@ export class ProductUpdateHandler
 
 				const foundCategory = data.categories.find(
 					(productCategory: CategoryReference) => {
-						if (productCategory.id == resolvedCategory.id) {
+						if (productCategory.id === resolvedCategory.id) {
 							return productCategory;
 						}
 						return false;
@@ -502,7 +502,7 @@ export class ProductUpdateHandler
 
 				data.categories = data.categories.filter(
 					(productCategory: CategoryReference) => {
-						if (productCategory.id == resolvedCategory.id) {
+						if (productCategory.id === resolvedCategory.id) {
 							return false;
 						}
 						return true;

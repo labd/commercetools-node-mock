@@ -151,15 +151,15 @@ class ProductTypeUpdateHandler
 		{ attributeName, keys }: ProductTypeRemoveEnumValuesAction,
 	) {
 		resource.attributes?.forEach((attr) => {
-			if (attr.name == attributeName) {
-				if (attr.type.name == "enum") {
+			if (attr.name === attributeName) {
+				if (attr.type.name === "enum") {
 					attr.type.values = attr.type.values.filter(
 						(v) => !keys.includes(v.key),
 					);
 				}
 
-				if (attr.type.name == "set") {
-					if (attr.type.elementType.name == "enum") {
+				if (attr.type.name === "set") {
+					if (attr.type.elementType.name === "enum") {
 						attr.type.elementType.values = attr.type.elementType.values.filter(
 							(v) => !keys.includes(v.key),
 						);

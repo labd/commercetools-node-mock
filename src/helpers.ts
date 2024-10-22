@@ -23,7 +23,7 @@ export const nestedLookup = (obj: any, path: string): any => {
 
 	for (let i = 0; i < parts.length; i++) {
 		const part = parts[i];
-		if (val == undefined) {
+		if (val === undefined) {
 			return undefined;
 		}
 
@@ -36,7 +36,7 @@ export const nestedLookup = (obj: any, path: string): any => {
 export const queryParamsArray = (
 	input: string | ParsedQs | string[] | ParsedQs[] | undefined,
 ): string[] | undefined => {
-	if (input == undefined) {
+	if (input === undefined) {
 		return undefined;
 	}
 
