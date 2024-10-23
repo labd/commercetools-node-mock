@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.39.0
+
+### Minor Changes
+
+- [#242](https://github.com/labd/commercetools-node-mock/pull/242) [`c970b6e`](https://github.com/labd/commercetools-node-mock/commit/c970b6e008b5571cae07d5646bb9251f13fd75c3) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added cart discount set stores support
+
 ## 2.38.0
 
 ### Minor Changes
