@@ -15,6 +15,7 @@ import type {
 	OrderSetDeliveryCustomFieldAction,
 	OrderSetLocaleAction,
 	OrderSetOrderNumberAction,
+	OrderSetParcelCustomFieldAction,
 	OrderSetPurchaseOrderNumberAction,
 	OrderSetShippingAddressAction,
 	OrderSetStoreAction,
@@ -223,6 +224,31 @@ export class OrderUpdateHandler
 		{ orderNumber }: OrderSetOrderNumberAction,
 	) {
 		resource.orderNumber = orderNumber;
+	}
+
+	setParcelCustomField(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ parcelId, name, value }: OrderSetParcelCustomFieldAction,
+	) {
+		assert(resource.shippingInfo, "shippingInfo is not defined");
+
+		if (Array.isArray(resource.shippingInfo.deliveries)) {
+			resource.shippingInfo.deliveries.map((delivery) => {
+				if (Array.isArray(delivery.parcels)) {
+					delivery.parcels.map((parcel) => {
+						if (parcel.id !== parcelId) throw "No matching parcel id found";
+						if (parcel.custom) {
+							const update = parcel.custom.fields;
+							update[name] = value;
+							Object.assign(parcel.custom.fields, update);
+						}
+						return parcel;
+					});
+				}
+				return delivery;
+			});
+		}
 	}
 
 	setPurchaseOrderNumber(
