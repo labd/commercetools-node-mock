@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.40.0
+
+### Minor Changes
+
+- [#249](https://github.com/labd/commercetools-node-mock/pull/249) [`280f73a`](https://github.com/labd/commercetools-node-mock/commit/280f73aa045b7e9ed5058f95110ae6cbb47e04a3) Thanks [@jsm1t](https://github.com/jsm1t)! - Add support for setting stores on customers
+
 ## 2.39.0
 
 ### Minor Changes
