@@ -103,18 +103,16 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				lookupAdressId(addresses, addressId),
 			) ?? [];
 
-		let storesForCustomer: StoreKeyReference[] = []
+		let storesForCustomer: StoreKeyReference[] = [];
 
 		if (draft.stores) {
-			const storeIds = draft.stores.map((storeReference) => storeReference.id).filter(Boolean);
+			const storeIds = draft.stores
+				.map((storeReference) => storeReference.id)
+				.filter(Boolean);
 
-			const stores = this._storage.query(
-				context.projectKey,
-				"store",
-				{
-					where: storeIds.map((id) => `id="${id}"`),
-				},
-			).results;
+			const stores = this._storage.query(context.projectKey, "store", {
+				where: storeIds.map((id) => `id="${id}"`),
+			}).results;
 
 			if (storeIds.length !== stores.length) {
 				throw new CommercetoolsError<ResourceNotFoundError>({
@@ -125,7 +123,10 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 
 			storesForCustomer = draft.stores.map((storeReference) => ({
 				typeId: "store",
-				key: storeReference.key ?? stores.find((store) => store.id === storeReference.id)?.key as string,
+				key:
+					storeReference.key ??
+					(stores.find((store) => store.id === storeReference.id)
+						?.key as string),
 			}));
 		}
 
