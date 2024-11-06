@@ -1,12 +1,11 @@
+import type { Store } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import { InMemoryStorage } from "~src/storage";
 import { CustomerRepository } from "./index";
-import { Store } from "@commercetools/platform-sdk";
 
 describe("Order repository", () => {
 	const storage = new InMemoryStorage();
 	const repository = new CustomerRepository(storage);
-
 
 	test("adding stores to customer", async () => {
 		const store1: Store = {
@@ -48,14 +47,16 @@ describe("Order repository", () => {
 			{ projectKey: "dummy" },
 			{
 				email: "my-customer@email.com",
-				stores: [{
-					typeId: "store",
-					id: store1.id
-				},
-				{
-					typeId: "store",
-					key: store2.key
-				}]
+				stores: [
+					{
+						typeId: "store",
+						id: store1.id,
+					},
+					{
+						typeId: "store",
+						key: store2.key,
+					},
+				],
 			},
 		);
 
@@ -63,11 +64,11 @@ describe("Order repository", () => {
 		expect(result?.stores).toEqual([
 			{
 				typeId: "store",
-				key: store1.key
+				key: store1.key,
 			},
 			{
 				typeId: "store",
-				key: store2.key
+				key: store2.key,
 			},
 		]);
 	});
