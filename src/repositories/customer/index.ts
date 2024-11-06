@@ -9,6 +9,7 @@ import type {
 	InvalidInputError,
 	MyCustomerResetPassword,
 	ResourceNotFoundError,
+	StoreKeyReference,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
@@ -102,6 +103,32 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				lookupAdressId(addresses, addressId),
 			) ?? [];
 
+		let storesForCustomer: StoreKeyReference[] = []
+
+		if (draft.stores) {
+			const storeIds = draft.stores.map((storeReference) => storeReference.id).filter(Boolean);
+
+			const stores = this._storage.query(
+				context.projectKey,
+				"store",
+				{
+					where: storeIds.map((id) => `id="${id}"`),
+				},
+			).results;
+
+			if (storeIds.length !== stores.length) {
+				throw new CommercetoolsError<ResourceNotFoundError>({
+					code: "ResourceNotFound",
+					message: `Store with ID '${storeIds.find((id) => !stores.some((store) => store.id === id))}' was not found.`,
+				});
+			}
+
+			storesForCustomer = draft.stores.map((storeReference) => ({
+				typeId: "store",
+				key: storeReference.key ?? stores.find((store) => store.id === storeReference.id)?.key as string,
+			}));
+		}
+
 		const resource: Customer = {
 			...getBaseResourceProperties(),
 			key: draft.key,
@@ -127,7 +154,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				context.projectKey,
 				this._storage,
 			),
-			stores: [],
+			stores: storesForCustomer,
 		};
 		return this.saveNew(context, resource);
 	}
