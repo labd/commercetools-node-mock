@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { InMemoryStorage } from "~src/storage";
 import { CustomerRepository } from "./index";
 
-describe("Order repository", () => {
+describe("Customer repository", () => {
 	const storage = new InMemoryStorage();
 	const repository = new CustomerRepository(storage);
 
@@ -71,5 +71,18 @@ describe("Order repository", () => {
 				key: store2.key,
 			},
 		]);
+	});
+
+	test("adding customer without linked stores", async () => {
+		const result = repository.create(
+			{ projectKey: "dummy" },
+			{
+				email: "my-customer-without-stores@email.com",
+				stores: [],
+			},
+		);
+
+		expect(result.email).toEqual("my-customer-without-stores@email.com");
+		expect(result?.stores).toHaveLength(0);
 	});
 });
