@@ -599,7 +599,7 @@ describe("Order Update Actions", () => {
 			customLineItems: [],
 			lastMessageSequenceNumber: 0,
 			lineItems: [],
-			orderNumber: "1389",
+			orderNumber: "1390",
 			orderState: "Open",
 			origin: "Customer",
 			paymentInfo: {
