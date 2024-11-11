@@ -105,7 +105,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 
 		let storesForCustomer: StoreKeyReference[] = [];
 
-		if (draft.stores) {
+		if (draft.stores && draft.stores.length > 0) {
 			const storeIds = draft.stores
 				.map((storeReference) => storeReference.id)
 				.filter(Boolean);
