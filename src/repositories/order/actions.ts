@@ -195,18 +195,19 @@ export class OrderUpdateHandler
 		resource: Writable<Order>,
 		{ deliveryId, name, value }: OrderSetDeliveryCustomFieldAction,
 	) {
-		assert(resource.shippingInfo, "shippingInfo is not defined");
+		if (!resource.shippingInfo) {
+			throw new Error("Resource has no shipping info");
+		}
 
 		if (Array.isArray(resource.shippingInfo.deliveries)) {
-			resource.shippingInfo.deliveries.map((delivery) => {
-				if (delivery.id !== deliveryId) throw "No matching delivery id found";
+			for (const delivery of resource.shippingInfo.deliveries) {
+				if (delivery.id !== deliveryId) continue;
 				if (delivery.custom) {
 					const update = delivery.custom.fields;
 					update[name] = value;
 					Object.assign(delivery.custom.fields, update);
 				}
-				return delivery;
-			});
+			}
 		}
 	}
 
@@ -231,23 +232,23 @@ export class OrderUpdateHandler
 		resource: Writable<Order>,
 		{ parcelId, name, value }: OrderSetParcelCustomFieldAction,
 	) {
-		assert(resource.shippingInfo, "shippingInfo is not defined");
+		if (!resource.shippingInfo) {
+			throw new Error("Resource has no shipping info");
+		}
 
 		if (Array.isArray(resource.shippingInfo.deliveries)) {
-			resource.shippingInfo.deliveries.map((delivery) => {
+			for (const delivery of resource.shippingInfo.deliveries) {
 				if (Array.isArray(delivery.parcels)) {
-					delivery.parcels.map((parcel) => {
-						if (parcel.id !== parcelId) throw "No matching parcel id found";
+					for (const parcel of delivery.parcels) {
+						if (parcel.id !== parcelId) continue;
 						if (parcel.custom) {
 							const update = parcel.custom.fields;
 							update[name] = value;
 							Object.assign(parcel.custom.fields, update);
 						}
-						return parcel;
-					});
+					}
 				}
-				return delivery;
-			});
+			}
 		}
 	}
 
