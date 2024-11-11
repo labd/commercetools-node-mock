@@ -27,7 +27,6 @@ import type {
 	Store,
 	SyncInfo,
 } from "@commercetools/platform-sdk";
-import assert from "assert";
 import { getBaseResourceProperties } from "~src/helpers";
 import type { Writable } from "~src/types";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
