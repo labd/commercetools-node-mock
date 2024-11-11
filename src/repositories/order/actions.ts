@@ -198,14 +198,9 @@ export class OrderUpdateHandler
 			throw new Error("Resource has no shipping info");
 		}
 
-		if (Array.isArray(resource.shippingInfo.deliveries)) {
-			for (const delivery of resource.shippingInfo.deliveries) {
-				if (delivery.id !== deliveryId) continue;
-				if (delivery.custom) {
-					const update = delivery.custom.fields;
-					update[name] = value;
-					Object.assign(delivery.custom.fields, update);
-				}
+		for (const delivery of resource.shippingInfo.deliveries || []) {
+			if (delivery.id === deliveryId && delivery.custom?.fields) {
+				delivery.custom.fields[name] = value;
 			}
 		}
 	}
@@ -235,17 +230,10 @@ export class OrderUpdateHandler
 			throw new Error("Resource has no shipping info");
 		}
 
-		if (Array.isArray(resource.shippingInfo.deliveries)) {
-			for (const delivery of resource.shippingInfo.deliveries) {
-				if (Array.isArray(delivery.parcels)) {
-					for (const parcel of delivery.parcels) {
-						if (parcel.id !== parcelId) continue;
-						if (parcel.custom) {
-							const update = parcel.custom.fields;
-							update[name] = value;
-							Object.assign(parcel.custom.fields, update);
-						}
-					}
+		for (const delivery of resource.shippingInfo.deliveries || []) {
+			for (const parcel of delivery.parcels || []) {
+				if (parcel.id === parcelId && parcel.custom?.fields) {
+					parcel.custom.fields[name] = value;
 				}
 			}
 		}
