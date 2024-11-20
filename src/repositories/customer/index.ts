@@ -37,7 +37,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 	create(context: RepositoryContext, draft: CustomerDraft): Customer {
 		// Check uniqueness
 		const results = this._storage.query(context.projectKey, this.getTypeId(), {
-			where: [`email="${draft.email.toLocaleLowerCase()}"`],
+			where: [`lowercaseEmail="${draft.email.toLocaleLowerCase()}"`],
 		});
 		if (results.count > 0) {
 			throw new CommercetoolsError<any>({
@@ -141,6 +141,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			dateOfBirth: draft.dateOfBirth,
 			companyName: draft.companyName,
 			email: draft.email.toLowerCase(),
+			lowercaseEmail: draft.email.toLowerCase(),
 			password: draft.password ? hashPassword(draft.password) : undefined,
 			isEmailVerified: draft.isEmailVerified || false,
 			addresses: addresses,
@@ -156,7 +157,8 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				this._storage,
 			),
 			stores: storesForCustomer,
-		};
+		} satisfies unknown as Customer;
+
 		return this.saveNew(context, resource);
 	}
 

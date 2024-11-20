@@ -31,6 +31,7 @@ describe("Me", () => {
 			customer: {
 				...draft,
 				password: "cDRzc3cwcmQ=",
+				lowercaseEmail: draft.email.toLocaleLowerCase(),
 				authenticationMode: "Password",
 				version: 1,
 				isEmailVerified: false,
