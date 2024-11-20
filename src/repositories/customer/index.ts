@@ -37,7 +37,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 	create(context: RepositoryContext, draft: CustomerDraft): Customer {
 		// Check uniqueness
 		const results = this._storage.query(context.projectKey, this.getTypeId(), {
-			where: [`lowercaseEmail="${draft.email.toLocaleLowerCase()}"`],
+			where: [`lowercaseEmail="${draft.email.toLowerCase()}"`],
 		});
 		if (results.count > 0) {
 			throw new CommercetoolsError<any>({
