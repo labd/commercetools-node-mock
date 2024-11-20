@@ -7,6 +7,21 @@ describe("Order repository", () => {
 	const storage = new InMemoryStorage();
 	const repository = new CustomerRepository(storage);
 
+	test("lowercaseEmail", async () => {
+		const customer = repository.create(
+			{ projectKey: "dummy" },
+			{ email: "my-customer-UPPERCASE@email.com" },
+		);
+
+		const result = repository.query(
+			{ projectKey: "dummy" },
+			{ where: [`lowercaseEmail = "my-customer-uppercase@email.com"`] },
+		);
+
+		expect(result.results).toHaveLength(1);
+		expect(result.results[0].id).toEqual(customer.id);
+	});
+
 	test("adding stores to customer", async () => {
 		const store1: Store = {
 			id: "d0016081-e9af-48a7-8133-1f04f340a335",
