@@ -20,7 +20,7 @@ import {
 	validatePasswordResetToken,
 } from "~src/lib/password";
 import type { AbstractStorage } from "~src/storage/abstract";
-import type { Writable } from "~src/types";
+import type { ResourceMap, ShallowWritable, Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -160,6 +160,20 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		} satisfies unknown as Customer;
 
 		return this.saveNew(context, resource);
+	}
+
+	saveUpdate(
+		context: RepositoryContext,
+		version: number,
+		resource: ShallowWritable<ResourceMap["customer"]>,
+	): ShallowWritable<ResourceMap["customer"]> {
+		// Also update lowercaseEmail attribute
+		const updatedResource: Customer = {
+			...resource,
+			lowercaseEmail: resource.email.toLowerCase(),
+		} satisfies unknown as Customer;
+
+		return super.saveUpdate(context, version, updatedResource);
 	}
 
 	passwordResetToken(

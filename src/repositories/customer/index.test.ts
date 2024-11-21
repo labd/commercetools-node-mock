@@ -7,7 +7,7 @@ describe("Order repository", () => {
 	const storage = new InMemoryStorage();
 	const repository = new CustomerRepository(storage);
 
-	test("lowercaseEmail", async () => {
+	test("query by lowercaseEmail", async () => {
 		const customer = repository.create(
 			{ projectKey: "dummy" },
 			{ email: "my-customer-UPPERCASE@email.com" },
@@ -20,6 +20,30 @@ describe("Order repository", () => {
 
 		expect(result.results).toHaveLength(1);
 		expect(result.results[0].id).toEqual(customer.id);
+	});
+
+	test("updating lowercaseEmail", async () => {
+		const customer = repository.create(
+			{ projectKey: "dummy" },
+			{ email: "my-customer-UPPERCASE-v1@email.com" },
+		);
+
+		repository.saveUpdate({ projectKey: "dummy" }, customer.version, {
+			...customer,
+			email: "my-customer-UPPERCASE-v2@email.com",
+			version: customer.version + 1,
+		});
+
+		const result = repository.query(
+			{ projectKey: "dummy" },
+			{ where: [`lowercaseEmail = "my-customer-uppercase-v2@email.com"`] },
+		);
+
+		expect(result.results).toHaveLength(1);
+		expect(result.results[0].id).toEqual(customer.id);
+		expect(result.results[0].email).toEqual(
+			"my-customer-UPPERCASE-v2@email.com",
+		);
 	});
 
 	test("adding stores to customer", async () => {
