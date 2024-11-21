@@ -1,5 +1,17 @@
 ## 2.23.1
 
+## 2.41.0
+
+### Minor Changes
+
+- [#248](https://github.com/labd/commercetools-node-mock/pull/248) [`1530420`](https://github.com/labd/commercetools-node-mock/commit/1530420ce67810bc7f88e90b3c4de46b98c9bbca) Thanks [@gijsmin](https://github.com/gijsmin)! - add missing addParcelCustomField action to order
+
+- [#252](https://github.com/labd/commercetools-node-mock/pull/252) [`f40bbea`](https://github.com/labd/commercetools-node-mock/commit/f40bbea082333c3f3efbf175f033e6b807e61ebf) Thanks [@mikedebock](https://github.com/mikedebock)! - Add support for lowercaseEmail on customers
+
+### Patch Changes
+
+- [#251](https://github.com/labd/commercetools-node-mock/pull/251) [`f61e38d`](https://github.com/labd/commercetools-node-mock/commit/f61e38dc32af4094c49618354c4ea393d35baaab) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix customer not being allowed to have no stores
+
 ## 2.40.0
 
 ### Minor Changes
