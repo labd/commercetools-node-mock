@@ -15,7 +15,6 @@ import { InMemoryStorage } from "./storage";
 import type { Services } from "./types";
 
 // Services
-import { warnDeprecation } from "./deprecation";
 import { mapHeaderType } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import { createRepositories } from "./repositories";
@@ -78,8 +77,9 @@ export class CommercetoolsMock {
 	}
 
 	start() {
-		warnDeprecation(
-			"The start method is deprecated, use .registerHandlers() to bind to an msw server instead",
+		process.emitWarning(
+			"The start() method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"DeprecationWarning",
 		);
 
 		// Order is important here when the hostnames match
@@ -88,8 +88,9 @@ export class CommercetoolsMock {
 	}
 
 	stop() {
-		warnDeprecation(
-			"The stop method is deprecated, use .registerHandlers() to bind to an msw server instead",
+		process.emitWarning(
+			"The stop() method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"DeprecationWarning",
 		);
 		this._mswServer?.close();
 		this._mswServer = undefined;
