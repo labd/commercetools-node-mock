@@ -9,7 +9,9 @@ import type {
 	InvalidInputError,
 	MyCustomerResetPassword,
 	ResourceNotFoundError,
+	Store,
 	StoreKeyReference,
+	StoreResourceIdentifier,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
@@ -106,28 +108,10 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		let storesForCustomer: StoreKeyReference[] = [];
 
 		if (draft.stores && draft.stores.length > 0) {
-			const storeIds = draft.stores
-				.map((storeReference) => storeReference.id)
-				.filter(Boolean);
-
-			const stores = this._storage.query(context.projectKey, "store", {
-				where: storeIds.map((id) => `id="${id}"`),
-			}).results;
-
-			if (storeIds.length !== stores.length) {
-				throw new CommercetoolsError<ResourceNotFoundError>({
-					code: "ResourceNotFound",
-					message: `Store with ID '${storeIds.find((id) => !stores.some((store) => store.id === id))}' was not found.`,
-				});
-			}
-
-			storesForCustomer = draft.stores.map((storeReference) => ({
-				typeId: "store",
-				key:
-					storeReference.key ??
-					(stores.find((store) => store.id === storeReference.id)
-						?.key as string),
-			}));
+			storesForCustomer = this.storeReferenceToStoreKeyReference(
+				draft.stores,
+				context.projectKey,
+			);
 		}
 
 		const resource: Customer = {
@@ -266,5 +250,36 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			expiresAt: expiresAt.toISOString(),
 			value: token,
 		};
+	}
+
+	private storeReferenceToStoreKeyReference(
+		draftStores: StoreResourceIdentifier[],
+		projectKey: string,
+	): StoreKeyReference[] {
+		const storeIds = draftStores
+			.map((storeReference) => storeReference.id)
+			.filter(Boolean);
+
+		let stores: Store[] = [];
+
+		if (storeIds.length > 0) {
+			stores = this._storage.query(projectKey, "store", {
+				where: storeIds.map((id) => `id="${id}"`),
+			}).results;
+
+			if (storeIds.length !== stores.length) {
+				throw new CommercetoolsError<ResourceNotFoundError>({
+					code: "ResourceNotFound",
+					message: `Store with ID '${storeIds.find((id) => !stores.some((store) => store.id === id))}' was not found.`,
+				});
+			}
+		}
+
+		return draftStores.map((storeReference) => ({
+			typeId: "store",
+			key:
+				storeReference.key ??
+				(stores.find((store) => store.id === storeReference.id)?.key as string),
+		}));
 	}
 }
