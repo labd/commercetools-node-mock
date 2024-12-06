@@ -46,7 +46,7 @@ describe("Customer repository", () => {
 		);
 	});
 
-	test("adding stores to customer", async () => {
+	test("adding multiple stores to customer", async () => {
 		const store1: Store = {
 			id: "d0016081-e9af-48a7-8133-1f04f340a335",
 			key: "store-1",
@@ -108,6 +108,46 @@ describe("Customer repository", () => {
 			{
 				typeId: "store",
 				key: store2.key,
+			},
+		]);
+	});
+
+	test("adding single store to customer", async () => {
+		const store1: Store = {
+			id: "58082253-fe4e-4714-941f-86ab596d42ed",
+			key: "store-1",
+			name: {
+				en: "Store 1",
+			},
+			version: 1,
+			createdAt: "2021-09-02T12:23:30.036Z",
+			lastModifiedAt: "2021-09-02T12:23:30.546Z",
+			languages: [],
+			distributionChannels: [],
+			countries: [],
+			supplyChannels: [],
+			productSelections: [],
+		};
+
+		storage.add("dummy", "store", store1);
+
+		const result = repository.create(
+			{ projectKey: "dummy" },
+			{
+				email: "my-customer2@email.com",
+				stores: [
+					{
+						typeId: "store",
+						key: store1.key,
+					},
+				],
+			},
+		);
+
+		expect(result?.stores).toEqual([
+			{
+				typeId: "store",
+				key: store1.key,
 			},
 		]);
 	});
