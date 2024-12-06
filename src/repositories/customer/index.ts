@@ -108,7 +108,10 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		let storesForCustomer: StoreKeyReference[] = [];
 
 		if (draft.stores && draft.stores.length > 0) {
-			storesForCustomer = this.storeReferenceToStoreKeyReference(draft.stores, context.projectKey);
+			storesForCustomer = this.storeReferenceToStoreKeyReference(
+				draft.stores,
+				context.projectKey,
+			);
 		}
 
 		const resource: Customer = {
@@ -249,7 +252,10 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		};
 	}
 
-	private storeReferenceToStoreKeyReference(draftStores: StoreResourceIdentifier[], projectKey: string): StoreKeyReference[] {
+	private storeReferenceToStoreKeyReference(
+		draftStores: StoreResourceIdentifier[],
+		projectKey: string,
+	): StoreKeyReference[] {
 		const storeIds = draftStores
 			.map((storeReference) => storeReference.id)
 			.filter(Boolean);
@@ -273,8 +279,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			typeId: "store",
 			key:
 				storeReference.key ??
-				(stores.find((store) => store.id === storeReference.id)
-					?.key as string),
+				(stores.find((store) => store.id === storeReference.id)?.key as string),
 		}));
 	}
 }
