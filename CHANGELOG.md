@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.41.1
+
+### Patch Changes
+
+- [#254](https://github.com/labd/commercetools-node-mock/pull/254) [`424a375`](https://github.com/labd/commercetools-node-mock/commit/424a375a50775b304ccedeb85569202257d151f2) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix setting stores to customer by storekey
+
 ## 2.41.0
 
 ### Minor Changes
