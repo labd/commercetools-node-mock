@@ -93,7 +93,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 
 			associates: draft.associates?.map((a) =>
 				createAssociate(a, context.projectKey, this._storage),
-			),
+			) ?? [],
 		};
 
 		if (this._isDivisionDraft(draft)) {
@@ -130,8 +130,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 class BusinessUnitUpdateHandler
 	extends AbstractUpdateHandler
 	implements
-		Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>>
-{
+	Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>> {
 	addAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
