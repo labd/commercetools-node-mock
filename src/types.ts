@@ -1,6 +1,5 @@
 import type * as ctp from "@commercetools/platform-sdk";
 import type { RepositoryMap } from "./repositories";
-import type AbstractService from "./services/abstract";
 
 export const isType = <T>(x: T) => x;
 
@@ -16,10 +15,6 @@ export type ServiceTypes =
 	| "my-payment"
 	| "my-customer"
 	| "my-business-unit";
-
-export type Services = Partial<{
-	[index in ServiceTypes]: AbstractService;
-}>;
 
 export type ResourceType = keyof ResourceMap & keyof RepositoryMap;
 

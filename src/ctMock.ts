@@ -12,7 +12,6 @@ import { OAuth2Server } from "./oauth/server";
 import { ProjectAPI } from "./projectAPI";
 import type { AbstractStorage } from "./storage";
 import { InMemoryStorage } from "./storage";
-import type { Services } from "./types";
 
 // Services
 import { warnDeprecation } from "./deprecation";
@@ -56,15 +55,12 @@ export class CommercetoolsMock {
 
 	private _mswServer: SetupServer | undefined = undefined;
 
-	private _services: Services | null;
-
 	private _repositories: RepositoryMap | null;
 
 	private _projectService?: ProjectService;
 
 	constructor(options: Partial<CommercetoolsMockOptions> = {}) {
 		this.options = { ...DEFAULT_OPTIONS, ...options };
-		this._services = null;
 		this._repositories = null;
 		this._projectService = undefined;
 
@@ -154,7 +150,7 @@ export class CommercetoolsMock {
 		}
 
 		// Register the rest api services in the router
-		this._services = createServices(projectRouter, this._repositories);
+		createServices(projectRouter, this._repositories);
 		this._projectService = new ProjectService(
 			projectRouter,
 			this._repositories.project as ProjectRepository,
