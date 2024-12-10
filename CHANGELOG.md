@@ -1,5 +1,15 @@
 ## 2.23.1
 
+## 2.42.0
+
+### Minor Changes
+
+- [#259](https://github.com/labd/commercetools-node-mock/pull/259) [`a7166d7`](https://github.com/labd/commercetools-node-mock/commit/a7166d79fe315a9244daa17df648674ba9ce234f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Support as-associate endpoints for carts and orders
+
+### Patch Changes
+
+- [#257](https://github.com/labd/commercetools-node-mock/pull/257) [`36c79e2`](https://github.com/labd/commercetools-node-mock/commit/36c79e20acac4d8ab13397fc3ae3f653fe7da061) Thanks [@jsm1t](https://github.com/jsm1t)! - Allow setting associates to business unit, if its created without associates
+
 ## 2.41.1
 
 ### Patch Changes
