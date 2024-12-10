@@ -1,5 +1,9 @@
 import { ProductTailoringRepository } from "~src/repositories/product-tailoring";
 import type { AbstractStorage } from "../storage";
+import {
+	AsAssociateCartRepository,
+	AsAssociateOrderRepository,
+} from "./as-associate";
 import { AssociateRoleRepository } from "./associate-role";
 import { AttributeGroupRepository } from "./attribute-group";
 import { BusinessUnitRepository } from "./business-unit";
@@ -41,6 +45,10 @@ import { ZoneRepository } from "./zone";
 export type RepositoryMap = ReturnType<typeof createRepositories>;
 
 export const createRepositories = (storage: AbstractStorage) => ({
+	"as-associate": {
+		cart: new AsAssociateCartRepository(storage),
+		order: new AsAssociateOrderRepository(storage),
+	},
 	"associate-role": new AssociateRoleRepository(storage),
 	"attribute-group": new AttributeGroupRepository(storage),
 	"business-unit": new BusinessUnitRepository(storage),
