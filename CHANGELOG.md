@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.42.1
+
+### Patch Changes
+
+- [#261](https://github.com/labd/commercetools-node-mock/pull/261) [`d20c176`](https://github.com/labd/commercetools-node-mock/commit/d20c17699e97f6b04a57c4b26cd994b74374d29b) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added missing mutations for custom fields on associate roles, product selections and business units
+
 ## 2.42.0
 
 ### Minor Changes
