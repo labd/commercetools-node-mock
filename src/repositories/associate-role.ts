@@ -5,6 +5,7 @@ import type {
 	AssociateRoleDraft,
 	AssociateRoleRemovePermissionAction,
 	AssociateRoleSetCustomFieldAction,
+	AssociateRoleSetCustomTypeAction,
 	AssociateRoleSetNameAction,
 	AssociateRoleSetPermissionsAction,
 	AssociateRoleUpdateAction,
@@ -104,6 +105,22 @@ class AssociateRoleUpdateHandler
 			delete resource.custom.fields[name];
 		} else {
 			resource.custom.fields[name] = value;
+		}
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<AssociateRole>,
+		{ type, fields }: AssociateRoleSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
 		}
 	}
 

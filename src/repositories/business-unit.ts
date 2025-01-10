@@ -2,6 +2,7 @@ import type {
 	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
+	BusinessUnitSetCustomTypeAction,
 	BusinessUnitUpdateAction,
 	CompanyDraft,
 	DivisionDraft,
@@ -258,6 +259,22 @@ class BusinessUnitUpdateHandler
 		{ contactEmail }: BusinessUnitSetContactEmailAction,
 	) {
 		resource.contactEmail = contactEmail;
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ type, fields }: BusinessUnitSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
 	}
 
 	setStoreMode(
