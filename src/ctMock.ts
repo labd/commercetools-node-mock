@@ -14,7 +14,6 @@ import type { AbstractStorage } from "./storage";
 import { InMemoryStorage } from "./storage";
 
 // Services
-import { warnDeprecation } from "./deprecation";
 import { mapHeaderType } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import { createRepositories } from "./repositories";
@@ -74,7 +73,7 @@ export class CommercetoolsMock {
 	}
 
 	start() {
-		warnDeprecation(
+		process.emitWarning(
 			"The start method is deprecated, use .registerHandlers() to bind to an msw server instead",
 		);
 
@@ -84,7 +83,7 @@ export class CommercetoolsMock {
 	}
 
 	stop() {
-		warnDeprecation(
+		process.emitWarning(
 			"The stop method is deprecated, use .registerHandlers() to bind to an msw server instead",
 		);
 		this._mswServer?.close();
