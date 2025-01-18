@@ -1,6 +1,7 @@
 import express from "express";
 import supertest from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
 import { hashPassword } from "../lib/password";
 import { CustomerRepository } from "../repositories/customer";
@@ -21,7 +22,8 @@ describe("OAuth2Server", () => {
 		app.use(server.createRouter());
 
 		storage = new InMemoryStorage();
-		customerRepository = new CustomerRepository(storage);
+		const config: Config = { storage, strict: false };
+		customerRepository = new CustomerRepository(config);
 		server.setCustomerRepository(customerRepository);
 	});
 

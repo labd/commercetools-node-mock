@@ -7,7 +7,7 @@ import type {
 	ExtensionSetTimeoutInMsAction,
 	ExtensionUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "~src/storage";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
 import { maskSecretValue } from "../lib/masking";
 import type { Writable } from "../types";
@@ -19,9 +19,9 @@ import {
 } from "./abstract";
 
 export class ExtensionRepository extends AbstractResourceRepository<"extension"> {
-	constructor(storage: AbstractStorage) {
-		super("extension", storage);
-		this.actions = new ExtensionUpdateHandler(storage);
+	constructor(config: Config) {
+		super("extension", config);
+		this.actions = new ExtensionUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: ExtensionDraft): Extension {

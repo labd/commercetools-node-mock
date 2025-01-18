@@ -1,11 +1,13 @@
 import type { Store } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
 import { CustomerRepository } from "./index";
 
 describe("Customer repository", () => {
 	const storage = new InMemoryStorage();
-	const repository = new CustomerRepository(storage);
+	const config: Config = { storage, strict: false };
+	const repository = new CustomerRepository(config);
 
 	test("query by lowercaseEmail", async () => {
 		const customer = repository.create(

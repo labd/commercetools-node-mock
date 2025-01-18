@@ -3,14 +3,14 @@ import type {
 	OrderEditDraft,
 	OrderEditResult,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "~src/storage";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
 import type { RepositoryContext } from "./abstract";
 import { AbstractResourceRepository } from "./abstract";
 
 export class OrderEditRepository extends AbstractResourceRepository<"order-edit"> {
-	constructor(storage: AbstractStorage) {
-		super("order-edit", storage);
+	constructor(config: Config) {
+		super("order-edit", config);
 	}
 
 	create(context: RepositoryContext, draft: OrderEditDraft): OrderEdit {

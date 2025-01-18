@@ -1,11 +1,13 @@
 import type { CartDraft, LineItem } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
 import { CartRepository } from "./index";
 
 describe("Cart repository", () => {
 	const storage = new InMemoryStorage();
-	const repository = new CartRepository(storage);
+	const config: Config = { storage, strict: false };
+	const repository = new CartRepository(config);
 
 	test("create cart in store", async () => {
 		storage.add("dummy", "product", {

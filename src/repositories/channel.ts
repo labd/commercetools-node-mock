@@ -10,8 +10,8 @@ import type {
 	ChannelSetGeoLocationAction,
 	ChannelUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
 import {
@@ -22,8 +22,8 @@ import {
 import { createAddress, createCustomFields } from "./helpers";
 
 export class ChannelRepository extends AbstractResourceRepository<"channel"> {
-	constructor(storage: AbstractStorage) {
-		super("channel", storage);
+	constructor(config: Config) {
+		super("channel", config);
 		this.actions = new ChannelUpdateHandler(this._storage);
 	}
 

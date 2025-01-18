@@ -7,8 +7,8 @@ import type {
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -21,9 +21,9 @@ import {
 import { CartDiscountUpdateHandler } from "./actions";
 
 export class CartDiscountRepository extends AbstractResourceRepository<"cart-discount"> {
-	constructor(storage: AbstractStorage) {
-		super("cart-discount", storage);
-		this.actions = new CartDiscountUpdateHandler(storage);
+	constructor(config: Config) {
+		super("cart-discount", config);
+		this.actions = new CartDiscountUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {
@@ -80,7 +80,5 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 				} as CartDiscountValueRelative;
 			}
 		}
-
-		return value;
 	}
 }

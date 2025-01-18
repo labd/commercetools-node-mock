@@ -14,6 +14,7 @@ import type { AbstractStorage } from "./storage";
 import { InMemoryStorage } from "./storage";
 
 // Services
+import type { Config } from "./config";
 import { mapHeaderType } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import { createRepositories } from "./repositories";
@@ -39,6 +40,7 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	apiHost: DEFAULT_API_HOSTNAME,
 	authHost: DEFAULT_AUTH_HOSTNAME,
 	silent: false,
+	strict: false,
 };
 
 const _globalListeners: SetupServer[] = [];
@@ -122,7 +124,11 @@ export class CommercetoolsMock {
 	}
 
 	private createApp(options?: AppOptions): express.Express {
-		this._repositories = createRepositories(this._storage);
+		const config: Config = {
+			strict: this.options.strict,
+			storage: this._storage,
+		};
+		this._repositories = createRepositories(config);
 		this._oauth2.setCustomerRepository(this._repositories.customer);
 
 		const app = express();

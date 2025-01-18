@@ -10,8 +10,8 @@ import type {
 	AssociateRoleSetPermissionsAction,
 	AssociateRoleUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
 import {
@@ -22,8 +22,8 @@ import {
 import { createCustomFields } from "./helpers";
 
 export class AssociateRoleRepository extends AbstractResourceRepository<"associate-role"> {
-	constructor(storage: AbstractStorage) {
-		super("associate-role", storage);
+	constructor(config: Config) {
+		super("associate-role", config);
 		this.actions = new AssociateRoleUpdateHandler(this._storage);
 	}
 

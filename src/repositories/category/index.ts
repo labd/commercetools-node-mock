@@ -4,9 +4,9 @@ import type {
 	CategoryReference,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
 import { parseExpandClause } from "~src/lib/expandParser";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { Writable } from "~src/types";
 import type { GetParams } from "../abstract";
 import {
@@ -17,8 +17,8 @@ import { createCustomFields } from "../helpers";
 import { CategoryUpdateHandler } from "./actions";
 
 export class CategoryRepository extends AbstractResourceRepository<"category"> {
-	constructor(storage: AbstractStorage) {
-		super("category", storage);
+	constructor(config: Config) {
+		super("category", config);
 		this.actions = new CategoryUpdateHandler(this._storage);
 	}
 

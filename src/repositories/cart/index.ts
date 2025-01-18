@@ -8,9 +8,9 @@ import {
 	type ProductPagedQueryResponse,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
@@ -21,8 +21,8 @@ import { CartUpdateHandler } from "./actions";
 import { calculateCartTotalPrice, selectPrice } from "./helpers";
 
 export class CartRepository extends AbstractResourceRepository<"cart"> {
-	constructor(storage: AbstractStorage) {
-		super("cart", storage);
+	constructor(config: Config) {
+		super("cart", config);
 		this.actions = new CartUpdateHandler(this._storage);
 	}
 

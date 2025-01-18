@@ -13,6 +13,7 @@ import type {
 	StoreKeyReference,
 	StoreResourceIdentifier,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
 import {
@@ -21,7 +22,6 @@ import {
 	hashPassword,
 	validatePasswordResetToken,
 } from "~src/lib/password";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { ResourceMap, ShallowWritable, Writable } from "~src/types";
 import {
 	AbstractResourceRepository,
@@ -31,9 +31,9 @@ import { createCustomFields } from "../helpers";
 import { CustomerUpdateHandler } from "./actions";
 
 export class CustomerRepository extends AbstractResourceRepository<"customer"> {
-	constructor(storage: AbstractStorage) {
-		super("customer", storage);
-		this.actions = new CustomerUpdateHandler(storage);
+	constructor(config: Config) {
+		super("customer", config);
+		this.actions = new CustomerUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: CustomerDraft): Customer {
