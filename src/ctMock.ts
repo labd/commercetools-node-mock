@@ -106,10 +106,15 @@ export class CommercetoolsMock {
 			throw new Error("repositories not initialized yet");
 		}
 
+		const config: Config = {
+			strict: this.options.strict,
+			storage: this._storage,
+		};
+
 		return new ProjectAPI(
 			projectKey || this.options.defaultProjectKey!,
 			this._repositories,
-			this._storage,
+			config,
 		);
 	}
 
