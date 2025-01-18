@@ -1,5 +1,13 @@
 ## 2.23.1
 
+## 2.43.0
+
+### Minor Changes
+
+- [#263](https://github.com/labd/commercetools-node-mock/pull/263) [`55b0bfc`](https://github.com/labd/commercetools-node-mock/commit/55b0bfc56198247c9d96bcb2ed4ea14c40294d0a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add a `strict` boolean option to make the mock service strict and throw errors when certain values are missing
+
+- [#246](https://github.com/labd/commercetools-node-mock/pull/246) [`2774582`](https://github.com/labd/commercetools-node-mock/commit/27745827102d9278cf2c5ca04df1529d293a6b3d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add deprecation warning for `ctMock.add()`
+
 ## 2.42.1
 
 ### Patch Changes
