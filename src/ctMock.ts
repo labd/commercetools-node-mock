@@ -29,6 +29,7 @@ export type CommercetoolsMockOptions = {
 	apiHost: RegExp | string;
 	authHost: RegExp | string;
 	silent: boolean;
+	strict: boolean;
 };
 
 type AppOptions = { silent?: boolean };
@@ -39,7 +40,7 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	defaultProjectKey: undefined,
 	apiHost: DEFAULT_API_HOSTNAME,
 	authHost: DEFAULT_AUTH_HOSTNAME,
-	silent: false,
+	silent: true,
 	strict: false,
 };
 
@@ -297,7 +298,7 @@ export class CommercetoolsMock {
 			if (this._mswServer !== undefined) {
 				throw new Error("Server already started");
 			} else {
-				console.warn("Server wasn't stopped properly, clearing");
+				process.emitWarning("Server wasn't stopped properly, clearing");
 				_globalListeners.forEach((listener) => listener.close());
 			}
 		}
