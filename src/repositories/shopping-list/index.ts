@@ -6,8 +6,8 @@ import type {
 	ShoppingListDraft,
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../../helpers";
-import type { AbstractStorage } from "../../storage/abstract";
 import type { Writable } from "../../types";
 import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
@@ -19,9 +19,9 @@ import {
 import { ShoppingListUpdateHandler } from "./actions";
 
 export class ShoppingListRepository extends AbstractResourceRepository<"shopping-list"> {
-	constructor(storage: AbstractStorage) {
-		super("shopping-list", storage);
-		this.actions = new ShoppingListUpdateHandler(storage);
+	constructor(config: Config) {
+		super("shopping-list", config);
+		this.actions = new ShoppingListUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {

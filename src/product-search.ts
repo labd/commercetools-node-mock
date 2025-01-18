@@ -6,6 +6,7 @@ import type {
 	ProductSearchRequest,
 	ProductSearchResult,
 } from "@commercetools/platform-sdk";
+import type { Config } from "./config";
 import { CommercetoolsError } from "./exceptions";
 import { parseSearchQuery } from "./lib/productSearchFilter";
 import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
@@ -15,8 +16,8 @@ import type { AbstractStorage } from "./storage";
 export class ProductSearch {
 	protected _storage: AbstractStorage;
 
-	constructor(storage: AbstractStorage) {
-		this._storage = storage;
+	constructor(config: Config) {
+		this._storage = config.storage;
 	}
 
 	search(

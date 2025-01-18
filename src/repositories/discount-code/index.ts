@@ -3,8 +3,8 @@ import type {
 	DiscountCode,
 	DiscountCodeDraft,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -13,9 +13,9 @@ import { createCustomFields } from "../helpers";
 import { DiscountCodeUpdateHandler } from "./actions";
 
 export class DiscountCodeRepository extends AbstractResourceRepository<"discount-code"> {
-	constructor(storage: AbstractStorage) {
-		super("discount-code", storage);
-		this.actions = new DiscountCodeUpdateHandler(storage);
+	constructor(config: Config) {
+		super("discount-code", config);
+		this.actions = new DiscountCodeUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {

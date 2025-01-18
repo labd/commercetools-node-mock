@@ -7,7 +7,7 @@ import {
 	type ReviewDraft,
 	type StateReference,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "~src/storage";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
 import type { RepositoryContext } from "./abstract";
 import { AbstractResourceRepository } from "./abstract";
@@ -17,8 +17,8 @@ import {
 } from "./helpers";
 
 export class ReviewRepository extends AbstractResourceRepository<"review"> {
-	constructor(storage: AbstractStorage) {
-		super("review", storage);
+	constructor(config: Config) {
+		super("review", config);
 	}
 
 	create(context: RepositoryContext, draft: ReviewDraft): Review {

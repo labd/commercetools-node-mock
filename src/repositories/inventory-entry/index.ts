@@ -2,8 +2,8 @@ import type {
 	InventoryEntry,
 	InventoryEntryDraft,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -12,9 +12,9 @@ import { createCustomFields } from "../helpers";
 import { InventoryEntryUpdateHandler } from "./actions";
 
 export class InventoryEntryRepository extends AbstractResourceRepository<"inventory-entry"> {
-	constructor(storage: AbstractStorage) {
-		super("inventory-entry", storage);
-		this.actions = new InventoryEntryUpdateHandler(storage);
+	constructor(config: Config) {
+		super("inventory-entry", config);
+		this.actions = new InventoryEntryUpdateHandler(config.storage);
 	}
 
 	create(

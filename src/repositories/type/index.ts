@@ -1,14 +1,14 @@
 import type { Type, TypeDraft } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import { TypeUpdateHandler } from "./actions";
 
 export class TypeRepository extends AbstractResourceRepository<"type"> {
-	constructor(storage: AbstractStorage) {
-		super("type", storage);
-		this.actions = new TypeUpdateHandler(storage);
+	constructor(config: Config) {
+		super("type", config);
+		this.actions = new TypeUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: TypeDraft): Type {

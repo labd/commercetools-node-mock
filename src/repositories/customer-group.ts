@@ -7,8 +7,8 @@ import type {
 	CustomerGroupSetKeyAction,
 	CustomerGroupUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
 import {
@@ -19,9 +19,9 @@ import {
 import { createCustomFields } from "./helpers";
 
 export class CustomerGroupRepository extends AbstractResourceRepository<"customer-group"> {
-	constructor(storage: AbstractStorage) {
-		super("customer-group", storage);
-		this.actions = new CustomerGroupUpdateHandler(storage);
+	constructor(config: Config) {
+		super("customer-group", config);
+		this.actions = new CustomerGroupUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: CustomerGroupDraft): CustomerGroup {

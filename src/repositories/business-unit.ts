@@ -23,7 +23,7 @@ import {
 	type Company,
 	type Division,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "~src/storage";
+import type { Config } from "~src/config";
 import { generateRandomString, getBaseResourceProperties } from "../helpers";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
@@ -41,8 +41,8 @@ import {
 } from "./helpers";
 
 export class BusinessUnitRepository extends AbstractResourceRepository<"business-unit"> {
-	constructor(storage: AbstractStorage) {
-		super("business-unit", storage);
+	constructor(config: Config) {
+		super("business-unit", config);
 		this.actions = new BusinessUnitUpdateHandler(this._storage);
 	}
 

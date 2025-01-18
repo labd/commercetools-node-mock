@@ -5,9 +5,9 @@ import {
 	type ZoneRateDraft,
 	type ZoneReference,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../../helpers";
 import { getShippingMethodsMatchingCart } from "../../shipping";
-import type { AbstractStorage } from "../../storage/abstract";
 import type { GetParams, RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import {
@@ -18,9 +18,9 @@ import { ShippingMethodUpdateHandler } from "./actions";
 import { transformShippingRate } from "./helpers";
 
 export class ShippingMethodRepository extends AbstractResourceRepository<"shipping-method"> {
-	constructor(storage: AbstractStorage) {
-		super("shipping-method", storage);
-		this.actions = new ShippingMethodUpdateHandler(storage);
+	constructor(config: Config) {
+		super("shipping-method", config);
+		this.actions = new ShippingMethodUpdateHandler(config.storage);
 	}
 
 	create(

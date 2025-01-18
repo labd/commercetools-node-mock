@@ -4,12 +4,17 @@ import type {
 	OrderImportDraft,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
 import { OrderRepository } from "./index";
 
 describe("Order repository", () => {
 	const storage = new InMemoryStorage();
-	const repository = new OrderRepository(storage);
+	const config: Config = {
+		storage,
+		strict: false,
+	};
+	const repository = new OrderRepository(config);
 
 	test("create from cart", async () => {
 		const cart: Cart = {

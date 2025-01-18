@@ -11,6 +11,7 @@ import type {
 	StoreSetNameAction,
 	StoreUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
 import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
@@ -22,8 +23,8 @@ import {
 } from "./helpers";
 
 export class StoreRepository extends AbstractResourceRepository<"store"> {
-	constructor(storage: AbstractStorage) {
-		super("store", storage);
+	constructor(config: Config) {
+		super("store", config);
 		this.actions = new StoreUpdateHandler(this._storage);
 	}
 

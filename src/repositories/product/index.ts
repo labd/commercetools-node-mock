@@ -10,10 +10,10 @@ import type {
 	StateReference,
 	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
 import { ProductSearch } from "~src/product-search";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";
@@ -23,10 +23,10 @@ import { variantFromDraft } from "./helpers";
 export class ProductRepository extends AbstractResourceRepository<"product"> {
 	protected _searchService: ProductSearch;
 
-	constructor(storage: AbstractStorage) {
-		super("product", storage);
-		this.actions = new ProductUpdateHandler(storage);
-		this._searchService = new ProductSearch(storage);
+	constructor(config: Config) {
+		super("product", config);
+		this.actions = new ProductUpdateHandler(config.storage);
+		this._searchService = new ProductSearch(config);
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): Product {

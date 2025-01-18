@@ -16,16 +16,16 @@ import type {
 	ProjectUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { ProjectSetBusinessUnitAssociateRoleOnCreationAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/project";
+import type { Config } from "~src/config";
 import { maskSecretValue } from "../lib/masking";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractRepository, AbstractUpdateHandler } from "./abstract";
 
 export class ProjectRepository extends AbstractRepository<Project> {
-	constructor(storage: AbstractStorage) {
-		super(storage);
-		this.actions = new ProjectUpdateHandler(storage);
+	constructor(config: Config) {
+		super(config);
+		this.actions = new ProjectUpdateHandler(config.storage);
 	}
 
 	get(context: RepositoryContext): Project | null {

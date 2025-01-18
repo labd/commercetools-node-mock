@@ -12,16 +12,16 @@ import type {
 	ProductTypeRemoveEnumValuesAction,
 	ProductTypeUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 
 export class ProductTypeRepository extends AbstractResourceRepository<"product-type"> {
-	constructor(storage: AbstractStorage) {
-		super("product-type", storage);
-		this.actions = new ProductTypeUpdateHandler(storage);
+	constructor(config: Config) {
+		super("product-type", config);
+		this.actions = new ProductTypeUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: ProductTypeDraft): ProductType {

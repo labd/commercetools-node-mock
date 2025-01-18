@@ -9,16 +9,16 @@ import type {
 	StandalonePriceSetDiscountedPriceAction,
 	StandalonePriceUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 import { createTypedMoney } from "./helpers";
 
 export class StandAlonePriceRepository extends AbstractResourceRepository<"standalone-price"> {
-	constructor(storage: AbstractStorage) {
-		super("standalone-price", storage);
+	constructor(config: Config) {
+		super("standalone-price", config);
 		this.actions = new StandalonePriceUpdateHandler(this._storage);
 	}
 

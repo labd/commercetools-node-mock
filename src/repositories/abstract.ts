@@ -7,6 +7,7 @@ import type {
 	UpdateAction,
 } from "@commercetools/platform-sdk";
 import deepEqual from "deep-equal";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
 import type { AbstractStorage } from "../storage";
@@ -40,10 +41,13 @@ export type RepositoryContext = {
 export abstract class AbstractRepository<R extends BaseResource | Project> {
 	protected _storage: AbstractStorage;
 
+	protected config: Config;
+
 	protected actions: AbstractUpdateHandler | undefined;
 
-	constructor(storage: AbstractStorage) {
-		this._storage = storage;
+	constructor(config: Config) {
+		this.config = config;
+		this._storage = config.storage;
 	}
 
 	abstract saveNew({ projectKey }: RepositoryContext, resource: R): void;
@@ -92,8 +96,8 @@ export abstract class AbstractResourceRepository<
 > extends AbstractRepository<ResourceMap[T]> {
 	protected _typeId: T;
 
-	constructor(typeId: T, storage: AbstractStorage) {
-		super(storage);
+	constructor(typeId: T, config: Config) {
+		super(config);
 		this._typeId = typeId;
 	}
 
