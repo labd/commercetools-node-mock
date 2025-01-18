@@ -1,23 +1,11 @@
 import type { Store } from "@commercetools/platform-sdk";
 import supertest from "supertest";
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Store", () => {
-	beforeAll(() => {
-		ctMock.start();
-	});
-
-	afterEach(() => {
-		ctMock.clear();
-	});
-
-	afterAll(() => {
-		ctMock.stop();
-	});
-
 	test("Get store by key", async () => {
 		ctMock.project("dummy").add("store", {
 			id: "fake-store",

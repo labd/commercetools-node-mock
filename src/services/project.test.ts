@@ -1,23 +1,11 @@
 import type { Project } from "@commercetools/platform-sdk";
 import supertest from "supertest";
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Project", () => {
-	beforeAll(() => {
-		ctMock.start();
-	});
-
-	afterEach(() => {
-		ctMock.clear();
-	});
-
-	afterAll(() => {
-		ctMock.stop();
-	});
-
 	test("Get project by key", async () => {
 		const response = await supertest(ctMock.app).get("/dummy/");
 

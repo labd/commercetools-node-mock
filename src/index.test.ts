@@ -1,7 +1,18 @@
 import { type InvalidTokenError } from "@commercetools/platform-sdk";
 import got from "got";
-import { expect, test } from "vitest";
+import { setupServer } from "msw/node";
+import { afterEach, beforeAll, expect, test } from "vitest";
 import { CommercetoolsMock } from "./index";
+
+const mswServer = setupServer();
+
+beforeAll(() => {
+	mswServer.listen({ onUnhandledRequest: "error" });
+});
+
+afterEach(() => {
+	mswServer.resetHandlers();
+});
 
 test("node:fetch client", async () => {
 	const ctMock = new CommercetoolsMock({
@@ -10,7 +21,7 @@ test("node:fetch client", async () => {
 		apiHost: "https://localhost",
 		authHost: "https://localhost:8080",
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const authHeader = "Basic " + Buffer.from("foo:bar").toString("base64");
 	let response = await fetch("https://localhost:8080/oauth/token", {
@@ -44,7 +55,6 @@ test("node:fetch client", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("got client", async () => {
@@ -54,7 +64,7 @@ test("got client", async () => {
 		apiHost: "https://localhost",
 		authHost: "https://localhost:8080",
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	let response = await got.post<{ access_token: string }>(
 		"https://localhost:8080/oauth/token",
@@ -86,7 +96,6 @@ test("got client", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.validateCredentials: true (error)", async () => {
@@ -94,7 +103,7 @@ test("Options.validateCredentials: true (error)", async () => {
 		enableAuthentication: true,
 		validateCredentials: true,
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const response = await got.get<InvalidTokenError>(
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
@@ -108,7 +117,6 @@ test("Options.validateCredentials: true (error)", async () => {
 	);
 	expect(response.statusCode).toBe(401);
 	expect(response.body.message).toBe("invalid_token");
-	ctMock.stop();
 });
 
 test("Options.validateCredentials: false", async () => {
@@ -116,7 +124,7 @@ test("Options.validateCredentials: false", async () => {
 		enableAuthentication: true,
 		validateCredentials: false,
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const response = await got.get(
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
@@ -135,7 +143,6 @@ test("Options.validateCredentials: false", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.enableAuthentication: false", async () => {
@@ -143,7 +150,7 @@ test("Options.enableAuthentication: false", async () => {
 		enableAuthentication: false,
 		validateCredentials: false,
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const response = await got.get(
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
@@ -159,7 +166,6 @@ test("Options.enableAuthentication: false", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.apiHost: is overridden is set", async () => {
@@ -168,7 +174,7 @@ test("Options.apiHost: is overridden is set", async () => {
 		validateCredentials: false,
 		apiHost: "http://api.localhost",
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const response = await got.get("http://api.localhost/my-project/orders", {
 		responseType: "json",
@@ -181,7 +187,6 @@ test("Options.apiHost: is overridden is set", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
 
 test("Options.authHost: is set", async () => {
@@ -190,7 +195,7 @@ test("Options.authHost: is set", async () => {
 		validateCredentials: true,
 		authHost: "http://auth.localhost",
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const response = await got.post<{ access_token: string }>(
 		"http://auth.localhost/oauth/token",
@@ -216,7 +221,7 @@ test("apiHost mock proxy: querystring", async () => {
 		validateCredentials: false,
 		apiHost: "http://api.localhost",
 	});
-	ctMock.start();
+	ctMock.registerHandlers(mswServer);
 
 	const response = await got.get("http://api.localhost/my-project/orders", {
 		responseType: "json",
@@ -234,5 +239,4 @@ test("apiHost mock proxy: querystring", async () => {
 		limit: 20,
 		results: [],
 	});
-	ctMock.stop();
 });
