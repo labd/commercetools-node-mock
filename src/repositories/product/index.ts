@@ -42,8 +42,12 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 				this._storage,
 			);
 		} catch (err) {
+			if (this.config.strict) {
+				throw err;
+			}
+
 			// For now accept missing product types (but warn)
-			console.warn(
+			process.emitWarning(
 				`Error resolving product-type '${draft.productType.id}'. This will be throw an error in later releases.`,
 			);
 			productType = {
