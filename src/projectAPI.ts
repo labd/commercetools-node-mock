@@ -1,3 +1,4 @@
+import type { Config } from "./config";
 import { getBaseResourceProperties } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import type { GetParams } from "./repositories/abstract";
@@ -11,13 +12,12 @@ export class ProjectAPI {
 
 	private _repositories: RepositoryMap;
 
-	constructor(
-		projectKey: string,
-		repositories: RepositoryMap,
-		storage: AbstractStorage,
-	) {
+	private config: Config;
+
+	constructor(projectKey: string, repositories: RepositoryMap, config: Config) {
 		this.projectKey = projectKey;
-		this._storage = storage;
+		this.config = config;
+		this._storage = config.storage;
 		this._repositories = repositories;
 	}
 
