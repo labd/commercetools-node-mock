@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.43.1
+
+### Patch Changes
+
+- [#266](https://github.com/labd/commercetools-node-mock/pull/266) [`8d8e802`](https://github.com/labd/commercetools-node-mock/commit/8d8e802f8f8e829becb1b7f1d25020e6e2a2342f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove errornous console.error statemetn for concurrent modifications
+
 ## 2.43.0
 
 ### Minor Changes
