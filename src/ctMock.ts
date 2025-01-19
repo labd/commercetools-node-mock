@@ -197,8 +197,13 @@ export class CommercetoolsMock {
 	// allows you to manage msw server yourself and register the handlers needed
 	// for commercetools-mock to work.
 	public registerHandlers(server: SetupServerApi) {
+		const handlers = this.getHandlers(server);
+		server.use(...handlers);
+	}
+
+	public getHandlers(server: SetupServerApi) {
 		const app = this.app;
-		server.use(
+		return [
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
 				const body = await request.text();
 				const url = new URL(request.url);
@@ -290,7 +295,7 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
-		);
+		];
 	}
 
 	public mswServer() {
