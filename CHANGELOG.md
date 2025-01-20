@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.43.2
+
+### Patch Changes
+
+- [#268](https://github.com/labd/commercetools-node-mock/pull/268) [`0212cb4`](https://github.com/labd/commercetools-node-mock/commit/0212cb484b1f974fa5db42660622eeb5455d9178) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add `ctMock().getHandlers()` to return all msw handlers for initial setup
+
 ## 2.43.1
 
 ### Patch Changes
