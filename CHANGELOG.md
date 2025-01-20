@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.43.3
+
+### Patch Changes
+
+- [#270](https://github.com/labd/commercetools-node-mock/pull/270) [`9eccae3`](https://github.com/labd/commercetools-node-mock/commit/9eccae3644c6bde0c312c1625accd597a19f0efb) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove unused argument from `getHandlers()`
+
 ## 2.43.2
 
 ### Patch Changes
