@@ -197,11 +197,11 @@ export class CommercetoolsMock {
 	// allows you to manage msw server yourself and register the handlers needed
 	// for commercetools-mock to work.
 	public registerHandlers(server: SetupServerApi) {
-		const handlers = this.getHandlers(server);
+		const handlers = this.getHandlers();
 		server.use(...handlers);
 	}
 
-	public getHandlers(server: SetupServerApi) {
+	public getHandlers() {
 		const app = this.app;
 		return [
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
