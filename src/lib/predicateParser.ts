@@ -126,7 +126,10 @@ const getLexer = (value: string) =>
 
 		// Special case for UUID identifiers,
 		// since they otherwise would get matched as INT, when starting with a digit
-		.token("IDENTIFIER", /[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/)
+		.token(
+			"IDENTIFIER",
+			/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/,
+		)
 		.token("FLOAT", /\d+\.\d+/)
 		.token("INT", /\d+/)
 		.token("VARIABLE", /:([-_A-Za-z0-9]+)/)
@@ -476,8 +479,8 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 
 		throw new PredicateError(
 			`Unexpected end of input, expected SphereIdentifierChar, comparison ` +
-			`operator, not, in, contains, is, within or matches` +
-			` (line ${lines.length}, column ${column})`,
+				`operator, not, in, contains, is, within or matches` +
+				` (line ${lines.length}, column ${column})`,
 		);
 	}
 	return result;
