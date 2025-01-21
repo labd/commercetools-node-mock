@@ -13,12 +13,12 @@ describe("Predicate filter", () => {
 		nested: {
 			numberProperty: 1234,
 			objectProperty: {
-				stringProperty: "foobar",
-				booleanProperty: true,
+				"stringProperty": "foobar",
+				"booleanProperty": true,
 				"45c652f2-76e8-48fd-ab64-d11ad99d6631": {
 					stringProperty: "foobar",
 					uuidProperty: "3a57cc78-db08-4cd3-b778-d59b3326c435",
-				}
+				},
 			},
 			array: [
 				{
@@ -338,20 +338,28 @@ describe("Predicate filter", () => {
 
 	test("uuid as field name", async () => {
 		expect(
-			match(`nested(objectProperty(45c652f2-76e8-48fd-ab64-d11ad99d6631(stringProperty = "foobar")))`),
+			match(
+				`nested(objectProperty(45c652f2-76e8-48fd-ab64-d11ad99d6631(stringProperty = "foobar")))`,
+			),
 		).toBeTruthy();
 
 		expect(
-			match(`nested(objectProperty(3a57cc78-db08-4cd3-b778-d59b3326c435(stringProperty = "foobar")))`),
+			match(
+				`nested(objectProperty(3a57cc78-db08-4cd3-b778-d59b3326c435(stringProperty = "foobar")))`,
+			),
 		).toBeFalsy();
 	});
 
 	test("uuid as value", async () => {
 		expect(
-			match(`nested(objectProperty(45c652f2-76e8-48fd-ab64-d11ad99d6631(uuidProperty = "3a57cc78-db08-4cd3-b778-d59b3326c435")))`),
+			match(
+				`nested(objectProperty(45c652f2-76e8-48fd-ab64-d11ad99d6631(uuidProperty = "3a57cc78-db08-4cd3-b778-d59b3326c435")))`,
+			),
 		).toBeTruthy();
 		expect(
-			match(`nested(objectProperty(45c652f2-76e8-48fd-ab64-d11ad99d6631(uuidProperty = "45c652f2-76e8-48fd-ab64-d11ad99d6631")))`),
+			match(
+				`nested(objectProperty(45c652f2-76e8-48fd-ab64-d11ad99d6631(uuidProperty = "45c652f2-76e8-48fd-ab64-d11ad99d6631")))`,
+			),
 		).toBeFalsy();
 	});
 });
