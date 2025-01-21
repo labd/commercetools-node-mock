@@ -1,5 +1,47 @@
 ## 2.23.1
 
+## 2.43.3
+
+### Patch Changes
+
+- [#270](https://github.com/labd/commercetools-node-mock/pull/270) [`9eccae3`](https://github.com/labd/commercetools-node-mock/commit/9eccae3644c6bde0c312c1625accd597a19f0efb) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove unused argument from `getHandlers()`
+
+## 2.43.2
+
+### Patch Changes
+
+- [#268](https://github.com/labd/commercetools-node-mock/pull/268) [`0212cb4`](https://github.com/labd/commercetools-node-mock/commit/0212cb484b1f974fa5db42660622eeb5455d9178) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add `ctMock().getHandlers()` to return all msw handlers for initial setup
+
+## 2.43.1
+
+### Patch Changes
+
+- [#266](https://github.com/labd/commercetools-node-mock/pull/266) [`8d8e802`](https://github.com/labd/commercetools-node-mock/commit/8d8e802f8f8e829becb1b7f1d25020e6e2a2342f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove errornous console.error statemetn for concurrent modifications
+
+## 2.43.0
+
+### Minor Changes
+
+- [#263](https://github.com/labd/commercetools-node-mock/pull/263) [`55b0bfc`](https://github.com/labd/commercetools-node-mock/commit/55b0bfc56198247c9d96bcb2ed4ea14c40294d0a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add a `strict` boolean option to make the mock service strict and throw errors when certain values are missing
+
+- [#246](https://github.com/labd/commercetools-node-mock/pull/246) [`2774582`](https://github.com/labd/commercetools-node-mock/commit/27745827102d9278cf2c5ca04df1529d293a6b3d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add deprecation warning for `ctMock.add()`
+
+## 2.42.1
+
+### Patch Changes
+
+- [#261](https://github.com/labd/commercetools-node-mock/pull/261) [`d20c176`](https://github.com/labd/commercetools-node-mock/commit/d20c17699e97f6b04a57c4b26cd994b74374d29b) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added missing mutations for custom fields on associate roles, product selections and business units
+
+## 2.42.0
+
+### Minor Changes
+
+- [#259](https://github.com/labd/commercetools-node-mock/pull/259) [`a7166d7`](https://github.com/labd/commercetools-node-mock/commit/a7166d79fe315a9244daa17df648674ba9ce234f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Support as-associate endpoints for carts and orders
+
+### Patch Changes
+
+- [#257](https://github.com/labd/commercetools-node-mock/pull/257) [`36c79e2`](https://github.com/labd/commercetools-node-mock/commit/36c79e20acac4d8ab13397fc3ae3f653fe7da061) Thanks [@jsm1t](https://github.com/jsm1t)! - Allow setting associates to business unit, if its created without associates
+
 ## 2.41.1
 
 ### Patch Changes

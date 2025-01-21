@@ -5,23 +5,20 @@ import morgan from "morgan";
 import { http, HttpResponse } from "msw";
 import type { SetupServer, SetupServerApi } from "msw/node";
 import { setupServer } from "msw/node";
+import type { Config } from "./config";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants";
 import { CommercetoolsError } from "./exceptions";
+import { mapHeaderType } from "./helpers";
 import { copyHeaders } from "./lib/proxy";
 import { OAuth2Server } from "./oauth/server";
 import { ProjectAPI } from "./projectAPI";
-import type { AbstractStorage } from "./storage";
-import { InMemoryStorage } from "./storage";
-import type { Services } from "./types";
-
-// Services
-import { warnDeprecation } from "./deprecation";
-import { mapHeaderType } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import { createRepositories } from "./repositories";
 import type { ProjectRepository } from "./repositories/project";
 import { createServices } from "./services";
 import { ProjectService } from "./services/project";
+import type { AbstractStorage } from "./storage";
+import { InMemoryStorage } from "./storage";
 
 export type CommercetoolsMockOptions = {
 	validateCredentials: boolean;
@@ -30,6 +27,7 @@ export type CommercetoolsMockOptions = {
 	apiHost: RegExp | string;
 	authHost: RegExp | string;
 	silent: boolean;
+	strict: boolean;
 };
 
 type AppOptions = { silent?: boolean };
@@ -40,7 +38,8 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	defaultProjectKey: undefined,
 	apiHost: DEFAULT_API_HOSTNAME,
 	authHost: DEFAULT_AUTH_HOSTNAME,
-	silent: false,
+	silent: true,
+	strict: false,
 };
 
 const _globalListeners: SetupServer[] = [];
@@ -56,15 +55,12 @@ export class CommercetoolsMock {
 
 	private _mswServer: SetupServer | undefined = undefined;
 
-	private _services: Services | null;
-
 	private _repositories: RepositoryMap | null;
 
 	private _projectService?: ProjectService;
 
 	constructor(options: Partial<CommercetoolsMockOptions> = {}) {
 		this.options = { ...DEFAULT_OPTIONS, ...options };
-		this._services = null;
 		this._repositories = null;
 		this._projectService = undefined;
 
@@ -78,8 +74,9 @@ export class CommercetoolsMock {
 	}
 
 	start() {
-		warnDeprecation(
-			"The start method is deprecated, use .registerHandlers() to bind to an msw server instead",
+		process.emitWarning(
+			"The start() method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"DeprecationWarning",
 		);
 
 		// Order is important here when the hostnames match
@@ -88,8 +85,9 @@ export class CommercetoolsMock {
 	}
 
 	stop() {
-		warnDeprecation(
-			"The stop method is deprecated, use .registerHandlers() to bind to an msw server instead",
+		process.emitWarning(
+			"The stop() method is deprecated, use .registerHandlers() to bind to an msw server instead",
+			"DeprecationWarning",
 		);
 		this._mswServer?.close();
 		this._mswServer = undefined;
@@ -108,10 +106,15 @@ export class CommercetoolsMock {
 			throw new Error("repositories not initialized yet");
 		}
 
+		const config: Config = {
+			strict: this.options.strict,
+			storage: this._storage,
+		};
+
 		return new ProjectAPI(
 			projectKey || this.options.defaultProjectKey!,
 			this._repositories,
-			this._storage,
+			config,
 		);
 	}
 
@@ -127,7 +130,11 @@ export class CommercetoolsMock {
 	}
 
 	private createApp(options?: AppOptions): express.Express {
-		this._repositories = createRepositories(this._storage);
+		const config: Config = {
+			strict: this.options.strict,
+			storage: this._storage,
+		};
+		this._repositories = createRepositories(config);
 		this._oauth2.setCustomerRepository(this._repositories.customer);
 
 		const app = express();
@@ -154,7 +161,7 @@ export class CommercetoolsMock {
 		}
 
 		// Register the rest api services in the router
-		this._services = createServices(projectRouter, this._repositories);
+		createServices(projectRouter, this._repositories);
 		this._projectService = new ProjectService(
 			projectRouter,
 			this._repositories.project as ProjectRepository,
@@ -190,8 +197,13 @@ export class CommercetoolsMock {
 	// allows you to manage msw server yourself and register the handlers needed
 	// for commercetools-mock to work.
 	public registerHandlers(server: SetupServerApi) {
+		const handlers = this.getHandlers();
+		server.use(...handlers);
+	}
+
+	public getHandlers() {
 		const app = this.app;
-		server.use(
+		return [
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
 				const body = await request.text();
 				const url = new URL(request.url);
@@ -283,7 +295,7 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
-		);
+		];
 	}
 
 	public mswServer() {
@@ -296,7 +308,7 @@ export class CommercetoolsMock {
 			if (this._mswServer !== undefined) {
 				throw new Error("Server already started");
 			} else {
-				console.warn("Server wasn't stopped properly, clearing");
+				process.emitWarning("Server wasn't stopped properly, clearing");
 				_globalListeners.forEach((listener) => listener.close());
 			}
 		}

@@ -7,10 +7,6 @@ export const checkConcurrentModification = (
 	identifier: string,
 ) => {
 	if (currentVersion === expectedVersion) return;
-	console.error(
-		`Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`,
-	);
-
 	throw new CommercetoolsError<ConcurrentModificationError>(
 		{
 			message: `Object ${identifier} has a different version than expected. Expected: ${expectedVersion} - Actual: ${currentVersion}.`,

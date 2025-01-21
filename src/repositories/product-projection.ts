@@ -4,11 +4,11 @@ import type {
 	ProductProjection,
 	QueryParam,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { parseQueryExpression } from "../lib/predicateParser";
 import { applyPriceSelector } from "../priceSelector";
 import { ProductProjectionSearch } from "../product-projection-search";
-import { type AbstractStorage } from "../storage";
 import type { GetParams, RepositoryContext } from "./abstract";
 import { AbstractResourceRepository } from "./abstract";
 
@@ -32,9 +32,9 @@ export type ProductProjectionQueryParams = {
 export class ProductProjectionRepository extends AbstractResourceRepository<"product-projection"> {
 	protected _searchService: ProductProjectionSearch;
 
-	constructor(storage: AbstractStorage) {
-		super("product-projection", storage);
-		this._searchService = new ProductProjectionSearch(storage);
+	constructor(config: Config) {
+		super("product-projection", config);
+		this._searchService = new ProductProjectionSearch(config);
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): ProductProjection {

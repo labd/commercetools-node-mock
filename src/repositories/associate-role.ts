@@ -5,12 +5,13 @@ import type {
 	AssociateRoleDraft,
 	AssociateRoleRemovePermissionAction,
 	AssociateRoleSetCustomFieldAction,
+	AssociateRoleSetCustomTypeAction,
 	AssociateRoleSetNameAction,
 	AssociateRoleSetPermissionsAction,
 	AssociateRoleUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
 import {
@@ -21,8 +22,8 @@ import {
 import { createCustomFields } from "./helpers";
 
 export class AssociateRoleRepository extends AbstractResourceRepository<"associate-role"> {
-	constructor(storage: AbstractStorage) {
-		super("associate-role", storage);
+	constructor(config: Config) {
+		super("associate-role", config);
 		this.actions = new AssociateRoleUpdateHandler(this._storage);
 	}
 
@@ -104,6 +105,22 @@ class AssociateRoleUpdateHandler
 			delete resource.custom.fields[name];
 		} else {
 			resource.custom.fields[name] = value;
+		}
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<AssociateRole>,
+		{ type, fields }: AssociateRoleSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
 		}
 	}
 

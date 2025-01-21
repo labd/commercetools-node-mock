@@ -2,13 +2,13 @@ import type {
 	ProductTailoring,
 	ProductTailoringUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "~src/storage";
+import type { Config } from "~src/config";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 
 export class ProductTailoringRepository extends AbstractResourceRepository<"product-tailoring"> {
-	constructor(storage: AbstractStorage) {
-		super("product-tailoring", storage);
+	constructor(config: Config) {
+		super("product-tailoring", config);
 		this.actions = new ProductTailoringUpdateHandler(this._storage);
 	}
 

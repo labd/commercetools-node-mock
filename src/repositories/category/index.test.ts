@@ -1,10 +1,12 @@
 import { describe, expect, test } from "vitest";
+import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
 import { CategoryRepository } from "./index";
 
 describe("Order repository", () => {
 	const storage = new InMemoryStorage();
-	const repository = new CategoryRepository(storage);
+	const config: Config = { storage, strict: false };
+	const repository = new CategoryRepository(config);
 
 	test("valid ancestors", async () => {
 		const root = repository.create(

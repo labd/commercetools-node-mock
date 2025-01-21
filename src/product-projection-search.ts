@@ -9,6 +9,7 @@ import type {
 	RangeFacetResult,
 	TermFacetResult,
 } from "@commercetools/platform-sdk";
+import type { Config } from "./config";
 import { CommercetoolsError } from "./exceptions";
 import { nestedLookup } from "./helpers";
 import type {
@@ -51,8 +52,8 @@ export type ProductProjectionSearchParams = {
 export class ProductProjectionSearch {
 	protected _storage: AbstractStorage;
 
-	constructor(storage: AbstractStorage) {
-		this._storage = storage;
+	constructor(config: Config) {
+		this._storage = config.storage;
 	}
 
 	search(

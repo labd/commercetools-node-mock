@@ -8,16 +8,16 @@ import type {
 	ZoneSetKeyAction,
 	ZoneUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 
 export class ZoneRepository extends AbstractResourceRepository<"zone"> {
-	constructor(storage: AbstractStorage) {
-		super("zone", storage);
-		this.actions = new ZoneUpdateHandler(storage);
+	constructor(config: Config) {
+		super("zone", config);
+		this.actions = new ZoneUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: ZoneDraft): Zone {

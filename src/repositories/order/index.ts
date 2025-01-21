@@ -14,9 +14,9 @@ import type {
 	ProductVariant,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository, type QueryParams } from "../abstract";
 import {
@@ -30,9 +30,9 @@ import {
 import { OrderUpdateHandler } from "./actions";
 
 export class OrderRepository extends AbstractResourceRepository<"order"> {
-	constructor(storage: AbstractStorage) {
-		super("order", storage);
-		this.actions = new OrderUpdateHandler(storage);
+	constructor(config: Config) {
+		super("order", config);
+		this.actions = new OrderUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: OrderFromCartDraft): Order {

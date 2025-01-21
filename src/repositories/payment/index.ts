@@ -3,8 +3,8 @@ import type {
 	PaymentDraft,
 	StateReference,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
-import type { AbstractStorage } from "~src/storage/abstract";
 import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import {
@@ -16,8 +16,8 @@ import { PaymentUpdateHandler } from "./actions";
 import { transactionFromTransactionDraft } from "./helpers";
 
 export class PaymentRepository extends AbstractResourceRepository<"payment"> {
-	constructor(storage: AbstractStorage) {
-		super("payment", storage);
+	constructor(config: Config) {
+		super("payment", config);
 		this.actions = new PaymentUpdateHandler(this._storage);
 	}
 

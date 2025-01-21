@@ -13,17 +13,17 @@ import type {
 	StateSetTransitionsAction,
 	StateUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 import { getReferenceFromResourceIdentifier } from "./helpers";
 
 export class StateRepository extends AbstractResourceRepository<"state"> {
-	constructor(storage: AbstractStorage) {
-		super("state", storage);
-		this.actions = new StateUpdateHandler(storage);
+	constructor(config: Config) {
+		super("state", config);
+		this.actions = new StateUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: StateDraft): State {

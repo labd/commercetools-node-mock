@@ -2,6 +2,7 @@ import type {
 	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
+	BusinessUnitSetCustomTypeAction,
 	BusinessUnitUpdateAction,
 	CompanyDraft,
 	DivisionDraft,
@@ -22,7 +23,7 @@ import {
 	type Company,
 	type Division,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "~src/storage";
+import type { Config } from "~src/config";
 import { generateRandomString, getBaseResourceProperties } from "../helpers";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
@@ -40,8 +41,8 @@ import {
 } from "./helpers";
 
 export class BusinessUnitRepository extends AbstractResourceRepository<"business-unit"> {
-	constructor(storage: AbstractStorage) {
-		super("business-unit", storage);
+	constructor(config: Config) {
+		super("business-unit", config);
 		this.actions = new BusinessUnitUpdateHandler(this._storage);
 	}
 
@@ -91,9 +92,10 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			associateMode: draft.associateMode,
 			approvalRuleMode: draft.approvalRuleMode,
 
-			associates: draft.associates?.map((a) =>
-				createAssociate(a, context.projectKey, this._storage),
-			),
+			associates:
+				draft.associates?.map((a) =>
+					createAssociate(a, context.projectKey, this._storage),
+				) ?? [],
 		};
 
 		if (this._isDivisionDraft(draft)) {
@@ -257,6 +259,22 @@ class BusinessUnitUpdateHandler
 		{ contactEmail }: BusinessUnitSetContactEmailAction,
 	) {
 		resource.contactEmail = contactEmail;
+	}
+
+	setCustomType(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ type, fields }: BusinessUnitSetCustomTypeAction,
+	) {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
 	}
 
 	setStoreMode(

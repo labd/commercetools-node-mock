@@ -18,16 +18,16 @@ import type {
 	ProductDiscountValueExternal,
 	ProductDiscountValueRelative,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 import { createTypedMoney } from "./helpers";
 
 export class ProductDiscountRepository extends AbstractResourceRepository<"product-discount"> {
-	constructor(storage: AbstractStorage) {
-		super("product-discount", storage);
+	constructor(config: Config) {
+		super("product-discount", config);
 		this.actions = new ProductDiscountUpdateHandler(this._storage);
 	}
 

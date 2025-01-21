@@ -7,8 +7,8 @@ import type {
 	AttributeGroupSetKeyAction,
 	AttributeGroupUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { UpdateHandlerInterface } from "./abstract";
 import {
@@ -18,8 +18,8 @@ import {
 } from "./abstract";
 
 export class AttributeGroupRepository extends AbstractResourceRepository<"attribute-group"> {
-	constructor(storage: AbstractStorage) {
-		super("attribute-group", storage);
+	constructor(config: Config) {
+		super("attribute-group", config);
 		this.actions = new AttributeGroupUpdateHandler(this._storage);
 	}
 

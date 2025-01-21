@@ -5,17 +5,17 @@ import type {
 	SubscriptionSetKeyAction,
 	SubscriptionUpdateAction,
 } from "@commercetools/platform-sdk";
+import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "../helpers";
-import type { AbstractStorage } from "../storage/abstract";
 import type { Writable } from "../types";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
 import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
 
 export class SubscriptionRepository extends AbstractResourceRepository<"subscription"> {
-	constructor(storage: AbstractStorage) {
-		super("subscription", storage);
-		this.actions = new SubscriptionUpdateHandler(storage);
+	constructor(config: Config) {
+		super("subscription", config);
+		this.actions = new SubscriptionUpdateHandler(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: SubscriptionDraft): Subscription {

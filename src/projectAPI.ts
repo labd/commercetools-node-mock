@@ -1,3 +1,4 @@
+import type { Config } from "./config";
 import { getBaseResourceProperties } from "./helpers";
 import type { RepositoryMap } from "./repositories";
 import type { GetParams } from "./repositories/abstract";
@@ -11,17 +12,28 @@ export class ProjectAPI {
 
 	private _repositories: RepositoryMap;
 
-	constructor(
-		projectKey: string,
-		repositories: RepositoryMap,
-		storage: AbstractStorage,
-	) {
+	private config: Config;
+
+	constructor(projectKey: string, repositories: RepositoryMap, config: Config) {
 		this.projectKey = projectKey;
-		this._storage = storage;
+		this.config = config;
+		this._storage = config.storage;
 		this._repositories = repositories;
 	}
 
 	add<T extends keyof RepositoryMap & keyof ResourceMap>(
+		typeId: T,
+		resource: ResourceMap[T],
+	) {
+		process.emitWarning(
+			"ctMock.add() is deprecated, create resources via regular create endpoints " +
+				"or if you are really sure, use unsafeAdd() (but be aware of potential state issues)",
+			"DeprecationWarning",
+		);
+		this.unsafeAdd(typeId, resource);
+	}
+
+	unsafeAdd<T extends keyof RepositoryMap & keyof ResourceMap>(
 		typeId: T,
 		resource: ResourceMap[T],
 	) {

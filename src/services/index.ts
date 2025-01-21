@@ -1,4 +1,5 @@
 import type { createRepositories } from "../repositories";
+import { AsAssociateService } from "./as-associate";
 import { AssociateRoleServices } from "./associate-roles";
 import { AttributeGroupService } from "./attribute-group";
 import { BusinessUnitServices } from "./business-units";
@@ -41,6 +42,7 @@ export const createServices = (
 	repos: ReturnType<typeof createRepositories>,
 ) => ({
 	"associate-role": new AssociateRoleServices(router, repos["associate-role"]),
+	"as-associate": new AsAssociateService(router, repos["as-associate"]),
 	"business-unit": new BusinessUnitServices(router, repos["business-unit"]),
 	"category": new CategoryServices(router, repos["category"]),
 	"cart": new CartService(router, repos["cart"], repos["order"]),
