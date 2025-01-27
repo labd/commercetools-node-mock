@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.44.0
+
+### Minor Changes
+
+- [#273](https://github.com/labd/commercetools-node-mock/pull/273) [`44de8b7`](https://github.com/labd/commercetools-node-mock/commit/44de8b788d278facdd4a36d0a6afc2f8f497f042) Thanks [@Swendude](https://github.com/Swendude)! - Add support for key field in addLineItem actions
+
 ## 2.43.3
 
 ### Patch Changes
