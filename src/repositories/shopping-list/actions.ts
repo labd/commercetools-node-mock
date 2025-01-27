@@ -39,6 +39,7 @@ export class ShoppingListUpdateHandler
 			sku,
 			quantity = 1,
 			addedAt,
+			key,
 		}: ShoppingListAddLineItemAction,
 	) {
 		let product: Product | null = null;
@@ -95,6 +96,7 @@ export class ShoppingListUpdateHandler
 			resource.lineItems.push({
 				addedAt: addedAt ? addedAt : new Date().toISOString(),
 				id: uuidv4(),
+				key,
 				productId: product.id,
 				productSlug: product.masterData.current.slug,
 				productType: product.productType,

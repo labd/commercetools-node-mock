@@ -234,6 +234,30 @@ describe("Shopping List Update Actions", () => {
 		expect(response.body.message).toBe("A product with ID '123' not found.");
 	});
 
+	test("addLineItem by productID", async () => {
+		ctMock.clear();
+		ctMock.project().add("product", product);
+		ctMock.project().add("shopping-list", { ...shoppingList, lineItems: [] });
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/shopping-lists/${shoppingList.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addLineItem",
+						productId: product.id,
+						key: "my-key",
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.lineItems).toHaveLength(1);
+		expect(response.body.lineItems[0].key).toBeDefined();
+		expect(response.body.lineItems[0].key).toEqual("my-key");
+	});
+
 	test("removeLineItem", async () => {
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/shopping-lists/${shoppingList.id}`)
