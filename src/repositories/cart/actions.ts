@@ -92,6 +92,7 @@ export class CartUpdateHandler
 			custom,
 			quantity = 1,
 			addedAt,
+			key,
 		}: CartAddLineItemAction,
 	) {
 		let product: Product | null = null;
@@ -176,6 +177,7 @@ export class CartUpdateHandler
 			}
 			resource.lineItems.push({
 				id: uuidv4(),
+				key,
 				addedAt: addedAt ? addedAt : new Date().toISOString(),
 				productId: product.id,
 				productKey: product.key,
