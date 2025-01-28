@@ -24,6 +24,7 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 	create(context: RepositoryContext, draft: PaymentDraft): Payment {
 		const resource: Payment = {
 			...getBaseResourceProperties(),
+			key: draft.key,
 			amountPlanned: createCentPrecisionMoney(draft.amountPlanned),
 			paymentMethodInfo: draft.paymentMethodInfo!,
 			paymentStatus: draft.paymentStatus
