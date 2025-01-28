@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.45.0
+
+### Minor Changes
+
+- [#275](https://github.com/labd/commercetools-node-mock/pull/275) [`66846fb`](https://github.com/labd/commercetools-node-mock/commit/66846fb9663ad7cd00139f7c848b30964501e971) Thanks [@jsm1t](https://github.com/jsm1t)! - Add support for adding a key when creating a payment
+
 ## 2.44.0
 
 ### Minor Changes
