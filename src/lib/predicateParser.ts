@@ -124,6 +124,12 @@ const getLexer = (value: string) =>
 		.token("IS", /is(?![-_a-z0-9]+)/i)
 		.token("DEFINED", /defined(?![-_a-z0-9]+)/i)
 
+		// Special case for UUID identifiers,
+		// since they otherwise would get matched as INT, when starting with a digit
+		.token(
+			"IDENTIFIER",
+			/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/,
+		)
 		.token("FLOAT", /\d+\.\d+/)
 		.token("INT", /\d+/)
 		.token("VARIABLE", /:([-_A-Za-z0-9]+)/)
