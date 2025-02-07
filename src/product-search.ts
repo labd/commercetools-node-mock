@@ -13,6 +13,12 @@ import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
 import { applyPriceSelector } from "./priceSelector";
 import type { AbstractStorage } from "./storage";
 
+interface ProductVariantAvailability {
+	isOnStock: boolean;
+	availableQuantity: number;
+	isOnStockForChannel: string | undefined
+}
+
 export class ProductSearch {
 	protected _storage: AbstractStorage;
 
@@ -24,10 +30,24 @@ export class ProductSearch {
 		projectKey: string,
 		params: ProductSearchRequest,
 	): ProductPagedSearchResponse {
-		let resources = this._storage
+		const availabilityBySku = this._storage.all(projectKey, "inventory-entry").reduce((acc, entry) => {
+			const existingEntry = acc.get(entry.sku);
+
+			acc.set(entry.sku, {
+				isOnStock: existingEntry?.isOnStock || entry.quantityOnStock > 0,
+				availableQuantity: existingEntry?.availableQuantity ?? 0 + entry.quantityOnStock,
+				// isOnStockForChannel: (existingEntry?.isOnStockForChannel ?? []).concat(entry.supplyChannel?.id ?? [])
+				// TODO: this approach doesn't make it possible to support multiple channels per product
+				isOnStockForChannel: existingEntry?.isOnStockForChannel ?? entry.supplyChannel?.id
+			});
+
+			return acc;
+		}, new Map<string, ProductVariantAvailability>());
+
+		let productResources = this._storage
 			.all(projectKey, "product")
 			.map((r) =>
-				this.transform(r, params.productProjectionParameters?.staged ?? false),
+				this.transformProduct(r, params.productProjectionParameters?.staged ?? false, availabilityBySku),
 			)
 			.filter((p) => {
 				if (!(params.productProjectionParameters?.staged ?? false)) {
@@ -46,7 +66,7 @@ export class ProductSearch {
 				const matchFunc = parseSearchQuery(params.query);
 
 				// Filters can modify the output. So clone the resources first.
-				resources = resources.filter((resource) =>
+				productResources = productResources.filter((resource) =>
 					matchFunc(resource, markMatchingVariant),
 				);
 			} catch (err) {
@@ -63,7 +83,7 @@ export class ProductSearch {
 
 		// Apply the priceSelector
 		if (params.productProjectionParameters) {
-			applyPriceSelector(resources, {
+			applyPriceSelector(productResources, {
 				country: params.productProjectionParameters.priceCountry,
 				channel: params.productProjectionParameters.priceChannel,
 				customerGroup: params.productProjectionParameters.priceCustomerGroup,
@@ -76,7 +96,7 @@ export class ProductSearch {
 
 		const offset = params.offset || 0;
 		const limit = params.limit || 20;
-		const productProjectionsResult = resources.slice(offset, offset + limit);
+		const productProjectionsResult = productResources.slice(offset, offset + limit);
 
 		/**
 		 * Do not supply productProjection if productProjectionParameters are not given
@@ -100,7 +120,7 @@ export class ProductSearch {
 		);
 
 		return {
-			total: resources.length,
+			total: productResources.length,
 			offset: offset,
 			limit: limit,
 			results: results,
@@ -108,7 +128,7 @@ export class ProductSearch {
 		};
 	}
 
-	transform(product: Product, staged: boolean): ProductProjection {
+	transformProduct(product: Product, staged: boolean, availabilityBySku: Map<string, ProductVariantAvailability>): ProductProjection {
 		const obj = !staged
 			? product.masterData.current
 			: product.masterData.staged;
@@ -125,7 +145,10 @@ export class ProductSearch {
 			slug: obj.slug,
 			categories: obj.categories,
 			masterVariant: obj.masterVariant,
-			variants: obj.variants,
+			variants: obj.variants.map((variant) => ({
+				...variant,
+				availability: variant.sku ? availabilityBySku.get(variant.sku) : { isOnStock: false, availableQuantity: 0, isOnStockForChannel: [] },
+			})),
 			productType: product.productType,
 			hasStagedChanges: product.masterData.hasStagedChanges,
 			published: product.masterData.published,

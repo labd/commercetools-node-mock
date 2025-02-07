@@ -2,6 +2,7 @@ import type {
 	Category,
 	CategoryDraft,
 	Image,
+	InventoryEntryDraft,
 	PriceDraft,
 	Product,
 	ProductData,
@@ -105,6 +106,16 @@ const productPriceTypeDraft: TypeDraft = {
 			inputHint: "SingleLine",
 		},
 	],
+};
+
+const inventoryEntryDraft: InventoryEntryDraft = {
+	key: "1338_stock",
+	sku: '1338',
+	quantityOnStock: 10,
+	supplyChannel: {
+		typeId: "channel",
+		id: "dummy-inventory-channel",
+	}
 };
 
 const publishedProductDraft: ProductDraft = {
@@ -344,6 +355,11 @@ async function beforeAllProductTests(mock: CommercetoolsMock) {
 		.send(productPriceTypeDraft);
 	expect(response.status).toBe(201);
 	productPriceType = response.body;
+
+	response = await supertest(mock.app)
+		.post("/dummy/inventory")
+		.send(inventoryEntryDraft);
+	expect(response.status).toBe(201);
 }
 
 describe("Product", () => {
@@ -1558,6 +1574,38 @@ describe("Product update actions", () => {
 				);
 				expect(productFound).toBeUndefined();
 			}
+		});
+
+		test("Filter on inventory", async () => {
+			const body: ProductSearchRequest = {
+				query: {
+					exact: {
+						field: "variants.availability.isOnStockForChannel",
+						value: "dummy-inventory-channel",
+					},
+				},
+				productProjectionParameters: {
+					storeProjection: "dummy-store",
+					localeProjection: ["en-US"],
+					priceCurrency: "EUR",
+					priceChannel: "dummy-channel",
+				},
+				// TODO: the beforeEach creates 24 products
+				limit: 1,
+			};
+
+			const response = await supertest(ctMock.app)
+				.post("/dummy/products/search")
+				.send(body);
+
+			const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+
+			expect(pagedSearchResponse.results.length).toBe(1);
+
+			const productFound = pagedSearchResponse.results.find(
+				(result) => result?.productProjection?.masterVariant?.sku === "1337",
+			);
+			expect(productFound).toBeDefined();
 		});
 	});
 });
