@@ -21,7 +21,14 @@ import type {
 } from "@commercetools/platform-sdk";
 import assert from "assert";
 import supertest from "supertest";
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	test,
+} from "vitest";
 import { CommercetoolsMock } from "../index";
 
 const productTypeDraft: ProductTypeDraft = {
@@ -110,12 +117,12 @@ const productPriceTypeDraft: TypeDraft = {
 
 const inventoryEntryDraft: InventoryEntryDraft = {
 	key: "1338_stock",
-	sku: '1338',
+	sku: "1338",
 	quantityOnStock: 10,
 	supplyChannel: {
 		typeId: "channel",
 		id: "dummy-inventory-channel",
-	}
+	},
 };
 
 const publishedProductDraft: ProductDraft = {
