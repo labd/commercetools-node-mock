@@ -36,8 +36,8 @@ export class ProductSearch {
 			acc.set(entry.sku, {
 				isOnStock: existingEntry?.isOnStock || entry.quantityOnStock > 0,
 				availableQuantity: existingEntry?.availableQuantity ?? 0 + entry.quantityOnStock,
-				// isOnStockForChannel: (existingEntry?.isOnStockForChannel ?? []).concat(entry.supplyChannel?.id ?? [])
-				// TODO: this approach doesn't make it possible to support multiple channels per product
+				// NOTE: This doesn't handle inventory entries for multiple channels,
+				// so it doesn't exactly replicate the behavior of the commercetools api.
 				isOnStockForChannel: existingEntry?.isOnStockForChannel ?? entry.supplyChannel?.id
 			});
 
