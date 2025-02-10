@@ -13,7 +13,7 @@ import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
 import { applyPriceSelector } from "./priceSelector";
 import type { AbstractStorage } from "./storage";
 
-interface ProductVariantAvailability {
+interface ProductSearchVariantAvailability {
 	isOnStock: boolean;
 	availableQuantity: number;
 	isOnStockForChannel: string | undefined
@@ -42,7 +42,7 @@ export class ProductSearch {
 			});
 
 			return acc;
-		}, new Map<string, ProductVariantAvailability>());
+		}, new Map<string, ProductSearchVariantAvailability>());
 
 		let productResources = this._storage
 			.all(projectKey, "product")
@@ -128,7 +128,7 @@ export class ProductSearch {
 		};
 	}
 
-	transformProduct(product: Product, staged: boolean, availabilityBySku: Map<string, ProductVariantAvailability>): ProductProjection {
+	transformProduct(product: Product, staged: boolean, availabilityBySku: Map<string, ProductSearchVariantAvailability>): ProductProjection {
 		const obj = !staged
 			? product.masterData.current
 			: product.masterData.staged;
