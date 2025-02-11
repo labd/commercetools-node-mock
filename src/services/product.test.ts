@@ -115,16 +115,6 @@ const productPriceTypeDraft: TypeDraft = {
 	],
 };
 
-const inventoryEntryDraft: InventoryEntryDraft = {
-	key: "1338_stock",
-	sku: "1338",
-	quantityOnStock: 10,
-	supplyChannel: {
-		typeId: "channel",
-		id: "dummy-inventory-channel",
-	},
-};
-
 const publishedProductDraft: ProductDraft = {
 	name: {
 		"nl-NL": "test published product",
@@ -362,11 +352,6 @@ async function beforeAllProductTests(mock: CommercetoolsMock) {
 		.send(productPriceTypeDraft);
 	expect(response.status).toBe(201);
 	productPriceType = response.body;
-
-	response = await supertest(mock.app)
-		.post("/dummy/inventory")
-		.send(inventoryEntryDraft);
-	expect(response.status).toBe(201);
 }
 
 describe("Product", () => {
@@ -1521,6 +1506,22 @@ describe("Product update actions", () => {
 describe("Product Search - Generic", () => {
 	const ctMock = new CommercetoolsMock();
 
+	async function addInventoryEntry(sku: string, quantity: number) {
+		const inventoryEntryDraft: InventoryEntryDraft = {
+			key: `${sku}_stock`,
+			sku,
+			quantityOnStock: quantity,
+			supplyChannel: {
+				typeId: "channel",
+				id: "dummy-inventory-channel",
+			},
+		};
+
+		await supertest(ctMock.app)
+			.post("/dummy/inventory")
+			.send(inventoryEntryDraft);
+	}
+
 	beforeAll(async () => {
 		await beforeAllProductTests(ctMock);
 
@@ -1619,15 +1620,23 @@ describe("Product Search - Generic", () => {
 			limit: 1,
 		};
 
-		const response = await supertest(ctMock.app)
+		const response1 = await supertest(ctMock.app)
 			.post("/dummy/products/search")
 			.send(body);
 
-		const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+		const pagedSearchResponse1: ProductPagedSearchResponse = response1.body;
 
-		expect(pagedSearchResponse.results.length).toBe(1);
+		expect(pagedSearchResponse1.results.length).toBe(0);
 
-		const productFound = pagedSearchResponse.results.find(
+		await addInventoryEntry(publishedProductDraft.variants?.[0]?.sku as string, 10);
+
+		const response2 = await supertest(ctMock.app)
+			.post("/dummy/products/search")
+			.send(body);
+
+		const pagedSearchResponse2: ProductPagedSearchResponse = response2.body;
+
+		const productFound = pagedSearchResponse2.results.find(
 			(result) => result?.productProjection?.masterVariant?.sku === "1337",
 		);
 		expect(productFound).toBeDefined();
