@@ -1,4 +1,6 @@
 import type {
+	Asset,
+	AssetDraft,
 	ChannelReference,
 	Price,
 	PriceDraft,
@@ -13,6 +15,7 @@ import type { AbstractStorage } from "~src/storage";
 import type { Writable } from "~src/types";
 import type { RepositoryContext } from "../abstract";
 import {
+	createCustomFields,
 	createTypedMoney,
 	getReferenceFromResourceIdentifier,
 } from "../helpers";
@@ -75,9 +78,22 @@ export const variantFromDraft = (
 	key: variant?.key,
 	attributes: variant?.attributes ?? [],
 	prices: variant?.prices?.map((p) => priceFromDraft(context, storage, p)),
-	assets: [],
-	images: [],
+	assets: variant.assets?.map((a) => assetFromDraft(context, storage, a)) ?? [],
+	images: variant.images ?? [],
 });
+
+export const assetFromDraft = (
+	context: RepositoryContext,
+	storage: AbstractStorage,
+	draft: AssetDraft,
+): Asset => {
+	const asset: Asset = {
+		...draft,
+		id: uuidv4(),
+		custom: createCustomFields(draft.custom, context.projectKey, storage),
+	};
+	return asset;
+};
 
 export const priceFromDraft = (
 	context: RepositoryContext,
