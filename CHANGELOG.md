@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.45.1
+
+### Patch Changes
+
+- [`7ee6729`](https://github.com/labd/commercetools-node-mock/commit/7ee6729eb9700f6810e8f249d962b83ca27b58bb) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Support product images and assets creation
+
 ## 2.45.0
 
 ### Minor Changes
