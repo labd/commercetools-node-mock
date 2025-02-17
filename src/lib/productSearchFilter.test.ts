@@ -138,6 +138,24 @@ describe("Product search filter", () => {
 				},
 			}).isMatch,
 		).toBeTruthy();
+
+		expect(
+			match({
+				exact: {
+					field: "variants.sku",
+					values: ["MYSKU", "OTHER"],
+				},
+			}).isMatch,
+		).toBeTruthy();
+
+		expect(
+			match({
+				exact: {
+					field: "variants.sku",
+					values: ["OTHER"],
+				},
+			}).isMatch,
+		).toBeFalsy();
 	});
 
 	test("by attribute value", async () => {

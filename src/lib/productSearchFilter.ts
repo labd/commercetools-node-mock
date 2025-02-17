@@ -98,6 +98,13 @@ export const parseSearchQuery = (
 	}
 
 	if (isSearchExactExpression(searchQuery)) {
+		if (Array.isArray(searchQuery.exact.values)) {
+			return generateFieldMatchFunc(
+				(value: any) => (searchQuery.exact.values ?? []).includes(value),
+				searchQuery.exact,
+			);
+		}
+
 		return generateFieldMatchFunc(
 			(value: any) => value === searchQuery.exact.value,
 			searchQuery.exact,
