@@ -1,5 +1,17 @@
 ## 2.23.1
 
+## 2.46.0
+
+### Minor Changes
+
+- [#277](https://github.com/labd/commercetools-node-mock/pull/277) [`3e41eaf`](https://github.com/labd/commercetools-node-mock/commit/3e41eaf135f84d7b3d2c76bbc5aa5fd5119a6c6d) Thanks [@jsm1t](https://github.com/jsm1t)! - Add support for availability querying in product search
+
+### Patch Changes
+
+- [#272](https://github.com/labd/commercetools-node-mock/pull/272) [`6a3b6ed`](https://github.com/labd/commercetools-node-mock/commit/6a3b6edb765bce0cf8139455eaa032629c78e57b) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix predicate parser identifying uuid property key as int
+
+- [#279](https://github.com/labd/commercetools-node-mock/pull/279) [`3e606b8`](https://github.com/labd/commercetools-node-mock/commit/3e606b8de3c10381558a99e4416c49e6ecd879e1) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Support setting `customerID` when creating a cart
+
 ## 2.45.1
 
 ### Patch Changes
