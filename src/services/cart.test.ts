@@ -13,6 +13,7 @@ import type {
 import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { customerDraftFactory } from "~src/testing/customer";
 import { CommercetoolsMock } from "../index";
 
 describe("Carts Query", () => {
@@ -80,6 +81,30 @@ describe("Carts Query", () => {
 		expect(myCart.custom?.type.id).not.toBeUndefined();
 		expect(myCart.custom?.type.id).toBe(myCart.custom?.type.obj?.id);
 		expect(myCart.custom?.type.obj?.description?.en).toBe("Test Type");
+	});
+
+	test("throw error when anonymousId and customerId are given", async () => {
+		const customerId = "400be09e-bfe8-4925-a307-4ef6280b063e";
+		const anonymousId = "a99f27d1-7e7e-4592-8d5a-aa5da1adfe24";
+		const response = await supertest(ctMock.app).post("/dummy/carts").send({
+			currency: "EUR",
+			anonymousId,
+			customerId,
+		});
+		expect(response.status).toBe(400);
+		expect(response.body.message).toBe(
+			"Can set only one of customer OR anonymousId",
+		);
+	});
+
+	test("create cart with existing customer", async () => {
+		const customer = await customerDraftFactory(ctMock).create();
+		const response = await supertest(ctMock.app).post("/dummy/carts").send({
+			currency: "EUR",
+			customerId: customer.id,
+		});
+		expect(response.status).toBe(201);
+		expect(response.body.customerId).toBe(customer.id);
 	});
 });
 

@@ -4,52 +4,13 @@ import type {
 	CustomerToken,
 } from "@commercetools/platform-sdk";
 import assert from "assert";
-import { Factory } from "fishery";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { hashPassword } from "~src/lib/password";
+import { customerDraftFactory } from "~src/testing/customer";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index";
 
 const ctMock = new CommercetoolsMock();
-
-const customerDraftFactory = Factory.define<
-	CustomerDraft,
-	CustomerDraft,
-	Customer
->(({ onCreate }) => {
-	onCreate(async (draft) => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers`)
-			.send(draft);
-
-		return response.body.customer;
-	});
-
-	return {
-		email: "customer@example.com",
-		firstName: "John",
-		lastName: "Doe",
-		locale: "nl-NL",
-		password: "my-secret-pw",
-		addresses: [
-			{
-				firstName: "John",
-				lastName: "Doe",
-				streetName: "Street name",
-				streetNumber: "42",
-				postalCode: "1234 AB",
-				city: "Utrecht",
-				country: "NL",
-				company: "Lab Digital",
-				phone: "+31612345678",
-				email: "customer@example.com",
-			},
-		],
-		isEmailVerified: false,
-		stores: [],
-		authenticationMode: "Password",
-	};
-});
 
 afterEach(() => {
 	ctMock.clear();
@@ -57,7 +18,7 @@ afterEach(() => {
 
 describe("Customer create", () => {
 	test("create new customer", async () => {
-		const draft = customerDraftFactory.build();
+		const draft = customerDraftFactory(ctMock).build();
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers`)
@@ -109,7 +70,7 @@ describe("Customer create", () => {
 
 describe("Customer Update Actions", () => {
 	test("addAddress", async () => {
-		const customer = await customerDraftFactory.create();
+		const customer = await customerDraftFactory(ctMock).create();
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
 			.send({
@@ -134,7 +95,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("removeAddress by ID", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -165,7 +126,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("removeAddress by Key", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -196,7 +157,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("changeAddress by ID", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -248,7 +209,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("addBillingAddressId", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -280,7 +241,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("removeBillingAddressId", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -318,7 +279,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("setDefaultBillingAddress by ID", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			defaultBillingAddress: undefined,
 			defaultShippingAddress: undefined,
 			addresses: [
@@ -356,7 +317,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("addShippingAddressId", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -387,7 +348,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("removeShippingAddressId", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			addresses: [
 				{
 					key: "address-key",
@@ -425,7 +386,7 @@ describe("Customer Update Actions", () => {
 	});
 
 	test("setDefaultShippingAddress by ID", async () => {
-		const customer = await customerDraftFactory.create({
+		const customer = await customerDraftFactory(ctMock).create({
 			defaultBillingAddress: undefined,
 			defaultShippingAddress: undefined,
 			addresses: [

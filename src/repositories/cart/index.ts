@@ -1,3 +1,4 @@
+import type { InvalidOperationError } from "@commercetools/platform-sdk";
 import {
 	type Cart,
 	type CartDraft,
@@ -27,6 +28,21 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 	}
 
 	create(context: RepositoryContext, draft: CartDraft): Cart {
+		if (draft.anonymousId && draft.customerId) {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Can set only one of customer OR anonymousId",
+			});
+		}
+
+		// Validate that the customer exists
+		if (draft.customerId) {
+			this._storage.getByResourceIdentifier(context.projectKey, {
+				typeId: "customer",
+				id: draft.customerId,
+			});
+		}
+
 		const lineItems =
 			draft.lineItems?.map((draftLineItem) =>
 				this.draftLineItemtoLineItem(
@@ -45,6 +61,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				: undefined,
 			cartState: "Active",
 			country: draft.country,
+			customerId: draft.customerId,
 			customerEmail: draft.customerEmail,
 			customLineItems: [],
 			directDiscounts: [],
