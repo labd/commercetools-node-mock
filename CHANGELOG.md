@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.47.0
+
+### Minor Changes
+
+- [#281](https://github.com/labd/commercetools-node-mock/pull/281) [`c38c5f3`](https://github.com/labd/commercetools-node-mock/commit/c38c5f3e5b7e55d19757fbad897a067b576ec93c) Thanks [@jsm1t](https://github.com/jsm1t)! - Product search - add support for values in exact query
+
 ## 2.46.0
 
 ### Minor Changes
