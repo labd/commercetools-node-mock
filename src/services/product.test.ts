@@ -1628,7 +1628,10 @@ describe("Product Search - Generic", () => {
 
 		expect(pagedSearchResponse1.results.length).toBe(0);
 
-		await addInventoryEntry(publishedProductDraft.variants?.[0]?.sku as string, 10);
+		await addInventoryEntry(
+			publishedProductDraft.variants?.[0]?.sku as string,
+			10,
+		);
 
 		const response2 = await supertest(ctMock.app)
 			.post("/dummy/products/search")
