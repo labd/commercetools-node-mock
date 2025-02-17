@@ -13,6 +13,7 @@ import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import {
 	createCustomFields,
+	getBusinessUnitKeyReference,
 	getReferenceFromResourceIdentifier,
 	getStoreKeyReference,
 } from "../helpers";
@@ -49,6 +50,13 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 				: undefined,
 			store: draft.store
 				? getStoreKeyReference(draft.store, context.projectKey, this._storage)
+				: undefined,
+			businessUnit: draft.businessUnit
+				? getBusinessUnitKeyReference(
+						draft.businessUnit,
+						context.projectKey,
+						this._storage,
+					)
 				: undefined,
 		};
 		return this.saveNew(context, resource);
