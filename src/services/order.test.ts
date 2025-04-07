@@ -1,5 +1,5 @@
+import assert from "node:assert";
 import type { Order, Payment, State } from "@commercetools/platform-sdk";
-import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { generateRandomString } from "~src/helpers";
@@ -46,7 +46,7 @@ describe("Order Query", () => {
 	test("no filter", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app).get(`/dummy/orders`);
+		const response = await supertest(ctMock.app).get("/dummy/orders");
 		expect(response.status).toBe(200);
 		expect(response.body.count).toBe(1);
 		expect(response.body.total).toBe(1);
@@ -59,14 +59,14 @@ describe("Order Query", () => {
 
 		{
 			const response = await supertest(ctMock.app)
-				.get(`/dummy/orders`)
+				.get("/dummy/orders")
 				.query({ where: 'orderNumber="nomatch"' });
 			expect(response.status).toBe(200);
 			expect(response.body.count).toBe(0);
 		}
 		{
 			const response = await supertest(ctMock.app)
-				.get(`/dummy/orders`)
+				.get("/dummy/orders")
 				.query({ where: 'orderNumber="foobar"' });
 			expect(response.status).toBe(200);
 			expect(response.body.count).toBe(1);
@@ -171,7 +171,7 @@ describe("Order payment tests", () => {
 		ctMock.project().add("order", order);
 
 		const response = await supertest(ctMock.app)
-			.get(`/dummy/orders`)
+			.get("/dummy/orders")
 			.query({ where: `paymentInfo(payments(id="${payment.id}"))` });
 
 		expect(response.status).toBe(200);
@@ -179,8 +179,8 @@ describe("Order payment tests", () => {
 
 		{
 			const response = await supertest(ctMock.app)
-				.get(`/dummy/orders`)
-				.query({ where: `paymentInfo(payments(id is defined))` });
+				.get("/dummy/orders")
+				.query({ where: "paymentInfo(payments(id is defined))" });
 
 			expect(response.status).toBe(200);
 			expect(response.body.results[0].id).toBe(order.id);
@@ -800,7 +800,7 @@ describe("Order Import", () => {
 
 	test("Import", async () => {
 		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/import`)
+			.post("/dummy/orders/import")
 			.send({
 				orderNumber: "100000001",
 				totalPrice: {

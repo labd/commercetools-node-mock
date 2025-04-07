@@ -100,17 +100,13 @@ export class CategoryUpdateHandler
 		}
 
 		if (assetId) {
-			resource.assets = resource.assets.filter(function (obj) {
-				return obj.id !== assetId;
-			});
+			resource.assets = resource.assets.filter((obj) => obj.id !== assetId);
 
 			return;
 		}
 
 		if (assetKey) {
-			resource.assets = resource.assets.filter(function (obj) {
-				return obj.key !== assetKey;
-			});
+			resource.assets = resource.assets.filter((obj) => obj.key !== assetKey);
 
 			return;
 		}

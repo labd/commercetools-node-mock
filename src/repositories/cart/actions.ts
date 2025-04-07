@@ -7,36 +7,36 @@ import type {
 	MissingTaxRateForCountryError,
 	ShippingMethodDoesNotMatchCartError,
 } from "@commercetools/platform-sdk";
-import {
-	type Address,
-	type AddressDraft,
-	type Cart,
-	type CartAddItemShippingAddressAction,
-	type CartAddLineItemAction,
-	type CartChangeLineItemQuantityAction,
-	type CartChangeTaxRoundingModeAction,
-	type CartRemoveDiscountCodeAction,
-	type CartRemoveLineItemAction,
-	type CartSetBillingAddressAction,
-	type CartSetBillingAddressCustomTypeAction,
-	type CartSetCountryAction,
-	type CartSetCustomFieldAction,
-	type CartSetCustomShippingMethodAction,
-	type CartSetCustomTypeAction,
-	type CartSetCustomerEmailAction,
-	type CartSetDirectDiscountsAction,
-	type CartSetLineItemShippingDetailsAction,
-	type CartSetLocaleAction,
-	type CartSetShippingAddressAction,
-	type CartSetShippingAddressCustomTypeAction,
-	type CartSetShippingMethodAction,
-	type CustomFields,
-	type GeneralError,
-	type ItemShippingDetails,
-	type LineItem,
-	type Product,
-	type ProductPagedQueryResponse,
-	type ProductVariant,
+import type {
+	Address,
+	AddressDraft,
+	Cart,
+	CartAddItemShippingAddressAction,
+	CartAddLineItemAction,
+	CartChangeLineItemQuantityAction,
+	CartChangeTaxRoundingModeAction,
+	CartRemoveDiscountCodeAction,
+	CartRemoveLineItemAction,
+	CartSetBillingAddressAction,
+	CartSetBillingAddressCustomTypeAction,
+	CartSetCountryAction,
+	CartSetCustomFieldAction,
+	CartSetCustomShippingMethodAction,
+	CartSetCustomTypeAction,
+	CartSetCustomerEmailAction,
+	CartSetDirectDiscountsAction,
+	CartSetLineItemShippingDetailsAction,
+	CartSetLocaleAction,
+	CartSetShippingAddressAction,
+	CartSetShippingAddressCustomTypeAction,
+	CartSetShippingMethodAction,
+	CustomFields,
+	GeneralError,
+	ItemShippingDetails,
+	LineItem,
+	Product,
+	ProductPagedQueryResponse,
+	ProductVariant,
 } from "@commercetools/platform-sdk";
 import type {
 	DirectDiscount,
@@ -232,7 +232,7 @@ export class CartUpdateHandler
 		} else {
 			throw new CommercetoolsError<GeneralError>({
 				code: "General",
-				message: `Either lineItemid or lineItemKey needs to be provided.`,
+				message: "Either lineItemid or lineItemKey needs to be provided.",
 			});
 		}
 
@@ -656,7 +656,7 @@ export class CartUpdateHandler
 			// Locations cannot be assigned to more than one zone.
 			// See https://docs.commercetools.com/api/projects/zones#location
 			const zoneRate = method.zoneRates.find((rate) =>
-				rate.zone.obj!.locations.some((loc) => loc.country === country),
+				rate.zone.obj?.locations.some((loc) => loc.country === country),
 			);
 
 			if (!zoneRate) {

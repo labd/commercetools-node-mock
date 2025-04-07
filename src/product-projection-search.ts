@@ -27,25 +27,25 @@ import type { AbstractStorage } from "./storage";
 import type { Writable } from "./types";
 
 export type ProductProjectionSearchParams = {
-	"fuzzy"?: boolean;
-	"fuzzyLevel"?: number;
-	"markMatchingVariants"?: boolean;
-	"staged"?: boolean;
-	"filter"?: string[];
+	fuzzy?: boolean;
+	fuzzyLevel?: number;
+	markMatchingVariants?: boolean;
+	staged?: boolean;
+	filter?: string[];
 	"filter.facets"?: string[];
 	"filter.query"?: string[];
-	"facet"?: string | string[];
-	"sort"?: string | string[];
-	"limit"?: number;
-	"offset"?: number;
-	"withTotal"?: boolean;
-	"priceCurrency"?: string;
-	"priceCountry"?: string;
-	"priceCustomerGroup"?: string;
-	"priceChannel"?: string;
-	"localeProjection"?: string;
-	"storeProjection"?: string;
-	"expand"?: string | string[];
+	facet?: string | string[];
+	sort?: string | string[];
+	limit?: number;
+	offset?: number;
+	withTotal?: boolean;
+	priceCurrency?: string;
+	priceCountry?: string;
+	priceCustomerGroup?: string;
+	priceChannel?: string;
+	localeProjection?: string;
+	storeProjection?: string;
+	expand?: string | string[];
 	[key: string]: QueryParam;
 };
 
@@ -342,9 +342,8 @@ export class ProductProjectionSearch {
 						max: numValues > 0 ? Math.max(...values) : 0,
 						mean: numValues > 0 ? mean(values) : 0,
 					};
-				} else {
-					throw new Error("not supported");
 				}
+				throw new Error("not supported");
 			}) || [];
 		const data: RangeFacetResult = {
 			type: "range",

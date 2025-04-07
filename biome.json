@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["vendor/*"],
+		"ignore": ["vendor/*", "dist/*"],
 		"include": ["src/**/*"]
 	},
 	"formatter": {
@@ -21,9 +21,18 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"complexity": {
+				"noForEach": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off",
+				"noParameterAssign": "off"
+			},
 			"suspicious": {
 				"noConsoleLog": "error",
-				"noExplicitAny": "off"
+				"noImplicitAnyLet": "off",
+				"noExplicitAny": "off",
+				"noExportsInTest": "off"
 			}
 		}
 	},

@@ -21,7 +21,7 @@ describe("Store", () => {
 		});
 
 		const response = await supertest(ctMock.app).get(
-			`/dummy/stores/key=STOREKEY`,
+			"/dummy/stores/key=STOREKEY",
 		);
 
 		expect(response.status).toBe(200);
@@ -54,7 +54,7 @@ describe("Store", () => {
 		});
 
 		const response = await supertest(ctMock.app).get(
-			`/dummy/stores/key=DOESNOTEXIST`,
+			"/dummy/stores/key=DOESNOTEXIST",
 		);
 
 		expect(response.status).toBe(404);

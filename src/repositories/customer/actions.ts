@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import type {
 	Address,
 	BaseAddress,
@@ -38,7 +39,6 @@ import type {
 	InvalidJsonInputError,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
-import assert from "node:assert";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString } from "~src/helpers";
 import { hashPassword } from "~src/lib/password";
@@ -234,7 +234,7 @@ export class CustomerUpdateHandler
 		}
 		resource.authenticationMode = authMode;
 		if (authMode === "ExternalAuth") {
-			delete resource.password;
+			resource.password = undefined;
 			return;
 		}
 		if (authMode === "Password") {
@@ -461,7 +461,7 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		addressId: string | undefined,
 		addressKey: string | undefined,
-		required: boolean = false,
+		required = false,
 	): Address | undefined {
 		if (addressKey) {
 			const address = resource.addresses.find((a) => a.key === addressKey);

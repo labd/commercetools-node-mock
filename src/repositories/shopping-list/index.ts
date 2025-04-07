@@ -125,7 +125,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 		}
 
 		throw new Error(
-			`must provide either sku, productId or variantId for ShoppingListLineItem`,
+			"must provide either sku, productId or variantId for ShoppingListLineItem",
 		);
 	};
 }

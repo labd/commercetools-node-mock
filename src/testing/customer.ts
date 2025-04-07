@@ -7,7 +7,7 @@ export const customerDraftFactory = (m: CommercetoolsMock) =>
 	Factory.define<CustomerDraft, CustomerDraft, Customer>(({ onCreate }) => {
 		onCreate(async (draft) => {
 			const response = await supertest(m.app)
-				.post(`/dummy/customers`)
+				.post("/dummy/customers")
 				.send(draft);
 
 			return response.body.customer;

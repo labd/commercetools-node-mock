@@ -1,9 +1,9 @@
-import {
-	type ShippingMethod,
-	type ShippingMethodDraft,
-	type ZoneRate,
-	type ZoneRateDraft,
-	type ZoneReference,
+import type {
+	ShippingMethod,
+	ShippingMethodDraft,
+	ZoneRate,
+	ZoneRateDraft,
+	ZoneReference,
 } from "@commercetools/platform-sdk";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../../helpers";

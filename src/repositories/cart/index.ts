@@ -1,12 +1,12 @@
 import type { InvalidOperationError } from "@commercetools/platform-sdk";
-import {
-	type Cart,
-	type CartDraft,
-	type GeneralError,
-	type LineItem,
-	type LineItemDraft,
-	type Product,
-	type ProductPagedQueryResponse,
+import type {
+	Cart,
+	CartDraft,
+	GeneralError,
+	LineItem,
+	LineItemDraft,
+	Product,
+	ProductPagedQueryResponse,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import type { Config } from "~src/config";

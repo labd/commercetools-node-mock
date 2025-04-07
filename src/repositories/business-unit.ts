@@ -7,21 +7,21 @@ import type {
 	CompanyDraft,
 	DivisionDraft,
 } from "@commercetools/platform-sdk";
-import {
-	type Associate,
-	type BusinessUnit,
-	type BusinessUnitAddAddressAction,
-	type BusinessUnitAddAssociateAction,
-	type BusinessUnitAddStoreAction,
-	type BusinessUnitChangeAddressAction,
-	type BusinessUnitChangeNameAction,
-	type BusinessUnitChangeParentUnitAction,
-	type BusinessUnitDraft,
-	type BusinessUnitSetAssociatesAction,
-	type BusinessUnitSetContactEmailAction,
-	type BusinessUnitSetStoreModeAction,
-	type Company,
-	type Division,
+import type {
+	Associate,
+	BusinessUnit,
+	BusinessUnitAddAddressAction,
+	BusinessUnitAddAssociateAction,
+	BusinessUnitAddStoreAction,
+	BusinessUnitChangeAddressAction,
+	BusinessUnitChangeNameAction,
+	BusinessUnitChangeParentUnitAction,
+	BusinessUnitDraft,
+	BusinessUnitSetAssociatesAction,
+	BusinessUnitSetContactEmailAction,
+	BusinessUnitSetStoreModeAction,
+	Company,
+	Division,
 } from "@commercetools/platform-sdk";
 import type { Config } from "~src/config";
 import { generateRandomString, getBaseResourceProperties } from "../helpers";
@@ -110,7 +110,8 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 
 			this.saveNew(context, division);
 			return division;
-		} else if (this._isCompanyDraft(draft)) {
+		}
+		if (this._isCompanyDraft(draft)) {
 			const company = resource as Company;
 
 			this.saveNew(context, company);

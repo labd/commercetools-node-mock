@@ -1,6 +1,6 @@
-import {
-	type StagedQuote,
-	type StagedQuoteDraft,
+import type {
+	StagedQuote,
+	StagedQuoteDraft,
 } from "@commercetools/platform-sdk";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";

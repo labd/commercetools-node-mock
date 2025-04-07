@@ -40,21 +40,19 @@ export class ProductProjectionService extends AbstractService {
 	search(request: Request, response: Response) {
 		const query = request.query;
 		const searchParams: ProductProjectionQueryParams = {
-			"filter": queryParamsArray(query.filter),
+			filter: queryParamsArray(query.filter),
 			"filter.query": queryParamsArray(query["filter.query"]),
-			"facet": queryParamsArray(query.facet),
-			"expand": queryParamsArray(query.expand),
-			"staged": queryParamsValue(query.staged) === "true",
-			"localeProjection": queryParamsValue(query.localeProjection),
-			"storeProjection": queryParamsValue(query.storeProjection),
-			"priceChannel": queryParamsValue(query.priceChannel),
-			"priceCountry": queryParamsValue(query.priceCountry),
-			"priceCurrency": queryParamsValue(query.priceCurrency),
-			"priceCustomerGroup": queryParamsValue(query.priceCustomerGroup),
-			"offset": query.offset
-				? Number(queryParamsValue(query.offset))
-				: undefined,
-			"limit": query.limit ? Number(queryParamsValue(query.limit)) : undefined,
+			facet: queryParamsArray(query.facet),
+			expand: queryParamsArray(query.expand),
+			staged: queryParamsValue(query.staged) === "true",
+			localeProjection: queryParamsValue(query.localeProjection),
+			storeProjection: queryParamsValue(query.storeProjection),
+			priceChannel: queryParamsValue(query.priceChannel),
+			priceCountry: queryParamsValue(query.priceCountry),
+			priceCurrency: queryParamsValue(query.priceCurrency),
+			priceCustomerGroup: queryParamsValue(query.priceCustomerGroup),
+			offset: query.offset ? Number(queryParamsValue(query.offset)) : undefined,
+			limit: query.limit ? Number(queryParamsValue(query.limit)) : undefined,
 		};
 		const resource = this.repository.search(
 			getRepositoryContext(request),

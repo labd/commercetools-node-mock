@@ -24,7 +24,7 @@ export const selectPrice = ({
 };
 
 export const calculateLineItemTotalPrice = (lineItem: LineItem): number =>
-	lineItem.price!.value.centAmount * lineItem.quantity;
+	lineItem.price?.value.centAmount * lineItem.quantity;
 
 export const calculateCartTotalPrice = (cart: Cart): number =>
 	cart.lineItems.reduce((cur, item) => cur + item.totalPrice.centAmount, 0);

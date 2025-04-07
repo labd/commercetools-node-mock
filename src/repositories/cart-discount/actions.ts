@@ -65,10 +65,7 @@ export class CartDiscountUpdateHandler
 				throw new CommercetoolsError<InvalidOperationError>(
 					{
 						code: "InvalidOperation",
-						message:
-							"Cannot remove custom field " +
-							name +
-							" because it does not exist.",
+						message: `Cannot remove custom field ${name} because it does not exist.`,
 					},
 					400,
 				);

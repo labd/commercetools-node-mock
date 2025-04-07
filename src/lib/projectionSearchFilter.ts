@@ -154,7 +154,7 @@ const parseFilter = (filter: string): ExpressionSet => {
 				({
 					type: "Symbol",
 					kind: "int",
-					value: parseInt(t.token.match, 10),
+					value: Number.parseInt(t.token.match, 10),
 				}) as TypeSymbol,
 		)
 		.nud("STAR", 5, (_) => ({
@@ -184,9 +184,8 @@ const parseFilter = (filter: string): ExpressionSet => {
 			const expr: any = parser.parse({ terminals: [bp - 1] });
 			if (Array.isArray(expr)) {
 				return [left, ...expr];
-			} else {
-				return [left, expr];
 			}
+			return [left, expr];
 		})
 		.nud("(", 100, (t) => {
 			const expr: any = parser.parse({ terminals: [")"] });

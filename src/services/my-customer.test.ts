@@ -55,7 +55,7 @@ describe("Me", () => {
 			.post("/dummy/me/signup")
 			.send(draft);
 
-		const response = await supertest(ctMock.app).get(`/dummy/me`);
+		const response = await supertest(ctMock.app).get("/dummy/me");
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual(createResponse.body.customer);
@@ -284,7 +284,7 @@ describe("/me", () => {
 
 	test("setCustomField", async () => {
 		const response = await supertest(ctMock.app)
-			.post(`/dummy/me`)
+			.post("/dummy/me")
 			.send({
 				version: 2,
 				actions: [{ action: "setCustomField", name: "foobar", value: true }],

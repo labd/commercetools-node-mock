@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import type {
 	Cart,
 	CartReference,
@@ -13,7 +14,6 @@ import type {
 	ProductPagedQueryResponse,
 	ProductVariant,
 } from "@commercetools/platform-sdk";
-import assert from "assert";
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";

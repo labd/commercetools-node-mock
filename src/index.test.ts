@@ -1,4 +1,4 @@
-import { type InvalidTokenError } from "@commercetools/platform-sdk";
+import type { InvalidTokenError } from "@commercetools/platform-sdk";
 import got from "got";
 import { setupServer } from "msw/node";
 import { afterEach, beforeAll, expect, test } from "vitest";
@@ -23,12 +23,12 @@ test("node:fetch client", async () => {
 	});
 	ctMock.registerHandlers(mswServer);
 
-	const authHeader = "Basic " + Buffer.from("foo:bar").toString("base64");
+	const authHeader = `Basic ${Buffer.from("foo:bar").toString("base64")}`;
 	let response = await fetch("https://localhost:8080/oauth/token", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
-			"Authorization": authHeader,
+			Authorization: authHeader,
 		},
 		body: new URLSearchParams({
 			grant_type: "client_credentials",
@@ -109,7 +109,7 @@ test("Options.validateCredentials: true (error)", async () => {
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
 			headers: {
-				Authorization: `Bearer foobar`,
+				Authorization: "Bearer foobar",
 			},
 			responseType: "json",
 			throwHttpErrors: false,
@@ -130,7 +130,7 @@ test("Options.validateCredentials: false", async () => {
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
 			headers: {
-				Authorization: `Bearer foobar`,
+				Authorization: "Bearer foobar",
 			},
 			responseType: "json",
 		},

@@ -5,7 +5,7 @@
  * See https://docs.commercetools.com/api/predicates/query
  */
 import { haversineDistance } from "./haversine";
-import { Lexer, Parser, type ITokenPosition } from "./parser";
+import { type ITokenPosition, Lexer, Parser } from "./parser";
 
 export class PredicateError {
 	message: string;
@@ -34,10 +34,9 @@ export const matchesPredicate = (
 			const func = generateMatchFunc(item);
 			return func(target, variables ?? {});
 		});
-	} else {
-		const func = generateMatchFunc(predicate);
-		return func(target, variables ?? {});
 	}
+	const func = generateMatchFunc(predicate);
+	return func(target, variables ?? {});
 };
 
 export const parseQueryExpression = (
@@ -47,9 +46,8 @@ export const parseQueryExpression = (
 		const callbacks = predicate.map((item) => generateMatchFunc(item));
 		return (target: any, variables: VariableMap) =>
 			callbacks.every((callback) => callback(target, variables));
-	} else {
-		return generateMatchFunc(predicate);
 	}
+	return generateMatchFunc(predicate);
 };
 
 type TypeSymbol = {
@@ -177,7 +175,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			(t) =>
 				({
 					type: "boolean",
-					value: t.token.match === "true" ? true : false,
+					value: t.token.match === "true",
 					pos: t.token.strpos(),
 				}) as TypeSymbol,
 		)
@@ -209,7 +207,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			(t) =>
 				({
 					type: "int",
-					value: parseInt(t.token.match, 10),
+					value: Number.parseInt(t.token.match, 10),
 					pos: t.token.strpos(),
 				}) as TypeSymbol,
 		)
@@ -219,7 +217,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			(t) =>
 				({
 					type: "float",
-					value: parseFloat(t.token.match),
+					value: Number.parseFloat(t.token.match),
 					pos: t.token.strpos(),
 				}) as TypeSymbol,
 		)
@@ -242,9 +240,8 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			const expr: any = parser.parse({ terminals: [bp - 1] });
 			if (Array.isArray(expr)) {
 				return [left, ...expr];
-			} else {
-				return [left, expr];
 			}
+			return [left, expr];
 		})
 		.nud("(", 100, (t) => {
 			const expr: any = parser.parse({ terminals: [")"] });
@@ -262,17 +259,16 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 						}
 						return false;
 					});
-				} else {
-					const value = resolveValue(obj, left);
-					if (value) {
-						if (Array.isArray(value)) {
-							return value.some((item) => expr(item, vars));
-						}
-
-						return expr(value, vars);
-					}
-					return false;
 				}
+				const value = resolveValue(obj, left);
+				if (value) {
+					if (Array.isArray(value)) {
+						return value.some((item) => expr(item, vars));
+					}
+
+					return expr(value, vars);
+				}
+				return false;
 			};
 		})
 		.bp(")", 0)
@@ -290,14 +286,13 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 						}
 						return value === other;
 					});
-				} else {
-					const resolvedValue = resolveValue(obj, left);
-					const resolvedSymbol = resolveSymbol(expr, vars);
-					if (Array.isArray(resolvedValue)) {
-						return !!resolvedValue.some((elem) => elem === resolvedSymbol);
-					}
-					return resolvedValue === resolvedSymbol;
 				}
+				const resolvedValue = resolveValue(obj, left);
+				const resolvedSymbol = resolveSymbol(expr, vars);
+				if (Array.isArray(resolvedValue)) {
+					return !!resolvedValue.some((elem) => elem === resolvedSymbol);
+				}
+				return resolvedValue === resolvedSymbol;
 			};
 		})
 		.led("!=", 20, ({ left, bp }) => {
@@ -353,12 +348,11 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 							const val = resolveValue(obj, left);
 							return val.length === 0;
 						};
-					} else {
-						return (obj: any, vars: VariableMap) => {
-							const val = resolveValue(obj, left);
-							return val.length !== 0;
-						};
 					}
+					return (obj: any, vars: VariableMap) => {
+						const val = resolveValue(obj, left);
+						return val.length !== 0;
+					};
 				}
 				case "defined": {
 					if (!invert) {
@@ -366,12 +360,11 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 							const val = resolveValue(obj, left);
 							return val !== undefined;
 						};
-					} else {
-						return (obj: any, vars: VariableMap) => {
-							const val = resolveValue(obj, left);
-							return val === undefined;
-						};
 					}
+					return (obj: any, vars: VariableMap) => {
+						const val = resolveValue(obj, left);
+						return val === undefined;
+					};
 				}
 				default: {
 					throw new Error("Unexpected");
@@ -463,9 +456,8 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 				const array = expr.map((item: TypeSymbol) => resolveSymbol(item, vars));
 				if (keyword.type === "ALL") {
 					return array.every((item: any) => value.includes(item));
-				} else {
-					return array.some((item: any) => value.includes(item));
 				}
+				return array.some((item: any) => value.includes(item));
 			};
 		})
 
@@ -478,9 +470,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 		const column = lines[lines.length - 1].length;
 
 		throw new PredicateError(
-			`Unexpected end of input, expected SphereIdentifierChar, comparison ` +
-				`operator, not, in, contains, is, within or matches` +
-				` (line ${lines.length}, column ${column})`,
+			`Unexpected end of input, expected SphereIdentifierChar, comparison operator, not, in, contains, is, within or matches (line ${lines.length}, column ${column})`,
 		);
 	}
 	return result;

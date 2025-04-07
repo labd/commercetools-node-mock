@@ -1,5 +1,5 @@
+import assert from "node:assert";
 import type { CartDiscount, TypeDraft } from "@commercetools/platform-sdk";
-import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "..";

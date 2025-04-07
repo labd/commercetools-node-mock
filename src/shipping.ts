@@ -106,12 +106,12 @@ export const getShippingMethodsMatchingCart = (
 		context.projectKey,
 		"shipping-method",
 		{
-			"where": [
-				`zoneRates(zone(id in (:zoneIds)))`,
+			where: [
+				"zoneRates(zone(id in (:zoneIds)))",
 				`zoneRates(shippingRates(price(currencyCode="${cart.totalPrice.currencyCode}")))`,
 			],
 			"var.zoneIds": zoneIds,
-			"expand": params.expand,
+			expand: params.expand,
 		},
 	);
 

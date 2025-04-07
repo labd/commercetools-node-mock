@@ -137,7 +137,7 @@ export class ShoppingListUpdateHandler
 		} else {
 			throw new CommercetoolsError<GeneralError>({
 				code: "General",
-				message: `Either lineItemid or lineItemKey needs to be provided.`,
+				message: "Either lineItemid or lineItemKey needs to be provided.",
 			});
 		}
 

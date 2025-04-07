@@ -85,14 +85,14 @@ describe("MyCart", () => {
 			.post("/dummy/me/carts")
 			.send(draft);
 
-		const response = await supertest(ctMock.app).get(`/dummy/me/active-cart`);
+		const response = await supertest(ctMock.app).get("/dummy/me/active-cart");
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual(createResponse.body);
 	});
 
 	test("Get my active cart which doesnt exists", async () => {
-		const response = await supertest(ctMock.app).get(`/dummy/me/active-cart`);
+		const response = await supertest(ctMock.app).get("/dummy/me/active-cart");
 
 		expect(response.status).toBe(404);
 	});
