@@ -29,10 +29,7 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 				throw new CommercetoolsError<InvalidInputError>(
 					{
 						code: "InvalidInput",
-						message:
-							"A test message could not be delivered to this destination: " +
-							`SQS ${dest.queueUrl} in ${dest.region} for ${dest.accessKey}. ` +
-							"Please make sure your destination is correctly configured.",
+						message: `A test message could not be delivered to this destination: SQS ${dest.queueUrl} in ${dest.region} for ${dest.accessKey}. Please make sure your destination is correctly configured.`,
 					},
 					400,
 				);

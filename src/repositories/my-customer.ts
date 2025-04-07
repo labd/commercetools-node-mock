@@ -8,7 +8,7 @@ import type {
 import { CommercetoolsError } from "~src/exceptions";
 import { hashPassword, validateEmailVerifyToken } from "../lib/password";
 import type { Writable } from "../types";
-import { type RepositoryContext } from "./abstract";
+import type { RepositoryContext } from "./abstract";
 import { CustomerRepository } from "./customer";
 
 export class MyCustomerRepository extends CustomerRepository {

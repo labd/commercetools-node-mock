@@ -42,28 +42,27 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 				return updated;
 			}
 			return current;
-		} else {
-			// If the resource is new the only valid version is 0
-			if (draft.version) {
-				throw new CommercetoolsError<InvalidOperationError>(
-					{
-						code: "InvalidOperation",
-						message: "version on create must be 0",
-					},
-					400,
-				);
-			}
-			const baseProperties = getBaseResourceProperties();
-			const resource: CustomObject = {
-				...baseProperties,
-				container: draft.container,
-				key: draft.key,
-				value: draft.value,
-			};
-
-			this.saveNew(context, resource);
-			return resource;
 		}
+		// If the resource is new the only valid version is 0
+		if (draft.version) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "version on create must be 0",
+				},
+				400,
+			);
+		}
+		const baseProperties = getBaseResourceProperties();
+		const resource: CustomObject = {
+			...baseProperties,
+			container: draft.container,
+			key: draft.key,
+			value: draft.value,
+		};
+
+		this.saveNew(context, resource);
+		return resource;
 	}
 
 	getWithContainerAndKey(

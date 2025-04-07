@@ -120,7 +120,7 @@ describe("Standalone price Actions", () => {
 
 	test("changeValue", async () => {
 		const response = await supertest(ctMock.app)
-			.post("/dummy/standalone-prices/" + id)
+			.post(`/dummy/standalone-prices/${id}`)
 			.send({
 				version: 1,
 				actions: [
@@ -159,7 +159,7 @@ describe("Standalone price Actions", () => {
 
 	test("setActive", async () => {
 		const response = await supertest(ctMock.app)
-			.post("/dummy/standalone-prices/" + id)
+			.post(`/dummy/standalone-prices/${id}`)
 			.send({
 				version: 1,
 				actions: [
@@ -195,7 +195,7 @@ describe("Standalone price Actions", () => {
 
 	test("setDiscounted", async () => {
 		const response = await supertest(ctMock.app)
-			.post("/dummy/standalone-prices/" + id)
+			.post(`/dummy/standalone-prices/${id}`)
 			.send({
 				version: 1,
 				actions: [
@@ -250,7 +250,7 @@ describe("Standalone price Actions", () => {
 		});
 
 		const response2 = await supertest(ctMock.app)
-			.post("/dummy/standalone-prices/" + id)
+			.post(`/dummy/standalone-prices/${id}`)
 			.send({
 				version: 2,
 				actions: [

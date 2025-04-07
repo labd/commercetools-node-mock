@@ -49,7 +49,8 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 					extension,
 					"destination.authentication.headerValue",
 				);
-			} else if (extension.destination.type === "AWSLambda") {
+			}
+			if (extension.destination.type === "AWSLambda") {
 				return maskSecretValue(resource, "destination.accessSecret");
 			}
 		}

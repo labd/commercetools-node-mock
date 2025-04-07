@@ -181,7 +181,7 @@ beforeEach(async () => {
 					],
 					assets: [],
 					images: [],
-					attributes: productDraft.variants![0].attributes,
+					attributes: productDraft.variants?.[0].attributes,
 				},
 			],
 			name: productDraft.name,
@@ -236,8 +236,8 @@ describe("Product Projection Query - Generic", () => {
 			const response = await supertest(ctMock.app)
 				.get("/dummy/product-projections")
 				.query({
-					"limit": 50,
-					"where": ["slug(nl-NL=:slug)"],
+					limit: 50,
+					where: ["slug(nl-NL=:slug)"],
 					"var.slug": "test-product",
 				});
 
@@ -257,8 +257,8 @@ describe("Product Projection Query - Generic", () => {
 			const response = await supertest(ctMock.app)
 				.get("/dummy/product-projections")
 				.query({
-					"limit": 50,
-					"where": ["slug(nl-NL=:slug)"],
+					limit: 50,
+					where: ["slug(nl-NL=:slug)"],
 					"var.slug": "missing-product",
 				});
 

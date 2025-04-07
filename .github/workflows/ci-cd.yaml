@@ -26,15 +26,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: labd/gh-actions-typescript/pnpm-install@main
         with:
-          node-version: 22
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          run_install: true
+          node-version: ${{ matrix.node }}
 
       - name: Check formatting and typing
         run: pnpm check
@@ -88,15 +82,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          run_install: true
+        uses: labd/gh-actions-typescript/pnpm-install@main
 
       - name: Run build
         run: pnpm build

@@ -1,5 +1,5 @@
 import type { Update } from "@commercetools/platform-sdk";
-import { Router, type Request, type Response } from "express";
+import { type Request, type Response, Router } from "express";
 import type { ParsedQs } from "qs";
 import { updateRequestSchema } from "~src/schemas/update-request";
 import { validateData } from "~src/validate";
@@ -68,7 +68,7 @@ export default abstract class AbstractService {
 	}
 
 	getWithId(request: Request, response: Response) {
-		const result = this._expandWithId(request, request.params["id"]);
+		const result = this._expandWithId(request, request.params.id);
 		if (!result) {
 			return response.status(404).send();
 		}
@@ -78,7 +78,7 @@ export default abstract class AbstractService {
 	getWithKey(request: Request, response: Response) {
 		const result = this.repository.getByKey(
 			getRepositoryContext(request),
-			request.params["key"],
+			request.params.key,
 			{
 				expand: this._parseParam(request.query.expand),
 			},
@@ -90,7 +90,7 @@ export default abstract class AbstractService {
 	deleteWithId(request: Request, response: Response) {
 		const result = this.repository.delete(
 			getRepositoryContext(request),
-			request.params["id"],
+			request.params.id,
 			{
 				expand: this._parseParam(request.query.expand),
 			},
@@ -104,7 +104,7 @@ export default abstract class AbstractService {
 	deleteWithKey(request: Request, response: Response) {
 		const resource = this.repository.getByKey(
 			getRepositoryContext(request),
-			request.params["key"],
+			request.params.key,
 		);
 		if (!resource) {
 			return response.status(404).send("Not found");
@@ -140,7 +140,7 @@ export default abstract class AbstractService {
 		);
 		const resource = this.repository.get(
 			getRepositoryContext(request),
-			request.params["id"],
+			request.params.id,
 		);
 		if (!resource) {
 			return response.status(404).send("Not found");
@@ -165,7 +165,7 @@ export default abstract class AbstractService {
 
 		const resource = this.repository.getByKey(
 			getRepositoryContext(request),
-			request.params["key"],
+			request.params.key,
 		);
 		if (!resource) {
 			return response.status(404).send("Not found");

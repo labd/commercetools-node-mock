@@ -55,7 +55,7 @@ describe("OAuth2Server", () => {
 
 		it("should refresh a token", async () => {
 			const createResponse = await supertest(app)
-				.post(`/my-project/anonymous/token`)
+				.post("/my-project/anonymous/token")
 				.auth("validClientId", "validClientSecret")
 				.query({ grant_type: "client_credentials" })
 				.send();

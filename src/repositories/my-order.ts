@@ -1,10 +1,10 @@
+import assert from "node:assert";
 import type {
 	CartReference,
 	MyOrderFromCartDraft,
 	Order,
 } from "@commercetools/platform-sdk";
-import assert from "assert";
-import { type RepositoryContext } from "./abstract";
+import type { RepositoryContext } from "./abstract";
 import { OrderRepository } from "./order";
 
 export class MyOrderRepository extends OrderRepository {

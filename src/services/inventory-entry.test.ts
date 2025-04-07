@@ -1,5 +1,5 @@
+import assert from "node:assert";
 import type { InventoryEntry, Type } from "@commercetools/platform-sdk";
-import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index";
@@ -24,7 +24,7 @@ describe("Inventory Entry Query", () => {
 	test("no filter", async () => {
 		assert(inventoryEntry, "inventory entry not created");
 
-		const response = await supertest(ctMock.app).get(`/dummy/inventory`);
+		const response = await supertest(ctMock.app).get("/dummy/inventory");
 		expect(response.status).toBe(200);
 		expect(response.body.count).toBe(1);
 		expect(response.body.total).toBe(1);
@@ -37,14 +37,14 @@ describe("Inventory Entry Query", () => {
 
 		{
 			const response = await supertest(ctMock.app)
-				.get(`/dummy/inventory`)
+				.get("/dummy/inventory")
 				.query({ where: 'sku="unknown"' });
 			expect(response.status).toBe(200);
 			expect(response.body.count).toBe(0);
 		}
 		{
 			const response = await supertest(ctMock.app)
-				.get(`/dummy/inventory`)
+				.get("/dummy/inventory")
 				.query({ where: 'sku="1337"' });
 			expect(response.status).toBe(200);
 			expect(response.body.count).toBe(1);
@@ -155,7 +155,7 @@ describe("Inventory Entry Update Actions", () => {
 
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(3);
-		expect(response.body.custom.fields["foo"]).toBe("bar");
+		expect(response.body.custom.fields.foo).toBe("bar");
 	});
 
 	test("set restockable in days", async () => {

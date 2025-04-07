@@ -180,7 +180,8 @@ export class OAuth2Server {
 				request.query.scope?.toString(),
 			);
 			return response.status(200).send(token);
-		} else if (grantType === "refresh_token") {
+		}
+		if (grantType === "refresh_token") {
 			const refreshToken =
 				request.query.refresh_token?.toString() || request.body.refresh_token;
 			if (!refreshToken) {
@@ -214,17 +215,16 @@ export class OAuth2Server {
 				);
 			}
 			return response.status(200).send(token);
-		} else {
-			return next(
-				new CommercetoolsError<UnsupportedGrantType>(
-					{
-						code: "unsupported_grant_type",
-						message: `Invalid parameter: grant_type: Invalid grant type: ${grantType}`,
-					},
-					400,
-				),
-			);
 		}
+		return next(
+			new CommercetoolsError<UnsupportedGrantType>(
+				{
+					code: "unsupported_grant_type",
+					message: `Invalid parameter: grant_type: Invalid grant type: ${grantType}`,
+				},
+				400,
+			),
+		);
 	}
 
 	async customerTokenHandler(

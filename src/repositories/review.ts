@@ -2,10 +2,10 @@ import type {
 	ChannelReference,
 	ProductReference,
 } from "@commercetools/platform-sdk";
-import {
-	type Review,
-	type ReviewDraft,
-	type StateReference,
+import type {
+	Review,
+	ReviewDraft,
+	StateReference,
 } from "@commercetools/platform-sdk";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "../helpers";

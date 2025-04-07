@@ -1,10 +1,10 @@
+import assert from "node:assert";
 import type {
 	Cart,
 	CartReference,
 	QuoteRequest,
 	QuoteRequestDraft,
 } from "@commercetools/platform-sdk";
-import assert from "assert";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
 import type { RepositoryContext } from "../abstract";

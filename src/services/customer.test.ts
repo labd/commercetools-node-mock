@@ -1,9 +1,9 @@
+import assert from "node:assert";
 import type {
 	Customer,
 	CustomerDraft,
 	CustomerToken,
 } from "@commercetools/platform-sdk";
-import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { hashPassword } from "~src/lib/password";
@@ -21,7 +21,7 @@ describe("Customer create", () => {
 		const draft = customerDraftFactory(ctMock).build();
 
 		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers`)
+			.post("/dummy/customers")
 			.send(draft);
 
 		const customer = response.body.customer as Customer;
@@ -55,7 +55,7 @@ describe("Customer create", () => {
 		};
 
 		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers`)
+			.post("/dummy/customers")
 			.send(draft);
 
 		const customer = response.body.customer as Customer;
@@ -459,7 +459,7 @@ describe("Customer Update Actions (old-style)", () => {
 		assert(customer, "customer not created");
 
 		const response = await supertest(ctMock.app)
-			.head(`/dummy/customers/invalid-id`)
+			.head("/dummy/customers/invalid-id")
 			.send();
 
 		expect(response.status).toBe(404);

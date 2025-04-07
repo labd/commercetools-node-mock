@@ -420,7 +420,7 @@ export class ProductUpdateHandler
 
 			if (position >= variantImages.length) {
 				throw new Error(
-					`Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.`,
+					"Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.",
 				);
 			}
 

@@ -1,6 +1,6 @@
 import type { CustomerSignInResult } from "@commercetools/platform-sdk";
 import type { Router } from "express";
-import { type Request, type Response } from "express";
+import type { Request, Response } from "express";
 import type { CustomerRepository } from "../repositories/customer";
 import { getRepositoryContext } from "../repositories/helpers";
 import AbstractService from "./abstract";

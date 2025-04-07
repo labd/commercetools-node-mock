@@ -5,39 +5,39 @@ import type {
 	BusinessUnitResourceIdentifier,
 	RoundingMode,
 } from "@commercetools/platform-sdk";
-import {
-	type Address,
-	type Associate,
-	type AssociateDraft,
-	type AssociateRoleAssignment,
-	type AssociateRoleAssignmentDraft,
-	type AssociateRoleKeyReference,
-	type AssociateRoleResourceIdentifier,
-	type BaseAddress,
-	type CentPrecisionMoney,
-	type CustomFields,
-	type CustomFieldsDraft,
-	type HighPrecisionMoney,
-	type HighPrecisionMoneyDraft,
-	type InvalidJsonInputError,
-	type Price,
-	type PriceDraft,
-	type Reference,
-	type ReferencedResourceNotFoundError,
-	type ResourceIdentifier,
-	type Store,
-	type StoreKeyReference,
-	type StoreReference,
-	type StoreResourceIdentifier,
-	type Type,
-	type _Money,
+import type {
+	Address,
+	Associate,
+	AssociateDraft,
+	AssociateRoleAssignment,
+	AssociateRoleAssignmentDraft,
+	AssociateRoleKeyReference,
+	AssociateRoleResourceIdentifier,
+	BaseAddress,
+	CentPrecisionMoney,
+	CustomFields,
+	CustomFieldsDraft,
+	HighPrecisionMoney,
+	HighPrecisionMoneyDraft,
+	InvalidJsonInputError,
+	Price,
+	PriceDraft,
+	Reference,
+	ReferencedResourceNotFoundError,
+	ResourceIdentifier,
+	Store,
+	StoreKeyReference,
+	StoreReference,
+	StoreResourceIdentifier,
+	Type,
+	_Money,
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js/decimal";
 import type { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
 import type { AbstractStorage } from "../storage";
-import { type RepositoryContext } from "./abstract";
+import type { RepositoryContext } from "./abstract";
 
 export const createAddress = (
 	base: BaseAddress | undefined,

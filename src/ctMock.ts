@@ -182,12 +182,11 @@ export class CommercetoolsMock {
 					message: err.message,
 					errors: [err.info],
 				});
-			} else {
-				console.error(err);
-				return resp.status(500).send({
-					error: err.message,
-				});
 			}
+			console.error(err);
+			return resp.status(500).send({
+				error: err.message,
+			});
 		});
 
 		return app;
@@ -210,7 +209,7 @@ export class CommercetoolsMock {
 				const headers = copyHeaders(request.headers);
 
 				const res = await inject(app)
-					.post(url.pathname + "?" + url.searchParams.toString())
+					.post(`${url.pathname}?${url.searchParams.toString()}`)
 					.body(body)
 					.headers(headers)
 					.end();
@@ -225,7 +224,7 @@ export class CommercetoolsMock {
 				const headers = copyHeaders(request.headers);
 
 				const res = await inject(app)
-					.get(url.pathname + "?" + url.searchParams.toString())
+					.get(`${url.pathname}?${url.searchParams.toString()}`)
 					.body(body)
 					.headers(headers)
 					.end();
@@ -256,7 +255,7 @@ export class CommercetoolsMock {
 				const headers = copyHeaders(request.headers);
 
 				const res = await inject(app)
-					.get(url.pathname + "?" + url.searchParams.toString())
+					.get(`${url.pathname}?${url.searchParams.toString()}`)
 					.body(body)
 					.headers(headers)
 					.end();
@@ -271,7 +270,7 @@ export class CommercetoolsMock {
 				const headers = copyHeaders(request.headers);
 
 				const res = await inject(app)
-					.post(url.pathname + "?" + url.searchParams.toString())
+					.post(`${url.pathname}?${url.searchParams.toString()}`)
 					.body(body)
 					.headers(headers)
 					.end();
@@ -286,7 +285,7 @@ export class CommercetoolsMock {
 				const headers = copyHeaders(request.headers);
 
 				const res = await inject(app)
-					.delete(url.pathname + "?" + url.searchParams.toString())
+					.delete(`${url.pathname}?${url.searchParams.toString()}`)
 					.body(body)
 					.headers(headers)
 					.end();
@@ -307,10 +306,9 @@ export class CommercetoolsMock {
 		if (_globalListeners.length > 0) {
 			if (this._mswServer !== undefined) {
 				throw new Error("Server already started");
-			} else {
-				process.emitWarning("Server wasn't stopped properly, clearing");
-				_globalListeners.forEach((listener) => listener.close());
 			}
+			process.emitWarning("Server wasn't stopped properly, clearing");
+			_globalListeners.forEach((listener) => listener.close());
 		}
 
 		const server = setupServer();

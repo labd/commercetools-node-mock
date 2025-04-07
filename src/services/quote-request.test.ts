@@ -47,7 +47,7 @@ describe("Quote Request Create", () => {
 		});
 
 		response = await supertest(ctMock.app)
-			.get("/dummy/quote-requests/" + quote.id)
+			.get(`/dummy/quote-requests/${quote.id}`)
 			.send();
 
 		const quoteResult = response.body;

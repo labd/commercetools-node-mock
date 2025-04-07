@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import type {
 	Address,
 	Cart,
@@ -10,7 +11,6 @@ import type {
 	TaxCategoryDraft,
 	Zone,
 } from "@commercetools/platform-sdk";
-import assert from "assert";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { customerDraftFactory } from "~src/testing/customer";
@@ -252,7 +252,7 @@ describe("Cart Update Actions", () => {
 
 	test("addLineItem", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -279,7 +279,7 @@ describe("Cart Update Actions", () => {
 
 	test("addLineItem by SKU", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -305,7 +305,7 @@ describe("Cart Update Actions", () => {
 		await createCart(currency);
 
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -327,12 +327,12 @@ describe("Cart Update Actions", () => {
 
 	test("addLineItem with custom field", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
 		const type = await supertest(ctMock.app)
-			.post(`/dummy/types`)
+			.post("/dummy/types")
 			.send({
 				key: "my-type",
 				name: {
@@ -388,12 +388,12 @@ describe("Cart Update Actions", () => {
 
 	test("addLineItem with key", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
 		const type = await supertest(ctMock.app)
-			.post(`/dummy/types`)
+			.post("/dummy/types")
 			.send({
 				key: "my-type",
 				name: {
@@ -461,7 +461,7 @@ describe("Cart Update Actions", () => {
 
 	test("addItemShippingAddress", async () => {
 		await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -512,7 +512,7 @@ describe("Cart Update Actions", () => {
 
 	test("recalculate", async () => {
 		await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -536,7 +536,7 @@ describe("Cart Update Actions", () => {
 
 	test("removeLineItem", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -573,7 +573,7 @@ describe("Cart Update Actions", () => {
 
 	test("removeLineItem decrease quantity", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 
@@ -741,7 +741,7 @@ describe("Cart Update Actions", () => {
 		};
 
 		const type = await supertest(ctMock.app)
-			.post(`/dummy/types`)
+			.post("/dummy/types")
 			.send({
 				key: "my-type",
 				name: {
@@ -809,7 +809,7 @@ describe("Cart Update Actions", () => {
 		};
 
 		const type = await supertest(ctMock.app)
-			.post(`/dummy/types`)
+			.post("/dummy/types")
 			.send({
 				key: "my-type",
 				name: {
@@ -1243,7 +1243,7 @@ describe("Cart Update Actions", () => {
 
 	test("setLineItemShippingDetails", async () => {
 		const product = await supertest(ctMock.app)
-			.post(`/dummy/products`)
+			.post("/dummy/products")
 			.send(productDraft)
 			.then((x) => x.body);
 

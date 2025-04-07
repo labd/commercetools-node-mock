@@ -22,7 +22,7 @@ export type PriceSelector = {
 export const applyPriceSelector = (
 	products: ProductProjection[],
 	selector: PriceSelector,
-	noScopedPrice: boolean = false,
+	noScopedPrice = false,
 ) => {
 	validatePriceSelector(selector);
 

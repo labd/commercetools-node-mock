@@ -68,8 +68,8 @@ describe("Search filter", () => {
 	};
 
 	test("by product key", async () => {
-		expect(match(`key:exists`).isMatch).toBeTruthy();
-		expect(match(`key:missing`).isMatch).toBeFalsy();
+		expect(match("key:exists").isMatch).toBeTruthy();
+		expect(match("key:missing").isMatch).toBeFalsy();
 		expect(match(`key:"test-product"`).isMatch).toBeTruthy();
 	});
 
@@ -80,29 +80,29 @@ describe("Search filter", () => {
 	});
 
 	test("by SKU", async () => {
-		expect(match(`variants.sku:exists`).isMatch).toBeTruthy();
-		expect(match(`variants.sku:missing`).isMatch).toBeFalsy();
+		expect(match("variants.sku:exists").isMatch).toBeTruthy();
+		expect(match("variants.sku:missing").isMatch).toBeFalsy();
 		expect(match(`variants.sku:"MYSKU"`).isMatch).toBeTruthy();
 	});
 
 	test("by attribute value", async () => {
-		expect(match(`variants.attributes.number:4`).isMatch).toBeTruthy();
-		expect(match(`variants.attributes.number:3,4`).isMatch).toBeTruthy();
-		expect(match(`variants.attributes.number:3,4,5`).isMatch).toBeTruthy();
-		expect(match(`variants.attributes.number:1,2,3,5`).isMatch).toBeFalsy();
+		expect(match("variants.attributes.number:4").isMatch).toBeTruthy();
+		expect(match("variants.attributes.number:3,4").isMatch).toBeTruthy();
+		expect(match("variants.attributes.number:3,4,5").isMatch).toBeTruthy();
+		expect(match("variants.attributes.number:1,2,3,5").isMatch).toBeFalsy();
 	});
 
 	test("by attribute range", async () => {
 		expect(
-			match(`variants.attributes.number:range (0 TO 5)`).isMatch,
+			match("variants.attributes.number:range (0 TO 5)").isMatch,
 		).toBeTruthy();
 
 		expect(
-			match(`variants.attributes.number:range (* TO 5)`).isMatch,
+			match("variants.attributes.number:range (* TO 5)").isMatch,
 		).toBeTruthy();
 
 		expect(
-			match(`variants.attributes.number:range (* TO *)`).isMatch,
+			match("variants.attributes.number:range (* TO *)").isMatch,
 		).toBeTruthy();
 	});
 
@@ -118,14 +118,14 @@ describe("Search filter", () => {
 
 	test("by price range", async () => {
 		expect(
-			match(`variants.price.centAmount:range (1500 TO 2000)`).isMatch,
+			match("variants.price.centAmount:range (1500 TO 2000)").isMatch,
 		).toBeTruthy();
 	});
 
 	test("by price range - or", async () => {
 		expect(
 			match(
-				`variants.price.centAmount:range (2 TO 1500 ), (1500 TO 3000), (3000 TO 6000)`,
+				"variants.price.centAmount:range (2 TO 1500 ), (1500 TO 3000), (3000 TO 6000)",
 			).isMatch,
 		).toBeTruthy();
 	});
@@ -136,7 +136,7 @@ describe("Search filter", () => {
 
 		// No currency given
 		result = match(
-			`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+			"variants.scopedPrice.value.centAmount:range (1500 TO 2000)",
 		);
 		expect(result.isMatch).toBeFalsy();
 
@@ -145,7 +145,7 @@ describe("Search filter", () => {
 		applyPriceSelector(products, { currency: "EUR" });
 
 		result = match(
-			`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+			"variants.scopedPrice.value.centAmount:range (1500 TO 2000)",
 			products[0],
 		);
 		expect(result.isMatch).toBeTruthy();
@@ -161,7 +161,7 @@ describe("Search filter", () => {
 		applyPriceSelector(products, { currency: "USD" });
 
 		result = match(
-			`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+			"variants.scopedPrice.value.centAmount:range (1500 TO 2000)",
 			products[0],
 		);
 		expect(result.isMatch).toBeFalsy();
@@ -170,7 +170,7 @@ describe("Search filter", () => {
 		products = [cloneObject(exampleProduct)];
 		applyPriceSelector(products, { currency: "EUR", country: "NL" });
 		result = match(
-			`variants.scopedPrice.value.centAmount:range (1500 TO 2000)`,
+			"variants.scopedPrice.value.centAmount:range (1500 TO 2000)",
 			products[0],
 		);
 		expect(result.isMatch).toBeFalsy();
