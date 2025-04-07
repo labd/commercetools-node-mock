@@ -52,7 +52,7 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!result) {
-			response.status(404).send("Not Found");
+			response.sendStatus(404);
 			return;
 		}
 		response.status(200).send(result);
@@ -77,7 +77,7 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!current) {
-			response.status(404).send("Not Found");
+			response.sendStatus(404);
 			return;
 		}
 

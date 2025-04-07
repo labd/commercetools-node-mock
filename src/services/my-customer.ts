@@ -44,7 +44,7 @@ export class MyCustomerService extends AbstractService {
 	getMe(request: Request, response: Response) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 		response.status(200).send(resource);
@@ -54,7 +54,7 @@ export class MyCustomerService extends AbstractService {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 		const updateRequest = validateData<Update>(
@@ -75,7 +75,7 @@ export class MyCustomerService extends AbstractService {
 	deleteMe(request: Request, response: Response) {
 		const resource = this.repository.deleteMe(getRepositoryContext(request));
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 

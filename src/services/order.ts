@@ -44,6 +44,6 @@ export class OrderService extends AbstractService {
 			response.status(200).send(resource);
 			return;
 		}
-		response.status(404).send("Not found");
+		response.sendStatus(404);
 	}
 }

@@ -71,7 +71,16 @@ export default abstract class AbstractService {
 	getWithId(request: Request, response: Response) {
 		const result = this._expandWithId(request, request.params.id);
 		if (!result) {
-			response.status(404).send();
+			response.status(404).send({
+				statusCode: 404,
+				message: `The Resource with ID '${request.params.id} was not found.`,
+				errors: [
+					{
+						code: "ResourceNotFound",
+						message: `The Resource with ID '${request.params.id} was not found.`,
+					},
+				],
+			});
 			return;
 		}
 		response.status(200).send(result);
@@ -86,7 +95,16 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			response.status(404).send();
+			response.status(404).send({
+				statusCode: 404,
+				message: `The Resource with key '${request.params.id} was not found.`,
+				errors: [
+					{
+						code: "ResourceNotFound",
+						message: `The Resource with key '${request.params.id} was not found.`,
+					},
+				],
+			});
 			return;
 		}
 		response.status(200).send(result);
@@ -101,7 +119,7 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 		response.status(200).send(result);
@@ -113,7 +131,7 @@ export default abstract class AbstractService {
 			request.params.key,
 		);
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 
@@ -125,7 +143,7 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 		response.status(200).send(result);
@@ -151,7 +169,7 @@ export default abstract class AbstractService {
 			request.params.id,
 		);
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 
@@ -177,7 +195,7 @@ export default abstract class AbstractService {
 			request.params.key,
 		);
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 

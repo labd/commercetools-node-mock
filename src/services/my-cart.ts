@@ -37,7 +37,7 @@ export class MyCartService extends AbstractService {
 	activeCart(request: Request, response: Response) {
 		const resource = this.repository.getActiveCart(request.params.projectKey);
 		if (!resource) {
-			response.status(404).send("Not found");
+			response.sendStatus(404);
 			return;
 		}
 		response.status(200).send(resource);

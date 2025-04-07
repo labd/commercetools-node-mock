@@ -31,7 +31,7 @@ export class ProjectService {
 		const project = this.repository.get(getRepositoryContext(request));
 
 		if (!project) {
-			response.status(404).send({});
+			response.sendStatus(404);
 			return;
 		}
 
