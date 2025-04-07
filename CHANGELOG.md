@@ -1,5 +1,15 @@
 ## 2.23.1
 
+## 2.47.0
+
+### Minor Changes
+
+- [#281](https://github.com/labd/commercetools-node-mock/pull/281) [`c38c5f3`](https://github.com/labd/commercetools-node-mock/commit/c38c5f3e5b7e55d19757fbad897a067b576ec93c) Thanks [@jsm1t](https://github.com/jsm1t)! - Product search - add support for values in exact query
+
+- [#285](https://github.com/labd/commercetools-node-mock/pull/285) [`ae6d8c5`](https://github.com/labd/commercetools-node-mock/commit/ae6d8c5f695e4c3bea2bc04651800582cdee0f33) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update the `@commercetools/platform-sdk` version
+
+- [#285](https://github.com/labd/commercetools-node-mock/pull/285) [`3ff268c`](https://github.com/labd/commercetools-node-mock/commit/3ff268c17798be5789a74c7b3897d4e5fc34260a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add really basic quote functionality suppport, this is far from working correctly, but a good start
+
 ## 2.46.0
 
 ### Minor Changes
