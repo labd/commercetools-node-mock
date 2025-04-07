@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.47.1
+
+### Patch Changes
+
+- [`7729301`](https://github.com/labd/commercetools-node-mock/commit/7729301c13372a10c331e228dddda7a75453ef49) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Upgrade dependencies (express 5 and more)
+
 ## 2.47.0
 
 ### Minor Changes
