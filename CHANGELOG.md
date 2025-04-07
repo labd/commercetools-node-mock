@@ -1,5 +1,15 @@
 ## 2.23.1
 
+## 2.48.0
+
+### Minor Changes
+
+- [`b1c9fbf`](https://github.com/labd/commercetools-node-mock/commit/b1c9fbfb45b02b84d111e728003efc1370a6d009) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add retrieval of quote requests using as-associate endpoint
+
+### Patch Changes
+
+- [`94d2786`](https://github.com/labd/commercetools-node-mock/commit/94d278696c96cb3f9c9fb7d8d5706e6a743e4d37) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve 404 response on get by id and get by key calls
+
 ## 2.47.1
 
 ### Patch Changes
