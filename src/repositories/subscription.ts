@@ -49,6 +49,7 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 			key: draft.key,
 			messages: draft.messages || [],
 			status: "Healthy",
+			events: draft.events || [],
 		};
 		return this.saveNew(context, resource);
 	}

@@ -49,7 +49,7 @@ import { createAddress, createCustomFields } from "../helpers";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
-	implements UpdateHandlerInterface<Customer, CustomerUpdateAction>
+	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
 {
 	addAddress(
 		_context: RepositoryContext,

@@ -3,7 +3,27 @@ import type { RepositoryMap } from "./repositories";
 
 export const isType = <T>(x: T) => x;
 
-export type Writable<T> = { -readonly [P in keyof T]: Writable<T[P]> };
+type Builtin =
+	| string
+	| number
+	| boolean
+	| undefined
+	| null
+	| symbol
+	| bigint
+	| Date
+	| RegExp;
+
+export type Writable<T> = T extends Builtin
+	? T
+	: T extends ReadonlyArray<infer U>
+		? WritableArray<U>
+		: T extends object
+			? { -readonly [P in keyof T]: Writable<T[P]> }
+			: T;
+
+export interface WritableArray<T> extends Array<Writable<T>> {}
+
 export type ShallowWritable<T> = { -readonly [P in keyof T]: T[P] };
 
 export type ServiceTypes =
