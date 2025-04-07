@@ -52,8 +52,8 @@ importers:
         specifier: ^2.27.1
         version: 2.27.9
       '@commercetools/platform-sdk':
-        specifier: 8.2.0
-        version: 8.2.0
+        specifier: 8.8.0
+        version: 8.8.0
       '@stylistic/eslint-plugin':
         specifier: ^1.6.2
         version: 1.8.1(eslint@8.57.1)(typescript@5.6.3)
@@ -252,28 +252,12 @@ packages:
   '@changesets/write@0.3.2':
     resolution: {integrity: sha512-kDxDrPNpUgsjDbWBvUo27PzKX4gqeKOlhibaOXDJA6kuBisGqNHv/HwGJrAu8U/dSf8ZEFIeHIPtvSlZI1kULw==}
 
-  '@commercetools/platform-sdk@8.2.0':
-    resolution: {integrity: sha512-BpAeufwaNGnuJ4Pwvy2i/q28HPOyL/DqsCd8W+4HyALSbic6/rNRSQ0AZk8ATo5vrwU731G+HLpCmNoBDeO8mw==}
+  '@commercetools/platform-sdk@8.8.0':
+    resolution: {integrity: sha512-fHXx4e/4vU8VEofUhIUSo0jjjOqjPy2RsZGDlEahd60ZCTPOMTtyRq6JExQoBtAucBO++8CKCaEdWAp1hZJkOQ==}
     engines: {node: '>=18'}
 
-  '@commercetools/sdk-client-v2@3.0.0':
-    resolution: {integrity: sha512-AU0qyd41lv3l7X/e17mwRbtqGUMCJrCP25/ca3CMGvLGYGLx8zFu5zUYggOyEMTkViwG3NlY83zTTG0/YoUo8Q==}
-    engines: {node: '>=18'}
-
-  '@commercetools/sdk-middleware-auth@7.0.1':
-    resolution: {integrity: sha512-XLRm+o3Yd0mkVoyzsOA98PUu0U0ajQdBHMhZ8N2XMOtL4OY8zsgT8ap5JneXV8zWZNiwIYYAYoUDwBlLZh2lAQ==}
-    engines: {node: '>=14'}
-
-  '@commercetools/sdk-middleware-http@7.0.4':
-    resolution: {integrity: sha512-YpBDTA1NqjfwqPxrll6FzDc0A7hLSRwd9OLGMlPcvUG2Je1ks8Pe34pLdPqz7jgdURwfFXRBmXxPhezDzMbnZA==}
-    engines: {node: '>=14'}
-
-  '@commercetools/sdk-middleware-logger@3.0.0':
-    resolution: {integrity: sha512-DhMXAA2yIch/AaGxy7st85Z1HFmeLtHWGkr9z5rX4xKjan4PHGB/IE5saAR+SNGHhs6+1Lp8vZEHDo3tFqVLmg==}
-    engines: {node: '>=14'}
-
-  '@commercetools/ts-client@3.0.4':
-    resolution: {integrity: sha512-2UH3cl+/U6sWiHntjQBTjA8iVxyNPd7onT/3trQevKanraHpzgxS1LNjkgAlguvZskPIWbBLd4UtpACQ16e42Q==}
+  '@commercetools/ts-client@3.2.2':
+    resolution: {integrity: sha512-TOFskoZEOZgxFra78yHgOMvk23xPmu90vsMeb458hHljw+NqC+UX10Ku+ERx3EHhzT8nJDK2QmyvNumZsMnt0w==}
     engines: {node: '>=18'}
 
   '@cspotcode/source-map-support@0.8.1':
@@ -3284,31 +3268,11 @@ snapshots:
       human-id: 1.0.2
       prettier: 2.8.8
 
-  '@commercetools/platform-sdk@8.2.0':
+  '@commercetools/platform-sdk@8.8.0':
     dependencies:
-      '@commercetools/sdk-client-v2': 3.0.0
-      '@commercetools/sdk-middleware-auth': 7.0.1
-      '@commercetools/sdk-middleware-http': 7.0.4
-      '@commercetools/sdk-middleware-logger': 3.0.0
-      '@commercetools/ts-client': 3.0.4
-    transitivePeerDependencies:
-      - encoding
+      '@commercetools/ts-client': 3.2.2
 
-  '@commercetools/sdk-client-v2@3.0.0':
-    dependencies:
-      buffer: 6.0.3
-
-  '@commercetools/sdk-middleware-auth@7.0.1':
-    dependencies:
-      node-fetch: 2.7.0
-    transitivePeerDependencies:
-      - encoding
-
-  '@commercetools/sdk-middleware-http@7.0.4': {}
-
-  '@commercetools/sdk-middleware-logger@3.0.0': {}
-
-  '@commercetools/ts-client@3.0.4':
+  '@commercetools/ts-client@3.2.2':
     dependencies:
       buffer: 6.0.3
 
