@@ -64,15 +64,17 @@ export default abstract class AbstractService {
 		}
 
 		const result = this.repository.query(getRepositoryContext(request), params);
-		return response.status(200).send(result);
+		response.status(200).send(result);
+		return;
 	}
 
 	getWithId(request: Request, response: Response) {
 		const result = this._expandWithId(request, request.params.id);
 		if (!result) {
-			return response.status(404).send();
+			response.status(404).send();
+			return;
 		}
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	getWithKey(request: Request, response: Response) {
@@ -83,8 +85,11 @@ export default abstract class AbstractService {
 				expand: this._parseParam(request.query.expand),
 			},
 		);
-		if (!result) return response.status(404).send();
-		return response.status(200).send(result);
+		if (!result) {
+			response.status(404).send();
+			return;
+		}
+		response.status(200).send(result);
 	}
 
 	deleteWithId(request: Request, response: Response) {
@@ -96,9 +101,10 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	deleteWithKey(request: Request, response: Response) {
@@ -107,7 +113,8 @@ export default abstract class AbstractService {
 			request.params.key,
 		);
 		if (!resource) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
 
 		const result = this.repository.delete(
@@ -118,9 +125,10 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	post(request: Request, response: Response) {
@@ -130,7 +138,7 @@ export default abstract class AbstractService {
 			draft,
 		);
 		const result = this._expandWithId(request, resource.id);
-		return response.status(this.createStatusCode).send(result);
+		response.status(this.createStatusCode).send(result);
 	}
 
 	postWithId(request: Request, response: Response) {
@@ -143,7 +151,8 @@ export default abstract class AbstractService {
 			request.params.id,
 		);
 		if (!resource) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
 
 		const updatedResource = this.repository.processUpdateActions(
@@ -154,7 +163,7 @@ export default abstract class AbstractService {
 		);
 
 		const result = this._expandWithId(request, updatedResource.id);
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	postWithKey(request: Request, response: Response) {
@@ -168,7 +177,8 @@ export default abstract class AbstractService {
 			request.params.key,
 		);
 		if (!resource) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
 
 		const updatedResource = this.repository.processUpdateActions(
@@ -179,7 +189,7 @@ export default abstract class AbstractService {
 		);
 
 		const result = this._expandWithId(request, updatedResource.id);
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	protected _expandWithId(request: Request, resourceId: string) {

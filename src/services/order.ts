@@ -29,7 +29,7 @@ export class OrderService extends AbstractService {
 			getRepositoryContext(request),
 			importDraft,
 		);
-		return response.status(200).send(resource);
+		response.status(200).send(resource);
 	}
 
 	getWithOrderNumber(request: Request, response: Response) {
@@ -41,8 +41,9 @@ export class OrderService extends AbstractService {
 			request.query,
 		);
 		if (resource) {
-			return response.status(200).send(resource);
+			response.status(200).send(resource);
+			return;
 		}
-		return response.status(404).send("Not found");
+		response.status(404).send("Not found");
 	}
 }

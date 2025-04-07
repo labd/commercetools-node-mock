@@ -38,7 +38,8 @@ export class CartService extends AbstractService {
 				: this.repository.get(context, request.body.reference.id);
 
 		if (!cartOrOrder) {
-			return response.status(400).send();
+			response.status(400).send();
+			return;
 		}
 
 		const cartDraft: CartDraft = {
@@ -55,6 +56,6 @@ export class CartService extends AbstractService {
 
 		const newCart = this.repository.create(context, cartDraft);
 
-		return response.status(200).send(newCart);
+		response.status(200).send(newCart);
 	}
 }

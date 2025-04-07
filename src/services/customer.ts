@@ -34,7 +34,7 @@ export class CustomerService extends AbstractService {
 		const result: CustomerSignInResult = {
 			customer: expanded,
 		};
-		return response.status(this.createStatusCode).send(result);
+		response.status(this.createStatusCode).send(result);
 	}
 
 	passwordResetToken(request: Request, response: Response) {
@@ -43,7 +43,7 @@ export class CustomerService extends AbstractService {
 			request.body,
 		);
 
-		return response.status(200).send(customer);
+		response.status(200).send(customer);
 	}
 
 	passwordReset(request: Request, response: Response) {
@@ -52,7 +52,7 @@ export class CustomerService extends AbstractService {
 			request.body,
 		);
 
-		return response.status(200).send(customer);
+		response.status(200).send(customer);
 	}
 
 	confirmEmailToken(request: Request, response: Response) {
@@ -61,6 +61,6 @@ export class CustomerService extends AbstractService {
 			getRepositoryContext(request),
 			id,
 		);
-		return response.status(200).send(token);
+		response.status(200).send(token);
 	}
 }

@@ -44,16 +44,18 @@ export class MyCustomerService extends AbstractService {
 	getMe(request: Request, response: Response) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 		if (!resource) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
-		return response.status(200).send(resource);
+		response.status(200).send(resource);
 	}
 
 	updateMe(request: Request, response: Response) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 
 		if (!resource) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
 		const updateRequest = validateData<Update>(
 			request.body,
@@ -67,16 +69,17 @@ export class MyCustomerService extends AbstractService {
 		);
 
 		const result = this._expandWithId(request, updatedResource.id);
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	deleteMe(request: Request, response: Response) {
 		const resource = this.repository.deleteMe(getRepositoryContext(request));
 		if (!resource) {
-			return response.status(404).send("Not found");
+			response.status(404).send("Not found");
+			return;
 		}
 
-		return response.status(200).send(resource);
+		response.status(200).send(resource);
 	}
 
 	signUp(request: Request, response: Response) {
@@ -86,7 +89,7 @@ export class MyCustomerService extends AbstractService {
 			draft,
 		);
 		const result = this._expandWithId(request, resource.id);
-		return response.status(this.createStatusCode).send({ customer: result });
+		response.status(this.createStatusCode).send({ customer: result });
 	}
 
 	changePassword(request: Request, response: Response) {
@@ -95,7 +98,7 @@ export class MyCustomerService extends AbstractService {
 			request.body,
 		);
 
-		return response.status(200).send(customer);
+		response.status(200).send(customer);
 	}
 
 	resetPassword(request: Request, response: Response) {
@@ -104,7 +107,7 @@ export class MyCustomerService extends AbstractService {
 			request.body,
 		);
 
-		return response.status(200).send(customer);
+		response.status(200).send(customer);
 	}
 
 	emailConfirm(request: Request, response: Response) {
@@ -113,7 +116,7 @@ export class MyCustomerService extends AbstractService {
 			request.body,
 		);
 
-		return response.status(200).send(customer);
+		response.status(200).send(customer);
 	}
 
 	signIn(request: Request, response: Response) {
@@ -125,7 +128,7 @@ export class MyCustomerService extends AbstractService {
 		});
 
 		if (result.count === 0) {
-			return response.status(400).send({
+			response.status(400).send({
 				message: "Account with the given credentials not found.",
 				errors: [
 					{
@@ -134,8 +137,9 @@ export class MyCustomerService extends AbstractService {
 					},
 				],
 			});
+			return;
 		}
 
-		return response.status(200).send({ customer: result.results[0] });
+		response.status(200).send({ customer: result.results[0] });
 	}
 }

@@ -25,6 +25,6 @@ export class ProductService extends AbstractService {
 			getRepositoryContext(request),
 			searchBody,
 		);
-		return response.status(200).send(resource);
+		response.status(200).send(resource);
 	}
 }

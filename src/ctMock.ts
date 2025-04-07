@@ -170,23 +170,26 @@ export class CommercetoolsMock {
 		app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
 			if (err instanceof CommercetoolsError) {
 				if (err.errors?.length > 0) {
-					return resp.status(err.statusCode).send({
+					resp.status(err.statusCode).send({
 						statusCode: err.statusCode,
 						message: err.message,
 						errors: err.errors,
 					});
+					return;
 				}
 
-				return resp.status(err.statusCode).send({
+				resp.status(err.statusCode).send({
 					statusCode: err.statusCode,
 					message: err.message,
 					errors: [err.info],
 				});
+				return;
 			}
 			console.error(err);
-			return resp.status(500).send({
+			resp.status(500).send({
 				error: err.message,
 			});
+			return;
 		});
 
 		return app;

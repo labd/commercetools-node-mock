@@ -34,7 +34,7 @@ export class ProductProjectionService extends AbstractService {
 			limit: limit !== undefined ? Number(limit) : undefined,
 			offset: offset !== undefined ? Number(offset) : undefined,
 		});
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	search(request: Request, response: Response) {
@@ -58,6 +58,6 @@ export class ProductProjectionService extends AbstractService {
 			getRepositoryContext(request),
 			searchParams,
 		);
-		return response.status(200).send(resource);
+		response.status(200).send(resource);
 	}
 }

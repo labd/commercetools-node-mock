@@ -20,7 +20,7 @@ export class ProjectService {
 
 	get(request: Request, response: Response) {
 		const project = this.repository.get(getRepositoryContext(request));
-		return response.status(200).send(project);
+		response.status(200).send(project);
 	}
 
 	post(request: Request, response: Response) {
@@ -31,7 +31,8 @@ export class ProjectService {
 		const project = this.repository.get(getRepositoryContext(request));
 
 		if (!project) {
-			return response.status(404).send({});
+			response.status(404).send({});
+			return;
 		}
 
 		const updatedResource = this.repository.processUpdateActions(
@@ -41,6 +42,6 @@ export class ProjectService {
 			updateRequest.actions,
 		);
 
-		return response.status(200).send(updatedResource);
+		response.status(200).send(updatedResource);
 	}
 }

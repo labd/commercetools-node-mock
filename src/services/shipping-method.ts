@@ -24,7 +24,8 @@ export class ShippingMethodService extends AbstractService {
 	matchingCart(request: Request, response: Response) {
 		const cartId = queryParamsValue(request.query.cartId);
 		if (!cartId) {
-			return response.status(400).send();
+			response.status(400).send();
+			return;
 		}
 		const result = this.repository.matchingCart(
 			getRepositoryContext(request),
@@ -33,6 +34,7 @@ export class ShippingMethodService extends AbstractService {
 				expand: this._parseParam(request.query.expand),
 			},
 		);
-		return response.status(200).send(result);
+		response.status(200).send(result);
+		return;
 	}
 }

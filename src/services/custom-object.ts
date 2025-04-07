@@ -41,7 +41,7 @@ export class CustomObjectService extends AbstractService {
 			},
 		);
 
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	getWithContainerAndKey(request: Request, response: Response) {
@@ -52,9 +52,10 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!result) {
-			return response.status(404).send("Not Found");
+			response.status(404).send("Not Found");
+			return;
 		}
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	createWithContainerAndKey(request: Request, response: Response) {
@@ -65,7 +66,7 @@ export class CustomObjectService extends AbstractService {
 		};
 
 		const result = this.repository.create(getRepositoryContext(request), draft);
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 
 	deleteWithContainerAndKey(request: Request, response: Response) {
@@ -76,7 +77,8 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!current) {
-			return response.status(404).send("Not Found");
+			response.status(404).send("Not Found");
+			return;
 		}
 
 		const result = this.repository.delete(
@@ -84,6 +86,6 @@ export class CustomObjectService extends AbstractService {
 			current.id,
 		);
 
-		return response.status(200).send(result);
+		response.status(200).send(result);
 	}
 }

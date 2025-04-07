@@ -39,6 +39,14 @@ describe("OAuth2Server", () => {
 
 			expect(response.status, JSON.stringify(body)).toBe(200);
 			expect(body).toHaveProperty("access_token");
+			expect(body).toEqual({
+				// scope: expect.stringMatching(/anonymous_id:([^\s]+)/),
+				scope: expect.any(String),
+				access_token: expect.stringMatching(/\S{8,}==$/),
+				refresh_token: expect.stringMatching(/my-project.*/),
+				expires_in: 172800,
+				token_type: "Bearer",
+			});
 		});
 
 		it("should failed on invalid refresh token", async () => {

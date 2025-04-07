@@ -160,7 +160,7 @@ export class OAuth2Server {
 			);
 		}
 
-		const grantType = request.query.grant_type || request.body.grant_type;
+		const grantType = request.query.grant_type || request.body?.grant_type;
 		if (!grantType) {
 			return next(
 				new CommercetoolsError<InvalidRequestError>(
@@ -179,11 +179,12 @@ export class OAuth2Server {
 				request.credentials.clientSecret,
 				request.query.scope?.toString(),
 			);
-			return response.status(200).send(token);
+			response.status(200).send(token);
+			return;
 		}
 		if (grantType === "refresh_token") {
 			const refreshToken =
-				request.query.refresh_token?.toString() || request.body.refresh_token;
+				request.query.refresh_token?.toString() || request.body?.refresh_token;
 			if (!refreshToken) {
 				return next(
 					new CommercetoolsError<InvalidRequestError>(
@@ -214,7 +215,8 @@ export class OAuth2Server {
 					),
 				);
 			}
-			return response.status(200).send(token);
+			response.status(200).send(token);
+			return;
 		}
 		return next(
 			new CommercetoolsError<UnsupportedGrantType>(
@@ -233,7 +235,7 @@ export class OAuth2Server {
 		next: NextFunction,
 	) {
 		const projectKey = request.params.projectKey;
-		const grantType = request.query.grant_type || request.body.grant_type;
+		const grantType = request.query.grant_type || request.body?.grant_type;
 		if (!grantType) {
 			return next(
 				new CommercetoolsError<InvalidRequestError>(
@@ -247,12 +249,12 @@ export class OAuth2Server {
 		}
 
 		if (grantType === "password") {
-			const username = request.query.username || request.body.username;
+			const username = request.query.username || request.body?.username;
 			const password = hashPassword(
 				request.query.password || request.body.password,
 			);
 			const scope =
-				request.query.scope?.toString() || request.body.scope?.toString();
+				request.query.scope?.toString() || request.body?.scope?.toString();
 
 			const result = this.customerRepository.query(
 				{ projectKey: request.params.projectKey },
@@ -275,7 +277,7 @@ export class OAuth2Server {
 
 			const customer = result.results[0];
 			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
-			return response.status(200).send(token);
+			response.status(200).send(token);
 		}
 	}
 
@@ -328,7 +330,8 @@ export class OAuth2Server {
 
 			const customer = result.results[0];
 			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
-			return response.status(200).send(token);
+			response.status(200).send(token);
+			return;
 		}
 	}
 
@@ -353,7 +356,7 @@ export class OAuth2Server {
 
 		if (grantType === "client_credentials") {
 			const scope =
-				request.query.scope?.toString() || request.body.scope?.toString();
+				request.query.scope?.toString() || request.body?.scope?.toString();
 
 			const anonymous_id = undefined;
 
@@ -362,7 +365,8 @@ export class OAuth2Server {
 				anonymous_id,
 				scope,
 			);
-			return response.status(200).send(token);
+			response.status(200).send(token);
+			return;
 		}
 	}
 }
