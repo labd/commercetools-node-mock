@@ -2,6 +2,7 @@ import assert from "node:assert";
 import type {
 	Cart,
 	CartReference,
+	MyQuoteRequestDraft,
 	QuoteRequest,
 	QuoteRequestDraft,
 } from "@commercetools/platform-sdk";
@@ -17,7 +18,18 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 		this.actions = new QuoteRequestUpdateHandler(config.storage);
 	}
 
-	create(context: RepositoryContext, draft: QuoteRequestDraft): QuoteRequest {
+	create(
+		context: RepositoryContext,
+		draft: QuoteRequestDraft | MyQuoteRequestDraft,
+	): QuoteRequest {
+		// Handle the 'my' version of the draft
+		if ("cartId" in draft) {
+			return this.createFromCart(context, {
+				id: draft.cartId,
+				typeId: "cart",
+			});
+		}
+
 		assert(draft.cart, "draft.cart is missing");
 		return this.createFromCart(context, {
 			id: draft.cart.id!,

@@ -3,6 +3,7 @@ import { ProductTailoringRepository } from "~src/repositories/product-tailoring"
 import {
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
+	AsAssociateQuoteRequestRepository,
 } from "./as-associate";
 import { AssociateRoleRepository } from "./associate-role";
 import { AttributeGroupRepository } from "./attribute-group";
@@ -48,6 +49,7 @@ export const createRepositories = (config: Config) => ({
 	"as-associate": {
 		cart: new AsAssociateCartRepository(config),
 		order: new AsAssociateOrderRepository(config),
+		"quote-request": new AsAssociateQuoteRequestRepository(config),
 	},
 	"associate-role": new AssociateRoleRepository(config),
 	"attribute-group": new AttributeGroupRepository(config),
