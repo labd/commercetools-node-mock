@@ -26,6 +26,9 @@ import { ProductDiscountService } from "./product-discount";
 import { ProductProjectionService } from "./product-projection";
 import { ProductSelectionService } from "./product-selection";
 import { ProductTypeService } from "./product-type";
+import { QuoteService } from "./quote";
+import { QuoteRequestService } from "./quote-request";
+import { StagedQuoteService } from "./quote-staged";
 import { ReviewService } from "./reviews";
 import { ShippingMethodService } from "./shipping-method";
 import { ShoppingListService } from "./shopping-list";
@@ -93,8 +96,11 @@ export const createServices = (
 		router,
 		repos["product-selection"],
 	),
+	"quotes": new QuoteService(router, repos["quote"]),
+	"quote-request": new QuoteRequestService(router, repos["quote-request"]),
 	"reviews": new ReviewService(router, repos["review"]),
 	"shopping-list": new ShoppingListService(router, repos["shopping-list"]),
+	"staged-quote": new StagedQuoteService(router, repos["staged-quote"]),
 	"state": new StateService(router, repos["state"]),
 	"store": new StoreService(router, repos["store"]),
 	"subscription": new SubscriptionService(router, repos["subscription"]),
