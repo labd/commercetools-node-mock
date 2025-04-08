@@ -31,7 +31,7 @@ export class ProjectService {
 		const project = this.repository.get(getRepositoryContext(request));
 
 		if (!project) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 

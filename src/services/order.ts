@@ -33,9 +33,10 @@ export class OrderService extends AbstractService {
 	}
 
 	getWithOrderNumber(request: Request, response: Response) {
+		const orderNumber = request.params.orderNumber;
 		const resource = this.repository.getWithOrderNumber(
 			getRepositoryContext(request),
-			request.params.orderNumber,
+			orderNumber,
 
 			// @ts-ignore
 			request.query,
@@ -44,6 +45,15 @@ export class OrderService extends AbstractService {
 			response.status(200).send(resource);
 			return;
 		}
-		response.sendStatus(404);
+		response.status(404).send({
+			statusCode: 404,
+			message: `The Resource with key '${orderNumber}' was not found.`,
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with key '${orderNumber}' was not found.`,
+				},
+			],
+		});
 	}
 }

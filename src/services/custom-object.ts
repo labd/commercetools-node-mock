@@ -52,7 +52,7 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!result) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 		response.status(200).send(result);
@@ -77,7 +77,7 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!current) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 

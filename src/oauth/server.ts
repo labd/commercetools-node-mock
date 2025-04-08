@@ -75,7 +75,7 @@ export class OAuth2Server {
 		return async (request: Request, response: Response, next: NextFunction) => {
 			const token = getBearerToken(request);
 			if (!token) {
-				next(
+				return next(
 					new CommercetoolsError<InvalidTokenError>(
 						{
 							code: "invalid_token",
@@ -88,7 +88,7 @@ export class OAuth2Server {
 			}
 
 			if (!token || !this.store.validateToken(token)) {
-				next(
+				return next(
 					new CommercetoolsError<InvalidTokenError>(
 						{
 							code: "invalid_token",
@@ -99,7 +99,7 @@ export class OAuth2Server {
 				);
 			}
 
-			next();
+			return next();
 		};
 	}
 

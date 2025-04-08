@@ -119,7 +119,7 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 		response.status(200).send(result);
@@ -131,7 +131,7 @@ export default abstract class AbstractService {
 			request.params.key,
 		);
 		if (!resource) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 
@@ -143,7 +143,7 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 		response.status(200).send(result);
@@ -169,7 +169,7 @@ export default abstract class AbstractService {
 			request.params.id,
 		);
 		if (!resource) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 
@@ -195,7 +195,7 @@ export default abstract class AbstractService {
 			request.params.key,
 		);
 		if (!resource) {
-			response.sendStatus(404);
+			response.status(404).send({ statusCode: 404 });
 			return;
 		}
 

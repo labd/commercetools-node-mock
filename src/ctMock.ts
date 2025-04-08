@@ -138,9 +138,9 @@ export class CommercetoolsMock {
 		this._oauth2.setCustomerRepository(this._repositories.customer);
 
 		const app = express();
+		app.use(express.json());
 
 		const projectRouter = express.Router({ mergeParams: true });
-		projectRouter.use(express.json());
 
 		if (!options?.silent) {
 			app.use(morgan("tiny"));
