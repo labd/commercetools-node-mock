@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.48.1
+
+### Patch Changes
+
+- [`2564e8c`](https://github.com/labd/commercetools-node-mock/commit/2564e8c32954c66303a509127c6f1201aa7916af) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix readable stream error
+
 ## 2.48.0
 
 ### Minor Changes
