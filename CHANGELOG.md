@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.49.0
+
+### Minor Changes
+
+- [#289](https://github.com/labd/commercetools-node-mock/pull/289) [`c1ef7a3`](https://github.com/labd/commercetools-node-mock/commit/c1ef7a3bc65430d3fe04096dd406fb7a36c2e668) Thanks [@davidweterings](https://github.com/davidweterings)! - Add setShippingAddressCustomField and removeShippingMethod
+
 ## 2.48.1
 
 ### Patch Changes
