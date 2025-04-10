@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.49.1
+
+### Patch Changes
+
+- [#291](https://github.com/labd/commercetools-node-mock/pull/291) [`0d2119b`](https://github.com/labd/commercetools-node-mock/commit/0d2119b2df0f5811e724ebddb0af77de760d40b8) Thanks [@davidweterings](https://github.com/davidweterings)! - Fix removeShippingMethod not working
+
 ## 2.49.0
 
 ### Minor Changes
