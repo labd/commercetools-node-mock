@@ -17,6 +17,7 @@ import type {
 	CartChangeTaxRoundingModeAction,
 	CartRemoveDiscountCodeAction,
 	CartRemoveLineItemAction,
+	CartRemoveShippingMethodAction,
 	CartSetBillingAddressAction,
 	CartSetBillingAddressCustomTypeAction,
 	CartSetCountryAction,
@@ -28,6 +29,7 @@ import type {
 	CartSetLineItemShippingDetailsAction,
 	CartSetLocaleAction,
 	CartSetShippingAddressAction,
+	CartSetShippingAddressCustomFieldAction,
 	CartSetShippingAddressCustomTypeAction,
 	CartSetShippingMethodAction,
 	CustomFields,
@@ -43,6 +45,7 @@ import type {
 	TaxPortion,
 	TaxedItemPrice,
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
+import type { ShippingMethodResourceIdentifier } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/shipping-method";
 import { Decimal } from "decimal.js/decimal";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "~src/exceptions";
@@ -402,6 +405,7 @@ export class CartUpdateHandler
 		if (!resource.custom) {
 			throw new Error("Resource has no custom field");
 		}
+
 		resource.custom.fields[name] = value;
 	}
 
@@ -750,5 +754,40 @@ export class CartUpdateHandler
 		} else {
 			resource.shippingInfo = undefined;
 		}
+	}
+
+	setShippingAddressCustomField(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ name, value }: CartSetShippingAddressCustomFieldAction,
+	) {
+		if (!resource.shippingAddress) {
+			throw new Error("Resource has no shipping address");
+		}
+		if (!resource.shippingAddress.custom) {
+			throw new Error("Resource has no custom field");
+		}
+		resource.shippingAddress.custom.fields[name] = value;
+	}
+
+	removeShippingMethod(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ shippingKey }: CartRemoveShippingMethodAction,
+	) {
+		if (!resource.shippingInfo) {
+			return;
+		}
+		const shippingMethod =
+			this._storage.getByResourceIdentifier<"shipping-method">(
+				context.projectKey,
+				{ key: shippingKey } as ShippingMethodResourceIdentifier,
+			);
+
+		if (resource.shippingInfo?.shippingMethod?.id !== shippingMethod.id) {
+			throw new Error("Shipping method with key not found");
+		}
+
+		resource.shippingInfo = undefined;
 	}
 }
