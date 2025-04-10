@@ -1101,6 +1101,37 @@ describe("Cart Update Actions", () => {
 			);
 		});
 
+		test("correctly removes a shipping method", async () => {
+			assert(cart, "cart not created");
+
+			const shippingMethod: ShippingMethodResourceIdentifier = {
+				typeId: "shipping-method",
+				id: standardShippingMethod.id,
+			};
+
+			const response = await supertest(ctMock.app)
+				.post(`/dummy/carts/${cart.id}`)
+				.send({
+					version: 2,
+					actions: [{ action: "setShippingMethod", shippingMethod }],
+				});
+			expect(response.status).toBe(200);
+
+			const removeResponse = await supertest(ctMock.app)
+				.post(`/dummy/carts/${cart.id}`)
+				.send({
+					version: 3,
+					actions: [
+						{
+							action: "removeShippingMethod",
+							shippingKey: standardShippingMethod.key,
+						},
+					],
+				});
+			expect(removeResponse.status).toBe(200);
+			expect(removeResponse.body.shippingInfo).toBeUndefined();
+		});
+
 		test("correctly sets shippingInfo rates + tax when includedInPrice: true", async () => {
 			assert(cart, "cart not created");
 			assert(standardShippingMethod, "shipping method not created");

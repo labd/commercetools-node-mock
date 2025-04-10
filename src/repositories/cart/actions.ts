@@ -781,7 +781,10 @@ export class CartUpdateHandler
 		const shippingMethod =
 			this._storage.getByResourceIdentifier<"shipping-method">(
 				context.projectKey,
-				{ key: shippingKey } as ShippingMethodResourceIdentifier,
+				{
+					typeId: "shipping-method",
+					key: shippingKey,
+				} as ShippingMethodResourceIdentifier,
 			);
 
 		if (resource.shippingInfo?.shippingMethod?.id !== shippingMethod.id) {
