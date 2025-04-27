@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from "node:util";
 import type {
 	FieldDefinition,
 	InvalidOperationError,
@@ -11,7 +12,6 @@ import type {
 	TypeSetDescriptionAction,
 	TypeUpdateAction,
 } from "@commercetools/platform-sdk";
-import isEqual from "lodash.isequal";
 import { CommercetoolsError } from "~src/exceptions";
 import type { Writable } from "~src/types";
 import type { RepositoryContext } from "../abstract";
@@ -114,7 +114,7 @@ export class TypeUpdateHandler
 		});
 
 		if (
-			isEqual(
+			isDeepStrictEqual(
 				fieldNames,
 				resource.fieldDefinitions.map((item) => item.name),
 			)
