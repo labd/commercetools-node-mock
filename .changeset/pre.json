@@ -1,0 +1,8 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@labdigital/commercetools-mock": "2.49.1"
+  },
+  "changesets": []
+}
