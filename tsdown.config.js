@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig([
 	{
@@ -7,7 +7,7 @@ export default defineConfig([
 		splitting: false,
 		dts: true,
 		sourcemap: true,
-		format: ["cjs", "esm"],
+		format: ["esm"],
 		outDir: "dist",
 	},
 ]);

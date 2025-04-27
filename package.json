@@ -19,14 +19,14 @@
 		"src"
 	],
 	"scripts": {
-		"build": "tsup",
+		"build": "tsdown",
 		"build:server": "esbuild src/server.ts --bundle --outfile=dist/server.js --platform=node",
 		"check": "biome check && tsc",
 		"format": "biome format --fix",
 		"lint": "biome check",
 		"publish:ci": "pnpm build && pnpm changeset publish",
 		"publish:version": "pnpm changeset version && pnpm format",
-		"start": "tsup src/server.ts --watch --onSuccess 'node dist/server'",
+		"start": "tsdown src/server.ts --watch --onSuccess 'node dist/server'",
 		"test": "vitest run",
 		"test:ci": "vitest run --coverage"
 	},
@@ -61,7 +61,7 @@
 		"fishery": "2.2.3",
 		"supertest": "7.1.0",
 		"timekeeper": "2.3.1",
-		"tsup": "8.4.0",
+		"tsdown": "^0.9.9",
 		"typescript": "5.8.3",
 		"vitest": "3.1.1"
 	},
