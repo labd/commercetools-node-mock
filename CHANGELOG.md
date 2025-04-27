@@ -1,5 +1,19 @@
 ## 2.23.1
 
+## 2.50.0
+
+### Minor Changes
+
+- [`393f1b3`](https://github.com/labd/commercetools-node-mock/commit/393f1b396dde1c7258ff2abe50c0a7dd57b29b0c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Only release ESM version
+
+- [`393f1b3`](https://github.com/labd/commercetools-node-mock/commit/393f1b396dde1c7258ff2abe50c0a7dd57b29b0c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Cleanup dependencies and use built-in where possible
+
+- [`393f1b3`](https://github.com/labd/commercetools-node-mock/commit/393f1b396dde1c7258ff2abe50c0a7dd57b29b0c) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Switch from `tsup` to `tsdown` for packaging
+
+### Patch Changes
+
+- [`0568d33`](https://github.com/labd/commercetools-node-mock/commit/0568d330b9a40a8df315ebf09010ad08415e089f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Replace isEqual with isDeepStrictEqual
+
 ## 2.50.0-beta.0
 
 ### Minor Changes
