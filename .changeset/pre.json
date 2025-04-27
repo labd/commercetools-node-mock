@@ -4,5 +4,10 @@
   "initialVersions": {
     "@labdigital/commercetools-mock": "2.49.1"
   },
-  "changesets": []
+  "changesets": [
+    "happy-cooks-jog",
+    "nine-poets-say",
+    "slow-candies-lick",
+    "spicy-donkeys-rhyme"
+  ]
 }
