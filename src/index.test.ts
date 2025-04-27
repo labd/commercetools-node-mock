@@ -1,5 +1,4 @@
 import type { InvalidTokenError } from "@commercetools/platform-sdk";
-import got from "got";
 import { setupServer } from "msw/node";
 import { afterEach, beforeAll, expect, test } from "vitest";
 import { CommercetoolsMock } from "./index";
@@ -57,7 +56,7 @@ test("node:fetch client", async () => {
 	});
 });
 
-test("got client", async () => {
+test("fetch client", async () => {
 	const ctMock = new CommercetoolsMock({
 		enableAuthentication: true,
 		validateCredentials: true,
@@ -65,31 +64,34 @@ test("got client", async () => {
 		authHost: "https://localhost:8080",
 	});
 	ctMock.registerHandlers(mswServer);
+	const params = new URLSearchParams({
+		grant_type: "client_credentials",
+		scope: "manage_project:commercetools-node-mock",
+	});
 
-	let response = await got.post<{ access_token: string }>(
-		"https://localhost:8080/oauth/token",
-		{
-			searchParams: {
-				grant_type: "client_credentials",
-				scope: "manage_project:commercetools-node-mock",
-			},
-			username: "foo",
-			password: "bar",
-			responseType: "json",
+	const authHeader = `Basic ${Buffer.from("foo:bar").toString("base64")}`;
+	let response = await fetch(`https://localhost:8080/oauth/token?${params}`, {
+		method: "POST",
+		headers: {
+			Authorization: authHeader,
 		},
-	);
-	expect(response.statusCode).toBe(200);
+	});
 
-	const token = response.body.access_token;
-	expect(response.body.access_token).toBeDefined();
-	response = await got.get("https://localhost/my-project/orders", {
+	const authBody = await response.json();
+	expect(response.status).toBe(200);
+
+	const token = authBody.access_token;
+	expect(authBody.access_token).toBeDefined();
+
+	response = await fetch("https://localhost/my-project/orders", {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
-		responseType: "json",
 	});
-	expect(response.statusCode).toBe(200);
-	expect(response.body).toStrictEqual({
+
+	const body = await response.json();
+	expect(response.status).toBe(200);
+	expect(body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
@@ -105,18 +107,18 @@ test("Options.validateCredentials: true (error)", async () => {
 	});
 	ctMock.registerHandlers(mswServer);
 
-	const response = await got.get<InvalidTokenError>(
+	const response = await fetch(
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
 			headers: {
 				Authorization: "Bearer foobar",
 			},
-			responseType: "json",
-			throwHttpErrors: false,
 		},
 	);
-	expect(response.statusCode).toBe(401);
-	expect(response.body.message).toBe("invalid_token");
+
+	const body = (await response.json()) as InvalidTokenError;
+	expect(response.status).toBe(401);
+	expect(body.message).toBe("invalid_token");
 });
 
 test("Options.validateCredentials: false", async () => {
@@ -126,17 +128,18 @@ test("Options.validateCredentials: false", async () => {
 	});
 	ctMock.registerHandlers(mswServer);
 
-	const response = await got.get(
+	const response = await fetch(
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
 		{
 			headers: {
 				Authorization: "Bearer foobar",
 			},
-			responseType: "json",
 		},
 	);
-	expect(response.statusCode).toBe(200);
-	expect(response.body).toStrictEqual({
+
+	const body = await response.json();
+	expect(response.status).toBe(200);
+	expect(body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
@@ -152,14 +155,13 @@ test("Options.enableAuthentication: false", async () => {
 	});
 	ctMock.registerHandlers(mswServer);
 
-	const response = await got.get(
+	const response = await fetch(
 		"https://api.europe-west1.gcp.commercetools.com/my-project/orders",
-		{
-			responseType: "json",
-		},
 	);
-	expect(response.statusCode).toBe(200);
-	expect(response.body).toStrictEqual({
+
+	const body = await response.json();
+	expect(response.status).toBe(200);
+	expect(body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
@@ -176,11 +178,11 @@ test("Options.apiHost: is overridden is set", async () => {
 	});
 	ctMock.registerHandlers(mswServer);
 
-	const response = await got.get("http://api.localhost/my-project/orders", {
-		responseType: "json",
-	});
-	expect(response.statusCode).toBe(200);
-	expect(response.body).toStrictEqual({
+	const response = await fetch("http://api.localhost/my-project/orders");
+
+	const body = await response.json();
+	expect(response.status).toBe(200);
+	expect(body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
@@ -196,22 +198,23 @@ test("Options.authHost: is set", async () => {
 		authHost: "http://auth.localhost",
 	});
 	ctMock.registerHandlers(mswServer);
+	const params = new URLSearchParams({
+		grant_type: "client_credentials",
+		scope: "manage_project:commercetools-node-mock",
+	});
 
-	const response = await got.post<{ access_token: string }>(
-		"http://auth.localhost/oauth/token",
-		{
-			searchParams: {
-				grant_type: "client_credentials",
-				scope: "manage_project:commercetools-node-mock",
-			},
-			username: "foo",
-			password: "bar",
-			responseType: "json",
+	const authHeader = `Basic ${Buffer.from("foo:bar").toString("base64")}`;
+	const response = await fetch(`http://auth.localhost/oauth/token?${params}`, {
+		method: "POST",
+		headers: {
+			Authorization: authHeader,
 		},
-	);
-	expect(response.statusCode).toBe(200);
+	});
 
-	const token = response.body.access_token;
+	const authBody = await response.json();
+	expect(response.status).toBe(200);
+
+	const token = authBody.access_token;
 	expect(token).toBeDefined();
 });
 
@@ -223,16 +226,18 @@ test("apiHost mock proxy: querystring", async () => {
 	});
 	ctMock.registerHandlers(mswServer);
 
-	const response = await got.get("http://api.localhost/my-project/orders", {
-		responseType: "json",
-		searchParams: {
-			where: 'orderNumber="foobar"',
-			expand: "custom.type",
-		},
+	const queryParams = new URLSearchParams({
+		where: 'orderNumber="foobar"',
+		expand: "custom.type",
 	});
 
-	expect(response.statusCode).toBe(200);
-	expect(response.body).toStrictEqual({
+	const response = await fetch(
+		`http://api.localhost/my-project/orders?${queryParams}`,
+	);
+
+	const body = await response.json();
+	expect(response.status).toBe(200);
+	expect(body).toStrictEqual({
 		count: 0,
 		total: 0,
 		offset: 0,
