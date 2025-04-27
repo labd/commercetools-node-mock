@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from "node:util";
 import type {
 	BaseResource,
 	InvalidInputError,
@@ -6,7 +7,6 @@ import type {
 	ResourceNotFoundError,
 	UpdateAction,
 } from "@commercetools/platform-sdk";
-import deepEqual from "deep-equal";
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
@@ -291,7 +291,7 @@ export class AbstractUpdateHandler {
 			// an object per action which does an actual modification.
 			// This isn't the most performant method to do this (the update action
 			// should return a flag) but for now the easiest.
-			if (!deepEqual(beforeUpdate, updatedResource)) {
+			if (!isDeepStrictEqual(beforeUpdate, updatedResource)) {
 				// We only check the version when there is an actual modification to
 				// be stored.
 				checkConcurrentModification(resource.version, version, identifier);

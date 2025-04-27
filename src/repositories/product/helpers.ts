@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from "node:util";
 import type {
 	Asset,
 	AssetDraft,
@@ -9,7 +10,6 @@ import type {
 	ProductVariant,
 	ProductVariantDraft,
 } from "@commercetools/platform-sdk";
-import deepEqual from "deep-equal";
 import { v4 as uuidv4 } from "uuid";
 import type { AbstractStorage } from "~src/storage";
 import type { Writable } from "~src/types";
@@ -60,7 +60,9 @@ export const checkForStagedChanges = (product: Writable<Product>) => {
 		product.masterData.staged = product.masterData.current;
 	}
 
-	if (deepEqual(product.masterData.current, product.masterData.staged)) {
+	if (
+		isDeepStrictEqual(product.masterData.current, product.masterData.staged)
+	) {
 		product.masterData.hasStagedChanges = false;
 	} else {
 		product.masterData.hasStagedChanges = true;

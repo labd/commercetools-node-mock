@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from "node:util";
 import type {
 	ShippingMethodChangeTaxCategoryAction,
 	ShippingMethodRemoveShippingRateAction,
@@ -20,7 +21,6 @@ import type {
 	ShippingMethodUpdateAction,
 	ZoneReference,
 } from "@commercetools/platform-sdk";
-import deepEqual from "deep-equal";
 import type { Writable } from "~src/types";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
 import { AbstractUpdateHandler } from "../abstract";
@@ -117,7 +117,7 @@ export class ShippingMethodUpdateHandler
 		resource.zoneRates.forEach((zoneRate) => {
 			if (zoneRate.zone.id === zone.id) {
 				zoneRate.shippingRates = zoneRate.shippingRates.filter(
-					(otherRate) => !deepEqual(rate, otherRate),
+					(otherRate) => !isDeepStrictEqual(rate, otherRate),
 				);
 			}
 		});
