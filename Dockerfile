@@ -8,7 +8,7 @@ RUN corepack enable && \
 WORKDIR /app
 
 # Files required by pnpm install
-COPY package.json pnpm-lock.yaml tsup.config.js tsconfig.json /app/
+COPY package.json pnpm-lock.yaml tsdown.config.js tsconfig.json /app/
 
 RUN pnpm install --frozen-lockfile
 
