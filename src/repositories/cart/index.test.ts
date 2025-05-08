@@ -3,11 +3,21 @@ import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
 import { CartRepository } from "./index";
+import { getBaseResourceProperties } from "~src/helpers";
 
 describe("Cart repository", () => {
 	const storage = new InMemoryStorage();
 	const config: Config = { storage, strict: false };
 	const repository = new CartRepository(config);
+
+	storage.add("dummy", "type", {
+		...getBaseResourceProperties(),
+		id: "1234567890",
+		key: "custom-type-key",
+		name: { "nl-NL": "custom-type-name" },
+		resourceTypeIds: [],
+		fieldDefinitions: []
+	});
 
 	test("create cart in store", async () => {
 		storage.add("dummy", "product", {
@@ -108,6 +118,15 @@ describe("Cart repository", () => {
 							},
 						],
 					},
+					custom: {
+						type: {
+							typeId: "type",
+							id: "1234567890",
+						},
+						fields: {
+							description: "example description",
+						},
+					},
 				} as unknown as LineItem,
 			],
 			origin: "Customer",
@@ -149,5 +168,6 @@ describe("Cart repository", () => {
 		expect(result.taxMode).toEqual(cart.taxMode);
 		expect(result.taxRoundingMode).toEqual(cart.taxRoundingMode);
 		expect(result.store?.key).toEqual(ctx.storeKey);
+		expect(result.lineItems[0].custom?.fields.description as string).toEqual((cart.lineItems!)[0].custom?.fields?.description)
 	});
 });
