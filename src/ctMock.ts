@@ -138,7 +138,8 @@ export class CommercetoolsMock {
 		this._oauth2.setCustomerRepository(this._repositories.customer);
 
 		const app = express();
-		app.use(express.json());
+		// Set limit to 16mb, this is the maximum size allowed by the commercetools API: https://docs.commercetools.com/api/limits
+		app.use(express.json({ limit: "16mb" }));
 
 		const projectRouter = express.Router({ mergeParams: true });
 
