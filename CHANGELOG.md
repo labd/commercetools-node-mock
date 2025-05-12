@@ -1,5 +1,11 @@
 ## 2.23.1
 
+## 2.50.1
+
+### Patch Changes
+
+- [#296](https://github.com/labd/commercetools-node-mock/pull/296) [`0f56caf`](https://github.com/labd/commercetools-node-mock/commit/0f56caf998100c045e46394b5efed304f0043f64) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Set request document size limit to 16mb to allow for testing scenarios with large documents
+
 ## 2.50.0
 
 ### Minor Changes
