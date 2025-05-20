@@ -172,4 +172,42 @@ describe("Cart repository", () => {
 			cart.lineItems![0].custom?.fields?.description,
 		);
 	});
+
+	test("create cart with business unit", async () => {
+		storage.add("dummy", "business-unit", {
+			...getBaseResourceProperties(),
+			unitType: "Company",
+			key: "business-unit-key",
+			status: "Active",
+			storeMode: "Explicit",
+			name: "Test",
+			addresses: [],
+			associateMode: "Explicit",
+			associates: [],
+			topLevelUnit: {
+				typeId: "business-unit",
+				key: "business-unit-key",
+			},
+			approvalRuleMode: "Explicit",
+		});
+
+		const cart: CartDraft = {
+			country: "NL",
+			currency: "EUR",
+			businessUnit: {
+				typeId: "business-unit",
+				key: "business-unit-key",
+			},
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+
+		const result = repository.create(ctx, cart);
+		expect(result.id).toBeDefined();
+
+		expect(result.businessUnit).toEqual({
+			key: "business-unit-key",
+			typeId: "business-unit",
+		});
+	});
 });
