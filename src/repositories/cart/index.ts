@@ -202,7 +202,11 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			lineItemMode: "Standard",
 			priceMode: "Platform",
 			state: [],
-			custom: createCustomFields(draftLineItem.custom, projectKey, this._storage),
+			custom: createCustomFields(
+				draftLineItem.custom,
+				projectKey,
+				this._storage,
+			),
 		};
 	};
 }

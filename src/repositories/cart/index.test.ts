@@ -16,7 +16,7 @@ describe("Cart repository", () => {
 		key: "custom-type-key",
 		name: { "nl-NL": "custom-type-name" },
 		resourceTypeIds: [],
-		fieldDefinitions: []
+		fieldDefinitions: [],
 	});
 
 	test("create cart in store", async () => {
@@ -168,6 +168,8 @@ describe("Cart repository", () => {
 		expect(result.taxMode).toEqual(cart.taxMode);
 		expect(result.taxRoundingMode).toEqual(cart.taxRoundingMode);
 		expect(result.store?.key).toEqual(ctx.storeKey);
-		expect(result.lineItems[0].custom?.fields.description as string).toEqual((cart.lineItems!)[0].custom?.fields?.description)
+		expect(result.lineItems[0].custom?.fields.description as string).toEqual(
+			cart.lineItems![0].custom?.fields?.description,
+		);
 	});
 });
