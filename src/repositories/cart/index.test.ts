@@ -1,9 +1,9 @@
 import type { CartDraft, LineItem } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
+import { getBaseResourceProperties } from "~src/helpers";
 import { InMemoryStorage } from "~src/storage";
 import { CartRepository } from "./index";
-import { getBaseResourceProperties } from "~src/helpers";
 
 describe("Cart repository", () => {
 	const storage = new InMemoryStorage();
