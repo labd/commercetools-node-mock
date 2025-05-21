@@ -18,7 +18,7 @@
 		"build": "tsdown",
 		"build:server": "esbuild src/server.ts --bundle --outfile=dist/server.js --platform=node",
 		"check": "biome check && tsc",
-		"format": "biome format --fix",
+		"format": "biome check --fix",
 		"lint": "biome check",
 		"publish:ci": "pnpm build && pnpm changeset publish",
 		"publish:version": "pnpm changeset version && pnpm format",
