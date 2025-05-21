@@ -1,4 +1,7 @@
-import type { InvalidOperationError } from "@commercetools/platform-sdk";
+import type {
+	BusinessUnit,
+	InvalidOperationError,
+} from "@commercetools/platform-sdk";
 import type {
 	Cart,
 	CartDraft,
@@ -43,6 +46,19 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			});
 		}
 
+		let storedBusinessUnit: BusinessUnit | undefined = undefined;
+		if (draft.businessUnit?.id || draft.businessUnit?.key) {
+			storedBusinessUnit =
+				this._storage.getByResourceIdentifier<"business-unit">(
+					context.projectKey,
+					{
+						typeId: "business-unit",
+						id: draft.businessUnit.id,
+						key: draft.businessUnit.key,
+					},
+				);
+		}
+
 		const lineItems =
 			draft.lineItems?.map((draftLineItem) =>
 				this.draftLineItemtoLineItem(
@@ -56,6 +72,13 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		const resource: Writable<Cart> = {
 			...getBaseResourceProperties(),
 			anonymousId: draft.anonymousId,
+			businessUnit:
+				storedBusinessUnit && draft.businessUnit
+					? {
+							typeId: draft.businessUnit.typeId,
+							key: storedBusinessUnit.key,
+						}
+					: undefined,
 			billingAddress: draft.billingAddress
 				? createAddress(draft.billingAddress, context.projectKey, this._storage)
 				: undefined,
