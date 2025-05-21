@@ -1,5 +1,13 @@
 ## 2.23.1
 
+## 2.51.0
+
+### Minor Changes
+
+- [#298](https://github.com/labd/commercetools-node-mock/pull/298) [`1161924`](https://github.com/labd/commercetools-node-mock/commit/1161924fac0a95bb275729f25518476c0c6c02e2) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added support for business units to cart creation
+
+- [#295](https://github.com/labd/commercetools-node-mock/pull/295) [`b19fc03`](https://github.com/labd/commercetools-node-mock/commit/b19fc030d362674cb201875afc11deee9fceff86) Thanks [@daanjo3](https://github.com/daanjo3)! - Adds custom line item field handling on cart creation
+
 ## 2.50.1
 
 ### Patch Changes
