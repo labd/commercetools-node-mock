@@ -39,6 +39,10 @@ describe("Subscription", () => {
 				region: "us-east-1",
 				type: "SQS",
 			},
+			events: [],
+			format: {
+				type: "Platform",
+			},
 			id: expect.anything(),
 			key: "order-notifications",
 			lastModifiedAt: expect.anything(),

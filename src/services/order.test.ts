@@ -273,6 +273,23 @@ describe("Order payment tests", () => {
 		expect(maybePayment).toBeDefined();
 		expect(maybePayment.paymentStatus.state.obj).toBeDefined();
 	});
+
+	test("get by orderNumber - not found", async () => {
+		const response = await supertest(ctMock.app)
+			.get("/dummy/orders/order-number=nonexistent");
+
+		expect(response.status).toBe(404);
+		expect(response.body).toEqual({
+			statusCode: 404,
+			message: "The Resource with key 'nonexistent' was not found.",
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: "The Resource with key 'nonexistent' was not found.",
+				},
+			],
+		});
+	});
 });
 
 describe("Order Update Actions", () => {
