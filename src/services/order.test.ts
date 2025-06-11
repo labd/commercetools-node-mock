@@ -275,8 +275,9 @@ describe("Order payment tests", () => {
 	});
 
 	test("get by orderNumber - not found", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/orders/order-number=nonexistent");
+		const response = await supertest(ctMock.app).get(
+			"/dummy/orders/order-number=nonexistent",
+		);
 
 		expect(response.status).toBe(404);
 		expect(response.body).toEqual({

@@ -20,7 +20,9 @@ describe("MyBusinessUnit", () => {
 
 		expect(createResponse.status).toBe(201);
 
-		const response = await supertest(ctMock.app).get("/dummy/me/business-units/");
+		const response = await supertest(ctMock.app).get(
+			"/dummy/me/business-units/",
+		);
 
 		expect(response.status).toBe(200);
 		expect(response.body.count).toBeGreaterThanOrEqual(0);

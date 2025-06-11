@@ -135,7 +135,9 @@ describe("ProductDiscount", () => {
 
 		expect(createResponse.status).toBe(201);
 
-		const response = await supertest(ctMock.app).get("/dummy/product-discounts");
+		const response = await supertest(ctMock.app).get(
+			"/dummy/product-discounts",
+		);
 
 		expect(response.status).toBe(200);
 		expect(response.body.count).toBeGreaterThan(0);

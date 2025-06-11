@@ -301,12 +301,10 @@ describe("/me", () => {
 	});
 
 	test("signIn with invalid credentials", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/login")
-			.send({
-				email: "nonexistent@example.com",
-				password: "wrongpassword",
-			});
+		const response = await supertest(ctMock.app).post("/dummy/me/login").send({
+			email: "nonexistent@example.com",
+			password: "wrongpassword",
+		});
 
 		expect(response.status).toBe(400);
 		expect(response.body).toEqual({

@@ -15,11 +15,9 @@ describe("AttributeGroup", () => {
 			attributes: [
 				{
 					key: "size",
-					name: "size",
 				},
 				{
 					key: "color",
-					name: "color",
 				},
 			],
 		};
@@ -33,11 +31,9 @@ describe("AttributeGroup", () => {
 			attributes: [
 				{
 					key: "size",
-					name: "size",
 				},
 				{
 					key: "color",
-					name: "color",
 				},
 			],
 			createdAt: expect.anything(),
