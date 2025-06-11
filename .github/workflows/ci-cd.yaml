@@ -41,7 +41,7 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' &&  github.event.pull_request.draft == false
     needs: validate
     steps:
       - name: Set up QEMU
@@ -75,7 +75,7 @@ jobs:
   release:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.pull_request.draft == false
     needs: validate
     steps:
       - name: Checkout repo
