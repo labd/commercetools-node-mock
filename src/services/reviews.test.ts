@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import type { Review, Product, State } from "@commercetools/platform-sdk";
-import { CommercetoolsMock } from "~src/index";
+import type { Product, Review, State } from "@commercetools/platform-sdk";
 import supertest from "supertest";
+import { beforeEach, describe, expect, test } from "vitest";
+import { CommercetoolsMock } from "~src/index";
 
 describe("Review Update Actions", () => {
 	let ctMock: CommercetoolsMock;

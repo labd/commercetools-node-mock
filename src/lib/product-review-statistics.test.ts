@@ -1,7 +1,11 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import type { Review, Product, ProductProjection } from "@commercetools/platform-sdk";
-import { CommercetoolsMock } from "~src/index";
+import type {
+	Product,
+	ProductProjection,
+	Review,
+} from "@commercetools/platform-sdk";
 import supertest from "supertest";
+import { beforeEach, describe, expect, test } from "vitest";
+import { CommercetoolsMock } from "~src/index";
 
 describe("Product Review Statistics", () => {
 	let ctMock: CommercetoolsMock;
@@ -37,7 +41,9 @@ describe("Product Review Statistics", () => {
 	});
 
 	test("product has no review statistics when no reviews exist", async () => {
-		const response = await supertest(ctMock.app).get(`/dummy/products/${product.id}`);
+		const response = await supertest(ctMock.app).get(
+			`/dummy/products/${product.id}`,
+		);
 
 		expect(response.status).toBe(200);
 		expect(response.body.reviewRatingStatistics).toBeUndefined();
@@ -84,7 +90,9 @@ describe("Product Review Statistics", () => {
 				},
 			});
 
-		const response = await supertest(ctMock.app).get(`/dummy/products/${product.id}`);
+		const response = await supertest(ctMock.app).get(
+			`/dummy/products/${product.id}`,
+		);
 
 		expect(response.status).toBe(200);
 		expect(response.body.reviewRatingStatistics).toBeDefined();
@@ -113,7 +121,9 @@ describe("Product Review Statistics", () => {
 				},
 			});
 
-		const response = await supertest(ctMock.app).get(`/dummy/product-projections/${product.id}`);
+		const response = await supertest(ctMock.app).get(
+			`/dummy/product-projections/${product.id}`,
+		);
 
 		expect(response.status).toBe(200);
 		expect(response.body.reviewRatingStatistics).toBeDefined();
@@ -156,9 +166,15 @@ describe("Product Review Statistics", () => {
 		expect(response.body.results).toHaveLength(1);
 		expect(response.body.results[0].reviewRatingStatistics).toBeDefined();
 		expect(response.body.results[0].reviewRatingStatistics.count).toBe(2);
-		expect(response.body.results[0].reviewRatingStatistics.averageRating).toBe(3);
-		expect(response.body.results[0].reviewRatingStatistics.highestRating).toBe(4);
-		expect(response.body.results[0].reviewRatingStatistics.lowestRating).toBe(2);
+		expect(response.body.results[0].reviewRatingStatistics.averageRating).toBe(
+			3,
+		);
+		expect(response.body.results[0].reviewRatingStatistics.highestRating).toBe(
+			4,
+		);
+		expect(response.body.results[0].reviewRatingStatistics.lowestRating).toBe(
+			2,
+		);
 	});
 
 	test("only reviews with includedInStatistics=true are counted", async () => {
@@ -186,7 +202,9 @@ describe("Product Review Statistics", () => {
 			});
 
 		// Check that both reviews are included by default
-		let response = await supertest(ctMock.app).get(`/dummy/products/${product.id}`);
+		const response = await supertest(ctMock.app).get(
+			`/dummy/products/${product.id}`,
+		);
 
 		expect(response.status).toBe(200);
 		expect(response.body.reviewRatingStatistics).toBeDefined();
@@ -225,7 +243,9 @@ describe("Product Review Statistics", () => {
 				},
 			});
 
-		const response = await supertest(ctMock.app).get(`/dummy/products/${product.id}`);
+		const response = await supertest(ctMock.app).get(
+			`/dummy/products/${product.id}`,
+		);
 
 		expect(response.status).toBe(200);
 		// Only the review with rating should be counted
@@ -298,7 +318,9 @@ describe("Product Review Statistics", () => {
 			});
 
 		// Check statistics for the first product - should only include its own reviews
-		const response1 = await supertest(ctMock.app).get(`/dummy/products/${product.id}`);
+		const response1 = await supertest(ctMock.app).get(
+			`/dummy/products/${product.id}`,
+		);
 		expect(response1.status).toBe(200);
 		expect(response1.body.reviewRatingStatistics).toBeDefined();
 		expect(response1.body.reviewRatingStatistics.count).toBe(2); // Only reviews for this product
@@ -311,7 +333,9 @@ describe("Product Review Statistics", () => {
 		});
 
 		// Check statistics for the second product - should only include its own review
-		const response2 = await supertest(ctMock.app).get(`/dummy/products/${otherProduct.id}`);
+		const response2 = await supertest(ctMock.app).get(
+			`/dummy/products/${otherProduct.id}`,
+		);
 		expect(response2.status).toBe(200);
 		expect(response2.body.reviewRatingStatistics).toBeDefined();
 		expect(response2.body.reviewRatingStatistics.count).toBe(1); // Only reviews for this product

@@ -22,8 +22,8 @@ import {
 	parseFilterExpression,
 	resolveVariantValue,
 } from "./lib/projectionSearchFilter";
-import { applyPriceSelector } from "./priceSelector";
 import { ReviewStatisticsService } from "./lib/review-statistics";
+import { applyPriceSelector } from "./priceSelector";
 import type { AbstractStorage } from "./storage";
 import type { Writable } from "./types";
 
@@ -150,16 +150,21 @@ export class ProductProjectionSearch {
 		};
 	}
 
-	transform(product: Product, staged: boolean, projectKey: string): ProductProjection {
+	transform(
+		product: Product,
+		staged: boolean,
+		projectKey: string,
+	): ProductProjection {
 		const obj = !staged
 			? product.masterData.current
 			: product.masterData.staged;
 
 		// Calculate review statistics for this product
-		const reviewRatingStatistics = this._reviewStatisticsService.calculateProductReviewStatistics(
-			projectKey,
-			product.id,
-		);
+		const reviewRatingStatistics =
+			this._reviewStatisticsService.calculateProductReviewStatistics(
+				projectKey,
+				product.id,
+			);
 
 		return {
 			id: product.id,

@@ -1,4 +1,7 @@
-import type { ReviewRatingStatistics, Review } from "@commercetools/platform-sdk";
+import type {
+	Review,
+	ReviewRatingStatistics,
+} from "@commercetools/platform-sdk";
 import type { AbstractStorage } from "../storage";
 
 export class ReviewStatisticsService {

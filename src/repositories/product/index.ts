@@ -13,9 +13,9 @@ import type {
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
-import { ProductSearch } from "~src/product-search";
 import { ReviewStatisticsService } from "~src/lib/review-statistics";
-import type { RepositoryContext, GetParams } from "../abstract";
+import { ProductSearch } from "~src/product-search";
+import type { GetParams, RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";
 import { ProductUpdateHandler } from "./actions";
@@ -148,10 +148,11 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		params?: GetParams,
 	): Product {
 		// Add review statistics to the product
-		const reviewStatistics = this._reviewStatisticsService.calculateProductReviewStatistics(
-			context.projectKey,
-			resource.id,
-		);
+		const reviewStatistics =
+			this._reviewStatisticsService.calculateProductReviewStatistics(
+				context.projectKey,
+				resource.id,
+			);
 
 		return {
 			...resource,
