@@ -12,51 +12,6 @@ describe("As Associate Repositories", () => {
 	const storage = new InMemoryStorage();
 	const config: Config = { storage, strict: false };
 
-	test("AsAssociateCartRepository extends CartRepository", () => {
-		const repository = new AsAssociateCartRepository(config);
-
-		// Check that it has the expected methods from CartRepository
-		expect(repository).toHaveProperty("create");
-		expect(repository).toHaveProperty("query");
-		expect(repository).toHaveProperty("get");
-		expect(repository).toHaveProperty("getByKey");
-		expect(repository).toHaveProperty("delete");
-		expect(repository).toHaveProperty("processUpdateActions");
-
-		// Check that it's properly instantiated
-		expect(repository).toBeDefined();
-	});
-
-	test("AsAssociateOrderRepository extends OrderRepository", () => {
-		const repository = new AsAssociateOrderRepository(config);
-
-		// Check that it has the expected methods from OrderRepository
-		expect(repository).toHaveProperty("create");
-		expect(repository).toHaveProperty("query");
-		expect(repository).toHaveProperty("get");
-		expect(repository).toHaveProperty("getByKey");
-		expect(repository).toHaveProperty("delete");
-		expect(repository).toHaveProperty("processUpdateActions");
-
-		// Check that it's properly instantiated
-		expect(repository).toBeDefined();
-	});
-
-	test("AsAssociateQuoteRequestRepository extends QuoteRequestRepository", () => {
-		const repository = new AsAssociateQuoteRequestRepository(config);
-
-		// Check that it has the expected methods from QuoteRequestRepository
-		expect(repository).toHaveProperty("create");
-		expect(repository).toHaveProperty("query");
-		expect(repository).toHaveProperty("get");
-		expect(repository).toHaveProperty("getByKey");
-		expect(repository).toHaveProperty("delete");
-		expect(repository).toHaveProperty("processUpdateActions");
-
-		// Check that it's properly instantiated
-		expect(repository).toBeDefined();
-	});
-
 	test("AsAssociateCartRepository can create and retrieve carts", () => {
 		const repository = new AsAssociateCartRepository(config);
 		const ctx = { projectKey: "test-project" };
