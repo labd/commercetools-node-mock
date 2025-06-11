@@ -59,7 +59,7 @@ describe("AttributeGroup Repository", () => {
 		expect(result.name).toEqual(draft.name);
 		expect(result.description).toBeUndefined();
 		expect(result.key).toBeUndefined();
-		expect(result.attributes).toBeUndefined();
+		expect(result.attributes).toEqual([]);
 	});
 
 	test("update attribute group - changeName", () => {
