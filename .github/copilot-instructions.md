@@ -17,4 +17,5 @@ The code is split into these parts:
 - Use TypeScript for all code
 - Avoid enums and namespaces, all TypeScript code should be able to be stripped from the codebase
 - The code is tested with vitest
-- Run `pnpm format` before committing to format the code and make sure that all linting errors are fixed by checking `pnpm lint`
+- Check the code with `pnpm check`, to fix formatting issues run `pnpm format` and to just check for linting issues run `pnpm lint`
+- Don't forget to add a changeset (`@changesets/cli`) file using `pnpm changeset`
