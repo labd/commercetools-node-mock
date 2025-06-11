@@ -1,5 +1,6 @@
 import type {
 	ChannelReference,
+	CustomerReference,
 	ProductReference,
 } from "@commercetools/platform-sdk";
 import type {
@@ -124,7 +125,7 @@ class ReviewUpdateHandler
 		{ customer }: ReviewSetCustomerAction,
 	) {
 		resource.customer = customer
-			? getReferenceFromResourceIdentifier(
+			? getReferenceFromResourceIdentifier<CustomerReference>(
 					customer,
 					context.projectKey,
 					this._storage,
