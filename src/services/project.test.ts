@@ -48,4 +48,21 @@ describe("Project", () => {
 		const response = await supertest(ctMock.app).post("/dummy/");
 		expect(response.statusCode).toBe(400);
 	});
+
+	test("Post successful update", async () => {
+		const response = await supertest(ctMock.app)
+			.post("/dummy/")
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "changeName",
+						name: "Updated Project Name",
+					},
+				],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.name).toBe("Updated Project Name");
+		expect(response.body.version).toBe(2);
+	});
 });

@@ -293,4 +293,28 @@ describe("/me", () => {
 		expect(response.body.version).toBe(3);
 		expect(response.body.custom.fields.foobar).toBe(true);
 	});
+
+	test("deleteMe", async () => {
+		const response = await supertest(ctMock.app).delete("/dummy/me");
+		expect(response.status).toBe(200);
+		expect(response.body.id).toBeDefined();
+	});
+
+	test("signIn with invalid credentials", async () => {
+		const response = await supertest(ctMock.app).post("/dummy/me/login").send({
+			email: "nonexistent@example.com",
+			password: "wrongpassword",
+		});
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			message: "Account with the given credentials not found.",
+			errors: [
+				{
+					code: "InvalidCredentials",
+					message: "Account with the given credentials not found.",
+				},
+			],
+		});
+	});
 });
