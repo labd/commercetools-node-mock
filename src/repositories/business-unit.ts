@@ -101,6 +101,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		if (this._isDivisionDraft(draft)) {
 			const division = {
 				...resource,
+				unitType: "Division" as const,
 				parentUnit: getBusinessUnitKeyReference(
 					draft.parentUnit,
 					context.projectKey,
@@ -112,7 +113,10 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			return division;
 		}
 		if (this._isCompanyDraft(draft)) {
-			const company = resource as Company;
+			const company = {
+				...resource,
+				unitType: "Company" as const,
+			} as Company;
 
 			this.saveNew(context, company);
 			return company;
