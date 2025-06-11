@@ -1,4 +1,11 @@
-import type { ZoneDraft } from "@commercetools/platform-sdk";
+import type {
+	ZoneAddLocationAction,
+	ZoneChangeNameAction,
+	ZoneDraft,
+	ZoneRemoveLocationAction,
+	ZoneSetDescriptionAction,
+	ZoneSetKeyAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
@@ -68,7 +75,7 @@ describe("Zone Repository", () => {
 			{
 				action: "changeName",
 				name: "Updated Test Zone",
-			},
+			} as ZoneChangeNameAction,
 		]);
 
 		expect(result.name).toBe("Updated Test Zone");
@@ -88,7 +95,7 @@ describe("Zone Repository", () => {
 			{
 				action: "setKey",
 				key: "new-zone-key",
-			},
+			} as ZoneSetKeyAction,
 		]);
 
 		expect(result.key).toBe("new-zone-key");
@@ -108,7 +115,7 @@ describe("Zone Repository", () => {
 			{
 				action: "setDescription",
 				description: "New zone description",
-			},
+			} as ZoneSetDescriptionAction,
 		]);
 
 		expect(result.description).toBe("New zone description");
@@ -135,7 +142,7 @@ describe("Zone Repository", () => {
 				location: {
 					country: "FR",
 				},
-			},
+			} as ZoneAddLocationAction,
 		]);
 
 		expect(result.locations).toHaveLength(2);
@@ -161,7 +168,7 @@ describe("Zone Repository", () => {
 					country: "US",
 					state: "CA",
 				},
-			},
+			} as ZoneAddLocationAction,
 		]);
 
 		expect(result.locations).toHaveLength(1);
@@ -196,7 +203,7 @@ describe("Zone Repository", () => {
 				location: {
 					country: "FR",
 				},
-			},
+			} as ZoneRemoveLocationAction,
 		]);
 
 		expect(result.locations).toHaveLength(2);
@@ -232,7 +239,7 @@ describe("Zone Repository", () => {
 					country: "US",
 					state: "CA",
 				},
-			},
+			} as ZoneRemoveLocationAction,
 		]);
 
 		expect(result.locations).toHaveLength(1);

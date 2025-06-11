@@ -1,4 +1,11 @@
-import type { Extension, ExtensionDraft } from "@commercetools/platform-sdk";
+import type {
+	Extension,
+	ExtensionChangeDestinationAction,
+	ExtensionChangeTriggersAction,
+	ExtensionDraft,
+	ExtensionSetKeyAction,
+	ExtensionSetTimeoutInMsAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
@@ -155,11 +162,13 @@ describe("Extension Repository", () => {
 				{
 					action: "changeDestination",
 					destination: newDestination,
-				},
+				} as ExtensionChangeDestinationAction,
 			],
 		);
 
-		expect(result.destination.url).toBe("https://new-example.com/webhook");
+		expect((result.destination as any).url).toBe(
+			"https://new-example.com/webhook",
+		);
 		expect(result.version).toBe(extension.version + 1);
 	});
 
@@ -196,7 +205,7 @@ describe("Extension Repository", () => {
 				{
 					action: "changeTriggers",
 					triggers: newTriggers,
-				},
+				} as ExtensionChangeTriggersAction,
 			],
 		);
 
@@ -225,7 +234,7 @@ describe("Extension Repository", () => {
 				{
 					action: "setKey",
 					key: "new-extension-key",
-				},
+				} as ExtensionSetKeyAction,
 			],
 		);
 
@@ -254,7 +263,7 @@ describe("Extension Repository", () => {
 				{
 					action: "setTimeoutInMs",
 					timeoutInMs: 5000,
-				},
+				} as ExtensionSetTimeoutInMsAction,
 			],
 		);
 

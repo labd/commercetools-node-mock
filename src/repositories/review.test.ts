@@ -1,4 +1,17 @@
-import type { ReviewDraft } from "@commercetools/platform-sdk";
+import type {
+	ReviewDraft,
+	ReviewSetAuthorNameAction,
+	ReviewSetCustomFieldAction,
+	ReviewSetCustomTypeAction,
+	ReviewSetCustomerAction,
+	ReviewSetKeyAction,
+	ReviewSetLocaleAction,
+	ReviewSetRatingAction,
+	ReviewSetTargetAction,
+	ReviewSetTextAction,
+	ReviewSetTitleAction,
+	ReviewTransitionStateAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
@@ -45,6 +58,7 @@ describe("Review Repository", () => {
 				variants: [],
 				searchKeywords: {},
 			},
+			hasStagedChanges: false,
 		},
 	});
 
@@ -64,13 +78,14 @@ describe("Review Repository", () => {
 		lastName: "Doe",
 		password: "hashed-password",
 		addresses: [],
-		defaultShippingAddress: "",
-		defaultBillingAddress: "",
+		defaultShippingAddressId: "",
+		defaultBillingAddressId: "",
 		customerNumber: "",
 		externalId: "",
 		key: "",
 		stores: [],
 		authenticationMode: "Password" as const,
+		isEmailVerified: false,
 	});
 
 	storage.add("dummy", "state", {
@@ -231,7 +246,7 @@ describe("Review Repository", () => {
 				{
 					action: "setAuthorName",
 					authorName: "Updated Author",
-				},
+				} as ReviewSetAuthorNameAction,
 			],
 		);
 
@@ -261,7 +276,7 @@ describe("Review Repository", () => {
 				{
 					action: "setTitle",
 					title: "Updated Title",
-				},
+				} as ReviewSetTitleAction,
 			],
 		);
 
@@ -292,7 +307,7 @@ describe("Review Repository", () => {
 				{
 					action: "setText",
 					text: "Updated text content",
-				},
+				} as ReviewSetTextAction,
 			],
 		);
 
@@ -322,7 +337,7 @@ describe("Review Repository", () => {
 				{
 					action: "setRating",
 					rating: 5,
-				},
+				} as ReviewSetRatingAction,
 			],
 		);
 
@@ -352,7 +367,7 @@ describe("Review Repository", () => {
 				{
 					action: "setLocale",
 					locale: "de-DE",
-				},
+				} as ReviewSetLocaleAction,
 			],
 		);
 
@@ -383,7 +398,7 @@ describe("Review Repository", () => {
 				{
 					action: "setKey",
 					key: "updated-key",
-				},
+				} as ReviewSetKeyAction,
 			],
 		);
 
@@ -416,7 +431,7 @@ describe("Review Repository", () => {
 						typeId: "customer",
 						id: "customer-123",
 					},
-				},
+				} as ReviewSetCustomerAction,
 			],
 		);
 
@@ -449,7 +464,7 @@ describe("Review Repository", () => {
 						typeId: "channel",
 						id: "channel-123",
 					},
-				},
+				} as ReviewSetTargetAction,
 			],
 		);
 
@@ -483,7 +498,7 @@ describe("Review Repository", () => {
 						typeId: "state",
 						id: "state-123",
 					},
-				},
+				} as ReviewTransitionStateAction,
 			],
 		);
 
@@ -520,7 +535,7 @@ describe("Review Repository", () => {
 					fields: {
 						helpfulVotes: 5,
 					},
-				},
+				} as ReviewSetCustomTypeAction,
 			],
 		);
 
@@ -536,7 +551,7 @@ describe("Review Repository", () => {
 			[
 				{
 					action: "setCustomType",
-				},
+				} as ReviewSetCustomTypeAction,
 			],
 		);
 
@@ -576,7 +591,7 @@ describe("Review Repository", () => {
 					action: "setCustomField",
 					name: "helpfulVotes",
 					value: 10,
-				},
+				} as ReviewSetCustomFieldAction,
 			],
 		);
 

@@ -1,4 +1,10 @@
-import type { CustomerGroupDraft } from "@commercetools/platform-sdk";
+import type {
+	CustomerGroupChangeNameAction,
+	CustomerGroupDraft,
+	CustomerGroupSetCustomFieldAction,
+	CustomerGroupSetCustomTypeAction,
+	CustomerGroupSetKeyAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
@@ -91,7 +97,7 @@ describe("CustomerGroup Repository", () => {
 				{
 					action: "changeName",
 					name: "Updated Test Customers",
-				},
+				} as CustomerGroupChangeNameAction,
 			],
 		);
 
@@ -116,7 +122,7 @@ describe("CustomerGroup Repository", () => {
 				{
 					action: "setKey",
 					key: "new-customer-key",
-				},
+				} as CustomerGroupSetKeyAction,
 			],
 		);
 
@@ -148,7 +154,7 @@ describe("CustomerGroup Repository", () => {
 					fields: {
 						description: "New custom field value",
 					},
-				},
+				} as CustomerGroupSetCustomTypeAction,
 			],
 		);
 
@@ -164,7 +170,7 @@ describe("CustomerGroup Repository", () => {
 			[
 				{
 					action: "setCustomType",
-				},
+				} as CustomerGroupSetCustomTypeAction,
 			],
 		);
 
@@ -200,7 +206,7 @@ describe("CustomerGroup Repository", () => {
 					action: "setCustomField",
 					name: "description",
 					value: "Updated description",
-				},
+				} as CustomerGroupSetCustomFieldAction,
 			],
 		);
 
@@ -217,7 +223,7 @@ describe("CustomerGroup Repository", () => {
 					action: "setCustomField",
 					name: "description",
 					value: null,
-				},
+				} as CustomerGroupSetCustomFieldAction,
 			],
 		);
 

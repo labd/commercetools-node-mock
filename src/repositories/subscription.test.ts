@@ -1,4 +1,7 @@
-import type { SubscriptionDraft } from "@commercetools/platform-sdk";
+import type {
+	SubscriptionDraft,
+	SubscriptionSetKeyAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
@@ -161,7 +164,7 @@ describe("Subscription Repository", () => {
 				{
 					action: "setKey",
 					key: "updated-subscription-key",
-				},
+				} as SubscriptionSetKeyAction,
 			],
 		);
 
