@@ -23,6 +23,7 @@ import {
 	resolveVariantValue,
 } from "./lib/projectionSearchFilter";
 import { applyPriceSelector } from "./priceSelector";
+import { ReviewStatisticsService } from "./services/review-statistics";
 import type { AbstractStorage } from "./storage";
 import type { Writable } from "./types";
 
@@ -51,9 +52,11 @@ export type ProductProjectionSearchParams = {
 
 export class ProductProjectionSearch {
 	protected _storage: AbstractStorage;
+	protected _reviewStatisticsService: ReviewStatisticsService;
 
 	constructor(config: Config) {
 		this._storage = config.storage;
+		this._reviewStatisticsService = new ReviewStatisticsService(config.storage);
 	}
 
 	search(
@@ -62,7 +65,7 @@ export class ProductProjectionSearch {
 	): ProductProjectionPagedSearchResponse {
 		let resources = this._storage
 			.all(projectKey, "product")
-			.map((r) => this.transform(r, params.staged ?? false))
+			.map((r) => this.transform(r, params.staged ?? false, projectKey))
 			.filter((p) => {
 				if (!(params.staged ?? false)) {
 					return p.published;
@@ -147,10 +150,16 @@ export class ProductProjectionSearch {
 		};
 	}
 
-	transform(product: Product, staged: boolean): ProductProjection {
+	transform(product: Product, staged: boolean, projectKey: string): ProductProjection {
 		const obj = !staged
 			? product.masterData.current
 			: product.masterData.staged;
+
+		// Calculate review statistics for this product
+		const reviewRatingStatistics = this._reviewStatisticsService.calculateProductReviewStatistics(
+			projectKey,
+			product.id,
+		);
 
 		return {
 			id: product.id,
@@ -168,6 +177,7 @@ export class ProductProjectionSearch {
 			productType: product.productType,
 			hasStagedChanges: product.masterData.hasStagedChanges,
 			published: product.masterData.published,
+			reviewRatingStatistics,
 		};
 	}
 

@@ -58,7 +58,7 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 						ProductReference | ChannelReference
 					>(draft.target, context.projectKey, this._storage)
 				: undefined,
-			includedInStatistics: false,
+			includedInStatistics: true,
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
