@@ -13,8 +13,9 @@ import type {
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
+import { ReviewStatisticsService } from "~src/lib/review-statistics";
 import { ProductSearch } from "~src/product-search";
-import type { RepositoryContext } from "../abstract";
+import type { GetParams, RepositoryContext } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";
 import { ProductUpdateHandler } from "./actions";
@@ -22,11 +23,13 @@ import { variantFromDraft } from "./helpers";
 
 export class ProductRepository extends AbstractResourceRepository<"product"> {
 	protected _searchService: ProductSearch;
+	protected _reviewStatisticsService: ReviewStatisticsService;
 
 	constructor(config: Config) {
 		super("product", config);
 		this.actions = new ProductUpdateHandler(config.storage);
 		this._searchService = new ProductSearch(config);
+		this._reviewStatisticsService = new ReviewStatisticsService(config.storage);
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): Product {
@@ -137,6 +140,24 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		};
 
 		return this.saveNew(context, resource);
+	}
+
+	postProcessResource(
+		context: RepositoryContext,
+		resource: Product,
+		params?: GetParams,
+	): Product {
+		// Add review statistics to the product
+		const reviewStatistics =
+			this._reviewStatisticsService.calculateProductReviewStatistics(
+				context.projectKey,
+				resource.id,
+			);
+
+		return {
+			...resource,
+			reviewRatingStatistics: reviewStatistics,
+		};
 	}
 
 	search(
