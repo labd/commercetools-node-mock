@@ -14,7 +14,7 @@ import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
 import { ProductSearch } from "~src/product-search";
-import { ReviewStatisticsService } from "~src/services/review-statistics";
+import { ReviewStatisticsService } from "~src/lib/review-statistics";
 import type { RepositoryContext, GetParams } from "../abstract";
 import { AbstractResourceRepository } from "../abstract";
 import { getReferenceFromResourceIdentifier } from "../helpers";

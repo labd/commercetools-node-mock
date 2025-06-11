@@ -23,7 +23,7 @@ import {
 	resolveVariantValue,
 } from "./lib/projectionSearchFilter";
 import { applyPriceSelector } from "./priceSelector";
-import { ReviewStatisticsService } from "./services/review-statistics";
+import { ReviewStatisticsService } from "./lib/review-statistics";
 import type { AbstractStorage } from "./storage";
 import type { Writable } from "./types";
 

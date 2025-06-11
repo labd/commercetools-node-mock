@@ -233,4 +233,93 @@ describe("Product Review Statistics", () => {
 		expect(response.body.reviewRatingStatistics.count).toBe(1);
 		expect(response.body.reviewRatingStatistics.averageRating).toBe(4);
 	});
+
+	test("reviews on other products are excluded from statistics", async () => {
+		// Create another product
+		const otherProductResponse = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send({
+				name: { en: "Other Product" },
+				slug: { en: "other-product" },
+				productType: {
+					typeId: "product-type",
+					key: "dummy-product-type",
+				},
+				masterVariant: {
+					sku: "other-sku",
+					prices: [
+						{
+							value: {
+								currencyCode: "EUR",
+								centAmount: 2000,
+							},
+						},
+					],
+				},
+			});
+		expect(otherProductResponse.status).toBe(201);
+		const otherProduct = otherProductResponse.body;
+
+		// Create reviews for both products
+		await supertest(ctMock.app)
+			.post("/dummy/reviews")
+			.send({
+				authorName: "User A",
+				title: "Review for first product",
+				rating: 5,
+				target: {
+					typeId: "product",
+					id: product.id,
+				},
+			});
+
+		await supertest(ctMock.app)
+			.post("/dummy/reviews")
+			.send({
+				authorName: "User B",
+				title: "Review for second product",
+				rating: 1,
+				target: {
+					typeId: "product",
+					id: otherProduct.id,
+				},
+			});
+
+		await supertest(ctMock.app)
+			.post("/dummy/reviews")
+			.send({
+				authorName: "User C",
+				title: "Another review for first product",
+				rating: 3,
+				target: {
+					typeId: "product",
+					id: product.id,
+				},
+			});
+
+		// Check statistics for the first product - should only include its own reviews
+		const response1 = await supertest(ctMock.app).get(`/dummy/products/${product.id}`);
+		expect(response1.status).toBe(200);
+		expect(response1.body.reviewRatingStatistics).toBeDefined();
+		expect(response1.body.reviewRatingStatistics.count).toBe(2); // Only reviews for this product
+		expect(response1.body.reviewRatingStatistics.averageRating).toBe(4); // (5 + 3) / 2 = 4
+		expect(response1.body.reviewRatingStatistics.highestRating).toBe(5);
+		expect(response1.body.reviewRatingStatistics.lowestRating).toBe(3);
+		expect(response1.body.reviewRatingStatistics.ratingsDistribution).toEqual({
+			"3": 1,
+			"5": 1,
+		});
+
+		// Check statistics for the second product - should only include its own review
+		const response2 = await supertest(ctMock.app).get(`/dummy/products/${otherProduct.id}`);
+		expect(response2.status).toBe(200);
+		expect(response2.body.reviewRatingStatistics).toBeDefined();
+		expect(response2.body.reviewRatingStatistics.count).toBe(1); // Only reviews for this product
+		expect(response2.body.reviewRatingStatistics.averageRating).toBe(1);
+		expect(response2.body.reviewRatingStatistics.highestRating).toBe(1);
+		expect(response2.body.reviewRatingStatistics.lowestRating).toBe(1);
+		expect(response2.body.reviewRatingStatistics.ratingsDistribution).toEqual({
+			"1": 1,
+		});
+	});
 });
