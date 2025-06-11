@@ -223,12 +223,17 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setAuthorName",
-				authorName: "Updated Author",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setAuthorName",
+					authorName: "Updated Author",
+				},
+			],
+		);
 
 		expect(result.authorName).toBe("Updated Author");
 		expect(result.version).toBe(review.version + 1);
@@ -248,12 +253,17 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setTitle",
-				title: "Updated Title",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setTitle",
+					title: "Updated Title",
+				},
+			],
+		);
 
 		expect(result.title).toBe("Updated Title");
 		expect(result.version).toBe(review.version + 1);
@@ -274,12 +284,17 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setText",
-				text: "Updated text content",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setText",
+					text: "Updated text content",
+				},
+			],
+		);
 
 		expect(result.text).toBe("Updated text content");
 		expect(result.version).toBe(review.version + 1);
@@ -299,12 +314,17 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setRating",
-				rating: 5,
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setRating",
+					rating: 5,
+				},
+			],
+		);
 
 		expect(result.rating).toBe(5);
 		expect(result.version).toBe(review.version + 1);
@@ -324,12 +344,17 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setLocale",
-				locale: "de-DE",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setLocale",
+					locale: "de-DE",
+				},
+			],
+		);
 
 		expect(result.locale).toBe("de-DE");
 		expect(result.version).toBe(review.version + 1);
@@ -350,12 +375,17 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setKey",
-				key: "updated-key",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setKey",
+					key: "updated-key",
+				},
+			],
+		);
 
 		expect(result.key).toBe("updated-key");
 		expect(result.version).toBe(review.version + 1);
@@ -375,15 +405,20 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setCustomer",
-				customer: {
-					typeId: "customer",
-					id: "customer-123",
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setCustomer",
+					customer: {
+						typeId: "customer",
+						id: "customer-123",
+					},
 				},
-			},
-		]);
+			],
+		);
 
 		expect(result.customer?.id).toBe("customer-123");
 		expect(result.version).toBe(review.version + 1);
@@ -403,15 +438,20 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setTarget",
-				target: {
-					typeId: "channel",
-					id: "channel-123",
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setTarget",
+					target: {
+						typeId: "channel",
+						id: "channel-123",
+					},
 				},
-			},
-		]);
+			],
+		);
 
 		expect(result.target?.typeId).toBe("channel");
 		expect(result.target?.id).toBe("channel-123");
@@ -432,15 +472,20 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "transitionState",
-				state: {
-					typeId: "state",
-					id: "state-123",
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "transitionState",
+					state: {
+						typeId: "state",
+						id: "state-123",
+					},
 				},
-			},
-		]);
+			],
+		);
 
 		expect(result.state?.id).toBe("state-123");
 		expect(result.version).toBe(review.version + 1);
@@ -461,29 +506,39 @@ describe("Review Repository", () => {
 		const review = repository.create(ctx, draft);
 
 		// Set custom type
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setCustomType",
-				type: {
-					typeId: "type",
-					id: "type-123",
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setCustomType",
+					type: {
+						typeId: "type",
+						id: "type-123",
+					},
+					fields: {
+						helpfulVotes: 5,
+					},
 				},
-				fields: {
-					helpfulVotes: 5,
-				},
-			},
-		]);
+			],
+		);
 
 		expect(result.custom).toBeDefined();
 		expect(result.custom?.fields.helpfulVotes).toBe(5);
 		expect(result.version).toBe(review.version + 1);
 
 		// Remove custom type
-		const result2 = repository.processUpdateActions(ctx, result, result.version, [
-			{
-				action: "setCustomType",
-			},
-		]);
+		const result2 = repository.processUpdateActions(
+			ctx,
+			result,
+			result.version,
+			[
+				{
+					action: "setCustomType",
+				},
+			],
+		);
 
 		expect(result2.custom).toBeUndefined();
 		expect(result2.version).toBe(result.version + 1);
@@ -512,13 +567,18 @@ describe("Review Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const review = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, review, review.version, [
-			{
-				action: "setCustomField",
-				name: "helpfulVotes",
-				value: 10,
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			review,
+			review.version,
+			[
+				{
+					action: "setCustomField",
+					name: "helpfulVotes",
+					value: 10,
+				},
+			],
+		);
 
 		expect(result.custom?.fields.helpfulVotes).toBe(10);
 		expect(result.version).toBe(review.version + 1);

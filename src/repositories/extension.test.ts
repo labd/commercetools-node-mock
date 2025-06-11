@@ -91,7 +91,10 @@ describe("Extension Repository", () => {
 		const result = repository.postProcessResource(ctx, extension);
 
 		expect(result.destination.type).toBe("HTTP");
-		if (result.destination.type === "HTTP" && result.destination.authentication?.type === "AuthorizationHeader") {
+		if (
+			result.destination.type === "HTTP" &&
+			result.destination.authentication?.type === "AuthorizationHeader"
+		) {
 			expect(result.destination.authentication.headerValue).toBe("****");
 		}
 	});
@@ -144,12 +147,17 @@ describe("Extension Repository", () => {
 			url: "https://new-example.com/webhook",
 		};
 
-		const result = repository.processUpdateActions(ctx, extension, extension.version, [
-			{
-				action: "changeDestination",
-				destination: newDestination,
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "changeDestination",
+					destination: newDestination,
+				},
+			],
+		);
 
 		expect(result.destination.url).toBe("https://new-example.com/webhook");
 		expect(result.version).toBe(extension.version + 1);
@@ -180,12 +188,17 @@ describe("Extension Repository", () => {
 			},
 		];
 
-		const result = repository.processUpdateActions(ctx, extension, extension.version, [
-			{
-				action: "changeTriggers",
-				triggers: newTriggers,
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "changeTriggers",
+					triggers: newTriggers,
+				},
+			],
+		);
 
 		expect(result.triggers).toEqual(newTriggers);
 		expect(result.version).toBe(extension.version + 1);
@@ -204,12 +217,17 @@ describe("Extension Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const extension = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, extension, extension.version, [
-			{
-				action: "setKey",
-				key: "new-extension-key",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "setKey",
+					key: "new-extension-key",
+				},
+			],
+		);
 
 		expect(result.key).toBe("new-extension-key");
 		expect(result.version).toBe(extension.version + 1);
@@ -228,12 +246,17 @@ describe("Extension Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const extension = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, extension, extension.version, [
-			{
-				action: "setTimeoutInMs",
-				timeoutInMs: 5000,
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "setTimeoutInMs",
+					timeoutInMs: 5000,
+				},
+			],
+		);
 
 		expect(result.timeoutInMs).toBe(5000);
 		expect(result.version).toBe(extension.version + 1);

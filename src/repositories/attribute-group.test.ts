@@ -1,4 +1,10 @@
-import type { AttributeGroupDraft } from "@commercetools/platform-sdk";
+import type {
+	AttributeGroupChangeNameAction,
+	AttributeGroupDraft,
+	AttributeGroupSetAttributesAction,
+	AttributeGroupSetDescriptionAction,
+	AttributeGroupSetKeyAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { InMemoryStorage } from "~src/storage";
@@ -43,6 +49,7 @@ describe("AttributeGroup Repository", () => {
 	test("create attribute group with minimal data", () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Minimal Attributes" },
+			attributes: [],
 		};
 
 		const ctx = { projectKey: "dummy" };
@@ -59,19 +66,28 @@ describe("AttributeGroup Repository", () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Original Name" },
 			key: "test-attributes",
+			attributes: [],
 		};
 
 		const ctx = { projectKey: "dummy" };
 		const attributeGroup = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, attributeGroup, attributeGroup.version, [
-			{
-				action: "changeName",
-				name: { "en-US": "Updated Name", "de-DE": "Aktualisierter Name" },
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			attributeGroup,
+			attributeGroup.version,
+			[
+				{
+					action: "changeName",
+					name: { "en-US": "Updated Name", "de-DE": "Aktualisierter Name" },
+				} as AttributeGroupChangeNameAction,
+			],
+		);
 
-		expect(result.name).toEqual({ "en-US": "Updated Name", "de-DE": "Aktualisierter Name" });
+		expect(result.name).toEqual({
+			"en-US": "Updated Name",
+			"de-DE": "Aktualisierter Name",
+		});
 		expect(result.version).toBe(attributeGroup.version + 1);
 	});
 
@@ -79,19 +95,31 @@ describe("AttributeGroup Repository", () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Test Attributes" },
 			key: "test-attributes-2",
+			attributes: [],
 		};
 
 		const ctx = { projectKey: "dummy" };
 		const attributeGroup = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, attributeGroup, attributeGroup.version, [
-			{
-				action: "setDescription",
-				description: { "en-US": "New description", "de-DE": "Neue Beschreibung" },
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			attributeGroup,
+			attributeGroup.version,
+			[
+				{
+					action: "setDescription",
+					description: {
+						"en-US": "New description",
+						"de-DE": "Neue Beschreibung",
+					},
+				} as AttributeGroupSetDescriptionAction,
+			],
+		);
 
-		expect(result.description).toEqual({ "en-US": "New description", "de-DE": "Neue Beschreibung" });
+		expect(result.description).toEqual({
+			"en-US": "New description",
+			"de-DE": "Neue Beschreibung",
+		});
 		expect(result.version).toBe(attributeGroup.version + 1);
 	});
 
@@ -99,17 +127,23 @@ describe("AttributeGroup Repository", () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Key Test Attributes" },
 			key: "original-key",
+			attributes: [],
 		};
 
 		const ctx = { projectKey: "dummy" };
 		const attributeGroup = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, attributeGroup, attributeGroup.version, [
-			{
-				action: "setKey",
-				key: "updated-key",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			attributeGroup,
+			attributeGroup.version,
+			[
+				{
+					action: "setKey",
+					key: "updated-key",
+				} as AttributeGroupSetKeyAction,
+			],
+		);
 
 		expect(result.key).toBe("updated-key");
 		expect(result.version).toBe(attributeGroup.version + 1);
@@ -129,19 +163,24 @@ describe("AttributeGroup Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const attributeGroup = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, attributeGroup, attributeGroup.version, [
-			{
-				action: "setAttributes",
-				attributes: [
-					{
-						key: "new-attribute-1",
-					},
-					{
-						key: "new-attribute-2",
-					},
-				],
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			attributeGroup,
+			attributeGroup.version,
+			[
+				{
+					action: "setAttributes",
+					attributes: [
+						{
+							key: "new-attribute-1",
+						},
+						{
+							key: "new-attribute-2",
+						},
+					],
+				} as AttributeGroupSetAttributesAction,
+			],
+		);
 
 		expect(result.attributes).toEqual([
 			{ key: "new-attribute-1" },
@@ -154,6 +193,7 @@ describe("AttributeGroup Repository", () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Delete Test Attributes" },
 			key: "delete-test",
+			attributes: [],
 		};
 
 		const ctx = { projectKey: "dummy" };

@@ -107,7 +107,8 @@ describe("Subscription Repository", () => {
 			key: "servicebus-subscription",
 			destination: {
 				type: "AzureServiceBus",
-				connectionString: "Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=example;SharedAccessKey=example",
+				connectionString:
+					"Endpoint=sb://example.servicebus.windows.net/;SharedAccessKeyName=example;SharedAccessKey=example",
 			},
 		};
 
@@ -152,12 +153,17 @@ describe("Subscription Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const subscription = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, subscription, subscription.version, [
-			{
-				action: "setKey",
-				key: "updated-subscription-key",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			subscription,
+			subscription.version,
+			[
+				{
+					action: "setKey",
+					key: "updated-subscription-key",
+				},
+			],
+		);
 
 		expect(result.key).toBe("updated-subscription-key");
 		expect(result.version).toBe(subscription.version + 1);

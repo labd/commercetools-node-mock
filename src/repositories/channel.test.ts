@@ -1,4 +1,13 @@
-import type { ChannelDraft } from "@commercetools/platform-sdk";
+import type {
+	ChannelChangeDescriptionAction,
+	ChannelChangeKeyAction,
+	ChannelChangeNameAction,
+	ChannelDraft,
+	ChannelSetAddressAction,
+	ChannelSetCustomFieldAction,
+	ChannelSetCustomTypeAction,
+	ChannelSetGeoLocationAction,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
@@ -70,7 +79,7 @@ describe("Channel Repository", () => {
 			},
 			geoLocation: {
 				type: "Point",
-				coordinates: [13.4050, 52.5200],
+				coordinates: [13.405, 52.52],
 			},
 			custom: {
 				type: {
@@ -104,12 +113,17 @@ describe("Channel Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const channel = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "changeName",
-				name: { "en-US": "Updated Test Channel" },
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "changeName",
+					name: { "en-US": "Updated Test Channel" },
+				} as ChannelChangeNameAction,
+			],
+		);
 
 		expect(result.name).toEqual({ "en-US": "Updated Test Channel" });
 		expect(result.version).toBe(channel.version + 1);
@@ -124,12 +138,17 @@ describe("Channel Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const channel = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "changeKey",
-				key: "new-channel-key",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "changeKey",
+					key: "new-channel-key",
+				} as ChannelChangeKeyAction,
+			],
+		);
 
 		expect(result.key).toBe("new-channel-key");
 		expect(result.version).toBe(channel.version + 1);
@@ -144,12 +163,17 @@ describe("Channel Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const channel = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "changeDescription",
-				description: { "en-US": "New description" },
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "changeDescription",
+					description: { "en-US": "New description" },
+				} as ChannelChangeDescriptionAction,
+			],
+		);
 
 		expect(result.description).toEqual({ "en-US": "New description" });
 		expect(result.version).toBe(channel.version + 1);
@@ -164,18 +188,23 @@ describe("Channel Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const channel = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "setAddress",
-				address: {
-					country: "US",
-					city: "New York",
-					streetName: "Broadway",
-					streetNumber: "123",
-					postalCode: "10001",
-				},
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "setAddress",
+					address: {
+						country: "US",
+						city: "New York",
+						streetName: "Broadway",
+						streetNumber: "123",
+						postalCode: "10001",
+					},
+				} as ChannelSetAddressAction,
+			],
+		);
 
 		expect(result.address?.country).toBe("US");
 		expect(result.address?.city).toBe("New York");
@@ -191,15 +220,20 @@ describe("Channel Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const channel = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "setGeoLocation",
-				geoLocation: {
-					type: "Point",
-					coordinates: [2.3522, 48.8566], // Paris coordinates
-				},
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "setGeoLocation",
+					geoLocation: {
+						type: "Point",
+						coordinates: [2.3522, 48.8566], // Paris coordinates
+					},
+				} as ChannelSetGeoLocationAction,
+			],
+		);
 
 		expect(result.geoLocation).toEqual({
 			type: "Point",
@@ -218,29 +252,39 @@ describe("Channel Repository", () => {
 		const channel = repository.create(ctx, draft);
 
 		// Set custom type
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "setCustomType",
-				type: {
-					typeId: "type",
-					id: "custom-type-id",
-				},
-				fields: {
-					description: "New custom field value",
-				},
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "setCustomType",
+					type: {
+						typeId: "type",
+						id: "custom-type-id",
+					},
+					fields: {
+						description: "New custom field value",
+					},
+				} as ChannelSetCustomTypeAction,
+			],
+		);
 
 		expect(result.custom).toBeDefined();
 		expect(result.custom?.fields.description).toBe("New custom field value");
 		expect(result.version).toBe(channel.version + 1);
 
 		// Remove custom type
-		const result2 = repository.processUpdateActions(ctx, result, result.version, [
-			{
-				action: "setCustomType",
-			},
-		]);
+		const result2 = repository.processUpdateActions(
+			ctx,
+			result,
+			result.version,
+			[
+				{
+					action: "setCustomType",
+				} as ChannelSetCustomTypeAction,
+			],
+		);
 
 		expect(result2.custom).toBeUndefined();
 		expect(result2.version).toBe(result.version + 1);
@@ -265,25 +309,35 @@ describe("Channel Repository", () => {
 		const channel = repository.create(ctx, draft);
 
 		// Update custom field
-		const result = repository.processUpdateActions(ctx, channel, channel.version, [
-			{
-				action: "setCustomField",
-				name: "description",
-				value: "Updated description",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			channel,
+			channel.version,
+			[
+				{
+					action: "setCustomField",
+					name: "description",
+					value: "Updated description",
+				} as ChannelSetCustomFieldAction,
+			],
+		);
 
 		expect(result.custom?.fields.description).toBe("Updated description");
 		expect(result.version).toBe(channel.version + 1);
 
 		// Remove custom field
-		const result2 = repository.processUpdateActions(ctx, result, result.version, [
-			{
-				action: "setCustomField",
-				name: "description",
-				value: null,
-			},
-		]);
+		const result2 = repository.processUpdateActions(
+			ctx,
+			result,
+			result.version,
+			[
+				{
+					action: "setCustomField",
+					name: "description",
+					value: null,
+				} as ChannelSetCustomFieldAction,
+			],
+		);
 
 		expect(result2.custom?.fields.description).toBeUndefined();
 		expect(result2.version).toBe(result.version + 1);

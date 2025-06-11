@@ -83,12 +83,17 @@ describe("CustomerGroup Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const customerGroup = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, customerGroup, customerGroup.version, [
-			{
-				action: "changeName",
-				name: "Updated Test Customers",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			customerGroup,
+			customerGroup.version,
+			[
+				{
+					action: "changeName",
+					name: "Updated Test Customers",
+				},
+			],
+		);
 
 		expect(result.name).toBe("Updated Test Customers");
 		expect(result.version).toBe(customerGroup.version + 1);
@@ -103,12 +108,17 @@ describe("CustomerGroup Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const customerGroup = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, customerGroup, customerGroup.version, [
-			{
-				action: "setKey",
-				key: "new-customer-key",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			customerGroup,
+			customerGroup.version,
+			[
+				{
+					action: "setKey",
+					key: "new-customer-key",
+				},
+			],
+		);
 
 		expect(result.key).toBe("new-customer-key");
 		expect(result.version).toBe(customerGroup.version + 1);
@@ -124,29 +134,39 @@ describe("CustomerGroup Repository", () => {
 		const customerGroup = repository.create(ctx, draft);
 
 		// Set custom type
-		const result = repository.processUpdateActions(ctx, customerGroup, customerGroup.version, [
-			{
-				action: "setCustomType",
-				type: {
-					typeId: "type",
-					id: "custom-type-id",
+		const result = repository.processUpdateActions(
+			ctx,
+			customerGroup,
+			customerGroup.version,
+			[
+				{
+					action: "setCustomType",
+					type: {
+						typeId: "type",
+						id: "custom-type-id",
+					},
+					fields: {
+						description: "New custom field value",
+					},
 				},
-				fields: {
-					description: "New custom field value",
-				},
-			},
-		]);
+			],
+		);
 
 		expect(result.custom).toBeDefined();
 		expect(result.custom?.fields.description).toBe("New custom field value");
 		expect(result.version).toBe(customerGroup.version + 1);
 
 		// Remove custom type
-		const result2 = repository.processUpdateActions(ctx, result, result.version, [
-			{
-				action: "setCustomType",
-			},
-		]);
+		const result2 = repository.processUpdateActions(
+			ctx,
+			result,
+			result.version,
+			[
+				{
+					action: "setCustomType",
+				},
+			],
+		);
 
 		expect(result2.custom).toBeUndefined();
 		expect(result2.version).toBe(result.version + 1);
@@ -171,25 +191,35 @@ describe("CustomerGroup Repository", () => {
 		const customerGroup = repository.create(ctx, draft);
 
 		// Update custom field
-		const result = repository.processUpdateActions(ctx, customerGroup, customerGroup.version, [
-			{
-				action: "setCustomField",
-				name: "description",
-				value: "Updated description",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			customerGroup,
+			customerGroup.version,
+			[
+				{
+					action: "setCustomField",
+					name: "description",
+					value: "Updated description",
+				},
+			],
+		);
 
 		expect(result.custom?.fields.description).toBe("Updated description");
 		expect(result.version).toBe(customerGroup.version + 1);
 
 		// Remove custom field
-		const result2 = repository.processUpdateActions(ctx, result, result.version, [
-			{
-				action: "setCustomField",
-				name: "description",
-				value: null,
-			},
-		]);
+		const result2 = repository.processUpdateActions(
+			ctx,
+			result,
+			result.version,
+			[
+				{
+					action: "setCustomField",
+					name: "description",
+					value: null,
+				},
+			],
+		);
 
 		expect(result2.custom?.fields.description).toBeUndefined();
 		expect(result2.version).toBe(result.version + 1);

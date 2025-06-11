@@ -1,9 +1,16 @@
-import type { CompanyDraft, DivisionDraft } from "@commercetools/platform-sdk";
+import type {
+	BusinessUnitChangeNameAction,
+	BusinessUnitChangeStatusAction,
+	BusinessUnitSetContactEmailAction,
+	CompanyDraft,
+	DivisionDraft,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
 import { InMemoryStorage } from "~src/storage";
 import { BusinessUnitRepository } from "./business-unit";
+import { CustomerRepository } from "./customer";
 
 describe("BusinessUnit Repository", () => {
 	const storage = new InMemoryStorage();
@@ -17,28 +24,23 @@ describe("BusinessUnit Repository", () => {
 		key: "test-store",
 		name: { "en-US": "Test Store" },
 		languages: ["en-US"],
-		countries: ["US"],
+		countries: [{ code: "US" }],
 		distributionChannels: [],
 		supplyChannels: [],
 		productSelections: [],
 	});
 
-	storage.add("dummy", "customer", {
-		...getBaseResourceProperties(),
-		id: "customer-123",
-		email: "associate@example.com",
-		firstName: "John",
-		lastName: "Associate",
-		password: "hashed-password",
-		addresses: [],
-		defaultShippingAddress: "",
-		defaultBillingAddress: "",
-		customerNumber: "",
-		externalId: "",
-		key: "",
-		stores: [],
-		authenticationMode: "Password" as const,
-	});
+	// Create a proper customer using the customer repository
+	const customerRepository = new CustomerRepository(config);
+	const customer = customerRepository.create(
+		{ projectKey: "dummy" },
+		{
+			email: "associate@example.com",
+			password: "password123",
+			firstName: "John",
+			lastName: "Associate",
+		},
+	);
 
 	test("create company business unit", () => {
 		const draft: CompanyDraft = {
@@ -73,7 +75,7 @@ describe("BusinessUnit Repository", () => {
 				{
 					customer: {
 						typeId: "customer",
-						id: "customer-123",
+						id: customer.id,
 					},
 					associateRoleAssignments: [
 						{
@@ -143,7 +145,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.unitType).toBe("Division");
 		expect(result.name).toBe(draft.name);
 		expect(result.contactEmail).toBe(draft.contactEmail);
-		
+
 		// Check division-specific properties
 		if (result.unitType === "Division") {
 			expect(result.parentUnit?.key).toBe("parent-company");
@@ -179,12 +181,17 @@ describe("BusinessUnit Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const businessUnit = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, businessUnit, businessUnit.version, [
-			{
-				action: "changeName",
-				name: "Updated Company Name",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			businessUnit,
+			businessUnit.version,
+			[
+				{
+					action: "changeName",
+					name: "Updated Company Name",
+				} as BusinessUnitChangeNameAction,
+			],
+		);
 
 		expect(result.name).toBe("Updated Company Name");
 		expect(result.version).toBe(businessUnit.version + 1);
@@ -200,12 +207,17 @@ describe("BusinessUnit Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const businessUnit = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, businessUnit, businessUnit.version, [
-			{
-				action: "setContactEmail",
-				contactEmail: "newemail@company.com",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			businessUnit,
+			businessUnit.version,
+			[
+				{
+					action: "setContactEmail",
+					contactEmail: "newemail@company.com",
+				} as BusinessUnitSetContactEmailAction,
+			],
+		);
 
 		expect(result.contactEmail).toBe("newemail@company.com");
 		expect(result.version).toBe(businessUnit.version + 1);
@@ -222,12 +234,17 @@ describe("BusinessUnit Repository", () => {
 		const ctx = { projectKey: "dummy" };
 		const businessUnit = repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, businessUnit, businessUnit.version, [
-			{
-				action: "changeStatus",
-				status: "Inactive",
-			},
-		]);
+		const result = repository.processUpdateActions(
+			ctx,
+			businessUnit,
+			businessUnit.version,
+			[
+				{
+					action: "changeStatus",
+					status: "Inactive",
+				} as BusinessUnitChangeStatusAction,
+			],
+		);
 
 		expect(result.status).toBe("Inactive");
 		expect(result.version).toBe(businessUnit.version + 1);
