@@ -356,7 +356,7 @@ describe("Product search filter", () => {
 					isOnStock: true,
 					availableQuantity: 10,
 					isOnStockForChannel: "test-channel",
-				},
+				} as any, // Cast to any since isOnStockForChannel is not in SDK type
 			},
 		};
 
@@ -370,7 +370,7 @@ describe("Product search filter", () => {
 			},
 			productWithAvailability,
 		);
-		
+
 		expect(result1.isMatch).toBeTruthy();
 
 		const result2 = match(
@@ -382,7 +382,7 @@ describe("Product search filter", () => {
 			},
 			productWithAvailability,
 		);
-		
+
 		expect(result2.isMatch).toBeFalsy();
 	});
 
@@ -395,7 +395,7 @@ describe("Product search filter", () => {
 					isOnStock: true,
 					availableQuantity: 10,
 					isOnStockForChannel: "test-channel",
-				},
+				} as any, // Cast to any since isOnStockForChannel is not in SDK type
 			},
 		};
 
