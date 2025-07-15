@@ -1,5 +1,6 @@
 import type {
 	CustomLineItemReturnItem,
+	InvalidInputError,
 	LineItemReturnItem,
 	Order,
 	OrderAddParcelToDeliveryAction,
@@ -29,6 +30,7 @@ import type {
 	Store,
 	SyncInfo,
 } from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
 import type { Writable } from "~src/types";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
@@ -78,11 +80,29 @@ export class OrderUpdateHandler
 		}: OrderAddParcelToDeliveryAction,
 	) {
 		if (!resource.shippingInfo) {
-			throw new Error("Order has no shipping info");
+			throw new CommercetoolsError<InvalidInputError>({
+				code: "InvalidInput",
+				message: "Order has no shipping info",
+				errors: [
+					{
+						code: "InvalidInput",
+						message: "Order has no shipping info",
+					},
+				],
+			});
 		}
 
 		if (!deliveryId && !deliveryKey) {
-			throw new Error("Either deliveryId or deliveryKey must be provided");
+			throw new CommercetoolsError<InvalidInputError>({
+				code: "InvalidInput",
+				message: "Either deliveryId or deliveryKey must be provided",
+				errors: [
+					{
+						code: "InvalidInput",
+						message: "Either deliveryId or deliveryKey must be provided",
+					},
+				],
+			});
 		}
 
 		// Find the delivery by id or key
@@ -99,9 +119,17 @@ export class OrderUpdateHandler
 
 		if (!targetDelivery) {
 			const identifier = deliveryId || deliveryKey;
-			throw new Error(
-				`Delivery with ${deliveryId ? "id" : "key"} '${identifier}' not found`,
-			);
+			const message = `Delivery with ${deliveryId ? "id" : "key"} '${identifier}' not found`;
+			throw new CommercetoolsError<InvalidInputError>({
+				code: "InvalidInput",
+				message,
+				errors: [
+					{
+						code: "InvalidInput",
+						message,
+					},
+				],
+			});
 		}
 
 		// Create the new parcel
