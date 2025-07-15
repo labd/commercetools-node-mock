@@ -794,6 +794,251 @@ describe("Order Update Actions", () => {
 			},
 		]);
 	});
+
+	test("addParcelToDelivery", async () => {
+		const order: Order = {
+			...getBaseResourceProperties(),
+			customLineItems: [],
+			lastMessageSequenceNumber: 0,
+			lineItems: [],
+			orderNumber: "1391",
+			orderState: "Open",
+			origin: "Customer",
+			refusedGifts: [],
+			shippingInfo: {
+				shippingMethodName: "Standard delivery",
+				price: {
+					type: "centPrecision",
+					currencyCode: "EUR",
+					centAmount: 500,
+					fractionDigits: 2,
+				},
+				shippingRate: {
+					price: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						centAmount: 500,
+						fractionDigits: 2,
+					},
+					tiers: [],
+				},
+				deliveries: [
+					{
+						id: "delivery-1",
+						key: "DELIVERY-001",
+						createdAt: "2024-01-01T10:00:00.000Z",
+						items: [
+							{
+								id: "line-item-1",
+								quantity: 2,
+							},
+						],
+						parcels: [],
+					},
+				],
+				shippingMethodState: "MatchesCart",
+			},
+			shipping: [],
+			shippingMode: "Single",
+			syncInfo: [],
+			totalPrice: {
+				type: "centPrecision",
+				fractionDigits: 2,
+				centAmount: 1500,
+				currencyCode: "EUR",
+			},
+		};
+		ctMock.project("dummy").add("order", order);
+
+		const response = await supertest(ctMock.app).get(
+			`/dummy/orders/order-number=${order.orderNumber}`,
+		);
+		expect(response.status).toBe(200);
+
+		// Test adding parcel by deliveryId
+		const updateResponse = await supertest(ctMock.app)
+			.post(`/dummy/orders/${response.body.id}`)
+			.send({
+				version: 0,
+				actions: [
+					{
+						action: "addParcelToDelivery",
+						deliveryId: "delivery-1",
+						parcelKey: "parcel-001",
+						measurements: {
+							heightInMillimeter: 100,
+							lengthInMillimeter: 200,
+							widthInMillimeter: 150,
+							weightInGram: 500,
+						},
+						trackingData: {
+							trackingId: "TRACK123",
+							carrier: "DHL",
+						},
+						items: [
+							{
+								id: "line-item-1",
+								quantity: 1,
+							},
+						],
+					},
+				],
+			});
+		expect(updateResponse.status).toBe(200);
+		expect(updateResponse.body.version).toBe(1);
+
+		const delivery = updateResponse.body.shippingInfo.deliveries[0];
+		expect(delivery.parcels).toHaveLength(1);
+
+		const parcel = delivery.parcels[0];
+		expect(parcel.key).toBe("parcel-001");
+		expect(parcel.measurements).toMatchObject({
+			heightInMillimeter: 100,
+			lengthInMillimeter: 200,
+			widthInMillimeter: 150,
+			weightInGram: 500,
+		});
+		expect(parcel.trackingData).toMatchObject({
+			trackingId: "TRACK123",
+			carrier: "DHL",
+		});
+		expect(parcel.items).toMatchObject([
+			{
+				id: "line-item-1",
+				quantity: 1,
+			},
+		]);
+
+		// Test adding parcel by deliveryKey
+		const updateResponse2 = await supertest(ctMock.app)
+			.post(`/dummy/orders/${response.body.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addParcelToDelivery",
+						deliveryKey: "DELIVERY-001",
+						parcelKey: "parcel-002",
+						items: [
+							{
+								id: "line-item-1",
+								quantity: 1,
+							},
+						],
+					},
+				],
+			});
+		expect(updateResponse2.status).toBe(200);
+		expect(updateResponse2.body.version).toBe(2);
+
+		const delivery2 = updateResponse2.body.shippingInfo.deliveries[0];
+		expect(delivery2.parcels).toHaveLength(2);
+		expect(delivery2.parcels[1].key).toBe("parcel-002");
+	});
+
+	test("addParcelToDelivery - error cases", async () => {
+		const order: Order = {
+			...getBaseResourceProperties(),
+			customLineItems: [],
+			lastMessageSequenceNumber: 0,
+			lineItems: [],
+			orderNumber: "1392",
+			orderState: "Open",
+			origin: "Customer",
+			refusedGifts: [],
+			shippingInfo: {
+				shippingMethodName: "Standard delivery",
+				price: {
+					type: "centPrecision",
+					currencyCode: "EUR",
+					centAmount: 500,
+					fractionDigits: 2,
+				},
+				shippingRate: {
+					price: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						centAmount: 500,
+						fractionDigits: 2,
+					},
+					tiers: [],
+				},
+				deliveries: [
+					{
+						id: "delivery-1",
+						key: "DELIVERY-001",
+						createdAt: "2024-01-01T10:00:00.000Z",
+						items: [],
+						parcels: [],
+					},
+				],
+				shippingMethodState: "MatchesCart",
+			},
+			shipping: [],
+			shippingMode: "Single",
+			syncInfo: [],
+			totalPrice: {
+				type: "centPrecision",
+				fractionDigits: 2,
+				centAmount: 1500,
+				currencyCode: "EUR",
+			},
+		};
+		ctMock.project("dummy").add("order", order);
+
+		const response = await supertest(ctMock.app).get(
+			`/dummy/orders/order-number=${order.orderNumber}`,
+		);
+		expect(response.status).toBe(200);
+
+		// Test error: no deliveryId or deliveryKey provided
+		const errorResponse1 = await supertest(ctMock.app)
+			.post(`/dummy/orders/${response.body.id}`)
+			.send({
+				version: 0,
+				actions: [
+					{
+						action: "addParcelToDelivery",
+						parcelKey: "parcel-001",
+					},
+				],
+			});
+		expect(errorResponse1.status).toBe(500);
+
+		// Test error: delivery not found
+		const errorResponse2 = await supertest(ctMock.app)
+			.post(`/dummy/orders/${response.body.id}`)
+			.send({
+				version: 0,
+				actions: [
+					{
+						action: "addParcelToDelivery",
+						deliveryId: "nonexistent-delivery",
+						parcelKey: "parcel-001",
+					},
+				],
+			});
+		expect(errorResponse2.status).toBe(500);
+	});
+
+	test("addParcelToDelivery - order without shipping info", async () => {
+		assert(order, "order not created");
+
+		// Test error: order has no shipping info
+		const errorResponse = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addParcelToDelivery",
+						deliveryId: "delivery-1",
+						parcelKey: "parcel-001",
+					},
+				],
+			});
+		expect(errorResponse.status).toBe(500);
+	});
 });
 
 describe("Order Import", () => {

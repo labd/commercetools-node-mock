@@ -2,6 +2,7 @@ import type {
 	CustomLineItemReturnItem,
 	LineItemReturnItem,
 	Order,
+	OrderAddParcelToDeliveryAction,
 	OrderAddPaymentAction,
 	OrderAddReturnInfoAction,
 	OrderChangeOrderStateAction,
@@ -22,6 +23,7 @@ import type {
 	OrderTransitionStateAction,
 	OrderUpdateAction,
 	OrderUpdateSyncInfoAction,
+	Parcel,
 	ReturnInfo,
 	State,
 	Store,
@@ -31,7 +33,7 @@ import { getBaseResourceProperties } from "~src/helpers";
 import type { Writable } from "~src/types";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
 import { AbstractUpdateHandler } from "../abstract";
-import { createAddress } from "../helpers";
+import { createAddress, createCustomFields } from "../helpers";
 
 export class OrderUpdateHandler
 	extends AbstractUpdateHandler
@@ -60,6 +62,65 @@ export class OrderUpdateHandler
 			typeId: "payment",
 			id: payment.id!,
 		});
+	}
+
+	addParcelToDelivery(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{
+			deliveryId,
+			deliveryKey,
+			parcelKey,
+			measurements,
+			trackingData,
+			items,
+			custom,
+		}: OrderAddParcelToDeliveryAction,
+	) {
+		if (!resource.shippingInfo) {
+			throw new Error("Order has no shipping info");
+		}
+
+		if (!deliveryId && !deliveryKey) {
+			throw new Error("Either deliveryId or deliveryKey must be provided");
+		}
+
+		// Find the delivery by id or key
+		let targetDelivery = null;
+		for (const delivery of resource.shippingInfo.deliveries || []) {
+			if (
+				(deliveryId && delivery.id === deliveryId) ||
+				(deliveryKey && delivery.key === deliveryKey)
+			) {
+				targetDelivery = delivery;
+				break;
+			}
+		}
+
+		if (!targetDelivery) {
+			const identifier = deliveryId || deliveryKey;
+			throw new Error(
+				`Delivery with ${deliveryId ? "id" : "key"} '${identifier}' not found`,
+			);
+		}
+
+		// Create the new parcel
+		const newParcel: Parcel = {
+			...getBaseResourceProperties(),
+			...(parcelKey && { key: parcelKey }),
+			...(measurements && { measurements }),
+			...(trackingData && { trackingData }),
+			items: items || [],
+			...(custom && {
+				custom: createCustomFields(custom, context.projectKey, this._storage),
+			}),
+		};
+
+		// Add the parcel to the delivery
+		if (!targetDelivery.parcels) {
+			targetDelivery.parcels = [];
+		}
+		targetDelivery.parcels.push(newParcel);
 	}
 
 	addReturnInfo(
