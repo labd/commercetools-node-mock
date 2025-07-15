@@ -3,10 +3,16 @@ import type {
 	Asset,
 	AssetDraft,
 	ChannelReference,
+	CustomerGroupReference,
+	DiscountedPrice,
+	DiscountedPriceDraft,
 	Price,
 	PriceDraft,
+	PriceTier,
+	PriceTierDraft,
 	Product,
 	ProductData,
+	ProductDiscountReference,
 	ProductVariant,
 	ProductVariantDraft,
 } from "@commercetools/platform-sdk";
@@ -113,4 +119,30 @@ export const priceFromDraft = (
 				storage,
 			)
 		: undefined,
+	customerGroup: draft.customerGroup
+		? getReferenceFromResourceIdentifier<CustomerGroupReference>(
+				draft.customerGroup,
+				context.projectKey,
+				storage,
+			)
+		: undefined,
+	validFrom: draft.validFrom,
+	validUntil: draft.validUntil,
+	discounted: draft.discounted
+		? {
+				value: createTypedMoney(draft.discounted.value),
+				discount: getReferenceFromResourceIdentifier<ProductDiscountReference>(
+					draft.discounted.discount,
+					context.projectKey,
+					storage,
+				),
+			}
+		: undefined,
+	tiers: draft.tiers?.map(
+		(tier: PriceTierDraft): PriceTier => ({
+			minimumQuantity: tier.minimumQuantity,
+			value: createTypedMoney(tier.value),
+		}),
+	),
+	custom: createCustomFields(draft.custom, context.projectKey, storage),
 });
