@@ -1003,7 +1003,7 @@ describe("Order Update Actions", () => {
 					},
 				],
 			});
-		expect(errorResponse1.status).toBe(500);
+		expect(errorResponse1.status).toBe(400);
 
 		// Test error: delivery not found
 		const errorResponse2 = await supertest(ctMock.app)
@@ -1018,7 +1018,7 @@ describe("Order Update Actions", () => {
 					},
 				],
 			});
-		expect(errorResponse2.status).toBe(500);
+		expect(errorResponse2.status).toBe(400);
 	});
 
 	test("addParcelToDelivery - order without shipping info", async () => {
@@ -1037,7 +1037,7 @@ describe("Order Update Actions", () => {
 					},
 				],
 			});
-		expect(errorResponse.status).toBe(500);
+		expect(errorResponse.status).toBe(400);
 	});
 });
 
