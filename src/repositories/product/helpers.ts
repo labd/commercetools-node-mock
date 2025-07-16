@@ -128,16 +128,6 @@ export const priceFromDraft = (
 		: undefined,
 	validFrom: draft.validFrom,
 	validUntil: draft.validUntil,
-	discounted: draft.discounted
-		? {
-				value: createTypedMoney(draft.discounted.value),
-				discount: getReferenceFromResourceIdentifier<ProductDiscountReference>(
-					draft.discounted.discount,
-					context.projectKey,
-					storage,
-				),
-			}
-		: undefined,
 	tiers: draft.tiers?.map(
 		(tier: PriceTierDraft): PriceTier => ({
 			minimumQuantity: tier.minimumQuantity,
