@@ -1,4 +1,14 @@
-## 2.23.1
+# CHANGELOG
+
+## 2.52.0
+
+### Minor Changes
+
+- [#308](https://github.com/labd/commercetools-node-mock/pull/308) [`d711323`](https://github.com/labd/commercetools-node-mock/commit/d71132324fdcebf58d55f31a7ef96b5c2cb9945d) Thanks [@mikedebock](https://github.com/mikedebock)! - add missing "/me/business-units/\*" endpoints
+
+### Patch Changes
+
+- [#306](https://github.com/labd/commercetools-node-mock/pull/306) [`6840ef0`](https://github.com/labd/commercetools-node-mock/commit/6840ef08bec3513661bd1a70699fcf896f326f1b) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Improve test coverage for src/services directory to meet 80% threshold
 
 ## 2.51.0
 
