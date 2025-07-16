@@ -346,4 +346,81 @@ describe("Product search filter", () => {
 			}).isMatch,
 		).toBeTruthy();
 	});
+
+	test("by availability.isOnStock", async () => {
+		const productWithAvailability: ProductProjection = {
+			...exampleProduct,
+			masterVariant: {
+				...exampleProduct.masterVariant,
+				availability: {
+					isOnStock: true,
+					availableQuantity: 10,
+					isOnStockForChannel: "test-channel",
+				} as any, // Cast to any since isOnStockForChannel is not in SDK type
+			},
+		};
+
+		// This should pass - current behavior
+		const result1 = match(
+			{
+				exact: {
+					field: "variants.availability.isOnStock",
+					value: true,
+				},
+			},
+			productWithAvailability,
+		);
+
+		expect(result1.isMatch).toBeTruthy();
+
+		const result2 = match(
+			{
+				exact: {
+					field: "variants.availability.isOnStock",
+					value: false,
+				},
+			},
+			productWithAvailability,
+		);
+
+		expect(result2.isMatch).toBeFalsy();
+	});
+
+	test("by availability.isOnStockForChannel", async () => {
+		const productWithAvailability: ProductProjection = {
+			...exampleProduct,
+			masterVariant: {
+				...exampleProduct.masterVariant,
+				availability: {
+					isOnStock: true,
+					availableQuantity: 10,
+					isOnStockForChannel: "test-channel",
+				} as any, // Cast to any since isOnStockForChannel is not in SDK type
+			},
+		};
+
+		expect(
+			match(
+				{
+					exact: {
+						field: "variants.availability.isOnStockForChannel",
+						value: "test-channel",
+					},
+				},
+				productWithAvailability,
+			).isMatch,
+		).toBeTruthy();
+
+		expect(
+			match(
+				{
+					exact: {
+						field: "variants.availability.isOnStockForChannel",
+						value: "other-channel",
+					},
+				},
+				productWithAvailability,
+			).isMatch,
+		).toBeFalsy();
+	});
 });

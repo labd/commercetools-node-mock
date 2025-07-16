@@ -148,6 +148,23 @@ export class ProductSearch {
 			? product.masterData.current
 			: product.masterData.staged;
 
+		const getVariantAvailability = (sku?: string) => {
+			if (!sku) {
+				return {
+					isOnStock: false,
+					availableQuantity: 0,
+					isOnStockForChannel: undefined,
+				};
+			}
+			return (
+				availabilityBySku.get(sku) || {
+					isOnStock: false,
+					availableQuantity: 0,
+					isOnStockForChannel: undefined,
+				}
+			);
+		};
+
 		return {
 			id: product.id,
 			createdAt: product.createdAt,
@@ -159,12 +176,13 @@ export class ProductSearch {
 			metaDescription: obj.metaDescription,
 			slug: obj.slug,
 			categories: obj.categories,
-			masterVariant: obj.masterVariant,
+			masterVariant: {
+				...obj.masterVariant,
+				availability: getVariantAvailability(obj.masterVariant.sku),
+			},
 			variants: obj.variants.map((variant) => ({
 				...variant,
-				availability: variant.sku
-					? availabilityBySku.get(variant.sku)
-					: { isOnStock: false, availableQuantity: 0, isOnStockForChannel: [] },
+				availability: getVariantAvailability(variant.sku),
 			})),
 			productType: product.productType,
 			hasStagedChanges: product.masterData.hasStagedChanges,
