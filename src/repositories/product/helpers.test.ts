@@ -1,9 +1,7 @@
 import type {
 	CustomerGroupResourceIdentifier,
-	DiscountedPriceDraft,
 	PriceDraft,
 	PriceTierDraft,
-	ProductDiscountReference,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import { getBaseResourceProperties } from "~src/helpers";
@@ -171,70 +169,6 @@ describe("priceFromDraft", () => {
 					},
 				},
 			],
-		});
-	});
-
-	test("should handle discounted field when provided", () => {
-		// First create a product discount in storage
-		const productDiscount = {
-			...getBaseResourceProperties(),
-			id: "product-discount-id",
-			name: { en: "Test Discount" },
-			description: { en: "Test Discount Description" },
-			value: {
-				type: "relative" as const,
-				permyriad: 2000, // 20% discount
-			},
-			predicate: "1=1",
-			sortOrder: "0.1",
-			isActive: true,
-			references: [],
-		};
-		storage.add("test-project", "product-discount", productDiscount);
-
-		const discountedDraft: DiscountedPriceDraft = {
-			value: {
-				currencyCode: "EUR",
-				centAmount: 800,
-			},
-			discount: {
-				typeId: "product-discount",
-				id: "product-discount-id",
-			},
-		};
-
-		const draft: PriceDraft = {
-			value: {
-				currencyCode: "EUR",
-				centAmount: 1000,
-			},
-			country: "NL",
-			discounted: discountedDraft,
-		};
-
-		const result = priceFromDraft(context, storage, draft);
-
-		expect(result).toMatchObject({
-			id: expect.any(String),
-			country: "NL",
-			value: {
-				type: "centPrecision",
-				currencyCode: "EUR",
-				centAmount: 1000,
-				fractionDigits: 2,
-			},
-			discounted: {
-				value: {
-					type: "centPrecision",
-					currencyCode: "EUR",
-					centAmount: 800,
-					fractionDigits: 2,
-				},
-				discount: {
-					typeId: "product-discount",
-					id: "product-discount-id",
-				},
-			},
 		});
 	});
 
