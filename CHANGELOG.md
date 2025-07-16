@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.52.1
+
+### Patch Changes
+
+- [#311](https://github.com/labd/commercetools-node-mock/pull/311) [`dbee365`](https://github.com/labd/commercetools-node-mock/commit/dbee365c67a3a6d5f75935a3271b9e529745c0f3) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add support for filtering on stock in Product Search
+
 ## 2.52.0
 
 ### Minor Changes
