@@ -1,0 +1,13 @@
+# Research artifacts - generated files
+/benchmarks/results.json
+/bundle-analysis/*.js
+/bundle-analysis/analysis.json
+/bundle-analysis/express-entry.js
+/bundle-analysis/fastify-entry.js
+
+# Node modules if any
+node_modules/
+
+# Build artifacts
+*.js.map
+dist/
