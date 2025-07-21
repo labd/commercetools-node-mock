@@ -20,6 +20,7 @@ import type {
 	BusinessUnitSetAssociatesAction,
 	BusinessUnitSetContactEmailAction,
 	BusinessUnitSetStoreModeAction,
+	BusinessUnitRemoveAddressAction,
 	Company,
 	Division,
 } from "@commercetools/platform-sdk";
@@ -289,4 +290,26 @@ class BusinessUnitUpdateHandler
 	) {
 		resource.storeMode = storeMode;
 	}
+
+	removeAddress(
+    context: RepositoryContext,
+    resource: Writable<BusinessUnit>,
+    { addressId }: BusinessUnitRemoveAddressAction, 
+) {
+    resource.addresses = resource.addresses.filter(addr => addr.id !== addressId);
+
+    if (resource.shippingAddressIds) {
+        resource.shippingAddressIds = resource.shippingAddressIds.filter(id => id !== addressId);
+    }
+    if (resource.billingAddressIds) {
+        resource.billingAddressIds = resource.billingAddressIds.filter(id => id !== addressId);
+    }
+
+    if (resource.defaultShippingAddressId === addressId) {
+        resource.defaultShippingAddressId = undefined;
+    }
+    if (resource.defaultBillingAddressId === addressId) {
+        resource.defaultBillingAddressId = undefined;
+    }
+}
 }
