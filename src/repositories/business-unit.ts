@@ -1,8 +1,10 @@
 import type {
+	BusinessUnitAddShippingAddressIdAction,
 	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
 	BusinessUnitSetCustomTypeAction,
+	BusinessUnitSetDefaultShippingAddressAction,
 	BusinessUnitUpdateAction,
 	CompanyDraft,
 	DivisionDraft,
@@ -17,6 +19,7 @@ import type {
 	BusinessUnitChangeNameAction,
 	BusinessUnitChangeParentUnitAction,
 	BusinessUnitDraft,
+	BusinessUnitRemoveAddressAction,
 	BusinessUnitSetAssociatesAction,
 	BusinessUnitSetContactEmailAction,
 	BusinessUnitSetStoreModeAction,
@@ -288,5 +291,54 @@ class BusinessUnitUpdateHandler
 		{ storeMode }: BusinessUnitSetStoreModeAction,
 	) {
 		resource.storeMode = storeMode;
+	}
+
+	setDefaultShippingAddress(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitSetDefaultShippingAddressAction,
+	) {
+		resource.defaultShippingAddressId = addressId;
+	}
+
+	addShippingAddressId(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitAddShippingAddressIdAction,
+	) {
+		if (!resource.shippingAddressIds) {
+			resource.shippingAddressIds = [];
+		}
+		if (addressId) {
+			resource.shippingAddressIds.push(addressId);
+		}
+	}
+
+	removeAddress(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitRemoveAddressAction,
+	) {
+		resource.addresses = resource.addresses.filter(
+			(addr) => addr.id !== addressId,
+		);
+
+		if (resource.shippingAddressIds) {
+			resource.shippingAddressIds = resource.shippingAddressIds.filter(
+				(id) => id !== addressId,
+			);
+		}
+		if (resource.billingAddressIds) {
+			resource.billingAddressIds = resource.billingAddressIds.filter(
+				(id) => id !== addressId,
+			);
+		}
+
+		if (resource.defaultShippingAddressId === addressId) {
+			resource.defaultShippingAddressId = undefined;
+		}
+		if (resource.defaultBillingAddressId === addressId) {
+			resource.defaultBillingAddressId = undefined;
+		}
 	}
 }
