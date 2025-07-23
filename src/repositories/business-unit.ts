@@ -3,6 +3,7 @@ import type {
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
 	BusinessUnitSetCustomTypeAction,
+	BusinessUnitSetDefaultShippingAddressAction,
 	BusinessUnitUpdateAction,
 	CompanyDraft,
 	DivisionDraft,
@@ -289,6 +290,14 @@ class BusinessUnitUpdateHandler
 		{ storeMode }: BusinessUnitSetStoreModeAction,
 	) {
 		resource.storeMode = storeMode;
+	}
+
+	setDefaultShippingAddress(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitSetDefaultShippingAddressAction,
+	) {
+		resource.defaultShippingAddressId = addressId;
 	}
 
 	removeAddress(
