@@ -1,4 +1,5 @@
 import type {
+	BusinessUnitAddShippingAddressIdAction,
 	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
@@ -298,6 +299,19 @@ class BusinessUnitUpdateHandler
 		{ addressId }: BusinessUnitSetDefaultShippingAddressAction,
 	) {
 		resource.defaultShippingAddressId = addressId;
+	}
+
+	addShippingAddressId(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitAddShippingAddressIdAction,
+	) {
+		if (!resource.shippingAddressIds) {
+			resource.shippingAddressIds = [];
+		}
+		if (addressId) {
+			resource.shippingAddressIds.push(addressId);
+		}
 	}
 
 	removeAddress(

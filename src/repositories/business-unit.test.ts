@@ -1,7 +1,10 @@
 import type {
+	BusinessUnitAddShippingAddressIdAction,
 	BusinessUnitChangeNameAction,
 	BusinessUnitChangeStatusAction,
+	BusinessUnitRemoveAddressAction,
 	BusinessUnitSetContactEmailAction,
+	BusinessUnitSetDefaultShippingAddressAction,
 	CompanyDraft,
 	DivisionDraft,
 } from "@commercetools/platform-sdk";
@@ -247,6 +250,146 @@ describe("BusinessUnit Repository", () => {
 		);
 
 		expect(result.status).toBe("Inactive");
+		expect(result.version).toBe(businessUnit.version + 1);
+	});
+
+	test("update business unit - setDefaultShippingAddress", () => {
+		const draft: CompanyDraft = {
+			key: "default-shipping-company",
+			unitType: "Company",
+			name: "Default Shipping Company",
+			addresses: [
+				{
+					country: "US",
+					city: "New York",
+					streetName: "5th Avenue",
+					streetNumber: "123",
+					postalCode: "10001",
+				},
+				{
+					country: "US",
+					city: "Boston",
+					streetName: "Boylston",
+					streetNumber: "456",
+					postalCode: "02116",
+				},
+			],
+			shippingAddresses: [0, 1],
+		};
+
+		const ctx = { projectKey: "dummy" };
+		const businessUnit = repository.create(ctx, draft);
+		const addressId = businessUnit.addresses[1].id;
+
+		const result = repository.processUpdateActions(
+			ctx,
+			businessUnit,
+			businessUnit.version,
+			[
+				{
+					action: "setDefaultShippingAddress",
+					addressId,
+				} as BusinessUnitSetDefaultShippingAddressAction,
+			],
+		);
+
+		expect(result.defaultShippingAddressId).toBe(addressId);
+		expect(result.version).toBe(businessUnit.version + 1);
+	});
+
+	test("update business unit - addShippingAddressId", () => {
+		const draft: CompanyDraft = {
+			key: "add-shipping-address-company",
+			unitType: "Company",
+			name: "Add Shipping Address Company",
+			addresses: [
+				{
+					country: "US",
+					city: "New York",
+					streetName: "5th Avenue",
+					streetNumber: "123",
+					postalCode: "10001",
+				},
+				{
+					country: "US",
+					city: "Boston",
+					streetName: "Boylston",
+					streetNumber: "456",
+					postalCode: "02116",
+				},
+			],
+		};
+
+		const ctx = { projectKey: "dummy" };
+		const businessUnit = repository.create(ctx, draft);
+		const addressId = businessUnit.addresses[1].id;
+
+		const result = repository.processUpdateActions(
+			ctx,
+			businessUnit,
+			businessUnit.version,
+			[
+				{
+					action: "addShippingAddressId",
+					addressId,
+				} as BusinessUnitAddShippingAddressIdAction,
+			],
+		);
+
+		expect(result.shippingAddressIds).toContain(addressId);
+		expect(result.version).toBe(businessUnit.version + 1);
+	});
+
+	test("update business unit - removeAddress", () => {
+		const draft: CompanyDraft = {
+			key: "remove-address-company",
+			unitType: "Company",
+			name: "Remove Address Company",
+			addresses: [
+				{
+					country: "US",
+					city: "New York",
+					streetName: "5th Avenue",
+					streetNumber: "123",
+					postalCode: "10001",
+				},
+				{
+					country: "US",
+					city: "Boston",
+					streetName: "Boylston",
+					streetNumber: "456",
+					postalCode: "02116",
+				},
+			],
+			billingAddresses: [0, 1],
+			shippingAddresses: [0, 1],
+			defaultBillingAddress: 0,
+			defaultShippingAddress: 1,
+		};
+
+		const ctx = { projectKey: "dummy" };
+		const businessUnit = repository.create(ctx, draft);
+		const addressIdToRemove = businessUnit.addresses[0].id;
+		const remainingAddressId = businessUnit.addresses[1].id;
+
+		const result = repository.processUpdateActions(
+			ctx,
+			businessUnit,
+			businessUnit.version,
+			[
+				{
+					action: "removeAddress",
+					addressId: addressIdToRemove,
+				} as BusinessUnitRemoveAddressAction,
+			],
+		);
+
+		expect(result.addresses).toHaveLength(1);
+		expect(result.addresses[0].id).toBe(remainingAddressId);
+		expect(result.billingAddressIds).toEqual([remainingAddressId]);
+		expect(result.shippingAddressIds).toEqual([remainingAddressId]);
+		expect(result.defaultBillingAddressId).toBeUndefined();
+		expect(result.defaultShippingAddressId).toBe(remainingAddressId);
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
