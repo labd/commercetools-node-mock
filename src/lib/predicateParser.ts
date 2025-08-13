@@ -88,6 +88,15 @@ const resolveValue = (obj: any, val: TypeSymbol): any => {
 		throw new PredicateError("Internal error");
 	}
 
+	// variants() includes both masterVariant and variants for predicates
+	if (
+		val.value === "variants" &&
+		obj.masterVariant &&
+		obj.variants !== undefined
+	) {
+		return [obj.masterVariant, ...(obj.variants ?? [])];
+	}
+
 	if (!(val.value in obj)) {
 		if (Array.isArray(obj)) {
 			return Object.values(obj)
@@ -230,7 +239,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 
 		.led("AND", 5, ({ left, bp }) => {
 			const expr = parser.parse({ terminals: [bp - 1] });
-			return (obj: any) => left(obj) && expr(obj);
+			return (obj: any, vars: object) => left(obj, vars) && expr(obj, vars);
 		})
 		.led("OR", 5, ({ left, token, bp }) => {
 			const expr = parser.parse({ terminals: [bp - 1] });
