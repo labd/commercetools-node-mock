@@ -89,7 +89,11 @@ const resolveValue = (obj: any, val: TypeSymbol): any => {
 	}
 
 	// variants() includes both masterVariant and variants for predicates
-	if (val.value === "variants" && obj.masterVariant && obj.variants !== undefined) {
+	if (
+		val.value === "variants" &&
+		obj.masterVariant &&
+		obj.variants !== undefined
+	) {
 		return [obj.masterVariant, ...(obj.variants ?? [])];
 	}
 

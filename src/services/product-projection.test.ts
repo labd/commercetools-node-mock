@@ -99,7 +99,7 @@ beforeEach(async () => {
 					},
 					{
 						name: "store",
-						value: ["test-store"]
+						value: ["test-store"],
 					},
 				],
 			},
@@ -256,16 +256,17 @@ describe("Product Projection Query - Generic", () => {
 		}
 	});
 
-
 	test("Filter on complex query", async () => {
 		{
 			const response = await supertest(ctMock.app)
 				.get("/dummy/product-projections")
 				.query({
 					limit: 50,
-					where: ['slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))'],
+					where: [
+						'slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))',
+					],
 					"var.slug": "test-product",
-					"var.store": "test-store"
+					"var.store": "test-store",
 				});
 
 			const result: ProductProjectionPagedSearchResponse = response.body;
