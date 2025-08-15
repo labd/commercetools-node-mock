@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.53.0
+
+### Minor Changes
+
+- [#315](https://github.com/labd/commercetools-node-mock/pull/315) [`f26a6dc`](https://github.com/labd/commercetools-node-mock/commit/f26a6dced59bc100da7b32271e753ab7158a736c) Thanks [@martinaplaceres](https://github.com/martinaplaceres)! - added business unit actions
+
+### Patch Changes
+
+- [#311](https://github.com/labd/commercetools-node-mock/pull/311) [`dbee365`](https://github.com/labd/commercetools-node-mock/commit/dbee365c67a3a6d5f75935a3271b9e529745c0f3) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add support for filtering on stock in Product Search
+
 ## 2.52.0
 
 ### Minor Changes
