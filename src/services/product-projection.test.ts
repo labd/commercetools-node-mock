@@ -97,6 +97,10 @@ beforeEach(async () => {
 						name: "number",
 						value: 4 as any,
 					},
+					{
+						name: "store",
+						value: ["test-store"],
+					},
 				],
 			},
 			variants: [
@@ -239,6 +243,30 @@ describe("Product Projection Query - Generic", () => {
 					limit: 50,
 					where: ["slug(nl-NL=:slug)"],
 					"var.slug": "test-product",
+				});
+
+			const result: ProductProjectionPagedSearchResponse = response.body;
+			expect(result).toEqual({
+				count: 1,
+				limit: 50,
+				offset: 0,
+				total: 1,
+				results: [productProjection],
+			});
+		}
+	});
+
+	test("Filter on complex query", async () => {
+		{
+			const response = await supertest(ctMock.app)
+				.get("/dummy/product-projections")
+				.query({
+					limit: 50,
+					where: [
+						'slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))',
+					],
+					"var.slug": "test-product",
+					"var.store": "test-store",
 				});
 
 			const result: ProductProjectionPagedSearchResponse = response.body;
