@@ -151,13 +151,12 @@ describe("Predicate filter", () => {
 		expect(match("numberProperty in (1234)")).toBeTruthy();
 	});
 
-	test('in operator works with with and without parentheses', async () => {
+	test("in operator works with with and without parentheses", async () => {
 		expect(match("numberProperty in :val", { val: 1234 })).toBeTruthy();
 		expect(match("numberProperty in :val", { val: 1235 })).toBeFalsy();
 		expect(match("numberProperty in :val", { val: [1234] })).toBeTruthy();
 		expect(match("numberProperty in :val", { val: [1235] })).toBeFalsy();
-	})
-
+	});
 
 	test("arrayProperty contains all (...)", async () => {
 		expect(match(`arrayProperty contains all ("foo", "bar")`)).toBeTruthy();

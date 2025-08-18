@@ -385,7 +385,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			const expr = parser.parse({ terminals: [bp - 1] });
 
 			// IN can be a single value or a list of values
-			if (firstToken.match === '(') {
+			if (firstToken.match === "(") {
 				lexer.expect(")");
 			}
 
