@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.53.1
+
+### Patch Changes
+
+- [#316](https://github.com/labd/commercetools-node-mock/pull/316) [`e455a60`](https://github.com/labd/commercetools-node-mock/commit/e455a607cd78573b3e1010cca0e1f0412f9161aa) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Fixes a bug where main variants were not included in where predicates. Fixes a bug where vars were not read in predicates with AND statements
+
 ## 2.53.0
 
 ### Minor Changes
