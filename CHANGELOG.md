@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.53.2
+
+### Patch Changes
+
+- [#318](https://github.com/labd/commercetools-node-mock/pull/318) [`eab2927`](https://github.com/labd/commercetools-node-mock/commit/eab2927a71295b4bd851ee756df6feddac9950cf) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: predicate parser bugs in IN and WITHIN
+
 ## 2.53.1
 
 ### Patch Changes
