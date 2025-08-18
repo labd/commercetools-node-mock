@@ -381,7 +381,9 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			}
 		})
 		.led("IN", 20, ({ left, bp }) => {
-			const expr = parser.parse({ terminals: [bp - 1] });
+			lexer.expect("(");
+			const expr = parser.parse({ terminals: [")"] });
+			lexer.expect(")");
 			return (obj: any, vars: object) => {
 				let symbols = expr;
 				if (!Array.isArray(symbols)) {
@@ -426,6 +428,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 
 			lexer.expect("(");
 			const expr = parser.parse({ terminals: [")"] });
+			lexer.expect(")");
 
 			return (obj: any, vars: object) => {
 				const value = resolveValue(obj, left);
