@@ -387,7 +387,6 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			// IN can be a single value or a list of values
 			if (firstToken.match === '(') {
 				lexer.expect(")");
-
 			}
 
 			return (obj: any, vars: object) => {
