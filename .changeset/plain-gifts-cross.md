@@ -2,4 +2,4 @@
 "@labdigital/commercetools-mock": patch
 ---
 
-Remove discounted field mapping from priceFromDraft as it should be calculated
+Implement missing fields for priceFromDraft function: customerGroup, validFrom, validUntil, tiers, and custom fields
