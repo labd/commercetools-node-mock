@@ -41,7 +41,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 			references: [],
 			target: draft.target,
 			requiresDiscountCode: draft.requiresDiscountCode || false,
-			sortOrder: draft.sortOrder,
+			sortOrder: draft.sortOrder ?? "0.1",
 			stackingMode: draft.stackingMode || "Stacking",
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,

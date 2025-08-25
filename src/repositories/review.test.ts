@@ -36,6 +36,7 @@ describe("Review Repository", () => {
 			current: {
 				name: { "en-US": "Test Product" },
 				slug: { "en-US": "test-product" },
+				attributes: [],
 				categories: [],
 				masterVariant: {
 					id: 1,
@@ -49,6 +50,7 @@ describe("Review Repository", () => {
 			staged: {
 				name: { "en-US": "Test Product" },
 				slug: { "en-US": "test-product" },
+				attributes: [],
 				categories: [],
 				masterVariant: {
 					id: 1,

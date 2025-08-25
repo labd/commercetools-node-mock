@@ -49,8 +49,8 @@ importers:
         specifier: 2.28.1
         version: 2.28.1
       '@commercetools/platform-sdk':
-        specifier: 8.8.0
-        version: 8.8.0
+        specifier: 8.14.0
+        version: 8.14.0
       '@types/basic-auth':
         specifier: 1.1.8
         version: 1.1.8
@@ -261,12 +261,12 @@ packages:
   '@changesets/write@0.4.0':
     resolution: {integrity: sha512-CdTLvIOPiCNuH71pyDu3rA+Q0n65cmAbXnwWH84rKGiFumFzkmHNT8KHTMEchcxN+Kl8I54xGUhJ7l3E7X396Q==}
 
-  '@commercetools/platform-sdk@8.8.0':
-    resolution: {integrity: sha512-fHXx4e/4vU8VEofUhIUSo0jjjOqjPy2RsZGDlEahd60ZCTPOMTtyRq6JExQoBtAucBO++8CKCaEdWAp1hZJkOQ==}
+  '@commercetools/platform-sdk@8.14.0':
+    resolution: {integrity: sha512-nlUVjtNNfBJEGsvHa2yqfXuF0+3j6hJcdKGlZ9smKCFOjIk0gSKwFjUvQYEovxfXpIiX1n5J3L2Fpl6DmC2NxA==}
     engines: {node: '>=18'}
 
-  '@commercetools/ts-client@3.2.2':
-    resolution: {integrity: sha512-TOFskoZEOZgxFra78yHgOMvk23xPmu90vsMeb458hHljw+NqC+UX10Ku+ERx3EHhzT8nJDK2QmyvNumZsMnt0w==}
+  '@commercetools/ts-client@4.2.0':
+    resolution: {integrity: sha512-ZJN9DIog7+FpL/Lx0K11SQkN2nFM+mNBP9vvDphHlHifzU1dwf9gGcsyAVJDqbyN7S4qeFet/GVZYvLIlhYoig==}
     engines: {node: '>=18'}
 
   '@emnapi/core@1.4.3':
@@ -2521,11 +2521,11 @@ snapshots:
       human-id: 4.1.1
       prettier: 2.8.8
 
-  '@commercetools/platform-sdk@8.8.0':
+  '@commercetools/platform-sdk@8.14.0':
     dependencies:
-      '@commercetools/ts-client': 3.2.2
+      '@commercetools/ts-client': 4.2.0
 
-  '@commercetools/ts-client@3.2.2':
+  '@commercetools/ts-client@4.2.0':
     dependencies:
       buffer: 6.0.3
 

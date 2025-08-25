@@ -46,6 +46,7 @@ describe("MyCart", () => {
 			lineItems: [],
 			customLineItems: [],
 			shipping: [],
+			priceRoundingMode: "HalfEven",
 			shippingMode: "Single",
 			totalPrice: {
 				type: "centPrecision",

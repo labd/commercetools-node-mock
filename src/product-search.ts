@@ -176,6 +176,7 @@ export class ProductSearch {
 			metaDescription: obj.metaDescription,
 			slug: obj.slug,
 			categories: obj.categories,
+			attributes: obj.attributes,
 			masterVariant: {
 				...obj.masterVariant,
 				availability: getVariantAvailability(obj.masterVariant.sku),

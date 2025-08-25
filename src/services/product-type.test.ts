@@ -35,6 +35,7 @@ describe("Product type", () => {
 					label: {
 						"nl-NL": "bar",
 					},
+					level: "Variant",
 					name: "name",
 					type: {
 						name: "boolean",

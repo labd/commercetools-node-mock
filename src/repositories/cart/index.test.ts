@@ -33,6 +33,7 @@ describe("Cart repository", () => {
 				current: {
 					name: { "nl-NL": "Dummy" },
 					slug: { "nl-NL": "Dummy" },
+					attributes: [],
 					categories: [],
 					masterVariant: {
 						sku: "MYSKU",
@@ -57,6 +58,7 @@ describe("Cart repository", () => {
 				staged: {
 					name: { "nl-NL": "Dummy" },
 					slug: { "nl-NL": "Dummy" },
+					attributes: [],
 					categories: [],
 					masterVariant: {
 						sku: "MYSKU",

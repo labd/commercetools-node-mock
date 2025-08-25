@@ -3,6 +3,7 @@ import type {
 	FilteredFacetResult,
 	InvalidInputError,
 	Product,
+	ProductData,
 	ProductProjection,
 	ProductProjectionPagedSearchResponse,
 	QueryParam,
@@ -169,6 +170,7 @@ export class ProductProjectionSearch {
 		return {
 			id: product.id,
 			createdAt: product.createdAt,
+			attributes: obj.attributes,
 			lastModifiedAt: product.lastModifiedAt,
 			version: product.version,
 			name: obj.name,
