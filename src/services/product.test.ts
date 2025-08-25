@@ -392,6 +392,7 @@ describe("Product", () => {
 			metaKeywords: {
 				"nl-NL": "Test product (meta Keywords)",
 			},
+			attributes: [],
 			masterVariant: {
 				id: 1,
 				key: "master-variant-key",

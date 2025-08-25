@@ -108,6 +108,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 			name: draft.name,
 			slug: draft.slug,
 			description: draft.description,
+			attributes: draft.attributes ?? [],
 			categories: categoryReferences,
 			masterVariant: variantFromDraft(
 				context,
