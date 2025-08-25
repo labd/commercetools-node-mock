@@ -45,7 +45,6 @@ import type {
 	Type,
 	Zone,
 } from "@commercetools/platform-sdk";
-import { D } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
 import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
 import { parseExpandClause } from "../lib/expandParser";
