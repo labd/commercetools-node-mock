@@ -20,6 +20,7 @@ const shoppingList: ShoppingList = {
 			quantity: 1,
 			productSlug: {},
 			variantId: 2,
+			published: true,
 		},
 	],
 	textLineItems: [],
@@ -40,6 +41,7 @@ export const product: Product = {
 	masterData: {
 		staged: {
 			name: {},
+			attributes: [],
 			categories: [],
 			slug: {},
 			masterVariant: {
@@ -52,6 +54,7 @@ export const product: Product = {
 		current: {
 			name: {},
 			slug: {},
+			attributes: [],
 			categories: [],
 			masterVariant: {
 				id: 1,

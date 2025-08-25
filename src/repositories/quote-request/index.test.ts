@@ -30,6 +30,7 @@ describe("QuoteRequest repository", () => {
 					quantity: 1,
 				} as unknown as LineItem,
 			],
+			priceRoundingMode: "HalfEven",
 			customLineItems: [],
 			totalPrice: {
 				type: "centPrecision",

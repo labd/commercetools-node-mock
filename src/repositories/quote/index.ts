@@ -40,6 +40,7 @@ export class QuoteRepository extends AbstractResourceRepository<"quote"> {
 				typeId: "staged-quote",
 				id: staged.id,
 			},
+			priceRoundingMode: cart.priceRoundingMode,
 			totalPrice: cart.totalPrice,
 			taxedPrice: cart.taxedPrice,
 			taxMode: cart.taxMode,

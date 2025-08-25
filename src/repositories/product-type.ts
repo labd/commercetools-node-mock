@@ -44,6 +44,7 @@ const attributeDefinitionFromAttributeDefinitionDraft = (
 	draft: AttributeDefinitionDraft,
 ): AttributeDefinition => ({
 	...draft,
+	level: draft.level ?? "Variant",
 	attributeConstraint: draft.attributeConstraint ?? "None",
 	inputHint: draft.inputHint ?? "SingleLine",
 	inputTip:

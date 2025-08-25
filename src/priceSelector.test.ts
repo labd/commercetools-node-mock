@@ -24,6 +24,7 @@ describe("priceSelector", () => {
 			variants: [],
 			searchKeywords: {},
 			categories: [],
+			attributes: [],
 			masterVariant: {
 				id: 1,
 				sku: "MYSKU",

@@ -93,6 +93,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			itemShippingAddresses: [],
 			lineItems,
 			locale: draft.locale,
+			priceRoundingMode: draft.priceRoundingMode ?? "HalfEven",
 			taxCalculationMode: draft.taxCalculationMode ?? "LineItemLevel",
 			taxMode: draft.taxMode ?? "Platform",
 			taxRoundingMode: draft.taxRoundingMode ?? "HalfEven",

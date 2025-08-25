@@ -189,6 +189,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			customerId: customer.id,
 			expiresAt: expiresAt.toISOString(),
 			value: token,
+			invalidateOlderTokens: request.invalidateOlderTokens || false,
 		};
 	}
 
@@ -249,6 +250,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			customerId: customer.id,
 			expiresAt: expiresAt.toISOString(),
 			value: token,
+			invalidateOlderTokens: false,
 		};
 	}
 

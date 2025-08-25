@@ -1,6 +1,9 @@
 import assert from "node:assert";
 import type {
+	DiscountGroup,
 	InvalidJsonInputError,
+	RecurrencePolicy,
+	RecurringOrder,
 	ReferencedResourceNotFoundError,
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
@@ -42,6 +45,7 @@ import type {
 	Type,
 	Zone,
 } from "@commercetools/platform-sdk";
+import { D } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
 import { CommercetoolsError } from "~src/exceptions";
 import { cloneObject } from "../helpers";
 import { parseExpandClause } from "../lib/expandParser";
@@ -181,6 +185,7 @@ export class InMemoryStorage extends AbstractStorage {
 				customer: new Map<string, Customer>(),
 				"customer-group": new Map<string, CustomerGroup>(),
 				"discount-code": new Map<string, DiscountCode>(),
+				"discount-group": new Map<string, DiscountGroup>(),
 				extension: new Map<string, Extension>(),
 				"inventory-entry": new Map<string, InventoryEntry>(),
 				"key-value-document": new Map<string, CustomObject>(),
@@ -195,6 +200,8 @@ export class InMemoryStorage extends AbstractStorage {
 				"product-type": new Map<string, ProductType>(),
 				"product-projection": new Map<string, ProductProjection>(),
 				"product-tailoring": new Map<string, ProductTailoring>(),
+				"recurrence-policy": new Map<string, RecurrencePolicy>(),
+				"recurring-order": new Map<string, RecurringOrder>(),
 				review: new Map<string, any>(),
 				"shipping-method": new Map<string, ShippingMethod>(),
 				"staged-quote": new Map<string, StagedQuote>(),

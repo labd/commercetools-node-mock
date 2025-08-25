@@ -11,6 +11,7 @@ import { CustomObjectService } from "./custom-object";
 import { CustomerService } from "./customer";
 import { CustomerGroupService } from "./customer-group";
 import { DiscountCodeService } from "./discount-code";
+import { DiscountGroupService } from "./discount-group";
 import { ExtensionServices } from "./extension";
 import { InventoryEntryService } from "./inventory-entry";
 import { MyBusinessUnitService } from "./my-business-unit";
@@ -29,6 +30,8 @@ import { ProductTypeService } from "./product-type";
 import { QuoteService } from "./quote";
 import { QuoteRequestService } from "./quote-request";
 import { StagedQuoteService } from "./quote-staged";
+import { RecurrencePolicyService } from "./recurrence-policy";
+import { RecurringOrderService } from "./recurring-order";
 import { ReviewService } from "./reviews";
 import { ShippingMethodService } from "./shipping-method";
 import { ShoppingListService } from "./shopping-list";
@@ -54,6 +57,7 @@ export const createServices = (
 	channel: new ChannelService(router, repos.channel),
 	"customer-group": new CustomerGroupService(router, repos["customer-group"]),
 	"discount-code": new DiscountCodeService(router, repos["discount-code"]),
+	"discount-group": new DiscountGroupService(router, repos["discount-group"]),
 	extension: new ExtensionServices(router, repos.extension),
 	"inventory-entry": new InventoryEntryService(
 		router,
@@ -98,6 +102,14 @@ export const createServices = (
 	),
 	quotes: new QuoteService(router, repos.quote),
 	"quote-request": new QuoteRequestService(router, repos["quote-request"]),
+	"recurrence-policy": new RecurrencePolicyService(
+		router,
+		repos["recurrence-policy"],
+	),
+	"recurring-order": new RecurringOrderService(
+		router,
+		repos["recurring-order"],
+	),
 	reviews: new ReviewService(router, repos.review),
 	"shopping-list": new ShoppingListService(router, repos["shopping-list"]),
 	"staged-quote": new StagedQuoteService(router, repos["staged-quote"]),

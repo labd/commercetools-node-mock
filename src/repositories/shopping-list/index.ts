@@ -75,6 +75,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			productId: draftLineItem.productId ?? "",
 			name: {},
 			variantId,
+			published: true,
 			quantity: draftLineItem.quantity ?? 1,
 			productType: { typeId: "product-type", id: "" },
 			custom: createCustomFields(

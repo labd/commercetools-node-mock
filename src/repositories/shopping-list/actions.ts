@@ -103,6 +103,7 @@ export class ShoppingListUpdateHandler
 				name: product.masterData.current.name,
 				variantId: varId,
 				quantity,
+				published: Boolean(product.masterData.current),
 			});
 		}
 	}

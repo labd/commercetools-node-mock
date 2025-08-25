@@ -16,6 +16,7 @@ import { CustomObjectRepository } from "./custom-object";
 import { CustomerRepository } from "./customer";
 import { CustomerGroupRepository } from "./customer-group";
 import { DiscountCodeRepository } from "./discount-code";
+import { DiscountGroupRepository } from "./discount-group";
 import { ExtensionRepository } from "./extension";
 import { InventoryEntryRepository } from "./inventory-entry";
 import { MyCustomerRepository } from "./my-customer";
@@ -32,6 +33,8 @@ import { ProjectRepository } from "./project";
 import { QuoteRepository } from "./quote";
 import { QuoteRequestRepository } from "./quote-request";
 import { StagedQuoteRepository } from "./quote-staged";
+import { RecurrencePolicyRepository } from "./recurrence-policy";
+import { RecurringOrderRepository } from "./recurring-order";
 import { ReviewRepository } from "./review";
 import { ShippingMethodRepository } from "./shipping-method";
 import { ShoppingListRepository } from "./shopping-list";
@@ -61,6 +64,7 @@ export const createRepositories = (config: Config) => ({
 	channel: new ChannelRepository(config),
 	"customer-group": new CustomerGroupRepository(config),
 	"discount-code": new DiscountCodeRepository(config),
+	"discount-group": new DiscountGroupRepository(config),
 	extension: new ExtensionRepository(config),
 	"inventory-entry": new InventoryEntryRepository(config),
 	"key-value-document": new CustomObjectRepository(config),
@@ -79,6 +83,8 @@ export const createRepositories = (config: Config) => ({
 	"product-selection": new ProductSelectionRepository(config),
 	"product-tailoring": new ProductTailoringRepository(config),
 	project: new ProjectRepository(config),
+	"recurring-order": new RecurringOrderRepository(config),
+	"recurrence-policy": new RecurrencePolicyRepository(config),
 	review: new ReviewRepository(config),
 	quote: new QuoteRepository(config),
 	"quote-request": new QuoteRequestRepository(config),

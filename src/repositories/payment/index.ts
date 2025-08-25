@@ -26,7 +26,7 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 			...getBaseResourceProperties(),
 			key: draft.key,
 			amountPlanned: createCentPrecisionMoney(draft.amountPlanned),
-			paymentMethodInfo: draft.paymentMethodInfo!,
+			paymentMethodInfo: { ...draft.paymentMethodInfo!, custom: undefined },
 			paymentStatus: draft.paymentStatus
 				? {
 						...draft.paymentStatus,

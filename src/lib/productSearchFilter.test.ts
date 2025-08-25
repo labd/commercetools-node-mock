@@ -25,6 +25,7 @@ describe("Product search filter", () => {
 			"nl-NL": "test",
 			"en-US": "test",
 		},
+		attributes: [],
 		variants: [],
 		searchKeywords: {},
 		categories: [],

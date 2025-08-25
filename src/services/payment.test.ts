@@ -46,6 +46,7 @@ describe("Payment", () => {
 				centAmount: 1337,
 			},
 			paymentStatus: {},
+			paymentMethodInfo: {},
 			transactions: [],
 			interfaceInteractions: [],
 			custom: {

@@ -65,6 +65,7 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 			directDiscounts: cart.directDiscounts,
 			lineItems: cart.lineItems,
 			paymentInfo: cart.paymentInfo,
+			priceRoundingMode: cart.priceRoundingMode,
 			quoteRequestState: "Submitted",
 			shippingAddress: cart.shippingAddress,
 			taxCalculationMode: cart.taxCalculationMode,

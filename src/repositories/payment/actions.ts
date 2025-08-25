@@ -13,9 +13,14 @@ import type {
 	PaymentSetCustomerAction,
 	PaymentSetInterfaceIdAction,
 	PaymentSetKeyAction,
+	PaymentSetMethodInfoAction,
+	PaymentSetMethodInfoCustomFieldAction,
+	PaymentSetMethodInfoCustomTypeAction,
+	PaymentSetMethodInfoInterfaceAccountAction,
 	PaymentSetMethodInfoInterfaceAction,
 	PaymentSetMethodInfoMethodAction,
 	PaymentSetMethodInfoNameAction,
+	PaymentSetMethodInfoTokenAction,
 	PaymentSetStatusInterfaceCodeAction,
 	PaymentSetStatusInterfaceTextAction,
 	PaymentSetTransactionCustomFieldAction,
@@ -298,5 +303,87 @@ export class PaymentUpdateHandler
 			id: stateObj.id,
 			obj: stateObj,
 		};
+	}
+
+	setMethodInfo(
+		context: RepositoryContext,
+		resource: Writable<Payment>,
+		{
+			paymentInterface,
+			method,
+			name,
+			interfaceAccount,
+			token,
+		}: PaymentSetMethodInfoAction,
+	) {
+		if (paymentInterface !== undefined) {
+			resource.paymentMethodInfo.paymentInterface = paymentInterface;
+		}
+		if (method !== undefined) {
+			resource.paymentMethodInfo.method = method;
+		}
+		if (name !== undefined) {
+			resource.paymentMethodInfo.name = name;
+		}
+		if (interfaceAccount !== undefined) {
+			resource.paymentMethodInfo.interfaceAccount = interfaceAccount;
+		}
+		if (token !== undefined) {
+			resource.paymentMethodInfo.token = token;
+		}
+	}
+
+	setMethodInfoCustomField(
+		context: RepositoryContext,
+		resource: Writable<Payment>,
+		{ name, value }: PaymentSetMethodInfoCustomFieldAction,
+	) {
+		if (!resource.paymentMethodInfo.custom) {
+			throw new Error("PaymentMethodInfo has no custom field");
+		}
+
+		resource.paymentMethodInfo.custom.fields[name] = value;
+	}
+
+	setMethodInfoCustomType(
+		context: RepositoryContext,
+		resource: Writable<Payment>,
+		{ type, fields }: PaymentSetMethodInfoCustomTypeAction,
+	) {
+		if (!type) {
+			resource.paymentMethodInfo.custom = undefined;
+		} else {
+			const resolvedType = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				type,
+			);
+			if (!resolvedType) {
+				throw new Error(`Type ${type} not found`);
+			}
+
+			resource.paymentMethodInfo.custom = {
+				type: {
+					typeId: "type",
+					id: resolvedType.id,
+				},
+				fields: fields ?? {},
+			};
+		}
+	}
+
+	setMethodInfoInterfaceAccount(
+		_context: RepositoryContext,
+		resource: Writable<Payment>,
+		{ interfaceAccount }: PaymentSetMethodInfoInterfaceAccountAction,
+	) {
+		resource.paymentMethodInfo.interfaceAccount = interfaceAccount;
+	}
+
+	setMethodInfoToken(
+		_context: RepositoryContext,
+		resource: Writable<Payment>,
+		{ token }: PaymentSetMethodInfoTokenAction,
+	) {
+		resource.paymentMethodInfo.token = token;
 	}
 }

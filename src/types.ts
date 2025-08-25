@@ -51,6 +51,7 @@ export type ResourceMap = {
 	"customer-password-token": never;
 	customer: ctp.Customer;
 	"discount-code": ctp.DiscountCode;
+	"discount-group": ctp.DiscountGroup;
 	extension: ctp.Extension;
 	"inventory-entry": ctp.InventoryEntry;
 	"key-value-document": ctp.CustomObject;
@@ -74,6 +75,8 @@ export type ResourceMap = {
 	state: ctp.State;
 	store: ctp.Store;
 	subscription: ctp.Subscription;
+	"recurring-order": ctp.RecurringOrder;
+	"recurrence-policy": ctp.RecurrencePolicy;
 	"tax-category": ctp.TaxCategory;
 	type: ctp.Type;
 	zone: ctp.Zone;
@@ -92,6 +95,7 @@ export type PagedQueryResponseMap = {
 	"customer-password-token": never;
 	customer: ctp.CustomerPagedQueryResponse;
 	"discount-code": ctp.DiscountCodePagedQueryResponse;
+	"discount-group": ctp.DiscountGroupPagedQueryResponse;
 	extension: ctp.ExtensionPagedQueryResponse;
 	"inventory-entry": ctp.InventoryPagedQueryResponse;
 	"key-value-document": ctp.CustomObjectPagedQueryResponse;
@@ -115,6 +119,8 @@ export type PagedQueryResponseMap = {
 	state: ctp.StatePagedQueryResponse;
 	store: ctp.StorePagedQueryResponse;
 	subscription: ctp.SubscriptionPagedQueryResponse;
+	"recurring-order": ctp.RecurringOrderPagedQueryResponse;
+	"recurrence-policy": ctp.RecurrencePolicyPagedQueryResponse;
 	"tax-category": ctp.TaxCategoryPagedQueryResponse;
 	type: ctp.TypePagedQueryResponse;
 	zone: ctp.ZonePagedQueryResponse;
