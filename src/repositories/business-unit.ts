@@ -1,9 +1,18 @@
 import type {
+	BusinessUnitAddBillingAddressIdAction,
 	BusinessUnitAddShippingAddressIdAction,
 	BusinessUnitChangeApprovalRuleModeAction,
+	BusinessUnitChangeAssociateAction,
 	BusinessUnitChangeAssociateModeAction,
 	BusinessUnitChangeStatusAction,
+	BusinessUnitRemoveAssociateAction,
+	BusinessUnitRemoveBillingAddressIdAction,
+	BusinessUnitRemoveShippingAddressIdAction,
+	BusinessUnitSetAddressCustomFieldAction,
+	BusinessUnitSetAddressCustomTypeAction,
+	BusinessUnitSetCustomFieldAction,
 	BusinessUnitSetCustomTypeAction,
+	BusinessUnitSetDefaultBillingAddressAction,
 	BusinessUnitSetDefaultShippingAddressAction,
 	BusinessUnitUpdateAction,
 	CompanyDraft,
@@ -194,15 +203,25 @@ class BusinessUnitUpdateHandler
 	changeAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ address }: BusinessUnitChangeAddressAction,
+		{ addressId, address }: BusinessUnitChangeAddressAction,
 	) {
+		const existingAddressIndex = resource.addresses.findIndex(
+			(addr) => addr.id === addressId,
+		);
+		if (existingAddressIndex === -1) {
+			throw new Error(`Address with id ${addressId} not found`);
+		}
+
 		const newAddress = createAddress(
 			address,
 			context.projectKey,
 			this._storage,
 		);
 		if (newAddress) {
-			resource.addresses.push(newAddress);
+			resource.addresses[existingAddressIndex] = {
+				...newAddress,
+				id: addressId,
+			};
 		}
 	}
 
@@ -261,6 +280,40 @@ class BusinessUnitUpdateHandler
 		resource.associates = newAssociates || undefined;
 	}
 
+	removeAssociate(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ customer }: BusinessUnitRemoveAssociateAction,
+	) {
+		resource.associates = resource.associates.filter(
+			(associate) => associate.customer.id !== customer.id,
+		);
+	}
+
+	changeAssociate(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ associate }: BusinessUnitChangeAssociateAction,
+	) {
+		const existingAssociateIndex = resource.associates.findIndex(
+			(a) => a.customer.id === associate.customer.id,
+		);
+		if (existingAssociateIndex === -1) {
+			throw new Error(
+				`Associate with customer id ${associate.customer.id} not found`,
+			);
+		}
+
+		const newAssociate = createAssociate(
+			associate,
+			context.projectKey,
+			this._storage,
+		);
+		if (newAssociate) {
+			resource.associates[existingAssociateIndex] = newAssociate;
+		}
+	}
+
 	setContactEmail(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
@@ -311,6 +364,108 @@ class BusinessUnitUpdateHandler
 		}
 		if (addressId) {
 			resource.shippingAddressIds.push(addressId);
+		}
+	}
+
+	removeShippingAddressId(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitRemoveShippingAddressIdAction,
+	) {
+		if (resource.shippingAddressIds) {
+			resource.shippingAddressIds = resource.shippingAddressIds.filter(
+				(id) => id !== addressId,
+			);
+		}
+		if (resource.defaultShippingAddressId === addressId) {
+			resource.defaultShippingAddressId = undefined;
+		}
+	}
+
+	addBillingAddressId(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitAddBillingAddressIdAction,
+	) {
+		if (!resource.billingAddressIds) {
+			resource.billingAddressIds = [];
+		}
+		if (addressId) {
+			resource.billingAddressIds.push(addressId);
+		}
+	}
+
+	removeBillingAddressId(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitRemoveBillingAddressIdAction,
+	) {
+		if (resource.billingAddressIds) {
+			resource.billingAddressIds = resource.billingAddressIds.filter(
+				(id) => id !== addressId,
+			);
+		}
+		if (resource.defaultBillingAddressId === addressId) {
+			resource.defaultBillingAddressId = undefined;
+		}
+	}
+
+	setDefaultBillingAddress(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId }: BusinessUnitSetDefaultBillingAddressAction,
+	) {
+		resource.defaultBillingAddressId = addressId;
+	}
+
+	setCustomField(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ name, value }: BusinessUnitSetCustomFieldAction,
+	) {
+		if (!resource.custom) {
+			throw new Error("Resource has no custom type");
+		}
+		resource.custom.fields[name] = value;
+	}
+
+	setAddressCustomField(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId, name, value }: BusinessUnitSetAddressCustomFieldAction,
+	) {
+		const address = resource.addresses.find((addr) => addr.id === addressId);
+		if (!address) {
+			throw new Error(`Address with id ${addressId} not found`);
+		}
+		if (!address.custom) {
+			// If the address doesn't have custom fields, we need to initialize them
+			// This might require a type to be set first, but we'll just create minimal structure
+			throw new Error(
+				"Address has no custom type set. Use setAddressCustomType first.",
+			);
+		}
+		address.custom.fields[name] = value;
+	}
+
+	setAddressCustomType(
+		context: RepositoryContext,
+		resource: Writable<BusinessUnit>,
+		{ addressId, type, fields }: BusinessUnitSetAddressCustomTypeAction,
+	) {
+		const address = resource.addresses.find((addr) => addr.id === addressId);
+		if (!address) {
+			throw new Error(`Address with id ${addressId} not found`);
+		}
+
+		if (!type) {
+			address.custom = undefined;
+		} else {
+			address.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
 		}
 	}
 
