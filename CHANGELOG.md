@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2.55.0
+
+### Minor Changes
+
+- [#323](https://github.com/labd/commercetools-node-mock/pull/323) [`e29f6e1`](https://github.com/labd/commercetools-node-mock/commit/e29f6e1573188472c2ae62b70123c6332936caa4) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for attributes at Product level
+  Add DiscountGroup, RecurrencePolicy, and RecurringOrder services
+  Add PaymentUpdateAction methods
+  Add invalidateOlderTokens to customer token creation
+
 ## 2.54.0
 
 ### Minor Changes
