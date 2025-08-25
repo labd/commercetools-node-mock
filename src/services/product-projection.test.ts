@@ -41,7 +41,7 @@ beforeEach(async () => {
 		const productDraft: Writable<ProductDraft> = {
 			publish: false,
 			key: "my-unpublished-product",
-			attributes: [{ "name": "number", value: 11 as any }],
+			attributes: [{ name: "number", value: 11 as any }],
 			masterVariant: {
 				sku: "my-unpub-sku",
 				prices: [
@@ -83,7 +83,7 @@ beforeEach(async () => {
 		const productDraft: Writable<ProductDraft> = {
 			publish: true,
 			key: "my-product-key",
-			attributes: [{ "name": "number", value: 111 as any }],
+			attributes: [{ name: "number", value: 111 as any }],
 			masterVariant: {
 				sku: "my-sku",
 				prices: [
@@ -152,7 +152,7 @@ beforeEach(async () => {
 			key: "my-product-key",
 			published: true,
 			hasStagedChanges: false,
-			attributes: [{ "name": "number", value: 111 as any }],
+			attributes: [{ name: "number", value: 111 as any }],
 			masterVariant: {
 				id: 1,
 				sku: "my-sku",
