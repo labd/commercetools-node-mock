@@ -339,11 +339,12 @@ export class CartUpdateHandler
 			taxCategory,
 			custom,
 			priceMode = "Standard",
+			key,
 		}: CartAddCustomLineItemAction,
 	) {
 		const customLineItem = createCustomLineItemFromDraft(
 			context.projectKey,
-			{ money, name, slug, quantity, taxCategory, custom, priceMode },
+			{ money, name, slug, quantity, taxCategory, custom, priceMode, key },
 			this._storage,
 			resource.country,
 		);

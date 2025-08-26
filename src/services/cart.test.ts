@@ -1447,6 +1447,47 @@ describe("Cart Update Actions", () => {
 		expect(removeResponse.body.customLineItems).toHaveLength(0);
 	});
 
+	test("removeCustomLineItem by key", async () => {
+		assert(cart, "cart not created");
+
+		const addResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Service Fee" },
+						slug: "service-fee",
+						key: "custom-service-fee",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 1,
+					},
+				],
+			});
+
+		expect(addResponse.status).toBe(200);
+		expect(addResponse.body.customLineItems).toHaveLength(1);
+
+		const removeResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: addResponse.body.version,
+				actions: [
+					{
+						action: "removeCustomLineItem",
+						customLineItemKey: "custom-service-fee",
+					},
+				],
+			});
+
+		expect(removeResponse.status).toBe(200);
+		expect(removeResponse.body.customLineItems).toHaveLength(0);
+	});
+
 	test("changeCustomLineItemQuantity", async () => {
 		assert(cart, "cart not created");
 		const addResponse = await supertest(ctMock.app)

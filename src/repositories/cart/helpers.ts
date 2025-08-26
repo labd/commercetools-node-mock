@@ -179,6 +179,7 @@ export const createCustomLineItemFromDraft = (
 
 	return {
 		id: uuidv4(),
+		key: draft.key,
 		name: draft.name,
 		money: createTypedMoney(draft.money),
 		slug: draft.slug,
