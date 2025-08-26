@@ -369,6 +369,14 @@ describe("Predicate filter", () => {
 			),
 		).toBeFalsy();
 	});
+
+	test("in operator with array values", async () => {
+		expect(match(`arrayProperty in ("foo")`)).toBeTruthy();
+		expect(match(`arrayProperty in ("bar")`)).toBeTruthy();
+		expect(match(`arrayProperty in ("missing")`)).toBeFalsy();
+		expect(match(`arrayProperty in ("foo", "bar")`)).toBeTruthy();
+		expect(match(`arrayProperty in ("missing", "alsomissing")`)).toBeFalsy();
+	});
 });
 
 describe("Report parse errors", () => {
