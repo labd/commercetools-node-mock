@@ -11,10 +11,14 @@ import type {
 	Address,
 	AddressDraft,
 	Cart,
+	CartAddCustomLineItemAction,
 	CartAddItemShippingAddressAction,
 	CartAddLineItemAction,
+	CartChangeCustomLineItemMoneyAction,
+	CartChangeCustomLineItemQuantityAction,
 	CartChangeLineItemQuantityAction,
 	CartChangeTaxRoundingModeAction,
+	CartRemoveCustomLineItemAction,
 	CartRemoveDiscountCodeAction,
 	CartRemoveLineItemAction,
 	CartRemoveShippingMethodAction,
@@ -39,8 +43,10 @@ import type {
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
+	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
 import type {
+	CustomLineItem,
 	DirectDiscount,
 	TaxPortion,
 	TaxedItemPrice,
@@ -58,11 +64,14 @@ import {
 	createCentPrecisionMoney,
 	createCustomFields,
 	createTypedMoney,
+	getReferenceFromResourceIdentifier,
 	roundDecimal,
 } from "../helpers";
 import {
 	calculateCartTotalPrice,
 	calculateLineItemTotalPrice,
+	calculateTaxedPrice,
+	createCustomLineItemFromDraft,
 	selectPrice,
 } from "./helpers";
 
@@ -313,6 +322,175 @@ export class CartUpdateHandler
 					x.totalPrice.centAmount = calculateLineItemTotalPrice(x);
 				}
 			});
+		}
+
+		// Update cart total price
+		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+	}
+
+	addCustomLineItem(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			money,
+			name,
+			slug,
+			quantity = 1,
+			taxCategory,
+			custom,
+			priceMode = "Standard",
+			key,
+		}: CartAddCustomLineItemAction,
+	) {
+		const customLineItem = createCustomLineItemFromDraft(
+			context.projectKey,
+			{ money, name, slug, quantity, taxCategory, custom, priceMode, key },
+			this._storage,
+			resource.country,
+		);
+
+		resource.customLineItems.push(customLineItem);
+		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+	}
+
+	removeCustomLineItem(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ customLineItemId, customLineItemKey }: CartRemoveCustomLineItemAction,
+	) {
+		let customLineItem;
+
+		if (!customLineItemId && !customLineItemKey) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message:
+					"Either customLineItemId or customLineItemKey needs to be provided.",
+			});
+		}
+
+		if (customLineItemId) {
+			customLineItem = resource.customLineItems.find(
+				(x) => x.id === customLineItemId,
+			);
+			if (!customLineItem) {
+				throw new CommercetoolsError<GeneralError>({
+					code: "General",
+					message: `A custom line item with ID '${customLineItemId}' not found.`,
+				});
+			}
+			resource.customLineItems = resource.customLineItems.filter(
+				(x) => x.id !== customLineItemId,
+			);
+		}
+
+		if (customLineItemKey) {
+			customLineItem = resource.customLineItems.find(
+				(x) => x.key === customLineItemKey,
+			);
+			if (!customLineItem) {
+				throw new CommercetoolsError<GeneralError>({
+					code: "General",
+					message: `A custom line item with key '${customLineItemKey}' not found.`,
+				});
+			}
+			resource.customLineItems = resource.customLineItems.filter(
+				(x) => x.key !== customLineItemKey,
+			);
+		}
+
+		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+	}
+
+	changeCustomLineItemQuantity(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			customLineItemId,
+			customLineItemKey,
+			quantity,
+		}: CartChangeCustomLineItemQuantityAction,
+	) {
+		let customLineItem;
+
+		if (!customLineItemId && !customLineItemKey) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message:
+					"Either customLineItemId or customLineItemKey needs to be provided.",
+			});
+		}
+
+		const setQuantity = (
+			customLineItem: Writable<CustomLineItem> | undefined,
+		) => {
+			if (!customLineItem) {
+				throw new CommercetoolsError<GeneralError>({
+					code: "General",
+					message: `A custom line item with ${customLineItemId ? `ID '${customLineItemId}'` : `key '${customLineItemKey}'`} not found.`,
+				});
+			}
+			customLineItem.quantity = quantity;
+			customLineItem.totalPrice = createCentPrecisionMoney({
+				...customLineItem.money,
+				centAmount: (customLineItem.money.centAmount ?? 0) * quantity,
+			});
+		};
+
+		if (customLineItemId) {
+			customLineItem = resource.customLineItems.find(
+				(x) => x.id === customLineItemId,
+			);
+			setQuantity(customLineItem);
+		}
+
+		if (customLineItemKey) {
+			customLineItem = resource.customLineItems.find(
+				(x) => x.key === customLineItemKey,
+			);
+			setQuantity(customLineItem);
+		}
+
+		// Update cart total price
+		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+	}
+
+	changeCustomLineItemMoney(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			customLineItemId,
+			customLineItemKey,
+			money,
+		}: CartChangeCustomLineItemMoneyAction,
+	) {
+		let customLineItem;
+
+		const setMoney = (customLineItem: Writable<CustomLineItem> | undefined) => {
+			if (!customLineItem) {
+				throw new CommercetoolsError<GeneralError>({
+					code: "General",
+					message: `A custom line item with ${customLineItemId ? `ID '${customLineItemId}'` : `key '${customLineItemKey}'`} not found.`,
+				});
+			}
+			customLineItem.money = createTypedMoney(money);
+			customLineItem.totalPrice = createCentPrecisionMoney({
+				...money,
+				centAmount: (money.centAmount ?? 0) * customLineItem.quantity,
+			});
+		};
+
+		if (customLineItemId) {
+			customLineItem = resource.customLineItems.find(
+				(x) => x.id === customLineItemId,
+			);
+			setMoney(customLineItem);
+		}
+
+		if (customLineItemKey) {
+			customLineItem = resource.customLineItems.find(
+				(x) => x.key === customLineItemKey,
+			);
+			setMoney(customLineItem);
 		}
 
 		// Update cart total price
