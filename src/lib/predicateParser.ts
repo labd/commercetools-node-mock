@@ -381,8 +381,14 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			}
 		})
 		.led("IN", 20, ({ left, bp }) => {
+			const firstToken = lexer.peek();
 			const expr = parser.parse({ terminals: [bp - 1] });
-			lexer.expect(")");
+
+			// IN can be a single value or a list of values
+			if (firstToken.match === "(") {
+				lexer.expect(")");
+			}
+
 			return (obj: any, vars: object) => {
 				let symbols = expr;
 				if (!Array.isArray(symbols)) {

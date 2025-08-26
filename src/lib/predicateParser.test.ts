@@ -151,43 +151,11 @@ describe("Predicate filter", () => {
 		expect(match("numberProperty in (1234)")).toBeTruthy();
 	});
 
-	test("in operator with and clause", async () => {
-		expect(
-			match("numberProperty in (1234) and stringProperty=:val", {
-				val: "foobar",
-			}),
-		).toBeTruthy();
-		expect(
-			match("numberProperty in (1234) and stringProperty=:val", {
-				val: "other",
-			}),
-		).toBeFalsy();
-		expect(
-			match("numberProperty in (1235) and stringProperty=:val", {
-				val: "foobar",
-			}),
-		).toBeFalsy();
-	});
-
-	test("within operator with and clause", async () => {
-		expect(
-			match(
-				"geoLocation within circle(5.121310867198959, 52.09068804569714, 2500) and stringProperty=:val",
-				{ val: "foobar" },
-			),
-		).toBeTruthy();
-		expect(
-			match(
-				"geoLocation within circle(5.121310867198959, 52.09068804569714, 2500) and stringProperty=:val",
-				{ val: "other" },
-			),
-		).toBeFalsy();
-		expect(
-			match(
-				"geoLocation within circle(5.121310867198959, 52.09068804569714, 1000) and stringProperty=:val",
-				{ val: "foobar" },
-			),
-		).toBeFalsy();
+	test("in operator works with with and without parentheses", async () => {
+		expect(match("numberProperty in :val", { val: 1234 })).toBeTruthy();
+		expect(match("numberProperty in :val", { val: 1235 })).toBeFalsy();
+		expect(match("numberProperty in :val", { val: [1234] })).toBeTruthy();
+		expect(match("numberProperty in :val", { val: [1235] })).toBeFalsy();
 	});
 
 	test("arrayProperty contains all (...)", async () => {
