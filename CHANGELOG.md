@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.56.0
+
+### Minor Changes
+
+- [#326](https://github.com/labd/commercetools-node-mock/pull/326) [`8c3dcfe`](https://github.com/labd/commercetools-node-mock/commit/8c3dcfe0ed475a47f36bed563ee0b4db0ba932c7) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for custom line items on cart
+
+### Patch Changes
+
+- [#320](https://github.com/labd/commercetools-node-mock/pull/320) [`7a466c6`](https://github.com/labd/commercetools-node-mock/commit/7a466c676995602d9f5fb6e9060ed5c40c3e78f2) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: IN operator can be both a list and a single value
+
+- [#327](https://github.com/labd/commercetools-node-mock/pull/327) [`be5a2b5`](https://github.com/labd/commercetools-node-mock/commit/be5a2b55f3264ed2c2a683be78568253f10a7ef5) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Fix IN operator to work correctly with array values in predicate parser
+
 ## 2.55.0
 
 ### Minor Changes
