@@ -403,6 +403,274 @@ describe("Predicate filter", () => {
 	});
 });
 
+describe("Product attributes filtering", () => {
+	const productWithAttributes = {
+		id: "product-123",
+		name: "Test Product",
+		attributes: [
+			{ name: "brand", value: "TestBrand" },
+			{ name: "stores", value: ["store1", "store2", "store3"] },
+			{ name: "color", value: "red" },
+			{ name: "size", value: 42 },
+			{ name: "available", value: true },
+			{ name: "tags", value: [] },
+		],
+	};
+
+	const productWithoutAttributes = {
+		id: "product-456",
+		name: "Product without attributes",
+	};
+
+	const matchProduct = (
+		pattern: string,
+		obj: any = productWithAttributes,
+		vars?: VariableMap,
+	) => {
+		const matchFunc = parseQueryExpression(pattern);
+		return matchFunc(obj, vars || {});
+	};
+
+	test("attributes() function with simple equality", () => {
+		expect(
+			matchProduct(`attributes(name="brand" and value="TestBrand")`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="brand" and value="OtherBrand")`),
+		).toBeFalsy();
+		expect(
+			matchProduct(`attributes(name="color" and value="red")`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="color" and value="blue")`),
+		).toBeFalsy();
+	});
+
+	test("attributes() function with numeric values", () => {
+		expect(
+			matchProduct(`attributes(name="size" and value=42)`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="size" and value=43)`),
+		).toBeFalsy();
+		expect(matchProduct(`attributes(name="size" and value>40)`)).toBeTruthy();
+		expect(matchProduct(`attributes(name="size" and value<50)`)).toBeTruthy();
+		expect(matchProduct(`attributes(name="size" and value<40)`)).toBeFalsy();
+	});
+
+	test("attributes() function with boolean values", () => {
+		expect(
+			matchProduct(`attributes(name="available" and value=true)`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="available" and value=false)`),
+		).toBeFalsy();
+	});
+
+	test("attributes() function with IN operator for array values", () => {
+		// Test that array values work with IN operator
+		expect(
+			matchProduct(`attributes(name="stores" and value in ("store1"))`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="stores" and value in ("store2"))`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="stores" and value in ("store4"))`),
+		).toBeFalsy();
+		expect(
+			matchProduct(`attributes(name="stores" and value in ("store1", "store2"))`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="stores" and value in ("store4", "store5"))`),
+		).toBeFalsy();
+	});
+
+	test("attributes() function with IN operator for single values", () => {
+		expect(
+			matchProduct(`attributes(name="color" and value in ("red", "blue", "green"))`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="color" and value in ("blue", "green"))`),
+		).toBeFalsy();
+		expect(
+			matchProduct(`attributes(name="brand" and value in ("TestBrand", "OtherBrand"))`),
+		).toBeTruthy();
+	});
+
+	test("attributes() function with empty arrays", () => {
+		expect(
+			matchProduct(`attributes(name="tags" and value in ("tag1"))`),
+		).toBeFalsy();
+	});
+
+	test("attributes() function on product without attributes", () => {
+		expect(
+			matchProduct(
+				`attributes(name="brand" and value="TestBrand")`,
+				productWithoutAttributes,
+			),
+		).toBeFalsy();
+	});
+
+	test("combined predicates with AND", () => {
+		expect(
+			matchProduct(`id="product-123" and attributes(name="brand" and value="TestBrand")`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`id="product-456" and attributes(name="brand" and value="TestBrand")`),
+		).toBeFalsy();
+		expect(
+			matchProduct(`id="product-123" and attributes(name="brand" and value="OtherBrand")`),
+		).toBeFalsy();
+		expect(
+			matchProduct(`name="Test Product" and attributes(name="stores" and value in ("store1"))`),
+		).toBeTruthy();
+	});
+
+	test("combined predicates with OR", () => {
+		expect(
+			matchProduct(`id="wrong-id" or attributes(name="brand" and value="TestBrand")`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`id="product-123" or attributes(name="brand" and value="WrongBrand")`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`id="wrong-id" or attributes(name="brand" and value="WrongBrand")`),
+		).toBeFalsy();
+	});
+
+	test("attributes() with variables", () => {
+		expect(
+			matchProduct(`attributes(name="brand" and value=:brand)`, productWithAttributes, {
+				brand: "TestBrand",
+			}),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="brand" and value=:brand)`, productWithAttributes, {
+				brand: "OtherBrand",
+			}),
+		).toBeFalsy();
+		expect(
+			matchProduct(
+				`attributes(name="stores" and value in (:stores))`,
+				productWithAttributes,
+				{
+					stores: ["store1"],
+				},
+			),
+		).toBeTruthy();
+		expect(
+			matchProduct(
+				`attributes(name="stores" and value in (:stores))`,
+				productWithAttributes,
+				{
+					stores: ["store4", "store5"],
+				},
+			),
+		).toBeFalsy();
+	});
+
+	test("multiple attributes conditions", () => {
+		// Test that only matching attributes return true
+		const productWithMultiple = {
+			id: "product-789",
+			attributes: [
+				{ name: "brand", value: "BrandA" },
+				{ name: "brand", value: "BrandB" }, // Multiple brand attributes
+				{ name: "category", value: "electronics" },
+			],
+		};
+
+		expect(
+			matchProduct(`attributes(name="brand" and value="BrandA")`, productWithMultiple),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="brand" and value="BrandB")`, productWithMultiple),
+		).toBeTruthy();
+		expect(
+			matchProduct(`attributes(name="brand" and value="BrandC")`, productWithMultiple),
+		).toBeFalsy();
+	});
+
+	test("attributes() with NOT operator", () => {
+		expect(
+			matchProduct(`not attributes(name="brand" and value="WrongBrand")`),
+		).toBeTruthy();
+		expect(
+			matchProduct(`not attributes(name="brand" and value="TestBrand")`),
+		).toBeFalsy();
+	});
+
+	test("nested attributes are not confused with product attributes", () => {
+		const productWithNestedAttributes = {
+			id: "product-nested",
+			attributes: [{ name: "topLevel", value: "correct" }],
+			nested: {
+				attributes: [{ name: "nestedLevel", value: "incorrect" }],
+			},
+		};
+
+		expect(
+			matchProduct(
+				`attributes(name="topLevel" and value="correct")`,
+				productWithNestedAttributes,
+			),
+		).toBeTruthy();
+		expect(
+			matchProduct(
+				`attributes(name="nestedLevel" and value="incorrect")`,
+				productWithNestedAttributes,
+			),
+		).toBeFalsy();
+	});
+});
+
+describe("IN operator with array values", () => {
+	const testObject = {
+		singleValue: "apple",
+		arrayValue: ["apple", "banana", "orange"],
+		emptyArray: [],
+		numberArray: [1, 2, 3],
+	};
+
+	const match = (pattern: string, vars?: VariableMap) => {
+		const matchFunc = parseQueryExpression(pattern);
+		return matchFunc(testObject, vars || {});
+	};
+
+	test("IN operator with single values", () => {
+		expect(match(`singleValue in ("apple", "pear")`)).toBeTruthy();
+		expect(match(`singleValue in ("pear", "orange")`)).toBeFalsy();
+	});
+
+	test("IN operator with array values checks for overlap", () => {
+		expect(match(`arrayValue in ("apple")`)).toBeTruthy();
+		expect(match(`arrayValue in ("banana")`)).toBeTruthy();
+		expect(match(`arrayValue in ("grape")`)).toBeFalsy();
+		expect(match(`arrayValue in ("apple", "grape")`)).toBeTruthy(); // At least one match
+		expect(match(`arrayValue in ("grape", "melon")`)).toBeFalsy(); // No matches
+	});
+
+	test("IN operator with empty arrays", () => {
+		expect(match(`emptyArray in ("anything")`)).toBeFalsy();
+	});
+
+	test("IN operator with number arrays", () => {
+		expect(match(`numberArray in (1, 4)`)).toBeTruthy();
+		expect(match(`numberArray in (4, 5, 6)`)).toBeFalsy();
+		expect(match(`numberArray in (2)`)).toBeTruthy();
+	});
+
+	test("IN operator with variables containing arrays", () => {
+		expect(match(`arrayValue in (:values)`, { values: ["apple"] })).toBeTruthy();
+		expect(match(`arrayValue in (:values)`, { values: ["grape"] })).toBeFalsy();
+		expect(
+			match(`arrayValue in (:values)`, { values: ["apple", "grape"] }),
+		).toBeTruthy();
+	});
+});
+
 describe("Report parse errors", () => {
 	test("unexpect input", () => {
 		expect(() => parseQueryExpression("foo=bar")).toThrow(PredicateError);

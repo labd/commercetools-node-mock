@@ -97,6 +97,11 @@ const resolveValue = (obj: any, val: TypeSymbol): any => {
 		return [obj.masterVariant, ...(obj.variants ?? [])];
 	}
 
+	// Handle attributes array for product-level attributes
+	if (val.value === "attributes" && obj.attributes) {
+		return obj.attributes;
+	}
+
 	if (!(val.value in obj)) {
 		if (Array.isArray(obj)) {
 			return Object.values(obj)
@@ -260,6 +265,15 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			const expr = parser.parse();
 			lexer.expect(")");
 			return (obj: any, vars: object) => {
+				if (left && left.value === "attributes") {
+					if (Array.isArray(obj.attributes)) {
+						return obj.attributes.some((attr: any) => {
+							return expr(attr, vars);
+						});
+					}
+					return false;
+				}
+				
 				if (Array.isArray(obj)) {
 					return obj.some((item) => {
 						const value = resolveValue(item, left);
@@ -397,6 +411,12 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 					resolveSymbol(item, vars),
 				);
 				const value = resolveValue(obj, left);
+				
+				// If value is an array, check if any of its elements are in inValues
+				if (Array.isArray(value)) {
+					return value.some(v => inValues.includes(v));
+				}
+				
 				return inValues.includes(value);
 			};
 		})
