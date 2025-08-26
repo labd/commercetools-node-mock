@@ -404,7 +404,6 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 				);
 				const value = resolveValue(obj, left);
 
-
 				if (Array.isArray(value)) {
 					return inValues.some((inValue: any) => value.includes(inValue));
 				}
