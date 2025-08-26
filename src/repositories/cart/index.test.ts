@@ -254,7 +254,7 @@ describe("Cart repository", () => {
 				{
 					id: "rate-1",
 					name: "Standard VAT",
-					amount: 0.21, // 21% VAT
+					amount: 0.21,
 					includedInPrice: false,
 					country: "NL",
 				},
