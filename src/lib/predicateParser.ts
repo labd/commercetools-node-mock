@@ -403,6 +403,11 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 					resolveSymbol(item, vars),
 				);
 				const value = resolveValue(obj, left);
+
+				if (Array.isArray(value)) {
+					return inValues.some((inValue: any) => value.includes(inValue));
+				}
+
 				return inValues.includes(value);
 			};
 		})
