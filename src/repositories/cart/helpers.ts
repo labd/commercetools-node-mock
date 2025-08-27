@@ -178,7 +178,7 @@ export const createCustomLineItemFromDraft = (
 	const taxRate = taxCategory
 		? taxCategory.rates.find(
 				(rate) => !rate.country || rate.country === country,
-			) || taxCategory.rates[0]
+			)
 		: undefined;
 
 	return {
