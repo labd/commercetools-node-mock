@@ -150,7 +150,6 @@ export const createCustomLineItemFromDraft = (
 			)
 		: undefined;
 
-	// Get the tax category to calculate taxed price
 	let taxCategory: TaxCategory | undefined = undefined;
 	if (taxCategoryRef) {
 		try {
@@ -167,7 +166,6 @@ export const createCustomLineItemFromDraft = (
 		centAmount: (draft.money.centAmount ?? 0) * quantity,
 	});
 
-	// Calculate taxed price if tax category is available
 	const taxedPrice = taxCategory
 		? calculateTaxedPrice(
 				totalPrice.centAmount,
@@ -175,6 +173,12 @@ export const createCustomLineItemFromDraft = (
 				totalPrice.currencyCode,
 				country,
 			)
+		: undefined;
+
+	const taxRate = taxCategory
+		? taxCategory.rates.find(
+				(rate) => !rate.country || rate.country === country,
+			) || taxCategory.rates[0]
 		: undefined;
 
 	return {
@@ -186,6 +190,7 @@ export const createCustomLineItemFromDraft = (
 		quantity: draft.quantity ?? 1,
 		state: [],
 		taxCategory: taxCategoryRef,
+		taxRate,
 		taxedPrice,
 		custom: createCustomFields(draft.custom, projectKey, storage),
 		discountedPricePerQuantity: [],

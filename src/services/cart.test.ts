@@ -1399,6 +1399,8 @@ describe("Cart Update Actions", () => {
 		expect(customLineItem.totalPrice.centAmount).toBe(1000);
 		expect(customLineItem.taxCategory.id).toBe(taxCategory.id);
 		expect(customLineItem.taxedPrice).toBeDefined();
+		expect(customLineItem.taxRate).toBeDefined();
+		expect(customLineItem.taxRate.amount).toBe(0.21);
 		expect(customLineItem.id).toBeDefined();
 		expect(customLineItem.custom).toBeDefined();
 		expect(customLineItem.custom.fields.description).toBe(

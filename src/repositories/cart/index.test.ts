@@ -293,5 +293,10 @@ describe("Cart repository", () => {
 		expect(customLineItem.taxedPrice?.totalTax?.centAmount).toBe(210);
 		expect(customLineItem.taxedPrice?.taxPortions).toHaveLength(1);
 		expect(customLineItem.taxedPrice?.taxPortions[0].rate).toBe(0.21);
+		expect(customLineItem.taxRate).toBeDefined();
+		expect(customLineItem.taxRate?.amount).toBe(0.21);
+		expect(customLineItem.taxRate?.name).toBe("Standard VAT");
+		expect(customLineItem.taxRate?.includedInPrice).toBe(false);
+		expect(customLineItem.taxRate?.country).toBe("NL");
 	});
 });
