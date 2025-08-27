@@ -346,7 +346,7 @@ export class CartUpdateHandler
 			context.projectKey,
 			{ money, name, slug, quantity, taxCategory, custom, priceMode, key },
 			this._storage,
-			resource.country,
+			resource.shippingAddress?.country ?? resource.country,
 		);
 
 		resource.customLineItems.push(customLineItem);

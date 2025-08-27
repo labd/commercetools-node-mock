@@ -116,6 +116,7 @@ describe("Cart Update Actions", () => {
 	const createCart = async (currency: string) => {
 		const response = await supertest(ctMock.app).post("/dummy/carts").send({
 			currency,
+			country: "NL",
 		});
 		expect(response.status).toBe(201);
 		cart = response.body;
@@ -653,11 +654,11 @@ describe("Cart Update Actions", () => {
 			.post(`/dummy/carts/${cart.id}`)
 			.send({
 				version: 1,
-				actions: [{ action: "setCountry", country: "NL" }],
+				actions: [{ action: "setCountry", country: "BE" }],
 			});
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(2);
-		expect(response.body.country).toBe("NL");
+		expect(response.body.country).toBe("BE");
 	});
 
 	test("setDirectDiscounts", async () => {

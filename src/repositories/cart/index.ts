@@ -81,7 +81,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 					context.projectKey,
 					draftCustomLineItem,
 					this._storage,
-					draft.country,
+					draft.shippingAddress?.country ?? draft.country,
 				),
 			) ?? [];
 
