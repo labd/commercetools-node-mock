@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.56.1
+
+### Patch Changes
+
+- [#331](https://github.com/labd/commercetools-node-mock/pull/331) [`35da11e`](https://github.com/labd/commercetools-node-mock/commit/35da11e6d5ec99c706d2b0e8788357da3346b738) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: make tax rate for custom line item dependent on the cart.shippingAddress.country ?? cart.country
+
+- [#329](https://github.com/labd/commercetools-node-mock/pull/329) [`9a70063`](https://github.com/labd/commercetools-node-mock/commit/9a700636abae01c0e11e8a7acfa9fc54551a9408) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: implement tax rate on custom line items
+
 ## 2.56.0
 
 ### Minor Changes
