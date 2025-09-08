@@ -69,8 +69,6 @@ describe("MyBusinessUnit", () => {
 
 		expect(createResponse.status).toBe(201);
 
-		console.log(createResponse.body);
-
 		const response = await supertest(ctMock.app).get(
 			`/dummy/me/business-units/key=${createResponse.body.key}`,
 		);
