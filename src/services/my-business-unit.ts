@@ -23,11 +23,14 @@ export class MyBusinessUnitService extends AbstractService {
 
 		router.get("/business-units/", this.get.bind(this));
 		router.get("/business-units/:id", this.getWithId.bind(this));
+		router.get("/business-units/key=:key", this.getWithKey.bind(this));
 
 		router.delete("/business-units/:id", this.deleteWithId.bind(this));
+		router.delete("/business-units/key=:key", this.deleteWithKey.bind(this));
 
 		router.post("/business-units/", this.post.bind(this));
 		router.post("/business-units/:id", this.postWithId.bind(this));
+		router.post("/business-units/key=:key", this.postWithKey.bind(this));
 
 		parent.use(`/${basePath}`, router);
 	}
