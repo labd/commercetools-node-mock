@@ -80,6 +80,11 @@ export class InMemoryStorage extends AbstractStorage {
 				carts: {
 					countryTaxRateFallbackEnabled: false,
 					deleteDaysAfterLastModification: 90,
+					priceRoundingMode: "HalfEven",
+					taxRoundingMode: "HalfEven",
+				},
+				shoppingLists: {
+					deleteDaysAfterLastModification: 360,
 				},
 				messages: { enabled: false, deleteDaysAfterCreation: 15 },
 				shippingRateInputType: undefined,
@@ -95,6 +100,9 @@ export class InMemoryStorage extends AbstractStorage {
 						status: "Deactivated",
 					},
 					customers: {
+						status: "Deactivated",
+					},
+					businessUnits: {
 						status: "Deactivated",
 					},
 				},
