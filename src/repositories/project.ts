@@ -1,5 +1,6 @@
 import type {
 	Project,
+	ProjectChangeBusinessUnitSearchStatusAction,
 	ProjectChangeBusinessUnitStatusOnCreationAction,
 	ProjectChangeCartsConfigurationAction,
 	ProjectChangeCountriesAction,
@@ -10,7 +11,10 @@ import type {
 	ProjectChangeMessagesConfigurationAction,
 	ProjectChangeNameAction,
 	ProjectChangeOrderSearchStatusAction,
+	ProjectChangePriceRoundingModeAction,
 	ProjectChangeProductSearchIndexingEnabledAction,
+	ProjectChangeShoppingListsConfigurationAction,
+	ProjectChangeTaxRoundingModeAction,
 	ProjectSetExternalOAuthAction,
 	ProjectSetShippingRateInputTypeAction,
 	ProjectUpdateAction,
@@ -62,6 +66,20 @@ class ProjectUpdateHandler
 		resource.carts = cartsConfiguration || {
 			countryTaxRateFallbackEnabled: false,
 			deleteDaysAfterLastModification: 90,
+			priceRoundingMode: "HalfEven",
+			taxRoundingMode: "HalfEven",
+		};
+	}
+
+	changeShoppingListsConfiguration(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{
+			shoppingListsConfiguration,
+		}: ProjectChangeShoppingListsConfigurationAction,
+	) {
+		resource.shoppingLists = shoppingListsConfiguration || {
+			deleteDaysAfterLastModification: 90,
 		};
 	}
 
@@ -84,6 +102,22 @@ class ProjectUpdateHandler
 			countryTaxRateFallbackEnabled;
 	}
 
+	changePriceRoundingMode(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ priceRoundingMode }: ProjectChangePriceRoundingModeAction,
+	) {
+		resource.carts.priceRoundingMode = priceRoundingMode;
+	}
+
+	changeTaxRoundingMode(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ taxRoundingMode }: ProjectChangeTaxRoundingModeAction,
+	) {
+		resource.carts.taxRoundingMode = taxRoundingMode;
+	}
+
 	changeCurrencies(
 		context: RepositoryContext,
 		resource: Writable<Project>,
@@ -102,6 +136,19 @@ class ProjectUpdateHandler
 		}
 		resource.searchIndexing.customers.status = status;
 		resource.searchIndexing.customers.lastModifiedAt = new Date().toISOString();
+	}
+
+	changeBusinessUnitSearchStatus(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ status }: ProjectChangeBusinessUnitSearchStatusAction,
+	) {
+		if (!resource.searchIndexing?.businessUnits) {
+			throw new Error("Invalid project state");
+		}
+		resource.searchIndexing.businessUnits.status = status;
+		resource.searchIndexing.businessUnits.lastModifiedAt =
+			new Date().toISOString();
 	}
 
 	changeLanguages(
