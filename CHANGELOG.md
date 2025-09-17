@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.57.1
+
+### Patch Changes
+
+- [#336](https://github.com/labd/commercetools-node-mock/pull/336) [`72bae12`](https://github.com/labd/commercetools-node-mock/commit/72bae12a27cbddae74e2c3bae8737da519593b14) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: include business and customer from draft on order import
+
 ## 2.57.0
 
 ### Minor Changes
