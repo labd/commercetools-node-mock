@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.57.0
+
+### Minor Changes
+
+- [#332](https://github.com/labd/commercetools-node-mock/pull/332) [`71ecce0`](https://github.com/labd/commercetools-node-mock/commit/71ecce0b638ff3f511259f360ed888d6e3a31798) Thanks [@jsm1t](https://github.com/jsm1t)! - Add support for get my business unit by key
+
+- [#333](https://github.com/labd/commercetools-node-mock/pull/333) [`7948f69`](https://github.com/labd/commercetools-node-mock/commit/7948f69e81b990880bd7c05843204067071ac3f4) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Added additional features to project endpoints, updated project starting defaults to align with commercetools
+
 ## 2.56.1
 
 ### Patch Changes
