@@ -1,3 +1,4 @@
+import { beforeEach } from "node:test";
 import type {
 	Cart,
 	LineItem,
@@ -5,6 +6,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
+import { getBaseResourceProperties } from "~src/helpers";
 import { InMemoryStorage } from "~src/storage";
 import { OrderRepository } from "./index";
 
@@ -15,6 +17,10 @@ describe("Order repository", () => {
 		strict: false,
 	};
 	const repository = new OrderRepository(config);
+
+	beforeEach(() => {
+		storage.clear();
+	});
 
 	test("create from cart", async () => {
 		const cart: Cart = {
@@ -181,6 +187,90 @@ describe("Order repository", () => {
 		expect(result.taxRoundingMode).toEqual(cart.taxRoundingMode);
 		expect(result.totalPrice).toEqual(cart.totalPrice);
 		expect(result.store).toEqual(cart.store);
+	});
+
+	test("create order in store", async () => {
+
+		storage.add("dummy", "store", {
+			...getBaseResourceProperties(),
+			id: "store-123",
+			key: "testStore",
+			name: { "en-US": "Test Store" },
+			countries: [{ code: "NL" }],
+			languages: ["en-US"],
+			distributionChannels: [],
+			supplyChannels: [],
+			productSelections: [],
+		});
+
+		storage.add("dummy", "business-unit", {
+			...getBaseResourceProperties(),
+			id: "business-unit-123",
+			unitType: "Company",
+			key: "test-business-unit",
+			status: "Active",
+			storeMode: "Explicit",
+			name: "Test Business Unit",
+			addresses: [],
+			associateMode: "Explicit",
+			associates: [],
+			topLevelUnit: {
+				typeId: "business-unit",
+				key: "test-business-unit",
+			},
+			approvalRuleMode: "Explicit",
+		});
+
+		storage.add("dummy", "customer", {
+			...getBaseResourceProperties(),
+			id: "customer-123",
+			email: "test@example.com",
+			firstName: "John",
+			lastName: "Doe",
+			password: "hashed-password",
+			addresses: [],
+			defaultShippingAddressId: "",
+			defaultBillingAddressId: "",
+			customerNumber: "CUST-001",
+			externalId: "",
+			key: "test-customer",
+			stores: [],
+			isEmailVerified: true,
+			authenticationMode: "Password" as const,
+		});
+
+		const draft: OrderImportDraft = {
+			orderNumber: "100000002",
+			totalPrice: {
+				centAmount: 1000,
+				currencyCode: "EUR",
+			},
+			paymentState: "Paid",
+			customLineItems: [],
+			lineItems: [],
+			store: {
+				typeId: "store",
+				key: "testStore",
+			},
+			businessUnit: {
+				typeId: "business-unit",
+				key: "test-business-unit",
+			},
+			customerId: "customer-123",
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "testStore" };
+		const result = repository.import(ctx, draft);
+
+		expect(result.orderNumber).toBe("100000002");
+		expect(result.store?.key).toBe("testStore");
+		expect(result.businessUnit?.key).toBe("test-business-unit");
+		expect(result.customerId).toBe("customer-123");
+		expect(result.totalPrice.centAmount).toBe(1000);
+		expect(result.totalPrice.currencyCode).toBe("EUR");
+		expect(result.orderState).toBe("Open");
+		expect(result.paymentState).toBe("Paid");
+
 	});
 
 	test("import exiting product", async () => {
