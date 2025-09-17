@@ -27,6 +27,7 @@ describe("DiscountGroup", () => {
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			key: "premium-discount-group",
+			isActive: true,
 			lastModifiedAt: expect.anything(),
 			name: {
 				"en-GB": "Premium Discount Group",

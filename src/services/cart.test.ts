@@ -111,10 +111,12 @@ describe("Carts Query", () => {
 describe("Cart Update Actions", () => {
 	const ctMock = new CommercetoolsMock();
 	let cart: Cart | undefined;
+	let taxCategory: TaxCategory;
 
 	const createCart = async (currency: string) => {
 		const response = await supertest(ctMock.app).post("/dummy/carts").send({
 			currency,
+			country: "NL",
 		});
 		expect(response.status).toBe(201);
 		cart = response.body;
@@ -220,6 +222,18 @@ describe("Cart Update Actions", () => {
 
 	beforeEach(async () => {
 		await createCart("EUR");
+		taxCategory = await createTaxCategory({
+			name: "Standard VAT",
+			key: "standard-vat",
+			rates: [
+				{
+					name: "NL VAT",
+					amount: 0.21,
+					includedInPrice: false,
+					country: "NL",
+				},
+			],
+		});
 	});
 
 	afterEach(() => {
@@ -640,11 +654,11 @@ describe("Cart Update Actions", () => {
 			.post(`/dummy/carts/${cart.id}`)
 			.send({
 				version: 1,
-				actions: [{ action: "setCountry", country: "NL" }],
+				actions: [{ action: "setCountry", country: "BE" }],
 			});
 		expect(response.status).toBe(200);
 		expect(response.body.version).toBe(2);
-		expect(response.body.country).toBe("NL");
+		expect(response.body.country).toBe("BE");
 	});
 
 	test("setDirectDiscounts", async () => {
@@ -1326,5 +1340,276 @@ describe("Cart Update Actions", () => {
 		const updatedLineItem = response.body.lineItems[0];
 		expect(updatedLineItem.shippingDetails).toBeDefined();
 		expect(updatedLineItem.shippingDetails.targets).toHaveLength(1);
+	});
+
+	test("addCustomLineItem", async () => {
+		assert(cart, "cart not created");
+		const type = await supertest(ctMock.app)
+			.post("/dummy/types")
+			.send({
+				key: "custom-line-item-type",
+				name: { en: "Custom Line Item Type" },
+				resourceTypeIds: ["custom-line-item"],
+				fieldDefinitions: [
+					{
+						name: "description",
+						label: { en: "Description" },
+						required: false,
+						type: { name: "String" },
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((res) => res.body);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Custom Service Fee" },
+						slug: "service-fee",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 1,
+						taxCategory: {
+							typeId: "tax-category",
+							id: taxCategory.id,
+						},
+						custom: {
+							type: { typeId: "type", key: type.key },
+							fields: { description: "Premium support service" },
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.customLineItems).toHaveLength(1);
+
+		const customLineItem = response.body.customLineItems[0];
+		expect(customLineItem.name).toEqual({ en: "Custom Service Fee" });
+		expect(customLineItem.slug).toBe("service-fee");
+		expect(customLineItem.money.centAmount).toBe(1000);
+		expect(customLineItem.quantity).toBe(1);
+		expect(customLineItem.totalPrice.centAmount).toBe(1000);
+		expect(customLineItem.taxCategory.id).toBe(taxCategory.id);
+		expect(customLineItem.taxedPrice).toBeDefined();
+		expect(customLineItem.taxRate).toBeDefined();
+		expect(customLineItem.taxRate.amount).toBe(0.21);
+		expect(customLineItem.id).toBeDefined();
+		expect(customLineItem.custom).toBeDefined();
+		expect(customLineItem.custom.fields.description).toBe(
+			"Premium support service",
+		);
+	});
+
+	test("removeCustomLineItem by ID", async () => {
+		assert(cart, "cart not created");
+
+		const addResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Service Fee" },
+						slug: "service-fee",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 1,
+					},
+				],
+			});
+
+		expect(addResponse.status).toBe(200);
+		expect(addResponse.body.customLineItems).toHaveLength(1);
+
+		const customLineItemId = addResponse.body.customLineItems[0].id;
+		const removeResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: addResponse.body.version,
+				actions: [
+					{
+						action: "removeCustomLineItem",
+						customLineItemId,
+					},
+				],
+			});
+
+		expect(removeResponse.status).toBe(200);
+		expect(removeResponse.body.customLineItems).toHaveLength(0);
+	});
+
+	test("removeCustomLineItem by key", async () => {
+		assert(cart, "cart not created");
+
+		const addResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Service Fee" },
+						slug: "service-fee",
+						key: "custom-service-fee",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 1,
+					},
+				],
+			});
+
+		expect(addResponse.status).toBe(200);
+		expect(addResponse.body.customLineItems).toHaveLength(1);
+
+		const removeResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: addResponse.body.version,
+				actions: [
+					{
+						action: "removeCustomLineItem",
+						customLineItemKey: "custom-service-fee",
+					},
+				],
+			});
+
+		expect(removeResponse.status).toBe(200);
+		expect(removeResponse.body.customLineItems).toHaveLength(0);
+	});
+
+	test("changeCustomLineItemQuantity", async () => {
+		assert(cart, "cart not created");
+		const addResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Service Fee" },
+						slug: "service-fee",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 1,
+					},
+				],
+			});
+
+		const customLineItemId = addResponse.body.customLineItems[0].id;
+		const changeResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: addResponse.body.version,
+				actions: [
+					{
+						action: "changeCustomLineItemQuantity",
+						customLineItemId,
+						quantity: 3,
+					},
+				],
+			});
+
+		expect(changeResponse.status).toBe(200);
+		expect(changeResponse.body.customLineItems).toHaveLength(1);
+
+		const customLineItem = changeResponse.body.customLineItems[0];
+		expect(customLineItem.quantity).toBe(3);
+		expect(customLineItem.totalPrice.centAmount).toBe(3000);
+	});
+
+	test("changeCustomLineItemMoney", async () => {
+		assert(cart, "cart not created");
+		const addResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Service Fee" },
+						slug: "service-fee",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 2,
+					},
+				],
+			});
+
+		const customLineItemId = addResponse.body.customLineItems[0].id;
+		const changeResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: addResponse.body.version,
+				actions: [
+					{
+						action: "changeCustomLineItemMoney",
+						customLineItemId,
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1500,
+						},
+					},
+				],
+			});
+
+		expect(changeResponse.status).toBe(200);
+		expect(changeResponse.body.customLineItems).toHaveLength(1);
+
+		const customLineItem = changeResponse.body.customLineItems[0];
+		expect(customLineItem.money.centAmount).toBe(1500);
+		expect(customLineItem.totalPrice.centAmount).toBe(3000);
+	});
+
+	test("addCustomLineItem with tax calculation", async () => {
+		assert(cart, "cart not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cart.id}`)
+			.send({
+				version: 1,
+				actions: [
+					{
+						action: "addCustomLineItem",
+						name: { en: "Taxed Service" },
+						slug: "taxed-service",
+						money: {
+							currencyCode: "EUR",
+							centAmount: 1000,
+						},
+						quantity: 1,
+						taxCategory: {
+							typeId: "tax-category",
+							id: taxCategory.id,
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		const customLineItem = response.body.customLineItems[0];
+
+		expect(customLineItem.taxedPrice).toBeDefined();
+		expect(customLineItem.taxedPrice.totalNet.centAmount).toBe(1000);
+		expect(customLineItem.taxedPrice.totalGross.centAmount).toBe(1210);
+		expect(customLineItem.taxedPrice.taxPortions).toHaveLength(1);
+		expect(customLineItem.taxedPrice.taxPortions[0].rate).toBe(0.21);
 	});
 });

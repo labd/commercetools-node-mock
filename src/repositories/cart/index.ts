@@ -5,6 +5,8 @@ import type {
 import type {
 	Cart,
 	CartDraft,
+	CustomLineItem,
+	CustomLineItemDraft,
 	GeneralError,
 	LineItem,
 	LineItemDraft,
@@ -22,7 +24,11 @@ import {
 } from "../abstract";
 import { createAddress, createCustomFields } from "../helpers";
 import { CartUpdateHandler } from "./actions";
-import { calculateCartTotalPrice, selectPrice } from "./helpers";
+import {
+	calculateCartTotalPrice,
+	createCustomLineItemFromDraft,
+	selectPrice,
+} from "./helpers";
 
 export class CartRepository extends AbstractResourceRepository<"cart"> {
 	constructor(config: Config) {
@@ -69,6 +75,16 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				),
 			) ?? [];
 
+		const customLineItems =
+			draft.customLineItems?.map((draftCustomLineItem) =>
+				createCustomLineItemFromDraft(
+					context.projectKey,
+					draftCustomLineItem,
+					this._storage,
+					draft.shippingAddress?.country ?? draft.country,
+				),
+			) ?? [];
+
 		const resource: Writable<Cart> = {
 			...getBaseResourceProperties(),
 			anonymousId: draft.anonymousId,
@@ -86,7 +102,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			country: draft.country,
 			customerId: draft.customerId,
 			customerEmail: draft.customerEmail,
-			customLineItems: [],
+			customLineItems,
 			directDiscounts: [],
 			discountCodes: [],
 			inventoryMode: "None",

@@ -15,6 +15,8 @@ describe("Project", () => {
 			carts: {
 				countryTaxRateFallbackEnabled: false,
 				deleteDaysAfterLastModification: 90,
+				priceRoundingMode: "HalfEven",
+				taxRoundingMode: "HalfEven",
 			},
 			countries: [],
 			createdAt: "2018-10-04T11:32:12.603Z",
@@ -39,8 +41,14 @@ describe("Project", () => {
 				productsSearch: {
 					status: "Deactivated",
 				},
+				businessUnits: {
+					status: "Deactivated",
+				},
 			},
 			trialUntil: "2018-12",
+			shoppingLists: {
+				deleteDaysAfterLastModification: 360,
+			},
 		} as Project);
 	});
 

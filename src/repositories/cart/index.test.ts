@@ -1,4 +1,8 @@
-import type { CartDraft, LineItem } from "@commercetools/platform-sdk";
+import type {
+	CartDraft,
+	CustomLineItemDraft,
+	LineItem,
+} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
@@ -83,6 +87,14 @@ describe("Cart repository", () => {
 			},
 		});
 
+		storage.add("dummy", "tax-category", {
+			...getBaseResourceProperties(),
+			id: "tax-category-id",
+			key: "standard-tax",
+			name: "Standard Tax",
+			rates: [],
+		});
+
 		const cart: CartDraft = {
 			anonymousId: "1234567890",
 			billingAddress: {
@@ -97,7 +109,21 @@ describe("Cart repository", () => {
 			country: "NL",
 			currency: "EUR",
 			customerEmail: "john.doe@example.com",
-			customLineItems: [],
+			customLineItems: [
+				{
+					name: { "nl-NL": "Douane kosten" },
+					slug: "customs-fee",
+					money: {
+						currencyCode: "EUR",
+						centAmount: 2500,
+					},
+					quantity: 1,
+					taxCategory: {
+						typeId: "tax-category" as const,
+						id: "tax-category-id",
+					},
+				},
+			],
 			inventoryMode: "None",
 			itemShippingAddresses: [],
 			lineItems: [
@@ -173,6 +199,11 @@ describe("Cart repository", () => {
 		expect(result.lineItems[0].custom?.fields.description as string).toEqual(
 			cart.lineItems![0].custom?.fields?.description,
 		);
+		expect(result.customLineItems).toHaveLength(1);
+		expect(result.customLineItems[0].name).toEqual(
+			cart.customLineItems?.[0].name,
+		);
+		expect(result.totalPrice.centAmount).toBe(3500);
 	});
 
 	test("create cart with business unit", async () => {
@@ -211,5 +242,61 @@ describe("Cart repository", () => {
 			key: "business-unit-key",
 			typeId: "business-unit",
 		});
+	});
+
+	test("should calculate taxed price for custom line items with tax category", () => {
+		storage.add("dummy", "tax-category", {
+			...getBaseResourceProperties(),
+			id: "tax-category-with-rate",
+			key: "vat-tax",
+			name: "VAT Tax",
+			rates: [
+				{
+					id: "rate-1",
+					name: "Standard VAT",
+					amount: 0.21,
+					includedInPrice: false,
+					country: "NL",
+				},
+			],
+		});
+
+		const cart: CartDraft = {
+			currency: "EUR",
+			country: "NL",
+			customLineItems: [
+				{
+					name: { en: "Service Fee" },
+					slug: "service-fee",
+					money: {
+						currencyCode: "EUR",
+						centAmount: 1000,
+					},
+					quantity: 1,
+					taxCategory: {
+						typeId: "tax-category" as const,
+						id: "tax-category-with-rate",
+					},
+				},
+			],
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+		const result = repository.create(ctx, cart);
+
+		expect(result.customLineItems).toHaveLength(1);
+		const customLineItem = result.customLineItems[0];
+
+		expect(customLineItem.taxedPrice).toBeDefined();
+		expect(customLineItem.taxedPrice?.totalGross.centAmount).toBe(1210);
+		expect(customLineItem.taxedPrice?.totalNet.centAmount).toBe(1000);
+		expect(customLineItem.taxedPrice?.totalTax?.centAmount).toBe(210);
+		expect(customLineItem.taxedPrice?.taxPortions).toHaveLength(1);
+		expect(customLineItem.taxedPrice?.taxPortions[0].rate).toBe(0.21);
+		expect(customLineItem.taxRate).toBeDefined();
+		expect(customLineItem.taxRate?.amount).toBe(0.21);
+		expect(customLineItem.taxRate?.name).toBe("Standard VAT");
+		expect(customLineItem.taxRate?.includedInPrice).toBe(false);
+		expect(customLineItem.taxRate?.country).toBe("NL");
 	});
 });

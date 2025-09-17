@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 2.56.1
+
+### Patch Changes
+
+- [#331](https://github.com/labd/commercetools-node-mock/pull/331) [`35da11e`](https://github.com/labd/commercetools-node-mock/commit/35da11e6d5ec99c706d2b0e8788357da3346b738) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: make tax rate for custom line item dependent on the cart.shippingAddress.country ?? cart.country
+
+- [#329](https://github.com/labd/commercetools-node-mock/pull/329) [`9a70063`](https://github.com/labd/commercetools-node-mock/commit/9a700636abae01c0e11e8a7acfa9fc54551a9408) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: implement tax rate on custom line items
+
+## 2.56.0
+
+### Minor Changes
+
+- [#326](https://github.com/labd/commercetools-node-mock/pull/326) [`8c3dcfe`](https://github.com/labd/commercetools-node-mock/commit/8c3dcfe0ed475a47f36bed563ee0b4db0ba932c7) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for custom line items on cart
+
+### Patch Changes
+
+- [#320](https://github.com/labd/commercetools-node-mock/pull/320) [`7a466c6`](https://github.com/labd/commercetools-node-mock/commit/7a466c676995602d9f5fb6e9060ed5c40c3e78f2) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: IN operator can be both a list and a single value
+
+- [#327](https://github.com/labd/commercetools-node-mock/pull/327) [`be5a2b5`](https://github.com/labd/commercetools-node-mock/commit/be5a2b55f3264ed2c2a683be78568253f10a7ef5) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Fix IN operator to work correctly with array values in predicate parser
+
 ## 2.55.0
 
 ### Minor Changes
