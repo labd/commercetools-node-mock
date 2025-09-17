@@ -190,7 +190,6 @@ describe("Order repository", () => {
 	});
 
 	test("create order in store", async () => {
-
 		storage.add("dummy", "store", {
 			...getBaseResourceProperties(),
 			id: "store-123",
@@ -270,7 +269,6 @@ describe("Order repository", () => {
 		expect(result.totalPrice.currencyCode).toBe("EUR");
 		expect(result.orderState).toBe("Open");
 		expect(result.paymentState).toBe("Paid");
-
 	});
 
 	test("import exiting product", async () => {
