@@ -121,7 +121,9 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			),
 			customerEmail: draft.customerEmail,
 			customerId: draft.customerId,
-			businessUnit: draft.businessUnit,
+			businessUnit: draft.businessUnit?.key
+				? { typeId: "business-unit", key: draft.businessUnit.key }
+				: undefined,
 			lastMessageSequenceNumber: 0,
 			orderNumber: draft.orderNumber,
 			orderState: draft.orderState || "Open",
