@@ -273,7 +273,6 @@ describe("Cart repository", () => {
 		);
 		expect(result.totalPrice.centAmount).toBe(3500);
 
-		// Verify shipping info is properly set when shipping method is provided
 		expect(result.shippingInfo).toBeDefined();
 		expect(result.shippingInfo!.shippingMethod!.id).toBe("shipping-method-id");
 		expect(result.shippingInfo!.shippingMethodName).toBe("Standard Shipping");
@@ -281,7 +280,7 @@ describe("Cart repository", () => {
 		expect(result.shippingInfo?.price.centAmount).toBe(500);
 		expect(result.shippingInfo?.price.currencyCode).toBe("EUR");
 		expect(result.shippingInfo?.taxedPrice).toBeDefined();
-		expect(result.shippingInfo?.taxedPrice?.totalGross.centAmount).toBe(605); // 500 + 21% VAT
+		expect(result.shippingInfo?.taxedPrice?.totalGross.centAmount).toBe(605);
 		expect(result.shippingInfo?.taxedPrice?.totalNet.centAmount).toBe(500);
 		expect(result.shippingInfo?.taxRate?.amount).toBe(0.21);
 		expect(result.shippingInfo?.taxRate?.name).toBe("Standard VAT");
@@ -382,7 +381,7 @@ describe("Cart repository", () => {
 	});
 });
 
-describe("CartRepository.createShippingInfo", () => {
+describe("createShippingInfo", () => {
 	const storage = new InMemoryStorage();
 	const config: Config = { storage, strict: false };
 	const repository = new CartRepository(config);
@@ -407,7 +406,6 @@ describe("CartRepository.createShippingInfo", () => {
 		storage.add("dummy", "zone", {
 			...getBaseResourceProperties(),
 			id: "test-zone-id",
-			key: "test-zone",
 			name: "Test Zone",
 			locations: [
 				{
@@ -421,7 +419,6 @@ describe("CartRepository.createShippingInfo", () => {
 		storage.add("dummy", "shipping-method", {
 			...getBaseResourceProperties(),
 			id: "basic-shipping-id",
-			key: "basic-shipping",
 			name: "Standard Shipping",
 			taxCategory: {
 				typeId: "tax-category",
@@ -435,7 +432,6 @@ describe("CartRepository.createShippingInfo", () => {
 						obj: {
 							...getBaseResourceProperties(),
 							id: "test-zone-id",
-							key: "test-zone",
 							name: "Test Zone",
 							locations: [
 								{
@@ -448,11 +444,10 @@ describe("CartRepository.createShippingInfo", () => {
 						{
 							price: {
 								currencyCode: "EUR",
-								centAmount: 595, // €5.95
+								centAmount: 595,
 								type: "centPrecision",
 								fractionDigits: 2,
 							},
-							// No freeAbove
 							tiers: [],
 						},
 					],
@@ -469,33 +464,14 @@ describe("CartRepository.createShippingInfo", () => {
 			cartState: "Active",
 			totalPrice: {
 				currencyCode: "EUR",
-				centAmount: 3000, // €30.00
+				centAmount: 3000,
 				type: "centPrecision",
 				fractionDigits: 2,
 			},
 			shippingAddress: {
 				country: "NL",
-				firstName: "Test",
-				lastName: "User",
-				streetName: "Test Street",
-				streetNumber: "1",
-				postalCode: "1234AB",
-				city: "Amsterdam",
 			},
-			lineItems: [],
-			customLineItems: [],
-			directDiscounts: [],
-			discountCodes: [],
-			itemShippingAddresses: [],
-			shipping: [],
-			taxMode: "Platform",
 			taxRoundingMode: "HalfEven",
-			taxCalculationMode: "LineItemLevel",
-			priceRoundingMode: "HalfEven",
-			inventoryMode: "None",
-			origin: "Customer",
-			refusedGifts: [],
-			shippingMode: "Single",
 		};
 
 		const context = { projectKey: "dummy", storeKey: "testStore" };
@@ -510,12 +486,12 @@ describe("CartRepository.createShippingInfo", () => {
 			shippingMethodRef,
 		);
 
-		expect(result.price.centAmount).toBe(595); // €5.95
+		expect(result.price.centAmount).toBe(595);
 		expect(result.shippingMethodName).toBe("Standard Shipping");
 		expect(result.shippingMethod!.id).toBe("basic-shipping-id");
 		expect(result.taxRate?.amount).toBe(0.21);
 		expect(result.taxedPrice!.totalNet.centAmount).toBe(595);
-		expect(result.taxedPrice!.totalGross.centAmount).toBe(720); // 595 + 21% VAT
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(720);
 	});
 
 	test("should apply free shipping when cart total is above freeAbove threshold", () => {
@@ -549,13 +525,13 @@ describe("CartRepository.createShippingInfo", () => {
 						{
 							price: {
 								currencyCode: "EUR",
-								centAmount: 995, // €9.95
+								centAmount: 995,
 								type: "centPrecision",
 								fractionDigits: 2,
 							},
 							freeAbove: {
 								currencyCode: "EUR",
-								centAmount: 5000, // Free above €50.00
+								centAmount: 5000,
 								type: "centPrecision",
 								fractionDigits: 2,
 							},
@@ -568,40 +544,21 @@ describe("CartRepository.createShippingInfo", () => {
 			isDefault: false,
 		});
 
-		const cart: Cart = {
+		const cart: any = {
 			...getBaseResourceProperties(),
 			id: "test-cart-id",
 			version: 1,
 			cartState: "Active",
 			totalPrice: {
 				currencyCode: "EUR",
-				centAmount: 6000, // €60.00 - above threshold
+				centAmount: 6000,
 				type: "centPrecision",
 				fractionDigits: 2,
 			},
 			shippingAddress: {
 				country: "NL",
-				firstName: "John",
-				lastName: "Doe",
-				streetName: "Main Street",
-				streetNumber: "123",
-				postalCode: "1234AB",
-				city: "Amsterdam",
 			},
-			lineItems: [],
-			customLineItems: [],
-			directDiscounts: [],
-			discountCodes: [],
-			itemShippingAddresses: [],
-			shipping: [],
-			taxMode: "Platform",
 			taxRoundingMode: "HalfEven",
-			taxCalculationMode: "LineItemLevel",
-			priceRoundingMode: "HalfEven",
-			inventoryMode: "None",
-			origin: "Customer",
-			refusedGifts: [],
-			shippingMode: "Single",
 		};
 
 		const context = { projectKey: "dummy", storeKey: "testStore" };
@@ -616,9 +573,9 @@ describe("CartRepository.createShippingInfo", () => {
 			shippingMethodRef,
 		);
 
-		expect(result.price.centAmount).toBe(0); // Free shipping
+		expect(result.price.centAmount).toBe(0);
 		expect(result.shippingMethodName).toBe("Free Above €50");
-		expect(result.taxedPrice!.totalGross.centAmount).toBe(0); // No tax on free shipping
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(0);
 		expect(result.taxedPrice!.totalNet.centAmount).toBe(0);
 	});
 
@@ -653,13 +610,13 @@ describe("CartRepository.createShippingInfo", () => {
 						{
 							price: {
 								currencyCode: "EUR",
-								centAmount: 995, // €9.95
+								centAmount: 995,
 								type: "centPrecision",
 								fractionDigits: 2,
 							},
 							freeAbove: {
 								currencyCode: "EUR",
-								centAmount: 5000, // Free above €50.00
+								centAmount: 5000,
 								type: "centPrecision",
 								fractionDigits: 2,
 							},
@@ -672,40 +629,21 @@ describe("CartRepository.createShippingInfo", () => {
 			isDefault: false,
 		});
 
-		const cart: Cart = {
+		const cart: any = {
 			...getBaseResourceProperties(),
 			id: "test-cart-id-2",
 			version: 1,
 			cartState: "Active",
 			totalPrice: {
 				currencyCode: "EUR",
-				centAmount: 2000, // €20.00 - below threshold
+				centAmount: 2000,
 				type: "centPrecision",
 				fractionDigits: 2,
 			},
 			shippingAddress: {
 				country: "NL",
-				firstName: "Jane",
-				lastName: "Smith",
-				streetName: "Side Street",
-				streetNumber: "456",
-				postalCode: "5678CD",
-				city: "Rotterdam",
 			},
-			lineItems: [],
-			customLineItems: [],
-			directDiscounts: [],
-			discountCodes: [],
-			itemShippingAddresses: [],
-			shipping: [],
-			taxMode: "Platform",
 			taxRoundingMode: "HalfEven",
-			taxCalculationMode: "LineItemLevel",
-			priceRoundingMode: "HalfEven",
-			inventoryMode: "None",
-			origin: "Customer",
-			refusedGifts: [],
-			shippingMode: "Single",
 		};
 
 		const context = { projectKey: "dummy", storeKey: "testStore" };
@@ -720,9 +658,9 @@ describe("CartRepository.createShippingInfo", () => {
 			shippingMethodRef,
 		);
 
-		expect(result.price.centAmount).toBe(995); // Normal shipping €9.95
+		expect(result.price.centAmount).toBe(995);
 		expect(result.shippingMethodName).toBe("Free Above €50");
-		expect(result.taxedPrice!.totalGross.centAmount).toBe(1204); // 995 + 21% VAT (rounded)
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(1204);
 		expect(result.taxedPrice!.totalNet.centAmount).toBe(995);
 	});
 });
