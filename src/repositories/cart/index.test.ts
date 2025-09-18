@@ -286,6 +286,16 @@ describe("Cart repository", () => {
 		expect(result.shippingInfo?.taxRate?.name).toBe("Standard VAT");
 	});
 
+	test("create start with store from draft", () => {
+		const ctx = { projectKey: "dummy" };
+		const draft: CartDraft = {
+			currency: "USD",
+			store: { key: "draftStore", typeId: "store" },
+		};
+		const result = repository.create(ctx, draft);
+		expect(result.store).toEqual({ typeId: "store", key: "draftStore" });
+	});
+
 	test("create cart with business unit", async () => {
 		storage.add("dummy", "business-unit", {
 			...getBaseResourceProperties(),

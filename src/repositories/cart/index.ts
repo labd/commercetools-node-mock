@@ -153,7 +153,9 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 		resource.store = context.storeKey
 			? { typeId: "store", key: context.storeKey }
-			: undefined;
+			: draft.store?.key
+				? { typeId: "store", key: draft.store.key }
+				: undefined;
 
 		// Set shipping info after resource is created
 		if (draft.shippingMethod) {
