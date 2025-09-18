@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.58.0
+
+### Minor Changes
+
+- [#340](https://github.com/labd/commercetools-node-mock/pull/340) [`d2e5bf8`](https://github.com/labd/commercetools-node-mock/commit/d2e5bf876f5a1115ef61c34f7ce5579b36cea1f8) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Feat: takes store key from cart draft if not avaiable from context
+
+- [#338](https://github.com/labd/commercetools-node-mock/pull/338) [`a5cc7d7`](https://github.com/labd/commercetools-node-mock/commit/a5cc7d7be0fbc2c04af5e2744f3d00110a3b1350) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Feat: set shipping method from cart draft as shipping method
+
 ## 2.57.1
 
 ### Patch Changes
