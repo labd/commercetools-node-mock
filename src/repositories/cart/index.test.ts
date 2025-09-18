@@ -1,9 +1,10 @@
 import type {
+	Cart,
 	CartDraft,
 	CustomLineItemDraft,
 	LineItem,
 } from "@commercetools/platform-sdk";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import type { Config } from "~src/config";
 import { getBaseResourceProperties } from "~src/helpers";
 import { InMemoryStorage } from "~src/storage";
@@ -92,7 +93,70 @@ describe("Cart repository", () => {
 			id: "tax-category-id",
 			key: "standard-tax",
 			name: "Standard Tax",
-			rates: [],
+			rates: [
+				{
+					id: "nl-rate",
+					name: "Standard VAT",
+					amount: 0.21,
+					includedInPrice: false,
+					country: "NL",
+				},
+			],
+		});
+
+		storage.add("dummy", "zone", {
+			...getBaseResourceProperties(),
+			id: "nl-zone-id",
+			key: "nl-zone",
+			name: "Netherlands Zone",
+			locations: [
+				{
+					country: "NL",
+				},
+			],
+		});
+
+		storage.add("dummy", "shipping-method", {
+			...getBaseResourceProperties(),
+			id: "shipping-method-id",
+			key: "standard-shipping",
+			name: "Standard Shipping",
+			taxCategory: {
+				typeId: "tax-category",
+				id: "tax-category-id",
+			},
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						id: "nl-zone-id",
+						obj: {
+							...getBaseResourceProperties(),
+							id: "nl-zone-id",
+							key: "nl-zone",
+							name: "Netherlands Zone",
+							locations: [
+								{
+									country: "NL",
+								},
+							],
+						},
+					},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "EUR",
+								centAmount: 500,
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							tiers: [],
+						},
+					],
+				},
+			],
+			active: true,
+			isDefault: false,
 		});
 
 		const cart: CartDraft = {
@@ -109,6 +173,10 @@ describe("Cart repository", () => {
 			country: "NL",
 			currency: "EUR",
 			customerEmail: "john.doe@example.com",
+			shippingMethod: {
+				typeId: "shipping-method",
+				id: "shipping-method-id",
+			},
 			customLineItems: [
 				{
 					name: { "nl-NL": "Douane kosten" },
@@ -204,6 +272,19 @@ describe("Cart repository", () => {
 			cart.customLineItems?.[0].name,
 		);
 		expect(result.totalPrice.centAmount).toBe(3500);
+
+		// Verify shipping info is properly set when shipping method is provided
+		expect(result.shippingInfo).toBeDefined();
+		expect(result.shippingInfo!.shippingMethod!.id).toBe("shipping-method-id");
+		expect(result.shippingInfo!.shippingMethodName).toBe("Standard Shipping");
+		expect(result.shippingInfo?.price).toBeDefined();
+		expect(result.shippingInfo?.price.centAmount).toBe(500);
+		expect(result.shippingInfo?.price.currencyCode).toBe("EUR");
+		expect(result.shippingInfo?.taxedPrice).toBeDefined();
+		expect(result.shippingInfo?.taxedPrice?.totalGross.centAmount).toBe(605); // 500 + 21% VAT
+		expect(result.shippingInfo?.taxedPrice?.totalNet.centAmount).toBe(500);
+		expect(result.shippingInfo?.taxRate?.amount).toBe(0.21);
+		expect(result.shippingInfo?.taxRate?.name).toBe("Standard VAT");
 	});
 
 	test("create cart with business unit", async () => {
@@ -298,5 +379,350 @@ describe("Cart repository", () => {
 		expect(customLineItem.taxRate?.name).toBe("Standard VAT");
 		expect(customLineItem.taxRate?.includedInPrice).toBe(false);
 		expect(customLineItem.taxRate?.country).toBe("NL");
+	});
+});
+
+describe("CartRepository.createShippingInfo", () => {
+	const storage = new InMemoryStorage();
+	const config: Config = { storage, strict: false };
+	const repository = new CartRepository(config);
+
+	beforeEach(() => {
+		storage.add("dummy", "tax-category", {
+			...getBaseResourceProperties(),
+			id: "shipping-tax-category-id",
+			key: "shipping-tax",
+			name: "Shipping Tax",
+			rates: [
+				{
+					id: "nl-shipping-rate",
+					name: "Standard VAT",
+					amount: 0.21,
+					includedInPrice: false,
+					country: "NL",
+				},
+			],
+		});
+
+		storage.add("dummy", "zone", {
+			...getBaseResourceProperties(),
+			id: "test-zone-id",
+			key: "test-zone",
+			name: "Test Zone",
+			locations: [
+				{
+					country: "NL",
+				},
+			],
+		});
+	});
+
+	test("should calculate shipping info", () => {
+		storage.add("dummy", "shipping-method", {
+			...getBaseResourceProperties(),
+			id: "basic-shipping-id",
+			key: "basic-shipping",
+			name: "Standard Shipping",
+			taxCategory: {
+				typeId: "tax-category",
+				id: "shipping-tax-category-id",
+			},
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						id: "test-zone-id",
+						obj: {
+							...getBaseResourceProperties(),
+							id: "test-zone-id",
+							key: "test-zone",
+							name: "Test Zone",
+							locations: [
+								{
+									country: "NL",
+								},
+							],
+						},
+					},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "EUR",
+								centAmount: 595, // €5.95
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							// No freeAbove
+							tiers: [],
+						},
+					],
+				},
+			],
+			active: true,
+			isDefault: false,
+		});
+
+		const cart: any = {
+			...getBaseResourceProperties(),
+			id: "basic-cart-id",
+			version: 1,
+			cartState: "Active",
+			totalPrice: {
+				currencyCode: "EUR",
+				centAmount: 3000, // €30.00
+				type: "centPrecision",
+				fractionDigits: 2,
+			},
+			shippingAddress: {
+				country: "NL",
+				firstName: "Test",
+				lastName: "User",
+				streetName: "Test Street",
+				streetNumber: "1",
+				postalCode: "1234AB",
+				city: "Amsterdam",
+			},
+			lineItems: [],
+			customLineItems: [],
+			directDiscounts: [],
+			discountCodes: [],
+			itemShippingAddresses: [],
+			shipping: [],
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "LineItemLevel",
+			priceRoundingMode: "HalfEven",
+			inventoryMode: "None",
+			origin: "Customer",
+			refusedGifts: [],
+			shippingMode: "Single",
+		};
+
+		const context = { projectKey: "dummy", storeKey: "testStore" };
+		const shippingMethodRef = {
+			typeId: "shipping-method" as const,
+			id: "basic-shipping-id",
+		};
+
+		const result = repository.createShippingInfo(
+			context,
+			cart,
+			shippingMethodRef,
+		);
+
+		expect(result.price.centAmount).toBe(595); // €5.95
+		expect(result.shippingMethodName).toBe("Standard Shipping");
+		expect(result.shippingMethod!.id).toBe("basic-shipping-id");
+		expect(result.taxRate?.amount).toBe(0.21);
+		expect(result.taxedPrice!.totalNet.centAmount).toBe(595);
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(720); // 595 + 21% VAT
+	});
+
+	test("should apply free shipping when cart total is above freeAbove threshold", () => {
+		storage.add("dummy", "shipping-method", {
+			...getBaseResourceProperties(),
+			id: "free-above-shipping-id",
+			key: "free-above-shipping",
+			name: "Free Above €50",
+			taxCategory: {
+				typeId: "tax-category",
+				id: "shipping-tax-category-id",
+			},
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						id: "test-zone-id",
+						obj: {
+							...getBaseResourceProperties(),
+							id: "test-zone-id",
+							key: "test-zone",
+							name: "Test Zone",
+							locations: [
+								{
+									country: "NL",
+								},
+							],
+						},
+					},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "EUR",
+								centAmount: 995, // €9.95
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							freeAbove: {
+								currencyCode: "EUR",
+								centAmount: 5000, // Free above €50.00
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							tiers: [],
+						},
+					],
+				},
+			],
+			active: true,
+			isDefault: false,
+		});
+
+		const cart: Cart = {
+			...getBaseResourceProperties(),
+			id: "test-cart-id",
+			version: 1,
+			cartState: "Active",
+			totalPrice: {
+				currencyCode: "EUR",
+				centAmount: 6000, // €60.00 - above threshold
+				type: "centPrecision",
+				fractionDigits: 2,
+			},
+			shippingAddress: {
+				country: "NL",
+				firstName: "John",
+				lastName: "Doe",
+				streetName: "Main Street",
+				streetNumber: "123",
+				postalCode: "1234AB",
+				city: "Amsterdam",
+			},
+			lineItems: [],
+			customLineItems: [],
+			directDiscounts: [],
+			discountCodes: [],
+			itemShippingAddresses: [],
+			shipping: [],
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "LineItemLevel",
+			priceRoundingMode: "HalfEven",
+			inventoryMode: "None",
+			origin: "Customer",
+			refusedGifts: [],
+			shippingMode: "Single",
+		};
+
+		const context = { projectKey: "dummy", storeKey: "testStore" };
+		const shippingMethodRef = {
+			typeId: "shipping-method" as const,
+			id: "free-above-shipping-id",
+		};
+
+		const result = repository.createShippingInfo(
+			context,
+			cart,
+			shippingMethodRef,
+		);
+
+		expect(result.price.centAmount).toBe(0); // Free shipping
+		expect(result.shippingMethodName).toBe("Free Above €50");
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(0); // No tax on free shipping
+		expect(result.taxedPrice!.totalNet.centAmount).toBe(0);
+	});
+
+	test("should charge normal shipping when cart total is below freeAbove threshold", () => {
+		storage.add("dummy", "shipping-method", {
+			...getBaseResourceProperties(),
+			id: "free-above-shipping-id-2",
+			key: "free-above-shipping-2",
+			name: "Free Above €50",
+			taxCategory: {
+				typeId: "tax-category",
+				id: "shipping-tax-category-id",
+			},
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						id: "test-zone-id",
+						obj: {
+							...getBaseResourceProperties(),
+							id: "test-zone-id",
+							key: "test-zone",
+							name: "Test Zone",
+							locations: [
+								{
+									country: "NL",
+								},
+							],
+						},
+					},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "EUR",
+								centAmount: 995, // €9.95
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							freeAbove: {
+								currencyCode: "EUR",
+								centAmount: 5000, // Free above €50.00
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							tiers: [],
+						},
+					],
+				},
+			],
+			active: true,
+			isDefault: false,
+		});
+
+		const cart: Cart = {
+			...getBaseResourceProperties(),
+			id: "test-cart-id-2",
+			version: 1,
+			cartState: "Active",
+			totalPrice: {
+				currencyCode: "EUR",
+				centAmount: 2000, // €20.00 - below threshold
+				type: "centPrecision",
+				fractionDigits: 2,
+			},
+			shippingAddress: {
+				country: "NL",
+				firstName: "Jane",
+				lastName: "Smith",
+				streetName: "Side Street",
+				streetNumber: "456",
+				postalCode: "5678CD",
+				city: "Rotterdam",
+			},
+			lineItems: [],
+			customLineItems: [],
+			directDiscounts: [],
+			discountCodes: [],
+			itemShippingAddresses: [],
+			shipping: [],
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "LineItemLevel",
+			priceRoundingMode: "HalfEven",
+			inventoryMode: "None",
+			origin: "Customer",
+			refusedGifts: [],
+			shippingMode: "Single",
+		};
+
+		const context = { projectKey: "dummy", storeKey: "testStore" };
+		const shippingMethodRef = {
+			typeId: "shipping-method" as const,
+			id: "free-above-shipping-id-2",
+		};
+
+		const result = repository.createShippingInfo(
+			context,
+			cart,
+			shippingMethodRef,
+		);
+
+		expect(result.price.centAmount).toBe(995); // Normal shipping €9.95
+		expect(result.shippingMethodName).toBe("Free Above €50");
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(1204); // 995 + 21% VAT (rounded)
+		expect(result.taxedPrice!.totalNet.centAmount).toBe(995);
 	});
 });
