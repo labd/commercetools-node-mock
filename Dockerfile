@@ -1,5 +1,5 @@
-FROM node:18-alpine AS builder
-ENV PNPM_VERSION=9.0.2
+FROM node:24-alpine AS builder
+ENV PNPM_VERSION=10.11
 
 RUN corepack enable && \
   corepack prepare pnpm@${PNPM_VERSION} --activate && \

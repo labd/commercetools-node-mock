@@ -58,7 +58,7 @@
 		"fishery": "2.2.3",
 		"supertest": "7.1.0",
 		"timekeeper": "2.3.1",
-		"tsdown": "^0.9.9",
+		"tsdown": "0.15.1",
 		"typescript": "5.8.3",
 		"vitest": "3.1.1"
 	},
