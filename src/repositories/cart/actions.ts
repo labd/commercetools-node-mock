@@ -26,6 +26,8 @@ import type {
 	CartSetCustomTypeAction,
 	CartSetCustomerEmailAction,
 	CartSetDirectDiscountsAction,
+	CartSetLineItemCustomFieldAction,
+	CartSetLineItemCustomTypeAction,
 	CartSetLineItemShippingDetailsAction,
 	CartSetLocaleAction,
 	CartSetShippingAddressAction,
@@ -660,6 +662,82 @@ export class CartUpdateHandler
 					id: uuidv4(),
 				}) as DirectDiscount,
 		);
+	}
+
+	setLineItemCustomField(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			lineItemId,
+			lineItemKey,
+			name,
+			value,
+			action,
+		}: CartSetLineItemCustomFieldAction,
+	) {
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+
+		if (!lineItem) {
+			// Check if line item is found
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		if (!lineItem.custom) {
+			throw new Error("Resource has no custom field");
+		}
+
+		lineItem.custom.fields[name] = value;
+	}
+
+	setLineItemCustomType(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ lineItemId, lineItemKey, type, fields }: CartSetLineItemCustomTypeAction,
+	) {
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+
+		if (!lineItem) {
+			// Check if line item is found
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		if (!type) {
+			lineItem.custom = undefined;
+		} else {
+			const resolvedType = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				type,
+			);
+			if (!resolvedType) {
+				throw new Error(`Type ${type} not found`);
+			}
+
+			lineItem.custom = {
+				type: {
+					typeId: "type",
+					id: resolvedType.id,
+				},
+				fields: fields || {},
+			};
+		}
 	}
 
 	setLineItemShippingDetails(

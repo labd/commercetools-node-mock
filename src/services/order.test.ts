@@ -1,5 +1,10 @@
 import assert from "node:assert";
-import type { Order, Payment, State } from "@commercetools/platform-sdk";
+import type {
+	CentPrecisionMoney,
+	Order,
+	Payment,
+	State,
+} from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { generateRandomString } from "~src/helpers";
@@ -609,6 +614,236 @@ describe("Order Update Actions", () => {
 		expect(
 			_updateResponse2.body.shippingInfo.deliveries[0].custom.fields.carrier,
 		).toBe("dhl");
+	});
+
+	test("setLineItemCustomField", async () => {
+		const order: Order = {
+			...getBaseResourceProperties(),
+			version: 1,
+			customLineItems: [],
+			directDiscounts: [],
+			discountCodes: [],
+			lineItems: [
+				{
+					id: "d70b14c8-72cf-4cab-82ba-6339cebe1e79",
+					productId: "06028a97-d622-47ac-a194-a3d90baa2b3c",
+					productSlug: { "nl-NL": "test-product" },
+					productType: { typeId: "product-type", id: "some-uuid" },
+					name: { "nl-NL": "test product" },
+					custom: {
+						type: {
+							typeId: "type",
+							id: "a493b7bb-d415-450c-b421-e128a8b26569",
+						},
+						fields: {},
+					},
+					variant: {
+						id: 1,
+						sku: "1337",
+						attributes: [{ name: "test", value: "test" }],
+						prices: [],
+						assets: [],
+						images: [],
+					},
+					price: {
+						id: "2f59a6c9-6a86-48d3-87f9-fabb3b12fd93",
+						value: {
+							type: "centPrecision",
+							centAmount: 14900,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+					totalPrice: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						fractionDigits: 2,
+						centAmount: 14900,
+					},
+					taxedPricePortions: [],
+					perMethodTaxRate: [],
+					quantity: 1,
+					discountedPricePerQuantity: [],
+					lineItemMode: "Standard",
+					priceMode: "Platform",
+					state: [],
+				},
+			],
+			orderState: "Open",
+			origin: "Customer",
+			refusedGifts: [],
+			shipping: [],
+			shippingMode: "Single",
+			syncInfo: [],
+			taxCalculationMode: "LineItemLevel",
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			totalPrice: {
+				type: "centPrecision",
+				centAmount: 14900,
+				currencyCode: "EUR",
+				fractionDigits: 0,
+			},
+		};
+
+		ctMock.project("dummy").add("order", order);
+
+		const lineItem = order.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: order.version,
+				actions: [
+					{
+						action: "setLineItemCustomField",
+						lineItemId: lineItem.id,
+						name: "foo",
+						value: "bar",
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.lineItems).toMatchObject([
+			{
+				id: lineItem.id,
+				custom: {
+					fields: {
+						foo: "bar",
+					},
+				},
+			},
+		]);
+	});
+
+	test("setLineItemCustomType", async () => {
+		const order: Order = {
+			...getBaseResourceProperties(),
+			version: 1,
+			customLineItems: [],
+			directDiscounts: [],
+			discountCodes: [],
+			lineItems: [
+				{
+					id: "d70b14c8-72cf-4cab-82ba-6339cebe1e79",
+					productId: "06028a97-d622-47ac-a194-a3d90baa2b3c",
+					productSlug: { "nl-NL": "test-product" },
+					productType: { typeId: "product-type", id: "some-uuid" },
+					name: { "nl-NL": "test product" },
+					variant: {
+						id: 1,
+						sku: "1337",
+						attributes: [{ name: "test", value: "test" }],
+						prices: [],
+						assets: [],
+						images: [],
+					},
+					price: {
+						id: "2f59a6c9-6a86-48d3-87f9-fabb3b12fd93",
+						value: {
+							type: "centPrecision",
+							centAmount: 14900,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+					totalPrice: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						fractionDigits: 2,
+						centAmount: 14900,
+					},
+					taxedPricePortions: [],
+					perMethodTaxRate: [],
+					quantity: 1,
+					discountedPricePerQuantity: [],
+					lineItemMode: "Standard",
+					priceMode: "Platform",
+					state: [],
+				},
+			],
+			orderState: "Open",
+			origin: "Customer",
+			refusedGifts: [],
+			shipping: [],
+			shippingMode: "Single",
+			syncInfo: [],
+			taxCalculationMode: "LineItemLevel",
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			totalPrice: {
+				type: "centPrecision",
+				centAmount: 14900,
+				currencyCode: "EUR",
+				fractionDigits: 0,
+			},
+		};
+
+		ctMock.project("dummy").add("order", order);
+
+		const type = await supertest(ctMock.app)
+			.post("/dummy/types")
+			.send({
+				key: "my-type",
+				name: {
+					en: "My Type",
+				},
+				description: {
+					en: "My Type Description",
+				},
+				fieldDefinitions: [
+					{
+						name: "foo",
+						label: {
+							en: "foo",
+						},
+						required: false,
+						type: {
+							name: "String",
+						},
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		assert(type, "type not created");
+
+		const lineItem = order.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/orders/${order.id}`)
+			.send({
+				version: order.version,
+				actions: [
+					{
+						action: "setLineItemCustomType",
+						lineItemId: lineItem.id,
+						type: {
+							typeId: "type",
+							id: type.id,
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.lineItems).toMatchObject([
+			{
+				id: lineItem.id,
+				custom: {
+					type: {
+						typeId: "type",
+						id: type.id,
+					},
+				},
+			},
+		]);
 	});
 
 	test("setParcelCustomField", async () => {
