@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.59.0
+
+### Minor Changes
+
+- [#341](https://github.com/labd/commercetools-node-mock/pull/341) [`bde20b2`](https://github.com/labd/commercetools-node-mock/commit/bde20b217f48b4481b8dbb986dce583b9a4e04b9) Thanks [@mikedebock](https://github.com/mikedebock)! - feat: implement support for set line-item custom types and fields on carts and orders
+
+- [#343](https://github.com/labd/commercetools-node-mock/pull/343) [`e36d8dc`](https://github.com/labd/commercetools-node-mock/commit/e36d8dc2e244a334893b77db0c98353358dab84c) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - update MSW depedency to 2.8.4
+
 ## 2.58.0
 
 ### Minor Changes
