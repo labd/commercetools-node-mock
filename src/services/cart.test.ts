@@ -711,6 +711,176 @@ describe("Cart Update Actions", () => {
 		]);
 	});
 
+	test("setLineItemCustomField", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const type = await supertest(ctMock.app)
+			.post("/dummy/types")
+			.send({
+				key: "my-type",
+				name: {
+					en: "My Type",
+				},
+				description: {
+					en: "My Type Description",
+				},
+				fieldDefinitions: [
+					{
+						name: "foo",
+						label: {
+							en: "foo",
+						},
+						required: false,
+						type: {
+							name: "String",
+						},
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		assert(type, "type not created");
+
+		const myCart = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({
+				currency: "EUR",
+				lineItems: [
+					{
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 1,
+						custom: {
+							type: {
+								typeId: "type",
+								key: "my-type",
+							},
+							fields: {},
+						},
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		const lineItem = myCart.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${myCart.id}`)
+			.send({
+				version: myCart.version,
+				actions: [
+					{
+						action: "setLineItemCustomField",
+						lineItemId: lineItem.id,
+						name: "foo",
+						value: "bar",
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.lineItems).toMatchObject([
+			{
+				id: lineItem.id,
+				custom: {
+					fields: {
+						foo: "bar",
+					},
+				},
+			},
+		]);
+	});
+
+	test("setLineItemCustomType", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const type = await supertest(ctMock.app)
+			.post("/dummy/types")
+			.send({
+				key: "my-type",
+				name: {
+					en: "My Type",
+				},
+				description: {
+					en: "My Type Description",
+				},
+				fieldDefinitions: [
+					{
+						name: "foo",
+						label: {
+							en: "foo",
+						},
+						required: false,
+						type: {
+							name: "String",
+						},
+						inputHint: "SingleLine",
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		assert(type, "type not created");
+
+		const myCart = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({
+				currency: "EUR",
+				lineItems: [
+					{
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 1,
+					},
+				],
+			})
+			.then((x) => x.body);
+
+		const lineItem = myCart.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${myCart.id}`)
+			.send({
+				version: myCart.version,
+				actions: [
+					{
+						action: "setLineItemCustomType",
+						lineItemId: lineItem.id,
+						type: {
+							typeId: "type",
+							key: "my-type",
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.lineItems).toMatchObject([
+			{
+				id: lineItem.id,
+				custom: {
+					type: {
+						typeId: "type",
+						id: type.id,
+					},
+				},
+			},
+		]);
+	});
+
 	test("setCustomerEmail", async () => {
 		assert(cart, "cart not created");
 

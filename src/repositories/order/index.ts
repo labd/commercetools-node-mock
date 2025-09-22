@@ -219,6 +219,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				id: variant.id,
 				sku: variant.sku,
 				price: createPrice(draft.price),
+				attributes: variant.attributes,
 			},
 		};
 

@@ -1,5 +1,6 @@
 import type {
 	CustomLineItemReturnItem,
+	GeneralError,
 	LineItemReturnItem,
 	Order,
 	OrderAddPaymentAction,
@@ -9,10 +10,13 @@ import type {
 	OrderChangeShipmentStateAction,
 	OrderSetBillingAddressAction,
 	OrderSetCustomFieldAction,
+	OrderSetCustomLineItemCustomTypeAction,
 	OrderSetCustomTypeAction,
 	OrderSetCustomerEmailAction,
 	OrderSetCustomerIdAction,
 	OrderSetDeliveryCustomFieldAction,
+	OrderSetLineItemCustomFieldAction,
+	OrderSetLineItemCustomTypeAction,
 	OrderSetLocaleAction,
 	OrderSetOrderNumberAction,
 	OrderSetParcelCustomFieldAction,
@@ -27,6 +31,7 @@ import type {
 	Store,
 	SyncInfo,
 } from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
 import type { Writable } from "~src/types";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
@@ -202,6 +207,82 @@ export class OrderUpdateHandler
 			if (delivery.id === deliveryId && delivery.custom?.fields) {
 				delivery.custom.fields[name] = value;
 			}
+		}
+	}
+
+	setLineItemCustomField(
+		context: RepositoryContext,
+		resource: Order,
+		{
+			lineItemId,
+			lineItemKey,
+			name,
+			value,
+			action,
+		}: OrderSetLineItemCustomFieldAction,
+	) {
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+
+		if (!lineItem) {
+			// Check if line item is found
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		if (!lineItem.custom) {
+			throw new Error("Resource has no custom field");
+		}
+
+		lineItem.custom.fields[name] = value;
+	}
+
+	setLineItemCustomType(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ lineItemId, lineItemKey, type, fields }: OrderSetLineItemCustomTypeAction,
+	) {
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+
+		if (!lineItem) {
+			// Check if line item is found
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		if (!type) {
+			lineItem.custom = undefined;
+		} else {
+			const resolvedType = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				type,
+			);
+			if (!resolvedType) {
+				throw new Error(`Type ${type} not found`);
+			}
+
+			lineItem.custom = {
+				type: {
+					typeId: "type",
+					id: resolvedType.id,
+				},
+				fields: fields || {},
+			};
 		}
 	}
 
