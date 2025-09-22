@@ -34,7 +34,7 @@
 		"express": "5.1.0",
 		"light-my-request": "6.6.0",
 		"morgan": "1.10.0",
-		"msw": "2.7.3",
+		"msw": "2.8.4",
 		"uuid": "11.1.0",
 		"zod": "3.24.2",
 		"zod-validation-error": "3.4.0"
