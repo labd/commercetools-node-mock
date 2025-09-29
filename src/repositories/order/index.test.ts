@@ -2,6 +2,7 @@ import { beforeEach } from "node:test";
 import type {
 	Cart,
 	LineItem,
+	Order,
 	OrderImportDraft,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
@@ -187,6 +188,8 @@ describe("Order repository", () => {
 		expect(result.taxRoundingMode).toEqual(cart.taxRoundingMode);
 		expect(result.totalPrice).toEqual(cart.totalPrice);
 		expect(result.store).toEqual(cart.store);
+		// Test that shippingInfo is copied from cart to order
+		expect(result.shippingInfo).toEqual(cart.shippingInfo);
 	});
 
 	test("create order in store", async () => {
@@ -510,4 +513,308 @@ describe("Order repository", () => {
 	repository.import('dummy', draft)
   })
   */
+
+	describe("shippingInfo functionality", () => {
+		test("createShippingInfo creates basic shipping info", () => {
+			// Create a zone for Netherlands
+			const zone = {
+				...getBaseResourceProperties(),
+				id: "zone-nl",
+				name: "Netherlands Zone",
+				locations: [
+					{
+						country: "NL",
+					},
+				],
+			};
+
+			// Create a shipping method first
+			const shippingMethod = {
+				...getBaseResourceProperties(),
+				id: "shipping-method-123",
+				name: "Express Shipping",
+				active: true,
+				isDefault: false,
+				taxCategory: {
+					typeId: "tax-category" as const,
+					id: "tax-category-123",
+				},
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone" as const,
+							id: "zone-nl",
+							obj: zone,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision" as const,
+									currencyCode: "EUR",
+									centAmount: 500,
+									fractionDigits: 2,
+								},
+								tiers: [],
+							},
+						],
+					},
+				],
+			};
+
+			const taxCategory = {
+				...getBaseResourceProperties(),
+				id: "tax-category-123",
+				name: "Standard Tax",
+				rates: [
+					{
+						name: "Standard VAT",
+						amount: 0.21,
+						country: "NL",
+						includedInPrice: true,
+					},
+				],
+			};
+
+			storage.add("dummy", "zone", zone);
+			storage.add("dummy", "shipping-method", shippingMethod);
+			storage.add("dummy", "tax-category", taxCategory);
+
+			const order: Order = {
+				...getBaseResourceProperties(),
+				orderNumber: "order-123",
+				orderState: "Open",
+				origin: "Customer",
+				customLineItems: [],
+				lineItems: [],
+				totalPrice: {
+					type: "centPrecision",
+					currencyCode: "EUR",
+					centAmount: 1000,
+					fractionDigits: 2,
+				},
+				lastMessageSequenceNumber: 0,
+				refusedGifts: [],
+				shipping: [],
+				shippingMode: "Single",
+				shippingAddress: {
+					id: "address-123",
+					country: "NL",
+					firstName: "John",
+					lastName: "Doe",
+					streetName: "Main Street",
+					streetNumber: "123",
+					postalCode: "1234AB",
+					city: "Amsterdam",
+				},
+				syncInfo: [],
+				taxCalculationMode: "UnitPriceLevel",
+				taxMode: "Platform",
+				taxRoundingMode: "HalfEven",
+			};
+
+			const ctx = { projectKey: "dummy" };
+			const result = repository.createShippingInfo(ctx, order, {
+				typeId: "shipping-method",
+				id: "shipping-method-123",
+			});
+
+			expect(result).toBeDefined();
+			expect(result.shippingMethod?.id).toBe("shipping-method-123");
+			expect(result.shippingMethodName).toBe("Express Shipping");
+			expect(result.price.currencyCode).toBe("EUR");
+			expect(result.price.centAmount).toBe(500);
+			expect(result.shippingMethodState).toBe("MatchesCart");
+			expect(result.deliveries).toEqual([]);
+			expect(result.taxCategory?.id).toBe("tax-category-123");
+		});
+
+		test("import order with shippingInfo", () => {
+			// Create required resources
+			const zone = {
+				...getBaseResourceProperties(),
+				id: "zone-de",
+				name: "Germany Zone",
+				locations: [
+					{
+						country: "DE",
+					},
+				],
+			};
+
+			const shippingMethod = {
+				...getBaseResourceProperties(),
+				id: "shipping-method-456",
+				name: "Standard Shipping",
+				active: true,
+				isDefault: false,
+				taxCategory: {
+					typeId: "tax-category" as const,
+					id: "tax-category-456",
+				},
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone" as const,
+							id: "zone-de",
+							obj: zone,
+						},
+						shippingRates: [
+							{
+								price: {
+									type: "centPrecision" as const,
+									currencyCode: "EUR",
+									centAmount: 500,
+									fractionDigits: 2,
+								},
+								tiers: [],
+							},
+						],
+					},
+				],
+			};
+
+			const taxCategory = {
+				...getBaseResourceProperties(),
+				id: "tax-category-456",
+				name: "Standard Tax",
+				rates: [
+					{
+						name: "Standard VAT",
+						amount: 0.19,
+						country: "DE",
+						includedInPrice: true,
+					},
+				],
+			};
+
+			storage.add("dummy", "zone", zone);
+			storage.add("dummy", "shipping-method", shippingMethod);
+			storage.add("dummy", "tax-category", taxCategory);
+
+			const draft: OrderImportDraft = {
+				orderNumber: "imported-order-123",
+				totalPrice: {
+					currencyCode: "EUR",
+					centAmount: 2000,
+				},
+				shippingAddress: {
+					country: "DE",
+					firstName: "Max",
+					lastName: "Mustermann",
+					streetName: "Hauptstraße",
+					streetNumber: "1",
+					postalCode: "10115",
+					city: "Berlin",
+				},
+				shippingInfo: {
+					shippingMethodName: "Standard Shipping",
+					price: {
+						currencyCode: "EUR",
+						centAmount: 500,
+					},
+					shippingRate: {
+						price: {
+							currencyCode: "EUR",
+							centAmount: 500,
+						},
+						tiers: [],
+					},
+					shippingMethod: {
+						typeId: "shipping-method",
+						id: "shipping-method-456",
+					},
+					taxCategory: {
+						typeId: "tax-category",
+						id: "tax-category-456",
+					},
+					taxRate: {
+						name: "Standard VAT",
+						amount: 0.19,
+						country: "DE",
+						includedInPrice: true,
+					},
+					shippingMethodState: "MatchesCart",
+					deliveries: [
+						{
+							key: "delivery-1",
+							items: [],
+							parcels: [
+								{
+									key: "parcel-1",
+									measurements: {
+										heightInMillimeter: 100,
+										lengthInMillimeter: 200,
+										widthInMillimeter: 150,
+										weightInGram: 500,
+									},
+									items: [],
+								},
+							],
+						},
+					],
+				},
+			};
+
+			const ctx = { projectKey: "dummy" };
+			const result = repository.import(ctx, draft);
+
+			expect(result.shippingInfo).toBeDefined();
+			expect(result.shippingInfo?.shippingMethodName).toBe("Standard Shipping");
+			expect(result.shippingInfo?.price.centAmount).toBe(500);
+			expect(result.shippingInfo?.shippingMethod?.id).toBe(
+				"shipping-method-456",
+			);
+			expect(result.shippingInfo?.taxCategory?.id).toBe("tax-category-456");
+			expect(result.shippingInfo?.taxRate?.amount).toBe(0.19);
+			// Note: deliveries from import drafts are not currently supported in native implementation
+			expect(result.shippingInfo?.deliveries).toEqual([]);
+		});
+
+		test("createShippingInfo throws error for non-existent shipping method", () => {
+			const order: Order = {
+				...getBaseResourceProperties(),
+				orderNumber: "order-456",
+				orderState: "Open",
+				origin: "Customer",
+				customLineItems: [],
+				lineItems: [],
+				totalPrice: {
+					type: "centPrecision",
+					currencyCode: "USD",
+					centAmount: 1500,
+					fractionDigits: 2,
+				},
+				lastMessageSequenceNumber: 0,
+				refusedGifts: [],
+				shipping: [],
+				shippingMode: "Single",
+				shippingAddress: {
+					id: "address-456",
+					country: "US",
+					firstName: "Jane",
+					lastName: "Smith",
+					streetName: "Broadway",
+					streetNumber: "456",
+					postalCode: "10001",
+					city: "New York",
+					state: "NY",
+				},
+				syncInfo: [],
+				taxCalculationMode: "UnitPriceLevel",
+				taxMode: "Platform",
+				taxRoundingMode: "HalfEven",
+			};
+
+			const ctx = { projectKey: "dummy" };
+
+			expect(() => {
+				repository.createShippingInfo(ctx, order, {
+					typeId: "shipping-method",
+					id: "non-existent-shipping-method",
+				});
+			}).toThrow(
+				/The shipping method with ID 'non-existent-shipping-method' is not allowed/,
+			);
+		});
+	});
 });

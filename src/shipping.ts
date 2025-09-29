@@ -1,12 +1,23 @@
 import type {
 	Cart,
 	CartValueTier,
+	CentPrecisionMoney,
 	InvalidOperationError,
+	MissingTaxRateForCountryError,
+	Order,
+	ShippingInfo,
+	ShippingMethod,
+	ShippingMethodDoesNotMatchCartError,
 	ShippingRate,
 	ShippingRatePriceTier,
+	TaxPortion,
+	TaxRate,
+	TaxedItemPrice,
 } from "@commercetools/platform-sdk";
+import { Decimal } from "decimal.js";
 import { CommercetoolsError } from "./exceptions";
 import type { GetParams, RepositoryContext } from "./repositories/abstract";
+import { createCentPrecisionMoney, roundDecimal } from "./repositories/helpers";
 import type { AbstractStorage } from "./storage/abstract";
 
 export const markMatchingShippingRate = (
@@ -143,5 +154,151 @@ export const getShippingMethodsMatchingCart = (
 	return {
 		...shippingMethods,
 		results: results,
+	};
+};
+
+/**
+ * Interface for cart-like objects that can be used for shipping calculations
+ */
+interface ShippingCalculationSource {
+	id: string;
+	totalPrice: CentPrecisionMoney;
+	shippingAddress?: {
+		country: string;
+		[key: string]: any;
+	};
+	taxRoundingMode?: string;
+}
+
+/**
+ * Creates shipping info from a shipping method, handling all tax calculations and pricing logic.
+ */
+export const createShippingInfoFromMethod = (
+	context: RepositoryContext,
+	storage: AbstractStorage,
+	resource: ShippingCalculationSource,
+	method: ShippingMethod,
+): Omit<ShippingInfo, "deliveries"> => {
+	const country = resource.shippingAddress!.country;
+
+	// There should only be one zone rate matching the address, since
+	// Locations cannot be assigned to more than one zone.
+	// See https://docs.commercetools.com/api/projects/zones#location
+	const zoneRate = method.zoneRates.find((rate) =>
+		rate.zone.obj?.locations.some((loc) => loc.country === country),
+	);
+
+	if (!zoneRate) {
+		// This shouldn't happen because getShippingMethodsMatchingCart already
+		// filtered out shipping methods without any zones matching the address
+		throw new Error("Zone rate not found");
+	}
+
+	// Shipping rates are defined by currency, and getShippingMethodsMatchingCart
+	// also matches on currency, so there should only be one in the array.
+	// See https://docs.commercetools.com/api/projects/shippingMethods#zonerate
+	const shippingRate = zoneRate.shippingRates[0];
+	if (!shippingRate) {
+		// This shouldn't happen because getShippingMethodsMatchingCart already
+		// filtered out shipping methods without any matching rates
+		throw new Error("Shipping rate not found");
+	}
+
+	const taxCategory = storage.getByResourceIdentifier<"tax-category">(
+		context.projectKey,
+		method.taxCategory,
+	);
+
+	// TODO: match state in addition to country
+	const taxRate = taxCategory.rates.find((rate) => rate.country === country);
+
+	if (!taxRate) {
+		throw new CommercetoolsError<MissingTaxRateForCountryError>({
+			code: "MissingTaxRateForCountry",
+			message: `Tax category '${taxCategory.id}' is missing a tax rate for country '${country}'.`,
+			taxCategoryId: taxCategory.id,
+		});
+	}
+
+	const shippingRateTier = shippingRate.tiers.find((tier) => tier.isMatching);
+	if (shippingRateTier && shippingRateTier.type !== "CartValue") {
+		throw new Error("Non-CartValue shipping rate tier is not supported");
+	}
+
+	let shippingPrice = shippingRateTier
+		? createCentPrecisionMoney(shippingRateTier.price)
+		: shippingRate.price;
+
+	// Handle freeAbove: if total is above the freeAbove threshold, shipping is free
+	if (
+		shippingRate.freeAbove &&
+		shippingRate.freeAbove.currencyCode === resource.totalPrice.currencyCode &&
+		resource.totalPrice.centAmount >= shippingRate.freeAbove.centAmount
+	) {
+		shippingPrice = {
+			...shippingPrice,
+			centAmount: 0,
+		};
+	}
+
+	// Calculate tax amounts
+	const totalGross: CentPrecisionMoney = taxRate.includedInPrice
+		? shippingPrice
+		: {
+			...shippingPrice,
+			centAmount: roundDecimal(
+				new Decimal(shippingPrice.centAmount).mul(1 + taxRate.amount),
+				resource.taxRoundingMode || "HalfEven",
+			).toNumber(),
+		};
+
+	const totalNet: CentPrecisionMoney = taxRate.includedInPrice
+		? {
+			...shippingPrice,
+			centAmount: roundDecimal(
+				new Decimal(shippingPrice.centAmount).div(1 + taxRate.amount),
+				resource.taxRoundingMode || "HalfEven",
+			).toNumber(),
+		}
+		: shippingPrice;
+
+	const taxPortions: TaxPortion[] = [
+		{
+			name: taxRate.name,
+			rate: taxRate.amount,
+			amount: {
+				...shippingPrice,
+				centAmount: totalGross.centAmount - totalNet.centAmount,
+			},
+		},
+	];
+
+	const totalTax: CentPrecisionMoney = {
+		...shippingPrice,
+		centAmount: taxPortions.reduce(
+			(acc, portion) => acc + portion.amount.centAmount,
+			0,
+		),
+	};
+
+	const taxedPrice: TaxedItemPrice = {
+		totalNet,
+		totalGross,
+		taxPortions,
+		totalTax,
+	};
+
+	return {
+		shippingMethod: {
+			typeId: "shipping-method" as const,
+			id: method.id,
+		},
+		shippingMethodName: method.name,
+		price: shippingPrice,
+		shippingRate,
+		taxedPrice,
+		taxRate,
+		taxCategory: method.taxCategory,
+		shippingMethodState: "MatchesCart",
 	};
 };
