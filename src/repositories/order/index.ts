@@ -2,21 +2,35 @@ import assert from "node:assert";
 import type {
 	Cart,
 	CartReference,
+	CentPrecisionMoney,
 	CustomLineItem,
 	CustomLineItemImportDraft,
 	GeneralError,
+	InvalidOperationError,
 	LineItem,
 	LineItemImportDraft,
+	MissingTaxRateForCountryError,
 	Order,
 	OrderFromCartDraft,
 	OrderImportDraft,
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
+	ShippingInfo,
+	ShippingMethodDoesNotMatchCartError,
+	ShippingMethodReference,
+	TaxPortion,
+	TaxedItemPrice,
 } from "@commercetools/platform-sdk";
+import { Decimal } from "decimal.js/decimal";
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
+import {
+	createShippingInfoFromMethod,
+	getShippingMethodsMatchingCart,
+} from "~src/shipping";
+import type { Writable } from "~src/types";
 import type { RepositoryContext } from "../abstract";
 import { AbstractResourceRepository, type QueryParams } from "../abstract";
 import {
@@ -26,6 +40,7 @@ import {
 	createPrice,
 	createTypedMoney,
 	resolveStoreReference,
+	roundDecimal,
 } from "../helpers";
 import { OrderUpdateHandler } from "./actions";
 
@@ -84,6 +99,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			refusedGifts: [],
 			shipping: cart.shipping,
 			shippingAddress: cart.shippingAddress,
+			shippingInfo: cart.shippingInfo,
 			shippingMode: cart.shippingMode,
 			syncInfo: [],
 			taxCalculationMode: cart.taxCalculationMode,
@@ -100,7 +116,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 	import(context: RepositoryContext, draft: OrderImportDraft): Order {
 		// TODO: Check if order with given orderNumber already exists
 		assert(this, "OrderRepository not valid");
-		const resource: Order = {
+		const resource: Writable<Order> = {
 			...getBaseResourceProperties(),
 
 			billingAddress: createAddress(
@@ -132,7 +148,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			refusedGifts: [],
 			shippingMode: "Single",
 			shipping: [],
-
+			shippingInfo: undefined,
 			store: resolveStoreReference(
 				draft.store,
 				context.projectKey,
@@ -151,6 +167,33 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 
 			totalPrice: createCentPrecisionMoney(draft.totalPrice),
 		};
+
+		// Set shipping info after resource is created
+		if (draft.shippingInfo?.shippingMethod) {
+			const { ...shippingMethodRef } = draft.shippingInfo.shippingMethod;
+
+			// get id when reference is by key only
+			if (shippingMethodRef.key && !shippingMethodRef.id) {
+				const shippingMethod =
+					this._storage.getByResourceIdentifier<"shipping-method">(
+						context.projectKey,
+						shippingMethodRef,
+					);
+				if (!shippingMethod) {
+					throw new CommercetoolsError<GeneralError>({
+						code: "General",
+						message: `A shipping method with key '${shippingMethodRef.key}' does not exist.`,
+					});
+				}
+				shippingMethodRef.id = shippingMethod.id;
+			}
+
+			resource.shippingInfo = this.createShippingInfo(context, resource, {
+				typeId: "shipping-method",
+				id: shippingMethodRef.id as string,
+			});
+		}
+
 		return this.saveNew(context, resource);
 	}
 
@@ -271,5 +314,57 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		}
 
 		return;
+	}
+
+	createShippingInfo(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		shippingMethodRef: ShippingMethodReference,
+	): ShippingInfo {
+		const cartLikeForMatching: Writable<Cart> = {
+			...resource,
+			cartState: "Active" as const,
+			inventoryMode: "None" as const,
+			itemShippingAddresses: [],
+			priceRoundingMode: resource.taxRoundingMode || "HalfEven",
+			taxMode: resource.taxMode || "Platform",
+			taxCalculationMode: resource.taxCalculationMode || "LineItemLevel",
+			taxRoundingMode: resource.taxRoundingMode || "HalfEven",
+			discountCodes: resource.discountCodes || [],
+			directDiscounts: resource.directDiscounts || [],
+			shippingInfo: undefined,
+		};
+
+		const shippingMethods = getShippingMethodsMatchingCart(
+			context,
+			this._storage,
+			cartLikeForMatching,
+			{
+				expand: ["zoneRates[*].zone"],
+			},
+		);
+
+		const method = shippingMethods.results.find(
+			(candidate) => candidate.id === shippingMethodRef.id,
+		);
+
+		if (!method) {
+			throw new CommercetoolsError<ShippingMethodDoesNotMatchCartError>({
+				code: "ShippingMethodDoesNotMatchCart",
+				message: `The shipping method with ID '${shippingMethodRef.id}' is not allowed for the order with ID '${resource.id}'.`,
+			});
+		}
+
+		const baseShippingInfo = createShippingInfoFromMethod(
+			context,
+			this._storage,
+			resource,
+			method,
+		);
+
+		return {
+			...baseShippingInfo,
+			deliveries: [],
+		};
 	}
 }
