@@ -32,10 +32,7 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract";
-import {
-	createAddress,
-	createCustomFields,
-} from "../helpers";
+import { createAddress, createCustomFields } from "../helpers";
 import { CartUpdateHandler } from "./actions";
 import {
 	calculateCartTotalPrice,
@@ -104,9 +101,9 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			businessUnit:
 				storedBusinessUnit && draft.businessUnit
 					? {
-						typeId: draft.businessUnit.typeId,
-						key: storedBusinessUnit.key,
-					}
+							typeId: draft.businessUnit.typeId,
+							key: storedBusinessUnit.key,
+						}
 					: undefined,
 			billingAddress: draft.billingAddress
 				? createAddress(draft.billingAddress, context.projectKey, this._storage)
@@ -135,10 +132,10 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			shippingMode: "Single",
 			shippingAddress: draft.shippingAddress
 				? createAddress(
-					draft.shippingAddress,
-					context.projectKey,
-					this._storage,
-				)
+						draft.shippingAddress,
+						context.projectKey,
+						this._storage,
+					)
 				: undefined,
 			shipping: [],
 			shippingInfo: undefined,
@@ -283,7 +280,6 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		if (resource.taxMode === "External") {
 			throw new Error("External tax rate is not supported");
 		}
-
 
 		// Bit of a hack: calling this checks that the resource identifier is
 		// valid (i.e. id xor key) and that the shipping method exists.

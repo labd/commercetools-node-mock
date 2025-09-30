@@ -245,21 +245,21 @@ export const createShippingInfoFromMethod = (
 	const totalGross: CentPrecisionMoney = taxRate.includedInPrice
 		? shippingPrice
 		: {
-			...shippingPrice,
-			centAmount: roundDecimal(
-				new Decimal(shippingPrice.centAmount).mul(1 + taxRate.amount),
-				resource.taxRoundingMode || "HalfEven",
-			).toNumber(),
-		};
+				...shippingPrice,
+				centAmount: roundDecimal(
+					new Decimal(shippingPrice.centAmount).mul(1 + taxRate.amount),
+					resource.taxRoundingMode || "HalfEven",
+				).toNumber(),
+			};
 
 	const totalNet: CentPrecisionMoney = taxRate.includedInPrice
 		? {
-			...shippingPrice,
-			centAmount: roundDecimal(
-				new Decimal(shippingPrice.centAmount).div(1 + taxRate.amount),
-				resource.taxRoundingMode || "HalfEven",
-			).toNumber(),
-		}
+				...shippingPrice,
+				centAmount: roundDecimal(
+					new Decimal(shippingPrice.centAmount).div(1 + taxRate.amount),
+					resource.taxRoundingMode || "HalfEven",
+				).toNumber(),
+			}
 		: shippingPrice;
 
 	const taxPortions: TaxPortion[] = [
