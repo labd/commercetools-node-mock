@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.59.1
+
+### Patch Changes
+
+- [#344](https://github.com/labd/commercetools-node-mock/pull/344) [`0fb00be`](https://github.com/labd/commercetools-node-mock/commit/0fb00bec7af53f6d234f56cbd80f6c686d59fe0e) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add shippingInfo to orders
+
 ## 2.59.0
 
 ### Minor Changes
