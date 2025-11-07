@@ -711,6 +711,217 @@ describe("Cart Update Actions", () => {
 		]);
 	});
 
+	test("setLineItemPrice sets an external price for a line item", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const baseCartResponse = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({ currency: "EUR" });
+		expect(baseCartResponse.status).toBe(201);
+		const baseCart = baseCartResponse.body as Cart;
+
+		const addLineItemResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${baseCart.id}`)
+			.send({
+				version: baseCart.version,
+				actions: [
+					{
+						action: "addLineItem",
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 2,
+						key: "line-item-key",
+					},
+				],
+			});
+		expect(addLineItemResponse.status).toBe(200);
+		const cartWithLineItem = addLineItemResponse.body as Cart;
+		const lineItem = cartWithLineItem.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const externalPrice: CentPrecisionMoney = {
+			type: "centPrecision",
+			currencyCode: "EUR",
+			centAmount: 2500,
+			fractionDigits: 2,
+		};
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cartWithLineItem.id}`)
+			.send({
+				version: cartWithLineItem.version,
+				actions: [
+					{
+						action: "setLineItemPrice",
+						lineItemKey: lineItem.key,
+						externalPrice,
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(cartWithLineItem.version + 1);
+		expect(response.body.lineItems).toHaveLength(1);
+
+		const updatedLineItem = response.body.lineItems[0];
+		expect(updatedLineItem.priceMode).toBe("ExternalPrice");
+		expect(updatedLineItem.price.value.centAmount).toBe(
+			externalPrice.centAmount,
+		);
+		expect(updatedLineItem.price.value.currencyCode).toBe(
+			externalPrice.currencyCode,
+		);
+		expect(updatedLineItem.totalPrice.centAmount).toBe(
+			externalPrice.centAmount * updatedLineItem.quantity,
+		);
+		expect(response.body.totalPrice.centAmount).toBe(
+			externalPrice.centAmount * updatedLineItem.quantity,
+		);
+	});
+
+	test("setLineItemPrice fails when the money uses another currency", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const baseCartResponse = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({ currency: "EUR" });
+		expect(baseCartResponse.status).toBe(201);
+		const baseCart = baseCartResponse.body as Cart;
+
+		const addLineItemResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${baseCart.id}`)
+			.send({
+				version: baseCart.version,
+				actions: [
+					{
+						action: "addLineItem",
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 1,
+					},
+				],
+			});
+		expect(addLineItemResponse.status).toBe(200);
+		const cartWithLineItem = addLineItemResponse.body as Cart;
+		const lineItem = cartWithLineItem.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cartWithLineItem.id}`)
+			.send({
+				version: cartWithLineItem.version,
+				actions: [
+					{
+						action: "setLineItemPrice",
+						lineItemId: lineItem.id,
+						externalPrice: {
+							type: "centPrecision",
+							currencyCode: "USD",
+							centAmount: 5000,
+							fractionDigits: 2,
+						},
+					},
+				],
+			});
+
+		expect(response.status).toBe(400);
+		expect(response.body.message).toContain("Currency mismatch");
+	});
+
+	test("setLineItemPrice removes external price when no value is provided", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const baseCartResponse = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({ currency: "EUR" });
+		expect(baseCartResponse.status).toBe(201);
+		const baseCart = baseCartResponse.body as Cart;
+
+		const addLineItemResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${baseCart.id}`)
+			.send({
+				version: baseCart.version,
+				actions: [
+					{
+						action: "addLineItem",
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 1,
+					},
+				],
+			});
+		expect(addLineItemResponse.status).toBe(200);
+		const cartWithLineItem = addLineItemResponse.body as Cart;
+		const lineItem = cartWithLineItem.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const externalPrice: CentPrecisionMoney = {
+			type: "centPrecision",
+			currencyCode: "EUR",
+			centAmount: 1000,
+			fractionDigits: 2,
+		};
+
+		const setExternalPriceResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cartWithLineItem.id}`)
+			.send({
+				version: cartWithLineItem.version,
+				actions: [
+					{
+						action: "setLineItemPrice",
+						lineItemId: lineItem.id,
+						externalPrice,
+					},
+				],
+			});
+		expect(setExternalPriceResponse.status).toBe(200);
+		const cartWithExternalPrice = setExternalPriceResponse.body as Cart;
+		expect(cartWithExternalPrice.lineItems[0].priceMode).toBe("ExternalPrice");
+
+		const resetResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cartWithExternalPrice.id}`)
+			.send({
+				version: cartWithExternalPrice.version,
+				actions: [
+					{
+						action: "setLineItemPrice",
+						lineItemId: lineItem.id,
+					},
+				],
+			});
+
+		expect(resetResponse.status).toBe(200);
+		expect(resetResponse.body.version).toBe(cartWithExternalPrice.version + 1);
+		expect(resetResponse.body.lineItems).toHaveLength(1);
+
+		const revertedLineItem = resetResponse.body.lineItems[0];
+		const expectedCentAmount =
+			product.masterData.current.masterVariant.prices?.[0].value.centAmount;
+		if (typeof expectedCentAmount !== "number") {
+			throw new Error("product price not found");
+		}
+		expect(revertedLineItem.priceMode).toBe("Platform");
+		expect(revertedLineItem.price.value.centAmount).toBe(expectedCentAmount);
+		expect(revertedLineItem.totalPrice.centAmount).toBe(
+			expectedCentAmount * revertedLineItem.quantity,
+		);
+		expect(resetResponse.body.totalPrice.centAmount).toBe(
+			expectedCentAmount * revertedLineItem.quantity,
+		);
+	});
+
 	test("setLineItemCustomField", async () => {
 		const product = await supertest(ctMock.app)
 			.post("/dummy/products")
