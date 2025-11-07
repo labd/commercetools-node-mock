@@ -766,9 +766,7 @@ export class CartUpdateHandler
 		}
 
 		if (externalPrice) {
-			if (
-				externalPrice.currencyCode !== resource.totalPrice.currencyCode
-			) {
+			if (externalPrice.currencyCode !== resource.totalPrice.currencyCode) {
 				throw new CommercetoolsError<GeneralError>({
 					code: "General",
 					message: `Currency mismatch. Expected '${resource.totalPrice.currencyCode}' but got '${externalPrice.currencyCode}'.`,
