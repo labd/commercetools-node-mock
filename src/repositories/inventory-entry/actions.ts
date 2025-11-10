@@ -1,6 +1,7 @@
 import type {
 	InventoryEntry,
 	InventoryEntryChangeQuantityAction,
+	InventoryEntryRemoveQuantityAction,
 	InventoryEntrySetCustomFieldAction,
 	InventoryEntrySetCustomTypeAction,
 	InventoryEntrySetExpectedDeliveryAction,
@@ -24,6 +25,17 @@ export class InventoryEntryUpdateHandler
 		resource.quantityOnStock = quantity;
 		// don't know active reservations so just set to same value
 		resource.availableQuantity = quantity;
+	}
+
+	removeQuantity(
+		context: RepositoryContext,
+		resource: Writable<InventoryEntry>,
+		{ quantity }: InventoryEntryRemoveQuantityAction,
+	) {
+		const newQuantity = Math.max(0, resource.quantityOnStock - quantity);
+		resource.quantityOnStock = newQuantity;
+		// don't know active reservations so just set to same value
+		resource.availableQuantity = newQuantity;
 	}
 
 	setCustomField(
