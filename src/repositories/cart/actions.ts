@@ -781,9 +781,7 @@ export class CartUpdateHandler
 
 			lineItem.price = lineItem.price ?? { id: uuidv4() };
 			lineItem.price.value = priceValue;
-		}
-
-		if (!externalPrice) {
+		} else {
 			lineItem.priceMode = "Platform";
 
 			const price = selectPrice({
