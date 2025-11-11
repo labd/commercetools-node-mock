@@ -1,6 +1,5 @@
 import type {
 	BusinessUnit,
-	CentPrecisionMoney,
 	InvalidOperationError,
 	MissingTaxRateForCountryError,
 	ShippingMethodDoesNotMatchCartError,
@@ -15,14 +14,12 @@ import type {
 	LineItemDraft,
 	Product,
 	ProductPagedQueryResponse,
-	TaxPortion,
-	TaxedItemPrice,
 } from "@commercetools/platform-sdk";
-import { Decimal } from "decimal.js/decimal";
 import { v4 as uuidv4 } from "uuid";
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { getBaseResourceProperties } from "~src/helpers";
+import { calculateTaxTotals } from "~src/lib/tax";
 import {
 	createShippingInfoFromMethod,
 	getShippingMethodsMatchingCart,
@@ -162,6 +159,10 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				draft.shippingMethod,
 			);
 		}
+
+		const { taxedPrice, taxedShippingPrice } = calculateTaxTotals(resource);
+		resource.taxedPrice = taxedPrice;
+		resource.taxedShippingPrice = taxedShippingPrice;
 
 		return this.saveNew(context, resource);
 	}

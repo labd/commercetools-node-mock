@@ -192,6 +192,106 @@ describe("Order repository", () => {
 		expect(result.shippingInfo).toEqual(cart.shippingInfo);
 	});
 
+	test("should calculate taxed price when creating order from cart", () => {
+		const cart: Cart = {
+			...getBaseResourceProperties(),
+			id: "cart-with-taxed-items",
+			version: 1,
+			cartState: "Active",
+			lineItems: [
+				{
+					id: "li-1",
+					productId: "product-1",
+					variantId: 1,
+					quantity: 1,
+					name: { en: "Test" },
+					variant: {
+						id: 1,
+						sku: "TEST",
+					},
+					price: {
+						value: {
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 1000,
+							fractionDigits: 2,
+						},
+					},
+					totalPrice: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						centAmount: 1000,
+						fractionDigits: 2,
+					},
+					taxedPrice: {
+						totalNet: {
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 1000,
+							fractionDigits: 2,
+						},
+						totalGross: {
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 1210,
+							fractionDigits: 2,
+						},
+						taxPortions: [
+							{
+								rate: 0.21,
+								amount: {
+									type: "centPrecision",
+									currencyCode: "EUR",
+									centAmount: 210,
+									fractionDigits: 2,
+								},
+							},
+						],
+						totalTax: {
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 210,
+							fractionDigits: 2,
+						},
+					},
+				} as unknown as LineItem,
+			],
+			customLineItems: [],
+			totalPrice: {
+				type: "centPrecision",
+				currencyCode: "EUR",
+				centAmount: 1000,
+				fractionDigits: 2,
+			},
+			priceRoundingMode: "HalfEven",
+			refusedGifts: [],
+			shippingMode: "Single",
+			shipping: [],
+			shippingAddress: { country: "NL" },
+			taxMode: "Platform",
+			taxRoundingMode: "HalfEven",
+			taxCalculationMode: "LineItemLevel",
+			origin: "Customer",
+			itemShippingAddresses: [],
+			directDiscounts: [],
+			discountCodes: [],
+			discountOnTotalPrice: undefined,
+			inventoryMode: "None",
+		};
+
+		storage.add("dummy", "cart", cart);
+		const ctx = { projectKey: "dummy" };
+		const result = repository.create(ctx, {
+			cart: { id: cart.id, typeId: "cart" },
+			version: cart.version,
+		});
+
+		expect(result.taxedPrice).toBeDefined();
+		expect(result.taxedPrice?.totalNet.centAmount).toBe(1000);
+		expect(result.taxedPrice?.totalGross.centAmount).toBe(1210);
+		expect(result.taxedPrice?.totalTax?.centAmount).toBe(210);
+	});
+
 	test("create order in store", async () => {
 		storage.add("dummy", "store", {
 			...getBaseResourceProperties(),
@@ -272,6 +372,89 @@ describe("Order repository", () => {
 		expect(result.totalPrice.currencyCode).toBe("EUR");
 		expect(result.orderState).toBe("Open");
 		expect(result.paymentState).toBe("Paid");
+	});
+
+	test("should calculate taxed price when importing order", () => {
+		storage.add("dummy", "product", {
+			...getBaseResourceProperties(),
+			id: "product-import",
+			productType: {
+				typeId: "product-type",
+				id: "product-type-id",
+			},
+			masterData: {
+				current: {
+					name: { en: "Imported" },
+					slug: { en: "imported" },
+					categories: [],
+					masterVariant: {
+						id: 1,
+						sku: "IMPORT-SKU",
+						prices: [],
+						attributes: [],
+					},
+					variants: [],
+					searchKeywords: {},
+					attributes: [],
+				},
+				staged: {
+					name: { en: "Imported" },
+					slug: { en: "imported" },
+					categories: [],
+					masterVariant: {
+						id: 1,
+						sku: "IMPORT-SKU",
+						prices: [],
+						attributes: [],
+					},
+					variants: [],
+					searchKeywords: {},
+					attributes: [],
+				},
+				published: false,
+				hasStagedChanges: false,
+			},
+		});
+
+		const draft: OrderImportDraft = {
+			orderNumber: "IMPORT-ORDER-1",
+			totalPrice: {
+				centAmount: 1000,
+				currencyCode: "EUR",
+			},
+			lineItems: [
+				{
+					name: { en: "Imported" },
+					variant: {
+						sku: "IMPORT-SKU",
+					},
+					price: {
+						value: {
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 1000,
+							fractionDigits: 2,
+						},
+					},
+					quantity: 1,
+					taxRate: {
+						name: "Standard VAT",
+						amount: 0.21,
+						includedInPrice: false,
+						country: "NL",
+						id: "import-tax-rate",
+						subRates: [],
+					},
+				},
+			],
+			customLineItems: [],
+		};
+
+		const result = repository.import({ projectKey: "dummy" }, draft);
+		expect(result.taxedPrice).toBeDefined();
+		expect(result.taxedPrice?.totalNet.centAmount).toBe(1000);
+		expect(result.taxedPrice?.totalGross.centAmount).toBe(1210);
+		expect(result.taxedPrice?.totalTax?.centAmount).toBe(210);
 	});
 
 	test("import exiting product", async () => {

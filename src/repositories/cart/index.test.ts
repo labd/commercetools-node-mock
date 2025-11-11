@@ -389,6 +389,54 @@ describe("Cart repository", () => {
 		expect(customLineItem.taxRate?.includedInPrice).toBe(false);
 		expect(customLineItem.taxRate?.country).toBe("NL");
 	});
+
+	test("should calculate taxed price for the cart", () => {
+		storage.add("dummy", "tax-category", {
+			...getBaseResourceProperties(),
+			id: "cart-tax-category",
+			key: "cart-vat-tax",
+			name: "Cart VAT Tax",
+			rates: [
+				{
+					id: "cart-rate-1",
+					name: "Standard VAT",
+					amount: 0.21,
+					includedInPrice: false,
+					country: "NL",
+				},
+			],
+		});
+
+		const cart: CartDraft = {
+			currency: "EUR",
+			country: "NL",
+			customLineItems: [
+				{
+					name: { en: "Gift Wrap" },
+					slug: "gift-wrap",
+					money: {
+						currencyCode: "EUR",
+						centAmount: 1000,
+					},
+					quantity: 1,
+					taxCategory: {
+						typeId: "tax-category" as const,
+						id: "cart-tax-category",
+					},
+				},
+			],
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+		const result = repository.create(ctx, cart);
+
+		expect(result.taxedPrice).toBeDefined();
+		expect(result.taxedPrice?.totalNet.centAmount).toBe(1000);
+		expect(result.taxedPrice?.totalGross.centAmount).toBe(1210);
+		expect(result.taxedPrice?.totalTax?.centAmount).toBe(210);
+		expect(result.taxedPrice?.taxPortions).toHaveLength(1);
+		expect(result.taxedPrice?.taxPortions?.[0].rate).toBe(0.21);
+	});
 });
 
 describe("createShippingInfo", () => {

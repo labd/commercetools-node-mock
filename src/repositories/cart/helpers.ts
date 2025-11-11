@@ -1,15 +1,14 @@
 import type {
 	Cart,
-	CentPrecisionMoney,
 	CustomLineItem,
 	CustomLineItemDraft,
 	LineItem,
 	Price,
 	TaxCategory,
 	TaxCategoryReference,
-	TaxedPrice,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
+import { calculateTaxedPrice } from "~src/lib/tax";
 import type { AbstractStorage } from "~src/storage/abstract";
 import {
 	createCentPrecisionMoney,
@@ -54,84 +53,6 @@ export const calculateCartTotalPrice = (cart: Cart): number => {
 		0,
 	);
 	return lineItemsTotal + customLineItemsTotal;
-};
-
-export const calculateTaxedPrice = (
-	amount: number,
-	taxCategory: TaxCategory | undefined,
-	currency: string,
-	country: string | undefined,
-): TaxedPrice | undefined => {
-	if (!taxCategory || !taxCategory.rates.length) {
-		return undefined;
-	}
-
-	// Find the appropriate tax rate for the country
-	const taxRate =
-		taxCategory.rates.find(
-			(rate) => !rate.country || rate.country === country,
-		) || taxCategory.rates[0]; // Fallback to first rate if no country-specific rate found
-
-	if (!taxRate) {
-		return undefined;
-	}
-
-	let netAmount: number;
-	let grossAmount: number;
-	let taxAmount: number;
-
-	if (taxRate.includedInPrice) {
-		// Amount is gross, calculate net
-		grossAmount = amount;
-		taxAmount = Math.round(
-			(grossAmount * taxRate.amount) / (1 + taxRate.amount),
-		);
-		netAmount = grossAmount - taxAmount;
-	} else {
-		// Amount is net, calculate gross
-		netAmount = amount;
-		taxAmount = Math.round(netAmount * taxRate.amount);
-		grossAmount = netAmount + taxAmount;
-	}
-
-	return {
-		totalNet: {
-			type: "centPrecision",
-			currencyCode: currency,
-			centAmount: netAmount,
-			fractionDigits: 2,
-		},
-		totalGross: {
-			type: "centPrecision",
-			currencyCode: currency,
-			centAmount: grossAmount,
-			fractionDigits: 2,
-		},
-		taxPortions:
-			taxAmount > 0
-				? [
-						{
-							rate: taxRate.amount,
-							amount: {
-								type: "centPrecision",
-								currencyCode: currency,
-								centAmount: taxAmount,
-								fractionDigits: 2,
-							},
-							name: taxRate.name,
-						},
-					]
-				: [],
-		totalTax:
-			taxAmount > 0
-				? {
-						type: "centPrecision",
-						currencyCode: currency,
-						centAmount: taxAmount,
-						fractionDigits: 2,
-					}
-				: undefined,
-	};
 };
 
 export const createCustomLineItemFromDraft = (
