@@ -765,25 +765,27 @@ export class CartUpdateHandler
 			return;
 		}
 
-		if (externalPrice) {
-			if (externalPrice.currencyCode !== resource.totalPrice.currencyCode) {
-				throw new CommercetoolsError<GeneralError>({
-					code: "General",
-					message: `Currency mismatch. Expected '${resource.totalPrice.currencyCode}' but got '${externalPrice.currencyCode}'.`,
-				});
-			}
+		if (
+			externalPrice &&
+			externalPrice.currencyCode !== resource.totalPrice.currencyCode
+		) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: `Currency mismatch. Expected '${resource.totalPrice.currencyCode}' but got '${externalPrice.currencyCode}'.`,
+			});
+		}
 
-			const priceValue = createTypedMoney(externalPrice);
-			if (!lineItem.price) {
-				lineItem.price = {
-					id: uuidv4(),
-					value: priceValue,
-				};
-			} else {
-				lineItem.price.value = priceValue;
-			}
+		if (externalPrice) {
 			lineItem.priceMode = "ExternalPrice";
-		} else {
+			const priceValue = createTypedMoney(externalPrice);
+
+			lineItem.price = lineItem.price ?? { id: uuidv4() };
+			lineItem.price.value = priceValue;
+		}
+
+		if (!externalPrice) {
+			lineItem.priceMode = "Platform";
+
 			const price = selectPrice({
 				prices: lineItem.variant.prices,
 				currency: resource.totalPrice.currencyCode,
@@ -797,7 +799,6 @@ export class CartUpdateHandler
 			}
 
 			lineItem.price = price;
-			lineItem.priceMode = "Platform";
 		}
 
 		const lineItemTotal = calculateLineItemTotalPrice(lineItem);
