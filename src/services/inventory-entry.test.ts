@@ -93,6 +93,21 @@ describe("Inventory Entry Update Actions", () => {
 		expect(response.body.quantityOnStock).toBe(300);
 	});
 
+	test("removeQuantity", async () => {
+		assert(inventoryEntry, "inventory entry not created");
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/inventory/${inventoryEntry.id}`)
+			.send({
+				version: 1,
+				actions: [{ action: "removeQuantity", quantity: 15 }],
+			});
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(2);
+		expect(response.body.availableQuantity).toBe(85);
+		expect(response.body.quantityOnStock).toBe(85);
+	});
+
 	test("set custom type", async () => {
 		assert(inventoryEntry, "inventory entry not created");
 		assert(customType, "custom type not created");
