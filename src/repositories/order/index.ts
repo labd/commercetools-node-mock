@@ -26,6 +26,7 @@ import { Decimal } from "decimal.js/decimal";
 import type { Config } from "~src/config";
 import { CommercetoolsError } from "~src/exceptions";
 import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
+import { calculateTaxTotals, calculateTaxedPriceFromRate } from "~src/lib/tax";
 import {
 	createShippingInfoFromMethod,
 	getShippingMethodsMatchingCart,
@@ -75,7 +76,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			throw new Error("Cannot find cart");
 		}
 
-		const resource: Order = {
+		const resource: Writable<Order> = {
 			...getBaseResourceProperties(),
 			anonymousId: cart.anonymousId,
 			billingAddress: cart.billingAddress,
@@ -110,6 +111,16 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			totalPrice: cart.totalPrice,
 			store: cart.store,
 		};
+
+		const { taxedPrice, taxedShippingPrice } = calculateTaxTotals({
+			lineItems: cart.lineItems,
+			customLineItems: cart.customLineItems,
+			shippingInfo: cart.shippingInfo,
+			totalPrice: cart.totalPrice,
+		});
+		resource.taxedPrice = resource.taxedPrice ?? taxedPrice;
+		resource.taxedShippingPrice =
+			resource.taxedShippingPrice ?? taxedShippingPrice;
 		return this.saveNew(context, resource);
 	}
 
@@ -194,6 +205,16 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			});
 		}
 
+		const { taxedPrice, taxedShippingPrice } = calculateTaxTotals({
+			lineItems: resource.lineItems,
+			customLineItems: resource.customLineItems,
+			shippingInfo: resource.shippingInfo,
+			totalPrice: resource.totalPrice,
+		});
+		resource.taxedPrice = resource.taxedPrice ?? taxedPrice;
+		resource.taxedShippingPrice =
+			resource.taxedShippingPrice ?? taxedShippingPrice;
+
 		return this.saveNew(context, resource);
 	}
 
@@ -238,6 +259,12 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			throw new Error("No product found");
 		}
 
+		const quantity = draft.quantity ?? 1;
+		const totalPrice = createCentPrecisionMoney({
+			...draft.price.value,
+			centAmount: (draft.price.value.centAmount ?? 0) * quantity,
+		});
+
 		const lineItem: LineItem = {
 			...getBaseResourceProperties(),
 			custom: createCustomFields(
@@ -252,12 +279,17 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			priceMode: "Platform",
 			productId: product.id,
 			productType: product.productType,
-			quantity: draft.quantity,
+			quantity,
 			state: draft.state || [],
 			taxRate: draft.taxRate,
+			taxedPrice: calculateTaxedPriceFromRate(
+				totalPrice.centAmount,
+				totalPrice.currencyCode,
+				draft.taxRate,
+			),
 			taxedPricePortions: [],
 			perMethodTaxRate: [],
-			totalPrice: createCentPrecisionMoney(draft.price.value),
+			totalPrice,
 			variant: {
 				id: variant.id,
 				sku: variant.sku,
@@ -273,6 +305,12 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		context: RepositoryContext,
 		draft: CustomLineItemImportDraft,
 	): CustomLineItem {
+		const quantity = draft.quantity ?? 1;
+		const totalPrice = createCentPrecisionMoney({
+			...draft.money,
+			centAmount: (draft.money.centAmount ?? 0) * quantity,
+		});
+
 		const lineItem: CustomLineItem = {
 			...getBaseResourceProperties(),
 			custom: createCustomFields(
@@ -283,12 +321,17 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			discountedPricePerQuantity: [],
 			money: createTypedMoney(draft.money),
 			name: draft.name,
-			quantity: draft.quantity ?? 0,
+			quantity,
 			perMethodTaxRate: [],
 			priceMode: draft.priceMode ?? "Standard",
 			slug: draft.slug,
 			state: [],
-			totalPrice: createCentPrecisionMoney(draft.money),
+			totalPrice,
+			taxedPrice: calculateTaxedPriceFromRate(
+				totalPrice.centAmount,
+				totalPrice.currencyCode,
+				draft.taxRate,
+			),
 			taxedPricePortions: [],
 		};
 
