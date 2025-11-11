@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.60.0
+
+### Minor Changes
+
+- [#349](https://github.com/labd/commercetools-node-mock/pull/349) [`85b06f7`](https://github.com/labd/commercetools-node-mock/commit/85b06f70426d98359ac6fb182f36cb2c65243df0) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add taxedPrice to cart and order
+
+- [#346](https://github.com/labd/commercetools-node-mock/pull/346) [`375f7a2`](https://github.com/labd/commercetools-node-mock/commit/375f7a2eb6efc47ec61bcddfb9ed3cea7081c3ef) Thanks [@robertmoelker](https://github.com/robertmoelker)! - feat(cart): add support for set line-item prices
+
 ## 2.59.1
 
 ### Patch Changes
