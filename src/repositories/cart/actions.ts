@@ -28,6 +28,7 @@ import type {
 	CartSetDirectDiscountsAction,
 	CartSetLineItemCustomFieldAction,
 	CartSetLineItemCustomTypeAction,
+	CartSetLineItemPriceAction,
 	CartSetLineItemShippingDetailsAction,
 	CartSetLocaleAction,
 	CartSetShippingAddressAction,
@@ -738,6 +739,72 @@ export class CartUpdateHandler
 				fields: fields || {},
 			};
 		}
+	}
+
+	setLineItemPrice(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ lineItemId, lineItemKey, externalPrice }: CartSetLineItemPriceAction,
+	) {
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+
+		if (!lineItem) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		if (!externalPrice && lineItem.priceMode !== "ExternalPrice") {
+			return;
+		}
+
+		if (
+			externalPrice &&
+			externalPrice.currencyCode !== resource.totalPrice.currencyCode
+		) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: `Currency mismatch. Expected '${resource.totalPrice.currencyCode}' but got '${externalPrice.currencyCode}'.`,
+			});
+		}
+
+		if (externalPrice) {
+			lineItem.priceMode = "ExternalPrice";
+			const priceValue = createTypedMoney(externalPrice);
+
+			lineItem.price = lineItem.price ?? { id: uuidv4() };
+			lineItem.price.value = priceValue;
+		} else {
+			lineItem.priceMode = "Platform";
+
+			const price = selectPrice({
+				prices: lineItem.variant.prices,
+				currency: resource.totalPrice.currencyCode,
+				country: resource.country,
+			});
+
+			if (!price) {
+				throw new Error(
+					`No valid price found for ${lineItem.productId} for country ${resource.country} and currency ${resource.totalPrice.currencyCode}`,
+				);
+			}
+
+			lineItem.price = price;
+		}
+
+		const lineItemTotal = calculateLineItemTotalPrice(lineItem);
+		lineItem.totalPrice = createCentPrecisionMoney({
+			...lineItem.price!.value,
+			centAmount: lineItemTotal,
+		});
+		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 	}
 
 	setLineItemShippingDetails(
