@@ -6,9 +6,9 @@ import type {
 	AttributeGroupSetKeyAction,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
-import { AttributeGroupRepository } from "./attribute-group";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { AttributeGroupRepository } from "./attribute-group.ts";
 
 describe("AttributeGroup Repository", () => {
 	const storage = new InMemoryStorage();

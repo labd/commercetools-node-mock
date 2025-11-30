@@ -2,7 +2,7 @@ import type {
 	ShippingRate,
 	ShippingRateDraft,
 } from "@commercetools/platform-sdk";
-import { createTypedMoney } from "../helpers";
+import { createTypedMoney } from "../helpers.ts";
 
 export const transformShippingRate = (
 	rate: ShippingRateDraft,

@@ -1,15 +1,13 @@
 import { isDeepStrictEqual } from "node:util";
 import type {
-	ShippingMethodChangeTaxCategoryAction,
-	ShippingMethodRemoveShippingRateAction,
-} from "@commercetools/platform-sdk";
-import type {
 	ShippingMethod,
 	ShippingMethodAddShippingRateAction,
 	ShippingMethodAddZoneAction,
 	ShippingMethodChangeActiveAction,
 	ShippingMethodChangeIsDefaultAction,
 	ShippingMethodChangeNameAction,
+	ShippingMethodChangeTaxCategoryAction,
+	ShippingMethodRemoveShippingRateAction,
 	ShippingMethodRemoveZoneAction,
 	ShippingMethodSetCustomFieldAction,
 	ShippingMethodSetCustomTypeAction,
@@ -21,14 +19,14 @@ import type {
 	ShippingMethodUpdateAction,
 	ZoneReference,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "~src/types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
-import { transformShippingRate } from "./helpers";
+} from "../helpers.ts";
+import { transformShippingRate } from "./helpers.ts";
 
 export class ShippingMethodUpdateHandler
 	extends AbstractUpdateHandler

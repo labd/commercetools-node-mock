@@ -1,9 +1,4 @@
 import type {
-	CartSetAnonymousIdAction,
-	CartSetCustomerIdAction,
-	CartUpdateAction,
-} from "@commercetools/platform-sdk";
-import type {
 	Address,
 	AddressDraft,
 	Cart,
@@ -18,13 +13,15 @@ import type {
 	CartRemoveDiscountCodeAction,
 	CartRemoveLineItemAction,
 	CartRemoveShippingMethodAction,
+	CartSetAnonymousIdAction,
 	CartSetBillingAddressAction,
 	CartSetBillingAddressCustomTypeAction,
 	CartSetCountryAction,
+	CartSetCustomerEmailAction,
+	CartSetCustomerIdAction,
 	CartSetCustomFieldAction,
 	CartSetCustomShippingMethodAction,
 	CartSetCustomTypeAction,
-	CartSetCustomerEmailAction,
 	CartSetDirectDiscountsAction,
 	CartSetLineItemCustomFieldAction,
 	CartSetLineItemCustomTypeAction,
@@ -35,6 +32,7 @@ import type {
 	CartSetShippingAddressCustomFieldAction,
 	CartSetShippingAddressCustomTypeAction,
 	CartSetShippingMethodAction,
+	CartUpdateAction,
 	CustomFields,
 	GeneralError,
 	ItemShippingDetails,
@@ -42,7 +40,6 @@ import type {
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
-	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
 import type {
 	CustomLineItem,
@@ -50,23 +47,23 @@ import type {
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
 import type { ShippingMethodResourceIdentifier } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/shipping-method";
 import { v4 as uuidv4 } from "uuid";
-import { CommercetoolsError } from "~src/exceptions";
-import type { Writable } from "~src/types";
-import type { CartRepository } from ".";
-import type { UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { Writable } from "#src/types.ts";
+import type { UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
 import {
 	createAddress,
 	createCentPrecisionMoney,
 	createCustomFields,
 	createTypedMoney,
-} from "../helpers";
+} from "../helpers.ts";
 import {
 	calculateCartTotalPrice,
 	calculateLineItemTotalPrice,
 	createCustomLineItemFromDraft,
 	selectPrice,
-} from "./helpers";
+} from "./helpers.ts";
+import type { CartRepository } from "./index.ts";
 
 export class CartUpdateHandler
 	extends AbstractUpdateHandler
@@ -857,7 +854,7 @@ export class CartUpdateHandler
 			return;
 		}
 
-		let custom: CustomFields | undefined = undefined;
+		let custom: CustomFields | undefined;
 		if ((address as Address & AddressDraft).custom) {
 			custom = createCustomFields(
 				(address as Address & AddressDraft).custom,

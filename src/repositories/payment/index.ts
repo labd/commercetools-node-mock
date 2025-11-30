@@ -3,17 +3,17 @@ import type {
 	PaymentDraft,
 	StateReference,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import type { RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
 import {
 	createCentPrecisionMoney,
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
-import { PaymentUpdateHandler } from "./actions";
-import { transactionFromTransactionDraft } from "./helpers";
+} from "../helpers.ts";
+import { PaymentUpdateHandler } from "./actions.ts";
+import { transactionFromTransactionDraft } from "./helpers.ts";
 
 export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 	constructor(config: Config) {

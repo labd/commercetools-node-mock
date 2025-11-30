@@ -10,16 +10,16 @@ import type {
 	StateReference,
 	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { getBaseResourceProperties } from "~src/helpers";
-import { ReviewStatisticsService } from "~src/lib/review-statistics";
-import { ProductSearch } from "~src/product-search";
-import type { GetParams, RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
-import { getReferenceFromResourceIdentifier } from "../helpers";
-import { ProductUpdateHandler } from "./actions";
-import { variantFromDraft } from "./helpers";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { ReviewStatisticsService } from "#src/lib/review-statistics.ts";
+import { ProductSearch } from "#src/product-search.ts";
+import type { GetParams, RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
+import { getReferenceFromResourceIdentifier } from "../helpers.ts";
+import { ProductUpdateHandler } from "./actions.ts";
+import { variantFromDraft } from "./helpers.ts";
 
 export class ProductRepository extends AbstractResourceRepository<"product"> {
 	protected _searchService: ProductSearch;
@@ -37,7 +37,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 			throw new Error("Missing master variant");
 		}
 
-		let productType: ProductTypeReference | undefined = undefined;
+		let productType: ProductTypeReference | undefined;
 		try {
 			productType = getReferenceFromResourceIdentifier<ProductTypeReference>(
 				draft.productType,
@@ -83,7 +83,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		});
 
 		// Resolve Tax category
-		let taxCategoryReference: TaxCategoryReference | undefined = undefined;
+		let taxCategoryReference: TaxCategoryReference | undefined;
 		if (draft.taxCategory) {
 			taxCategoryReference =
 				getReferenceFromResourceIdentifier<TaxCategoryReference>(
@@ -94,7 +94,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		}
 
 		// Resolve Product State
-		let productStateReference: StateReference | undefined = undefined;
+		let productStateReference: StateReference | undefined;
 		if (draft.state) {
 			productStateReference =
 				getReferenceFromResourceIdentifier<StateReference>(

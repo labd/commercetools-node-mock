@@ -8,10 +8,10 @@ import type {
 	TaxCategorySetKeyAction,
 	TaxCategoryUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "~src/types";
-import type { RepositoryContext } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
-import { taxRateFromTaxRateDraft } from "./helpers";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
+import { taxRateFromTaxRateDraft } from "./helpers.ts";
 
 type TaxCategoryUpdateHandlerMethod<T> = (
 	context: RepositoryContext,

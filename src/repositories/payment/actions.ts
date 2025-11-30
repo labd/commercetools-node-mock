@@ -8,9 +8,9 @@ import type {
 	PaymentChangeTransactionStateAction,
 	PaymentChangeTransactionTimestampAction,
 	PaymentSetAnonymousIdAction,
+	PaymentSetCustomerAction,
 	PaymentSetCustomFieldAction,
 	PaymentSetCustomTypeAction,
-	PaymentSetCustomerAction,
 	PaymentSetInterfaceIdAction,
 	PaymentSetKeyAction,
 	PaymentSetMethodInfoAction,
@@ -30,15 +30,15 @@ import type {
 	State,
 	Transaction,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "~src/types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
 import {
 	createCentPrecisionMoney,
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
-import { transactionFromTransactionDraft } from "./helpers";
+} from "../helpers.ts";
+import { transactionFromTransactionDraft } from "./helpers.ts";
 
 export class PaymentUpdateHandler
 	extends AbstractUpdateHandler

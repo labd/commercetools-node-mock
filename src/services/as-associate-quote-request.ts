@@ -1,7 +1,6 @@
 import { Router } from "express";
-import type { MyQuoteRequestRepository } from "~src/repositories/my-quote-request";
-import type { MyOrderRepository } from "../repositories/my-order";
-import AbstractService from "./abstract";
+import type { MyQuoteRequestRepository } from "#src/repositories/my-quote-request.ts";
+import AbstractService from "./abstract.ts";
 
 export class AsAssociateQuoteRequestService extends AbstractService {
 	public repository: MyQuoteRequestRepository;

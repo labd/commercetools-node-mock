@@ -1,10 +1,10 @@
-import type { BusinessUnit, CompanyDraft } from "@commercetools/platform-sdk";
+import type { BusinessUnit } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { businessUnitDraftFactory } from "~src/testing/business-unit";
-import { customerDraftFactory } from "~src/testing/customer";
-import { typeDraftFactory } from "~src/testing/type";
-import { CommercetoolsMock } from "../ctMock";
+import { businessUnitDraftFactory } from "#src/testing/business-unit.ts";
+import { customerDraftFactory } from "#src/testing/customer.ts";
+import { typeDraftFactory } from "#src/testing/type.ts";
+import { CommercetoolsMock } from "../ctMock.ts";
 
 describe("Business units query", () => {
 	const ctMock = new CommercetoolsMock();

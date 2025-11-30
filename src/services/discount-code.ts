@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { DiscountCodeRepository } from "../repositories/discount-code/index";
-import AbstractService from "./abstract";
+import type { DiscountCodeRepository } from "../repositories/discount-code/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class DiscountCodeService extends AbstractService {
 	public repository: DiscountCodeRepository;

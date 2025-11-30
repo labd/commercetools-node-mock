@@ -6,18 +6,18 @@ import type {
 	ShoppingListDraft,
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../../helpers";
-import type { Writable } from "../../types";
-import type { RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../../helpers.ts";
+import type { Writable } from "../../types.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
 import {
 	createCustomFields,
 	getBusinessUnitKeyReference,
 	getReferenceFromResourceIdentifier,
 	getStoreKeyReference,
-} from "../helpers";
-import { ShoppingListUpdateHandler } from "./actions";
+} from "../helpers.ts";
+import { ShoppingListUpdateHandler } from "./actions.ts";
 
 export class ShoppingListRepository extends AbstractResourceRepository<"shopping-list"> {
 	constructor(config: Config) {

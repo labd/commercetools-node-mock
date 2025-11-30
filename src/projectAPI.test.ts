@@ -1,5 +1,5 @@
 import { test } from "vitest";
-import { CommercetoolsMock } from "./index";
+import { CommercetoolsMock } from "./index.ts";
 
 test("getRepository", async () => {
 	const ctMock = new CommercetoolsMock();

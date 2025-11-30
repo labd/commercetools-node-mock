@@ -3,10 +3,10 @@ import type {
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
-} from "~src/repositories/as-associate";
-import { AsAssociateCartService } from "./as-associate-cart";
-import { AsAssociateOrderService } from "./as-associate-order";
-import { AsAssociateQuoteRequestService } from "./as-associate-quote-request";
+} from "#src/repositories/as-associate.ts";
+import { AsAssociateCartService } from "./as-associate-cart.ts";
+import { AsAssociateOrderService } from "./as-associate-order.ts";
+import { AsAssociateQuoteRequestService } from "./as-associate-quote-request.ts";
 
 type Repositories = {
 	cart: AsAssociateCartRepository;

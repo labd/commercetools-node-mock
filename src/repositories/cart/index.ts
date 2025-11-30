@@ -1,41 +1,36 @@
 import type {
 	BusinessUnit,
-	InvalidOperationError,
-	MissingTaxRateForCountryError,
-	ShippingMethodDoesNotMatchCartError,
-} from "@commercetools/platform-sdk";
-import type {
 	Cart,
 	CartDraft,
-	CustomLineItem,
-	CustomLineItemDraft,
 	GeneralError,
+	InvalidOperationError,
 	LineItem,
 	LineItemDraft,
 	Product,
 	ProductPagedQueryResponse,
+	ShippingMethodDoesNotMatchCartError,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { getBaseResourceProperties } from "~src/helpers";
-import { calculateTaxTotals } from "~src/lib/tax";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { calculateTaxTotals } from "#src/lib/tax.ts";
 import {
 	createShippingInfoFromMethod,
 	getShippingMethodsMatchingCart,
-} from "~src/shipping";
-import type { Writable } from "~src/types";
+} from "#src/shipping.ts";
+import type { Writable } from "#src/types.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { createAddress, createCustomFields } from "../helpers";
-import { CartUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { createAddress, createCustomFields } from "../helpers.ts";
+import { CartUpdateHandler } from "./actions.ts";
 import {
 	calculateCartTotalPrice,
 	createCustomLineItemFromDraft,
 	selectPrice,
-} from "./helpers";
+} from "./helpers.ts";
 
 export class CartRepository extends AbstractResourceRepository<"cart"> {
 	constructor(config: Config) {
@@ -59,7 +54,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			});
 		}
 
-		let storedBusinessUnit: BusinessUnit | undefined = undefined;
+		let storedBusinessUnit: BusinessUnit | undefined;
 		if (draft.businessUnit?.id || draft.businessUnit?.key) {
 			storedBusinessUnit =
 				this._storage.getByResourceIdentifier<"business-unit">(

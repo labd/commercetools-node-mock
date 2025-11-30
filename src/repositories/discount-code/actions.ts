@@ -15,10 +15,10 @@ import type {
 	DiscountCodeSetValidUntilAction,
 	DiscountCodeUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "~src/types";
-import type { UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
-import { createCustomFields } from "../helpers";
+import type { Writable } from "#src/types.ts";
+import type { UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
+import { createCustomFields } from "../helpers.ts";
 
 export class DiscountCodeUpdateHandler
 	extends AbstractUpdateHandler

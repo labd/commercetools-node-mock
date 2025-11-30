@@ -35,19 +35,19 @@ import type {
 	StateReference,
 	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import type { Writable } from "~src/types";
-import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { Writable } from "#src/types.ts";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
+} from "../helpers.ts";
 import {
 	checkForStagedChanges,
 	getVariant,
 	priceFromDraft,
 	variantFromDraft,
-} from "./helpers";
+} from "./helpers.ts";
 
 type ProductUpdateHandlerMethod<T> = (
 	context: RepositoryContext,
@@ -944,7 +944,7 @@ export class ProductUpdateHandler
 		resource: Writable<Product>,
 		{ taxCategory }: ProductSetTaxCategoryAction,
 	) {
-		let taxCategoryReference: TaxCategoryReference | undefined = undefined;
+		let taxCategoryReference: TaxCategoryReference | undefined;
 		if (taxCategory) {
 			taxCategoryReference =
 				getReferenceFromResourceIdentifier<TaxCategoryReference>(
@@ -972,7 +972,7 @@ export class ProductUpdateHandler
 		resource: Writable<Product>,
 		{ state, force }: ProductTransitionStateAction,
 	) {
-		let productStateReference: StateReference | undefined = undefined;
+		let productStateReference: StateReference | undefined;
 		if (state) {
 			productStateReference =
 				getReferenceFromResourceIdentifier<StateReference>(

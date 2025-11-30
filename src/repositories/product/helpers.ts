@@ -11,14 +11,14 @@ import type {
 	ProductVariantDraft,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { AbstractStorage } from "~src/storage";
-import type { Writable } from "~src/types";
-import type { RepositoryContext } from "../abstract";
+import type { AbstractStorage } from "#src/storage/index.ts";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext } from "../abstract.ts";
 import {
 	createCustomFields,
 	createTypedMoney,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
+} from "../helpers.ts";
 
 interface VariantResult {
 	variant: Writable<ProductVariant> | undefined;

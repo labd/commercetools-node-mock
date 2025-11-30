@@ -7,11 +7,11 @@ import type {
 	QuoteUpdateAction,
 	StateReference,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import type { Writable } from "~src/types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
-import { getReferenceFromResourceIdentifier } from "../helpers";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
+import { getReferenceFromResourceIdentifier } from "../helpers.ts";
 
 export class QuoteUpdateHandler
 	extends AbstractUpdateHandler
@@ -59,7 +59,7 @@ export class QuoteUpdateHandler
 		resource: Writable<Quote>,
 		{ state, force }: QuoteTransitionStateAction,
 	) {
-		let stateReference: StateReference | undefined = undefined;
+		let stateReference: StateReference | undefined;
 		if (state) {
 			stateReference = getReferenceFromResourceIdentifier<StateReference>(
 				state,

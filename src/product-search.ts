@@ -6,12 +6,12 @@ import type {
 	ProductSearchRequest,
 	ProductSearchResult,
 } from "@commercetools/platform-sdk";
-import type { Config } from "./config";
-import { CommercetoolsError } from "./exceptions";
-import { parseSearchQuery } from "./lib/productSearchFilter";
-import { validateSearchQuery } from "./lib/searchQueryTypeChecker";
-import { applyPriceSelector } from "./priceSelector";
-import type { AbstractStorage } from "./storage";
+import type { Config } from "./config.ts";
+import { CommercetoolsError } from "./exceptions.ts";
+import { parseSearchQuery } from "./lib/productSearchFilter.ts";
+import { validateSearchQuery } from "./lib/searchQueryTypeChecker.ts";
+import { applyPriceSelector } from "./priceSelector.ts";
+import type { AbstractStorage } from "./storage/index.ts";
 
 interface ProductSearchVariantAvailability {
 	isOnStock: boolean;
@@ -78,7 +78,6 @@ export class ProductSearch {
 					matchFunc(resource, markMatchingVariant),
 				);
 			} catch (err) {
-				console.error(err);
 				throw new CommercetoolsError<InvalidInputError>(
 					{
 						code: "InvalidInput",

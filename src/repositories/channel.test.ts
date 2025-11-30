@@ -9,10 +9,10 @@ import type {
 	ChannelSetGeoLocationAction,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import { InMemoryStorage } from "~src/storage";
-import { ChannelRepository } from "./channel";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { ChannelRepository } from "./channel.ts";
 
 describe("Channel Repository", () => {
 	const storage = new InMemoryStorage();

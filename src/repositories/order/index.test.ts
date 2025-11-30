@@ -6,10 +6,10 @@ import type {
 	OrderImportDraft,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import { InMemoryStorage } from "~src/storage";
-import { OrderRepository } from "./index";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { OrderRepository } from "./index.ts";
 
 describe("Order repository", () => {
 	const storage = new InMemoryStorage();
@@ -460,9 +460,8 @@ describe("Order repository", () => {
 	test("import exiting product", async () => {
 		storage.add("dummy", "product", {
 			id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
-			// @ts-ignore
 			masterData: {
-				// @ts-ignore
+				// @ts-expect-error
 				current: {
 					name: { "nl-NL": "Dummy" },
 					slug: { "nl-NL": "Dummy" },
@@ -585,7 +584,7 @@ describe("Order repository", () => {
 		  productType: {
 			typeId: 'product-type',
 			id: '109caecb-abe6-4900-ab03-7af5af985ff3',
-			// @ts-ignore
+			// @ts-expect-error
 			version: 1,
 		  },
 		  variant: {
@@ -595,7 +594,7 @@ describe("Order repository", () => {
 			prices: [
 			  {
 				value: {
-				  // @ts-ignore
+				  // @ts-expect-error
 				  type: 'centPrecision',
 				  currencyCode: 'EUR',
 				  centAmount: 14900,
@@ -622,7 +621,7 @@ describe("Order repository", () => {
 		  },
 		  price: {
 			value: {
-			  // @ts-ignore
+			  // @ts-expect-error
 			  type: 'centPrecision',
 			  currencyCode: 'EUR',
 			  centAmount: 14900,

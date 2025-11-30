@@ -7,9 +7,9 @@ import type {
 	ExtensionSetTimeoutInMsAction,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
-import { ExtensionRepository } from "./extension";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { ExtensionRepository } from "./extension.ts";
 
 describe("Extension Repository", () => {
 	const storage = new InMemoryStorage();

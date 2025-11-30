@@ -3,9 +3,9 @@ import type {
 	TransactionDraft,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { AbstractStorage } from "~src/storage";
-import type { RepositoryContext } from "../abstract";
-import { createCentPrecisionMoney, createCustomFields } from "../helpers";
+import type { AbstractStorage } from "#src/storage/index.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { createCentPrecisionMoney, createCustomFields } from "../helpers.ts";
 
 export const transactionFromTransactionDraft = (
 	context: RepositoryContext,

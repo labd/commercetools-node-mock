@@ -1,11 +1,10 @@
 import type {
 	BusinessUnit,
 	BusinessUnitDraft,
-	CompanyDraft,
 } from "@commercetools/platform-sdk";
 import { Factory } from "fishery";
 import supertest from "supertest";
-import type { CommercetoolsMock } from "~src/ctMock";
+import type { CommercetoolsMock } from "#src/ctMock.ts";
 
 export const businessUnitDraftFactory = (m: CommercetoolsMock) =>
 	Factory.define<BusinessUnitDraft, BusinessUnitDraft, BusinessUnit>(

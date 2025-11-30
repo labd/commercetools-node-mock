@@ -1,12 +1,12 @@
 import type { Update } from "@commercetools/platform-sdk";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import { updateRequestSchema } from "~src/schemas/update-request";
-import { validateData } from "~src/validate";
-import { hashPassword } from "../lib/password";
-import { getRepositoryContext } from "../repositories/helpers";
-import type { MyCustomerRepository } from "../repositories/my-customer";
-import AbstractService from "./abstract";
+import { updateRequestSchema } from "#src/schemas/update-request.ts";
+import { validateData } from "#src/validate.ts";
+import { hashPassword } from "../lib/password.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import type { MyCustomerRepository } from "../repositories/my-customer.ts";
+import AbstractService from "./abstract.ts";
 
 export class MyCustomerService extends AbstractService {
 	public repository: MyCustomerRepository;

@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { ZoneRepository } from "../repositories/zone";
-import AbstractService from "./abstract";
+import type { ZoneRepository } from "../repositories/zone.ts";
+import AbstractService from "./abstract.ts";
 
 export class ZoneService extends AbstractService {
 	public repository: ZoneRepository;

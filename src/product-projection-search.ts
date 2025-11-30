@@ -3,30 +3,29 @@ import type {
 	FilteredFacetResult,
 	InvalidInputError,
 	Product,
-	ProductData,
 	ProductProjection,
 	ProductProjectionPagedSearchResponse,
 	QueryParam,
 	RangeFacetResult,
 	TermFacetResult,
 } from "@commercetools/platform-sdk";
-import type { Config } from "./config";
-import { CommercetoolsError } from "./exceptions";
-import { nestedLookup } from "./helpers";
+import type { Config } from "./config.ts";
+import { CommercetoolsError } from "./exceptions.ts";
+import { nestedLookup } from "./helpers.ts";
 import type {
 	FilterExpression,
 	RangeExpression,
-} from "./lib/projectionSearchFilter";
+} from "./lib/projectionSearchFilter.ts";
 import {
 	generateFacetFunc,
 	getVariants,
 	parseFilterExpression,
 	resolveVariantValue,
-} from "./lib/projectionSearchFilter";
-import { ReviewStatisticsService } from "./lib/review-statistics";
-import { applyPriceSelector } from "./priceSelector";
-import type { AbstractStorage } from "./storage";
-import type { Writable } from "./types";
+} from "./lib/projectionSearchFilter.ts";
+import { ReviewStatisticsService } from "./lib/review-statistics.ts";
+import { applyPriceSelector } from "./priceSelector.ts";
+import type { AbstractStorage } from "./storage/index.ts";
+import type { Writable } from "./types.ts";
 
 export type ProductProjectionSearchParams = {
 	fuzzy?: boolean;
@@ -94,7 +93,6 @@ export class ProductProjectionSearch {
 					filters.every((f) => f(resource, markMatchingVariant)),
 				);
 			} catch (err) {
-				console.error(err);
 				throw new CommercetoolsError<InvalidInputError>(
 					{
 						code: "InvalidInput",
@@ -364,7 +362,7 @@ export class ProductProjectionSearch {
 			}) || [];
 		const data: RangeFacetResult = {
 			type: "range",
-			// @ts-ignore
+			// @ts-expect-error
 			dataType: "number",
 			ranges: counts,
 		};

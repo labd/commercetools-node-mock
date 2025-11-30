@@ -1,7 +1,7 @@
 import type { AssociateRole } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "../ctMock";
+import { CommercetoolsMock } from "../ctMock.ts";
 
 describe("Associate roles query", () => {
 	const ctMock = new CommercetoolsMock();

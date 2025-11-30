@@ -2,13 +2,13 @@ import type {
 	DiscountGroup,
 	DiscountGroupDraft,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { DiscountGroupUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { DiscountGroupUpdateHandler } from "./actions.ts";
 
 export class DiscountGroupRepository extends AbstractResourceRepository<"discount-group"> {
 	constructor(config: Config) {

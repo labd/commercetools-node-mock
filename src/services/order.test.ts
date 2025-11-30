@@ -1,14 +1,9 @@
 import assert from "node:assert";
-import type {
-	CentPrecisionMoney,
-	Order,
-	Payment,
-	State,
-} from "@commercetools/platform-sdk";
+import type { Order, Payment, State } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { generateRandomString } from "~src/helpers";
-import { CommercetoolsMock, getBaseResourceProperties } from "../index";
+import { generateRandomString } from "#src/helpers.ts";
+import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
 describe("Order Query", () => {
 	const ctMock = new CommercetoolsMock();
@@ -1035,9 +1030,8 @@ describe("Order Import", () => {
 	const ctMock = new CommercetoolsMock();
 	ctMock.project("dummy").add("product", {
 		id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
-		// @ts-ignore
 		masterData: {
-			// @ts-ignore
+			// @ts-expect-error
 			current: {
 				name: { "nl-NL": "Dummy" },
 				slug: { "nl-NL": "Dummy" },
@@ -1092,7 +1086,6 @@ describe("Order Import", () => {
 						productType: {
 							typeId: "product-type",
 							id: "109caecb-abe6-4900-ab03-7af5af985ff3",
-							// @ts-ignore
 							version: 1,
 						},
 						variant: {

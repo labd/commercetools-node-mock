@@ -1,8 +1,8 @@
 import type { Store } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
-import { CustomerRepository } from "./index";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { CustomerRepository } from "./index.ts";
 
 describe("Customer repository", () => {
 	const storage = new InMemoryStorage();

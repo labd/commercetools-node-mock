@@ -6,13 +6,13 @@ import express, {
 	type Request,
 	type Response,
 } from "express";
-import type { AuthError, InvalidRequestError } from "~src/exceptions";
-import { CommercetoolsError } from "~src/exceptions";
-import { hashPassword } from "../lib/password";
-import type { CustomerRepository } from "../repositories/customer";
-import type { InvalidClientError, UnsupportedGrantType } from "./errors";
-import { getBearerToken } from "./helpers";
-import { OAuth2Store } from "./store";
+import type { AuthError, InvalidRequestError } from "#src/exceptions.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { hashPassword } from "../lib/password.ts";
+import type { CustomerRepository } from "../repositories/customer/index.ts";
+import type { InvalidClientError, UnsupportedGrantType } from "./errors.ts";
+import { getBearerToken } from "./helpers.ts";
+import { OAuth2Store } from "./store.ts";
 
 type AuthRequest = Request & {
 	credentials?: {

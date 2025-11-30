@@ -2,14 +2,14 @@ import type {
 	InventoryEntry,
 	InventoryEntryDraft,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { createCustomFields } from "../helpers";
-import { InventoryEntryUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { createCustomFields } from "../helpers.ts";
+import { InventoryEntryUpdateHandler } from "./actions.ts";
 
 export class InventoryEntryRepository extends AbstractResourceRepository<"inventory-entry"> {
 	constructor(config: Config) {

@@ -1,18 +1,14 @@
-import assert from "node:assert";
 import type {
 	RecurrencePolicy,
 	RecurrencePolicyDraft,
-	RecurringOrder,
-	RecurringOrderDraft,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { OrderRepository } from "../order";
-import { RecurrencePolicyUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { RecurrencePolicyUpdateHandler } from "./actions.ts";
 
 export class RecurrencePolicyRepository extends AbstractResourceRepository<"recurrence-policy"> {
 	constructor(config: Config) {

@@ -1,9 +1,9 @@
 import type { Cart, CartDraft, Order } from "@commercetools/platform-sdk";
 import type { Request, Response, Router } from "express";
-import type { CartRepository } from "../repositories/cart";
-import { getRepositoryContext } from "../repositories/helpers";
-import type { OrderRepository } from "../repositories/order";
-import AbstractService from "./abstract";
+import type { CartRepository } from "../repositories/cart/index.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import type { OrderRepository } from "../repositories/order/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class CartService extends AbstractService {
 	public repository: CartRepository;
@@ -31,7 +31,6 @@ export class CartService extends AbstractService {
 	replicate(request: Request, response: Response) {
 		const context = getRepositoryContext(request);
 
-		// @ts-ignore
 		const cartOrOrder: Cart | Order | null =
 			request.body.reference.typeId === "order"
 				? this.orderRepository.get(context, request.body.reference.id)

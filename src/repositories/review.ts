@@ -2,14 +2,12 @@ import type {
 	ChannelReference,
 	CustomerReference,
 	ProductReference,
-} from "@commercetools/platform-sdk";
-import type {
 	Review,
 	ReviewDraft,
 	ReviewSetAuthorNameAction,
+	ReviewSetCustomerAction,
 	ReviewSetCustomFieldAction,
 	ReviewSetCustomTypeAction,
-	ReviewSetCustomerAction,
 	ReviewSetKeyAction,
 	ReviewSetLocaleAction,
 	ReviewSetRatingAction,
@@ -20,15 +18,18 @@ import type {
 	ReviewUpdateAction,
 	StateReference,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
-import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+} from "./abstract.ts";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from "./helpers";
+} from "./helpers.ts";
 
 export class ReviewRepository extends AbstractResourceRepository<"review"> {
 	constructor(config: Config) {

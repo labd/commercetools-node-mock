@@ -20,10 +20,10 @@ import type {
 	CategoryUpdateAction,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { Writable } from "~src/types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
-import { createCustomFields } from "../helpers";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
+import { createCustomFields } from "../helpers.ts";
 
 export class CategoryUpdateHandler
 	extends AbstractUpdateHandler

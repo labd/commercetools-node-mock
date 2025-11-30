@@ -2,12 +2,12 @@ import type {
 	TaxCategory,
 	TaxCategoryDraft,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import type { RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
-import { TaxCategoryUpdateHandler } from "./actions";
-import { taxRateFromTaxRateDraft } from "./helpers";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
+import { TaxCategoryUpdateHandler } from "./actions.ts";
+import { taxRateFromTaxRateDraft } from "./helpers.ts";
 
 export class TaxCategoryRepository extends AbstractResourceRepository<"tax-category"> {
 	constructor(config: Config) {

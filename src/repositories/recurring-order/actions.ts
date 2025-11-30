@@ -11,9 +11,9 @@ import type {
 	RecurringOrderTransitionStateAction,
 	RecurringOrderUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "~src/types";
-import type { UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
+import type { Writable } from "#src/types.ts";
+import type { UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
 
 export class RecurringOrderUpdateHandler
 	extends AbstractUpdateHandler

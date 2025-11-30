@@ -3,13 +3,16 @@ import type {
 	CustomObjectDraft,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { cloneObject, getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { QueryParams } from "./abstract";
-import { AbstractResourceRepository, type RepositoryContext } from "./abstract";
-import { checkConcurrentModification } from "./errors";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { cloneObject, getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { QueryParams } from "./abstract.ts";
+import {
+	AbstractResourceRepository,
+	type RepositoryContext,
+} from "./abstract.ts";
+import { checkConcurrentModification } from "./errors.ts";
 
 export class CustomObjectRepository extends AbstractResourceRepository<"key-value-document"> {
 	constructor(config: Config) {
@@ -88,7 +91,7 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 			where: whereClause,
 		});
 
-		// @ts-ignore
+		// @ts-expect-error
 		result.results = result.results.map((r) =>
 			this.postProcessResource(context, r as CustomObject, {
 				expand: params.expand,

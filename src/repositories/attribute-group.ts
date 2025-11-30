@@ -7,15 +7,15 @@ import type {
 	AttributeGroupSetKeyAction,
 	AttributeGroupUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { UpdateHandlerInterface } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
 	type RepositoryContext,
-} from "./abstract";
+} from "./abstract.ts";
 
 export class AttributeGroupRepository extends AbstractResourceRepository<"attribute-group"> {
 	constructor(config: Config) {

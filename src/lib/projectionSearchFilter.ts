@@ -6,9 +6,9 @@ import type {
 	ProductProjection,
 	ProductVariant,
 } from "@commercetools/platform-sdk";
-import { nestedLookup } from "../helpers";
-import type { Writable } from "../types";
-import { Lexer, Parser } from "./parser";
+import { nestedLookup } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import { Lexer, Parser } from "./parser.ts";
 
 type MatchFunc = (target: any) => boolean;
 
@@ -143,7 +143,7 @@ const parseFilter = (filter: string): ExpressionSet => {
 				({
 					type: "Symbol",
 					kind: "string",
-					// @ts-ignore
+					// @ts-expect-error
 					value: t.token.groups[1],
 				}) as TypeSymbol,
 		)

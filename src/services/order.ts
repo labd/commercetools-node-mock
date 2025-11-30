@@ -1,7 +1,7 @@
 import type { Request, Response, Router } from "express";
-import { getRepositoryContext } from "../repositories/helpers";
-import type { OrderRepository } from "../repositories/order/index";
-import AbstractService from "./abstract";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import type { OrderRepository } from "../repositories/order/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class OrderService extends AbstractService {
 	public repository: OrderRepository;
@@ -38,7 +38,7 @@ export class OrderService extends AbstractService {
 			getRepositoryContext(request),
 			orderNumber,
 
-			// @ts-ignore
+			// @ts-expect-error
 			request.query,
 		);
 		if (resource) {

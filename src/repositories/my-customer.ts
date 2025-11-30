@@ -5,11 +5,11 @@ import type {
 	MyCustomerEmailVerify,
 	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import { hashPassword, validateEmailVerifyToken } from "../lib/password";
-import type { Writable } from "../types";
-import type { RepositoryContext } from "./abstract";
-import { CustomerRepository } from "./customer";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { hashPassword, validateEmailVerifyToken } from "../lib/password.ts";
+import type { Writable } from "../types.ts";
+import type { RepositoryContext } from "./abstract.ts";
+import { CustomerRepository } from "./customer/index.ts";
 
 export class MyCustomerRepository extends CustomerRepository {
 	changePassword(

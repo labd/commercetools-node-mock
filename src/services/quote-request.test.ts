@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
-import { customerDraftFactory } from "~src/testing/customer";
-import { CommercetoolsMock } from "../index";
+import { customerDraftFactory } from "#src/testing/customer.ts";
+import { CommercetoolsMock } from "../index.ts";
 
 describe("Quote Request Create", () => {
 	const ctMock = new CommercetoolsMock();

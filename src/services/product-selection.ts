@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { ProductSelectionRepository } from "../repositories/product-selection";
-import AbstractService from "./abstract";
+import type { ProductSelectionRepository } from "../repositories/product-selection.ts";
+import AbstractService from "./abstract.ts";
 
 export class ProductSelectionService extends AbstractService {
 	public repository: ProductSelectionRepository;

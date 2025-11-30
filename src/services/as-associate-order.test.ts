@@ -2,7 +2,7 @@ import assert from "node:assert";
 import type { Order } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "../index";
+import { CommercetoolsMock } from "../index.ts";
 
 describe("Order Query", () => {
 	const ctMock = new CommercetoolsMock();

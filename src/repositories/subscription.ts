@@ -5,12 +5,15 @@ import type {
 	SubscriptionSetKeyAction,
 	SubscriptionUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
-import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+} from "./abstract.ts";
 
 export class SubscriptionRepository extends AbstractResourceRepository<"subscription"> {
 	constructor(config: Config) {

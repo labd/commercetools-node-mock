@@ -3,10 +3,10 @@ import type {
 	OrderEditDraft,
 	OrderEditResult,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import type { RepositoryContext } from "./abstract";
-import { AbstractResourceRepository } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { RepositoryContext } from "./abstract.ts";
+import { AbstractResourceRepository } from "./abstract.ts";
 
 export class OrderEditRepository extends AbstractResourceRepository<"order-edit"> {
 	constructor(config: Config) {

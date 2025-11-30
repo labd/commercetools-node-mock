@@ -1,2 +1,2 @@
-export { Lexer } from "~vendor/perplex/lexer";
-export { Parser, type ITokenPosition } from "~vendor/pratt";
+export { Lexer } from "#vendor/perplex/lexer.ts";
+export { type ITokenPosition, Parser } from "#vendor/pratt/index.ts";

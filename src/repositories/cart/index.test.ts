@@ -1,14 +1,9 @@
-import type {
-	Cart,
-	CartDraft,
-	CustomLineItemDraft,
-	LineItem,
-} from "@commercetools/platform-sdk";
+import type { CartDraft, LineItem } from "@commercetools/platform-sdk";
 import { beforeEach, describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import { InMemoryStorage } from "~src/storage";
-import { CartRepository } from "./index";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { CartRepository } from "./index.ts";
 
 describe("Cart repository", () => {
 	const storage = new InMemoryStorage();

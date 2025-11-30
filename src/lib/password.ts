@@ -31,7 +31,7 @@ export const validatePasswordResetToken = (token: string) => {
 	}
 
 	// Check if the token is expired
-	if (Number.parseInt(time) < new Date().getTime()) {
+	if (Number.parseInt(time, 10) < Date.now()) {
 		return undefined;
 	}
 

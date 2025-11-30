@@ -7,16 +7,16 @@ import type {
 	ExtensionSetTimeoutInMsAction,
 	ExtensionUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import { maskSecretValue } from "../lib/masking";
-import type { Writable } from "../types";
-import type { UpdateHandlerInterface } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import { maskSecretValue } from "../lib/masking.ts";
+import type { Writable } from "../types.ts";
+import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
 	type RepositoryContext,
-} from "./abstract";
+} from "./abstract.ts";
 
 export class ExtensionRepository extends AbstractResourceRepository<"extension"> {
 	constructor(config: Config) {

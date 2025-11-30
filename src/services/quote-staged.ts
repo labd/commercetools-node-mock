@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { StagedQuoteRepository } from "~src/repositories/quote-staged";
-import AbstractService from "./abstract";
+import type { StagedQuoteRepository } from "#src/repositories/quote-staged/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class StagedQuoteService extends AbstractService {
 	public repository: StagedQuoteRepository;

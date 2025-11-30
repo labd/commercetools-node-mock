@@ -4,17 +4,17 @@ import type {
 	CategoryReference,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import { parseExpandClause } from "~src/lib/expandParser";
-import type { Writable } from "~src/types";
-import type { GetParams } from "../abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { parseExpandClause } from "#src/lib/expandParser.ts";
+import type { Writable } from "#src/types.ts";
+import type { GetParams } from "../abstract.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { createCustomFields } from "../helpers";
-import { CategoryUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { createCustomFields } from "../helpers.ts";
+import { CategoryUpdateHandler } from "./actions.ts";
 
 export class CategoryRepository extends AbstractResourceRepository<"category"> {
 	constructor(config: Config) {

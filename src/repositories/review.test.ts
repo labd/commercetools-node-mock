@@ -1,9 +1,9 @@
 import type {
 	ReviewDraft,
 	ReviewSetAuthorNameAction,
+	ReviewSetCustomerAction,
 	ReviewSetCustomFieldAction,
 	ReviewSetCustomTypeAction,
-	ReviewSetCustomerAction,
 	ReviewSetKeyAction,
 	ReviewSetLocaleAction,
 	ReviewSetRatingAction,
@@ -13,10 +13,10 @@ import type {
 	ReviewTransitionStateAction,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import { InMemoryStorage } from "~src/storage";
-import { ReviewRepository } from "./review";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { ReviewRepository } from "./review.ts";
 
 describe("Review Repository", () => {
 	const storage = new InMemoryStorage();

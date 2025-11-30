@@ -1,9 +1,9 @@
 import type { Type, TypeDraft } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import type { RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
-import { TypeUpdateHandler } from "./actions";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
+import { TypeUpdateHandler } from "./actions.ts";
 
 export class TypeRepository extends AbstractResourceRepository<"type"> {
 	constructor(config: Config) {

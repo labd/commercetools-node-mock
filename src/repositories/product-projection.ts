@@ -4,13 +4,13 @@ import type {
 	ProductProjection,
 	QueryParam,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { parseQueryExpression } from "../lib/predicateParser";
-import { applyPriceSelector } from "../priceSelector";
-import { ProductProjectionSearch } from "../product-projection-search";
-import type { GetParams, RepositoryContext } from "./abstract";
-import { AbstractResourceRepository } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { parseQueryExpression } from "../lib/predicateParser.ts";
+import { applyPriceSelector } from "../priceSelector.ts";
+import { ProductProjectionSearch } from "../product-projection-search.ts";
+import type { GetParams, RepositoryContext } from "./abstract.ts";
+import { AbstractResourceRepository } from "./abstract.ts";
 
 export type ProductProjectionQueryParams = {
 	staged?: boolean;

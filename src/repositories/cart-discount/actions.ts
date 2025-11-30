@@ -14,12 +14,11 @@ import type {
 	CartDiscountUpdateAction,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
-import type { Writable } from "~src/types";
-import type { UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
-
-import { CommercetoolsError } from "~src/exceptions";
-import { getStoreKeyReference } from "~src/repositories/helpers";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { getStoreKeyReference } from "#src/repositories/helpers.ts";
+import type { Writable } from "#src/types.ts";
+import type { UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
 
 export class CartDiscountUpdateHandler
 	extends AbstractUpdateHandler
