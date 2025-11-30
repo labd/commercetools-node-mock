@@ -92,6 +92,9 @@ jobs:
       - name: Run build
         run: pnpm build
 
+      - name: Upgrade npm for trusted publishing
+        run: npm i -g npm@^11.6.4
+
       - name: Create and publish versions
         uses: changesets/action@v1
         with:
@@ -101,5 +104,4 @@ jobs:
           version: pnpm publish:version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ''
           NPM_CONFIG_PROVENANCE: true
