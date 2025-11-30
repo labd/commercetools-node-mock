@@ -20,7 +20,7 @@
 	],
 	"scripts": {
 		"build": "tsdown",
-		"build:server": "esbuild src/server.ts --bundle --outfile=dist/server.js --platform=node",
+		"build:server": "tsdown src/server.ts --platform=node",
 		"check": "biome check && tsc",
 		"format": "biome check --fix",
 		"lint": "biome check",
@@ -65,10 +65,10 @@
 		"typescript": "5.9.3",
 		"vitest": "4.0.13"
 	},
-	"packageManager": "pnpm@10.8.0",
+	"packageManager": "pnpm@10.24.0",
 	"engines": {
 		"node": ">=18",
-		"pnpm": ">=9.0.2"
+		"pnpm": ">=10.8.0"
 	},
 	"publishConfig": {
 		"access": "public",
