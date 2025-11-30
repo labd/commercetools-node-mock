@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2.61.0
+
+### Minor Changes
+
+- [#347](https://github.com/labd/commercetools-node-mock/pull/347) [`c7683d2`](https://github.com/labd/commercetools-node-mock/commit/c7683d2eea6365cd31c91ea8684ca00759ba90e4) Thanks [@tleguijt](https://github.com/tleguijt)! - Add removeQuantity action for inventory entries
+
+### Patch Changes
+
+- [#350](https://github.com/labd/commercetools-node-mock/pull/350) [`cfbc4ac`](https://github.com/labd/commercetools-node-mock/commit/cfbc4aca8416c45c2e78c59969000fae7a5151f4) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update release process to use trusted publishing
+
+- [#352](https://github.com/labd/commercetools-node-mock/pull/352) [`93cebc5`](https://github.com/labd/commercetools-node-mock/commit/93cebc547a9bdb43fea5f340f647eb7be30ed957) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update build process for the docker version
+
+- [#350](https://github.com/labd/commercetools-node-mock/pull/350) [`cfbc4ac`](https://github.com/labd/commercetools-node-mock/commit/cfbc4aca8416c45c2e78c59969000fae7a5151f4) Thanks [@mvantellingen](https://github.com/mvantellingen)! - update various depdendencies to resolve potential security issues
+
 ## 2.60.0
 
 ### Minor Changes
