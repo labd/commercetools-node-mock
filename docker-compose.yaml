@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8989:8989"
+    environment:
+      NODE_ENV: production
+      PORT: 8989
+    restart: unless-stopped

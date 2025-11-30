@@ -1,32 +1,29 @@
-FROM node:18-alpine AS builder
-ENV PNPM_VERSION=9.0.2
+FROM node:22-alpine AS builder
+ENV PNPM_VERSION=10.24.0
 
 RUN corepack enable && \
   corepack prepare pnpm@${PNPM_VERSION} --activate && \
   pnpm config set store-dir /pnpm-store
 
+RUN mkdir -p /app && chown node:node /app
+
+USER node
+
 WORKDIR /app
 
 # Files required by pnpm install
-COPY package.json pnpm-lock.yaml tsdown.config.js tsconfig.json /app/
+COPY --chown=node package.json pnpm-lock.yaml tsdown.config.js tsconfig.json /app/
 
 RUN pnpm install --frozen-lockfile
 
-# Bundle app source
-COPY src src
-COPY vendor vendor
+COPY --chown=node src /app/src
+COPY --chown=node vendor /app/vendor
 
+
+# Build server bundle
 RUN pnpm build:server
 
-
-FROM node:18-alpine
-WORKDIR /app
-
-RUN adduser -D -u 8000 commercetools
-
-COPY --from=builder /app/dist /app
-
 EXPOSE 8989
-ENV HTTP_SERVER_PORT 8989
+ENV HTTP_SERVER_PORT=8989
 
-CMD ["node", "./server.js"]
+CMD ["node", "./dist/server.mjs"]
