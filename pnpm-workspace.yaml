@@ -1,0 +1,7 @@
+minimumReleaseAge: 20160
+trustPolicy: no-downgrade
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - esbuild
+  - msw
+  - rolldown
