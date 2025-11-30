@@ -2,11 +2,13 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
 		"allowJs": true,
-		"baseUrl": ".",
+		"rootDir": ".",  
 		"esModuleInterop": true,
 		"isolatedModules": true,
 		"module": "ES2022",
 		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
 		"outDir": "dist",
 		"preserveWatchOutput": true,
 		"resolveJsonModule": true,
@@ -14,11 +16,7 @@
 		"skipLibCheck": true,
 		"strict": true,
 		"strictPropertyInitialization": false,
-		"target": "ES2022",
-		"paths": {
-			"~src/*": ["./src/*"],
-			"~vendor/*": ["./vendor/*"]
-		}
+		"target": "ES2022"
 	},
 	"include": ["./src/**/*.ts"]
 }

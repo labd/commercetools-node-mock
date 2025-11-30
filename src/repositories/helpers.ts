@@ -1,19 +1,17 @@
 import type {
-	AssociateRoleReference,
-	BusinessUnitKeyReference,
-	BusinessUnitReference,
-	BusinessUnitResourceIdentifier,
-	RoundingMode,
-} from "@commercetools/platform-sdk";
-import type {
+	_Money,
 	Address,
 	Associate,
 	AssociateDraft,
 	AssociateRoleAssignment,
 	AssociateRoleAssignmentDraft,
 	AssociateRoleKeyReference,
+	AssociateRoleReference,
 	AssociateRoleResourceIdentifier,
 	BaseAddress,
+	BusinessUnitKeyReference,
+	BusinessUnitReference,
+	BusinessUnitResourceIdentifier,
 	CentPrecisionMoney,
 	CustomFields,
 	CustomFieldsDraft,
@@ -25,19 +23,19 @@ import type {
 	Reference,
 	ReferencedResourceNotFoundError,
 	ResourceIdentifier,
+	RoundingMode,
 	Store,
 	StoreKeyReference,
 	StoreReference,
 	StoreResourceIdentifier,
 	Type,
-	_Money,
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js/decimal";
 import type { Request } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { CommercetoolsError } from "~src/exceptions";
-import type { AbstractStorage } from "../storage";
-import type { RepositoryContext } from "./abstract";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { AbstractStorage } from "../storage/index.ts";
+import type { RepositoryContext } from "./abstract.ts";
 
 export const createAddress = (
 	base: BaseAddress | undefined,
@@ -206,7 +204,6 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
 		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
 			{
 				code: "ReferencedResourceNotFound",
-				// @ts-ignore
 				typeId: resourceIdentifier.typeId,
 				message: `The referenced object of type '${resourceIdentifier.typeId}' with '${errIdentifier}' was not found. It either doesn't exist, or it can't be accessed from this endpoint (e.g., if the endpoint filters by store or customer account).`,
 			},

@@ -4,8 +4,8 @@
  *
  * See https://docs.commercetools.com/api/predicates/query
  */
-import { haversineDistance } from "./haversine";
-import { type ITokenPosition, Lexer, Parser } from "./parser";
+import { haversineDistance } from "./haversine.ts";
+import { type ITokenPosition, Lexer, Parser } from "./parser.ts";
 
 export class PredicateError {
 	message: string;
@@ -194,7 +194,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			(t) =>
 				({
 					type: "var",
-					// @ts-ignore
+					// @ts-expect-error
 					value: t.token.groups[1],
 					pos: t.token.strpos(),
 				}) as TypeSymbol,
@@ -205,7 +205,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			(t) =>
 				({
 					type: "string",
-					// @ts-ignore
+					// @ts-expect-error
 					value: t.token.groups[1],
 					pos: t.token.strpos(),
 				}) as TypeSymbol,

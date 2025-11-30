@@ -1,11 +1,7 @@
-import type {
-	Product,
-	ProductProjection,
-	Review,
-} from "@commercetools/platform-sdk";
+import type { Product } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "~src/index";
+import { CommercetoolsMock } from "#src/index.ts";
 
 describe("Product Review Statistics", () => {
 	let ctMock: CommercetoolsMock;
@@ -179,7 +175,7 @@ describe("Product Review Statistics", () => {
 
 	test("only reviews with includedInStatistics=true are counted", async () => {
 		// Create reviews - both will be included by default
-		const review1Response = await supertest(ctMock.app)
+		const _review1Response = await supertest(ctMock.app)
 			.post("/dummy/reviews")
 			.send({
 				authorName: "Reviewer 1",
@@ -190,7 +186,7 @@ describe("Product Review Statistics", () => {
 				},
 			});
 
-		const review2Response = await supertest(ctMock.app)
+		const _review2Response = await supertest(ctMock.app)
 			.post("/dummy/reviews")
 			.send({
 				authorName: "Reviewer 2",

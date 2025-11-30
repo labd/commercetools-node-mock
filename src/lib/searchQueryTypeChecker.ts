@@ -1,4 +1,6 @@
 import type {
+	_SearchQuery,
+	_SearchQueryExpression,
 	SearchAndExpression,
 	SearchAnyValue,
 	SearchDateRangeExpression,
@@ -15,15 +17,17 @@ import type {
 	SearchPrefixExpression,
 	SearchTimeRangeExpression,
 	SearchWildCardExpression,
-	_SearchQuery,
-	_SearchQueryExpression,
 } from "@commercetools/platform-sdk";
 
 export const validateSearchQuery = (query: _SearchQuery): void => {
 	if (isSearchAndExpression(query)) {
-		query.and.forEach((expr) => validateSearchQuery(expr));
+		for (const expr of query.and) {
+			validateSearchQuery(expr);
+		}
 	} else if (isSearchOrExpression(query)) {
-		query.or.forEach((expr) => validateSearchQuery(expr));
+		for (const expr of query.or) {
+			validateSearchQuery(expr);
+		}
 	} else if (isSearchNotExpression(query)) {
 		validateSearchQuery(query.not);
 	} else if (

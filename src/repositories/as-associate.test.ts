@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
 import {
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
-} from "./as-associate";
-import { CustomerRepository } from "./customer";
+} from "./as-associate.ts";
+import { CustomerRepository } from "./customer/index.ts";
 
 describe("As Associate Repositories", () => {
 	const storage = new InMemoryStorage();

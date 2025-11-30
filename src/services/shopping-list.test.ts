@@ -5,7 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "../ctMock";
+import { CommercetoolsMock } from "../ctMock.ts";
 
 const shoppingList: ShoppingList = {
 	id: "f15b4a80-7def-4381-bf6a-c66cab258a2b",

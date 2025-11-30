@@ -1,13 +1,5 @@
 import assert from "node:assert";
 import type {
-	DiscountGroup,
-	InvalidJsonInputError,
-	RecurrencePolicy,
-	RecurringOrder,
-	ReferencedResourceNotFoundError,
-	ShoppingListLineItem,
-} from "@commercetools/platform-sdk";
-import type {
 	AssociateRole,
 	AttributeGroup,
 	BusinessUnit,
@@ -15,12 +7,14 @@ import type {
 	CartDiscount,
 	Category,
 	Channel,
-	CustomObject,
 	Customer,
 	CustomerGroup,
+	CustomObject,
 	DiscountCode,
+	DiscountGroup,
 	Extension,
 	InvalidInputError,
+	InvalidJsonInputError,
 	InventoryEntry,
 	Order,
 	PagedQueryResponse,
@@ -33,10 +27,14 @@ import type {
 	Project,
 	Quote,
 	QuoteRequest,
+	RecurrencePolicy,
+	RecurringOrder,
 	Reference,
+	ReferencedResourceNotFoundError,
 	ResourceIdentifier,
 	ShippingMethod,
 	ShoppingList,
+	ShoppingListLineItem,
 	StagedQuote,
 	State,
 	Store,
@@ -45,18 +43,18 @@ import type {
 	Type,
 	Zone,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import { cloneObject } from "../helpers";
-import { parseExpandClause } from "../lib/expandParser";
-import { parseQueryExpression } from "../lib/predicateParser";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { cloneObject } from "../helpers.ts";
+import { parseExpandClause } from "../lib/expandParser.ts";
+import { parseQueryExpression } from "../lib/predicateParser.ts";
 import type {
 	PagedQueryResponseMap,
 	ResourceMap,
 	ResourceType,
 	Writable,
-} from "../types";
-import type { GetParams, ProjectStorage, QueryParams } from "./abstract";
-import { AbstractStorage } from "./abstract";
+} from "../types.ts";
+import type { GetParams, ProjectStorage, QueryParams } from "./abstract.ts";
+import { AbstractStorage } from "./abstract.ts";
 
 export class InMemoryStorage extends AbstractStorage {
 	protected resources: {
@@ -507,7 +505,7 @@ export class InMemoryStorage extends AbstractStorage {
 			product.masterData.current.masterVariant,
 			...product.masterData.current.variants,
 		].find((e) => e.id === lineItem.variantId);
-		// @ts-ignore
+		// @ts-expect-error
 		lineItem.variant = variant;
 	}
 }

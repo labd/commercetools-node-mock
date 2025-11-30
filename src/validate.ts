@@ -1,7 +1,7 @@
 import type { InvalidJsonInputError } from "@commercetools/platform-sdk";
 import type { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { CommercetoolsError } from "./exceptions";
+import { CommercetoolsError } from "./exceptions.ts";
 
 export const validateData = <T>(data: any, schema: z.AnyZodObject) => {
 	try {

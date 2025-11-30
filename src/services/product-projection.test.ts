@@ -9,8 +9,8 @@ import type {
 import supertest from "supertest";
 import * as timekeeper from "timekeeper";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "../index";
-import type { Writable } from "../types";
+import { CommercetoolsMock } from "../index.ts";
+import type { Writable } from "../types.ts";
 
 const ctMock = new CommercetoolsMock();
 

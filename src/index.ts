@@ -1,6 +1,6 @@
-import type { CommercetoolsMockOptions } from "./ctMock";
-import { CommercetoolsMock } from "./ctMock";
-import { getBaseResourceProperties } from "./helpers";
+import type { CommercetoolsMockOptions } from "./ctMock.ts";
+import { CommercetoolsMock } from "./ctMock.ts";
+import { getBaseResourceProperties } from "./helpers.ts";
 
 export {
 	CommercetoolsMock,

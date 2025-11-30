@@ -1,14 +1,14 @@
 import type { Update } from "@commercetools/platform-sdk";
 import { type Request, type Response, Router } from "express";
 import type { ParsedQs } from "qs";
-import { updateRequestSchema } from "~src/schemas/update-request";
-import { validateData } from "~src/validate";
-import { queryParamsArray } from "../helpers";
+import { updateRequestSchema } from "#src/schemas/update-request.ts";
+import { validateData } from "#src/validate.ts";
+import { queryParamsArray } from "../helpers.ts";
 import type {
 	AbstractResourceRepository,
 	QueryParams,
-} from "../repositories/abstract";
-import { getRepositoryContext } from "../repositories/helpers";
+} from "../repositories/abstract.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
 
 export default abstract class AbstractService {
 	public abstract repository: AbstractResourceRepository<any>;

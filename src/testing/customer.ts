@@ -1,7 +1,7 @@
 import type { Customer, CustomerDraft } from "@commercetools/platform-sdk";
 import { Factory } from "fishery";
 import supertest from "supertest";
-import type { CommercetoolsMock } from "~src/ctMock";
+import type { CommercetoolsMock } from "#src/ctMock.ts";
 
 export const customerDraftFactory = (m: CommercetoolsMock) =>
 	Factory.define<CustomerDraft, CustomerDraft, Customer>(({ onCreate }) => {

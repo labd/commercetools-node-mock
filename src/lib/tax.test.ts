@@ -1,14 +1,14 @@
 import type {
 	TaxCategory,
-	TaxRate,
 	TaxedItemPrice,
+	TaxRate,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import {
-	calculateTaxTotals,
 	calculateTaxedPrice,
 	calculateTaxedPriceFromRate,
-} from "~src/lib/tax";
+	calculateTaxTotals,
+} from "#src/lib/tax.ts";
 
 const money = (centAmount: number) => ({
 	type: "centPrecision" as const,

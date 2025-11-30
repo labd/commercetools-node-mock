@@ -8,14 +8,14 @@ import type {
 	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { calculateTaxedPrice } from "~src/lib/tax";
-import type { AbstractStorage } from "~src/storage/abstract";
+import { calculateTaxedPrice } from "#src/lib/tax.ts";
+import type { AbstractStorage } from "#src/storage/abstract.ts";
 import {
 	createCentPrecisionMoney,
 	createCustomFields,
 	createTypedMoney,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
+} from "../helpers.ts";
 
 export const selectPrice = ({
 	prices,
@@ -71,13 +71,13 @@ export const createCustomLineItemFromDraft = (
 			)
 		: undefined;
 
-	let taxCategory: TaxCategory | undefined = undefined;
+	let taxCategory: TaxCategory | undefined;
 	if (taxCategoryRef) {
 		try {
 			taxCategory =
 				storage.get(projectKey, "tax-category", taxCategoryRef.id, {}) ||
 				undefined;
-		} catch (error) {
+		} catch (_error) {
 			// Tax category not found, continue without tax calculation
 		}
 	}

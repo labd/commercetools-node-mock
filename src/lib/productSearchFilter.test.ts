@@ -1,10 +1,10 @@
 import type {
-	ProductProjection,
 	_SearchQuery,
+	ProductProjection,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import { cloneObject } from "~src/helpers";
-import { parseSearchQuery } from "./productSearchFilter";
+import { cloneObject } from "#src/helpers.ts";
+import { parseSearchQuery } from "./productSearchFilter.ts";
 
 describe("Product search filter", () => {
 	const exampleProduct: ProductProjection = {

@@ -1,8 +1,8 @@
 import type { Cart, LineItem } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
-import { QuoteRequestRepository } from ".";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { QuoteRequestRepository } from "./index.ts";
 
 describe("QuoteRequest repository", () => {
 	const storage = new InMemoryStorage();

@@ -8,7 +8,7 @@ import type {
 	PagedQueryResponseMap,
 	ResourceMap,
 	ResourceType,
-} from "../types";
+} from "../types.ts";
 
 export type GetParams = {
 	expand?: string[];

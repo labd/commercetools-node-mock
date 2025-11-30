@@ -1,7 +1,7 @@
 import type { InvalidTokenError } from "@commercetools/platform-sdk";
 import { setupServer } from "msw/node";
 import { afterEach, beforeAll, expect, test } from "vitest";
-import { CommercetoolsMock } from "./index";
+import { CommercetoolsMock } from "./index.ts";
 
 const mswServer = setupServer();
 

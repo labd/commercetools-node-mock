@@ -7,11 +7,11 @@ import type {
 	StagedQuoteUpdateAction,
 	StateReference,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import type { Writable } from "~src/types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
-import { getReferenceFromResourceIdentifier } from "../helpers";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
+import { getReferenceFromResourceIdentifier } from "../helpers.ts";
 
 export class StagedQuoteUpdateHandler
 	extends AbstractUpdateHandler
@@ -60,7 +60,7 @@ export class StagedQuoteUpdateHandler
 		resource: Writable<StagedQuote>,
 		{ state, force }: StagedQuoteTransitionStateAction,
 	) {
-		let stateReference: StateReference | undefined = undefined;
+		let stateReference: StateReference | undefined;
 		if (state) {
 			stateReference = getReferenceFromResourceIdentifier<StateReference>(
 				state,

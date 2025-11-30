@@ -1,2 +1,2 @@
-export { AbstractStorage } from "./abstract";
-export { InMemoryStorage } from "./in-memory";
+export { AbstractStorage } from "./abstract.ts";
+export { InMemoryStorage } from "./in-memory.ts";

@@ -1,13 +1,13 @@
 import express from "express";
 import supertest from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import { hashPassword } from "../lib/password";
-import { CustomerRepository } from "../repositories/customer";
-import type { AbstractStorage } from "../storage";
-import { InMemoryStorage } from "../storage";
-import { OAuth2Server } from "./server";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import { hashPassword } from "../lib/password.ts";
+import { CustomerRepository } from "../repositories/customer/index.ts";
+import type { AbstractStorage } from "../storage/index.ts";
+import { InMemoryStorage } from "../storage/index.ts";
+import { OAuth2Server } from "./server.ts";
 
 describe("OAuth2Server", () => {
 	let app: express.Express;

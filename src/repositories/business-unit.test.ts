@@ -9,11 +9,11 @@ import type {
 	DivisionDraft,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import { InMemoryStorage } from "~src/storage";
-import { BusinessUnitRepository } from "./business-unit";
-import { CustomerRepository } from "./customer";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { BusinessUnitRepository } from "./business-unit.ts";
+import { CustomerRepository } from "./customer/index.ts";
 
 describe("BusinessUnit Repository", () => {
 	const storage = new InMemoryStorage();
@@ -126,7 +126,7 @@ describe("BusinessUnit Repository", () => {
 			name: "Parent Company",
 		};
 
-		const company = repository.create({ projectKey: "dummy" }, companyDraft);
+		const _company = repository.create({ projectKey: "dummy" }, companyDraft);
 
 		const draft: DivisionDraft = {
 			key: "test-division",

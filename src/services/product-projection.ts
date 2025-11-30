@@ -1,11 +1,11 @@
 import type { Request, Response, Router } from "express";
-import { queryParamsArray, queryParamsValue } from "../helpers";
-import { getRepositoryContext } from "../repositories/helpers";
+import { queryParamsArray, queryParamsValue } from "../helpers.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
 import type {
 	ProductProjectionQueryParams,
 	ProductProjectionRepository,
-} from "./../repositories/product-projection";
-import AbstractService from "./abstract";
+} from "./../repositories/product-projection.ts";
+import AbstractService from "./abstract.ts";
 
 export class ProductProjectionService extends AbstractService {
 	public repository: ProductProjectionRepository;

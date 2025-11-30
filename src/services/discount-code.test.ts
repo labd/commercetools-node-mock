@@ -1,7 +1,7 @@
 import type { DiscountCodeDraft } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { describe, expect, test } from "vitest";
-import { CommercetoolsMock } from "../index";
+import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 

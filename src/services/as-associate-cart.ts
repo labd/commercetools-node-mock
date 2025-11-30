@@ -1,6 +1,6 @@
 import { Router } from "express";
-import type { CartRepository } from "../repositories/cart";
-import AbstractService from "./abstract";
+import type { CartRepository } from "../repositories/cart/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class AsAssociateCartService extends AbstractService {
 	public repository: CartRepository;

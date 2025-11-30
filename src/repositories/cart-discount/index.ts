@@ -7,18 +7,18 @@ import type {
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
+} from "../abstract.ts";
 import {
 	createCustomFields,
 	createTypedMoney,
 	getStoreKeyReference,
-} from "../helpers";
-import { CartDiscountUpdateHandler } from "./actions";
+} from "../helpers.ts";
+import { CartDiscountUpdateHandler } from "./actions.ts";
 
 export class CartDiscountRepository extends AbstractResourceRepository<"cart-discount"> {
 	constructor(config: Config) {

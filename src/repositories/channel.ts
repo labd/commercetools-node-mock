@@ -10,16 +10,16 @@ import type {
 	ChannelSetGeoLocationAction,
 	ChannelUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { UpdateHandlerInterface } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
 	type RepositoryContext,
-} from "./abstract";
-import { createAddress, createCustomFields } from "./helpers";
+} from "./abstract.ts";
+import { createAddress, createCustomFields } from "./helpers.ts";
 
 export class ChannelRepository extends AbstractResourceRepository<"channel"> {
 	constructor(config: Config) {

@@ -1,4 +1,4 @@
-import { cloneObject } from "../helpers";
+import { cloneObject } from "../helpers.ts";
 
 export const maskSecretValue = <T>(resource: T, path: string): T => {
 	const parts = path.split(".");

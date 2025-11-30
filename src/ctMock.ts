@@ -2,23 +2,23 @@ import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import inject from "light-my-request";
 import morgan from "morgan";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import type { SetupServer, SetupServerApi } from "msw/node";
 import { setupServer } from "msw/node";
-import type { Config } from "./config";
-import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants";
-import { CommercetoolsError } from "./exceptions";
-import { mapHeaderType } from "./helpers";
-import { copyHeaders } from "./lib/proxy";
-import { OAuth2Server } from "./oauth/server";
-import { ProjectAPI } from "./projectAPI";
-import type { RepositoryMap } from "./repositories";
-import { createRepositories } from "./repositories";
-import type { ProjectRepository } from "./repositories/project";
-import { createServices } from "./services";
-import { ProjectService } from "./services/project";
-import type { AbstractStorage } from "./storage";
-import { InMemoryStorage } from "./storage";
+import type { Config } from "./config.ts";
+import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants.ts";
+import { CommercetoolsError } from "./exceptions.ts";
+import { mapHeaderType } from "./helpers.ts";
+import { copyHeaders } from "./lib/proxy.ts";
+import { OAuth2Server } from "./oauth/server.ts";
+import { ProjectAPI } from "./projectAPI.ts";
+import type { RepositoryMap } from "./repositories/index.ts";
+import { createRepositories } from "./repositories/index.ts";
+import type { ProjectRepository } from "./repositories/project.ts";
+import { createServices } from "./services/index.ts";
+import { ProjectService } from "./services/project.ts";
+import type { AbstractStorage } from "./storage/index.ts";
+import { InMemoryStorage } from "./storage/index.ts";
 
 export type CommercetoolsMockOptions = {
 	validateCredentials: boolean;
@@ -57,7 +57,8 @@ export class CommercetoolsMock {
 
 	private _repositories: RepositoryMap | null;
 
-	private _projectService?: ProjectService;
+	// biome-ignore lint: lint/correctness/noUnusedPrivateClassMembers
+	private _projectService: ProjectService | undefined;
 
 	constructor(options: Partial<CommercetoolsMockOptions> = {}) {
 		this.options = { ...DEFAULT_OPTIONS, ...options };
@@ -123,9 +124,7 @@ export class CommercetoolsMock {
 	}
 
 	runServer(port = 3000, options?: AppOptions) {
-		const server = this.app.listen(port, () => {
-			console.info(`Mock server listening at http://localhost:${port}`);
-		});
+		const server = this.app.listen(port, () => {});
 		server.keepAliveTimeout = 60 * 1000;
 	}
 
@@ -186,7 +185,6 @@ export class CommercetoolsMock {
 				});
 				return;
 			}
-			console.error(err);
 			resp.status(500).send({
 				error: err.message,
 			});
@@ -312,7 +310,10 @@ export class CommercetoolsMock {
 				throw new Error("Server already started");
 			}
 			process.emitWarning("Server wasn't stopped properly, clearing");
-			_globalListeners.forEach((listener) => listener.close());
+			for (const listener of _globalListeners) {
+				listener.close();
+			}
+			_globalListeners.length = 0;
 		}
 
 		const server = setupServer();

@@ -10,16 +10,16 @@ import type {
 	AssociateRoleSetPermissionsAction,
 	AssociateRoleUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { UpdateHandlerInterface } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
 	type RepositoryContext,
-} from "./abstract";
-import { createCustomFields } from "./helpers";
+} from "./abstract.ts";
+import { createCustomFields } from "./helpers.ts";
 
 export class AssociateRoleRepository extends AbstractResourceRepository<"associate-role"> {
 	constructor(config: Config) {
@@ -79,9 +79,7 @@ class AssociateRoleUpdateHandler
 			return;
 		}
 
-		resource.permissions = resource.permissions.filter((p) => {
-			p !== permission;
-		});
+		resource.permissions = resource.permissions.filter((p) => p !== permission);
 	}
 
 	setBuyerAssignable(

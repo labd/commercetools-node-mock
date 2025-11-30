@@ -13,22 +13,25 @@ import type {
 	StoreKeyReference,
 	StoreResourceIdentifier,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { generateRandomString, getBaseResourceProperties } from "~src/helpers";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import {
+	generateRandomString,
+	getBaseResourceProperties,
+} from "#src/helpers.ts";
 import {
 	createEmailVerifyToken,
 	createPasswordResetToken,
 	hashPassword,
 	validatePasswordResetToken,
-} from "~src/lib/password";
-import type { ResourceMap, ShallowWritable, Writable } from "~src/types";
+} from "#src/lib/password.ts";
+import type { ResourceMap, ShallowWritable, Writable } from "#src/types.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { createCustomFields } from "../helpers";
-import { CustomerUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { createCustomFields } from "../helpers.ts";
+import { CustomerUpdateHandler } from "./actions.ts";
 
 export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 	constructor(config: Config) {
@@ -176,7 +179,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 
 		const ttlMinutes = request.ttlMinutes ?? 34560; // 34560 is CT default
 
-		const expiresAt = new Date(new Date().getTime() + ttlMinutes * 60 * 1000);
+		const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 		const customer = results.results[0] as Customer;
 		const rest = getBaseResourceProperties();
 

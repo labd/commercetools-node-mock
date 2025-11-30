@@ -1,9 +1,8 @@
 import type { CustomerSignInResult } from "@commercetools/platform-sdk";
-import type { Router } from "express";
-import type { Request, Response } from "express";
-import type { CustomerRepository } from "../repositories/customer";
-import { getRepositoryContext } from "../repositories/helpers";
-import AbstractService from "./abstract";
+import type { Request, Response, Router } from "express";
+import type { CustomerRepository } from "../repositories/customer/index.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import AbstractService from "./abstract.ts";
 
 export class CustomerService extends AbstractService {
 	public repository: CustomerRepository;

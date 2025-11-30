@@ -1,56 +1,54 @@
 import type {
+	Associate,
+	BusinessUnit,
+	BusinessUnitAddAddressAction,
+	BusinessUnitAddAssociateAction,
 	BusinessUnitAddBillingAddressIdAction,
 	BusinessUnitAddShippingAddressIdAction,
+	BusinessUnitAddStoreAction,
+	BusinessUnitChangeAddressAction,
 	BusinessUnitChangeApprovalRuleModeAction,
 	BusinessUnitChangeAssociateAction,
 	BusinessUnitChangeAssociateModeAction,
+	BusinessUnitChangeNameAction,
+	BusinessUnitChangeParentUnitAction,
 	BusinessUnitChangeStatusAction,
+	BusinessUnitDraft,
+	BusinessUnitRemoveAddressAction,
 	BusinessUnitRemoveAssociateAction,
 	BusinessUnitRemoveBillingAddressIdAction,
 	BusinessUnitRemoveShippingAddressIdAction,
 	BusinessUnitSetAddressCustomFieldAction,
 	BusinessUnitSetAddressCustomTypeAction,
+	BusinessUnitSetAssociatesAction,
+	BusinessUnitSetContactEmailAction,
 	BusinessUnitSetCustomFieldAction,
 	BusinessUnitSetCustomTypeAction,
 	BusinessUnitSetDefaultBillingAddressAction,
 	BusinessUnitSetDefaultShippingAddressAction,
+	BusinessUnitSetStoreModeAction,
 	BusinessUnitUpdateAction,
+	Company,
 	CompanyDraft,
+	Division,
 	DivisionDraft,
 } from "@commercetools/platform-sdk";
-import type {
-	Associate,
-	BusinessUnit,
-	BusinessUnitAddAddressAction,
-	BusinessUnitAddAssociateAction,
-	BusinessUnitAddStoreAction,
-	BusinessUnitChangeAddressAction,
-	BusinessUnitChangeNameAction,
-	BusinessUnitChangeParentUnitAction,
-	BusinessUnitDraft,
-	BusinessUnitRemoveAddressAction,
-	BusinessUnitSetAssociatesAction,
-	BusinessUnitSetContactEmailAction,
-	BusinessUnitSetStoreModeAction,
-	Company,
-	Division,
-} from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { generateRandomString, getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { UpdateHandlerInterface } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { generateRandomString, getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
 	type RepositoryContext,
-} from "./abstract";
+} from "./abstract.ts";
 import {
 	createAddress,
 	createAssociate,
 	createCustomFields,
 	getBusinessUnitKeyReference,
 	getStoreKeyReference,
-} from "./helpers";
+} from "./helpers.ts";
 
 export class BusinessUnitRepository extends AbstractResourceRepository<"business-unit"> {
 	constructor(config: Config) {

@@ -1,8 +1,8 @@
 import type { CustomObjectDraft } from "@commercetools/platform-sdk";
 import type { Request, Response, Router } from "express";
-import type { CustomObjectRepository } from "../repositories/custom-object";
-import { getRepositoryContext } from "../repositories/helpers";
-import AbstractService from "./abstract";
+import type { CustomObjectRepository } from "../repositories/custom-object.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import AbstractService from "./abstract.ts";
 
 export class CustomObjectService extends AbstractService {
 	public repository: CustomObjectRepository;

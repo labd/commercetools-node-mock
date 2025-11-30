@@ -20,11 +20,11 @@ import type {
 	ProjectUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { ProjectSetBusinessUnitAssociateRoleOnCreationAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/project";
-import type { Config } from "~src/config";
-import { maskSecretValue } from "../lib/masking";
-import type { Writable } from "../types";
-import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
-import { AbstractRepository, AbstractUpdateHandler } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { maskSecretValue } from "../lib/masking.ts";
+import type { Writable } from "../types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
+import { AbstractRepository, AbstractUpdateHandler } from "./abstract.ts";
 
 export class ProjectRepository extends AbstractRepository<Project> {
 	constructor(config: Config) {

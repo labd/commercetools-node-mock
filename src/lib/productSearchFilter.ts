@@ -1,4 +1,7 @@
 import type {
+	_SearchQuery,
+	_SearchQueryExpression,
+	_SearchQueryExpressionValue,
 	ProductProjection,
 	ProductVariant,
 	SearchAndExpression,
@@ -16,13 +19,10 @@ import type {
 	SearchPrefixExpression,
 	SearchTimeRangeExpression,
 	SearchWildCardExpression,
-	_SearchQuery,
-	_SearchQueryExpression,
-	_SearchQueryExpressionValue,
 } from "@commercetools/platform-sdk";
-import { nestedLookup } from "~src/helpers";
-import type { Writable } from "../types";
-import { getVariants } from "./projectionSearchFilter";
+import { nestedLookup } from "#src/helpers.ts";
+import type { Writable } from "../types.ts";
+import { getVariants } from "./projectionSearchFilter.ts";
 
 type ProductSearchFilterFunc = (
 	p: Writable<ProductProjection>,

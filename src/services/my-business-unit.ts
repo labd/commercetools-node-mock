@@ -1,6 +1,6 @@
 import { Router } from "express";
-import type { BusinessUnitRepository } from "~src/repositories/business-unit";
-import AbstractService from "./abstract";
+import type { BusinessUnitRepository } from "#src/repositories/business-unit.ts";
+import AbstractService from "./abstract.ts";
 
 export class MyBusinessUnitService extends AbstractService {
 	public repository: BusinessUnitRepository;

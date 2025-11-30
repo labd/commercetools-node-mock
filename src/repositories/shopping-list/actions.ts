@@ -9,9 +9,9 @@ import type {
 	ShoppingListLineItem,
 	ShoppingListRemoveLineItemAction,
 	ShoppingListSetAnonymousIdAction,
+	ShoppingListSetCustomerAction,
 	ShoppingListSetCustomFieldAction,
 	ShoppingListSetCustomTypeAction,
-	ShoppingListSetCustomerAction,
 	ShoppingListSetDeleteDaysAfterLastModificationAction,
 	ShoppingListSetDescriptionAction,
 	ShoppingListSetKeyAction,
@@ -20,10 +20,10 @@ import type {
 	ShoppingListUpdateAction,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { CommercetoolsError } from "~src/exceptions";
-import type { Writable } from "../../types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { Writable } from "../../types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
 
 export class ShoppingListUpdateHandler
 	extends AbstractUpdateHandler

@@ -4,8 +4,8 @@ import type {
 	MyOrderFromCartDraft,
 	Order,
 } from "@commercetools/platform-sdk";
-import type { RepositoryContext } from "./abstract";
-import { OrderRepository } from "./order";
+import type { RepositoryContext } from "./abstract.ts";
+import { OrderRepository } from "./order/index.ts";
 
 export class MyOrderRepository extends OrderRepository {
 	create(context: RepositoryContext, draft: MyOrderFromCartDraft): Order {

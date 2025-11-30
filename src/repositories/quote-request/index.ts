@@ -6,11 +6,11 @@ import type {
 	QuoteRequest,
 	QuoteRequestDraft,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
-import type { RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
-import { QuoteRequestUpdateHandler } from "./actions";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
+import { QuoteRequestUpdateHandler } from "./actions.ts";
 
 export class QuoteRequestRepository extends AbstractResourceRepository<"quote-request"> {
 	constructor(config: Config) {

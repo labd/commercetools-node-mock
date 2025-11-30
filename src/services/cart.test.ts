@@ -13,8 +13,8 @@ import type {
 } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { customerDraftFactory } from "~src/testing/customer";
-import { CommercetoolsMock } from "../index";
+import { customerDraftFactory } from "#src/testing/customer.ts";
+import { CommercetoolsMock } from "../index.ts";
 
 describe("Carts Query", () => {
 	const ctMock = new CommercetoolsMock();

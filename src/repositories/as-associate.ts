@@ -1,6 +1,6 @@
-import { CartRepository } from "./cart";
-import { OrderRepository } from "./order";
-import { QuoteRequestRepository } from "./quote-request";
+import { CartRepository } from "./cart/index.ts";
+import { OrderRepository } from "./order/index.ts";
+import { QuoteRequestRepository } from "./quote-request/index.ts";
 
 export class AsAssociateOrderRepository extends OrderRepository {}
 export class AsAssociateCartRepository extends CartRepository {}

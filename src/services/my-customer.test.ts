@@ -6,8 +6,8 @@ import type {
 } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { CommercetoolsMock, getBaseResourceProperties } from "../index";
-import { hashPassword } from "../lib/password";
+import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
+import { hashPassword } from "../lib/password.ts";
 
 const ctMock = new CommercetoolsMock();
 

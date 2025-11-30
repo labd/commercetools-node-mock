@@ -1,8 +1,8 @@
 import type { Request, Response, Router } from "express";
-import { queryParamsValue } from "../helpers";
-import { getRepositoryContext } from "../repositories/helpers";
-import type { ShippingMethodRepository } from "../repositories/shipping-method";
-import AbstractService from "./abstract";
+import { queryParamsValue } from "../helpers.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import type { ShippingMethodRepository } from "../repositories/shipping-method/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class ShippingMethodService extends AbstractService {
 	public repository: ShippingMethodRepository;

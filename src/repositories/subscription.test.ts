@@ -3,9 +3,9 @@ import type {
 	SubscriptionSetKeyAction,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
-import { SubscriptionRepository } from "./subscription";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { SubscriptionRepository } from "./subscription.ts";
 
 describe("Subscription Repository", () => {
 	const storage = new InMemoryStorage();

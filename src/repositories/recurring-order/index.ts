@@ -3,14 +3,14 @@ import type {
 	RecurringOrder,
 	RecurringOrderDraft,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "~src/helpers";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
-} from "../abstract";
-import { OrderRepository } from "../order";
-import { RecurringOrderUpdateHandler } from "./actions";
+} from "../abstract.ts";
+import { OrderRepository } from "../order/index.ts";
+import { RecurringOrderUpdateHandler } from "./actions.ts";
 
 export class RecurringOrderRepository extends AbstractResourceRepository<"recurring-order"> {
 	constructor(config: Config) {

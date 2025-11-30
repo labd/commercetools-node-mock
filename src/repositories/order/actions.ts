@@ -9,11 +9,10 @@ import type {
 	OrderChangePaymentStateAction,
 	OrderChangeShipmentStateAction,
 	OrderSetBillingAddressAction,
-	OrderSetCustomFieldAction,
-	OrderSetCustomLineItemCustomTypeAction,
-	OrderSetCustomTypeAction,
 	OrderSetCustomerEmailAction,
 	OrderSetCustomerIdAction,
+	OrderSetCustomFieldAction,
+	OrderSetCustomTypeAction,
 	OrderSetDeliveryCustomFieldAction,
 	OrderSetLineItemCustomFieldAction,
 	OrderSetLineItemCustomTypeAction,
@@ -31,12 +30,12 @@ import type {
 	Store,
 	SyncInfo,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import { getBaseResourceProperties } from "~src/helpers";
-import type { Writable } from "~src/types";
-import type { RepositoryContext, UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
-import { createAddress } from "../helpers";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { getBaseResourceProperties } from "#src/helpers.ts";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
+import { createAddress } from "../helpers.ts";
 
 export class OrderUpdateHandler
 	extends AbstractUpdateHandler

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
-import type { Config } from "~src/config";
-import { InMemoryStorage } from "~src/storage";
-import { createRepositories } from "./index";
+import type { Config } from "#src/config.ts";
+import { InMemoryStorage } from "#src/storage/index.ts";
+import { createRepositories } from "./index.ts";
 
 describe("Repository Index", () => {
 	const storage = new InMemoryStorage();

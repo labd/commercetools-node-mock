@@ -7,16 +7,16 @@ import type {
 	CustomerGroupSetKeyAction,
 	CustomerGroupUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../helpers";
-import type { Writable } from "../types";
-import type { UpdateHandlerInterface } from "./abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
+import type { Writable } from "../types.ts";
+import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
 	AbstractUpdateHandler,
 	type RepositoryContext,
-} from "./abstract";
-import { createCustomFields } from "./helpers";
+} from "./abstract.ts";
+import { createCustomFields } from "./helpers.ts";
 
 export class CustomerGroupRepository extends AbstractResourceRepository<"customer-group"> {
 	constructor(config: Config) {

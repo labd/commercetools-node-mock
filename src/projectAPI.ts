@@ -1,9 +1,9 @@
-import type { Config } from "./config";
-import { getBaseResourceProperties } from "./helpers";
-import type { RepositoryMap } from "./repositories";
-import type { GetParams } from "./repositories/abstract";
-import type { AbstractStorage } from "./storage";
-import type { ResourceMap, ResourceType } from "./types";
+import type { Config } from "./config.ts";
+import { getBaseResourceProperties } from "./helpers.ts";
+import type { GetParams } from "./repositories/abstract.ts";
+import type { RepositoryMap } from "./repositories/index.ts";
+import type { AbstractStorage } from "./storage/index.ts";
+import type { ResourceMap, ResourceType } from "./types.ts";
 
 export class ProjectAPI {
 	private projectKey: string;
@@ -12,7 +12,7 @@ export class ProjectAPI {
 
 	private _repositories: RepositoryMap;
 
-	private config: Config;
+	readonly config: Config;
 
 	constructor(projectKey: string, repositories: RepositoryMap, config: Config) {
 		this.projectKey = projectKey;

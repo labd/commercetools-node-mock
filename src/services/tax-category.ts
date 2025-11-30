@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { TaxCategoryRepository } from "../repositories/tax-category";
-import AbstractService from "./abstract";
+import type { TaxCategoryRepository } from "../repositories/tax-category/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class TaxCategoryService extends AbstractService {
 	public repository: TaxCategoryRepository;

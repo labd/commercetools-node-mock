@@ -2,7 +2,7 @@ import type {
 	Review,
 	ReviewRatingStatistics,
 } from "@commercetools/platform-sdk";
-import type { AbstractStorage } from "../storage";
+import type { AbstractStorage } from "../storage/index.ts";
 
 export class ReviewStatisticsService {
 	constructor(private _storage: AbstractStorage) {}

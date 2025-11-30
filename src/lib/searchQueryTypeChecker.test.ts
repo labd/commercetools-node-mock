@@ -1,8 +1,8 @@
 import type {
-	SearchAndExpression,
-	SearchOrExpression,
 	_SearchQuery,
 	_SearchQueryExpression,
+	SearchAndExpression,
+	SearchOrExpression,
 } from "@commercetools/platform-sdk";
 import { describe, expect, it } from "vitest";
 import {
@@ -19,7 +19,7 @@ import {
 	isSearchRangeExpression,
 	isSearchWildCardExpression,
 	validateSearchQuery,
-} from "./searchQueryTypeChecker";
+} from "./searchQueryTypeChecker.ts";
 
 describe("searchQueryTypeChecker", () => {
 	it("should validate SearchAndExpression", () => {

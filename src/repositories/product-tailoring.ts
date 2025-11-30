@@ -2,9 +2,12 @@ import type {
 	ProductTailoring,
 	ProductTailoringUpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import type { RepositoryContext, UpdateHandlerInterface } from "./abstract";
-import { AbstractResourceRepository, AbstractUpdateHandler } from "./abstract";
+import type { Config } from "#src/config.ts";
+import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
+import {
+	AbstractResourceRepository,
+	AbstractUpdateHandler,
+} from "./abstract.ts";
 
 export class ProductTailoringRepository extends AbstractResourceRepository<"product-tailoring"> {
 	constructor(config: Config) {

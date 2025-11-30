@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { RecurringOrderRepository } from "../repositories/recurring-order/index";
-import AbstractService from "./abstract";
+import type { RecurringOrderRepository } from "../repositories/recurring-order/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class RecurringOrderService extends AbstractService {
 	public repository: RecurringOrderRepository;

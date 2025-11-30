@@ -7,17 +7,17 @@ import type {
 	ResourceNotFoundError,
 	UpdateAction,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { CommercetoolsError } from "~src/exceptions";
-import { cloneObject } from "../helpers";
-import type { AbstractStorage } from "../storage";
+import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { cloneObject } from "../helpers.ts";
+import type { AbstractStorage } from "../storage/index.ts";
 import type {
 	ResourceMap,
 	ResourceType,
 	ShallowWritable,
 	Writable,
-} from "./../types";
-import { checkConcurrentModification } from "./errors";
+} from "./../types.ts";
+import { checkConcurrentModification } from "./errors.ts";
 
 export type QueryParams = {
 	expand?: string[];
@@ -259,9 +259,8 @@ export class AbstractUpdateHandler {
 
 		for (const action of actions) {
 			// Validate if this action exists
-			// @ts-ignore
+			// @ts-expect-error
 			if (this[action.action] === undefined) {
-				console.info(`No handler for action ${action.action}`);
 				throw new CommercetoolsError<InvalidInputError>({
 					code: "InvalidInput",
 					message: `Invalid action ${action.action}`,
@@ -274,11 +273,10 @@ export class AbstractUpdateHandler {
 				});
 			}
 
-			// @ts-ignore
+			// @ts-expect-error
 			const updateFunc = this[action.action].bind(this);
 
 			if (!updateFunc) {
-				console.error(`No mock implemented for update action ${action.action}`);
 				throw new Error(
 					`No mock implemented for update action ${action.action}`,
 				);

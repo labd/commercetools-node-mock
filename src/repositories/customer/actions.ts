@@ -17,10 +17,10 @@ import type {
 	CustomerSetAddressCustomTypeAction,
 	CustomerSetAuthenticationModeAction,
 	CustomerSetCompanyNameAction,
-	CustomerSetCustomFieldAction,
-	CustomerSetCustomTypeAction,
 	CustomerSetCustomerGroupAction,
 	CustomerSetCustomerNumberAction,
+	CustomerSetCustomFieldAction,
+	CustomerSetCustomTypeAction,
 	CustomerSetDateOfBirthAction,
 	CustomerSetDefaultBillingAddressAction,
 	CustomerSetDefaultShippingAddressAction,
@@ -39,13 +39,13 @@ import type {
 	InvalidJsonInputError,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import { generateRandomString } from "~src/helpers";
-import { hashPassword } from "~src/lib/password";
-import type { Writable } from "~src/types";
-import type { UpdateHandlerInterface } from "../abstract";
-import { AbstractUpdateHandler, type RepositoryContext } from "../abstract";
-import { createAddress, createCustomFields } from "../helpers";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import { generateRandomString } from "#src/helpers.ts";
+import { hashPassword } from "#src/lib/password.ts";
+import type { Writable } from "#src/types.ts";
+import type { UpdateHandlerInterface } from "../abstract.ts";
+import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
+import { createAddress, createCustomFields } from "../helpers.ts";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler

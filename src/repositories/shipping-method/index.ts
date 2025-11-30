@@ -5,17 +5,17 @@ import type {
 	ZoneRateDraft,
 	ZoneReference,
 } from "@commercetools/platform-sdk";
-import type { Config } from "~src/config";
-import { getBaseResourceProperties } from "../../helpers";
-import { getShippingMethodsMatchingCart } from "../../shipping";
-import type { GetParams, RepositoryContext } from "../abstract";
-import { AbstractResourceRepository } from "../abstract";
+import type { Config } from "#src/config.ts";
+import { getBaseResourceProperties } from "../../helpers.ts";
+import { getShippingMethodsMatchingCart } from "../../shipping.ts";
+import type { GetParams, RepositoryContext } from "../abstract.ts";
+import { AbstractResourceRepository } from "../abstract.ts";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
-} from "../helpers";
-import { ShippingMethodUpdateHandler } from "./actions";
-import { transformShippingRate } from "./helpers";
+} from "../helpers.ts";
+import { ShippingMethodUpdateHandler } from "./actions.ts";
+import { transformShippingRate } from "./helpers.ts";
 
 export class ShippingMethodRepository extends AbstractResourceRepository<"shipping-method"> {
 	constructor(config: Config) {

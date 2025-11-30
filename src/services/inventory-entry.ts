@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { InventoryEntryRepository } from "../repositories/inventory-entry";
-import AbstractService from "./abstract";
+import type { InventoryEntryRepository } from "../repositories/inventory-entry/index.ts";
+import AbstractService from "./abstract.ts";
 
 export class InventoryEntryService extends AbstractService {
 	public repository: InventoryEntryRepository;

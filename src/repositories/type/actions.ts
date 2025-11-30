@@ -12,10 +12,10 @@ import type {
 	TypeSetDescriptionAction,
 	TypeUpdateAction,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "~src/exceptions";
-import type { Writable } from "~src/types";
-import type { RepositoryContext } from "../abstract";
-import { AbstractUpdateHandler } from "../abstract";
+import { CommercetoolsError } from "#src/exceptions.ts";
+import type { Writable } from "#src/types.ts";
+import type { RepositoryContext } from "../abstract.ts";
+import { AbstractUpdateHandler } from "../abstract.ts";
 
 type TypeUpdateHandlerMethod<T> = (
 	context: RepositoryContext,

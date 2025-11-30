@@ -1,6 +1,6 @@
 import type { Router } from "express";
-import type { ChannelRepository } from "../repositories/channel";
-import AbstractService from "./abstract";
+import type { ChannelRepository } from "../repositories/channel.ts";
+import AbstractService from "./abstract.ts";
 
 export class ChannelService extends AbstractService {
 	public repository: ChannelRepository;
