@@ -79,6 +79,7 @@ jobs:
     permissions:
       id-token: write  
       contents: read
+    environment: release
     needs: validate
     steps:
       - name: Checkout repo
