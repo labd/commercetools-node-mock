@@ -73,5 +73,13 @@
 	"publishConfig": {
 		"access": "public",
 		"provenance": true
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/labd/commercetools-node-mock.git"
+	},
+	"bugs": {
+		"url": "https://github.com/labd/commercetools-node-mock/issues"
+	},
+	"homepage": "https://github.com/labd/commercetools-node-mock#readme"
 }
