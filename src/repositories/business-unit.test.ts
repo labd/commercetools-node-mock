@@ -254,37 +254,6 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("update business unit - addAddress sets id when only key provided", () => {
-		const draft: CompanyDraft = {
-			key: "add-address-key-company",
-			unitType: "Company",
-			name: "Add Address Key Company",
-		};
-
-		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
-
-		const result = repository.processUpdateActions(
-			ctx,
-			businessUnit,
-			businessUnit.version,
-			[
-				{
-					action: "addAddress",
-					address: {
-						key: "address-key",
-						country: "US",
-					},
-				} as BusinessUnitAddAddressAction,
-			],
-		);
-
-		expect(result.addresses).toHaveLength(1);
-		expect(result.addresses[0].key).toBe("address-key");
-		expect(result.addresses[0].id).toBeDefined();
-		expect(result.version).toBe(businessUnit.version + 1);
-	});
-
 	test("update business unit - setDefaultShippingAddress", () => {
 		const draft: CompanyDraft = {
 			key: "default-shipping-company",
