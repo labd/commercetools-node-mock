@@ -1,4 +1,6 @@
+import assert from "node:assert";
 import type {
+	Address,
 	Associate,
 	BusinessUnit,
 	BusinessUnitAddAddressAction,
@@ -32,8 +34,10 @@ import type {
 	CompanyDraft,
 	Division,
 	DivisionDraft,
+	InvalidOperationError,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { generateRandomString, getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
@@ -147,8 +151,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 class BusinessUnitUpdateHandler
 	extends AbstractUpdateHandler
 	implements
-		Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>>
-{
+	Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>> {
 	addAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
@@ -201,22 +204,23 @@ class BusinessUnitUpdateHandler
 	changeAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId, address }: BusinessUnitChangeAddressAction,
+		{ addressId, addressKey, address }: BusinessUnitChangeAddressAction,
 	) {
-		const existingAddressIndex = resource.addresses.findIndex(
-			(addr) => addr.id === addressId,
+		const current = this._findAddress(resource, addressId, addressKey, true);
+		assert(current?.id); // always true since we set required to true
+
+		const oldAddressIndex = resource.addresses.findIndex(
+			(a) => a.id === current.id,
 		);
-		if (existingAddressIndex === -1) {
-			throw new Error(`Address with id ${addressId} not found`);
-		}
 
 		const newAddress = createAddress(
-			{ ...address, id: addressId },
+			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,
 		);
+
 		if (newAddress) {
-			resource.addresses[existingAddressIndex] = newAddress;
+			resource.addresses[oldAddressIndex] = newAddress;
 		}
 	}
 
@@ -344,35 +348,59 @@ class BusinessUnitUpdateHandler
 	setDefaultShippingAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitSetDefaultShippingAddressAction,
+		{ addressId, addressKey }: BusinessUnitSetDefaultShippingAddressAction,
 	) {
-		resource.defaultShippingAddressId = addressId;
+		const address = this._findAddress(
+			resource,
+			addressId,
+			addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+
+		resource.defaultShippingAddressId = address.id;
+		if (resource.shippingAddressIds === undefined) {
+			resource.shippingAddressIds = [];
+		}
+		if (!resource.shippingAddressIds.includes(address.id)) {
+			resource.shippingAddressIds.push(address.id);
+		}
 	}
 
 	addShippingAddressId(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitAddShippingAddressIdAction,
+		{ addressId, addressKey }: BusinessUnitAddShippingAddressIdAction,
 	) {
-		if (!resource.shippingAddressIds) {
+		const address = this._findAddress(resource, addressId, addressKey, true);
+		assert(address?.id); // always true since we set required to true
+
+		if (resource.shippingAddressIds === undefined) {
 			resource.shippingAddressIds = [];
 		}
-		if (addressId) {
-			resource.shippingAddressIds.push(addressId);
+
+		if (!resource.shippingAddressIds.includes(address.id)) {
+			resource.shippingAddressIds.push(address.id);
 		}
+		return resource;
 	}
 
 	removeShippingAddressId(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitRemoveShippingAddressIdAction,
+		{ addressId, addressKey }: BusinessUnitRemoveShippingAddressIdAction,
 	) {
-		if (resource.shippingAddressIds) {
-			resource.shippingAddressIds = resource.shippingAddressIds.filter(
-				(id) => id !== addressId,
-			);
-		}
-		if (resource.defaultShippingAddressId === addressId) {
+		const address = this._findAddress(
+			resource,
+			addressId,
+			addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+		resource.shippingAddressIds = resource.shippingAddressIds?.filter(
+			(id) => id !== address.id,
+		);
+		if (resource.defaultShippingAddressId === address.id) {
 			resource.defaultShippingAddressId = undefined;
 		}
 	}
@@ -380,27 +408,36 @@ class BusinessUnitUpdateHandler
 	addBillingAddressId(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitAddBillingAddressIdAction,
+		{ addressId, addressKey }: BusinessUnitAddBillingAddressIdAction,
 	) {
-		if (!resource.billingAddressIds) {
+		const address = this._findAddress(resource, addressId, addressKey, true);
+		assert(address?.id); // always true since we set required to true
+
+		if (resource.billingAddressIds === undefined) {
 			resource.billingAddressIds = [];
 		}
-		if (addressId) {
-			resource.billingAddressIds.push(addressId);
+
+		if (!resource.billingAddressIds.includes(address.id)) {
+			resource.billingAddressIds.push(address.id);
 		}
 	}
 
 	removeBillingAddressId(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitRemoveBillingAddressIdAction,
+		{ addressId, addressKey }: BusinessUnitRemoveBillingAddressIdAction,
 	) {
-		if (resource.billingAddressIds) {
-			resource.billingAddressIds = resource.billingAddressIds.filter(
-				(id) => id !== addressId,
-			);
-		}
-		if (resource.defaultBillingAddressId === addressId) {
+		const address = this._findAddress(
+			resource,
+			addressId,
+			addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+		resource.billingAddressIds = resource.billingAddressIds?.filter(
+			(id) => id !== address.id,
+		);
+		if (resource.defaultBillingAddressId === address.id) {
 			resource.defaultBillingAddressId = undefined;
 		}
 	}
@@ -408,9 +445,23 @@ class BusinessUnitUpdateHandler
 	setDefaultBillingAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitSetDefaultBillingAddressAction,
+		{ addressId, addressKey }: BusinessUnitSetDefaultBillingAddressAction,
 	) {
-		resource.defaultBillingAddressId = addressId;
+		const address = this._findAddress(
+			resource,
+			addressId,
+			addressKey,
+			true,
+		);
+		assert(address?.id); // always true since we set required to true
+
+		resource.defaultBillingAddressId = address.id;
+		if (resource.billingAddressIds === undefined) {
+			resource.billingAddressIds = [];
+		}
+		if (!resource.billingAddressIds.includes(address.id)) {
+			resource.billingAddressIds.push(address.id);
+		}
 	}
 
 	setCustomField(
@@ -467,28 +518,78 @@ class BusinessUnitUpdateHandler
 	removeAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
-		{ addressId }: BusinessUnitRemoveAddressAction,
+		{ addressId, addressKey }: BusinessUnitRemoveAddressAction,
 	) {
-		resource.addresses = resource.addresses.filter(
-			(addr) => addr.id !== addressId,
+		const address = this._findAddress(
+			resource,
+			addressId,
+			addressKey,
+			true,
 		);
+		assert(address?.id); // always true since we set required to true
+		resource.addresses = resource.addresses.filter((a) => a.id !== address.id);
 
 		if (resource.shippingAddressIds) {
 			resource.shippingAddressIds = resource.shippingAddressIds.filter(
-				(id) => id !== addressId,
+				(id) => id !== address.id,
 			);
 		}
 		if (resource.billingAddressIds) {
 			resource.billingAddressIds = resource.billingAddressIds.filter(
-				(id) => id !== addressId,
+				(id) => id !== address.id,
 			);
 		}
 
-		if (resource.defaultShippingAddressId === addressId) {
+		if (resource.defaultShippingAddressId === address.id) {
 			resource.defaultShippingAddressId = undefined;
 		}
-		if (resource.defaultBillingAddressId === addressId) {
+		if (resource.defaultBillingAddressId === address.id) {
 			resource.defaultBillingAddressId = undefined;
+		}
+	}
+
+	private _findAddress(
+		resource: Writable<BusinessUnit>,
+		addressId: string | undefined,
+		addressKey: string | undefined,
+		required = false,
+	): Address | undefined {
+		if (addressKey) {
+			const address = resource.addresses.find((a) => a.key === addressKey);
+			if (!address) {
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Business Unit does not contain an address with the key ${addressKey}.`,
+					},
+					400,
+				);
+			}
+			return address;
+		}
+
+		if (addressId) {
+			const address = resource.addresses.find((a) => a.id === addressId);
+			if (!address) {
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Business Unit does not contain an address with the id ${addressId}.`,
+					},
+					400,
+				);
+			}
+			return address;
+		}
+
+		if (required) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "One of address 'addressId' or 'addressKey' is required.",
+				},
+				400,
+			);
 		}
 	}
 }

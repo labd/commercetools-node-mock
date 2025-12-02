@@ -49,8 +49,7 @@ import { createAddress, createCustomFields } from "../helpers.ts";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
-	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
-{
+	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>> {
 	addAddress(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -149,6 +148,24 @@ export class CustomerUpdateHandler
 		);
 		assert(address?.id); // always true since we set required to true
 		resource.addresses = resource.addresses.filter((a) => a.id !== address.id);
+
+		if (resource.shippingAddressIds) {
+			resource.shippingAddressIds = resource.shippingAddressIds.filter(
+				(id) => id !== address.id,
+			);
+		}
+		if (resource.billingAddressIds) {
+			resource.billingAddressIds = resource.billingAddressIds.filter(
+				(id) => id !== address.id,
+			);
+		}
+
+		if (resource.defaultShippingAddressId === address.id) {
+			resource.defaultShippingAddressId = undefined;
+		}
+		if (resource.defaultBillingAddressId === address.id) {
+			resource.defaultBillingAddressId = undefined;
+		}
 	}
 
 	removeBillingAddressId(
