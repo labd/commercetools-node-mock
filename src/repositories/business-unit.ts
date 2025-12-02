@@ -147,7 +147,8 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 class BusinessUnitUpdateHandler
 	extends AbstractUpdateHandler
 	implements
-	Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>> {
+		Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>>
+{
 	addAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
@@ -215,7 +216,7 @@ class BusinessUnitUpdateHandler
 			this._storage,
 		);
 		if (newAddress) {
-			resource.addresses[existingAddressIndex] = newAddress
+			resource.addresses[existingAddressIndex] = newAddress;
 		}
 	}
 

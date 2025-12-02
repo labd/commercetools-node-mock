@@ -647,7 +647,6 @@ describe("Cart Update Actions", () => {
 		expect(response.body.billingAddress).toEqual({
 			...address,
 			id: expect.any(String),
-
 		});
 	});
 
