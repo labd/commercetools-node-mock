@@ -13,7 +13,7 @@
 	},
 	"main": "dist/index.mjs",
 	"module": "dist/index.mjs",
-	"typings": "dist/index.d.ts",
+	"typings": "dist/index.d.mts",
 	"files": [
 		"dist",
 		"src"
