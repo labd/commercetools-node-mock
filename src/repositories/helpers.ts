@@ -32,8 +32,8 @@ import type {
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js/decimal";
 import type { Request } from "express";
-import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { v4 as uuidv4 } from "uuid";
 import type { AbstractStorage } from "../storage/index.ts";
 import type { RepositoryContext } from "./abstract.ts";
 
@@ -48,10 +48,15 @@ export const createAddress = (
 		throw new Error("Country is required");
 	}
 
+	// Generate a random 8-character alphanumeric string
+	// which is what addresses use instead of uuid
+	const generateRandomId = (): string => Math.random().toString(36).substring(2, 10).padEnd(8, '0');
 	return {
 		...base,
+		id: base.id ?? generateRandomId(),
 	};
 };
+
 
 export const createCustomFields = (
 	draft: CustomFieldsDraft | undefined,

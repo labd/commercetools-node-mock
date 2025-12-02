@@ -49,8 +49,7 @@ import { createAddress, createCustomFields } from "../helpers.ts";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
-	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
-{
+	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>> {
 	addAddress(
 		_context: RepositoryContext,
 		resource: Writable<Customer>,
@@ -118,16 +117,13 @@ export class CustomerUpdateHandler
 		);
 
 		const newAddress = createAddress(
-			address,
+			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,
 		);
 
 		if (newAddress) {
-			resource.addresses[oldAddressIndex] = {
-				id: addressId,
-				...newAddress,
-			};
+			resource.addresses[oldAddressIndex] = newAddress
 		}
 	}
 
