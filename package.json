@@ -5,14 +5,14 @@
 	"author": "Michael van Tellingen",
 	"type": "module",
 	"exports": {
-		".": "./dist/index.js"
+		".": "./dist/index.mjs"
 	},
 	"imports": {
 		"#src/*": "./src/*",
 		"#vendor/*": "./vendor/*"
 	},
-	"main": "dist/index.js",
-	"module": "dist/index.js",
+	"main": "dist/index.mjs",
+	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
 	"files": [
 		"dist",
