@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.61.2
+
+### Patch Changes
+
+- [#355](https://github.com/labd/commercetools-node-mock/pull/355) [`263e40f`](https://github.com/labd/commercetools-node-mock/commit/263e40f034c9847432d433d2e312c74f3c175b92) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix release by properly referencing the `index.mjs` file in the package.json
+
 ## 2.61.1
 
 ### Patch Changes
