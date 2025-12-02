@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.61.1
+
+### Patch Changes
+
+- [#353](https://github.com/labd/commercetools-node-mock/pull/353) [`88af65c`](https://github.com/labd/commercetools-node-mock/commit/88af65c9ac97b5f9b739cb437dc5ec3b7c7b1d75) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Generate an ID for address when one has not been passed
+
 ## 2.61.0
 
 ### Minor Changes
