@@ -1,5 +1,4 @@
 import type {
-	BusinessUnitAddAddressAction,
 	BusinessUnitAddShippingAddressIdAction,
 	BusinessUnitChangeNameAction,
 	BusinessUnitChangeStatusAction,
