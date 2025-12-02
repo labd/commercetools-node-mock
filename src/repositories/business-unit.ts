@@ -151,7 +151,8 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 class BusinessUnitUpdateHandler
 	extends AbstractUpdateHandler
 	implements
-	Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>> {
+		Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>>
+{
 	addAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
@@ -350,12 +351,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ addressId, addressKey }: BusinessUnitSetDefaultShippingAddressAction,
 	) {
-		const address = this._findAddress(
-			resource,
-			addressId,
-			addressKey,
-			true,
-		);
+		const address = this._findAddress(resource, addressId, addressKey, true);
 		assert(address?.id); // always true since we set required to true
 
 		resource.defaultShippingAddressId = address.id;
@@ -390,12 +386,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ addressId, addressKey }: BusinessUnitRemoveShippingAddressIdAction,
 	) {
-		const address = this._findAddress(
-			resource,
-			addressId,
-			addressKey,
-			true,
-		);
+		const address = this._findAddress(resource, addressId, addressKey, true);
 		assert(address?.id); // always true since we set required to true
 		resource.shippingAddressIds = resource.shippingAddressIds?.filter(
 			(id) => id !== address.id,
@@ -427,12 +418,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ addressId, addressKey }: BusinessUnitRemoveBillingAddressIdAction,
 	) {
-		const address = this._findAddress(
-			resource,
-			addressId,
-			addressKey,
-			true,
-		);
+		const address = this._findAddress(resource, addressId, addressKey, true);
 		assert(address?.id); // always true since we set required to true
 		resource.billingAddressIds = resource.billingAddressIds?.filter(
 			(id) => id !== address.id,
@@ -447,12 +433,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ addressId, addressKey }: BusinessUnitSetDefaultBillingAddressAction,
 	) {
-		const address = this._findAddress(
-			resource,
-			addressId,
-			addressKey,
-			true,
-		);
+		const address = this._findAddress(resource, addressId, addressKey, true);
 		assert(address?.id); // always true since we set required to true
 
 		resource.defaultBillingAddressId = address.id;
@@ -520,12 +501,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ addressId, addressKey }: BusinessUnitRemoveAddressAction,
 	) {
-		const address = this._findAddress(
-			resource,
-			addressId,
-			addressKey,
-			true,
-		);
+		const address = this._findAddress(resource, addressId, addressKey, true);
 		assert(address?.id); // always true since we set required to true
 		resource.addresses = resource.addresses.filter((a) => a.id !== address.id);
 
