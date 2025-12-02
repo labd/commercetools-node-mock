@@ -211,15 +211,12 @@ class BusinessUnitUpdateHandler
 		}
 
 		const newAddress = createAddress(
-			address,
+			{ ...address, id: addressId },
 			context.projectKey,
 			this._storage,
 		);
 		if (newAddress) {
-			resource.addresses[existingAddressIndex] = {
-				...newAddress,
-				id: addressId,
-			};
+			resource.addresses[existingAddressIndex] = newAddress;
 		}
 	}
 

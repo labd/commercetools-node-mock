@@ -48,8 +48,13 @@ export const createAddress = (
 		throw new Error("Country is required");
 	}
 
+	// Generate a random 8-character alphanumeric string
+	// which is what addresses use instead of uuid
+	const generateRandomId = (): string =>
+		Math.random().toString(36).substring(2, 10).padEnd(8, "0");
 	return {
 		...base,
+		id: base.id ?? generateRandomId(),
 	};
 };
 

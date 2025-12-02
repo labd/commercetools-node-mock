@@ -118,16 +118,13 @@ export class CustomerUpdateHandler
 		);
 
 		const newAddress = createAddress(
-			address,
+			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,
 		);
 
 		if (newAddress) {
-			resource.addresses[oldAddressIndex] = {
-				id: addressId,
-				...newAddress,
-			};
+			resource.addresses[oldAddressIndex] = newAddress;
 		}
 	}
 
