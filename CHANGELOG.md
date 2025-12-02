@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.61.3
+
+### Patch Changes
+
+- [#357](https://github.com/labd/commercetools-node-mock/pull/357) [`b07c7c9`](https://github.com/labd/commercetools-node-mock/commit/b07c7c98dd206130fed8d65ce986e21ba984d2d9) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix file ref to typings file
+
+- [#359](https://github.com/labd/commercetools-node-mock/pull/359) [`564b3f8`](https://github.com/labd/commercetools-node-mock/commit/564b3f8334e1ab4231b0d5bdecf310eb1f5e1fe6) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - fix: allow business unit address actions to work with key as well as ID
+
 ## 2.61.2
 
 ### Patch Changes
