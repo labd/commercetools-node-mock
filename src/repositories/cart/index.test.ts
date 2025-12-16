@@ -724,7 +724,7 @@ describe("createShippingInfo", () => {
 			cartDiscounts: [],
 			isActive: true,
 			references: [],
-			groups: []
+			groups: [],
 		});
 
 		const cart: CartDraft = {
@@ -738,12 +738,14 @@ describe("createShippingInfo", () => {
 		const result = repository.create(ctx, cart);
 		expect(result.id).toBeDefined();
 
-		expect(result.discountCodes).toEqual([{
-			discountCode: {
-				typeId: "discount-code",
-				id: code.id,
+		expect(result.discountCodes).toEqual([
+			{
+				discountCode: {
+					typeId: "discount-code",
+					id: code.id,
+				},
+				state: "MatchesCart",
 			},
-			state: "MatchesCart"
-		}]);
+		]);
 	});
 });
