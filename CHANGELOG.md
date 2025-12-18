@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.62.0
+
+### Minor Changes
+
+- [#361](https://github.com/labd/commercetools-node-mock/pull/361) [`378ad0d`](https://github.com/labd/commercetools-node-mock/commit/378ad0d030b59544d382886b3e461ab7bb5ac3f3) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for as associate shopping lists
+
 ## 2.61.3
 
 ### Patch Changes
