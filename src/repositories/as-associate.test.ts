@@ -1,3 +1,4 @@
+import type { ShoppingListDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
@@ -5,6 +6,7 @@ import {
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
+	AsAssociateShoppingListRepository,
 } from "./as-associate.ts";
 import { CustomerRepository } from "./customer/index.ts";
 
@@ -122,5 +124,28 @@ describe("As Associate Repositories", () => {
 		const retrieved = repository.get(ctx, quoteRequest.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(quoteRequest.id);
+	});
+
+	test("AsAssociateShoppingListRepository can create and retrieve shopping lists", () => {
+		const repository = new AsAssociateShoppingListRepository(config);
+		const ctx = { projectKey: "test-project" };
+
+		const shoppingListDraft: ShoppingListDraft = {
+			name: { "en-US": "My Shopping List" },
+		};
+
+		const shoppingList = repository.create(ctx, shoppingListDraft);
+		expect(shoppingList.id).toBeDefined();
+		expect(shoppingList.version).toBe(1);
+
+		// Test query
+		const result = repository.query(ctx);
+		expect(result.count).toBe(1);
+		expect(result.results[0].id).toBe(shoppingList.id);
+
+		// Test get
+		const retrieved = repository.get(ctx, shoppingList.id);
+		expect(retrieved).toBeDefined();
+		expect(retrieved?.id).toBe(shoppingList.id);
 	});
 });

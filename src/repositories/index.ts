@@ -4,6 +4,7 @@ import {
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
+	AsAssociateShoppingListRepository,
 } from "./as-associate.ts";
 import { AssociateRoleRepository } from "./associate-role.ts";
 import { AttributeGroupRepository } from "./attribute-group.ts";
@@ -53,6 +54,7 @@ export const createRepositories = (config: Config) => ({
 		cart: new AsAssociateCartRepository(config),
 		order: new AsAssociateOrderRepository(config),
 		"quote-request": new AsAssociateQuoteRequestRepository(config),
+		"shopping-list": new AsAssociateShoppingListRepository(config),
 	},
 	"associate-role": new AssociateRoleRepository(config),
 	"attribute-group": new AttributeGroupRepository(config),
