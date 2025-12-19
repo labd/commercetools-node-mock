@@ -10,7 +10,6 @@ import type {
 	AssociateRoleResourceIdentifier,
 	BaseAddress,
 	BusinessUnitKeyReference,
-	BusinessUnitReference,
 	BusinessUnitResourceIdentifier,
 	CentPrecisionMoney,
 	CustomFields,
@@ -323,18 +322,17 @@ export const getBusinessUnitKeyReference = (
 		};
 	}
 
-	const value = getReferenceFromResourceIdentifier<BusinessUnitReference>(
-		id,
+	const resource = storage.getByResourceIdentifier<"business-unit">(
 		projectKey,
-		storage,
+		id,
 	);
 
-	if (!value.obj?.key) {
+	if (!resource?.key) {
 		throw new Error("No business-unit found for reference");
 	}
 
 	return {
 		typeId: "business-unit",
-		key: value.obj?.key,
+		key: resource.key,
 	};
 };
