@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.62.1
+
+### Patch Changes
+
+- [#363](https://github.com/labd/commercetools-node-mock/pull/363) [`18bf0cb`](https://github.com/labd/commercetools-node-mock/commit/18bf0cb069717bb828d9fa2fc37d1fcf5449adbd) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - properly fetch the business unit key in getBusinessUnitKeyReference
+
 ## 2.62.0
 
 ### Minor Changes
