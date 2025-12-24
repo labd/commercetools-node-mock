@@ -35,6 +35,7 @@ import type { Writable } from "#src/types.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository, type QueryParams } from "../abstract.ts";
 import {
+	calculateMoneyTotalCentAmount,
 	createAddress,
 	createCentPrecisionMoney,
 	createCustomFields,
@@ -260,8 +261,8 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 
 		const quantity = draft.quantity ?? 1;
 		const totalPrice = createCentPrecisionMoney({
-			...draft.price.value,
-			centAmount: (draft.price.value.centAmount ?? 0) * quantity,
+			currencyCode: draft.price.value.currencyCode,
+			centAmount: calculateMoneyTotalCentAmount(draft.price.value, quantity),
 		});
 
 		const lineItem: LineItem = {
@@ -306,8 +307,8 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 	): CustomLineItem {
 		const quantity = draft.quantity ?? 1;
 		const totalPrice = createCentPrecisionMoney({
-			...draft.money,
-			centAmount: (draft.money.centAmount ?? 0) * quantity,
+			currencyCode: draft.money.currencyCode,
+			centAmount: calculateMoneyTotalCentAmount(draft.money, quantity),
 		});
 
 		const lineItem: CustomLineItem = {

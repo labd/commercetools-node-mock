@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 import { calculateTaxedPrice } from "#src/lib/tax.ts";
 import type { AbstractStorage } from "#src/storage/abstract.ts";
 import {
+	calculateMoneyTotalCentAmount,
 	createCentPrecisionMoney,
 	createCustomFields,
 	createTypedMoney,
@@ -40,8 +41,13 @@ export const selectPrice = ({
 	});
 };
 
-export const calculateLineItemTotalPrice = (lineItem: LineItem): number =>
-	lineItem.price?.value.centAmount * lineItem.quantity;
+export const calculateLineItemTotalPrice = (lineItem: LineItem): number => {
+	if (!lineItem.price?.value) {
+		return 0;
+	}
+
+	return calculateMoneyTotalCentAmount(lineItem.price.value, lineItem.quantity);
+};
 
 export const calculateCartTotalPrice = (cart: Cart): number => {
 	const lineItemsTotal = cart.lineItems.reduce(
@@ -83,8 +89,8 @@ export const createCustomLineItemFromDraft = (
 	}
 
 	const totalPrice = createCentPrecisionMoney({
-		...draft.money,
-		centAmount: (draft.money.centAmount ?? 0) * quantity,
+		currencyCode: draft.money.currencyCode,
+		centAmount: calculateMoneyTotalCentAmount(draft.money, quantity),
 	});
 
 	const taxedPrice = taxCategory
