@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.63.0
+
+### Minor Changes
+
+- [#365](https://github.com/labd/commercetools-node-mock/pull/365) [`ef7ef13`](https://github.com/labd/commercetools-node-mock/commit/ef7ef13fbacecf6544a8ce0d0a4e7a54f9f4c654) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Add HighPrecisionMoney support
+
 ## 2.62.1
 
 ### Patch Changes
