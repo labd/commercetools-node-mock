@@ -42,6 +42,7 @@ import type {
 	ProductVariant,
 } from "@commercetools/platform-sdk";
 import type {
+	CartAddDiscountCodeAction,
 	CustomLineItem,
 	DirectDiscount,
 } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
@@ -61,6 +62,7 @@ import {
 	calculateCartTotalPrice,
 	calculateLineItemTotalPrice,
 	createCustomLineItemFromDraft,
+	createDiscountCodeInfoFromCode,
 	selectPrice,
 } from "./helpers.ts";
 import type { CartRepository } from "./index.ts";
@@ -278,6 +280,25 @@ export class CartUpdateHandler
 		// but it triggers several Cart updates to bring prices and discounts to the latest state.
 		// Those can become stale over time when no Cart updates have been performed for a while
 		// and prices on related Products have changed in the meanwhile.
+	}
+
+	addDiscountCode(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ code }: CartAddDiscountCodeAction,
+	) {
+		const info = createDiscountCodeInfoFromCode(
+			context.projectKey,
+			this._storage,
+			code,
+		);
+		if (
+			!resource.discountCodes
+				.map((dc) => dc.discountCode.id)
+				.includes(info.discountCode.id)
+		) {
+			resource.discountCodes.push(info);
+		}
 	}
 
 	removeDiscountCode(
