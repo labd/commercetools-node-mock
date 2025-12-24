@@ -24,7 +24,12 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract.ts";
-import { createAddress, createCustomFields } from "../helpers.ts";
+import {
+	calculateMoneyTotalCentAmount,
+	createAddress,
+	createCentPrecisionMoney,
+	createCustomFields,
+} from "../helpers.ts";
 import { CartUpdateHandler } from "./actions.ts";
 import {
 	calculateCartTotalPrice,
@@ -238,6 +243,11 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			);
 		}
 
+		const totalPrice = createCentPrecisionMoney({
+			currencyCode: price.value.currencyCode,
+			centAmount: calculateMoneyTotalCentAmount(price.value, quant),
+		});
+
 		return {
 			id: uuidv4(),
 			productId: product.id,
@@ -247,12 +257,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			name: product.masterData.current.name,
 			variant,
 			price: price,
-			totalPrice: {
-				type: "centPrecision",
-				currencyCode: price.value.currencyCode,
-				fractionDigits: price.value.fractionDigits,
-				centAmount: price.value.centAmount * quant,
-			},
+			totalPrice,
 			taxedPricePortions: [],
 			perMethodTaxRate: [],
 			quantity: quant,

@@ -28,6 +28,7 @@ import type {
 	StoreReference,
 	StoreResourceIdentifier,
 	Type,
+	TypedMoney,
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js/decimal";
 import type { Request } from "express";
@@ -109,10 +110,9 @@ export const roundDecimal = (decimal: Decimal, roundingMode: RoundingMode) => {
 	}
 };
 
-export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
+export const getCurrencyFractionDigits = (currencyCode: string): number => {
 	// Taken from https://docs.adyen.com/development-resources/currency-codes
-	let fractionDigits = 2;
-	switch (value.currencyCode.toUpperCase()) {
+	switch (currencyCode.toUpperCase()) {
 		case "BHD":
 		case "IQD":
 		case "JOD":
@@ -120,8 +120,7 @@ export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
 		case "LYD":
 		case "OMR":
 		case "TND":
-			fractionDigits = 3;
-			break;
+			return 3;
 		case "CVE":
 		case "DJF":
 		case "GNF":
@@ -137,29 +136,120 @@ export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
 		case "XAF":
 		case "XOF":
 		case "XPF":
-			fractionDigits = 0;
-			break;
+			return 0;
 		default:
-			fractionDigits = 2;
+			return 2;
 	}
+};
 
-	if ((value as HighPrecisionMoney & HighPrecisionMoneyDraft).preciseAmount) {
-		throw new Error("HighPrecisionMoney not supported");
+export const calculateCentAmountFromPreciseAmount = (
+	preciseAmount: number,
+	fractionDigits: number,
+	currencyCode: string,
+	roundingMode: RoundingMode = "HalfEven",
+): number => {
+	const centFractionDigits = getCurrencyFractionDigits(currencyCode);
+	const diff = fractionDigits - centFractionDigits;
+	const scale = new Decimal(10).pow(Math.abs(diff));
+	const decimal =
+		diff >= 0
+			? new Decimal(preciseAmount).div(scale)
+			: new Decimal(preciseAmount).mul(scale);
+
+	return roundDecimal(decimal, roundingMode).toNumber();
+};
+
+export const createCentPrecisionMoney = (value: _Money): CentPrecisionMoney => {
+	const fractionDigits = getCurrencyFractionDigits(value.currencyCode);
+	const preciseValue = value as HighPrecisionMoney & HighPrecisionMoneyDraft;
+	let centAmount: number;
+
+	centAmount = value.centAmount ?? 0;
+
+	if (
+		preciseValue.preciseAmount !== undefined &&
+		preciseValue.fractionDigits !== undefined
+	) {
+		centAmount = calculateCentAmountFromPreciseAmount(
+			preciseValue.preciseAmount,
+			preciseValue.fractionDigits,
+			value.currencyCode,
+			"HalfEven",
+		);
 	}
 
 	return {
 		type: "centPrecision",
-		// centAmont is only optional on HighPrecisionMoney, so this should never
-		// fallback to 0
-		centAmount: value.centAmount ?? 0,
+		centAmount,
 		currencyCode: value.currencyCode,
-		fractionDigits: fractionDigits,
+		fractionDigits,
 	};
 };
 
-export const createTypedMoney = (value: _Money): CentPrecisionMoney => {
-	const result = createCentPrecisionMoney(value);
-	return result;
+export const createHighPrecisionMoney = (
+	value: HighPrecisionMoney | HighPrecisionMoneyDraft,
+): HighPrecisionMoney => {
+	if (value.preciseAmount === undefined) {
+		throw new Error("HighPrecisionMoney requires preciseAmount");
+	}
+
+	if (value.fractionDigits === undefined) {
+		throw new Error("HighPrecisionMoney requires fractionDigits");
+	}
+
+	const centAmount =
+		value.centAmount ??
+		calculateCentAmountFromPreciseAmount(
+			value.preciseAmount,
+			value.fractionDigits,
+			value.currencyCode,
+			"HalfEven",
+		);
+
+	return {
+		type: "highPrecision",
+		centAmount,
+		currencyCode: value.currencyCode,
+		fractionDigits: value.fractionDigits,
+		preciseAmount: value.preciseAmount,
+	};
+};
+
+export const createTypedMoney = (value: _Money): TypedMoney => {
+	const preciseValue = value as HighPrecisionMoney & HighPrecisionMoneyDraft;
+	if (
+		("type" in value && value.type === "highPrecision") ||
+		preciseValue.preciseAmount !== undefined
+	) {
+		return createHighPrecisionMoney(
+			value as HighPrecisionMoney | HighPrecisionMoneyDraft,
+		);
+	}
+
+	return createCentPrecisionMoney(value);
+};
+
+export const calculateMoneyTotalCentAmount = (
+	money: _Money,
+	quantity: number,
+	roundingMode: RoundingMode = "HalfEven",
+): number => {
+	const preciseValue = money as HighPrecisionMoney & HighPrecisionMoneyDraft;
+
+	if (
+		preciseValue.preciseAmount === undefined ||
+		preciseValue.fractionDigits === undefined
+	) {
+		return (money.centAmount ?? 0) * quantity;
+	}
+
+	const totalPrecise = new Decimal(preciseValue.preciseAmount).mul(quantity);
+	return calculateCentAmountFromPreciseAmount(
+		totalPrecise.toNumber(),
+		preciseValue.fractionDigits,
+		money.currencyCode,
+		roundingMode,
+	);
 };
 
 export const resolveStoreReference = (

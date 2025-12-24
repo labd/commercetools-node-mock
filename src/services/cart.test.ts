@@ -3,6 +3,7 @@ import type {
 	Address,
 	Cart,
 	CentPrecisionMoney,
+	HighPrecisionMoneyDraft,
 	ProductDraft,
 	ShippingMethod,
 	ShippingMethodDraft,
@@ -14,6 +15,7 @@ import type {
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { customerDraftFactory } from "#src/testing/customer.ts";
+import { calculateMoneyTotalCentAmount } from "#src/repositories/helpers.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Carts Query", () => {
@@ -784,6 +786,166 @@ describe("Cart Update Actions", () => {
 		expect(response.body.totalPrice.centAmount).toBe(
 			externalPrice.centAmount * updatedLineItem.quantity,
 		);
+	});
+
+	test("setLineItemPrice supports high precision external price", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const baseCartResponse = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({ currency: "EUR" });
+		expect(baseCartResponse.status).toBe(201);
+		const baseCart = baseCartResponse.body as Cart;
+
+		const addLineItemResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${baseCart.id}`)
+			.send({
+				version: baseCart.version,
+				actions: [
+					{
+						action: "addLineItem",
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 2,
+					},
+				],
+			});
+		expect(addLineItemResponse.status).toBe(200);
+		const cartWithLineItem = addLineItemResponse.body as Cart;
+		const lineItem = cartWithLineItem.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const externalPrice: HighPrecisionMoneyDraft = {
+			type: "highPrecision",
+			currencyCode: "EUR",
+			fractionDigits: 3,
+			preciseAmount: 1015,
+		};
+		const expectedUnitCentAmount = calculateMoneyTotalCentAmount(
+			externalPrice,
+			1,
+		);
+		const expectedTotalCentAmount = calculateMoneyTotalCentAmount(
+			externalPrice,
+			2,
+		);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cartWithLineItem.id}`)
+			.send({
+				version: cartWithLineItem.version,
+				actions: [
+					{
+						action: "setLineItemPrice",
+						lineItemId: lineItem.id,
+						externalPrice,
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(cartWithLineItem.version + 1);
+		expect(response.body.lineItems).toHaveLength(1);
+
+		const updatedLineItem = response.body.lineItems[0];
+		expect(updatedLineItem.priceMode).toBe("ExternalPrice");
+		expect(updatedLineItem.price.value.type).toBe("highPrecision");
+		expect(updatedLineItem.price.value.currencyCode).toBe(
+			externalPrice.currencyCode,
+		);
+		expect(updatedLineItem.price.value.fractionDigits).toBe(
+			externalPrice.fractionDigits,
+		);
+		expect(updatedLineItem.price.value.preciseAmount).toBe(
+			externalPrice.preciseAmount,
+		);
+		expect(updatedLineItem.price.value.centAmount).toBe(expectedUnitCentAmount);
+		expect(updatedLineItem.totalPrice.centAmount).toBe(expectedTotalCentAmount);
+		expect(response.body.totalPrice.centAmount).toBe(expectedTotalCentAmount);
+	});
+
+	test("setLineItemPrice supports high precision external price with fractionDigits 5", async () => {
+		const product = await supertest(ctMock.app)
+			.post("/dummy/products")
+			.send(productDraft)
+			.then((x) => x.body);
+
+		assert(product, "product not created");
+
+		const baseCartResponse = await supertest(ctMock.app)
+			.post("/dummy/carts")
+			.send({ currency: "EUR" });
+		expect(baseCartResponse.status).toBe(201);
+		const baseCart = baseCartResponse.body as Cart;
+
+		const addLineItemResponse = await supertest(ctMock.app)
+			.post(`/dummy/carts/${baseCart.id}`)
+			.send({
+				version: baseCart.version,
+				actions: [
+					{
+						action: "addLineItem",
+						sku: product.masterData.current.masterVariant.sku,
+						quantity: 2,
+					},
+				],
+			});
+		expect(addLineItemResponse.status).toBe(200);
+		const cartWithLineItem = addLineItemResponse.body as Cart;
+		const lineItem = cartWithLineItem.lineItems[0];
+		assert(lineItem, "lineItem not created");
+
+		const externalPrice: HighPrecisionMoneyDraft = {
+			type: "highPrecision",
+			currencyCode: "EUR",
+			fractionDigits: 5,
+			preciseAmount: 101499,
+		};
+		const expectedUnitCentAmount = calculateMoneyTotalCentAmount(
+			externalPrice,
+			1,
+		);
+		const expectedTotalCentAmount = calculateMoneyTotalCentAmount(
+			externalPrice,
+			2,
+		);
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/carts/${cartWithLineItem.id}`)
+			.send({
+				version: cartWithLineItem.version,
+				actions: [
+					{
+						action: "setLineItemPrice",
+						lineItemId: lineItem.id,
+						externalPrice,
+					},
+				],
+			});
+
+		expect(response.status).toBe(200);
+		expect(response.body.version).toBe(cartWithLineItem.version + 1);
+		expect(response.body.lineItems).toHaveLength(1);
+
+		const updatedLineItem = response.body.lineItems[0];
+		expect(updatedLineItem.priceMode).toBe("ExternalPrice");
+		expect(updatedLineItem.price.value.type).toBe("highPrecision");
+		expect(updatedLineItem.price.value.currencyCode).toBe(
+			externalPrice.currencyCode,
+		);
+		expect(updatedLineItem.price.value.fractionDigits).toBe(
+			externalPrice.fractionDigits,
+		);
+		expect(updatedLineItem.price.value.preciseAmount).toBe(
+			externalPrice.preciseAmount,
+		);
+		expect(updatedLineItem.price.value.centAmount).toBe(expectedUnitCentAmount);
+		expect(updatedLineItem.totalPrice.centAmount).toBe(expectedTotalCentAmount);
+		expect(response.body.totalPrice.centAmount).toBe(expectedTotalCentAmount);
 	});
 
 	test("setLineItemPrice fails when the money uses another currency", async () => {

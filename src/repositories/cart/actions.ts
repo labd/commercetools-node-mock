@@ -52,6 +52,7 @@ import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
 import {
+	calculateMoneyTotalCentAmount,
 	createAddress,
 	createCentPrecisionMoney,
 	createCustomFields,
@@ -183,6 +184,10 @@ export class CartUpdateHandler
 					`No valid price found for ${productId} for country ${resource.country} and currency ${currency}`,
 				);
 			}
+			const totalPrice = createCentPrecisionMoney({
+				currencyCode: price.value.currencyCode,
+				centAmount: calculateMoneyTotalCentAmount(price.value, quantity),
+			});
 			resource.lineItems.push({
 				id: uuidv4(),
 				key,
@@ -196,11 +201,7 @@ export class CartUpdateHandler
 				price: price,
 				taxedPricePortions: [],
 				perMethodTaxRate: [],
-				totalPrice: {
-					...price.value,
-					type: "centPrecision",
-					centAmount: price.value.centAmount * quantity,
-				},
+				totalPrice,
 				quantity,
 				discountedPricePerQuantity: [],
 				lineItemMode: "Standard",
@@ -427,8 +428,11 @@ export class CartUpdateHandler
 			}
 			customLineItem.quantity = quantity;
 			customLineItem.totalPrice = createCentPrecisionMoney({
-				...customLineItem.money,
-				centAmount: (customLineItem.money.centAmount ?? 0) * quantity,
+				currencyCode: customLineItem.money.currencyCode,
+				centAmount: calculateMoneyTotalCentAmount(
+					customLineItem.money,
+					quantity,
+				),
 			});
 		};
 
@@ -470,8 +474,11 @@ export class CartUpdateHandler
 			}
 			customLineItem.money = createTypedMoney(money);
 			customLineItem.totalPrice = createCentPrecisionMoney({
-				...money,
-				centAmount: (money.centAmount ?? 0) * customLineItem.quantity,
+				currencyCode: money.currencyCode,
+				centAmount: calculateMoneyTotalCentAmount(
+					money,
+					customLineItem.quantity,
+				),
 			});
 		};
 
@@ -608,7 +615,7 @@ export class CartUpdateHandler
 			shippingMethodName,
 			price: createCentPrecisionMoney(shippingRate.price),
 			shippingRate: {
-				price: createTypedMoney(shippingRate.price),
+				price: createCentPrecisionMoney(shippingRate.price),
 				tiers: [],
 			},
 			taxCategory: tax
@@ -798,7 +805,7 @@ export class CartUpdateHandler
 
 		const lineItemTotal = calculateLineItemTotalPrice(lineItem);
 		lineItem.totalPrice = createCentPrecisionMoney({
-			...lineItem.price!.value,
+			currencyCode: lineItem.price!.value.currencyCode,
 			centAmount: lineItemTotal,
 		});
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
