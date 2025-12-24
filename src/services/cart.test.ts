@@ -14,8 +14,8 @@ import type {
 } from "@commercetools/platform-sdk";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { customerDraftFactory } from "#src/testing/customer.ts";
 import { calculateMoneyTotalCentAmount } from "#src/repositories/helpers.ts";
+import { customerDraftFactory } from "#src/testing/customer.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Carts Query", () => {
