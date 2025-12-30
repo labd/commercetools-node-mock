@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.63.0
+
+### Minor Changes
+
+- [#365](https://github.com/labd/commercetools-node-mock/pull/365) [`ef7ef13`](https://github.com/labd/commercetools-node-mock/commit/ef7ef13fbacecf6544a8ce0d0a4e7a54f9f4c654) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Add HighPrecisionMoney support
+
+- [#360](https://github.com/labd/commercetools-node-mock/pull/360) [`06315c6`](https://github.com/labd/commercetools-node-mock/commit/06315c638a8829a58e866e8e570424762ba2fdd9) Thanks [@daanjo3](https://github.com/daanjo3)! - Add basic support for discount codes in the cart repository
+
 ## 2.62.1
 
 ### Patch Changes
