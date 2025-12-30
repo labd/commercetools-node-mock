@@ -716,4 +716,36 @@ describe("createShippingInfo", () => {
 		expect(result.taxedPrice!.totalGross.centAmount).toBe(1204);
 		expect(result.taxedPrice!.totalNet.centAmount).toBe(995);
 	});
+
+	test("create cart with discount code", async () => {
+		const code = storage.add("dummy", "discount-code", {
+			...getBaseResourceProperties(),
+			code: "test-1234",
+			cartDiscounts: [],
+			isActive: true,
+			references: [],
+			groups: [],
+		});
+
+		const cart: CartDraft = {
+			country: "NL",
+			currency: "EUR",
+			discountCodes: ["test-1234"],
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+
+		const result = repository.create(ctx, cart);
+		expect(result.id).toBeDefined();
+
+		expect(result.discountCodes).toEqual([
+			{
+				discountCode: {
+					typeId: "discount-code",
+					id: code.id,
+				},
+				state: "MatchesCart",
+			},
+		]);
+	});
 });

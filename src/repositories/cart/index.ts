@@ -2,6 +2,7 @@ import type {
 	BusinessUnit,
 	Cart,
 	CartDraft,
+	DiscountCodeInfo,
 	GeneralError,
 	InvalidOperationError,
 	LineItem,
@@ -34,6 +35,7 @@ import { CartUpdateHandler } from "./actions.ts";
 import {
 	calculateCartTotalPrice,
 	createCustomLineItemFromDraft,
+	createDiscountCodeInfoFromCode,
 	selectPrice,
 } from "./helpers.ts";
 
@@ -92,6 +94,20 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				),
 			) ?? [];
 
+		// Validate that discount codes exist
+		const discountCodeInfo: DiscountCodeInfo[] = [];
+		if (draft.discountCodes?.length) {
+			draft.discountCodes.forEach((code) => {
+				discountCodeInfo.push(
+					createDiscountCodeInfoFromCode(
+						context.projectKey,
+						this._storage,
+						code,
+					),
+				);
+			});
+		}
+
 		const resource: Writable<Cart> = {
 			...getBaseResourceProperties(),
 			anonymousId: draft.anonymousId,
@@ -111,7 +127,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			customerEmail: draft.customerEmail,
 			customLineItems,
 			directDiscounts: [],
-			discountCodes: [],
+			discountCodes: discountCodeInfo,
 			inventoryMode: "None",
 			itemShippingAddresses: [],
 			lineItems,

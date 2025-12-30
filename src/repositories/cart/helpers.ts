@@ -2,12 +2,15 @@ import type {
 	Cart,
 	CustomLineItem,
 	CustomLineItemDraft,
+	DiscountCodeInfo,
+	DiscountCodeNonApplicableError,
 	LineItem,
 	Price,
 	TaxCategory,
 	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { calculateTaxedPrice } from "#src/lib/tax.ts";
 import type { AbstractStorage } from "#src/storage/abstract.ts";
 import {
@@ -125,5 +128,31 @@ export const createCustomLineItemFromDraft = (
 		priceMode: draft.priceMode ?? "Standard",
 		totalPrice,
 		taxedPricePortions: [],
+	};
+};
+
+export const createDiscountCodeInfoFromCode = (
+	projectKey: string,
+	storage: AbstractStorage,
+	code: string,
+): DiscountCodeInfo => {
+	const discountCodes = storage.query(projectKey, "discount-code", {
+		where: `code="${code}"`,
+	});
+	// Does not validate anything besides existence of the DiscountCode object
+	if (discountCodes.count === 0) {
+		throw new CommercetoolsError<DiscountCodeNonApplicableError>({
+			code: "DiscountCodeNonApplicable",
+			message: `The discount code '${code}' was not found.`,
+			reason: "DoesNotExist",
+			discountCode: "nonexistent",
+		});
+	}
+	return {
+		discountCode: {
+			typeId: "discount-code",
+			id: discountCodes.results[0].id,
+		},
+		state: "MatchesCart",
 	};
 };
