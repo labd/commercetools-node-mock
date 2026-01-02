@@ -1,6 +1,6 @@
 import type { Request, Response, Router } from "express";
-import { getRepositoryContext } from "#src/repositories/helpers.ts";
-import type { OrderRepository } from "#src/repositories/order/index.ts";
+import { getRepositoryContext } from "../repositories/helpers.ts";
+import type { OrderRepository } from "../repositories/order/index.ts";
 import AbstractService from "./abstract.ts";
 
 export class OrderService extends AbstractService {

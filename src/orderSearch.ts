@@ -3,8 +3,8 @@ import type {
 	OrderSearchRequest,
 } from "@commercetools/platform-sdk";
 import type { Hit } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/order";
+import type { Config } from "#src/config.ts";
 import type { AbstractStorage } from "#src/storage/index.ts";
-import type { Config } from "./config.ts";
 
 export class OrderSearch {
 	protected _storage: AbstractStorage;
@@ -24,7 +24,7 @@ export class OrderSearch {
 		const limit = params.limit || 20;
 		const orderResult = orderResources.slice(offset, offset + limit);
 
-		// Transform to ProductSearchResult
+		// Transform orders into Hit objects for the OrderSearchResult
 		const results: Hit[] = orderResult.map((order) => ({
 			id: order.id,
 			version: order.version,
