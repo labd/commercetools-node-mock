@@ -17,6 +17,7 @@ export class OrderService extends AbstractService {
 
 	extraRoutes(router: Router) {
 		router.post("/import", this.import.bind(this));
+		router.post("/search", this.search.bind(this));
 		router.get(
 			"/order-number=:orderNumber",
 			this.getWithOrderNumber.bind(this),
@@ -55,5 +56,13 @@ export class OrderService extends AbstractService {
 				},
 			],
 		});
+	}
+
+	search(request: Request, response: Response) {
+		const resource = this.repository.search(
+			getRepositoryContext(request),
+			request.body,
+		);
+		response.status(200).send(resource);
 	}
 }
