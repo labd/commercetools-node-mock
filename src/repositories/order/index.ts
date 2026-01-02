@@ -10,6 +10,8 @@ import type {
 	Order,
 	OrderFromCartDraft,
 	OrderImportDraft,
+	OrderPagedSearchResponse,
+	OrderSearchRequest,
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
@@ -27,6 +29,7 @@ import {
 	calculateTaxedPriceFromRate,
 	calculateTaxTotals,
 } from "#src/lib/tax.ts";
+import { OrderSearch } from "#src/orderSearch.ts";
 import {
 	createShippingInfoFromMethod,
 	getShippingMethodsMatchingCart,
@@ -46,9 +49,12 @@ import {
 import { OrderUpdateHandler } from "./actions.ts";
 
 export class OrderRepository extends AbstractResourceRepository<"order"> {
+	protected _searchService: OrderSearch;
+
 	constructor(config: Config) {
 		super("order", config);
 		this.actions = new OrderUpdateHandler(config.storage);
+		this._searchService = new OrderSearch(config);
 	}
 
 	create(context: RepositoryContext, draft: OrderFromCartDraft): Order {
@@ -265,7 +271,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			centAmount: calculateMoneyTotalCentAmount(draft.price.value, quantity),
 		});
 
-		const lineItem: LineItem = {
+		return {
 			...getBaseResourceProperties(),
 			custom: createCustomFields(
 				draft.custom,
@@ -296,9 +302,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				price: createPrice(draft.price),
 				attributes: variant.attributes,
 			},
-		};
-
-		return lineItem;
+		} satisfies LineItem;
 	}
 
 	private customLineItemFromImportDraft(
@@ -311,7 +315,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			centAmount: calculateMoneyTotalCentAmount(draft.money, quantity),
 		});
 
-		const lineItem: CustomLineItem = {
+		return {
 			...getBaseResourceProperties(),
 			custom: createCustomFields(
 				draft.custom,
@@ -333,9 +337,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				draft.taxRate,
 			),
 			taxedPricePortions: [],
-		};
-
-		return lineItem;
+		} satisfies CustomLineItem;
 	}
 
 	getWithOrderNumber(
@@ -409,5 +411,12 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			...baseShippingInfo,
 			deliveries: [],
 		};
+	}
+
+	search(
+		context: RepositoryContext,
+		searchRequest: OrderSearchRequest,
+	): OrderPagedSearchResponse {
+		return this._searchService.search(context.projectKey, searchRequest);
 	}
 }
