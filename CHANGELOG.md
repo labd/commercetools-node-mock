@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.64.0
+
+### Minor Changes
+
+- [#368](https://github.com/labd/commercetools-node-mock/pull/368) [`a91c04e`](https://github.com/labd/commercetools-node-mock/commit/a91c04e6257c0292177945030be49f1191220403) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Add order search endpoint functionality
+
 ## 2.63.0
 
 ### Minor Changes
