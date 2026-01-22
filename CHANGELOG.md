@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.65.0
+
+### Minor Changes
+
+- [#370](https://github.com/labd/commercetools-node-mock/pull/370) [`a0f4312`](https://github.com/labd/commercetools-node-mock/commit/a0f43124971ebbaad781c466592338068ad64afd) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add email token verification
+
 ## 2.64.0
 
 ### Minor Changes
