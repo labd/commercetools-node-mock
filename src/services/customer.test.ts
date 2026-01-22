@@ -939,9 +939,9 @@ describe("Customer email verification", () => {
 
 		expect(response.status, JSON.stringify(response.body)).toBe(200);
 		expect(response.body).toMatchObject({
-			customerId: expect.any(String),
-			id: expect.any(String),
+			customerId: customer.id,
 			invalidateOlderTokens: false,
+			id: expect.any(String),
 			value: expect.any(String),
 		});
 
