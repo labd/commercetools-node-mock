@@ -971,6 +971,7 @@ describe("Customer email verification", () => {
 			});
 
 		expect(response.status, JSON.stringify(response.body)).toBe(200);
+		expect(response.body.id).toEqual(customer.id);
 		expect(response.body.isEmailVerified).toEqual(true);
 	});
 });
