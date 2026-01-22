@@ -23,6 +23,7 @@ import {
 	createEmailVerifyToken,
 	createPasswordResetToken,
 	hashPassword,
+	validateEmailVerifyToken,
 	validatePasswordResetToken,
 } from "#src/lib/password.ts";
 import type { ResourceMap, ShallowWritable, Writable } from "#src/types.ts";
@@ -231,7 +232,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		return customer;
 	}
 
-	verifyEmailToken(context: RepositoryContext, id: string): CustomerToken {
+	emailToken(context: RepositoryContext, id: string): CustomerToken {
 		const results = this._storage.query(context.projectKey, this.getTypeId(), {
 			where: [`id="${id.toLocaleLowerCase()}"`],
 		});
@@ -255,6 +256,39 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			value: token,
 			invalidateOlderTokens: false,
 		};
+	}
+
+	emailTokenConfirm(
+		context: RepositoryContext,
+		request: { tokenValue: string },
+	) {
+		const customerId = validateEmailVerifyToken(request.tokenValue);
+		if (!customerId) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID 'Token(${request.tokenValue})' was not found.`,
+			});
+		}
+
+		const customer = this._storage.get(
+			context.projectKey,
+			"customer",
+			customerId,
+		) as Writable<Customer> | undefined;
+
+		if (!customer) {
+			throw new CommercetoolsError<ResourceNotFoundError>({
+				code: "ResourceNotFound",
+				message: `The Customer with ID 'Token(${request.tokenValue})' was not found.`,
+			});
+		}
+
+		customer.isEmailVerified = true;
+		customer.version += 1;
+
+		// Update storage
+		this._storage.add(context.projectKey, "customer", customer);
+		return customer;
 	}
 
 	private storeReferenceToStoreKeyReference(

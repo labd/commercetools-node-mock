@@ -925,3 +925,53 @@ describe("Customer Password Reset", () => {
 		});
 	});
 });
+
+describe("Customer email verification", () => {
+	test("creates an email token", async () => {
+		const customer = await customerDraftFactory(ctMock).create();
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/email-token`)
+			.send({
+				id: customer.id,
+				ttlMinutes: 60,
+			});
+
+		expect(response.status, JSON.stringify(response.body)).toBe(200);
+		expect(response.body).toMatchObject({
+			customerId: customer.id,
+			invalidateOlderTokens: false,
+			id: expect.any(String),
+			value: expect.any(String),
+		});
+
+		const dateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+		expect(response.body.createdAt).toMatch(dateTime);
+		expect(response.body.lastModifiedAt).toMatch(dateTime);
+		expect(response.body.expiresAt).toMatch(dateTime);
+	});
+
+	test("validates an email token", async () => {
+		const customer = await customerDraftFactory(ctMock).create({
+			isEmailVerified: false,
+		});
+
+		const tokenResponse = await supertest(ctMock.app)
+			.post(`/dummy/customers/email-token`)
+			.send({
+				id: customer.id,
+				ttlMinutes: 60,
+			});
+
+		const response = await supertest(ctMock.app)
+			.post(`/dummy/customers/email/confirm`)
+			.send({
+				id: customer.id,
+				tokenValue: tokenResponse.body.value,
+			});
+
+		expect(response.status, JSON.stringify(response.body)).toBe(200);
+		expect(response.body.id).toEqual(customer.id);
+		expect(response.body.isEmailVerified).toEqual(true);
+	});
+});

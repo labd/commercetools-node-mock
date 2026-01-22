@@ -19,7 +19,8 @@ export class CustomerService extends AbstractService {
 	extraRoutes(parent: Router) {
 		parent.post("/password-token", this.passwordResetToken.bind(this));
 		parent.post("/password/reset", this.passwordReset.bind(this));
-		parent.post("/email-token", this.confirmEmailToken.bind(this));
+		parent.post("/email-token", this.emailToken.bind(this));
+		parent.post("/email/confirm", this.emailTokenConfirm.bind(this));
 	}
 
 	post(request: Request, response: Response) {
@@ -54,12 +55,18 @@ export class CustomerService extends AbstractService {
 		response.status(200).send(customer);
 	}
 
-	confirmEmailToken(request: Request, response: Response) {
+	emailToken(request: Request, response: Response) {
 		const id = request.body.id;
-		const token = this.repository.verifyEmailToken(
-			getRepositoryContext(request),
-			id,
-		);
+		const token = this.repository.emailToken(getRepositoryContext(request), id);
 		response.status(200).send(token);
+	}
+
+	emailTokenConfirm(request: Request, response: Response) {
+		const customer = this.repository.emailTokenConfirm(
+			getRepositoryContext(request),
+			request.body,
+		);
+
+		response.status(200).send(customer);
 	}
 }
