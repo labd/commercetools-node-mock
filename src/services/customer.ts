@@ -57,10 +57,7 @@ export class CustomerService extends AbstractService {
 
 	emailToken(request: Request, response: Response) {
 		const id = request.body.id;
-		const token = this.repository.emailToken(
-			getRepositoryContext(request),
-			id,
-		);
+		const token = this.repository.emailToken(getRepositoryContext(request), id);
 		response.status(200).send(token);
 	}
 
