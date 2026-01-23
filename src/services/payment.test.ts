@@ -1,6 +1,6 @@
 import type { PaymentDraft } from "@commercetools/platform-sdk";
 import supertest from "supertest";
-import { beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
@@ -17,6 +17,10 @@ describe("Payment", () => {
 				resourceTypeIds: ["payment"],
 			});
 		expect(response.status).toBe(201);
+	});
+
+	afterEach(() => {
+		ctMock.clear();
 	});
 
 	test("Create payment", async () => {

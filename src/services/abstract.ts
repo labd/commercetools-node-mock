@@ -223,7 +223,13 @@ export default abstract class AbstractService {
 
 	// No idea what i'm doing
 	protected _parseParam(
-		value: string | ParsedQs | string[] | ParsedQs[] | undefined,
+		value:
+			| string
+			| ParsedQs
+			| string[]
+			| ParsedQs[]
+			| (string | ParsedQs)[]
+			| undefined,
 	): string[] | undefined {
 		return queryParamsArray(value);
 	}
