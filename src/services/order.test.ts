@@ -1,7 +1,12 @@
 import assert from "node:assert";
-import type { Order, Payment, State } from "@commercetools/platform-sdk";
+import type {
+	DeliveryDraft,
+	Order,
+	Payment,
+	State,
+} from "@commercetools/platform-sdk";
 import supertest from "supertest";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, it } from "vitest";
 import { generateRandomString } from "#src/helpers.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
@@ -1023,6 +1028,224 @@ describe("Order Update Actions", () => {
 				externalId: "1234",
 			},
 		]);
+	});
+
+	describe("addDelivery", () => {
+		const order: Order = {
+			...getBaseResourceProperties(),
+			customLineItems: [],
+			lineItems: [
+				{
+					id: "d70b14c8-72cf-4cab-82ba-6339cebe1e79",
+					productId: "06028a97-d622-47ac-a194-a3d90baa2b3c",
+					productSlug: { "nl-NL": "test-product" },
+					productType: { typeId: "product-type", id: "some-uuid" },
+					name: { "nl-NL": "test product" },
+					custom: {
+						type: {
+							typeId: "type",
+							id: "a493b7bb-d415-450c-b421-e128a8b26569",
+						},
+						fields: {},
+					},
+					variant: {
+						id: 1,
+						sku: "1337",
+						attributes: [{ name: "test", value: "test" }],
+						prices: [],
+						assets: [],
+						images: [],
+					},
+					price: {
+						id: "2f59a6c9-6a86-48d3-87f9-fabb3b12fd93",
+						value: {
+							type: "centPrecision",
+							centAmount: 14900,
+							currencyCode: "EUR",
+							fractionDigits: 2,
+						},
+					},
+					totalPrice: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						fractionDigits: 2,
+						centAmount: 14900,
+					},
+					taxedPricePortions: [],
+					perMethodTaxRate: [],
+					quantity: 1,
+					discountedPricePerQuantity: [],
+					lineItemMode: "Standard",
+					priceMode: "Platform",
+					state: [],
+				},
+			],
+			orderNumber: "7777",
+			orderState: "Open",
+			origin: "Customer",
+			paymentInfo: {
+				payments: [
+					{
+						typeId: "payment",
+						id: generateRandomString(10),
+					},
+				],
+			},
+			refusedGifts: [],
+			shippingInfo: {
+				shippingMethodName: "Home delivery (package)",
+				price: {
+					type: "centPrecision",
+					currencyCode: "EUR",
+					centAmount: 999,
+					fractionDigits: 2,
+				},
+				shippingRate: {
+					price: {
+						type: "centPrecision",
+						currencyCode: "EUR",
+						centAmount: 999,
+						fractionDigits: 2,
+					},
+					tiers: [
+						{
+							type: "CartScore",
+							score: 24,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 1998,
+								fractionDigits: 2,
+							},
+						},
+						{
+							type: "CartScore",
+							score: 47,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 2997,
+								fractionDigits: 2,
+							},
+						},
+						{
+							type: "CartScore",
+							score: 70,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 3996,
+								fractionDigits: 2,
+							},
+						},
+						{
+							type: "CartScore",
+							score: 93,
+							price: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 4995,
+								fractionDigits: 2,
+							},
+						},
+					],
+				},
+				deliveries: [
+					{
+						id: "6a458cad-dd46-4f5f-8b73-debOede6a17d",
+						key: "CT-Z243002",
+						createdAt: "2024-07-29T13:37:48.047Z",
+						items: [
+							{
+								id: "d70b14c8-72cf-4cab-82ba-6339cebe1e79",
+								quantity: 1,
+							},
+						],
+						parcels: [
+							{
+								id: "7a458cad-dd46-4f5f-8b73-debOede6a17d",
+								createdAt: "2024-07-29T13:37:48.047Z",
+								items: [
+									{
+										id: "d70b14c8-72cf-4cab-82ba-6339cebe1e79",
+										quantity: 1,
+									},
+								],
+								custom: {
+									type: {
+										typeId: "type",
+										id: "c493b7bb-d415-450c-b421-e128a8b26569",
+									},
+									fields: {
+										status: "created",
+									},
+								},
+							},
+						],
+					},
+				],
+				shippingMethodState: "MatchesCart",
+			},
+			shipping: [],
+			shippingMode: "Single",
+			syncInfo: [],
+			totalPrice: {
+				type: "centPrecision",
+				fractionDigits: 2,
+				centAmount: 2000,
+				currencyCode: "EUR",
+			},
+		};
+		if (!order.shippingInfo) {
+			throw new Error("Order shippingInfo is required");
+		}
+		const { deliveries: _, ...shippingInfoWithoutDeliveries } =
+			order.shippingInfo;
+		const orderWithoutDeliveries = {
+			...order,
+			...getBaseResourceProperties(),
+			orderNumber: "7778",
+			shippingInfo: shippingInfoWithoutDeliveries,
+		};
+
+		ctMock.project("dummy").add("order", order);
+		ctMock.project("dummy").add("order", orderWithoutDeliveries);
+
+		const deliveryDraft: DeliveryDraft = {
+			key: `${order.orderNumber}-2`,
+			items: [
+				{
+					id: order.lineItems[0].id,
+					quantity: order.lineItems[0].quantity,
+				},
+			],
+		};
+
+		it.each([
+			[order, 1],
+			[orderWithoutDeliveries, 0],
+		])("should add to deliveries", async (order, index) => {
+			const response = await supertest(ctMock.app).get(
+				`/dummy/orders/order-number=${order.orderNumber}`,
+			);
+			const _updateResponse = await supertest(ctMock.app)
+				.post(`/dummy/orders/${response.body.id}`)
+				.send({
+					version: 0,
+					actions: [
+						{
+							action: "addDelivery",
+							...deliveryDraft,
+						},
+					],
+				});
+
+			expect(_updateResponse.status).toBe(200);
+			expect(_updateResponse.body.version).toBe(1);
+			expect(_updateResponse.body.shippingInfo.deliveries[index].key).toBe(
+				deliveryDraft.key,
+			);
+		});
 	});
 });
 
