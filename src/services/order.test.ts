@@ -6,7 +6,7 @@ import type {
 	State,
 } from "@commercetools/platform-sdk";
 import supertest from "supertest";
-import { afterEach, beforeEach, describe, expect, test, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, test } from "vitest";
 import { generateRandomString } from "#src/helpers.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
