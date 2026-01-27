@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.65.1
+
+### Patch Changes
+
+- [#373](https://github.com/labd/commercetools-node-mock/pull/373) [`0729881`](https://github.com/labd/commercetools-node-mock/commit/0729881f84338984f2473cd695b40dd2e669289b) Thanks [@stephanbeek](https://github.com/stephanbeek)! - Added support for addDelivery order update action
+
 ## 2.65.0
 
 ### Minor Changes
