@@ -42,7 +42,8 @@ import { createAddress, createCustomFields } from "../helpers.ts";
 
 export class OrderUpdateHandler
 	extends AbstractUpdateHandler
-	implements Partial<UpdateHandlerInterface<Order, OrderUpdateAction>> {
+	implements Partial<UpdateHandlerInterface<Order, OrderUpdateAction>>
+{
 	addPayment(
 		context: RepositoryContext,
 		resource: Writable<Order>,
