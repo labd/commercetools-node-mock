@@ -42,8 +42,7 @@ import { createAddress, createCustomFields } from "../helpers.ts";
 
 export class OrderUpdateHandler
 	extends AbstractUpdateHandler
-	implements Partial<UpdateHandlerInterface<Order, OrderUpdateAction>>
-{
+	implements Partial<UpdateHandlerInterface<Order, OrderUpdateAction>> {
 	addPayment(
 		context: RepositoryContext,
 		resource: Writable<Order>,
@@ -84,8 +83,13 @@ export class OrderUpdateHandler
 					...getBaseResourceProperties(),
 					quantity: item.quantity,
 					paymentState: "Initial",
-					shipmentState: "Initial",
+					shipmentState: item.shipmentState ?? "Advised",
 					comment: item.comment,
+					custom: createCustomFields(
+						item.custom,
+						context.projectKey,
+						this._storage,
+					),
 				};
 				if (item.customLineItemId) {
 					return {
