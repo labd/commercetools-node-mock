@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.66.0
+
+### Minor Changes
+
+- [#375](https://github.com/labd/commercetools-node-mock/pull/375) [`5cbccde`](https://github.com/labd/commercetools-node-mock/commit/5cbccde6cd0c22a8cd7657e8224f22f6508af244) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - include custom type in Order Return Items
+
 ## 2.65.1
 
 ### Patch Changes
