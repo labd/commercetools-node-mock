@@ -84,8 +84,13 @@ export class OrderUpdateHandler
 					...getBaseResourceProperties(),
 					quantity: item.quantity,
 					paymentState: "Initial",
-					shipmentState: "Initial",
+					shipmentState: item.shipmentState ?? "Advised",
 					comment: item.comment,
+					custom: createCustomFields(
+						item.custom,
+						context.projectKey,
+						this._storage,
+					),
 				};
 				if (item.customLineItemId) {
 					return {
