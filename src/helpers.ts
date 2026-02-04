@@ -34,7 +34,13 @@ export const nestedLookup = (obj: any, path: string): any => {
 };
 
 export const queryParamsArray = (
-	input: string | ParsedQs | string[] | ParsedQs[] | undefined,
+	input:
+		| string
+		| ParsedQs
+		| string[]
+		| ParsedQs[]
+		| (string | ParsedQs)[]
+		| undefined,
 ): string[] | undefined => {
 	if (input === undefined) {
 		return undefined;
@@ -50,7 +56,13 @@ export const queryParamsArray = (
 };
 
 export const queryParamsValue = (
-	value: string | ParsedQs | string[] | ParsedQs[] | undefined,
+	value:
+		| string
+		| ParsedQs
+		| string[]
+		| ParsedQs[]
+		| (string | ParsedQs)[]
+		| undefined,
 ): string | undefined => {
 	const values = queryParamsArray(value);
 	if (values && values.length > 0) {
