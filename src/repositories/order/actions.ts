@@ -1,8 +1,10 @@
 import type {
 	CustomLineItemReturnItem,
+	Delivery,
 	GeneralError,
 	LineItemReturnItem,
 	Order,
+	OrderAddDeliveryAction,
 	OrderAddPaymentAction,
 	OrderAddReturnInfoAction,
 	OrderChangeOrderStateAction,
@@ -25,6 +27,7 @@ import type {
 	OrderTransitionStateAction,
 	OrderUpdateAction,
 	OrderUpdateSyncInfoAction,
+	Parcel,
 	ReturnInfo,
 	State,
 	Store,
@@ -35,7 +38,7 @@ import { getBaseResourceProperties } from "#src/helpers.ts";
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
-import { createAddress } from "../helpers.ts";
+import { createAddress, createCustomFields } from "../helpers.ts";
 
 export class OrderUpdateHandler
 	extends AbstractUpdateHandler
@@ -81,8 +84,13 @@ export class OrderUpdateHandler
 					...getBaseResourceProperties(),
 					quantity: item.quantity,
 					paymentState: "Initial",
-					shipmentState: "Initial",
+					shipmentState: item.shipmentState ?? "Advised",
 					comment: item.comment,
+					custom: createCustomFields(
+						item.custom,
+						context.projectKey,
+						this._storage,
+					),
 				};
 				if (item.customLineItemId) {
 					return {
@@ -193,6 +201,50 @@ export class OrderUpdateHandler
 		}
 	}
 
+	addDelivery(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ action, items, ...deliveryDraft }: OrderAddDeliveryAction,
+	) {
+		if (!resource.shippingInfo) {
+			throw new Error("Resource has no shipping info");
+		}
+
+		if (!items) {
+			throw new Error("Delivery items are required");
+		}
+
+		if (!resource.shippingInfo.deliveries) {
+			resource.shippingInfo.deliveries = [];
+		}
+
+		const parcels: Parcel[] =
+			deliveryDraft.parcels?.map((p) => ({
+				...getBaseResourceProperties(),
+				...p,
+				custom: createCustomFields(p.custom, context.projectKey, this._storage),
+			})) ?? [];
+
+		const delivery: Delivery = {
+			...getBaseResourceProperties(),
+			...deliveryDraft,
+			parcels,
+			items,
+			address: createAddress(
+				deliveryDraft.address,
+				context.projectKey,
+				this._storage,
+			),
+			custom: createCustomFields(
+				deliveryDraft.custom,
+				context.projectKey,
+				this._storage,
+			),
+		};
+
+		resource.shippingInfo.deliveries.push(delivery);
+	}
+
 	setDeliveryCustomField(
 		context: RepositoryContext,
 		resource: Writable<Order>,
@@ -212,13 +264,7 @@ export class OrderUpdateHandler
 	setLineItemCustomField(
 		context: RepositoryContext,
 		resource: Order,
-		{
-			lineItemId,
-			lineItemKey,
-			name,
-			value,
-			action,
-		}: OrderSetLineItemCustomFieldAction,
+		{ lineItemId, lineItemKey, name, value }: OrderSetLineItemCustomFieldAction,
 	) {
 		const lineItem = resource.lineItems.find(
 			(x) =>
