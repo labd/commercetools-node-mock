@@ -425,7 +425,7 @@ describe("Customer Update Actions", () => {
 	});
 });
 
-// These tests use ctMock.project().add(), which we want to move away from.
+// These tests use ctMock.project().unsafeAdd(), which we want to move away from.
 // Please add new test to the previous section.
 describe("Customer Update Actions (old-style)", () => {
 	let customer: Customer | undefined;
@@ -442,7 +442,7 @@ describe("Customer Update Actions (old-style)", () => {
 			version: 1,
 			stores: [],
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 	});
 
 	test("exists", async () => {
@@ -581,7 +581,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -603,7 +603,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			firstName: "John",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -623,7 +623,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			firstName: "John",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -643,7 +643,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			lastName: "Doe",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -663,7 +663,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			salutation: "Mr.",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -683,7 +683,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			salutation: "Mr.",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -703,7 +703,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			companyName: "Acme",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -723,7 +723,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			vatId: "123456789",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -765,7 +765,7 @@ describe("Customer Update Actions (old-style)", () => {
 			],
 			defaultBillingAddressId: "address-uuid",
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -813,7 +813,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setCustomerNumber", async () => {
 		assert(customer, "customer not created");
 
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -831,7 +831,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setCustomerNumber error when already have a customer number", async () => {
 		assert(customer, "customer not created");
 
-		ctMock.project("dummy").add("customer", {
+		ctMock.project("dummy").unsafeAdd("customer", {
 			...customer,
 			customerNumber: "CUSTOMER-002",
 		});
@@ -853,7 +853,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setKey", async () => {
 		assert(customer, "customer not created");
 
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await supertest(ctMock.app)
 			.post(`/dummy/customers/${customer.id}`)
@@ -873,7 +873,7 @@ describe("Customer Password Reset", () => {
 	});
 
 	beforeEach(() => {
-		ctMock.project("dummy").add("customer", {
+		ctMock.project("dummy").unsafeAdd("customer", {
 			id: "123",
 			createdAt: "2021-03-18T14:00:00.000Z",
 			version: 2,

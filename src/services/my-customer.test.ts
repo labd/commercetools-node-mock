@@ -68,7 +68,7 @@ describe("/me", () => {
 	});
 
 	beforeEach(() => {
-		ctMock.project("dummy").add("customer", {
+		ctMock.project("dummy").unsafeAdd("customer", {
 			id: "123",
 			createdAt: "2021-03-18T14:00:00.000Z",
 			version: 2,
@@ -145,7 +145,7 @@ describe("/me", () => {
 			version: 1,
 			stores: [],
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const draft: CustomerChangePassword = {
 			id: customer.id,
@@ -196,7 +196,7 @@ describe("/me", () => {
 			version: 1,
 			stores: [],
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const token = await supertest(ctMock.app)
 			.post("/dummy/customers/password-token")
@@ -246,7 +246,7 @@ describe("/me", () => {
 			version: 1,
 			stores: [],
 		};
-		ctMock.project("dummy").add("customer", customer);
+		ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const token = await supertest(ctMock.app)
 			.post("/dummy/customers/email-token")

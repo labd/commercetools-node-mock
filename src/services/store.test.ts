@@ -7,7 +7,7 @@ const ctMock = new CommercetoolsMock();
 
 describe("Store", () => {
 	test("Get store by key", async () => {
-		ctMock.project("dummy").add("store", {
+		ctMock.project("dummy").unsafeAdd("store", {
 			id: "fake-store",
 			version: 1,
 			createdAt: "",
@@ -40,7 +40,7 @@ describe("Store", () => {
 	});
 
 	test("Get store by 404 when not found by key", async () => {
-		ctMock.project("dummy").add("store", {
+		ctMock.project("dummy").unsafeAdd("store", {
 			id: "fake-store",
 			version: 1,
 			createdAt: "",

@@ -171,9 +171,9 @@ describe("Order payment tests", () => {
 			},
 		};
 
-		ctMock.project().add("state", state);
-		ctMock.project().add("payment", payment);
-		ctMock.project().add("order", order);
+		ctMock.project().unsafeAdd("state", state);
+		ctMock.project().unsafeAdd("payment", payment);
+		ctMock.project().unsafeAdd("order", order);
 
 		const response = await supertest(ctMock.app)
 			.get("/dummy/orders")
@@ -264,9 +264,9 @@ describe("Order payment tests", () => {
 			},
 		};
 
-		ctMock.project().add("state", state);
-		ctMock.project().add("payment", payment);
-		ctMock.project().add("order", order);
+		ctMock.project().unsafeAdd("state", state);
+		ctMock.project().unsafeAdd("payment", payment);
+		ctMock.project().unsafeAdd("order", order);
 
 		const response = await supertest(ctMock.app)
 			.get(`/dummy/orders/order-number=${order.orderNumber}`)
@@ -569,7 +569,7 @@ describe("Order Update Actions", () => {
 				currencyCode: "EUR",
 			},
 		};
-		ctMock.project("dummy").add("order", order);
+		ctMock.project("dummy").unsafeAdd("order", order);
 
 		const response = await supertest(ctMock.app).get(
 			`/dummy/orders/order-number=${order.orderNumber}`,
@@ -686,7 +686,7 @@ describe("Order Update Actions", () => {
 			},
 		};
 
-		ctMock.project("dummy").add("order", order);
+		ctMock.project("dummy").unsafeAdd("order", order);
 
 		const lineItem = order.lineItems[0];
 		assert(lineItem, "lineItem not created");
@@ -782,7 +782,7 @@ describe("Order Update Actions", () => {
 			},
 		};
 
-		ctMock.project("dummy").add("order", order);
+		ctMock.project("dummy").unsafeAdd("order", order);
 
 		const type = await supertest(ctMock.app)
 			.post("/dummy/types")
@@ -968,7 +968,7 @@ describe("Order Update Actions", () => {
 				currencyCode: "EUR",
 			},
 		};
-		ctMock.project("dummy").add("order", order);
+		ctMock.project("dummy").unsafeAdd("order", order);
 
 		const response = await supertest(ctMock.app).get(
 			`/dummy/orders/order-number=${order.orderNumber}`,
@@ -1208,8 +1208,8 @@ describe("Order Update Actions", () => {
 			shippingInfo: shippingInfoWithoutDeliveries,
 		};
 
-		ctMock.project("dummy").add("order", order);
-		ctMock.project("dummy").add("order", orderWithoutDeliveries);
+		ctMock.project("dummy").unsafeAdd("order", order);
+		ctMock.project("dummy").unsafeAdd("order", orderWithoutDeliveries);
 
 		const deliveryDraft: DeliveryDraft = {
 			key: `${order.orderNumber}-2`,
@@ -1251,7 +1251,7 @@ describe("Order Update Actions", () => {
 
 describe("Order Import", () => {
 	const ctMock = new CommercetoolsMock();
-	ctMock.project("dummy").add("product", {
+	ctMock.project("dummy").unsafeAdd("product", {
 		id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
 		masterData: {
 			// @ts-expect-error
