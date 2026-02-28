@@ -21,18 +21,6 @@ export class ProjectAPI {
 		this._repositories = repositories;
 	}
 
-	add<T extends keyof RepositoryMap & keyof ResourceMap>(
-		typeId: T,
-		resource: ResourceMap[T],
-	) {
-		process.emitWarning(
-			"ctMock.add() is deprecated, create resources via regular create endpoints " +
-				"or if you are really sure, use unsafeAdd() (but be aware of potential state issues)",
-			"DeprecationWarning",
-		);
-		this.unsafeAdd(typeId, resource);
-	}
-
 	unsafeAdd<T extends keyof RepositoryMap & keyof ResourceMap>(
 		typeId: T,
 		resource: ResourceMap[T],

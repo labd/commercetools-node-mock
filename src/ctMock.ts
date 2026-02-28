@@ -74,25 +74,6 @@ export class CommercetoolsMock {
 		this.app = this.createApp({ silent: this.options.silent });
 	}
 
-	start() {
-		process.emitWarning(
-			"The start() method is deprecated, use .registerHandlers() to bind to an msw server instead",
-			"DeprecationWarning",
-		);
-
-		// Order is important here when the hostnames match
-		this.clear();
-		this.startServer();
-	}
-
-	stop() {
-		process.emitWarning(
-			"The stop() method is deprecated, use .registerHandlers() to bind to an msw server instead",
-			"DeprecationWarning",
-		);
-		this._mswServer?.close();
-		this._mswServer = undefined;
-	}
 
 	clear() {
 		this._storage.clear();
