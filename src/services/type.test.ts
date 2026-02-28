@@ -1,5 +1,4 @@
 import type { TypeDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -26,13 +25,15 @@ describe("Type", () => {
 				},
 			],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			fieldDefinitions: [
 				{
@@ -66,18 +67,22 @@ describe("Type", () => {
 			resourceTypeIds: ["product"],
 			fieldDefinitions: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/types/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/types/${createBody.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Get type by key", async () => {
@@ -89,18 +94,22 @@ describe("Type", () => {
 			resourceTypeIds: ["customer"],
 			fieldDefinitions: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/types/key=key-type",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/types/key=key-type",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Query types", async () => {
@@ -112,16 +121,23 @@ describe("Type", () => {
 			resourceTypeIds: ["order"],
 			fieldDefinitions: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get("/dummy/types");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/types",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
-		expect(response.body.results).toContainEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.count).toBeGreaterThan(0);
+		expect(body.results).toContainEqual(createBody);
 	});
 });

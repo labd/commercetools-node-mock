@@ -4,7 +4,6 @@ import type {
 	CustomerToken,
 	MyCustomerDraft,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 import { hashPassword } from "../lib/password.ts";
@@ -22,12 +21,14 @@ describe("Me", () => {
 			password: "p4ssw0rd",
 		};
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/signup")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/signup",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(201);
+		expect(response.json()).toEqual({
 			customer: {
 				...draft,
 				password: "cDRzc3cwcmQ=",
@@ -51,14 +52,16 @@ describe("Me", () => {
 			email: "test@example.org",
 			password: "p4ssw0rd",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/me/signup")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/signup",
+			payload: draft,
+		});
 
-		const response = await supertest(ctMock.app).get("/dummy/me");
+		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me" });
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body.customer);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json().customer);
 	});
 });
 
@@ -83,10 +86,10 @@ describe("/me", () => {
 	});
 
 	test("Get me", async () => {
-		const response = await supertest(ctMock.app).get("/dummy/me");
+		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me" });
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual({
 			id: "123",
 			createdAt: "2021-03-18T14:00:00.000Z",
 			version: 2,
@@ -107,10 +110,10 @@ describe("/me", () => {
 	});
 
 	test("Delete me", async () => {
-		const response = await supertest(ctMock.app).delete("/dummy/me");
+		const response = await ctMock.app.inject({ method: "DELETE", url: "/dummy/me" });
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual({
 			id: "123",
 			createdAt: "2021-03-18T14:00:00.000Z",
 			version: 2,
@@ -129,8 +132,8 @@ describe("/me", () => {
 			stores: [],
 		});
 
-		const newResponse = await supertest(ctMock.app).get("/dummy/me");
-		expect(newResponse.status).toBe(404);
+		const newResponse = await ctMock.app.inject({ method: "GET", url: "/dummy/me" });
+		expect(newResponse.statusCode).toBe(404);
 	});
 
 	test("Change my password", async () => {
@@ -153,11 +156,13 @@ describe("/me", () => {
 			newPassword: "newP4ssw0rd",
 			currentPassword: "p4ssw0rd",
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/password")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/password",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 	});
 
 	test("Fail to change password", async () => {
@@ -167,12 +172,14 @@ describe("/me", () => {
 			newPassword: "newP4ssw0rd",
 			currentPassword: "p4ssw0rd",
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/password")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/password",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(400);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toEqual({
 			message: "Account with the given credentials not found.",
 			statusCode: 400,
 			errors: [
@@ -198,31 +205,37 @@ describe("/me", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const token = await supertest(ctMock.app)
-			.post("/dummy/customers/password-token")
-			.send({
+		const tokenResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers/password-token",
+			payload: {
 				email: "user@example.com",
-			})
-			.then((response) => response.body as CustomerToken);
+			},
+		});
+		const token = tokenResponse.json() as CustomerToken;
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/password/reset")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/password/reset",
+			payload: {
 				tokenValue: token.value,
 				newPassword: "somethingNew",
-			});
-		expect(response.status).toBe(200);
+			},
+		});
+		expect(response.statusCode).toBe(200);
 	});
 
 	test("fail reset password flow", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/password/reset")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/password/reset",
+			payload: {
 				tokenValue: "invalid-token",
 				newPassword: "somethingNew",
-			});
-		expect(response.status).toBe(400);
-		expect(response.body).toEqual({
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toEqual({
 			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
 			statusCode: 400,
 			errors: [
@@ -248,29 +261,35 @@ describe("/me", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const token = await supertest(ctMock.app)
-			.post("/dummy/customers/email-token")
-			.send({
+		const tokenResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers/email-token",
+			payload: {
 				id: "customer-uuid",
-			})
-			.then((response) => response.body as CustomerToken);
+			},
+		});
+		const token = tokenResponse.json() as CustomerToken;
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/email/confirm")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/email/confirm",
+			payload: {
 				tokenValue: token.value,
-			});
-		expect(response.status).toBe(200);
+			},
+		});
+		expect(response.statusCode).toBe(200);
 	});
 
 	test("fail verify email flow", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/email/confirm")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/email/confirm",
+			payload: {
 				tokenValue: "invalid-token",
-			});
-		expect(response.status).toBe(400);
-		expect(response.body).toEqual({
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toEqual({
 			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
 			statusCode: 400,
 			errors: [
@@ -283,31 +302,37 @@ describe("/me", () => {
 	});
 
 	test("setCustomField", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me",
+			payload: {
 				version: 2,
 				actions: [{ action: "setCustomField", name: "foobar", value: true }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.custom.fields.foobar).toBe(true);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().custom.fields.foobar).toBe(true);
 	});
 
 	test("deleteMe", async () => {
-		const response = await supertest(ctMock.app).delete("/dummy/me");
-		expect(response.status).toBe(200);
-		expect(response.body.id).toBeDefined();
+		const response = await ctMock.app.inject({ method: "DELETE", url: "/dummy/me" });
+		expect(response.statusCode).toBe(200);
+		expect(response.json().id).toBeDefined();
 	});
 
 	test("signIn with invalid credentials", async () => {
-		const response = await supertest(ctMock.app).post("/dummy/me/login").send({
-			email: "nonexistent@example.com",
-			password: "wrongpassword",
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/login",
+			payload: {
+				email: "nonexistent@example.com",
+				password: "wrongpassword",
+			},
 		});
 
-		expect(response.status).toBe(400);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toEqual({
 			message: "Account with the given credentials not found.",
 			errors: [
 				{

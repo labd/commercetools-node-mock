@@ -1,11 +1,10 @@
 import type { InvalidTokenError } from "@commercetools/platform-sdk";
 import auth from "basic-auth";
-import bodyParser from "body-parser";
-import express, {
-	type NextFunction,
-	type Request,
-	type Response,
-} from "express";
+import type {
+	FastifyInstance,
+	FastifyReply,
+	FastifyRequest,
+} from "fastify";
 import type { AuthError, InvalidRequestError } from "#src/exceptions.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { hashPassword } from "../lib/password.ts";
@@ -14,12 +13,15 @@ import type { InvalidClientError, UnsupportedGrantType } from "./errors.ts";
 import { getBearerToken } from "./helpers.ts";
 import { OAuth2Store } from "./store.ts";
 
-type AuthRequest = Request & {
-	credentials?: {
-		clientId: string;
-		clientSecret: string;
-	};
-};
+declare module "fastify" {
+	interface FastifyRequest {
+		credentials?: {
+			clientId: string;
+			clientSecret: string;
+		};
+	}
+}
+
 export type Token = {
 	access_token: string;
 	token_type: "Bearer";
@@ -41,97 +43,86 @@ export class OAuth2Server {
 		this.customerRepository = repository;
 	}
 
-	createRouter() {
-		const router = express.Router();
-		router.use(bodyParser.urlencoded({ extended: true }));
-		router.use(this.validateClientCredentials.bind(this));
-		router.post("/token", this.tokenHandler.bind(this));
-		router.post(
-			"/:projectKey/customers/token",
-			this.customerTokenHandler.bind(this),
-		);
-		router.post(
-			"/:projectKey/in-store/key=:storeKey/customers/token",
-			this.inStoreCustomerTokenHandler.bind(this),
-		);
-		router.post(
-			"/:projectKey/anonymous/token",
-			this.anonymousTokenHandler.bind(this),
-		);
-		return router;
+	createPlugin() {
+		return async (instance: FastifyInstance) => {
+			await instance.register(import("@fastify/formbody"));
+			instance.decorateRequest("credentials", undefined);
+			instance.addHook(
+				"preHandler",
+				this.validateClientCredentials.bind(this),
+			);
+			instance.post("/token", this.tokenHandler.bind(this));
+			instance.post(
+				"/:projectKey/customers/token",
+				this.customerTokenHandler.bind(this),
+			);
+			instance.post(
+				"/:projectKey/in-store/key=:storeKey/customers/token",
+				this.inStoreCustomerTokenHandler.bind(this),
+			);
+			instance.post(
+				"/:projectKey/anonymous/token",
+				this.anonymousTokenHandler.bind(this),
+			);
+		};
 	}
 
 	createMiddleware() {
 		if (!this.options.validate) {
-			return async (
-				request: Request,
-				response: Response,
-				next: NextFunction,
-			) => {
-				next();
+			return async (request: FastifyRequest, reply: FastifyReply) => {
+				// No-op when validation is disabled
 			};
 		}
 
-		return async (request: Request, response: Response, next: NextFunction) => {
+		return async (request: FastifyRequest, reply: FastifyReply) => {
 			const token = getBearerToken(request);
 			if (!token) {
-				return next(
-					new CommercetoolsError<InvalidTokenError>(
-						{
-							code: "invalid_token",
-							message:
-								"This endpoint requires an access token. You can get one from the authorization server.",
-						},
-						401,
-					),
+				throw new CommercetoolsError<InvalidTokenError>(
+					{
+						code: "invalid_token",
+						message:
+							"This endpoint requires an access token. You can get one from the authorization server.",
+					},
+					401,
 				);
 			}
 
 			if (!token || !this.store.validateToken(token)) {
-				return next(
-					new CommercetoolsError<InvalidTokenError>(
-						{
-							code: "invalid_token",
-							message: "invalid_token",
-						},
-						401,
-					),
+				throw new CommercetoolsError<InvalidTokenError>(
+					{
+						code: "invalid_token",
+						message: "invalid_token",
+					},
+					401,
 				);
 			}
-
-			return next();
 		};
 	}
 
 	async validateClientCredentials(
-		request: AuthRequest,
-		response: Response,
-		next: NextFunction,
+		request: FastifyRequest,
+		reply: FastifyReply,
 	) {
-		const authHeader = request.header("Authorization");
+		const authHeader = request.headers.authorization;
 		if (!authHeader) {
-			return next(
-				new CommercetoolsError<InvalidClientError>(
-					{
-						code: "invalid_client",
-						message:
-							"Please provide valid client credentials using HTTP Basic Authentication.",
-					},
-					401,
-				),
+			throw new CommercetoolsError<InvalidClientError>(
+				{
+					code: "invalid_client",
+					message:
+						"Please provide valid client credentials using HTTP Basic Authentication.",
+				},
+				401,
 			);
 		}
 		const credentials = auth.parse(authHeader);
 		if (!credentials) {
-			return next(
-				new CommercetoolsError<InvalidClientError>(
-					{
-						code: "invalid_client",
-						message:
-							"Please provide valid client credentials using HTTP Basic Authentication.",
-					},
-					400,
-				),
+			throw new CommercetoolsError<InvalidClientError>(
+				{
+					code: "invalid_client",
+					message:
+						"Please provide valid client credentials using HTTP Basic Authentication.",
+				},
+				400,
 			);
 		}
 
@@ -139,37 +130,29 @@ export class OAuth2Server {
 			clientId: credentials.name,
 			clientSecret: credentials.pass,
 		};
-
-		next();
 	}
 
-	async tokenHandler(
-		request: AuthRequest,
-		response: Response,
-		next: NextFunction,
-	) {
+	async tokenHandler(request: FastifyRequest<{ Querystring: Record<string, any>; Body: Record<string, any> }>, reply: FastifyReply) {
 		if (!request.credentials) {
-			return next(
-				new CommercetoolsError<InvalidClientError>(
-					{
-						code: "invalid_client",
-						message: "Client credentials are missing.",
-					},
-					401,
-				),
+			throw new CommercetoolsError<InvalidClientError>(
+				{
+					code: "invalid_client",
+					message: "Client credentials are missing.",
+				},
+				401,
 			);
 		}
 
-		const grantType = request.query.grant_type || request.body?.grant_type;
+		const query = request.query;
+		const body = request.body;
+		const grantType = query.grant_type || body?.grant_type;
 		if (!grantType) {
-			return next(
-				new CommercetoolsError<InvalidRequestError>(
-					{
-						code: "invalid_request",
-						message: "Missing required parameter: grant_type.",
-					},
-					400,
-				),
+			throw new CommercetoolsError<InvalidRequestError>(
+				{
+					code: "invalid_request",
+					message: "Missing required parameter: grant_type.",
+				},
+				400,
 			);
 		}
 
@@ -177,23 +160,20 @@ export class OAuth2Server {
 			const token = this.store.getClientToken(
 				request.credentials.clientId,
 				request.credentials.clientSecret,
-				request.query.scope?.toString(),
+				query.scope?.toString(),
 			);
-			response.status(200).send(token);
-			return;
+			return reply.status(200).send(token);
 		}
 		if (grantType === "refresh_token") {
 			const refreshToken =
-				request.query.refresh_token?.toString() || request.body?.refresh_token;
+				query.refresh_token?.toString() || body?.refresh_token;
 			if (!refreshToken) {
-				return next(
-					new CommercetoolsError<InvalidRequestError>(
-						{
-							code: "invalid_request",
-							message: "Missing required parameter: refresh_token.",
-						},
-						400,
-					),
+				throw new CommercetoolsError<InvalidRequestError>(
+					{
+						code: "invalid_request",
+						message: "Missing required parameter: refresh_token.",
+					},
+					400,
 				);
 			}
 			const token = this.store.refreshToken(
@@ -202,112 +182,96 @@ export class OAuth2Server {
 				refreshToken,
 			);
 			if (!token) {
-				return next(
-					new CommercetoolsError<AuthError>(
-						{
-							statusCode: 400,
-							message: "The refresh token was not found. It may have expired.",
-							error: "invalid_grant",
-							error_description:
-								"The refresh token was not found. It may have expired.",
-						},
-						400,
-					),
+				throw new CommercetoolsError<AuthError>(
+					{
+						statusCode: 400,
+						message: "The refresh token was not found. It may have expired.",
+						error: "invalid_grant",
+						error_description:
+							"The refresh token was not found. It may have expired.",
+					},
+					400,
 				);
 			}
-			response.status(200).send(token);
-			return;
+			return reply.status(200).send(token);
 		}
-		return next(
-			new CommercetoolsError<UnsupportedGrantType>(
-				{
-					code: "unsupported_grant_type",
-					message: `Invalid parameter: grant_type: Invalid grant type: ${grantType}`,
-				},
-				400,
-			),
+		throw new CommercetoolsError<UnsupportedGrantType>(
+			{
+				code: "unsupported_grant_type",
+				message: `Invalid parameter: grant_type: Invalid grant type: ${grantType}`,
+			},
+			400,
 		);
 	}
 
-	async customerTokenHandler(
-		request: AuthRequest,
-		response: Response,
-		next: NextFunction,
-	) {
-		const projectKey = request.params.projectKey;
-		const grantType = request.query.grant_type || request.body?.grant_type;
+	async customerTokenHandler(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any>; Body: Record<string, any> }>, reply: FastifyReply) {
+		const params = request.params;
+		const query = request.query;
+		const body = request.body;
+		const projectKey = params.projectKey;
+		const grantType = query.grant_type || body?.grant_type;
 		if (!grantType) {
-			return next(
-				new CommercetoolsError<InvalidRequestError>(
-					{
-						code: "invalid_request",
-						message: "Missing required parameter: grant_type.",
-					},
-					400,
-				),
+			throw new CommercetoolsError<InvalidRequestError>(
+				{
+					code: "invalid_request",
+					message: "Missing required parameter: grant_type.",
+				},
+				400,
 			);
 		}
 
 		if (grantType === "password") {
-			const username = request.query.username || request.body?.username;
-			const password = hashPassword(
-				request.query.password || request.body.password,
-			);
-			const scope =
-				request.query.scope?.toString() || request.body?.scope?.toString();
+			const username = query.username || body?.username;
+			const password = hashPassword(query.password || body.password);
+			const scope = query.scope?.toString() || body?.scope?.toString();
 
 			const result = this.customerRepository.query(
-				{ projectKey: request.params.projectKey },
+				{ projectKey: params.projectKey },
 				{
 					where: [`email = "${username}"`, `password = "${password}"`],
 				},
 			);
 
 			if (result.count === 0) {
-				return next(
-					new CommercetoolsError<any>(
-						{
-							code: "invalid_customer_account_credentials",
-							message: "Customer account with the given credentials not found.",
-						},
-						400,
-					),
+				throw new CommercetoolsError<any>(
+					{
+						code: "invalid_customer_account_credentials",
+						message: "Customer account with the given credentials not found.",
+					},
+					400,
 				);
 			}
 
 			const customer = result.results[0];
 			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
-			response.status(200).send(token);
+			return reply.status(200).send(token);
 		}
 	}
 
 	async inStoreCustomerTokenHandler(
-		request: Request,
-		response: Response,
-		next: NextFunction,
+		request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any>; Body: Record<string, any> }>,
+		reply: FastifyReply,
 	) {
-		const projectKey = request.params.projectKey;
-		const storeKey = request.params.storeKey;
-		const grantType = request.query.grant_type || request.body.grant_type;
+		const params = request.params;
+		const query = request.query;
+		const body = request.body;
+		const projectKey = params.projectKey;
+		const storeKey = params.storeKey;
+		const grantType = query.grant_type || body.grant_type;
 		if (!grantType) {
-			return next(
-				new CommercetoolsError<InvalidRequestError>(
-					{
-						code: "invalid_request",
-						message: "Missing required parameter: grant_type.",
-					},
-					400,
-				),
+			throw new CommercetoolsError<InvalidRequestError>(
+				{
+					code: "invalid_request",
+					message: "Missing required parameter: grant_type.",
+				},
+				400,
 			);
 		}
 
 		if (grantType === "password") {
-			const username = request.query.username || request.body.username;
-			const password = hashPassword(
-				request.query.password || request.body.password,
-			);
-			const scope =
-				request.query.scope?.toString() || request.body.scope?.toString();
+			const username = query.username || body.username;
+			const password = hashPassword(query.password || body.password);
+			const scope = query.scope?.toString() || body.scope?.toString();
 
 			const result = this.customerRepository.query(
 				{ projectKey, storeKey },
@@ -317,46 +281,39 @@ export class OAuth2Server {
 			);
 
 			if (result.count === 0) {
-				return next(
-					new CommercetoolsError<any>(
-						{
-							code: "invalid_customer_account_credentials",
-							message: "Customer account with the given credentials not found.",
-						},
-						400,
-					),
+				throw new CommercetoolsError<any>(
+					{
+						code: "invalid_customer_account_credentials",
+						message: "Customer account with the given credentials not found.",
+					},
+					400,
 				);
 			}
 
 			const customer = result.results[0];
 			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
-			response.status(200).send(token);
-			return;
+			return reply.status(200).send(token);
 		}
 	}
 
-	async anonymousTokenHandler(
-		request: Request,
-		response: Response,
-		next: NextFunction,
-	) {
-		const projectKey = request.params.projectKey;
-		const grantType = request.query.grant_type || request.body.grant_type;
+	async anonymousTokenHandler(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any>; Body: Record<string, any> }>, reply: FastifyReply) {
+		const params = request.params;
+		const query = request.query;
+		const body = request.body;
+		const projectKey = params.projectKey;
+		const grantType = query.grant_type || body.grant_type;
 		if (!grantType) {
-			return next(
-				new CommercetoolsError<InvalidRequestError>(
-					{
-						code: "invalid_request",
-						message: "Missing required parameter: grant_type.",
-					},
-					400,
-				),
+			throw new CommercetoolsError<InvalidRequestError>(
+				{
+					code: "invalid_request",
+					message: "Missing required parameter: grant_type.",
+				},
+				400,
 			);
 		}
 
 		if (grantType === "client_credentials") {
-			const scope =
-				request.query.scope?.toString() || request.body?.scope?.toString();
+			const scope = query.scope?.toString() || body?.scope?.toString();
 
 			const anonymous_id = undefined;
 
@@ -365,8 +322,7 @@ export class OAuth2Server {
 				anonymous_id,
 				scope,
 			);
-			response.status(200).send(token);
-			return;
+			return reply.status(200).send(token);
 		}
 	}
 }

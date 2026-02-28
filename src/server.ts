@@ -13,4 +13,4 @@ if (process.env.HTTP_SERVER_PORT)
 
 // biome-ignore lint: lint/correctness/noConsoleLog
 console.info("Starting commercetools-mock on http://localhost:" + port);
-instance.runServer(port);
+await instance.runServer(port);

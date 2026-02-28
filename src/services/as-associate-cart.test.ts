@@ -1,4 +1,3 @@
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -12,47 +11,50 @@ describe("AsAssociateCart", () => {
 		const draft = {
 			currency: "EUR",
 		};
-		const response = await supertest(ctMock.app)
-			.post(
-				`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
-			)
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
-		expect(response.body.id).toBeDefined();
+		expect(response.statusCode).toBe(201);
+		expect(response.json().id).toBeDefined();
 	});
 
 	test("Get cart", async () => {
-		const createResponse = await supertest(ctMock.app)
-			.post(
-				`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
-			)
-			.send({ currency: "USD" });
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
+			payload: { currency: "USD" },
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts/${createBody.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Query carts", async () => {
-		const createResponse = await supertest(ctMock.app)
-			.post(
-				`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
-			)
-			.send({ currency: "GBP" });
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
+			payload: { currency: "GBP" },
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBeGreaterThan(0);
 	});
 });

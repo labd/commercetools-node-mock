@@ -1,5 +1,4 @@
 import type { RecurrencePolicyDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -21,13 +20,15 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Months",
 			},
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			key: "monthly-policy",
@@ -59,18 +60,21 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Days",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/recurrence-policies/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Get recurrence policy by key", async () => {
@@ -84,18 +88,21 @@ describe("RecurrencePolicy", () => {
 				day: 15,
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/recurrence-policies/key=key-policy",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/recurrence-policies/key=key-policy",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Query recurrence policies", async () => {
@@ -110,19 +117,22 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Months",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/recurrence-policies",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/recurrence-policies",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
-		expect(response.body.results).toContainEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBeGreaterThan(0);
+		expect(response.json().results).toContainEqual(createResponse.json());
 	});
 
 	test("Update recurrence policy - setName", async () => {
@@ -137,16 +147,19 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Weeks",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/recurrence-policies/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setName",
@@ -156,14 +169,15 @@ describe("RecurrencePolicy", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.name).toEqual({
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().name).toEqual({
 			en: "Updated Name",
 			de: "Aktualisierter Name",
 		});
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Update recurrence policy - setDescription", async () => {
@@ -177,16 +191,19 @@ describe("RecurrencePolicy", () => {
 				day: 10,
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/recurrence-policies/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setDescription",
@@ -196,14 +213,15 @@ describe("RecurrencePolicy", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.description).toEqual({
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().description).toEqual({
 			en: "New description",
 			de: "Neue Beschreibung",
 		});
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Update recurrence policy - setKey", async () => {
@@ -218,27 +236,31 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Months",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/recurrence-policies/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setKey",
 						key: "updated-key",
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.key).toBe("updated-key");
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().key).toBe("updated-key");
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Update recurrence policy - setSchedule", async () => {
@@ -253,16 +275,19 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Weeks",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/recurrence-policies/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setSchedule",
@@ -272,14 +297,15 @@ describe("RecurrencePolicy", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.schedule).toEqual({
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().schedule).toEqual({
 			type: "dayOfMonth",
 			day: 25,
 		});
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Delete recurrence policy", async () => {
@@ -294,23 +320,27 @@ describe("RecurrencePolicy", () => {
 				intervalUnit: "Days",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/recurrence-policies")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/recurrence-policies",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const deleteResponse = await supertest(ctMock.app)
-			.delete(`/dummy/recurrence-policies/${createResponse.body.id}`)
-			.query({ version: createResponse.body.version });
+		const deleteResponse = await ctMock.app.inject({
+			method: "DELETE",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}?version=${createResponse.json().version}`,
+		});
 
-		expect(deleteResponse.status).toBe(200);
-		expect(deleteResponse.body).toEqual(createResponse.body);
+		expect(deleteResponse.statusCode).toBe(200);
+		expect(deleteResponse.json()).toEqual(createResponse.json());
 
-		const getResponse = await supertest(ctMock.app).get(
-			`/dummy/recurrence-policies/${createResponse.body.id}`,
-		);
+		const getResponse = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+		});
 
-		expect(getResponse.status).toBe(404);
+		expect(getResponse.statusCode).toBe(404);
 	});
 });

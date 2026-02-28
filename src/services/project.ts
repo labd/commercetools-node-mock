@@ -1,5 +1,5 @@
 import type { Update } from "@commercetools/platform-sdk";
-import type { Request, Response, Router } from "express";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
@@ -8,22 +8,22 @@ import type { ProjectRepository } from "../repositories/project.ts";
 export class ProjectService {
 	public repository: ProjectRepository;
 
-	constructor(parent: Router, repository: ProjectRepository) {
+	constructor(parent: FastifyInstance, repository: ProjectRepository) {
 		this.repository = repository;
 		this.registerRoutes(parent);
 	}
 
-	registerRoutes(parent: Router) {
+	registerRoutes(parent: FastifyInstance) {
 		parent.get("", this.get.bind(this));
 		parent.post("", this.post.bind(this));
 	}
 
-	get(request: Request, response: Response) {
+	get(request: FastifyRequest, reply: FastifyReply) {
 		const project = this.repository.get(getRepositoryContext(request));
-		response.status(200).send(project);
+		return reply.status(200).send(project);
 	}
 
-	post(request: Request, response: Response) {
+	post(request: FastifyRequest, reply: FastifyReply) {
 		const updateRequest = validateData<Update>(
 			request.body,
 			updateRequestSchema,
@@ -31,8 +31,7 @@ export class ProjectService {
 		const project = this.repository.get(getRepositoryContext(request));
 
 		if (!project) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
 
 		const updatedResource = this.repository.processUpdateActions(
@@ -42,6 +41,6 @@ export class ProjectService {
 			updateRequest.actions,
 		);
 
-		response.status(200).send(updatedResource);
+		return reply.status(200).send(updatedResource);
 	}
 }

@@ -1,5 +1,4 @@
 import type { ProductTypeDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -19,13 +18,15 @@ describe("Product type", () => {
 				},
 			],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/product-types")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/product-types",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			attributes: [
 				{
 					attributeConstraint: "None",
@@ -56,17 +57,20 @@ describe("Product type", () => {
 			name: "foo",
 			description: "bar",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/product-types")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/product-types",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/product-types/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/product-types/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 });

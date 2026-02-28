@@ -1,11 +1,11 @@
-import { Router } from "express";
+import type { FastifyInstance } from "fastify";
 import type { MyQuoteRequestRepository } from "#src/repositories/my-quote-request.ts";
 import AbstractService from "./abstract.ts";
 
 export class AsAssociateQuoteRequestService extends AbstractService {
 	public repository: MyQuoteRequestRepository;
 
-	constructor(parent: Router, repository: MyQuoteRequestRepository) {
+	constructor(parent: FastifyInstance, repository: MyQuoteRequestRepository) {
 		super(parent);
 		this.repository = repository;
 	}
@@ -14,20 +14,23 @@ export class AsAssociateQuoteRequestService extends AbstractService {
 		return "quote-requests";
 	}
 
-	registerRoutes(parent: Router) {
+	registerRoutes(parent: FastifyInstance) {
 		const basePath = this.getBasePath();
-		const router = Router({ mergeParams: true });
+		parent.register(
+			(instance, opts, done) => {
+				this.extraRoutes(instance);
 
-		this.extraRoutes(router);
+				instance.get("/", this.get.bind(this));
+				instance.get("/:id", this.getWithId.bind(this));
 
-		router.get("/", this.get.bind(this));
-		router.get("/:id", this.getWithId.bind(this));
+				instance.delete("/:id", this.deleteWithId.bind(this));
 
-		router.delete("/:id", this.deleteWithId.bind(this));
+				instance.post("/", this.post.bind(this));
+				instance.post("/:id", this.postWithId.bind(this));
 
-		router.post("/", this.post.bind(this));
-		router.post("/:id", this.postWithId.bind(this));
-
-		parent.use(`/${basePath}`, router);
+				done();
+			},
+			{ prefix: `/${basePath}` },
+		);
 	}
 }

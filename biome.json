@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**/src/**/*", "!**/vendor/**/*", "!**/dist/**/*"]
+		"includes": ["**/src/**/*", "!**/vendor/**/*", "!**/dist/**/*", "!coverage"]
 	},
 	"formatter": {
 		"enabled": true,

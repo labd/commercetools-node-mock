@@ -1,5 +1,4 @@
 import type { ZoneDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -19,13 +18,15 @@ describe("Zone", () => {
 				},
 			],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/zones")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/zones",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			description: undefined,
 			id: expect.anything(),
@@ -54,18 +55,22 @@ describe("Zone", () => {
 				},
 			],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/zones")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/zones",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/zones/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/zones/${createBody.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Get zone by key", async () => {
@@ -78,18 +83,22 @@ describe("Zone", () => {
 				},
 			],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/zones")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/zones",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/zones/key=key-zone",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/zones/key=key-zone",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Query zones", async () => {
@@ -102,16 +111,23 @@ describe("Zone", () => {
 				},
 			],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/zones")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/zones",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get("/dummy/zones");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/zones",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
-		expect(response.body.results).toContainEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.count).toBeGreaterThan(0);
+		expect(body.results).toContainEqual(createBody);
 	});
 });

@@ -1,5 +1,4 @@
 import type { MyPaymentDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -7,16 +6,18 @@ const ctMock = new CommercetoolsMock();
 
 describe("MyPayment", () => {
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "custom-payment",
 				name: {
 					"nl-NL": "custom-payment",
 				},
 				resourceTypeIds: ["payment"],
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 	});
 
 	test("Create payment", async () => {
@@ -29,12 +30,14 @@ describe("MyPayment", () => {
 				},
 			},
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/payments")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/payments",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(201);
+		expect(response.json()).toEqual({
 			id: expect.anything(),
 			createdAt: expect.anything(),
 			lastModifiedAt: expect.anything(),
@@ -65,15 +68,18 @@ describe("MyPayment", () => {
 				},
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/me/payments")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/payments",
+			payload: draft,
+		});
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/me/payments/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/me/payments/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 });

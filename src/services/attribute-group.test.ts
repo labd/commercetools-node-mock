@@ -1,5 +1,4 @@
 import type { AttributeGroupDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -21,13 +20,15 @@ describe("AttributeGroup", () => {
 				},
 			],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/attribute-groups")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/attribute-groups",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			attributes: [
 				{
 					key: "size",
@@ -55,18 +56,22 @@ describe("AttributeGroup", () => {
 			},
 			attributes: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/attribute-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/attribute-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/attribute-groups/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/attribute-groups/${createBody.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Get attribute group by key", async () => {
@@ -77,18 +82,22 @@ describe("AttributeGroup", () => {
 			},
 			attributes: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/attribute-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/attribute-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/attribute-groups/key=key-group",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/attribute-groups/key=key-group",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createBody);
 	});
 
 	test("Query attribute groups", async () => {
@@ -99,16 +108,23 @@ describe("AttributeGroup", () => {
 			},
 			attributes: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/attribute-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/attribute-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
+		const createBody = createResponse.json();
 
-		const response = await supertest(ctMock.app).get("/dummy/attribute-groups");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/attribute-groups",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
-		expect(response.body.results).toContainEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.count).toBeGreaterThan(0);
+		expect(body.results).toContainEqual(createBody);
 	});
 });

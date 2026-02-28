@@ -1,5 +1,4 @@
 import type { AssociateRole } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../ctMock.ts";
 
@@ -8,18 +7,20 @@ describe("Associate roles query", () => {
 	let associateRole: AssociateRole | undefined;
 
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/associate-roles")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/associate-roles",
+			payload: {
 				name: "example-role",
 				buyerAssignable: false,
 				key: "example-role-associate-role",
 				permissions: ["ViewMyQuotes", "ViewMyOrders", "ViewMyCarts"],
-			});
+			},
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		associateRole = response.body as AssociateRole;
+		associateRole = response.json() as AssociateRole;
 	});
 
 	afterEach(() => {
@@ -27,15 +28,16 @@ describe("Associate roles query", () => {
 	});
 
 	test("no filter", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/associate-roles")
-			.query("{}")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/associate-roles?{}",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.count).toBe(1);
 
-		associateRole = response.body.results[0] as AssociateRole;
+		associateRole = body.results[0] as AssociateRole;
 
 		expect(associateRole.key).toBe("example-role-associate-role");
 	});

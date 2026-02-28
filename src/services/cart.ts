@@ -1,5 +1,5 @@
 import type { Cart, CartDraft, Order } from "@commercetools/platform-sdk";
-import type { Request, Response, Router } from "express";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { CartRepository } from "../repositories/cart/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
@@ -11,7 +11,7 @@ export class CartService extends AbstractService {
 	public orderRepository: OrderRepository;
 
 	constructor(
-		parent: Router,
+		parent: FastifyInstance,
 		cartRepository: CartRepository,
 		orderRepository: OrderRepository,
 	) {
@@ -24,21 +24,21 @@ export class CartService extends AbstractService {
 		return "carts";
 	}
 
-	extraRoutes(parent: Router) {
+	extraRoutes(parent: FastifyInstance) {
 		parent.post("/replicate", this.replicate.bind(this));
 	}
 
-	replicate(request: Request, response: Response) {
+	replicate(request: FastifyRequest<{ Params: Record<string, string>; Body: any }>, reply: FastifyReply) {
 		const context = getRepositoryContext(request);
+		const body = request.body;
 
 		const cartOrOrder: Cart | Order | null =
-			request.body.reference.typeId === "order"
-				? this.orderRepository.get(context, request.body.reference.id)
-				: this.repository.get(context, request.body.reference.id);
+			body.reference.typeId === "order"
+				? this.orderRepository.get(context, body.reference.id)
+				: this.repository.get(context, body.reference.id);
 
 		if (!cartOrOrder) {
-			response.status(400).send();
-			return;
+			return reply.status(400).send();
 		}
 
 		const cartDraft: CartDraft = {
@@ -55,6 +55,6 @@ export class CartService extends AbstractService {
 
 		const newCart = this.repository.create(context, cartDraft);
 
-		response.status(200).send(newCart);
+		return reply.status(200).send(newCart);
 	}
 }

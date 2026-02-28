@@ -1,6 +1,5 @@
 import type { Update } from "@commercetools/platform-sdk";
-import type { Request, Response } from "express";
-import { Router } from "express";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData } from "#src/validate.ts";
 import { hashPassword } from "../lib/password.ts";
@@ -11,7 +10,7 @@ import AbstractService from "./abstract.ts";
 export class MyCustomerService extends AbstractService {
 	public repository: MyCustomerRepository;
 
-	constructor(parent: Router, repository: MyCustomerRepository) {
+	constructor(parent: FastifyInstance, repository: MyCustomerRepository) {
 		super(parent);
 		this.repository = repository;
 	}
@@ -20,42 +19,43 @@ export class MyCustomerService extends AbstractService {
 		return "me";
 	}
 
-	registerRoutes(parent: Router) {
+	registerRoutes(parent: FastifyInstance) {
 		// Overwrite this function to be able to handle /me path.
 		const basePath = this.getBasePath();
-		const router = Router({ mergeParams: true });
+		parent.register(
+			(instance, opts, done) => {
+				this.extraRoutes(instance);
 
-		this.extraRoutes(router);
+				instance.get("", this.getMe.bind(this));
+				instance.post("", this.updateMe.bind(this));
+				instance.delete("", this.deleteMe.bind(this));
 
-		router.get("", this.getMe.bind(this));
-		router.post("", this.updateMe.bind(this));
-		router.delete("", this.deleteMe.bind(this));
+				instance.post("/signup", this.signUp.bind(this));
 
-		router.post("/signup", this.signUp.bind(this));
+				instance.post("/login", this.signIn.bind(this));
+				instance.post("/password", this.changePassword.bind(this));
+				instance.post("/password/reset", this.resetPassword.bind(this));
+				instance.post("/email/confirm", this.emailConfirm.bind(this));
 
-		router.post("/login", this.signIn.bind(this));
-		router.post("/password", this.changePassword.bind(this));
-		router.post("/password/reset", this.resetPassword.bind(this));
-		router.post("/email/confirm", this.emailConfirm.bind(this));
-
-		parent.use(`/${basePath}`, router);
+				done();
+			},
+			{ prefix: `/${basePath}` },
+		);
 	}
 
-	getMe(request: Request, response: Response) {
+	getMe(request: FastifyRequest, reply: FastifyReply) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 		if (!resource) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
-		response.status(200).send(resource);
+		return reply.status(200).send(resource);
 	}
 
-	updateMe(request: Request, response: Response) {
+	updateMe(request: FastifyRequest, reply: FastifyReply) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 
 		if (!resource) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
 		const updateRequest = validateData<Update>(
 			request.body,
@@ -69,58 +69,58 @@ export class MyCustomerService extends AbstractService {
 		);
 
 		const result = this._expandWithId(request, updatedResource.id);
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	deleteMe(request: Request, response: Response) {
+	deleteMe(request: FastifyRequest, reply: FastifyReply) {
 		const resource = this.repository.deleteMe(getRepositoryContext(request));
 		if (!resource) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
 
-		response.status(200).send(resource);
+		return reply.status(200).send(resource);
 	}
 
-	signUp(request: Request, response: Response) {
+	signUp(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
 		const draft = request.body;
 		const resource = this.repository.create(
 			getRepositoryContext(request),
 			draft,
 		);
 		const result = this._expandWithId(request, resource.id);
-		response.status(this.createStatusCode).send({ customer: result });
+		return reply.status(this.createStatusCode).send({ customer: result });
 	}
 
-	changePassword(request: Request, response: Response) {
+	changePassword(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
 		const customer = this.repository.changePassword(
 			getRepositoryContext(request),
 			request.body,
 		);
 
-		response.status(200).send(customer);
+		return reply.status(200).send(customer);
 	}
 
-	resetPassword(request: Request, response: Response) {
+	resetPassword(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
 		const customer = this.repository.passwordReset(
 			getRepositoryContext(request),
 			request.body,
 		);
 
-		response.status(200).send(customer);
+		return reply.status(200).send(customer);
 	}
 
-	emailConfirm(request: Request, response: Response) {
+	emailConfirm(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
 		const customer = this.repository.confirmEmail(
 			getRepositoryContext(request),
 			request.body,
 		);
 
-		response.status(200).send(customer);
+		return reply.status(200).send(customer);
 	}
 
-	signIn(request: Request, response: Response) {
-		const { email, password } = request.body;
+	signIn(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+		const body = request.body;
+		const { email, password } = body;
 		const encodedPassword = hashPassword(password);
 
 		const result = this.repository.query(getRepositoryContext(request), {
@@ -128,7 +128,7 @@ export class MyCustomerService extends AbstractService {
 		});
 
 		if (result.count === 0) {
-			response.status(400).send({
+			return reply.status(400).send({
 				message: "Account with the given credentials not found.",
 				errors: [
 					{
@@ -137,9 +137,8 @@ export class MyCustomerService extends AbstractService {
 					},
 				],
 			});
-			return;
 		}
 
-		response.status(200).send({ customer: result.results[0] });
+		return reply.status(200).send({ customer: result.results[0] });
 	}
 }

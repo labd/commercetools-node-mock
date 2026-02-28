@@ -1,5 +1,4 @@
 import type { Product } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "#src/index.ts";
 
@@ -11,9 +10,10 @@ describe("Product Review Statistics", () => {
 		ctMock = new CommercetoolsMock();
 
 		// Create a product
-		const productResponse = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send({
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: {
 				name: { en: "Test Product" },
 				slug: { en: "test-product" },
 				productType: {
@@ -31,25 +31,28 @@ describe("Product Review Statistics", () => {
 						},
 					],
 				},
-			});
-		expect(productResponse.status).toBe(201);
-		product = productResponse.body;
+			},
+		});
+		expect(productResponse.statusCode).toBe(201);
+		product = productResponse.json();
 	});
 
 	test("product has no review statistics when no reviews exist", async () => {
-		const response = await supertest(ctMock.app).get(
-			`/dummy/products/${product.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${product.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.reviewRatingStatistics).toBeUndefined();
+		expect(response.statusCode).toBe(200);
+		expect(response.json().reviewRatingStatistics).toBeUndefined();
 	});
 
 	test("product has review statistics when reviews exist", async () => {
 		// Create reviews for the product
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "John Doe",
 				title: "Great product!",
 				text: "I really love this product.",
@@ -58,11 +61,13 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Jane Smith",
 				title: "Good product",
 				text: "Pretty good overall.",
@@ -71,11 +76,13 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Bob Wilson",
 				title: "Excellent!",
 				text: "Amazing quality.",
@@ -84,19 +91,22 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/products/${product.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${product.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.reviewRatingStatistics).toBeDefined();
-		expect(response.body.reviewRatingStatistics.count).toBe(3);
-		expect(response.body.reviewRatingStatistics.averageRating).toBe(4.66667);
-		expect(response.body.reviewRatingStatistics.highestRating).toBe(5);
-		expect(response.body.reviewRatingStatistics.lowestRating).toBe(4);
-		expect(response.body.reviewRatingStatistics.ratingsDistribution).toEqual({
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.reviewRatingStatistics).toBeDefined();
+		expect(body.reviewRatingStatistics.count).toBe(3);
+		expect(body.reviewRatingStatistics.averageRating).toBe(4.66667);
+		expect(body.reviewRatingStatistics.highestRating).toBe(5);
+		expect(body.reviewRatingStatistics.lowestRating).toBe(4);
+		expect(body.reviewRatingStatistics.ratingsDistribution).toEqual({
 			"4": 1,
 			"5": 2,
 		});
@@ -104,9 +114,10 @@ describe("Product Review Statistics", () => {
 
 	test("product projection has review statistics", async () => {
 		// Create a review for the product
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Test User",
 				title: "Test Review",
 				text: "Test review text.",
@@ -115,97 +126,114 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/product-projections/${product.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/product-projections/${product.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.reviewRatingStatistics).toBeDefined();
-		expect(response.body.reviewRatingStatistics.count).toBe(1);
-		expect(response.body.reviewRatingStatistics.averageRating).toBe(3);
-		expect(response.body.reviewRatingStatistics.highestRating).toBe(3);
-		expect(response.body.reviewRatingStatistics.lowestRating).toBe(3);
-		expect(response.body.reviewRatingStatistics.ratingsDistribution).toEqual({
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.reviewRatingStatistics).toBeDefined();
+		expect(body.reviewRatingStatistics.count).toBe(1);
+		expect(body.reviewRatingStatistics.averageRating).toBe(3);
+		expect(body.reviewRatingStatistics.highestRating).toBe(3);
+		expect(body.reviewRatingStatistics.lowestRating).toBe(3);
+		expect(body.reviewRatingStatistics.ratingsDistribution).toEqual({
 			"3": 1,
 		});
 	});
 
 	test("product query includes review statistics", async () => {
 		// Create reviews for the product
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Reviewer 1",
 				rating: 2,
 				target: {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Reviewer 2",
 				rating: 4,
 				target: {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app).get("/dummy/products");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/products",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.results).toHaveLength(1);
-		expect(response.body.results[0].reviewRatingStatistics).toBeDefined();
-		expect(response.body.results[0].reviewRatingStatistics.count).toBe(2);
-		expect(response.body.results[0].reviewRatingStatistics.averageRating).toBe(
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.results).toHaveLength(1);
+		expect(body.results[0].reviewRatingStatistics).toBeDefined();
+		expect(body.results[0].reviewRatingStatistics.count).toBe(2);
+		expect(body.results[0].reviewRatingStatistics.averageRating).toBe(
 			3,
 		);
-		expect(response.body.results[0].reviewRatingStatistics.highestRating).toBe(
+		expect(body.results[0].reviewRatingStatistics.highestRating).toBe(
 			4,
 		);
-		expect(response.body.results[0].reviewRatingStatistics.lowestRating).toBe(
+		expect(body.results[0].reviewRatingStatistics.lowestRating).toBe(
 			2,
 		);
 	});
 
 	test("only reviews with includedInStatistics=true are counted", async () => {
 		// Create reviews - both will be included by default
-		const _review1Response = await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		const _review1Response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Reviewer 1",
 				rating: 5,
 				target: {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		const _review2Response = await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		const _review2Response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Reviewer 2",
 				rating: 1,
 				target: {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
 		// Check that both reviews are included by default
-		const response = await supertest(ctMock.app).get(
-			`/dummy/products/${product.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${product.id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.reviewRatingStatistics).toBeDefined();
-		expect(response.body.reviewRatingStatistics.count).toBe(2);
-		expect(response.body.reviewRatingStatistics.averageRating).toBe(3);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.reviewRatingStatistics).toBeDefined();
+		expect(body.reviewRatingStatistics.count).toBe(2);
+		expect(body.reviewRatingStatistics.averageRating).toBe(3);
 
 		// Now exclude one review from statistics by updating it
 		// (Note: In a real implementation, this would be done via state transitions,
@@ -214,9 +242,10 @@ describe("Product Review Statistics", () => {
 
 	test("reviews without ratings are not included in statistics", async () => {
 		// Create a review without rating
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "No Rating User",
 				title: "No rating review",
 				text: "This review has no rating.",
@@ -224,12 +253,14 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
 		// Create a review with rating
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "Rated User",
 				title: "Rated review",
 				rating: 4,
@@ -237,24 +268,28 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/products/${product.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${product.id}`,
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
 		// Only the review with rating should be counted
-		expect(response.body.reviewRatingStatistics).toBeDefined();
-		expect(response.body.reviewRatingStatistics.count).toBe(1);
-		expect(response.body.reviewRatingStatistics.averageRating).toBe(4);
+		expect(body.reviewRatingStatistics).toBeDefined();
+		expect(body.reviewRatingStatistics.count).toBe(1);
+		expect(body.reviewRatingStatistics.averageRating).toBe(4);
 	});
 
 	test("reviews on other products are excluded from statistics", async () => {
 		// Create another product
-		const otherProductResponse = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send({
+		const otherProductResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: {
 				name: { en: "Other Product" },
 				slug: { en: "other-product" },
 				productType: {
@@ -272,14 +307,16 @@ describe("Product Review Statistics", () => {
 						},
 					],
 				},
-			});
-		expect(otherProductResponse.status).toBe(201);
-		const otherProduct = otherProductResponse.body;
+			},
+		});
+		expect(otherProductResponse.statusCode).toBe(201);
+		const otherProduct = otherProductResponse.json();
 
 		// Create reviews for both products
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "User A",
 				title: "Review for first product",
 				rating: 5,
@@ -287,11 +324,13 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "User B",
 				title: "Review for second product",
 				rating: 1,
@@ -299,11 +338,13 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: otherProduct.id,
 				},
-			});
+			},
+		});
 
-		await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				authorName: "User C",
 				title: "Another review for first product",
 				rating: 3,
@@ -311,34 +352,39 @@ describe("Product Review Statistics", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
+			},
+		});
 
 		// Check statistics for the first product - should only include its own reviews
-		const response1 = await supertest(ctMock.app).get(
-			`/dummy/products/${product.id}`,
-		);
-		expect(response1.status).toBe(200);
-		expect(response1.body.reviewRatingStatistics).toBeDefined();
-		expect(response1.body.reviewRatingStatistics.count).toBe(2); // Only reviews for this product
-		expect(response1.body.reviewRatingStatistics.averageRating).toBe(4); // (5 + 3) / 2 = 4
-		expect(response1.body.reviewRatingStatistics.highestRating).toBe(5);
-		expect(response1.body.reviewRatingStatistics.lowestRating).toBe(3);
-		expect(response1.body.reviewRatingStatistics.ratingsDistribution).toEqual({
+		const response1 = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${product.id}`,
+		});
+		expect(response1.statusCode).toBe(200);
+		const body1 = response1.json();
+		expect(body1.reviewRatingStatistics).toBeDefined();
+		expect(body1.reviewRatingStatistics.count).toBe(2); // Only reviews for this product
+		expect(body1.reviewRatingStatistics.averageRating).toBe(4); // (5 + 3) / 2 = 4
+		expect(body1.reviewRatingStatistics.highestRating).toBe(5);
+		expect(body1.reviewRatingStatistics.lowestRating).toBe(3);
+		expect(body1.reviewRatingStatistics.ratingsDistribution).toEqual({
 			"3": 1,
 			"5": 1,
 		});
 
 		// Check statistics for the second product - should only include its own review
-		const response2 = await supertest(ctMock.app).get(
-			`/dummy/products/${otherProduct.id}`,
-		);
-		expect(response2.status).toBe(200);
-		expect(response2.body.reviewRatingStatistics).toBeDefined();
-		expect(response2.body.reviewRatingStatistics.count).toBe(1); // Only reviews for this product
-		expect(response2.body.reviewRatingStatistics.averageRating).toBe(1);
-		expect(response2.body.reviewRatingStatistics.highestRating).toBe(1);
-		expect(response2.body.reviewRatingStatistics.lowestRating).toBe(1);
-		expect(response2.body.reviewRatingStatistics.ratingsDistribution).toEqual({
+		const response2 = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${otherProduct.id}`,
+		});
+		expect(response2.statusCode).toBe(200);
+		const body2 = response2.json();
+		expect(body2.reviewRatingStatistics).toBeDefined();
+		expect(body2.reviewRatingStatistics.count).toBe(1); // Only reviews for this product
+		expect(body2.reviewRatingStatistics.averageRating).toBe(1);
+		expect(body2.reviewRatingStatistics.highestRating).toBe(1);
+		expect(body2.reviewRatingStatistics.lowestRating).toBe(1);
+		expect(body2.reviewRatingStatistics.ratingsDistribution).toEqual({
 			"1": 1,
 		});
 	});

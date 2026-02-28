@@ -1,5 +1,4 @@
 import type { Cart, MyCartDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -7,16 +6,18 @@ const ctMock = new CommercetoolsMock();
 
 describe("MyCart", () => {
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "custom-payment",
 				name: {
 					"nl-NL": "custom-payment",
 				},
 				resourceTypeIds: ["payment"],
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 	});
 
 	afterEach(() => {
@@ -28,12 +29,14 @@ describe("MyCart", () => {
 			currency: "EUR",
 		};
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/me/carts")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/carts",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(201);
+		expect(response.json()).toEqual({
 			id: expect.anything(),
 			createdAt: expect.anything(),
 			lastModifiedAt: expect.anything(),
@@ -66,35 +69,40 @@ describe("MyCart", () => {
 		const draft: MyCartDraft = {
 			currency: "EUR",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/me/carts")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/carts",
+			payload: draft,
+		});
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/me/carts/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/me/carts/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Get my active cart", async () => {
 		const draft: MyCartDraft = {
 			currency: "EUR",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/me/carts")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/carts",
+			payload: draft,
+		});
 
-		const response = await supertest(ctMock.app).get("/dummy/me/active-cart");
+		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me/active-cart" });
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Get my active cart which doesnt exists", async () => {
-		const response = await supertest(ctMock.app).get("/dummy/me/active-cart");
+		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me/active-cart" });
 
-		expect(response.status).toBe(404);
+		expect(response.statusCode).toBe(404);
 	});
 });

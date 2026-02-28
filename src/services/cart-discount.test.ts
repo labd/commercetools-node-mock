@@ -1,6 +1,5 @@
 import assert from "node:assert";
 import type { CartDiscount, TypeDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "..";
 
@@ -75,25 +74,32 @@ describe("Cart Discounts Query", () => {
 
 	beforeEach(async () => {
 		let response;
-		response = await supertest(ctMock.app).post("/dummy/types").send(typeDraft);
-		expect(response.status).toBe(201);
-		const typeId = response.body.id;
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: typeDraft,
+		});
+		expect(response.statusCode).toBe(201);
+		const typeId = response.json().id;
 
-		response = await supertest(ctMock.app)
-			.post("/dummy/cart-discounts")
-			.send(getCartDiscountDraft(typeId));
-		expect(response.status).toBe(201);
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/cart-discounts",
+			payload: getCartDiscountDraft(typeId),
+		});
+		expect(response.statusCode).toBe(201);
 	});
 
 	test("no filter", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/cart-discounts")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/cart-discounts",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBe(1);
 
-		const myRelativeCartDiscount = response.body.results[0] as CartDiscount;
+		const myRelativeCartDiscount = response.json().results[0] as CartDiscount;
 		expect(myRelativeCartDiscount.key).toBe("my-relative-cart-discount");
 		expect(myRelativeCartDiscount.description).toStrictEqual({
 			en: "My relative cart discount",
@@ -134,20 +140,24 @@ describe("Cart Discounts Update Actions", () => {
 	let cartDiscount: CartDiscount | undefined;
 
 	const createType = async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send(typeDraft);
-		expect(response.status).toBe(201);
-		return response.body.id;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: typeDraft,
+		});
+		expect(response.statusCode).toBe(201);
+		return response.json().id;
 	};
 
 	const createCartDiscount = async (typeId: string) => {
 		const cartDiscountDraft = getCartDiscountDraft(typeId);
-		const response = await supertest(ctMock.app)
-			.post("/dummy/cart-discounts")
-			.send(cartDiscountDraft);
-		expect(response.status).toBe(201);
-		cartDiscount = response.body;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/cart-discounts",
+			payload: cartDiscountDraft,
+		});
+		expect(response.statusCode).toBe(201);
+		cartDiscount = response.json();
 	};
 
 	beforeEach(async () => {
@@ -162,71 +172,80 @@ describe("Cart Discounts Update Actions", () => {
 	test("set key", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setKey", key: "my-cart-discount" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.key).toBe("my-cart-discount");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().key).toBe("my-cart-discount");
 	});
 
 	test("set description", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setDescription", description: { en: "Description" } },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.description.en).toBe("Description");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().description.en).toBe("Description");
 	});
 
 	test("set valid from", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setValidFrom", validFrom: "2020-01-01T00:00:01.000Z" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.validFrom).toBe("2020-01-01T00:00:01.000Z");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().validFrom).toBe("2020-01-01T00:00:01.000Z");
 	});
 
 	test("set valid until", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setValidUntil", validUntil: "2020-12-31T23:59:59.999Z" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.validUntil).toBe("2020-12-31T23:59:59.999Z");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().validUntil).toBe("2020-12-31T23:59:59.999Z");
 	});
 
 	test("set valid from and until", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -235,47 +254,53 @@ describe("Cart Discounts Update Actions", () => {
 						validUntil: "2020-12-31T23:59:59.999Z",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.validFrom).toBe("2020-01-01T00:00:01.000Z");
-		expect(response.body.validUntil).toBe("2020-12-31T23:59:59.999Z");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().validFrom).toBe("2020-01-01T00:00:01.000Z");
+		expect(response.json().validUntil).toBe("2020-12-31T23:59:59.999Z");
 	});
 
 	test("change sort order", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeSortOrder", sortOrder: "0.2" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.sortOrder).toBe("0.2");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().sortOrder).toBe("0.2");
 	});
 
 	test("change isActive", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeIsActive", isActive: true }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.isActive).toBe(true);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().isActive).toBe(true);
 	});
 
 	test("change target", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -283,10 +308,11 @@ describe("Cart Discounts Update Actions", () => {
 						target: { type: "shippingInfo", predicate: "2=2" },
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.target).toStrictEqual({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().target).toStrictEqual({
 			type: "shippingInfo",
 			predicate: "2=2",
 		});
@@ -295,9 +321,10 @@ describe("Cart Discounts Update Actions", () => {
 	test("set custom field", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -311,10 +338,11 @@ describe("Cart Discounts Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.custom.fields.fixedAmount).toStrictEqual({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().custom.fields.fixedAmount).toStrictEqual({
 			type: "centPrecision",
 			currencyCode: "EUR",
 			centAmount: 15,
@@ -325,9 +353,10 @@ describe("Cart Discounts Update Actions", () => {
 	test("reset custom field", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -336,18 +365,20 @@ describe("Cart Discounts Update Actions", () => {
 						value: null,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.custom.fields.fixedAmount).toBeUndefined();
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().custom.fields.fixedAmount).toBeUndefined();
 	});
 
 	test("reset non-existing custom field", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -356,25 +387,28 @@ describe("Cart Discounts Update Actions", () => {
 						value: null,
 					},
 				],
-			});
-		expect(response.status).toBe(400);
+			},
+		});
+		expect(response.statusCode).toBe(400);
 	});
 
 	test("remove all custom fields", async () => {
 		assert(cartDiscount, "cart discount not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/cart-discounts/${cartDiscount.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
 						action: "setCustomType",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.custom).toBeUndefined();
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().custom).toBeUndefined();
 	});
 });

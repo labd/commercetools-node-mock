@@ -20,7 +20,6 @@ import type {
 	Type,
 	TypeDraft,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import {
 	afterAll,
 	beforeAll,
@@ -292,66 +291,82 @@ let productPriceType: Type;
 async function beforeAllProductTests(mock: CommercetoolsMock) {
 	let response;
 	// Create Product Type
-	response = await supertest(mock.app)
-		.post("/dummy/product-types")
-		.send(productTypeDraft);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/product-types",
+		payload: productTypeDraft,
+	});
 
-	expect(response.status).toBe(201);
-	productType = response.body;
+	expect(response.statusCode).toBe(201);
+	productType = response.json();
 
 	// Create Category 1
-	response = await supertest(mock.app)
-		.post("/dummy/categories")
-		.send(categoryDraft1);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/categories",
+		payload: categoryDraft1,
+	});
 
-	expect(response.status).toBe(201);
-	category1 = response.body;
+	expect(response.statusCode).toBe(201);
+	category1 = response.json();
 
 	// Create Category 2
-	response = await supertest(mock.app)
-		.post("/dummy/categories")
-		.send(categoryDraft2);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/categories",
+		payload: categoryDraft2,
+	});
 
-	expect(response.status).toBe(201);
-	category2 = response.body;
+	expect(response.statusCode).toBe(201);
+	category2 = response.json();
 
 	// Create Tax Category 1
-	response = await supertest(mock.app)
-		.post("/dummy/tax-categories")
-		.send(taxcategoryDraft1);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/tax-categories",
+		payload: taxcategoryDraft1,
+	});
 
-	expect(response.status).toBe(201);
-	taxCategory1 = response.body;
+	expect(response.statusCode).toBe(201);
+	taxCategory1 = response.json();
 
 	// Create Tax Category 2
-	response = await supertest(mock.app)
-		.post("/dummy/tax-categories")
-		.send(taxcategoryDraft2);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/tax-categories",
+		payload: taxcategoryDraft2,
+	});
 
-	expect(response.status).toBe(201);
-	taxCategory2 = response.body;
+	expect(response.statusCode).toBe(201);
+	taxCategory2 = response.json();
 
 	// Create Product State 1
-	response = await supertest(mock.app)
-		.post("/dummy/states")
-		.send(productState1Draft);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/states",
+		payload: productState1Draft,
+	});
 
-	expect(response.status).toBe(201);
-	productState1 = response.body;
+	expect(response.statusCode).toBe(201);
+	productState1 = response.json();
 
 	// Create Product State 2
-	response = await supertest(mock.app)
-		.post("/dummy/states")
-		.send(productState2Draft);
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/states",
+		payload: productState2Draft,
+	});
 
-	expect(response.status).toBe(201);
-	productState2 = response.body;
+	expect(response.statusCode).toBe(201);
+	productState2 = response.json();
 
-	response = await supertest(mock.app)
-		.post("/dummy/types")
-		.send(productPriceTypeDraft);
-	expect(response.status).toBe(201);
-	productPriceType = response.body;
+	response = await mock.app.inject({
+		method: "POST",
+		url: "/dummy/types",
+		payload: productPriceTypeDraft,
+	});
+	expect(response.statusCode).toBe(201);
+	productPriceType = response.json();
 }
 
 describe("Product", () => {
@@ -363,9 +378,11 @@ describe("Product", () => {
 	test("Create product", async () => {
 		assert(productType, "product type not created");
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(unpublishedProductDraft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: unpublishedProductDraft,
+		});
 
 		const productData: ProductData = {
 			name: {
@@ -450,7 +467,7 @@ describe("Product", () => {
 			searchKeywords: {},
 		};
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),
@@ -487,18 +504,22 @@ describe("Product update actions", () => {
 
 	beforeEach(async () => {
 		let response;
-		response = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(publishedProductDraft);
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: publishedProductDraft,
+		});
 
-		expect(response.status).toBe(201);
-		productPublished = response.body;
+		expect(response.statusCode).toBe(201);
+		productPublished = response.json();
 
-		response = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(unpublishedProductDraft);
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: unpublishedProductDraft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 	});
 
 	afterAll(async () => {
@@ -509,17 +530,19 @@ describe("Product update actions", () => {
 		assert(productPublished, "product not created");
 
 		{
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/products/${productPublished.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/products/${productPublished.id}`,
+				payload: {
 					version: 1,
 					actions: [
 						{ action: "setAttribute", sku: "1337", name: "foo", value: "bar" },
 					],
-				});
+				},
+			});
 
-			expect(response.status).toBe(200);
-			const product: Product = response.body;
+			expect(response.statusCode).toBe(200);
+			const product: Product = response.json();
 			expect(product.version).toBe(2);
 			expect(product.masterData.hasStagedChanges).toBeTruthy();
 			expect(product.masterData.current.masterVariant.attributes).toHaveLength(
@@ -529,21 +552,23 @@ describe("Product update actions", () => {
 				2,
 			);
 
-			const attr = response.body.masterData.staged.masterVariant.attributes[1];
+			const attr = product.masterData.staged.masterVariant.attributes?.[1];
 			expect(attr).toEqual({ name: "foo", value: "bar" });
 		}
 
 		// Publish
 		{
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/products/${productPublished.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/products/${productPublished.id}`,
+				payload: {
 					version: 2,
 					actions: [{ action: "publish", scope: "All" }],
-				});
+				},
+			});
 
-			expect(response.status).toBe(200);
-			const product: Product = response.body;
+			expect(response.statusCode).toBe(200);
+			const product: Product = response.json();
 			expect(product.version).toBe(3);
 			expect(product.masterData.hasStagedChanges).toBeFalsy();
 			expect(product.masterData.current.masterVariant.attributes).toHaveLength(
@@ -555,9 +580,10 @@ describe("Product update actions", () => {
 	test("setAttribute masterVariant (published)", async () => {
 		assert(productPublished, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -568,10 +594,11 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		const product: Product = response.body;
+		expect(response.statusCode).toBe(200);
+		const product: Product = response.json();
 
 		// TODO: Since we auto publish it actually does two version updates. So the
 		// version should be 3
@@ -580,76 +607,86 @@ describe("Product update actions", () => {
 		expect(product.masterData.current.masterVariant.attributes).toHaveLength(2);
 		expect(product.masterData.staged.masterVariant.attributes).toHaveLength(2);
 
-		const attr = response.body.masterData.staged.masterVariant.attributes[1];
+		const attr = product.masterData.staged.masterVariant.attributes?.[1];
 		expect(attr).toEqual({ name: "foo", value: "bar" });
 	});
 
 	test("setAttribute variant", async () => {
 		assert(productPublished, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setAttribute", sku: "1338", name: "foo", value: "bar" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.variants[0].attributes).toHaveLength(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.variants[0].attributes).toHaveLength(
 			2,
 		);
-		const attr = response.body.masterData.staged.variants[0].attributes[1];
+		const attr = body.masterData.staged.variants[0].attributes[1];
 		expect(attr).toEqual({ name: "foo", value: "bar" });
 	});
 
 	test("setAttribute variant and publish", async () => {
 		assert(productPublished, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setAttribute", sku: "1338", name: "foo", value: "bar" },
 					{ action: "publish" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(3);
 		expect(
-			response.body.masterData.current.variants[0].attributes,
+			body.masterData.current.variants[0].attributes,
 		).toHaveLength(2);
-		const attr = response.body.masterData.current.variants[0].attributes[1];
+		const attr = body.masterData.current.variants[0].attributes[1];
 		expect(attr).toEqual({ name: "foo", value: "bar" });
 	});
 
 	test("setAttribute overwrite", async () => {
 		assert(productPublished, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setAttribute", sku: "1337", name: "test", value: "foo" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
 		expect(
-			response.body.masterData.staged.masterVariant.attributes,
+			body.masterData.staged.masterVariant.attributes,
 		).toHaveLength(1);
-		const attr = response.body.masterData.staged.masterVariant.attributes[0];
+		const attr = body.masterData.staged.masterVariant.attributes[0];
 		expect(attr).toEqual({ name: "test", value: "foo" });
 	});
 
 	test("setAttributeInAllVariants overwrite", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -658,9 +695,10 @@ describe("Product update actions", () => {
 						value: "foo",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		const product = response.body as Product;
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const product = response.json() as Product;
 		expect(product.version).toBe(2);
 		expect(product.masterData.staged.masterVariant.attributes).toHaveLength(1);
 
@@ -679,9 +717,10 @@ describe("Product update actions", () => {
 
 	test("setAttributeInAllVariants product staged", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -690,9 +729,10 @@ describe("Product update actions", () => {
 						value: "bar",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		const product = response.body as Product;
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const product = response.json() as Product;
 		expect(product.version).toBe(2);
 		expect(product.masterData.staged.masterVariant.attributes).toHaveLength(2);
 		const masterVariantAttr1 =
@@ -717,18 +757,20 @@ describe("Product update actions", () => {
 	test("setAttributeInAllVariants and publish", async () => {
 		assert(productPublished, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setAttributeInAllVariants", name: "foo", value: "bar" },
 					{ action: "publish" },
 				],
-			});
+			},
+		});
 
-		const product = response.body as Product;
-		expect(response.status).toBe(200);
+		const product = response.json() as Product;
+		expect(response.statusCode).toBe(200);
 		expect(product.version).toBe(3);
 		expect(product.masterData.current.masterVariant.attributes).toHaveLength(2);
 		const attr = product.masterData.current.masterVariant.attributes?.[1];
@@ -750,16 +792,19 @@ describe("Product update actions", () => {
 			url: "http://example.com/image",
 			dimensions: { w: 100, h: 100 },
 		};
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "addExternalImage", sku: "1338", image }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.variants[0].images).toHaveLength(1);
-		const attr = response.body.masterData.staged.variants[0].images[0];
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.variants[0].images).toHaveLength(1);
+		const attr = body.masterData.staged.variants[0].images[0];
 		expect(attr).toEqual(image);
 	});
 
@@ -772,19 +817,22 @@ describe("Product update actions", () => {
 		};
 
 		{
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/products/${productPublished.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/products/${productPublished.id}`,
+				payload: {
 					version: 1,
 					actions: [{ action: "addExternalImage", sku: "1338", image }],
-				});
-			expect(response.status).toBe(200);
-			expect(response.body.version).toBe(2);
+				},
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().version).toBe(2);
 		}
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 2,
 				actions: [
 					{
@@ -793,10 +841,12 @@ describe("Product update actions", () => {
 						imageUrl: image.url,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.masterData.staged.variants[0].images).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(3);
+		expect(body.masterData.staged.variants[0].images).toHaveLength(0);
 	});
 
 	test("moveImageToPosition variant", async () => {
@@ -812,22 +862,25 @@ describe("Product update actions", () => {
 		};
 
 		{
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/products/${productPublished.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/products/${productPublished.id}`,
+				payload: {
 					version: 1,
 					actions: [
 						{ action: "addExternalImage", sku: "1338", image: image1 },
 						{ action: "addExternalImage", sku: "1338", image: image2 },
 					],
-				});
-			expect(response.status).toBe(200);
-			expect(response.body.version).toBe(3);
+				},
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().version).toBe(3);
 		}
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 3,
 				actions: [
 					{
@@ -837,10 +890,12 @@ describe("Product update actions", () => {
 						position: 0,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(4);
-		expect(response.body.masterData.staged.variants[0].images).toEqual([
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(4);
+		expect(body.masterData.staged.variants[0].images).toEqual([
 			{ url: "http://example.com/image2", dimensions: { w: 100, h: 100 } },
 			{ url: "http://example.com/image1", dimensions: { w: 100, h: 100 } },
 		]);
@@ -857,9 +912,10 @@ describe("Product update actions", () => {
 			},
 		};
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -869,10 +925,12 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.masterVariant.prices).toMatchObject([
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.masterVariant.prices).toMatchObject([
 			{
 				country: "NL",
 				value: {
@@ -888,8 +946,8 @@ describe("Product update actions", () => {
 				},
 			},
 		]);
-		expect(response.body.masterData.staged.masterVariant.prices[1].id).toBe(
-			response.body.masterData.current.masterVariant.prices[1].id,
+		expect(body.masterData.staged.masterVariant.prices[1].id).toBe(
+			body.masterData.current.masterVariant.prices[1].id,
 		);
 	});
 
@@ -907,9 +965,10 @@ describe("Product update actions", () => {
 			},
 		};
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -918,10 +977,12 @@ describe("Product update actions", () => {
 						price: priceDraft,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.masterVariant.prices).toMatchObject([
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.masterVariant.prices).toMatchObject([
 			{
 				id: priceId,
 				country: "BE",
@@ -939,9 +1000,10 @@ describe("Product update actions", () => {
 			productPublished?.masterData.current.masterVariant.prices?.[0].id;
 		assert(priceId);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -949,19 +1011,22 @@ describe("Product update actions", () => {
 						priceId,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.masterVariant.prices).toHaveLength(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.masterVariant.prices).toHaveLength(
 			0,
 		);
 	});
 
 	test("changeName product", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -970,22 +1035,25 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.name).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.name).toBe(
 			"new test published product",
 		);
-		expect(response.body.masterData.current.name).toBe(
+		expect(body.masterData.current.name).toBe(
 			"new test published product",
 		);
 	});
 
 	test("changeSlug product", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -996,22 +1064,25 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.slug).toMatchObject({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.slug).toMatchObject({
 			"nl-NL": "test-published-product-new",
 		});
-		expect(response.body.masterData.current.slug).toMatchObject({
+		expect(body.masterData.current.slug).toMatchObject({
 			"nl-NL": "test-published-product-new",
 		});
 	});
 
 	test("setMetaTitle product", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1022,22 +1093,25 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.metaTitle).toMatchObject({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.metaTitle).toMatchObject({
 			"nl-NL": "Unpublished product (new meta title)",
 		});
-		expect(response.body.masterData.current.metaTitle).toMatchObject({
+		expect(body.masterData.current.metaTitle).toMatchObject({
 			"nl-NL": "Unpublished product (new meta title)",
 		});
 	});
 
 	test("setMetaDescription product", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1048,22 +1122,25 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.metaDescription).toMatchObject({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.metaDescription).toMatchObject({
 			"nl-NL": "Unpublished product description (new meta description)",
 		});
-		expect(response.body.masterData.current.metaDescription).toMatchObject({
+		expect(body.masterData.current.metaDescription).toMatchObject({
 			"nl-NL": "Unpublished product description (new meta description)",
 		});
 	});
 
 	test("setMetaKeywords product", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1074,22 +1151,25 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.metaKeywords).toMatchObject({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.metaKeywords).toMatchObject({
 			"nl-NL": "Test product (newmeta Keywords)",
 		});
-		expect(response.body.masterData.current.metaKeywords).toMatchObject({
+		expect(body.masterData.current.metaKeywords).toMatchObject({
 			"nl-NL": "Test product (newmeta Keywords)",
 		});
 	});
 
 	test("addVariant product", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1117,20 +1197,23 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.variants).toHaveLength(2);
-		expect(response.body.masterData.current.variants).toHaveLength(2);
-		expect(response.body.masterData.staged.variants[1].id).toBe(3);
-		expect(response.body.masterData.current.variants[1].id).toBe(3);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.variants).toHaveLength(2);
+		expect(body.masterData.current.variants).toHaveLength(2);
+		expect(body.masterData.staged.variants[1].id).toBe(3);
+		expect(body.masterData.current.variants[1].id).toBe(3);
 	});
 
 	test("removeVariant by id", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1139,18 +1222,21 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.variants).toHaveLength(0);
-		expect(response.body.masterData.current.variants).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.variants).toHaveLength(0);
+		expect(body.masterData.current.variants).toHaveLength(0);
 	});
 
 	test("removeVariant by sku", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1159,18 +1245,21 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.variants).toHaveLength(0);
-		expect(response.body.masterData.current.variants).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.variants).toHaveLength(0);
+		expect(body.masterData.current.variants).toHaveLength(0);
 	});
 
 	test("removeVariant master", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1179,18 +1268,20 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(500);
-		expect(response.body.error).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(500);
+		expect(response.json().error).toBe(
 			`Can not remove the variant [ID:1] for [Product:${productPublished.id}] since it's the master variant`,
 		);
 	});
 
 	test("changeMasterVariant", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1199,23 +1290,26 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.masterData.staged.variants).toHaveLength(1);
-		expect(response.body.masterData.staged.masterVariant.id).toBe(2);
-		expect(response.body.masterData.staged.variants[0].id).toBe(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.masterData.staged.variants).toHaveLength(1);
+		expect(body.masterData.staged.masterVariant.id).toBe(2);
+		expect(body.masterData.staged.variants[0].id).toBe(1);
 
-		expect(response.body.masterData.current.variants).toHaveLength(1);
-		expect(response.body.masterData.current.masterVariant.id).toBe(2);
-		expect(response.body.masterData.current.variants[0].id).toBe(1);
+		expect(body.masterData.current.variants).toHaveLength(1);
+		expect(body.masterData.current.masterVariant.id).toBe(2);
+		expect(body.masterData.current.variants[0].id).toBe(1);
 	});
 
 	test("changeMasterVariant same master", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1224,23 +1318,26 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(1);
-		expect(response.body.masterData.staged.variants).toHaveLength(1);
-		expect(response.body.masterData.staged.masterVariant.id).toBe(1);
-		expect(response.body.masterData.staged.variants[0].id).toBe(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(1);
+		expect(body.masterData.staged.variants).toHaveLength(1);
+		expect(body.masterData.staged.masterVariant.id).toBe(1);
+		expect(body.masterData.staged.variants[0].id).toBe(2);
 
-		expect(response.body.masterData.current.variants).toHaveLength(1);
-		expect(response.body.masterData.current.masterVariant.id).toBe(1);
-		expect(response.body.masterData.current.variants[0].id).toBe(2);
+		expect(body.masterData.current.variants).toHaveLength(1);
+		expect(body.masterData.current.masterVariant.id).toBe(1);
+		expect(body.masterData.current.variants[0].id).toBe(2);
 	});
 
 	test("setTaxCategory", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1251,17 +1348,19 @@ describe("Product update actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.taxCategory.id).toBe(taxCategory2.id);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().taxCategory.id).toBe(taxCategory2.id);
 	});
 
 	test("setTaxCategory fail 1", async () => {
 		assert(productPublished, "product not created");
 		const fakeTaxCategoryId = "00000000-0000-0000-0000-000000000000";
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1272,16 +1371,18 @@ describe("Product update actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.errors[0].code).toBe("ReferencedResourceNotFound");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("ReferencedResourceNotFound");
 	});
 
 	test("setTaxCategory fail 2", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1291,16 +1392,18 @@ describe("Product update actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.errors[0].code).toBe("InvalidJsonInput");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidJsonInput");
 	});
 
 	test("addToCategory by id", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1312,17 +1415,20 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.masterData.staged.categories).toHaveLength(2);
-		expect(response.body.masterData.current.categories).toHaveLength(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.masterData.staged.categories).toHaveLength(2);
+		expect(body.masterData.current.categories).toHaveLength(2);
 	});
 
 	test("addToCategory by key", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1334,18 +1440,21 @@ describe("Product update actions", () => {
 						staged: true,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.masterData.staged.categories).toHaveLength(2);
-		expect(response.body.masterData.current.categories).toHaveLength(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.masterData.staged.categories).toHaveLength(2);
+		expect(body.masterData.current.categories).toHaveLength(1);
 	});
 
 	test("addToCategory fail 1", async () => {
 		assert(productPublished, "product not created");
 		const fakeCategoryId = "00000000-0000-0000-0000-000000000000";
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1357,16 +1466,18 @@ describe("Product update actions", () => {
 						staged: true,
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.errors[0].code).toBe("ReferencedResourceNotFound");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("ReferencedResourceNotFound");
 	});
 
 	test("addToCategory fail 2", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1375,16 +1486,18 @@ describe("Product update actions", () => {
 						staged: true,
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.errors[0].code).toBe("InvalidJsonInput");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidJsonInput");
 	});
 
 	test("removeFromCategory", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1396,17 +1509,20 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.masterData.staged.categories).toHaveLength(0);
-		expect(response.body.masterData.current.categories).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.masterData.staged.categories).toHaveLength(0);
+		expect(body.masterData.current.categories).toHaveLength(0);
 	});
 
 	test("removeFromCategory fail 1", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1418,16 +1534,18 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.errors[0].code).toBe("ReferencedResourceNotFound");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("ReferencedResourceNotFound");
 	});
 
 	test("removeFromCategory fail 2", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1439,16 +1557,18 @@ describe("Product update actions", () => {
 						staged: false,
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.errors[0].code).toBe("InvalidOperation");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidOperation");
 	});
 
 	test("transitionState", async () => {
 		assert(productPublished, "product not created");
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1460,9 +1580,10 @@ describe("Product update actions", () => {
 						force: false,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.state).toMatchObject({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().state).toMatchObject({
 			typeId: "state",
 			id: productState2.id,
 		});
@@ -1474,9 +1595,10 @@ describe("Product update actions", () => {
 			productPublished?.masterData.current.masterVariant.prices?.[0].id;
 		assert(priceId);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/products/${productPublished.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productPublished.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1494,10 +1616,11 @@ describe("Product update actions", () => {
 						priceId,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
+			},
+		});
+		expect(response.statusCode).toBe(200);
 		expect(
-			response.body.masterData.staged.masterVariant.prices?.[0].custom.fields
+			response.json().masterData.staged.masterVariant.prices?.[0].custom.fields
 				?.myCustomField,
 		).toBe("MyRandomValue");
 	});
@@ -1518,21 +1641,25 @@ describe("Product Search - Generic", () => {
 			},
 		};
 
-		await supertest(ctMock.app)
-			.post("/dummy/inventory")
-			.send(inventoryEntryDraft);
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/inventory",
+			payload: inventoryEntryDraft,
+		});
 	}
 
 	beforeAll(async () => {
 		await beforeAllProductTests(ctMock);
 
-		new Array(24).fill(null).forEach(async () => {
-			const response = await supertest(ctMock.app)
-				.post("/dummy/products")
-				.send(publishedProductDraft);
+		for (let i = 0; i < 24; i++) {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/products",
+				payload: publishedProductDraft,
+			});
 
-			expect(response.status).toBe(201);
-		});
+			expect(response.statusCode).toBe(201);
+		}
 	});
 
 	test("Pagination", async () => {
@@ -1547,11 +1674,13 @@ describe("Product Search - Generic", () => {
 				},
 				limit: 24,
 			};
-			const response = await supertest(ctMock.app)
-				.post("/dummy/products/search")
-				.send(body);
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/products/search",
+				payload: body,
+			});
 
-			const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+			const pagedSearchResponse: ProductPagedSearchResponse = response.json();
 			expect(pagedSearchResponse.limit).toBe(24);
 			expect(pagedSearchResponse.offset).toBe(0);
 			expect(pagedSearchResponse.total).toBeGreaterThan(0);
@@ -1582,11 +1711,13 @@ describe("Product Search - Generic", () => {
 				offset: 88,
 			};
 
-			const response = await supertest(ctMock.app)
-				.post("/dummy/products/search")
-				.send(body);
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/products/search",
+				payload: body,
+			});
 
-			const pagedSearchResponse: ProductPagedSearchResponse = response.body;
+			const pagedSearchResponse: ProductPagedSearchResponse = response.json();
 			expect(pagedSearchResponse.limit).toBe(88);
 			expect(pagedSearchResponse.offset).toBe(88);
 			expect(pagedSearchResponse.total).toBeGreaterThan(0);
@@ -1621,11 +1752,13 @@ describe("Product Search - Generic", () => {
 			limit: 1,
 		};
 
-		const response1 = await supertest(ctMock.app)
-			.post("/dummy/products/search")
-			.send(body);
+		const response1 = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products/search",
+			payload: body,
+		});
 
-		const pagedSearchResponse1: ProductPagedSearchResponse = response1.body;
+		const pagedSearchResponse1: ProductPagedSearchResponse = response1.json();
 
 		expect(pagedSearchResponse1.results.length).toBe(0);
 
@@ -1634,11 +1767,13 @@ describe("Product Search - Generic", () => {
 			10,
 		);
 
-		const response2 = await supertest(ctMock.app)
-			.post("/dummy/products/search")
-			.send(body);
+		const response2 = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products/search",
+			payload: body,
+		});
 
-		const pagedSearchResponse2: ProductPagedSearchResponse = response2.body;
+		const pagedSearchResponse2: ProductPagedSearchResponse = response2.json();
 
 		const productFound = pagedSearchResponse2.results.find(
 			(result) => result?.productProjection?.masterVariant?.sku === "1337",

@@ -1,5 +1,4 @@
 import type { DiscountCodeDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -8,9 +7,10 @@ const ctMock = new CommercetoolsMock();
 describe("DiscountCode", () => {
 	test("Create discount code", async () => {
 		// First create a cart discount to reference
-		const cartDiscountResponse = await supertest(ctMock.app)
-			.post("/dummy/cart-discounts")
-			.send({
+		const cartDiscountResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/cart-discounts",
+			payload: {
 				key: "test-cart-discount",
 				name: {
 					en: "Test Cart Discount",
@@ -24,9 +24,10 @@ describe("DiscountCode", () => {
 					type: "totalPrice",
 				},
 				sortOrder: "0.1",
-			});
+			},
+		});
 
-		expect(cartDiscountResponse.status).toBe(201);
+		expect(cartDiscountResponse.statusCode).toBe(201);
 
 		const draft: DiscountCodeDraft = {
 			key: "SAVE10",
@@ -37,22 +38,24 @@ describe("DiscountCode", () => {
 			cartDiscounts: [
 				{
 					typeId: "cart-discount",
-					id: cartDiscountResponse.body.id,
+					id: cartDiscountResponse.json().id,
 				},
 			],
 			isActive: true,
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/discount-codes")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-codes",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			applicationVersion: 1,
 			cartDiscounts: [
 				{
-					id: cartDiscountResponse.body.id,
+					id: cartDiscountResponse.json().id,
 					typeId: "cart-discount",
 				},
 			],
@@ -72,9 +75,10 @@ describe("DiscountCode", () => {
 
 	test("Get discount code", async () => {
 		// First create a cart discount to reference
-		const cartDiscountResponse = await supertest(ctMock.app)
-			.post("/dummy/cart-discounts")
-			.send({
+		const cartDiscountResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/cart-discounts",
+			payload: {
 				key: "test-cart-discount-2",
 				name: {
 					en: "Test Cart Discount 2",
@@ -88,7 +92,8 @@ describe("DiscountCode", () => {
 					type: "totalPrice",
 				},
 				sortOrder: "0.1",
-			});
+			},
+		});
 
 		const draft: DiscountCodeDraft = {
 			key: "TEST10",
@@ -99,22 +104,25 @@ describe("DiscountCode", () => {
 			cartDiscounts: [
 				{
 					typeId: "cart-discount",
-					id: cartDiscountResponse.body.id,
+					id: cartDiscountResponse.json().id,
 				},
 			],
 			isActive: true,
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-codes")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-codes",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/discount-codes/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/discount-codes/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 });

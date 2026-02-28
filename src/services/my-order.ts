@@ -1,11 +1,11 @@
-import { Router } from "express";
+import type { FastifyInstance } from "fastify";
 import type { MyOrderRepository } from "../repositories/my-order.ts";
 import AbstractService from "./abstract.ts";
 
 export class MyOrderService extends AbstractService {
 	public repository: MyOrderRepository;
 
-	constructor(parent: Router, repository: MyOrderRepository) {
+	constructor(parent: FastifyInstance, repository: MyOrderRepository) {
 		super(parent);
 		this.repository = repository;
 	}
@@ -14,21 +14,24 @@ export class MyOrderService extends AbstractService {
 		return "me";
 	}
 
-	registerRoutes(parent: Router) {
+	registerRoutes(parent: FastifyInstance) {
 		// Overwrite this function to be able to handle /me/active-cart path.
 		const basePath = this.getBasePath();
-		const router = Router({ mergeParams: true });
+		parent.register(
+			(instance, opts, done) => {
+				this.extraRoutes(instance);
 
-		this.extraRoutes(router);
+				instance.get("/orders", this.get.bind(this));
+				instance.get("/orders/:id", this.getWithId.bind(this));
 
-		router.get("/orders/", this.get.bind(this));
-		router.get("/orders/:id", this.getWithId.bind(this));
+				instance.delete("/orders/:id", this.deleteWithId.bind(this));
 
-		router.delete("/orders/:id", this.deleteWithId.bind(this));
+				instance.post("/orders", this.post.bind(this));
+				instance.post("/orders/:id", this.postWithId.bind(this));
 
-		router.post("/orders/", this.post.bind(this));
-		router.post("/orders/:id", this.postWithId.bind(this));
-
-		parent.use(`/${basePath}`, router);
+				done();
+			},
+			{ prefix: `/${basePath}` },
+		);
 	}
 }

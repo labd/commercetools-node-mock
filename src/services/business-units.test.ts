@@ -1,5 +1,4 @@
 import type { BusinessUnit } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { businessUnitDraftFactory } from "#src/testing/business-unit.ts";
 import { customerDraftFactory } from "#src/testing/customer.ts";
@@ -17,22 +16,25 @@ describe("Business units query", () => {
 	beforeEach(async () => {
 		const draft = businessUnitDraftFactory(ctMock).build();
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/business-units")
-			.send(draft);
-		expect(response.status).toBe(201);
-		businessUnit = response.body as BusinessUnit;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/business-units",
+			payload: draft,
+		});
+		expect(response.statusCode).toBe(201);
+		businessUnit = response.json() as BusinessUnit;
 	});
 
 	test("no filter", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/business-units")
-			.query("{}")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/business-units?{}",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
-		businessUnit = response.body.results[0] as BusinessUnit;
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.count).toBe(1);
+		businessUnit = body.results[0] as BusinessUnit;
 		expect(businessUnit.key).toBe("test-business-unit");
 	});
 });
@@ -47,9 +49,10 @@ describe("Business Unit Update Actions", () => {
 	test("addAddress", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -64,18 +67,21 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses).toHaveLength(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.addresses).toHaveLength(2);
 	});
 
 	test("removeAddress by ID", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -83,10 +89,12 @@ describe("Business Unit Update Actions", () => {
 						addressId: businessUnit.addresses[0].id,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses).toHaveLength(0);
+			},
+		});
+		const body = response.json();
+		expect(response.statusCode, JSON.stringify(body)).toBe(200);
+		expect(body.version).toBe(2);
+		expect(body.addresses).toHaveLength(0);
 	});
 
 	test("changeAddress by ID", async () => {
@@ -94,9 +102,10 @@ describe("Business Unit Update Actions", () => {
 
 		const addressId = businessUnit.addresses[0].id;
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -112,9 +121,11 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		const result = response.body as BusinessUnit;
+			},
+		});
+		const body = response.json();
+		expect(response.statusCode, JSON.stringify(body)).toBe(200);
+		const result = body as BusinessUnit;
 		expect(result.version).toBe(2);
 		expect(result.addresses).toHaveLength(1);
 		expect(result.addresses).toStrictEqual([
@@ -133,9 +144,10 @@ describe("Business Unit Update Actions", () => {
 	test("addShippingAddressId", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -143,19 +155,22 @@ describe("Business Unit Update Actions", () => {
 						addressId: businessUnit.addresses[0].id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.shippingAddressIds).toHaveLength(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.shippingAddressIds).toHaveLength(1);
 	});
 
 	test("removeShippingAddressId", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
 		const addressId = businessUnit.addresses[0].id;
-		await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -163,11 +178,13 @@ describe("Business Unit Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 2,
 				actions: [
 					{
@@ -175,9 +192,10 @@ describe("Business Unit Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		const result = response.body as BusinessUnit;
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const result = response.json() as BusinessUnit;
 		expect(result.version).toBe(3);
 		expect(result.shippingAddressIds).toHaveLength(0);
 	});
@@ -187,9 +205,10 @@ describe("Business Unit Update Actions", () => {
 
 		const addressId = businessUnit.addresses[0].id;
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: businessUnit.version,
 				actions: [
 					{
@@ -197,18 +216,21 @@ describe("Business Unit Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.defaultShippingAddressId).toBe(addressId);
+			},
+		});
+		const body = response.json();
+		expect(response.statusCode, JSON.stringify(body)).toBe(200);
+		expect(body.version).toBe(2);
+		expect(body.defaultShippingAddressId).toBe(addressId);
 	});
 
 	test("addBillingAddressId", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -216,20 +238,23 @@ describe("Business Unit Update Actions", () => {
 						addressId: businessUnit.addresses[0].id,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.billingAddressIds).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.billingAddressIds).toHaveLength(1);
 	});
 
 	test("removeBillingAddressId", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
 		const addressId = businessUnit.addresses[0].id;
-		await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -237,11 +262,13 @@ describe("Business Unit Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 2,
 				actions: [
 					{
@@ -249,9 +276,10 @@ describe("Business Unit Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		const result = response.body as BusinessUnit;
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const result = response.json() as BusinessUnit;
 		expect(result.version).toBe(3);
 		expect(result.billingAddressIds).toHaveLength(0);
 	});
@@ -260,9 +288,10 @@ describe("Business Unit Update Actions", () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 		const addressId = businessUnit.addresses[0].id;
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: businessUnit.version,
 				actions: [
 					{
@@ -270,54 +299,65 @@ describe("Business Unit Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.defaultBillingAddressId).toBe(addressId);
+			},
+		});
+		const body = response.json();
+		expect(response.statusCode, JSON.stringify(body)).toBe(200);
+		expect(body.version).toBe(2);
+		expect(body.defaultBillingAddressId).toBe(addressId);
 	});
 
 	test("changeName", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeName", name: "Updated Business Unit Name" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.name).toBe("Updated Business Unit Name");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.name).toBe("Updated Business Unit Name");
 	});
 
 	test("setContactEmail", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setContactEmail", contactEmail: "newemail@business.com" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.contactEmail).toBe("newemail@business.com");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.contactEmail).toBe("newemail@business.com");
 	});
 
 	test("changeStatus", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeStatus", status: "Inactive" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.status).toBe("Inactive");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.status).toBe("Inactive");
 	});
 
 	test("changeParentUnit", async () => {
@@ -331,9 +371,10 @@ describe("Business Unit Update Actions", () => {
 			name: "Division Unit",
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${divisionBusinessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${divisionBusinessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -344,19 +385,22 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.parentUnit?.key).toBe(parentBusinessUnit.key);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.parentUnit?.key).toBe(parentBusinessUnit.key);
 	});
 
 	test("addAssociate", async () => {
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 		const customer = await customerDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -370,10 +414,12 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.associates).toHaveLength(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.associates).toHaveLength(1);
 	});
 
 	test("removeAssociate", async () => {
@@ -390,9 +436,10 @@ describe("Business Unit Update Actions", () => {
 			],
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -403,10 +450,12 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.associates).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.associates).toHaveLength(0);
 	});
 
 	test("changeAssociate", async () => {
@@ -423,9 +472,10 @@ describe("Business Unit Update Actions", () => {
 			],
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -451,10 +501,12 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.associates[0].associateRoleAssignments).toHaveLength(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.associates[0].associateRoleAssignments).toHaveLength(
 			1,
 		);
 	});
@@ -474,9 +526,10 @@ describe("Business Unit Update Actions", () => {
 
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -487,10 +540,12 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.custom.type.id).toBe(type.id);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.custom.type.id).toBe(type.id);
 	});
 
 	test("setCustomField", async () => {
@@ -518,9 +573,10 @@ describe("Business Unit Update Actions", () => {
 			},
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -529,10 +585,12 @@ describe("Business Unit Update Actions", () => {
 						value: "bar",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.custom.fields.customField).toBe("bar");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.custom.fields.customField).toBe("bar");
 	});
 
 	test("setAddressCustomType", async () => {
@@ -549,9 +607,10 @@ describe("Business Unit Update Actions", () => {
 		});
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -563,10 +622,12 @@ describe("Business Unit Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses[0].custom.type.id).toBe(type.id);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.addresses[0].custom.type.id).toBe(type.id);
 	});
 
 	test("setAddressCustomField", async () => {
@@ -583,9 +644,10 @@ describe("Business Unit Update Actions", () => {
 		});
 		const businessUnit = await businessUnitDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/business-units/${businessUnit.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/business-units/${businessUnit.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -603,10 +665,12 @@ describe("Business Unit Update Actions", () => {
 						value: "address custom value",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.addresses[0].custom.fields.addressCustomField).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(3);
+		expect(body.addresses[0].custom.fields.addressCustomField).toBe(
 			"address custom value",
 		);
 	});

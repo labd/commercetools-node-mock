@@ -1,5 +1,4 @@
 import type { CustomObject } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { getBaseResourceProperties } from "../helpers.ts";
 import { CommercetoolsMock } from "../index.ts";
@@ -8,16 +7,18 @@ describe("CustomObject create", () => {
 	const ctMock = new CommercetoolsMock();
 
 	test("Create new object", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/custom-objects")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/custom-objects",
+			payload: {
 				container: "my-container",
 				key: "my-key",
 				value: "my-value",
-			});
+			},
+		});
 
-		expect(response.status).toBe(201);
-		const customObject = response.body;
+		expect(response.statusCode).toBe(201);
+		const customObject = response.json();
 		expect(customObject.container).toBe("my-container");
 		expect(customObject.key).toBe("my-key");
 		expect(customObject.value).toBe("my-value");
@@ -29,16 +30,18 @@ describe("CustomObject retrieve", () => {
 	let customObject: CustomObject;
 
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/custom-objects")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/custom-objects",
+			payload: {
 				container: "my-container",
 				key: "my-key",
 				value: "my-value",
-			});
+			},
+		});
 
-		expect(response.status).toBe(201);
-		customObject = response.body;
+		expect(response.statusCode).toBe(201);
+		customObject = response.json();
 		expect(customObject.container).toBe("my-container");
 		expect(customObject.key).toBe("my-key");
 		expect(customObject.value).toBe("my-value");
@@ -48,40 +51,44 @@ describe("CustomObject retrieve", () => {
 	});
 
 	test("exists", async () => {
-		const response = await supertest(ctMock.app)
-			.head("/dummy/custom-objects/my-container/my-key")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "HEAD",
+			url: "/dummy/custom-objects/my-container/my-key",
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 	});
 
 	test("non-existent", async () => {
-		const response = await supertest(ctMock.app)
-			.head("/dummy/custom-objects/invalid-container/invalid")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "HEAD",
+			url: "/dummy/custom-objects/invalid-container/invalid",
+		});
 
-		expect(response.status).toBe(404);
+		expect(response.statusCode).toBe(404);
 	});
 
 	test("get", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/custom-objects/my-container/my-key")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/custom-objects/my-container/my-key",
+		});
 
-		expect(response.status).toBe(200);
-		const customObject = response.body;
+		expect(response.statusCode).toBe(200);
+		const customObject = response.json();
 		expect(customObject.container).toBe("my-container");
 		expect(customObject.key).toBe("my-key");
 		expect(customObject.value).toBe("my-value");
 	});
 
 	test("query with container", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/custom-objects/my-container")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/custom-objects/my-container",
+		});
 
-		expect(response.status).toBe(200);
-		const customObjects = response.body;
+		expect(response.statusCode).toBe(200);
+		const customObjects = response.json();
 		expect(customObjects).toMatchObject({
 			results: [
 				{
@@ -95,29 +102,33 @@ describe("CustomObject retrieve", () => {
 	});
 
 	test("Update match current (no conflict)", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/custom-objects")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/custom-objects",
+			payload: {
 				container: "my-container",
 				key: "my-key",
 				value: "my-value",
-			});
+			},
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 	});
 
 	test("New with version (errors)", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/custom-objects")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/custom-objects",
+			payload: {
 				container: "my-new-container",
 				key: "my-new-key",
 				value: "my-value",
 				version: 2,
-			});
+			},
+		});
 
-		expect(response.status).toBe(400);
-		expect(response.body).toStrictEqual({
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toStrictEqual({
 			statusCode: 400,
 			message: "version on create must be 0",
 			errors: [
@@ -130,17 +141,19 @@ describe("CustomObject retrieve", () => {
 	});
 
 	test("Update match current with version (conflict)", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/custom-objects")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/custom-objects",
+			payload: {
 				container: "my-container",
 				key: "my-key",
 				value: "my-value",
 				version: 2,
-			});
+			},
+		});
 
-		expect(response.status).toBe(409);
-		expect(response.body).toStrictEqual({
+		expect(response.statusCode).toBe(409);
+		expect(response.json()).toStrictEqual({
 			statusCode: 409,
 			message: `Object ${customObject.id} has a different version than expected. Expected: 2 - Actual: 1.`,
 			errors: [
@@ -162,12 +175,13 @@ describe("CustomObject retrieve", () => {
 			version: 2,
 		});
 
-		const response = await supertest(ctMock.app)
-			.get("/dummy/custom-objects/my-container/my-key")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/custom-objects/my-container/my-key",
+		});
 
-		expect(response.status).toEqual(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toEqual(200);
+		expect(response.json()).toEqual({
 			container: "my-container",
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -187,14 +201,16 @@ describe("CustomObject retrieve", () => {
 			version: 2,
 		});
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/custom-objects/my-other-container/my-key")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/custom-objects/my-other-container/my-key",
+			payload: {
 				value: "new-value",
-			});
+			},
+		});
 
-		expect(response.status).toEqual(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toEqual(200);
+		expect(response.json()).toEqual({
 			container: "my-other-container",
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -206,12 +222,13 @@ describe("CustomObject retrieve", () => {
 	});
 
 	test("delete with container and key", async () => {
-		const response = await supertest(ctMock.app)
-			.delete("/dummy/custom-objects/my-container/my-key")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "DELETE",
+			url: "/dummy/custom-objects/my-container/my-key",
+		});
 
-		expect(response.status).toEqual(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toEqual(200);
+		expect(response.json()).toEqual({
 			container: "my-container",
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -221,10 +238,11 @@ describe("CustomObject retrieve", () => {
 			version: 1,
 		});
 
-		const fetchRes = await supertest(ctMock.app)
-			.get("/dummy/custom-objects/my-container/my-key")
-			.send();
+		const fetchRes = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/custom-objects/my-container/my-key",
+		});
 
-		expect(fetchRes.status).toEqual(404);
+		expect(fetchRes.statusCode).toEqual(404);
 	});
 });
