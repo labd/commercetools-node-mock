@@ -1,6 +1,5 @@
 import assert from "node:assert";
 import type { Order } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -12,11 +11,10 @@ describe("Order Query", () => {
 	const businessUnitKey = "business-unit";
 
 	beforeEach(async () => {
-		let response = await supertest(ctMock.app)
-			.post(
-				`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
-			)
-			.send({
+		const cartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
+			payload: {
 				currency: "EUR",
 				custom: {
 					type: {
@@ -26,23 +24,24 @@ describe("Order Query", () => {
 						description: "example description",
 					},
 				},
-			});
-		expect(response.status).toBe(201);
-		const cart = response.body;
+			},
+		});
+		expect(cartResponse.statusCode).toBe(201);
+		const cart = cartResponse.json();
 
-		response = await supertest(ctMock.app)
-			.post(
-				`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/orders`,
-			)
-			.send({
+		const orderResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/orders`,
+			payload: {
 				cart: {
 					typeId: "cart",
 					id: cart.id,
 				},
 				orderNumber: "foobar",
-			});
-		expect(response.status).toBe(201);
-		order = response.body;
+			},
+		});
+		expect(orderResponse.statusCode).toBe(201);
+		order = orderResponse.json();
 	});
 
 	afterEach(() => {
@@ -52,13 +51,15 @@ describe("Order Query", () => {
 	test("no filter", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app).get(
-			`/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/orders`,
-		);
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
-		expect(response.body.total).toBe(1);
-		expect(response.body.offset).toBe(0);
-		expect(response.body.limit).toBe(20);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/orders`,
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.count).toBe(1);
+		expect(body.total).toBe(1);
+		expect(body.offset).toBe(0);
+		expect(body.limit).toBe(20);
 	});
 });

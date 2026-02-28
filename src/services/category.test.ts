@@ -4,7 +4,6 @@ import type {
 	CategoryAddAssetAction,
 	CategoryRemoveAssetAction,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -13,9 +12,10 @@ describe("Categories Query", () => {
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/categories")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/categories",
+			payload: {
 				name: {
 					en: "Top hat",
 				},
@@ -23,10 +23,11 @@ describe("Categories Query", () => {
 					en: "top-hat",
 				},
 				orderHint: "0.1",
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 
-		category = response.body as Category;
+		category = response.json() as Category;
 	});
 
 	afterEach(() => {
@@ -34,15 +35,15 @@ describe("Categories Query", () => {
 	});
 
 	test("no filter", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/categories")
-			.query({})
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/categories",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBe(1);
 
-		category = response.body.results[0] as Category;
+		category = response.json().results[0] as Category;
 
 		expect(category.name.en).toBe("Top hat");
 	});
@@ -53,9 +54,10 @@ describe("categories changeName", () => {
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/categories")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/categories",
+			payload: {
 				name: {
 					en: "Top hat",
 				},
@@ -63,15 +65,17 @@ describe("categories changeName", () => {
 					en: "top-hat",
 				},
 				orderHint: "0.1",
-			});
-		expect(response.status).toBe(201);
-		category = response.body as Category;
+			},
+		});
+		expect(response.statusCode).toBe(201);
+		category = response.json() as Category;
 	});
 
 	test("changeName", async () => {
-		const changeNameResponse = await supertest(ctMock.app)
-			.post(`/dummy/categories/${category?.id}`)
-			.send({
+		const changeNameResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/categories/${category?.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -81,10 +85,11 @@ describe("categories changeName", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(changeNameResponse.status).toBe(200);
-		expect(changeNameResponse.body.name.en).toBe("Top hat - new name");
+		expect(changeNameResponse.statusCode).toBe(200);
+		expect(changeNameResponse.json().name.en).toBe("Top hat - new name");
 	});
 });
 
@@ -94,9 +99,10 @@ describe("categories changeParent", () => {
 	let category2: Category | undefined;
 
 	beforeEach(async () => {
-		const response1 = await supertest(ctMock.app)
-			.post("/dummy/categories")
-			.send({
+		const response1 = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/categories",
+			payload: {
 				name: {
 					en: "Top hat",
 				},
@@ -104,13 +110,15 @@ describe("categories changeParent", () => {
 					en: "top-hat",
 				},
 				orderHint: "0.1",
-			});
-		expect(response1.status).toBe(201);
-		category1 = response1.body as Category;
+			},
+		});
+		expect(response1.statusCode).toBe(201);
+		category1 = response1.json() as Category;
 
-		const response2 = await supertest(ctMock.app)
-			.post("/dummy/categories")
-			.send({
+		const response2 = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/categories",
+			payload: {
 				name: {
 					en: "Top hat",
 				},
@@ -118,15 +126,17 @@ describe("categories changeParent", () => {
 					en: "top-hat",
 				},
 				orderHint: "0.1",
-			});
-		expect(response2.status).toBe(201);
-		category2 = response2.body as Category;
+			},
+		});
+		expect(response2.statusCode).toBe(201);
+		category2 = response2.json() as Category;
 	});
 
 	test("changeParent", async () => {
-		const changeNameResponse = await supertest(ctMock.app)
-			.post(`/dummy/categories/${category2?.id}`)
-			.send({
+		const changeNameResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/categories/${category2?.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -137,15 +147,16 @@ describe("categories changeParent", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(changeNameResponse.status).toBe(200);
-		expect(changeNameResponse.body.parent).toEqual({
+		expect(changeNameResponse.statusCode).toBe(200);
+		expect(changeNameResponse.json().parent).toEqual({
 			typeId: "category",
 			id: category1?.id,
 		});
-		expect(changeNameResponse.body.ancestors).toHaveLength(1);
-		expect(changeNameResponse.body.ancestors[0].id).toEqual(category1?.id);
+		expect(changeNameResponse.json().ancestors).toHaveLength(1);
+		expect(changeNameResponse.json().ancestors[0].id).toEqual(category1?.id);
 	});
 });
 
@@ -154,9 +165,10 @@ describe("Categories add asset", () => {
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/categories")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/categories",
+			payload: {
 				name: {
 					en: "Top hat",
 				},
@@ -169,18 +181,20 @@ describe("Categories add asset", () => {
 						key: "some-key",
 					},
 				],
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 
-		category = response.body as Category;
+		category = response.json() as Category;
 	});
 
 	test("add second asset", async () => {
 		assert(category, "category not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/categories/${category.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/categories/${category.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -190,12 +204,13 @@ describe("Categories add asset", () => {
 						},
 					} as CategoryAddAssetAction,
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.assets).toHaveLength(2);
-		expect(response.body.assets[0].key).toEqual("some-key");
-		expect(response.body.assets[1].key).toEqual("some-other-key");
+		expect(response.statusCode).toBe(200);
+		expect(response.json().assets).toHaveLength(2);
+		expect(response.json().assets[0].key).toEqual("some-key");
+		expect(response.json().assets[1].key).toEqual("some-other-key");
 	});
 });
 
@@ -204,9 +219,10 @@ describe("Categories remove asset", () => {
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/categories")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/categories",
+			payload: {
 				name: {
 					en: "Top hat",
 				},
@@ -222,18 +238,20 @@ describe("Categories remove asset", () => {
 						key: "some-other-key",
 					},
 				],
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 
-		category = response.body as Category;
+		category = response.json() as Category;
 	});
 
 	test("remove assets by id and key", async () => {
 		assert(category, "category not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/categories/${category.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/categories/${category.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -245,9 +263,10 @@ describe("Categories remove asset", () => {
 						assetId: category.assets?.[0].id,
 					} as CategoryRemoveAssetAction,
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.assets).toHaveLength(0);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().assets).toHaveLength(0);
 	});
 });

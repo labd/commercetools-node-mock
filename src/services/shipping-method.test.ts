@@ -5,7 +5,6 @@ import type {
 	TaxCategoryDraft,
 	ZoneDraft,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 import { isType } from "../types.ts";
@@ -14,35 +13,31 @@ const ctMock = new CommercetoolsMock();
 
 describe("Shipping method", () => {
 	beforeEach(async () => {
-		await supertest(ctMock.app)
-			.post("/dummy/tax-categories")
-			.send(
-				isType<TaxCategoryDraft>({
-					name: "foo",
-					key: "standard",
-					rates: [],
-				}),
-			)
-			.then((res) => {
-				expect(res.status).toEqual(201);
-			});
+		const taxCatResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/tax-categories",
+			payload: isType<TaxCategoryDraft>({
+				name: "foo",
+				key: "standard",
+				rates: [],
+			}),
+		});
+		expect(taxCatResponse.statusCode).toEqual(201);
 
-		await supertest(ctMock.app)
-			.post("/dummy/zones")
-			.send(
-				isType<ZoneDraft>({
-					name: "The Netherlands",
-					key: "NL",
-					locations: [
-						{
-							country: "NL",
-						},
-					],
-				}),
-			)
-			.then((res) => {
-				expect(res.status).toEqual(201);
-			});
+		const zoneResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/zones",
+			payload: isType<ZoneDraft>({
+				name: "The Netherlands",
+				key: "NL",
+				locations: [
+					{
+						country: "NL",
+					},
+				],
+			}),
+		});
+		expect(zoneResponse.statusCode).toEqual(201);
 	});
 
 	afterEach(async () => {
@@ -56,13 +51,15 @@ describe("Shipping method", () => {
 			isDefault: true,
 			zoneRates: [],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/shipping-methods")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shipping-methods",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			isDefault: true,
@@ -85,97 +82,98 @@ describe("Shipping method", () => {
 			isDefault: true,
 			zoneRates: [],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/shipping-methods")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shipping-methods",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/shipping-methods/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/shipping-methods/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Get shipping methods matching cart", async () => {
-		const cart = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send(
-				isType<CartDraft>({
-					currency: "EUR",
-					shippingAddress: {
-						country: "NL",
+		const cartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: isType<CartDraft>({
+				currency: "EUR",
+				shippingAddress: {
+					country: "NL",
+				},
+			}),
+		});
+		const cart = cartResponse.json() as Cart;
+
+		const smResponse1 = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shipping-methods",
+			payload: isType<ShippingMethodDraft>({
+				name: "NL",
+				taxCategory: { typeId: "tax-category", key: "standard" },
+				isDefault: true,
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone",
+							key: "NL",
+						},
+						shippingRates: [
+							{
+								price: {
+									currencyCode: "EUR",
+									centAmount: 495,
+								},
+							},
+						],
 					},
-				}),
-			)
-			.then((res) => res.body as Cart);
+				],
+			}),
+		});
+		expect(smResponse1.statusCode).toEqual(201);
 
-		await supertest(ctMock.app)
-			.post("/dummy/shipping-methods")
-			.send(
-				isType<ShippingMethodDraft>({
-					name: "NL",
-					taxCategory: { typeId: "tax-category", key: "standard" },
-					isDefault: true,
-					zoneRates: [
-						{
-							zone: {
-								typeId: "zone",
-								key: "NL",
-							},
-							shippingRates: [
-								{
-									price: {
-										currencyCode: "EUR",
-										centAmount: 495,
-									},
-								},
-							],
+		const smResponse2 = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shipping-methods",
+			payload: isType<ShippingMethodDraft>({
+				name: "NL/GBP",
+				taxCategory: { typeId: "tax-category", key: "standard" },
+				isDefault: true,
+				zoneRates: [
+					{
+						zone: {
+							typeId: "zone",
+							key: "NL",
 						},
-					],
-				}),
-			)
-			.then((res) => {
-				expect(res.status).toEqual(201);
-			});
-
-		await supertest(ctMock.app)
-			.post("/dummy/shipping-methods")
-			.send(
-				isType<ShippingMethodDraft>({
-					name: "NL/GBP",
-					taxCategory: { typeId: "tax-category", key: "standard" },
-					isDefault: true,
-					zoneRates: [
-						{
-							zone: {
-								typeId: "zone",
-								key: "NL",
-							},
-							shippingRates: [
-								{
-									price: {
-										currencyCode: "GBP",
-										centAmount: 495,
-									},
+						shippingRates: [
+							{
+								price: {
+									currencyCode: "GBP",
+									centAmount: 495,
 								},
-							],
-						},
-					],
-				}),
-			)
-			.then((res) => {
-				expect(res.status).toEqual(201);
-			});
+							},
+						],
+					},
+				],
+			}),
+		});
+		expect(smResponse2.statusCode).toEqual(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/shipping-methods/matching-cart?cartId=${cart.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/shipping-methods/matching-cart?cartId=${cart.id}`,
+		});
 
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body).toMatchObject({
+		const body = response.json();
+		expect(response.statusCode, JSON.stringify(body)).toBe(200);
+		expect(body).toMatchObject({
 			count: 1,
 			limit: 20,
 			offset: 0,

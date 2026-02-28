@@ -1,5 +1,4 @@
 import type { StateDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -11,13 +10,15 @@ describe("State", () => {
 			key: "foo",
 			type: "PaymentState",
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/states")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/states",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			builtIn: false,
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -35,17 +36,20 @@ describe("State", () => {
 			key: "foo",
 			type: "PaymentState",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/states")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/states",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/states/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/states/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 });

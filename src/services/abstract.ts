@@ -1,5 +1,5 @@
 import type { Update } from "@commercetools/platform-sdk";
-import { type Request, type Response, Router } from "express";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { ParsedQs } from "qs";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData } from "#src/validate.ts";
@@ -15,48 +15,51 @@ export default abstract class AbstractService {
 
 	createStatusCode = 201;
 
-	constructor(parent: Router) {
+	constructor(parent: FastifyInstance) {
 		this.registerRoutes(parent);
 	}
 
 	protected abstract getBasePath(): string;
 
-	extraRoutes(router: Router) {}
+	extraRoutes(instance: FastifyInstance) {}
 
-	registerRoutes(parent: Router) {
+	registerRoutes(parent: FastifyInstance) {
 		const basePath = this.getBasePath();
-		const router = Router({ mergeParams: true });
+		parent.register(
+			(instance, opts, done) => {
+				this.extraRoutes(instance);
 
-		// Bind this first since the `/:id` routes are currently a bit to greedy
-		this.extraRoutes(router);
+				instance.get("/", this.get.bind(this));
+				instance.get("/key=:key", this.getWithKey.bind(this));
+				instance.get("/:id", this.getWithId.bind(this));
 
-		router.get("/", this.get.bind(this));
-		router.get("/key=:key", this.getWithKey.bind(this)); // same thing goes for the key routes
-		router.get("/:id", this.getWithId.bind(this));
+				instance.delete("/key=:key", this.deleteWithKey.bind(this));
+				instance.delete("/:id", this.deleteWithId.bind(this));
 
-		router.delete("/key=:key", this.deleteWithKey.bind(this));
-		router.delete("/:id", this.deleteWithId.bind(this));
+				instance.post("/", this.post.bind(this));
+				instance.post("/key=:key", this.postWithKey.bind(this));
+				instance.post("/:id", this.postWithId.bind(this));
 
-		router.post("/", this.post.bind(this));
-		router.post("/key=:key", this.postWithKey.bind(this));
-		router.post("/:id", this.postWithId.bind(this));
-
-		parent.use(`/${basePath}`, router);
+				done();
+			},
+			{ prefix: `/${basePath}` },
+		);
 	}
 
-	get(request: Request, response: Response) {
-		const limit = this._parseParam(request.query.limit);
-		const offset = this._parseParam(request.query.offset);
+	get(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
+		const query = request.query;
+		const limit = this._parseParam(query.limit);
+		const offset = this._parseParam(query.offset);
 		const params: QueryParams = {
-			expand: this._parseParam(request.query.expand),
-			where: this._parseParam(request.query.where),
+			expand: this._parseParam(query.expand),
+			where: this._parseParam(query.where),
 			limit: limit !== undefined ? Number(limit) : undefined,
 			offset: offset !== undefined ? Number(offset) : undefined,
 		};
 
-		for (const key in request.query) {
+		for (const key in query) {
 			if (key.startsWith("var.")) {
-				const items = this._parseParam(request.query[key]);
+				const items = this._parseParam(query[key]);
 				if (items) {
 					params[key] = items.length === 1 ? items[0] : items;
 				}
@@ -64,113 +67,114 @@ export default abstract class AbstractService {
 		}
 
 		const result = this.repository.query(getRepositoryContext(request), params);
-		response.status(200).send(result);
-		return;
+		return reply.status(200).send(result);
 	}
 
-	getWithId(request: Request, response: Response) {
-		const result = this._expandWithId(request, request.params.id);
+	getWithId(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+		const params = request.params;
+		const result = this._expandWithId(request, params.id);
 		if (!result) {
-			response.status(404).send({
+			return reply.status(404).send({
 				statusCode: 404,
-				message: `The Resource with ID '${request.params.id} was not found.`,
+				message: `The Resource with ID '${params.id} was not found.`,
 				errors: [
 					{
 						code: "ResourceNotFound",
-						message: `The Resource with ID '${request.params.id} was not found.`,
+						message: `The Resource with ID '${params.id} was not found.`,
 					},
 				],
 			});
-			return;
 		}
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	getWithKey(request: Request, response: Response) {
+	getWithKey(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+		const params = request.params;
+		const query = request.query;
 		const result = this.repository.getByKey(
 			getRepositoryContext(request),
-			request.params.key,
+			params.key,
 			{
-				expand: this._parseParam(request.query.expand),
+				expand: this._parseParam(query.expand),
 			},
 		);
 		if (!result) {
-			response.status(404).send({
+			return reply.status(404).send({
 				statusCode: 404,
-				message: `The Resource with key '${request.params.id} was not found.`,
+				message: `The Resource with key '${params.id} was not found.`,
 				errors: [
 					{
 						code: "ResourceNotFound",
-						message: `The Resource with key '${request.params.id} was not found.`,
+						message: `The Resource with key '${params.id} was not found.`,
 					},
 				],
 			});
-			return;
 		}
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	deleteWithId(request: Request, response: Response) {
+	deleteWithId(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+		const params = request.params;
+		const query = request.query;
 		const result = this.repository.delete(
 			getRepositoryContext(request),
-			request.params.id,
+			params.id,
 			{
-				expand: this._parseParam(request.query.expand),
+				expand: this._parseParam(query.expand),
 			},
 		);
 		if (!result) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	deleteWithKey(request: Request, response: Response) {
+	deleteWithKey(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+		const params = request.params;
+		const query = request.query;
 		const resource = this.repository.getByKey(
 			getRepositoryContext(request),
-			request.params.key,
+			params.key,
 		);
 		if (!resource) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
 
 		const result = this.repository.delete(
 			getRepositoryContext(request),
 			resource.id,
 			{
-				expand: this._parseParam(request.query.expand),
+				expand: this._parseParam(query.expand),
 			},
 		);
 		if (!result) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	post(request: Request, response: Response) {
+	post(request: FastifyRequest, reply: FastifyReply) {
 		const draft = request.body;
 		const resource = this.repository.create(
 			getRepositoryContext(request),
 			draft,
 		);
 		const result = this._expandWithId(request, resource.id);
-		response.status(this.createStatusCode).send(result);
+		return reply.status(this.createStatusCode).send(result);
 	}
 
-	postWithId(request: Request, response: Response) {
+	postWithId(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+		const params = request.params;
 		const updateRequest = validateData<Update>(
 			request.body,
 			updateRequestSchema,
 		);
 		const resource = this.repository.get(
 			getRepositoryContext(request),
-			request.params.id,
+			params.id,
 		);
 		if (!resource) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
 
 		const updatedResource = this.repository.processUpdateActions(
@@ -181,10 +185,11 @@ export default abstract class AbstractService {
 		);
 
 		const result = this._expandWithId(request, updatedResource.id);
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	postWithKey(request: Request, response: Response) {
+	postWithKey(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+		const params = request.params;
 		const updateRequest = validateData<Update>(
 			request.body,
 			updateRequestSchema,
@@ -192,11 +197,10 @@ export default abstract class AbstractService {
 
 		const resource = this.repository.getByKey(
 			getRepositoryContext(request),
-			request.params.key,
+			params.key,
 		);
 		if (!resource) {
-			response.status(404).send({ statusCode: 404 });
-			return;
+			return reply.status(404).send({ statusCode: 404 });
 		}
 
 		const updatedResource = this.repository.processUpdateActions(
@@ -207,15 +211,16 @@ export default abstract class AbstractService {
 		);
 
 		const result = this._expandWithId(request, updatedResource.id);
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	protected _expandWithId(request: Request, resourceId: string) {
+	protected _expandWithId(request: FastifyRequest<{ Querystring: Record<string, any> }>, resourceId: string) {
+		const query = request.query;
 		const result = this.repository.get(
 			getRepositoryContext(request),
 			resourceId,
 			{
-				expand: this._parseParam(request.query.expand),
+				expand: this._parseParam(query.expand),
 			},
 		);
 		return result;

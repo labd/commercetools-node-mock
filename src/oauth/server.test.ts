@@ -1,7 +1,7 @@
-import express from "express";
-import supertest from "supertest";
+import Fastify, { type FastifyError, type FastifyReply, type FastifyRequest } from "fastify";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import { hashPassword } from "../lib/password.ts";
 import { CustomerRepository } from "../repositories/customer/index.ts";
@@ -10,34 +10,48 @@ import { InMemoryStorage } from "../storage/index.ts";
 import { OAuth2Server } from "./server.ts";
 
 describe("OAuth2Server", () => {
-	let app: express.Express;
+	let app: ReturnType<typeof Fastify>;
 	let server: OAuth2Server;
 
 	let storage: AbstractStorage;
 	let customerRepository: CustomerRepository;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		server = new OAuth2Server({ enabled: true, validate: false });
-		app = express();
-		app.use(server.createRouter());
+		app = Fastify();
+		app.register(server.createPlugin());
+		app.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+			if (error instanceof CommercetoolsError) {
+				return reply.status(error.statusCode).send({
+					statusCode: error.statusCode,
+					message: error.message,
+					errors: error.errors?.length > 0 ? error.errors : [error.info],
+				});
+			}
+			return reply.status(500).send({ error: error.message });
+		});
 
 		storage = new InMemoryStorage();
 		const config: Config = { storage, strict: false };
 		customerRepository = new CustomerRepository(config);
 		server.setCustomerRepository(customerRepository);
+
+		await app.ready();
 	});
 
 	describe("POST /token", () => {
 		it("should return a token for valid client credentials", async () => {
-			const response = await supertest(app)
-				.post("/token")
-				.auth("validClientId", "validClientSecret")
-				.query({ grant_type: "client_credentials" })
-				.send();
+			const response = await app.inject({
+				method: "POST",
+				url: `/token?${new URLSearchParams({ grant_type: "client_credentials" })}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			const body = await response.body;
+			const body = response.json();
 
-			expect(response.status, JSON.stringify(body)).toBe(200);
+			expect(response.statusCode, JSON.stringify(body)).toBe(200);
 			expect(body).toHaveProperty("access_token");
 			expect(body).toEqual({
 				// scope: expect.stringMatching(/anonymous_id:([^\s]+)/),
@@ -50,36 +64,42 @@ describe("OAuth2Server", () => {
 		});
 
 		it("should failed on invalid refresh token", async () => {
-			const response = await supertest(app)
-				.post("/token")
-				.auth("validClientId", "validClientSecret")
-				.query({ grant_type: "refresh_token", refresh_token: "invalid" })
-				.send();
+			const response = await app.inject({
+				method: "POST",
+				url: `/token?${new URLSearchParams({ grant_type: "refresh_token", refresh_token: "invalid" })}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			const body = await response.body;
+			const body = response.json();
 
-			expect(response.status, JSON.stringify(body)).toBe(400);
+			expect(response.statusCode, JSON.stringify(body)).toBe(400);
 		});
 
 		it("should refresh a token", async () => {
-			const createResponse = await supertest(app)
-				.post("/my-project/anonymous/token")
-				.auth("validClientId", "validClientSecret")
-				.query({ grant_type: "client_credentials" })
-				.send();
+			const createResponse = await app.inject({
+				method: "POST",
+				url: `/my-project/anonymous/token?${new URLSearchParams({ grant_type: "client_credentials" })}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			const refreshToken = createResponse.body.refresh_token;
+			const refreshToken = createResponse.json().refresh_token;
 
-			const response = await supertest(app)
-				.post("/token")
-				.auth("validClientId", "validClientSecret")
-				.query({ grant_type: "refresh_token", refresh_token: refreshToken })
-				.send();
+			const response = await app.inject({
+				method: "POST",
+				url: `/token?${new URLSearchParams({ grant_type: "refresh_token", refresh_token: refreshToken })}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			const body = await response.body;
+			const body = response.json();
 
-			expect(response.status, JSON.stringify(body)).toBe(200);
-			expect(body.access_token).not.toBe(createResponse.body.access_token);
+			expect(response.statusCode, JSON.stringify(body)).toBe(200);
+			expect(body.access_token).not.toBe(createResponse.json().access_token);
 			expect(body.refresh_token).toBeUndefined();
 		});
 	});
@@ -88,15 +108,17 @@ describe("OAuth2Server", () => {
 		it("should return a token for anonymous access", async () => {
 			const projectKey = "test-project";
 
-			const response = await supertest(app)
-				.post(`/${projectKey}/anonymous/token`)
-				.auth("validClientId", "validClientSecret")
-				.query({ grant_type: "client_credentials" })
-				.send();
+			const response = await app.inject({
+				method: "POST",
+				url: `/${projectKey}/anonymous/token?${new URLSearchParams({ grant_type: "client_credentials" })}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			expect(response.status).toBe(200);
-			expect(response.body).toHaveProperty("access_token");
-			expect(response.body).toEqual({
+			expect(response.statusCode).toBe(200);
+			expect(response.json()).toHaveProperty("access_token");
+			expect(response.json()).toEqual({
 				scope: expect.stringMatching(/anonymous_id:([^\s]+)/),
 				access_token: expect.stringMatching(/\S{8,}==$/),
 				refresh_token: expect.stringMatching(/test-project:\S{8,}==$/),
@@ -120,19 +142,21 @@ describe("OAuth2Server", () => {
 				stores: [],
 			});
 
-			const response = await supertest(app)
-				.post(`/${projectKey}/customers/token`)
-				.auth("validClientId", "validClientSecret")
-				.query({
+			const response = await app.inject({
+				method: "POST",
+				url: `/${projectKey}/customers/token?${new URLSearchParams({
 					grant_type: "password",
 					username: "j.doe@example.org",
 					password: "password",
 					scope: `${projectKey}:manage_my_profile`,
-				})
-				.send();
+				})}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			expect(response.status).toBe(200);
-			expect(response.body).toEqual({
+			expect(response.statusCode).toBe(200);
+			expect(response.json()).toEqual({
 				scope: expect.stringMatching(/customer_id:([^\s]+)/),
 				access_token: expect.stringMatching(/\S{8,}==$/),
 				refresh_token: expect.stringMatching(/test-project:\S{8,}==$/),
@@ -162,19 +186,21 @@ describe("OAuth2Server", () => {
 				],
 			});
 
-			const response = await supertest(app)
-				.post(`/${projectKey}/in-store/key=${storeKey}/customers/token`)
-				.auth("validClientId", "validClientSecret")
-				.query({
+			const response = await app.inject({
+				method: "POST",
+				url: `/${projectKey}/in-store/key=${storeKey}/customers/token?${new URLSearchParams({
 					grant_type: "password",
 					username: "j.doe@example.org",
 					password: "password",
 					scope: `${projectKey}:manage_my_profile`,
-				})
-				.send();
+				})}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
 
-			expect(response.status).toBe(200);
-			expect(response.body).toEqual({
+			expect(response.statusCode).toBe(200);
+			expect(response.json()).toEqual({
 				scope: expect.stringMatching(/customer_id:([^\s]+)/),
 				access_token: expect.stringMatching(/\S{8,}==$/),
 				refresh_token: expect.stringMatching(/test-project:\S{8,}==$/),

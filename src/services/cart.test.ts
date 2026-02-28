@@ -12,7 +12,6 @@ import type {
 	TaxCategoryDraft,
 	Zone,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { calculateMoneyTotalCentAmount } from "#src/repositories/helpers.ts";
 import { customerDraftFactory } from "#src/testing/customer.ts";
@@ -23,9 +22,10 @@ describe("Carts Query", () => {
 
 	beforeEach(async () => {
 		let response;
-		response = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-cart",
 				name: {
 					en: "Test",
@@ -47,12 +47,14 @@ describe("Carts Query", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 
-		response = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
 				currency: "EUR",
 				custom: {
 					type: {
@@ -63,22 +65,21 @@ describe("Carts Query", () => {
 						description: "example description",
 					},
 				},
-			});
-		expect(response.status).toBe(201);
+			},
+		});
+		expect(response.statusCode).toBe(201);
 	});
 
 	test("no filter", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/carts")
-			.query({
-				expand: "custom.type",
-			})
-			.send();
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/carts?expand=custom.type",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBe(1);
 
-		const myCart = response.body.results[0] as Cart;
+		const myCart = response.json().results[0] as Cart;
 
 		expect(myCart.custom?.type.id).not.toBeUndefined();
 		expect(myCart.custom?.type.id).toBe(myCart.custom?.type.obj?.id);
@@ -88,25 +89,33 @@ describe("Carts Query", () => {
 	test("throw error when anonymousId and customerId are given", async () => {
 		const customerId = "400be09e-bfe8-4925-a307-4ef6280b063e";
 		const anonymousId = "a99f27d1-7e7e-4592-8d5a-aa5da1adfe24";
-		const response = await supertest(ctMock.app).post("/dummy/carts").send({
-			currency: "EUR",
-			anonymousId,
-			customerId,
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
+				currency: "EUR",
+				anonymousId,
+				customerId,
+			},
 		});
-		expect(response.status).toBe(400);
-		expect(response.body.message).toBe(
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toBe(
 			"Can set only one of customer OR anonymousId",
 		);
 	});
 
 	test("create cart with existing customer", async () => {
 		const customer = await customerDraftFactory(ctMock).create();
-		const response = await supertest(ctMock.app).post("/dummy/carts").send({
-			currency: "EUR",
-			customerId: customer.id,
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
+				currency: "EUR",
+				customerId: customer.id,
+			},
 		});
-		expect(response.status).toBe(201);
-		expect(response.body.customerId).toBe(customer.id);
+		expect(response.statusCode).toBe(201);
+		expect(response.json().customerId).toBe(customer.id);
 	});
 });
 
@@ -116,47 +125,57 @@ describe("Cart Update Actions", () => {
 	let taxCategory: TaxCategory;
 
 	const createCart = async (currency: string) => {
-		const response = await supertest(ctMock.app).post("/dummy/carts").send({
-			currency,
-			country: "NL",
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
+				currency,
+				country: "NL",
+			},
 		});
-		expect(response.status).toBe(201);
-		cart = response.body;
+		expect(response.statusCode).toBe(201);
+		cart = response.json();
 	};
 
 	const createZone = async (country: string): Promise<Zone> => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/zones")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/zones",
+			payload: {
 				name: country,
 				locations: [
 					{
 						country,
 					},
 				],
-			});
-		expect(response.status).toBe(201);
-		return response.body;
+			},
+		});
+		expect(response.statusCode).toBe(201);
+		return response.json();
 	};
 
 	const createTaxCategory = async (
 		draft: TaxCategoryDraft,
 	): Promise<TaxCategory> => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/tax-categories")
-			.send(draft);
-		expect(response.status).toBe(201);
-		return response.body;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/tax-categories",
+			payload: draft,
+		});
+		expect(response.statusCode).toBe(201);
+		return response.json();
 	};
 
 	const createShippingMethod = async (
 		draft: ShippingMethodDraft,
 	): Promise<ShippingMethod> => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/shipping-methods")
-			.send(draft);
-		expect(response.status).toBe(201);
-		return response.body;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shipping-methods",
+			payload: draft,
+		});
+		expect(response.statusCode).toBe(201);
+		return response.json();
 	};
 
 	const productDraft: ProductDraft = {
@@ -245,39 +264,46 @@ describe("Cart Update Actions", () => {
 	test("no update", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setLocale", locale: "nl-NL" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.locale).toBe("nl-NL");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().locale).toBe("nl-NL");
 
-		const responseAgain = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const responseAgain = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 2,
 				actions: [{ action: "setLocale", locale: "nl-NL" }],
-			});
-		expect(responseAgain.status).toBe(200);
-		expect(responseAgain.body.version).toBe(2);
-		expect(responseAgain.body.locale).toBe("nl-NL");
+			},
+		});
+		expect(responseAgain.statusCode).toBe(200);
+		expect(responseAgain.json().version).toBe(2);
+		expect(responseAgain.json().locale).toBe("nl-NL");
 	});
 
 	test("addLineItem", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -286,32 +312,37 @@ describe("Cart Update Actions", () => {
 						variantId: product.masterData.current.variants[0].id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.totalPrice.centAmount).toEqual(14900);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toHaveLength(1);
+		expect(response.json().totalPrice.centAmount).toEqual(14900);
 	});
 
 	test("addLineItem by SKU", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "addLineItem", sku: "1337", quantity: 2 }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.totalPrice.centAmount).toEqual(29800);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toHaveLength(1);
+		expect(response.json().totalPrice.centAmount).toEqual(29800);
 	});
 
 	test.each([
@@ -320,36 +351,43 @@ describe("Cart Update Actions", () => {
 	])("addLineItem with price selection", async (currency, total) => {
 		await createCart(currency);
 
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "addLineItem", sku: "1337", quantity: 2 }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].price.value.currencyCode).toBe(currency);
-		expect(response.body.totalPrice.centAmount).toEqual(total);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toHaveLength(1);
+		expect(response.json().lineItems[0].price.value.currencyCode).toBe(currency);
+		expect(response.json().totalPrice.centAmount).toEqual(total);
 	});
 
 	test("addLineItem with custom field", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -370,16 +408,18 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -392,25 +432,29 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].custom).toEqual({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toHaveLength(1);
+		expect(response.json().lineItems[0].custom).toEqual({
 			type: { typeId: "type", id: expect.any(String) },
 			fields: { foo: "bar" },
 		});
 	});
 
 	test("addLineItem with key", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -431,16 +475,18 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -454,38 +500,43 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].key).toBeDefined();
-		expect(response.body.lineItems[0].key).toBe("my-key");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toHaveLength(1);
+		expect(response.json().lineItems[0].key).toBeDefined();
+		expect(response.json().lineItems[0].key).toBe("my-key");
 	});
 
 	test("addLineItem unknown product", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "addLineItem", productId: "123", variantId: 1 }],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.message).toBe("A product with ID '123' not found.");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toBe("A product with ID '123' not found.");
 	});
 
 	test("addItemShippingAddress", async () => {
-		await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
 
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -498,20 +549,22 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.body.itemShippingAddresses).toHaveLength(1);
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(0);
+		expect(response.json().itemShippingAddresses).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toHaveLength(0);
 	});
 
 	test("changeTaxRoundingMode", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -519,24 +572,27 @@ describe("Cart Update Actions", () => {
 						taxRoundingMode: "HalfUp",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.taxRoundingMode).toBe("HalfUp");
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().taxRoundingMode).toBe("HalfUp");
 	});
 
 	test("recalculate", async () => {
-		await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
 
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -544,24 +600,28 @@ describe("Cart Update Actions", () => {
 						updateProductData: true,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(1);
 	});
 
 	test("removeLineItem", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const updatedCart = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const updatedCart = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -570,35 +630,41 @@ describe("Cart Update Actions", () => {
 						variantId: product.masterData.current.variants[0].id,
 					},
 				],
-			});
-		const lineItem = updatedCart.body.lineItems[0];
+			},
+		});
+		const lineItem = updatedCart.json().lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		expect(updatedCart.body.lineItems).toHaveLength(1);
+		expect(updatedCart.json().lineItems).toHaveLength(1);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: updatedCart.body.version,
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: updatedCart.json().version,
 				actions: [{ action: "removeLineItem", lineItemId: lineItem.id }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.lineItems).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().lineItems).toHaveLength(0);
 	});
 
 	test("removeLineItem decrease quantity", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const updatedCart = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const updatedCart = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -608,25 +674,28 @@ describe("Cart Update Actions", () => {
 						quantity: 2,
 					},
 				],
-			});
-		const lineItem = updatedCart.body.lineItems[0];
+			},
+		});
+		const lineItem = updatedCart.json().lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		expect(updatedCart.body.lineItems).toHaveLength(1);
-		expect(updatedCart.body.lineItems[0].quantity).toBe(2);
+		expect(updatedCart.json().lineItems).toHaveLength(1);
+		expect(updatedCart.json().lineItems[0].quantity).toBe(2);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: updatedCart.body.version,
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: updatedCart.json().version,
 				actions: [
 					{ action: "removeLineItem", lineItemId: lineItem.id, quantity: 1 },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].quantity).toBe(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().lineItems).toHaveLength(1);
+		expect(response.json().lineItems[0].quantity).toBe(1);
 	});
 
 	test("setBillingAddress", async () => {
@@ -638,15 +707,17 @@ describe("Cart Update Actions", () => {
 			country: "NL",
 		};
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setBillingAddress", address }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.billingAddress).toEqual({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().billingAddress).toEqual({
 			...address,
 			id: expect.any(String),
 		});
@@ -655,23 +726,26 @@ describe("Cart Update Actions", () => {
 	test("setCountry", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setCountry", country: "BE" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.country).toBe("BE");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().country).toBe("BE");
 	});
 
 	test("setDirectDiscounts", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -694,10 +768,11 @@ describe("Cart Update Actions", () => {
 						],
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.directDiscounts).toMatchObject([
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().directDiscounts).toMatchObject([
 			{
 				id: expect.any(String),
 				target: { type: "totalPrice" },
@@ -717,22 +792,27 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemPrice sets an external price for a line item", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({ currency: "EUR" });
-		expect(baseCartResponse.status).toBe(201);
-		const baseCart = baseCartResponse.body as Cart;
+		const baseCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: { currency: "EUR" },
+		});
+		expect(baseCartResponse.statusCode).toBe(201);
+		const baseCart = baseCartResponse.json() as Cart;
 
-		const addLineItemResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${baseCart.id}`)
-			.send({
+		const addLineItemResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${baseCart.id}`,
+			payload: {
 				version: baseCart.version,
 				actions: [
 					{
@@ -742,9 +822,10 @@ describe("Cart Update Actions", () => {
 						key: "line-item-key",
 					},
 				],
-			});
-		expect(addLineItemResponse.status).toBe(200);
-		const cartWithLineItem = addLineItemResponse.body as Cart;
+			},
+		});
+		expect(addLineItemResponse.statusCode).toBe(200);
+		const cartWithLineItem = addLineItemResponse.json() as Cart;
 		const lineItem = cartWithLineItem.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
@@ -755,9 +836,10 @@ describe("Cart Update Actions", () => {
 			fractionDigits: 2,
 		};
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cartWithLineItem.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cartWithLineItem.id}`,
+			payload: {
 				version: cartWithLineItem.version,
 				actions: [
 					{
@@ -766,13 +848,14 @@ describe("Cart Update Actions", () => {
 						externalPrice,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(cartWithLineItem.version + 1);
-		expect(response.body.lineItems).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(cartWithLineItem.version + 1);
+		expect(response.json().lineItems).toHaveLength(1);
 
-		const updatedLineItem = response.body.lineItems[0];
+		const updatedLineItem = response.json().lineItems[0];
 		expect(updatedLineItem.priceMode).toBe("ExternalPrice");
 		expect(updatedLineItem.price.value.centAmount).toBe(
 			externalPrice.centAmount,
@@ -783,28 +866,33 @@ describe("Cart Update Actions", () => {
 		expect(updatedLineItem.totalPrice.centAmount).toBe(
 			externalPrice.centAmount * updatedLineItem.quantity,
 		);
-		expect(response.body.totalPrice.centAmount).toBe(
+		expect(response.json().totalPrice.centAmount).toBe(
 			externalPrice.centAmount * updatedLineItem.quantity,
 		);
 	});
 
 	test("setLineItemPrice supports high precision external price", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({ currency: "EUR" });
-		expect(baseCartResponse.status).toBe(201);
-		const baseCart = baseCartResponse.body as Cart;
+		const baseCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: { currency: "EUR" },
+		});
+		expect(baseCartResponse.statusCode).toBe(201);
+		const baseCart = baseCartResponse.json() as Cart;
 
-		const addLineItemResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${baseCart.id}`)
-			.send({
+		const addLineItemResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${baseCart.id}`,
+			payload: {
 				version: baseCart.version,
 				actions: [
 					{
@@ -813,9 +901,10 @@ describe("Cart Update Actions", () => {
 						quantity: 2,
 					},
 				],
-			});
-		expect(addLineItemResponse.status).toBe(200);
-		const cartWithLineItem = addLineItemResponse.body as Cart;
+			},
+		});
+		expect(addLineItemResponse.statusCode).toBe(200);
+		const cartWithLineItem = addLineItemResponse.json() as Cart;
 		const lineItem = cartWithLineItem.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
@@ -834,9 +923,10 @@ describe("Cart Update Actions", () => {
 			2,
 		);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cartWithLineItem.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cartWithLineItem.id}`,
+			payload: {
 				version: cartWithLineItem.version,
 				actions: [
 					{
@@ -845,13 +935,14 @@ describe("Cart Update Actions", () => {
 						externalPrice,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(cartWithLineItem.version + 1);
-		expect(response.body.lineItems).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(cartWithLineItem.version + 1);
+		expect(response.json().lineItems).toHaveLength(1);
 
-		const updatedLineItem = response.body.lineItems[0];
+		const updatedLineItem = response.json().lineItems[0];
 		expect(updatedLineItem.priceMode).toBe("ExternalPrice");
 		expect(updatedLineItem.price.value.type).toBe("highPrecision");
 		expect(updatedLineItem.price.value.currencyCode).toBe(
@@ -865,26 +956,31 @@ describe("Cart Update Actions", () => {
 		);
 		expect(updatedLineItem.price.value.centAmount).toBe(expectedUnitCentAmount);
 		expect(updatedLineItem.totalPrice.centAmount).toBe(expectedTotalCentAmount);
-		expect(response.body.totalPrice.centAmount).toBe(expectedTotalCentAmount);
+		expect(response.json().totalPrice.centAmount).toBe(expectedTotalCentAmount);
 	});
 
 	test("setLineItemPrice supports high precision external price with fractionDigits 5", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({ currency: "EUR" });
-		expect(baseCartResponse.status).toBe(201);
-		const baseCart = baseCartResponse.body as Cart;
+		const baseCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: { currency: "EUR" },
+		});
+		expect(baseCartResponse.statusCode).toBe(201);
+		const baseCart = baseCartResponse.json() as Cart;
 
-		const addLineItemResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${baseCart.id}`)
-			.send({
+		const addLineItemResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${baseCart.id}`,
+			payload: {
 				version: baseCart.version,
 				actions: [
 					{
@@ -893,9 +989,10 @@ describe("Cart Update Actions", () => {
 						quantity: 2,
 					},
 				],
-			});
-		expect(addLineItemResponse.status).toBe(200);
-		const cartWithLineItem = addLineItemResponse.body as Cart;
+			},
+		});
+		expect(addLineItemResponse.statusCode).toBe(200);
+		const cartWithLineItem = addLineItemResponse.json() as Cart;
 		const lineItem = cartWithLineItem.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
@@ -914,9 +1011,10 @@ describe("Cart Update Actions", () => {
 			2,
 		);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cartWithLineItem.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cartWithLineItem.id}`,
+			payload: {
 				version: cartWithLineItem.version,
 				actions: [
 					{
@@ -925,13 +1023,14 @@ describe("Cart Update Actions", () => {
 						externalPrice,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(cartWithLineItem.version + 1);
-		expect(response.body.lineItems).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(cartWithLineItem.version + 1);
+		expect(response.json().lineItems).toHaveLength(1);
 
-		const updatedLineItem = response.body.lineItems[0];
+		const updatedLineItem = response.json().lineItems[0];
 		expect(updatedLineItem.priceMode).toBe("ExternalPrice");
 		expect(updatedLineItem.price.value.type).toBe("highPrecision");
 		expect(updatedLineItem.price.value.currencyCode).toBe(
@@ -945,26 +1044,31 @@ describe("Cart Update Actions", () => {
 		);
 		expect(updatedLineItem.price.value.centAmount).toBe(expectedUnitCentAmount);
 		expect(updatedLineItem.totalPrice.centAmount).toBe(expectedTotalCentAmount);
-		expect(response.body.totalPrice.centAmount).toBe(expectedTotalCentAmount);
+		expect(response.json().totalPrice.centAmount).toBe(expectedTotalCentAmount);
 	});
 
 	test("setLineItemPrice fails when the money uses another currency", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({ currency: "EUR" });
-		expect(baseCartResponse.status).toBe(201);
-		const baseCart = baseCartResponse.body as Cart;
+		const baseCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: { currency: "EUR" },
+		});
+		expect(baseCartResponse.statusCode).toBe(201);
+		const baseCart = baseCartResponse.json() as Cart;
 
-		const addLineItemResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${baseCart.id}`)
-			.send({
+		const addLineItemResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${baseCart.id}`,
+			payload: {
 				version: baseCart.version,
 				actions: [
 					{
@@ -973,15 +1077,17 @@ describe("Cart Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			});
-		expect(addLineItemResponse.status).toBe(200);
-		const cartWithLineItem = addLineItemResponse.body as Cart;
+			},
+		});
+		expect(addLineItemResponse.statusCode).toBe(200);
+		const cartWithLineItem = addLineItemResponse.json() as Cart;
 		const lineItem = cartWithLineItem.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cartWithLineItem.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cartWithLineItem.id}`,
+			payload: {
 				version: cartWithLineItem.version,
 				actions: [
 					{
@@ -995,29 +1101,35 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(400);
-		expect(response.body.message).toContain("Currency mismatch");
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toContain("Currency mismatch");
 	});
 
 	test("setLineItemPrice removes external price when no value is provided", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({ currency: "EUR" });
-		expect(baseCartResponse.status).toBe(201);
-		const baseCart = baseCartResponse.body as Cart;
+		const baseCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: { currency: "EUR" },
+		});
+		expect(baseCartResponse.statusCode).toBe(201);
+		const baseCart = baseCartResponse.json() as Cart;
 
-		const addLineItemResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${baseCart.id}`)
-			.send({
+		const addLineItemResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${baseCart.id}`,
+			payload: {
 				version: baseCart.version,
 				actions: [
 					{
@@ -1026,9 +1138,10 @@ describe("Cart Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			});
-		expect(addLineItemResponse.status).toBe(200);
-		const cartWithLineItem = addLineItemResponse.body as Cart;
+			},
+		});
+		expect(addLineItemResponse.statusCode).toBe(200);
+		const cartWithLineItem = addLineItemResponse.json() as Cart;
 		const lineItem = cartWithLineItem.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
@@ -1039,9 +1152,10 @@ describe("Cart Update Actions", () => {
 			fractionDigits: 2,
 		};
 
-		const setExternalPriceResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cartWithLineItem.id}`)
-			.send({
+		const setExternalPriceResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cartWithLineItem.id}`,
+			payload: {
 				version: cartWithLineItem.version,
 				actions: [
 					{
@@ -1050,14 +1164,16 @@ describe("Cart Update Actions", () => {
 						externalPrice,
 					},
 				],
-			});
-		expect(setExternalPriceResponse.status).toBe(200);
-		const cartWithExternalPrice = setExternalPriceResponse.body as Cart;
+			},
+		});
+		expect(setExternalPriceResponse.statusCode).toBe(200);
+		const cartWithExternalPrice = setExternalPriceResponse.json() as Cart;
 		expect(cartWithExternalPrice.lineItems[0].priceMode).toBe("ExternalPrice");
 
-		const resetResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cartWithExternalPrice.id}`)
-			.send({
+		const resetResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cartWithExternalPrice.id}`,
+			payload: {
 				version: cartWithExternalPrice.version,
 				actions: [
 					{
@@ -1065,13 +1181,14 @@ describe("Cart Update Actions", () => {
 						lineItemId: lineItem.id,
 					},
 				],
-			});
+			},
+		});
 
-		expect(resetResponse.status).toBe(200);
-		expect(resetResponse.body.version).toBe(cartWithExternalPrice.version + 1);
-		expect(resetResponse.body.lineItems).toHaveLength(1);
+		expect(resetResponse.statusCode).toBe(200);
+		expect(resetResponse.json().version).toBe(cartWithExternalPrice.version + 1);
+		expect(resetResponse.json().lineItems).toHaveLength(1);
 
-		const revertedLineItem = resetResponse.body.lineItems[0];
+		const revertedLineItem = resetResponse.json().lineItems[0];
 		const expectedCentAmount =
 			product.masterData.current.masterVariant.prices?.[0].value.centAmount;
 		if (typeof expectedCentAmount !== "number") {
@@ -1082,22 +1199,25 @@ describe("Cart Update Actions", () => {
 		expect(revertedLineItem.totalPrice.centAmount).toBe(
 			expectedCentAmount * revertedLineItem.quantity,
 		);
-		expect(resetResponse.body.totalPrice.centAmount).toBe(
+		expect(resetResponse.json().totalPrice.centAmount).toBe(
 			expectedCentAmount * revertedLineItem.quantity,
 		);
 	});
 
 	test("setLineItemCustomField", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -1118,14 +1238,16 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
-		const myCart = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({
+		const myCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
 				currency: "EUR",
 				lineItems: [
 					{
@@ -1140,15 +1262,17 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const myCart = myCartResponse.json();
 
 		const lineItem = myCart.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${myCart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${myCart.id}`,
+			payload: {
 				version: myCart.version,
 				actions: [
 					{
@@ -1158,11 +1282,12 @@ describe("Cart Update Actions", () => {
 						value: "bar",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toMatchObject([
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toMatchObject([
 			{
 				id: lineItem.id,
 				custom: {
@@ -1175,16 +1300,19 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemCustomType", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(product, "product not created");
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -1205,14 +1333,16 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
-		const myCart = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({
+		const myCartResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
 				currency: "EUR",
 				lineItems: [
 					{
@@ -1220,15 +1350,17 @@ describe("Cart Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const myCart = myCartResponse.json();
 
 		const lineItem = myCart.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${myCart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${myCart.id}`,
+			payload: {
 				version: myCart.version,
 				actions: [
 					{
@@ -1240,11 +1372,12 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toMatchObject([
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toMatchObject([
 			{
 				id: lineItem.id,
 				custom: {
@@ -1260,15 +1393,17 @@ describe("Cart Update Actions", () => {
 	test("setCustomerEmail", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setCustomerEmail", email: "john@doe.com" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.customerEmail).toBe("john@doe.com");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().customerEmail).toBe("john@doe.com");
 	});
 
 	test("setShippingAddress", async () => {
@@ -1280,15 +1415,17 @@ describe("Cart Update Actions", () => {
 			country: "NL",
 		};
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setShippingAddress", address }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.shippingAddress).toEqual(address);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().shippingAddress).toEqual(address);
 	});
 
 	test("setBillingAddressCustomType", async () => {
@@ -1300,9 +1437,10 @@ describe("Cart Update Actions", () => {
 			country: "NL",
 		};
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -1323,14 +1461,16 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setBillingAddress", address },
@@ -1346,11 +1486,12 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.billingAddress).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().billingAddress).toEqual({
 			...address,
 			id: expect.any(String),
 			custom: {
@@ -1369,9 +1510,10 @@ describe("Cart Update Actions", () => {
 			country: "NL",
 		};
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -1392,14 +1534,16 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setShippingAddress", address },
@@ -1415,11 +1559,12 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.shippingAddress).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().shippingAddress).toEqual({
 			...address,
 			custom: {
 				type: { typeId: "type", id: type.id },
@@ -1622,9 +1767,10 @@ describe("Cart Update Actions", () => {
 
 			expect(
 				(
-					await supertest(ctMock.app)
-						.post(`/dummy/carts/${cart.id}`)
-						.send({
+					await ctMock.app.inject({
+						method: "POST",
+						url: `/dummy/carts/${cart.id}`,
+						payload: {
 							version: 1,
 							actions: [
 								{
@@ -1636,8 +1782,9 @@ describe("Cart Update Actions", () => {
 									},
 								},
 							],
-						})
-				).status,
+						},
+					})
+				).statusCode,
 			).toBe(200);
 		});
 
@@ -1649,15 +1796,17 @@ describe("Cart Update Actions", () => {
 				id: standardShippingMethod.id,
 			};
 
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/carts/${cart.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
 					version: 2,
 					actions: [{ action: "setShippingMethod", shippingMethod }],
-				});
-			expect(response.status).toBe(200);
-			expect(response.body.version).toBe(3);
-			expect(response.body.shippingInfo.shippingMethod.id).toEqual(
+				},
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().version).toBe(3);
+			expect(response.json().shippingInfo.shippingMethod.id).toEqual(
 				standardShippingMethod.id,
 			);
 		});
@@ -1670,17 +1819,20 @@ describe("Cart Update Actions", () => {
 				id: standardShippingMethod.id,
 			};
 
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/carts/${cart.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
 					version: 2,
 					actions: [{ action: "setShippingMethod", shippingMethod }],
-				});
-			expect(response.status).toBe(200);
+				},
+			});
+			expect(response.statusCode).toBe(200);
 
-			const removeResponse = await supertest(ctMock.app)
-				.post(`/dummy/carts/${cart.id}`)
-				.send({
+			const removeResponse = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
 					version: 3,
 					actions: [
 						{
@@ -1688,9 +1840,10 @@ describe("Cart Update Actions", () => {
 							shippingKey: standardShippingMethod.key,
 						},
 					],
-				});
-			expect(removeResponse.status).toBe(200);
-			expect(removeResponse.body.shippingInfo).toBeUndefined();
+				},
+			});
+			expect(removeResponse.statusCode).toBe(200);
+			expect(removeResponse.json().shippingInfo).toBeUndefined();
 		});
 
 		test("correctly sets shippingInfo rates + tax when includedInPrice: true", async () => {
@@ -1702,33 +1855,35 @@ describe("Cart Update Actions", () => {
 				id: standardShippingMethod.id,
 			};
 
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/carts/${cart.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
 					version: 2,
 					actions: [{ action: "setShippingMethod", shippingMethod }],
-				});
-			expect(response.status).toBe(200);
-			expect(response.body.version).toBe(3);
-			expect(response.body.shippingInfo.shippingRate.price).toMatchObject({
+				},
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().version).toBe(3);
+			expect(response.json().shippingInfo.shippingRate.price).toMatchObject({
 				centAmount: 499,
 				currencyCode: "EUR",
 				fractionDigits: 2,
 				type: "centPrecision",
 			});
-			expect(response.body.shippingInfo.price).toMatchObject({
+			expect(response.json().shippingInfo.price).toMatchObject({
 				centAmount: 499,
 				currencyCode: "EUR",
 				fractionDigits: 2,
 				type: "centPrecision",
 			});
-			expect(response.body.shippingInfo.taxRate).toMatchObject({
+			expect(response.json().shippingInfo.taxRate).toMatchObject({
 				name: "NL standard tax rate",
 				amount: 0.21,
 				includedInPrice: true,
 				country: "NL",
 			});
-			expect(response.body.shippingInfo.taxedPrice).toMatchObject({
+			expect(response.json().shippingInfo.taxedPrice).toMatchObject({
 				totalNet: {
 					type: "centPrecision",
 					centAmount: 412,
@@ -1771,34 +1926,36 @@ describe("Cart Update Actions", () => {
 				id: standardExcludedShippingMethod.id,
 			};
 
-			const response = await supertest(ctMock.app)
-				.post(`/dummy/carts/${cart.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
 					version: 2,
 					actions: [{ action: "setShippingMethod", shippingMethod }],
-				});
-			expect(response.status).toBe(200);
-			expect(response.body.version).toBe(3);
-			expect(response.body.shippingInfo.shippingRate.price).toMatchObject({
+				},
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().version).toBe(3);
+			expect(response.json().shippingInfo.shippingRate.price).toMatchObject({
 				centAmount: 499,
 				currencyCode: "EUR",
 				fractionDigits: 2,
 				type: "centPrecision",
 			});
 			// TODO: should this be gross or net? docs unclear (currently always just returns the shipping rate (tier) price)
-			expect(response.body.shippingInfo.price).toMatchObject({
+			expect(response.json().shippingInfo.price).toMatchObject({
 				centAmount: 499,
 				currencyCode: "EUR",
 				fractionDigits: 2,
 				type: "centPrecision",
 			});
-			expect(response.body.shippingInfo.taxRate).toMatchObject({
+			expect(response.json().shippingInfo.taxRate).toMatchObject({
 				name: "NL standard-excluded tax rate",
 				amount: 0.21,
 				includedInPrice: false,
 				country: "NL",
 			});
-			expect(response.body.shippingInfo.taxedPrice).toMatchObject({
+			expect(response.json().shippingInfo.taxedPrice).toMatchObject({
 				totalNet: {
 					type: "centPrecision",
 					centAmount: 499,
@@ -1834,17 +1991,20 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemShippingDetails", async () => {
-		const product = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft)
-			.then((x) => x.body);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		const product = productResponse.json();
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
 
-		const updatedCart = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const updatedCart = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1853,17 +2013,19 @@ describe("Cart Update Actions", () => {
 						variantId: product.masterData.current.variants[0].id,
 					},
 				],
-			});
-		const lineItem = updatedCart.body.lineItems[0];
+			},
+		});
+		const lineItem = updatedCart.json().lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		expect(updatedCart.body.version).toBe(2);
-		expect(updatedCart.body.lineItems).toHaveLength(1);
+		expect(updatedCart.json().version).toBe(2);
+		expect(updatedCart.json().lineItems).toHaveLength(1);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: updatedCart.body.version,
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: updatedCart.json().version,
 				actions: [
 					{
 						action: "setLineItemShippingDetails",
@@ -1878,22 +2040,24 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.lineItems).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().lineItems).toHaveLength(1);
 
-		const updatedLineItem = response.body.lineItems[0];
+		const updatedLineItem = response.json().lineItems[0];
 		expect(updatedLineItem.shippingDetails).toBeDefined();
 		expect(updatedLineItem.shippingDetails.targets).toHaveLength(1);
 	});
 
 	test("addCustomLineItem", async () => {
 		assert(cart, "cart not created");
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "custom-line-item-type",
 				name: { en: "Custom Line Item Type" },
 				resourceTypeIds: ["custom-line-item"],
@@ -1906,12 +2070,14 @@ describe("Cart Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((res) => res.body);
+			},
+		});
+		const type = typeResponse.json();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1933,13 +2099,14 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.customLineItems).toHaveLength(1);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().customLineItems).toHaveLength(1);
 
-		const customLineItem = response.body.customLineItems[0];
+		const customLineItem = response.json().customLineItems[0];
 		expect(customLineItem.name).toEqual({ en: "Custom Service Fee" });
 		expect(customLineItem.slug).toBe("service-fee");
 		expect(customLineItem.money.centAmount).toBe(1000);
@@ -1959,9 +2126,10 @@ describe("Cart Update Actions", () => {
 	test("removeCustomLineItem by ID", async () => {
 		assert(cart, "cart not created");
 
-		const addResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const addResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1975,34 +2143,38 @@ describe("Cart Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			});
+			},
+		});
 
-		expect(addResponse.status).toBe(200);
-		expect(addResponse.body.customLineItems).toHaveLength(1);
+		expect(addResponse.statusCode).toBe(200);
+		expect(addResponse.json().customLineItems).toHaveLength(1);
 
-		const customLineItemId = addResponse.body.customLineItems[0].id;
-		const removeResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: addResponse.body.version,
+		const customLineItemId = addResponse.json().customLineItems[0].id;
+		const removeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: addResponse.json().version,
 				actions: [
 					{
 						action: "removeCustomLineItem",
 						customLineItemId,
 					},
 				],
-			});
+			},
+		});
 
-		expect(removeResponse.status).toBe(200);
-		expect(removeResponse.body.customLineItems).toHaveLength(0);
+		expect(removeResponse.statusCode).toBe(200);
+		expect(removeResponse.json().customLineItems).toHaveLength(0);
 	});
 
 	test("removeCustomLineItem by key", async () => {
 		assert(cart, "cart not created");
 
-		const addResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const addResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -2017,32 +2189,36 @@ describe("Cart Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			});
+			},
+		});
 
-		expect(addResponse.status).toBe(200);
-		expect(addResponse.body.customLineItems).toHaveLength(1);
+		expect(addResponse.statusCode).toBe(200);
+		expect(addResponse.json().customLineItems).toHaveLength(1);
 
-		const removeResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: addResponse.body.version,
+		const removeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: addResponse.json().version,
 				actions: [
 					{
 						action: "removeCustomLineItem",
 						customLineItemKey: "custom-service-fee",
 					},
 				],
-			});
+			},
+		});
 
-		expect(removeResponse.status).toBe(200);
-		expect(removeResponse.body.customLineItems).toHaveLength(0);
+		expect(removeResponse.statusCode).toBe(200);
+		expect(removeResponse.json().customLineItems).toHaveLength(0);
 	});
 
 	test("changeCustomLineItemQuantity", async () => {
 		assert(cart, "cart not created");
-		const addResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const addResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -2056,13 +2232,15 @@ describe("Cart Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			});
+			},
+		});
 
-		const customLineItemId = addResponse.body.customLineItems[0].id;
-		const changeResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: addResponse.body.version,
+		const customLineItemId = addResponse.json().customLineItems[0].id;
+		const changeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: addResponse.json().version,
 				actions: [
 					{
 						action: "changeCustomLineItemQuantity",
@@ -2070,21 +2248,23 @@ describe("Cart Update Actions", () => {
 						quantity: 3,
 					},
 				],
-			});
+			},
+		});
 
-		expect(changeResponse.status).toBe(200);
-		expect(changeResponse.body.customLineItems).toHaveLength(1);
+		expect(changeResponse.statusCode).toBe(200);
+		expect(changeResponse.json().customLineItems).toHaveLength(1);
 
-		const customLineItem = changeResponse.body.customLineItems[0];
+		const customLineItem = changeResponse.json().customLineItems[0];
 		expect(customLineItem.quantity).toBe(3);
 		expect(customLineItem.totalPrice.centAmount).toBe(3000);
 	});
 
 	test("changeCustomLineItemMoney", async () => {
 		assert(cart, "cart not created");
-		const addResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const addResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -2098,13 +2278,15 @@ describe("Cart Update Actions", () => {
 						quantity: 2,
 					},
 				],
-			});
+			},
+		});
 
-		const customLineItemId = addResponse.body.customLineItems[0].id;
-		const changeResponse = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
-				version: addResponse.body.version,
+		const customLineItemId = addResponse.json().customLineItems[0].id;
+		const changeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: addResponse.json().version,
 				actions: [
 					{
 						action: "changeCustomLineItemMoney",
@@ -2115,12 +2297,13 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(changeResponse.status).toBe(200);
-		expect(changeResponse.body.customLineItems).toHaveLength(1);
+		expect(changeResponse.statusCode).toBe(200);
+		expect(changeResponse.json().customLineItems).toHaveLength(1);
 
-		const customLineItem = changeResponse.body.customLineItems[0];
+		const customLineItem = changeResponse.json().customLineItems[0];
 		expect(customLineItem.money.centAmount).toBe(1500);
 		expect(customLineItem.totalPrice.centAmount).toBe(3000);
 	});
@@ -2128,9 +2311,10 @@ describe("Cart Update Actions", () => {
 	test("addCustomLineItem with tax calculation", async () => {
 		assert(cart, "cart not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/carts/${cart.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -2148,10 +2332,11 @@ describe("Cart Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		const customLineItem = response.body.customLineItems[0];
+		expect(response.statusCode).toBe(200);
+		const customLineItem = response.json().customLineItems[0];
 
 		expect(customLineItem.taxedPrice).toBeDefined();
 		expect(customLineItem.taxedPrice.totalNet.centAmount).toBe(1000);

@@ -1,5 +1,4 @@
 import type { StandalonePriceDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import {
 	afterAll,
 	afterEach,
@@ -38,10 +37,12 @@ describe("Standalone price Query", () => {
 				},
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/standalone-prices")
-			.send(draft);
-		expect(createResponse.status).toEqual(201);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/standalone-prices",
+			payload: draft,
+		});
+		expect(createResponse.statusCode).toEqual(201);
 	});
 
 	afterAll(async () => {
@@ -49,13 +50,14 @@ describe("Standalone price Query", () => {
 	});
 
 	test("Get standalone price", async () => {
-		const response = await supertest(ctMock.app).get(
-			"/dummy/standalone-prices?sku=foo",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/standalone-prices?sku=foo",
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 
-		expect(response.body.results).toEqual([
+		expect(response.json().results).toEqual([
 			{
 				active: true,
 				channel: {
@@ -107,11 +109,13 @@ describe("Standalone price Actions", () => {
 				id: "bar",
 			},
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/standalone-prices")
-			.send(draft);
-		expect(createResponse.status).toEqual(201);
-		id = createResponse.body.id;
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/standalone-prices",
+			payload: draft,
+		});
+		expect(createResponse.statusCode).toEqual(201);
+		id = createResponse.json().id;
 	});
 
 	afterEach(async () => {
@@ -119,9 +123,10 @@ describe("Standalone price Actions", () => {
 	});
 
 	test("changeValue", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/standalone-prices/${id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/standalone-prices/${id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -132,11 +137,12 @@ describe("Standalone price Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			active: true,
 			channel: {
 				id: "bar",
@@ -158,9 +164,10 @@ describe("Standalone price Actions", () => {
 	});
 
 	test("setActive", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/standalone-prices/${id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/standalone-prices/${id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -168,11 +175,12 @@ describe("Standalone price Actions", () => {
 						active: false,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			active: false,
 			channel: {
 				id: "bar",
@@ -194,9 +202,10 @@ describe("Standalone price Actions", () => {
 	});
 
 	test("setDiscounted", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/standalone-prices/${id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/standalone-prices/${id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -213,11 +222,12 @@ describe("Standalone price Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			active: true,
 			channel: {
 				id: "bar",
@@ -249,9 +259,10 @@ describe("Standalone price Actions", () => {
 			version: 2,
 		});
 
-		const response2 = await supertest(ctMock.app)
-			.post(`/dummy/standalone-prices/${id}`)
-			.send({
+		const response2 = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/standalone-prices/${id}`,
+			payload: {
 				version: 2,
 				actions: [
 					{
@@ -259,11 +270,12 @@ describe("Standalone price Actions", () => {
 						discounted: null,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response2.status).toBe(200);
+		expect(response2.statusCode).toBe(200);
 
-		expect(response2.body).toEqual({
+		expect(response2.json()).toEqual({
 			active: true,
 			channel: {
 				id: "bar",

@@ -1,11 +1,11 @@
-import type { Router } from "express";
+import type { FastifyInstance } from "fastify";
 import type { BusinessUnitRepository } from "../repositories/business-unit.ts";
 import AbstractService from "./abstract.ts";
 
 export class BusinessUnitServices extends AbstractService {
 	public repository: BusinessUnitRepository;
 
-	constructor(parent: Router, repository: BusinessUnitRepository) {
+	constructor(parent: FastifyInstance, repository: BusinessUnitRepository) {
 		super(parent);
 
 		this.repository = repository;

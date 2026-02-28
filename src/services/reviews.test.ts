@@ -1,5 +1,4 @@
 import type { Product, Review, State } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "#src/index.ts";
 
@@ -13,9 +12,10 @@ describe("Review Update Actions", () => {
 		ctMock = new CommercetoolsMock();
 
 		// Create a product to target
-		const productResponse = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send({
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: {
 				name: { en: "Test Product" },
 				slug: { en: "test-product" },
 				productType: {
@@ -33,26 +33,30 @@ describe("Review Update Actions", () => {
 						},
 					],
 				},
-			});
-		expect(productResponse.status).toBe(201);
-		product = productResponse.body;
+			},
+		});
+		expect(productResponse.statusCode).toBe(201);
+		product = productResponse.json();
 
 		// Create a state
-		const stateResponse = await supertest(ctMock.app)
-			.post("/dummy/states")
-			.send({
+		const stateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/states",
+			payload: {
 				key: "review-state",
 				type: "ReviewState",
 				name: { en: "Review State" },
 				initial: true,
-			});
-		expect(stateResponse.status).toBe(201);
-		state = stateResponse.body;
+			},
+		});
+		expect(stateResponse.statusCode).toBe(201);
+		state = stateResponse.json();
 
 		// Create a review
-		const reviewResponse = await supertest(ctMock.app)
-			.post("/dummy/reviews")
-			.send({
+		const reviewResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/reviews",
+			payload: {
 				key: "test-review",
 				authorName: "John Doe",
 				title: "Great product!",
@@ -62,15 +66,17 @@ describe("Review Update Actions", () => {
 					typeId: "product",
 					id: product.id,
 				},
-			});
-		expect(reviewResponse.status).toBe(201);
-		review = reviewResponse.body;
+			},
+		});
+		expect(reviewResponse.statusCode).toBe(201);
+		review = reviewResponse.json();
 	});
 
 	test("setAuthorName", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -78,17 +84,19 @@ describe("Review Update Actions", () => {
 						authorName: "Jane Smith",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.authorName).toBe("Jane Smith");
-		expect(response.body.version).toBe(2);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().authorName).toBe("Jane Smith");
+		expect(response.json().version).toBe(2);
 	});
 
 	test("setTitle", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -96,17 +104,19 @@ describe("Review Update Actions", () => {
 						title: "Amazing product!",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.title).toBe("Amazing product!");
-		expect(response.body.version).toBe(2);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().title).toBe("Amazing product!");
+		expect(response.json().version).toBe(2);
 	});
 
 	test("setText", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -114,17 +124,19 @@ describe("Review Update Actions", () => {
 						text: "This product exceeded my expectations!",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.text).toBe("This product exceeded my expectations!");
-		expect(response.body.version).toBe(2);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().text).toBe("This product exceeded my expectations!");
+		expect(response.json().version).toBe(2);
 	});
 
 	test("setRating", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -132,17 +144,19 @@ describe("Review Update Actions", () => {
 						rating: 4,
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.rating).toBe(4);
-		expect(response.body.version).toBe(2);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().rating).toBe(4);
+		expect(response.json().version).toBe(2);
 	});
 
 	test("setLocale", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -150,17 +164,19 @@ describe("Review Update Actions", () => {
 						locale: "de-DE",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.locale).toBe("de-DE");
-		expect(response.body.version).toBe(2);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().locale).toBe("de-DE");
+		expect(response.json().version).toBe(2);
 	});
 
 	test("setKey", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -168,17 +184,19 @@ describe("Review Update Actions", () => {
 						key: "updated-review-key",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.key).toBe("updated-review-key");
-		expect(response.body.version).toBe(2);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().key).toBe("updated-review-key");
+		expect(response.json().version).toBe(2);
 	});
 
 	test("transitionState", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -189,20 +207,22 @@ describe("Review Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.state).toMatchObject({
+		expect(response.statusCode).toBe(200);
+		expect(response.json().state).toMatchObject({
 			typeId: "state",
 			id: state.id,
 		});
-		expect(response.body.version).toBe(2);
+		expect(response.json().version).toBe(2);
 	});
 
 	test("multiple actions in one update", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/reviews/${review.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/reviews/${review.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -218,13 +238,15 @@ describe("Review Update Actions", () => {
 						text: "Updated review text",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.authorName).toBe("Updated Author");
-		expect(response.body.rating).toBe(3);
-		expect(response.body.text).toBe("Updated review text");
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.authorName).toBe("Updated Author");
+		expect(body.rating).toBe(3);
+		expect(body.text).toBe("Updated review text");
 		// Version should be incremented by 3 since each action modifies the resource
-		expect(response.body.version).toBe(4);
+		expect(body.version).toBe(4);
 	});
 });

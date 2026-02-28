@@ -1,4 +1,4 @@
-import type { Request, Response, Router } from "express";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { queryParamsArray, queryParamsValue } from "../helpers.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type {
@@ -10,7 +10,7 @@ import AbstractService from "./abstract.ts";
 export class ProductProjectionService extends AbstractService {
 	public repository: ProductProjectionRepository;
 
-	constructor(parent: Router, repository: ProductProjectionRepository) {
+	constructor(parent: FastifyInstance, repository: ProductProjectionRepository) {
 		super(parent);
 		this.repository = repository;
 	}
@@ -19,25 +19,26 @@ export class ProductProjectionService extends AbstractService {
 		return "product-projections";
 	}
 
-	extraRoutes(router: Router) {
-		router.get("/search", this.search.bind(this));
+	extraRoutes(instance: FastifyInstance) {
+		instance.get("/search", this.search.bind(this));
 	}
 
-	get(request: Request, response: Response) {
-		const limit = this._parseParam(request.query.limit);
-		const offset = this._parseParam(request.query.offset);
+	get(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
+		const query = request.query;
+		const limit = this._parseParam(query.limit);
+		const offset = this._parseParam(query.offset);
 
 		const result = this.repository.query(getRepositoryContext(request), {
-			...request.query,
-			expand: this._parseParam(request.query.expand),
-			where: this._parseParam(request.query.where),
+			...query,
+			expand: this._parseParam(query.expand),
+			where: this._parseParam(query.where),
 			limit: limit !== undefined ? Number(limit) : undefined,
 			offset: offset !== undefined ? Number(offset) : undefined,
 		});
-		response.status(200).send(result);
+		return reply.status(200).send(result);
 	}
 
-	search(request: Request, response: Response) {
+	search(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
 		const query = request.query;
 		const searchParams: ProductProjectionQueryParams = {
 			filter: queryParamsArray(query.filter),
@@ -58,6 +59,6 @@ export class ProductProjectionService extends AbstractService {
 			getRepositoryContext(request),
 			searchParams,
 		);
-		response.status(200).send(resource);
+		return reply.status(200).send(resource);
 	}
 }

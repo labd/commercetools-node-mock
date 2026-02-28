@@ -1,5 +1,4 @@
 import type { DiscountGroupDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -17,13 +16,15 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.5",
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			key: "premium-discount-group",
@@ -48,18 +49,21 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.1",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/discount-groups/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/discount-groups/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Get discount group by key", async () => {
@@ -70,18 +74,21 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.2",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/discount-groups/key=key-discount-group",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/discount-groups/key=key-discount-group",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Query discount groups", async () => {
@@ -92,17 +99,22 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.3",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get("/dummy/discount-groups");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/discount-groups",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
-		expect(response.body.results).toContainEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBeGreaterThan(0);
+		expect(response.json().results).toContainEqual(createResponse.json());
 	});
 
 	test("Update discount group - setName", async () => {
@@ -113,16 +125,19 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.4",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/discount-groups/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/discount-groups/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setName",
@@ -132,14 +147,15 @@ describe("DiscountGroup", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.name).toEqual({
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().name).toEqual({
 			"en-GB": "Updated Name",
 			de: "Aktualisierter Name",
 		});
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Update discount group - setDescription", async () => {
@@ -150,16 +166,19 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.5",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/discount-groups/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/discount-groups/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setDescription",
@@ -169,14 +188,15 @@ describe("DiscountGroup", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.description).toEqual({
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().description).toEqual({
 			"en-GB": "New description",
 			de: "Neue Beschreibung",
 		});
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Update discount group - setKey", async () => {
@@ -187,27 +207,31 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.6",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/discount-groups/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/discount-groups/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setKey",
 						key: "updated-key",
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.key).toBe("updated-key");
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().key).toBe("updated-key");
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Update discount group - setSortOrder", async () => {
@@ -218,27 +242,31 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.1",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/discount-groups/${createResponse.body.id}`)
-			.send({
-				version: createResponse.body.version,
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/discount-groups/${createResponse.json().id}`,
+			payload: {
+				version: createResponse.json().version,
 				actions: [
 					{
 						action: "setSortOrder",
 						sortOrder: "0.9",
 					},
 				],
-			});
+			},
+		});
 
-		expect(updateResponse.status).toBe(200);
-		expect(updateResponse.body.sortOrder).toBe("0.9");
-		expect(updateResponse.body.version).toBe(2);
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().sortOrder).toBe("0.9");
+		expect(updateResponse.json().version).toBe(2);
 	});
 
 	test("Delete discount group", async () => {
@@ -249,23 +277,27 @@ describe("DiscountGroup", () => {
 			},
 			sortOrder: "0.7",
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/discount-groups")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const deleteResponse = await supertest(ctMock.app)
-			.delete(`/dummy/discount-groups/${createResponse.body.id}`)
-			.query({ version: createResponse.body.version });
+		const deleteResponse = await ctMock.app.inject({
+			method: "DELETE",
+			url: `/dummy/discount-groups/${createResponse.json().id}?version=${createResponse.json().version}`,
+		});
 
-		expect(deleteResponse.status).toBe(200);
-		expect(deleteResponse.body).toEqual(createResponse.body);
+		expect(deleteResponse.statusCode).toBe(200);
+		expect(deleteResponse.json()).toEqual(createResponse.json());
 
-		const getResponse = await supertest(ctMock.app).get(
-			`/dummy/discount-groups/${createResponse.body.id}`,
-		);
+		const getResponse = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/discount-groups/${createResponse.json().id}`,
+		});
 
-		expect(getResponse.status).toBe(404);
+		expect(getResponse.statusCode).toBe(404);
 	});
 });

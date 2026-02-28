@@ -4,7 +4,6 @@ import type {
 	CustomerDraft,
 	CustomerToken,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { hashPassword } from "#src/lib/password.ts";
 import { customerDraftFactory } from "#src/testing/customer.ts";
@@ -20,12 +19,14 @@ describe("Customer create", () => {
 	test("create new customer", async () => {
 		const draft = customerDraftFactory(ctMock).build();
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/customers")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers",
+			payload: draft,
+		});
 
-		const customer = response.body.customer as Customer;
-		expect(response.status, JSON.stringify(customer)).toBe(201);
+		const customer = response.json().customer as Customer;
+		expect(response.statusCode, JSON.stringify(customer)).toBe(201);
 		expect(customer.version).toBe(1);
 		expect(customer.defaultBillingAddressId).toBeUndefined();
 		expect(customer.defaultShippingAddressId).toBeUndefined();
@@ -54,12 +55,14 @@ describe("Customer create", () => {
 			defaultShippingAddress: 0,
 		};
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/customers")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers",
+			payload: draft,
+		});
 
-		const customer = response.body.customer as Customer;
-		expect(response.status, JSON.stringify(customer)).toBe(201);
+		const customer = response.json().customer as Customer;
+		expect(response.statusCode, JSON.stringify(customer)).toBe(201);
 		expect(customer.version).toBe(1);
 		expect(customer.defaultBillingAddressId).toBeDefined();
 		expect(customer.defaultShippingAddressId).toBeDefined();
@@ -71,9 +74,10 @@ describe("Customer create", () => {
 describe("Customer Update Actions", () => {
 	test("addAddress", async () => {
 		const customer = await customerDraftFactory(ctMock).create();
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -88,10 +92,11 @@ describe("Customer Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses).toHaveLength(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().addresses).toHaveLength(2);
 	});
 
 	test("removeAddress by ID", async () => {
@@ -109,9 +114,10 @@ describe("Customer Update Actions", () => {
 			],
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -119,10 +125,11 @@ describe("Customer Update Actions", () => {
 						addressId: customer.addresses[0].id,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().addresses).toHaveLength(0);
 	});
 
 	test("removeAddress by Key", async () => {
@@ -140,9 +147,10 @@ describe("Customer Update Actions", () => {
 			],
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -150,10 +158,11 @@ describe("Customer Update Actions", () => {
 						addressKey: customer.addresses[0].key,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().addresses).toHaveLength(0);
 	});
 
 	test("changeAddress by ID", async () => {
@@ -172,9 +181,10 @@ describe("Customer Update Actions", () => {
 		});
 		const addressId = customer.addresses[0].id;
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -190,9 +200,10 @@ describe("Customer Update Actions", () => {
 						},
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		const result = response.body as Customer;
+			},
+		});
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		const result = response.json() as Customer;
 		expect(result.version).toBe(2);
 		expect(result.addresses).toHaveLength(1);
 		expect(result.addresses).toStrictEqual([
@@ -223,9 +234,10 @@ describe("Customer Update Actions", () => {
 			],
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -233,11 +245,12 @@ describe("Customer Update Actions", () => {
 						addressId: customer.addresses[0].id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.shippingAddressIds).toHaveLength(0);
-		expect(response.body.billingAddressIds).toHaveLength(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().shippingAddressIds).toHaveLength(0);
+		expect(response.json().billingAddressIds).toHaveLength(1);
 	});
 
 	test("removeBillingAddressId", async () => {
@@ -260,9 +273,10 @@ describe("Customer Update Actions", () => {
 		expect(customer.defaultBillingAddressId).toBeDefined();
 
 		const addressId = customer.addresses[0].id;
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -270,9 +284,10 @@ describe("Customer Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		const result = response.body as Customer;
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const result = response.json() as Customer;
 		expect(result.version).toBe(2);
 		expect(result.billingAddressIds).toHaveLength(0);
 		expect(result.defaultBillingAddressId).toBeUndefined();
@@ -298,9 +313,10 @@ describe("Customer Update Actions", () => {
 		});
 		const addressId = customer.addresses[0].id;
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: customer.version,
 				actions: [
 					{
@@ -308,12 +324,13 @@ describe("Customer Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.defaultBillingAddressId).toBe(addressId);
-		expect(response.body.addresses).toHaveLength(1);
-		expect(response.body.billingAddressIds).toContain(addressId);
+			},
+		});
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().defaultBillingAddressId).toBe(addressId);
+		expect(response.json().addresses).toHaveLength(1);
+		expect(response.json().billingAddressIds).toContain(addressId);
 	});
 
 	test("addShippingAddressId", async () => {
@@ -331,9 +348,10 @@ describe("Customer Update Actions", () => {
 			],
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -341,10 +359,11 @@ describe("Customer Update Actions", () => {
 						addressId: customer.addresses[0].id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.shippingAddressIds).toHaveLength(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().shippingAddressIds).toHaveLength(1);
 	});
 
 	test("removeShippingAddressId", async () => {
@@ -367,9 +386,10 @@ describe("Customer Update Actions", () => {
 		expect(customer.defaultShippingAddressId).toBeDefined();
 
 		const addressId = customer.addresses[0].id;
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -377,9 +397,10 @@ describe("Customer Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		const result = response.body as Customer;
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const result = response.json() as Customer;
 		expect(result.version).toBe(2);
 		expect(result.shippingAddressIds).toHaveLength(0);
 		expect(result.defaultShippingAddressId).toBeUndefined();
@@ -405,9 +426,10 @@ describe("Customer Update Actions", () => {
 		});
 		const addressId = customer.addresses[0].id;
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: customer.version,
 				actions: [
 					{
@@ -415,9 +437,10 @@ describe("Customer Update Actions", () => {
 						addressId: addressId,
 					},
 				],
-			});
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		const result = response.body as Customer;
+			},
+		});
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		const result = response.json() as Customer;
 		expect(result.version).toBe(2);
 		expect(result.defaultShippingAddressId).toBe(addressId);
 		expect(result.addresses).toHaveLength(1);
@@ -448,52 +471,58 @@ describe("Customer Update Actions (old-style)", () => {
 	test("exists", async () => {
 		assert(customer, "customer not created");
 
-		const response = await supertest(ctMock.app)
-			.head(`/dummy/customers/${customer.id}`)
-			.send();
+		const response = await ctMock.app.inject({
+			method: "HEAD",
+			url: `/dummy/customers/${customer.id}`,
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 	});
 
 	test("non-existent", async () => {
 		assert(customer, "customer not created");
 
-		const response = await supertest(ctMock.app)
-			.head("/dummy/customers/invalid-id")
-			.send();
+		const response = await ctMock.app.inject({
+			method: "HEAD",
+			url: "/dummy/customers/invalid-id",
+		});
 
-		expect(response.status).toBe(404);
+		expect(response.statusCode).toBe(404);
 	});
 
 	test("changeEmail", async () => {
 		assert(customer, "customer not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeEmail", email: "new@example.com" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.email).toBe("new@example.com");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().email).toBe("new@example.com");
 	});
 
 	test("setAuthenticationMode to an invalid mode", async () => {
 		assert(customer, "customer not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setAuthenticationMode", authMode: "invalid" }],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.message).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toBe(
 			"Request body does not contain valid JSON.",
 		);
-		expect(response.body.errors[0].code).toBe("InvalidJsonInput");
-		expect(response.body.errors[0].detailedErrorMessage).toBe(
+		expect(response.json().errors[0].code).toBe("InvalidJsonInput");
+		expect(response.json().errors[0].detailedErrorMessage).toBe(
 			"actions -> authMode: Invalid enum value: 'invalid'. Expected one of: 'Password','ExternalAuth'",
 		);
 	});
@@ -501,18 +530,20 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setAuthenticationMode to ExternalAuth", async () => {
 		assert(customer, "customer not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setAuthenticationMode", authMode: "ExternalAuth" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.authenticationMode).toBe("ExternalAuth");
-		expect(response.body.password).toBe(undefined);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().authenticationMode).toBe("ExternalAuth");
+		expect(response.json().password).toBe(undefined);
 	});
 
 	test("setAuthenticationMode error when setting current authMode", async () => {
@@ -522,9 +553,10 @@ describe("Customer Update Actions (old-style)", () => {
 			"customer not in default state",
 		);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -533,9 +565,10 @@ describe("Customer Update Actions (old-style)", () => {
 						password: "newpass",
 					},
 				],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.message).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toBe(
 			"The customer is already using the 'Password' authentication mode.",
 		);
 	});
@@ -544,19 +577,22 @@ describe("Customer Update Actions (old-style)", () => {
 		assert(customer, "customer not created");
 
 		//change *away from* Password authMode (to be able to test changing *to* Password authMode)
-		await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setAuthenticationMode", authMode: "ExternalAuth" },
 				],
-			});
+			},
+		});
 
 		//change to Password authMode
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 2,
 				actions: [
 					{
@@ -565,11 +601,12 @@ describe("Customer Update Actions (old-style)", () => {
 						password: "newpass",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.authenticationMode).toBe("Password");
-		expect(response.body.password).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().authenticationMode).toBe("Password");
+		expect(response.json().password).toBe(
 			Buffer.from("newpass").toString("base64"),
 		);
 	});
@@ -583,17 +620,19 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setCustomField", name: "isValidCouponCode", value: false },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.custom.fields.isValidCouponCode).toBe(false);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().custom.fields.isValidCouponCode).toBe(false);
 	});
 
 	test("setExternalId", async () => {
@@ -605,15 +644,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setExternalId", externalId: "123-xx-123" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.externalId).toBe("123-xx-123");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().externalId).toBe("123-xx-123");
 	});
 
 	test("setFirstName", async () => {
@@ -625,15 +666,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setFirstName", firstName: "Mary" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.firstName).toBe("Mary");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().firstName).toBe("Mary");
 	});
 
 	test("setLastName", async () => {
@@ -645,15 +688,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setLastName", lastName: "Smith" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lastName).toBe("Smith");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lastName).toBe("Smith");
 	});
 
 	test("setLocale", async () => {
@@ -665,15 +710,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setLocale", locale: "de-DE" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.locale).toBe("de-DE");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().locale).toBe("de-DE");
 	});
 
 	test("setSalutation", async () => {
@@ -685,15 +732,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setSalutation", salutation: "Mrs." }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.salutation).toBe("Mrs.");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().salutation).toBe("Mrs.");
 	});
 
 	test("setCompanyName", async () => {
@@ -705,15 +754,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setCompanyName", companyName: "Acme Inc." }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.companyName).toBe("Acme Inc.");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().companyName).toBe("Acme Inc.");
 	});
 
 	test("setVatId", async () => {
@@ -725,15 +776,17 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setVatId", vatId: "ABCD" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.vatId).toBe("ABCD");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().vatId).toBe("ABCD");
 	});
 
 	test("changeAddress", async () => {
@@ -767,9 +820,10 @@ describe("Customer Update Actions (old-style)", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -785,10 +839,11 @@ describe("Customer Update Actions (old-style)", () => {
 						},
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.addresses).toMatchObject([
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().addresses).toMatchObject([
 			{
 				id: "other-address-uid",
 				firstName: "Foo",
@@ -815,17 +870,19 @@ describe("Customer Update Actions (old-style)", () => {
 
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setCustomerNumber", customerNumber: "CUSTOMER-001" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.customerNumber).toBe("CUSTOMER-001");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().customerNumber).toBe("CUSTOMER-001");
 	});
 
 	test("setCustomerNumber error when already have a customer number", async () => {
@@ -836,16 +893,18 @@ describe("Customer Update Actions (old-style)", () => {
 			customerNumber: "CUSTOMER-002",
 		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setCustomerNumber", customerNumber: "CUSTOMER-001" },
 				],
-			});
-		expect(response.status).toBe(500);
-		expect(response.body.error).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(500);
+		expect(response.json().error).toBe(
 			"A Customer number already exists and cannot be set again.",
 		);
 	});
@@ -855,15 +914,17 @@ describe("Customer Update Actions (old-style)", () => {
 
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/${customer.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setKey", key: "C001" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.key).toBe("C001");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().key).toBe("C001");
 	});
 });
 
@@ -889,31 +950,37 @@ describe("Customer Password Reset", () => {
 	});
 
 	test("reset password flow", async () => {
-		const token = await supertest(ctMock.app)
-			.post("/dummy/customers/password-token")
-			.send({
+		const tokenResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers/password-token",
+			payload: {
 				email: "foo@example.org",
-			})
-			.then((response) => response.body as CustomerToken);
+			},
+		});
+		const token = tokenResponse.json() as CustomerToken;
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/customers/password/reset")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers/password/reset",
+			payload: {
 				tokenValue: token.value,
 				newPassword: "somethingNew",
-			});
-		expect(response.status).toBe(200);
+			},
+		});
+		expect(response.statusCode).toBe(200);
 	});
 
 	test("fail reset password flow", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/customers/password/reset")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/customers/password/reset",
+			payload: {
 				tokenValue: "invalid-token",
 				newPassword: "somethingNew",
-			});
-		expect(response.status).toBe(400);
-		expect(response.body).toEqual({
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toEqual({
 			message: `The Customer with ID 'Token(invalid-token)' was not found.`,
 			statusCode: 400,
 			errors: [
@@ -930,15 +997,17 @@ describe("Customer email verification", () => {
 	test("creates an email token", async () => {
 		const customer = await customerDraftFactory(ctMock).create();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/email-token`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/email-token`,
+			payload: {
 				id: customer.id,
 				ttlMinutes: 60,
-			});
+			},
+		});
 
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body).toMatchObject({
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		expect(response.json()).toMatchObject({
 			customerId: customer.id,
 			invalidateOlderTokens: false,
 			id: expect.any(String),
@@ -946,9 +1015,9 @@ describe("Customer email verification", () => {
 		});
 
 		const dateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-		expect(response.body.createdAt).toMatch(dateTime);
-		expect(response.body.lastModifiedAt).toMatch(dateTime);
-		expect(response.body.expiresAt).toMatch(dateTime);
+		expect(response.json().createdAt).toMatch(dateTime);
+		expect(response.json().lastModifiedAt).toMatch(dateTime);
+		expect(response.json().expiresAt).toMatch(dateTime);
 	});
 
 	test("validates an email token", async () => {
@@ -956,22 +1025,26 @@ describe("Customer email verification", () => {
 			isEmailVerified: false,
 		});
 
-		const tokenResponse = await supertest(ctMock.app)
-			.post(`/dummy/customers/email-token`)
-			.send({
+		const tokenResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/email-token`,
+			payload: {
 				id: customer.id,
 				ttlMinutes: 60,
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/customers/email/confirm`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/email/confirm`,
+			payload: {
 				id: customer.id,
-				tokenValue: tokenResponse.body.value,
-			});
+				tokenValue: tokenResponse.json().value,
+			},
+		});
 
-		expect(response.status, JSON.stringify(response.body)).toBe(200);
-		expect(response.body.id).toEqual(customer.id);
-		expect(response.body.isEmailVerified).toEqual(true);
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		expect(response.json().id).toEqual(customer.id);
+		expect(response.json().isEmailVerified).toEqual(true);
 	});
 });

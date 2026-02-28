@@ -31,7 +31,7 @@ import type {
 	TypedMoney,
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js/decimal";
-import type { Request } from "express";
+import type { FastifyRequest } from "fastify";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import type { AbstractStorage } from "../storage/index.ts";
@@ -337,7 +337,9 @@ export const getStoreKeyReference = (
 	};
 };
 
-export const getRepositoryContext = (request: Request): RepositoryContext => ({
+export const getRepositoryContext = (
+	request: FastifyRequest<{ Params: Record<string, string> }>,
+): RepositoryContext => ({
 	projectKey: request.params.projectKey,
 	storeKey: request.params.storeKey,
 });

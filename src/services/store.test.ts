@@ -1,5 +1,4 @@
 import type { Store } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -20,12 +19,13 @@ describe("Store", () => {
 			productSelections: [],
 		});
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/stores/key=STOREKEY",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/stores/key=STOREKEY",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual({
 			version: 1,
 			createdAt: "",
 			id: "fake-store",
@@ -53,10 +53,11 @@ describe("Store", () => {
 			productSelections: [],
 		});
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/stores/key=DOESNOTEXIST",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/stores/key=DOESNOTEXIST",
+		});
 
-		expect(response.status).toBe(404);
+		expect(response.statusCode).toBe(404);
 	});
 });

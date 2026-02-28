@@ -1,16 +1,17 @@
 import type { Customer, CustomerDraft } from "@commercetools/platform-sdk";
 import { Factory } from "fishery";
-import supertest from "supertest";
 import type { CommercetoolsMock } from "#src/ctMock.ts";
 
 export const customerDraftFactory = (m: CommercetoolsMock) =>
 	Factory.define<CustomerDraft, CustomerDraft, Customer>(({ onCreate }) => {
 		onCreate(async (draft) => {
-			const response = await supertest(m.app)
-				.post("/dummy/customers")
-				.send(draft);
+			const response = await m.app.inject({
+				method: "POST",
+				url: "/dummy/customers",
+				payload: draft,
+			});
 
-			return response.body.customer;
+			return response.json().customer;
 		});
 
 		return {

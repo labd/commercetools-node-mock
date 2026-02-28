@@ -6,7 +6,6 @@ import type {
 	ProductType,
 	ProductTypeDraft,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import * as timekeeper from "timekeeper";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
@@ -28,12 +27,14 @@ beforeEach(async () => {
 			name: "Default Product Type",
 			description: "Product type for testing",
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/product-types")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/product-types",
+			payload: draft,
+		});
 
-		expect(response.ok).toBe(true);
-		productType = response.body;
+		expect(response.statusCode >= 200 && response.statusCode < 300).toBe(true);
+		productType = response.json();
 	}
 
 	// Create an unpublished product
@@ -71,11 +72,13 @@ beforeEach(async () => {
 			},
 		};
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft);
-		expect(response.ok).toBe(true);
-		unpublishedProduct = response.body;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		expect(response.statusCode >= 200 && response.statusCode < 300).toBe(true);
+		unpublishedProduct = response.json();
 	}
 
 	// Create a published product
@@ -136,12 +139,14 @@ beforeEach(async () => {
 			},
 		};
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft);
-		expect(response.ok).toBe(true);
-		const product = response.body;
-		publishedProduct = response.body;
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
+		expect(response.statusCode >= 200 && response.statusCode < 300).toBe(true);
+		const product = response.json();
+		publishedProduct = response.json();
 
 		// Create the expected ProductProjection object
 		productProjection = {
@@ -209,11 +214,12 @@ afterEach(async () => {
 // Test the general product projection implementation
 describe("Product Projection Get By ID", () => {
 	test("Get By ID", async () => {
-		const response = await supertest(ctMock.app).get(
-			`/dummy/product-projections/${publishedProduct.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/product-projections/${publishedProduct.id}`,
+		});
 
-		const result: ProductProjection = response.body;
+		const result: ProductProjection = response.json();
 
 		expect(result).toBeDefined();
 		expect(result.id).toBe(publishedProduct.id);
@@ -223,13 +229,15 @@ describe("Product Projection Get By ID", () => {
 // Test the general product projection implementation
 describe("Product Projection Query - Generic", () => {
 	test("Filter out staged", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections")
-			.query({
-				limit: 50,
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections",
+			query: {
+				limit: "50",
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toEqual({
 			count: 1,
 			limit: 50,
@@ -241,15 +249,17 @@ describe("Product Projection Query - Generic", () => {
 
 	test("Filter on valid slug", async () => {
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/product-projections")
-				.query({
-					limit: 50,
-					where: ["slug(nl-NL=:slug)"],
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/product-projections",
+				query: {
+					limit: "50",
+					where: "slug(nl-NL=:slug)",
 					"var.slug": "test-product",
-				});
+				},
+			});
 
-			const result: ProductProjectionPagedSearchResponse = response.body;
+			const result: ProductProjectionPagedSearchResponse = response.json();
 			expect(result).toEqual({
 				count: 1,
 				limit: 50,
@@ -262,18 +272,18 @@ describe("Product Projection Query - Generic", () => {
 
 	test("Filter on complex query", async () => {
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/product-projections")
-				.query({
-					limit: 50,
-					where: [
-						'slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))',
-					],
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/product-projections",
+				query: {
+					limit: "50",
+					where: 'slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))',
 					"var.slug": "test-product",
 					"var.store": "test-store",
-				});
+				},
+			});
 
-			const result: ProductProjectionPagedSearchResponse = response.body;
+			const result: ProductProjectionPagedSearchResponse = response.json();
 			expect(result).toEqual({
 				count: 1,
 				limit: 50,
@@ -286,15 +296,17 @@ describe("Product Projection Query - Generic", () => {
 
 	test("Filter on invalid slug", async () => {
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/product-projections")
-				.query({
-					limit: 50,
-					where: ["slug(nl-NL=:slug)"],
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/product-projections",
+				query: {
+					limit: "50",
+					where: "slug(nl-NL=:slug)",
 					"var.slug": "missing-product",
-				});
+				},
+			});
 
-			const result: ProductProjectionPagedSearchResponse = response.body;
+			const result: ProductProjectionPagedSearchResponse = response.json();
 			expect(result).toEqual({
 				count: 0,
 				limit: 50,
@@ -310,13 +322,15 @@ describe("Product Projection Query - Generic", () => {
 describe("Product Projection Search - Generic", () => {
 	test("Pagination", async () => {
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/product-projections/search")
-				.query({
-					limit: 50,
-				});
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/product-projections/search",
+				query: {
+					limit: "50",
+				},
+			});
 
-			const result: ProductProjectionPagedSearchResponse = response.body;
+			const result: ProductProjectionPagedSearchResponse = response.json();
 			expect(result).toEqual({
 				count: 1,
 				limit: 50,
@@ -327,14 +341,16 @@ describe("Product Projection Search - Generic", () => {
 			});
 		}
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/product-projections/search")
-				.query({
-					limit: 50,
-					offset: 50,
-				});
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/product-projections/search",
+				query: {
+					limit: "50",
+					offset: "50",
+				},
+			});
 
-			const projection: ProductProjection = response.body;
+			const projection: ProductProjection = response.json();
 			expect(projection).toEqual({
 				count: 1,
 				limit: 50,
@@ -348,14 +364,16 @@ describe("Product Projection Search - Generic", () => {
 
 	test("Search - unpublished", async () => {
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/product-projections/search")
-				.query({
-					limit: 50,
-					staged: true,
-				});
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/product-projections/search",
+				query: {
+					limit: "50",
+					staged: "true",
+				},
+			});
 
-			const result: ProductProjectionPagedSearchResponse = response.body;
+			const result: ProductProjectionPagedSearchResponse = response.json();
 
 			expect(result).toMatchObject({
 				count: 2,
@@ -372,25 +390,29 @@ describe("Product Projection Search - Generic", () => {
 	});
 
 	test("Get 404 when not found by key with expand", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/key=DOESNOTEXIST")
-			.query({
-				expand: ["categories[*]"],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/key=DOESNOTEXIST",
+			query: {
+				expand: "categories[*]",
+			},
+		});
 
-		expect(response.status).toBe(404);
+		expect(response.statusCode).toBe(404);
 	});
 });
 
 describe("Product Projection Search - Filters", () => {
 	test("variants.sku", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/search")
-			.query({
-				filter: ['variants.sku:"my-sku"'],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/search",
+			query: {
+				filter: 'variants.sku:"my-sku"',
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toMatchObject({
 			count: 1,
 			results: [
@@ -402,13 +424,15 @@ describe("Product Projection Search - Filters", () => {
 	});
 
 	test("variants.attributes.range - match", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/search")
-			.query({
-				filter: ["variants.attributes.number:range(0 TO 10)"],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/search",
+			query: {
+				filter: "variants.attributes.number:range(0 TO 10)",
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toMatchObject({
 			count: 1,
 			results: [
@@ -420,13 +444,15 @@ describe("Product Projection Search - Filters", () => {
 	});
 
 	test("variants.attributes.range - mismatch", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/search")
-			.query({
-				filter: ["variants.attributes.number:range(5 TO 10)"],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/search",
+			query: {
+				filter: "variants.attributes.number:range(5 TO 10)",
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toMatchObject({
 			count: 0,
 			results: [],
@@ -436,13 +462,15 @@ describe("Product Projection Search - Filters", () => {
 
 describe("Product Projection Search - Facets", () => {
 	test("termExpr - variants.attributes.number", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/search")
-			.query({
-				facet: ["variants.attributes.number"],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/search",
+			query: {
+				facet: "variants.attributes.number",
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toMatchObject({
 			count: 1,
 			facets: {
@@ -472,13 +500,15 @@ describe("Product Projection Search - Facets", () => {
 	});
 
 	test("filterExpr - variants.attributes.number", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/search")
-			.query({
-				facet: ["variants.attributes.number:3,4"],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/search",
+			query: {
+				facet: "variants.attributes.number:3,4",
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toMatchObject({
 			count: 1,
 			facets: {
@@ -496,15 +526,15 @@ describe("Product Projection Search - Facets", () => {
 	});
 
 	test("rangeExpr - variants.attributes.number", async () => {
-		const response = await supertest(ctMock.app)
-			.get("/dummy/product-projections/search")
-			.query({
-				facet: [
-					"variants.attributes.number:range(* TO 5), (5 TO 25), (25 TO 100)",
-				],
-			});
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/search",
+			query: {
+				facet: "variants.attributes.number:range(* TO 5), (5 TO 25), (25 TO 100)",
+			},
+		});
 
-		const result: ProductProjectionPagedSearchResponse = response.body;
+		const result: ProductProjectionPagedSearchResponse = response.json();
 		expect(result).toMatchObject({
 			count: 1,
 			facets: {

@@ -5,7 +5,6 @@ import type {
 	Payment,
 	State,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, it, test } from "vitest";
 import { generateRandomString } from "#src/helpers.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
@@ -15,9 +14,10 @@ describe("Order Query", () => {
 	let order: Order | undefined;
 
 	beforeEach(async () => {
-		let response = await supertest(ctMock.app)
-			.post("/dummy/carts")
-			.send({
+		let response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
 				currency: "EUR",
 				custom: {
 					type: {
@@ -27,21 +27,24 @@ describe("Order Query", () => {
 						description: "example description",
 					},
 				},
-			});
-		expect(response.status).toBe(201);
-		const cart = response.body;
+			},
+		});
+		expect(response.statusCode).toBe(201);
+		const cart = response.json();
 
-		response = await supertest(ctMock.app)
-			.post("/dummy/orders")
-			.send({
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/orders",
+			payload: {
 				cart: {
 					typeId: "cart",
 					id: cart.id,
 				},
 				orderNumber: "foobar",
-			});
-		expect(response.status).toBe(201);
-		order = response.body;
+			},
+		});
+		expect(response.statusCode).toBe(201);
+		order = response.json();
 	});
 
 	afterEach(() => {
@@ -51,42 +54,48 @@ describe("Order Query", () => {
 	test("no filter", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app).get("/dummy/orders");
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBe(1);
-		expect(response.body.total).toBe(1);
-		expect(response.body.offset).toBe(0);
-		expect(response.body.limit).toBe(20);
+		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/orders" });
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBe(1);
+		expect(response.json().total).toBe(1);
+		expect(response.json().offset).toBe(0);
+		expect(response.json().limit).toBe(20);
 	});
 
 	test("filter orderNumber", async () => {
 		assert(order, "order not created");
 
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/orders")
-				.query({ where: 'orderNumber="nomatch"' });
-			expect(response.status).toBe(200);
-			expect(response.body.count).toBe(0);
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/orders",
+				query: { where: 'orderNumber="nomatch"' },
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().count).toBe(0);
 		}
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/orders")
-				.query({ where: 'orderNumber="foobar"' });
-			expect(response.status).toBe(200);
-			expect(response.body.count).toBe(1);
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/orders",
+				query: { where: 'orderNumber="foobar"' },
+			});
+			expect(response.statusCode).toBe(200);
+			expect(response.json().count).toBe(1);
 		}
 	});
 
 	test("expand payment without payments", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.get(`/dummy/orders/${order.id}`)
-			.query({ expand: "paymentInfo.payments[*].paymentStatus.state" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/orders/${order.id}`,
+			query: { expand: "paymentInfo.payments[*].paymentStatus.state" },
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.id).toBe(order.id);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().id).toBe(order.id);
 	});
 });
 
@@ -175,20 +184,24 @@ describe("Order payment tests", () => {
 		ctMock.project().unsafeAdd("payment", payment);
 		ctMock.project().unsafeAdd("order", order);
 
-		const response = await supertest(ctMock.app)
-			.get("/dummy/orders")
-			.query({ where: `paymentInfo(payments(id="${payment.id}"))` });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/orders",
+			query: { where: `paymentInfo(payments(id="${payment.id}"))` },
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.results[0].id).toBe(order.id);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().results[0].id).toBe(order.id);
 
 		{
-			const response = await supertest(ctMock.app)
-				.get("/dummy/orders")
-				.query({ where: "paymentInfo(payments(id is defined))" });
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: "/dummy/orders",
+				query: { where: "paymentInfo(payments(id is defined))" },
+			});
 
-			expect(response.status).toBe(200);
-			expect(response.body.results[0].id).toBe(order.id);
+			expect(response.statusCode).toBe(200);
+			expect(response.json().results[0].id).toBe(order.id);
 		}
 	});
 
@@ -268,24 +281,27 @@ describe("Order payment tests", () => {
 		ctMock.project().unsafeAdd("payment", payment);
 		ctMock.project().unsafeAdd("order", order);
 
-		const response = await supertest(ctMock.app)
-			.get(`/dummy/orders/order-number=${order.orderNumber}`)
-			.query({ expand: "paymentInfo.payments[*].paymentStatus.state" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/orders/order-number=${order.orderNumber}`,
+			query: { expand: "paymentInfo.payments[*].paymentStatus.state" },
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.id).toBe(order.id);
-		const maybePayment = response.body.paymentInfo.payments[0].obj;
+		expect(response.statusCode).toBe(200);
+		expect(response.json().id).toBe(order.id);
+		const maybePayment = response.json().paymentInfo.payments[0].obj;
 		expect(maybePayment).toBeDefined();
 		expect(maybePayment.paymentStatus.state.obj).toBeDefined();
 	});
 
 	test("get by orderNumber - not found", async () => {
-		const response = await supertest(ctMock.app).get(
-			"/dummy/orders/order-number=nonexistent",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/orders/order-number=nonexistent",
+		});
 
-		expect(response.status).toBe(404);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(404);
+		expect(response.json()).toEqual({
 			statusCode: 404,
 			message: "The Resource with key 'nonexistent' was not found.",
 			errors: [
@@ -303,68 +319,81 @@ describe("Order Update Actions", () => {
 	let order: Order | undefined;
 
 	beforeEach(async () => {
-		let response = await supertest(ctMock.app).post("/dummy/carts").send({
-			currency: "EUR",
+		let response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: {
+				currency: "EUR",
+			},
 		});
-		expect(response.status).toBe(201);
-		const cart = response.body;
+		expect(response.statusCode).toBe(201);
+		const cart = response.json();
 
-		response = await supertest(ctMock.app)
-			.post("/dummy/orders")
-			.send({
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/orders",
+			payload: {
 				cart: {
 					typeId: "cart",
 					id: cart.id,
 				},
-			});
-		expect(response.status).toBe(201);
-		order = response.body;
+			},
+		});
+		expect(response.statusCode).toBe(201);
+		order = response.json();
 	});
 
 	test("no update", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setLocale", locale: "nl-NL" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.locale).toBe("nl-NL");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().locale).toBe("nl-NL");
 
-		const responseAgain = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const responseAgain = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 2,
 				actions: [{ action: "setLocale", locale: "nl-NL" }],
-			});
-		expect(responseAgain.status).toBe(200);
-		expect(responseAgain.body.version).toBe(2);
-		expect(responseAgain.body.locale).toBe("nl-NL");
+			},
+		});
+		expect(responseAgain.statusCode).toBe(200);
+		expect(responseAgain.json().version).toBe(2);
+		expect(responseAgain.json().locale).toBe("nl-NL");
 	});
 
 	test("setCustomerEmail", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setCustomerEmail", email: "john@doe.com" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.customerEmail).toBe("john@doe.com");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().customerEmail).toBe("john@doe.com");
 	});
 
 	test("setCustomerId", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -372,10 +401,11 @@ describe("Order Update Actions", () => {
 						customerId: "9e3479fc-cc92-4d10-820a-a080b45ddcc1",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.customerId).toBe(
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().customerId).toBe(
 			"9e3479fc-cc92-4d10-820a-a080b45ddcc1",
 		);
 	});
@@ -383,77 +413,87 @@ describe("Order Update Actions", () => {
 	test("setOrderNumber", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "setOrderNumber", orderNumber: "5000123" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.orderNumber).toBe("5000123");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().orderNumber).toBe("5000123");
 	});
 
 	test("setPurchaseOrderNumber", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "setPurchaseOrderNumber", purchaseOrderNumber: "abc123" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.purchaseOrderNumber).toBe("abc123");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().purchaseOrderNumber).toBe("abc123");
 	});
 
 	test("changeOrderState", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeOrderState", orderState: "Complete" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.orderState).toBe("Complete");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().orderState).toBe("Complete");
 	});
 
 	test("changePaymentState | changeOrderState", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{ action: "changeOrderState", orderState: "Cancelled" },
 					{ action: "changePaymentState", paymentState: "Failed" },
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.orderState).toBe("Cancelled");
-		expect(response.body.paymentState).toBe("Failed");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().orderState).toBe("Cancelled");
+		expect(response.json().paymentState).toBe("Failed");
 	});
 
 	test("changeShipmentState", async () => {
 		assert(order, "order not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "changeShipmentState", shipmentState: "Delayed" }],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.shipmentState).toBe("Delayed");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().shipmentState).toBe("Delayed");
 	});
 
 	test("setDeliveryCustomField", async () => {
@@ -571,14 +611,16 @@ describe("Order Update Actions", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("order", order);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/orders/order-number=${order.orderNumber}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/orders/order-number=${order.orderNumber}`,
+		});
 
 		// check if status is set
-		const _updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/orders/${response.body.id}`)
-			.send({
+		const _updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${response.json().id}`,
+			payload: {
 				version: 0,
 				actions: [
 					{
@@ -588,17 +630,19 @@ describe("Order Update Actions", () => {
 						value: "delayed",
 					},
 				],
-			});
-		expect(_updateResponse.status).toBe(200);
-		expect(_updateResponse.body.version).toBe(1);
+			},
+		});
+		expect(_updateResponse.statusCode).toBe(200);
+		expect(_updateResponse.json().version).toBe(1);
 		expect(
-			_updateResponse.body.shippingInfo.deliveries[0].custom.fields.status,
+			_updateResponse.json().shippingInfo.deliveries[0].custom.fields.status,
 		).toBe("delayed");
 
 		// check if other field can be set
-		const _updateResponse2 = await supertest(ctMock.app)
-			.post(`/dummy/orders/${response.body.id}`)
-			.send({
+		const _updateResponse2 = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${response.json().id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -608,11 +652,12 @@ describe("Order Update Actions", () => {
 						value: "dhl",
 					},
 				],
-			});
-		expect(_updateResponse2.status).toBe(200);
-		expect(_updateResponse2.body.version).toBe(2);
+			},
+		});
+		expect(_updateResponse2.statusCode).toBe(200);
+		expect(_updateResponse2.json().version).toBe(2);
 		expect(
-			_updateResponse2.body.shippingInfo.deliveries[0].custom.fields.carrier,
+			_updateResponse2.json().shippingInfo.deliveries[0].custom.fields.carrier,
 		).toBe("dhl");
 	});
 
@@ -691,9 +736,10 @@ describe("Order Update Actions", () => {
 		const lineItem = order.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: order.version,
 				actions: [
 					{
@@ -703,11 +749,12 @@ describe("Order Update Actions", () => {
 						value: "bar",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toMatchObject([
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toMatchObject([
 			{
 				id: lineItem.id,
 				custom: {
@@ -784,9 +831,10 @@ describe("Order Update Actions", () => {
 
 		ctMock.project("dummy").unsafeAdd("order", order);
 
-		const type = await supertest(ctMock.app)
-			.post("/dummy/types")
-			.send({
+		const typeResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/types",
+			payload: {
 				key: "my-type",
 				name: {
 					en: "My Type",
@@ -807,17 +855,19 @@ describe("Order Update Actions", () => {
 						inputHint: "SingleLine",
 					},
 				],
-			})
-			.then((x) => x.body);
+			},
+		});
+		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
 		const lineItem = order.lineItems[0];
 		assert(lineItem, "lineItem not created");
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: order.version,
 				actions: [
 					{
@@ -829,11 +879,12 @@ describe("Order Update Actions", () => {
 						},
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toMatchObject([
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().lineItems).toMatchObject([
 			{
 				id: lineItem.id,
 				custom: {
@@ -970,14 +1021,16 @@ describe("Order Update Actions", () => {
 		};
 		ctMock.project("dummy").unsafeAdd("order", order);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/orders/order-number=${order.orderNumber}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/orders/order-number=${order.orderNumber}`,
+		});
 
 		// check if status is set
-		const _updateResponse = await supertest(ctMock.app)
-			.post(`/dummy/orders/${response.body.id}`)
-			.send({
+		const _updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${response.json().id}`,
+			payload: {
 				version: 0,
 				actions: [
 					{
@@ -987,11 +1040,12 @@ describe("Order Update Actions", () => {
 						value: "delayed",
 					},
 				],
-			});
-		expect(_updateResponse.status).toBe(200);
-		expect(_updateResponse.body.version).toBe(1);
+			},
+		});
+		expect(_updateResponse.statusCode).toBe(200);
+		expect(_updateResponse.json().version).toBe(1);
 		expect(
-			_updateResponse.body.shippingInfo.deliveries[0].parcels[0].custom.fields
+			_updateResponse.json().shippingInfo.deliveries[0].parcels[0].custom.fields
 				.status,
 		).toBe("delayed");
 	});
@@ -999,18 +1053,21 @@ describe("Order Update Actions", () => {
 	test("updateSyncInfo", async () => {
 		assert(order, "order not created");
 
-		const channelResponse = await supertest(ctMock.app)
-			.post("/dummy/channels")
-			.send({
+		const channelResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/channels",
+			payload: {
 				key: "order-sync",
 				roles: ["OrderImport", "OrderExport"],
-			});
-		expect(channelResponse.status).toBe(201);
-		const channel = channelResponse.body;
+			},
+		});
+		expect(channelResponse.statusCode).toBe(201);
+		const channel = channelResponse.json();
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/orders/${order.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -1019,10 +1076,11 @@ describe("Order Update Actions", () => {
 						externalId: "1234",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.syncInfo).toMatchObject([
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().syncInfo).toMatchObject([
 			{
 				channel: { typeId: "channel", id: channel.id },
 				externalId: "1234",
@@ -1225,12 +1283,14 @@ describe("Order Update Actions", () => {
 			[order, 1],
 			[orderWithoutDeliveries, 0],
 		])("should add to deliveries", async (order, index) => {
-			const response = await supertest(ctMock.app).get(
-				`/dummy/orders/order-number=${order.orderNumber}`,
-			);
-			const _updateResponse = await supertest(ctMock.app)
-				.post(`/dummy/orders/${response.body.id}`)
-				.send({
+			const response = await ctMock.app.inject({
+				method: "GET",
+				url: `/dummy/orders/order-number=${order.orderNumber}`,
+			});
+			const _updateResponse = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/orders/${response.json().id}`,
+				payload: {
 					version: 0,
 					actions: [
 						{
@@ -1238,11 +1298,12 @@ describe("Order Update Actions", () => {
 							...deliveryDraft,
 						},
 					],
-				});
+				},
+			});
 
-			expect(_updateResponse.status).toBe(200);
-			expect(_updateResponse.body.version).toBe(1);
-			expect(_updateResponse.body.shippingInfo.deliveries[index].key).toBe(
+			expect(_updateResponse.statusCode).toBe(200);
+			expect(_updateResponse.json().version).toBe(1);
+			expect(_updateResponse.json().shippingInfo.deliveries[index].key).toBe(
 				deliveryDraft.key,
 			);
 		});
@@ -1251,6 +1312,7 @@ describe("Order Update Actions", () => {
 
 describe("Order Import", () => {
 	const ctMock = new CommercetoolsMock();
+
 	ctMock.project("dummy").unsafeAdd("product", {
 		id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
 		masterData: {
@@ -1269,9 +1331,10 @@ describe("Order Import", () => {
 	});
 
 	test("Import", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/orders/import")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/orders/import",
+			payload: {
 				orderNumber: "100000001",
 				totalPrice: {
 					centAmount: 1000,
@@ -1412,11 +1475,12 @@ describe("Order Import", () => {
 						lineItemMode: "Standard",
 					},
 				],
-			});
+			},
+		});
 
-		expect(response.status).toBe(200);
+		expect(response.statusCode).toBe(200);
 
-		const created: Order = response.body;
+		const created: Order = response.json();
 		expect(created.lineItems).toHaveLength(1);
 		expect(created.customLineItems).toHaveLength(1);
 	});

@@ -1,10 +1,7 @@
-import type { NextFunction, Request, Response } from "express";
-import express from "express";
-import inject from "light-my-request";
-import morgan from "morgan";
+import Fastify, { type FastifyInstance } from "fastify";
 import { HttpResponse, http } from "msw";
 import type { SetupServer, SetupServerApi } from "msw/node";
-import { setupServer } from "msw/node";
+import qs from "qs";
 import type { Config } from "./config.ts";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants.ts";
 import { CommercetoolsError } from "./exceptions.ts";
@@ -45,7 +42,7 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 const _globalListeners: SetupServer[] = [];
 
 export class CommercetoolsMock {
-	public app: express.Express;
+	public app: FastifyInstance;
 
 	public options: CommercetoolsMockOptions;
 
@@ -74,6 +71,9 @@ export class CommercetoolsMock {
 		this.app = this.createApp({ silent: this.options.silent });
 	}
 
+	get server() {
+		return this.app.server;
+	}
 
 	clear() {
 		this._storage.clear();
@@ -104,12 +104,11 @@ export class CommercetoolsMock {
 		return this._oauth2.store;
 	}
 
-	runServer(port = 3000, options?: AppOptions) {
-		const server = this.app.listen(port, () => {});
-		server.keepAliveTimeout = 60 * 1000;
+	async runServer(port = 3000) {
+		await this.app.listen({ port, host: "0.0.0.0" });
 	}
 
-	private createApp(options?: AppOptions): express.Express {
+	private createApp(options?: AppOptions): FastifyInstance {
 		const config: Config = {
 			strict: this.options.strict,
 			storage: this._storage,
@@ -117,59 +116,56 @@ export class CommercetoolsMock {
 		this._repositories = createRepositories(config);
 		this._oauth2.setCustomerRepository(this._repositories.customer);
 
-		const app = express();
-		// Set limit to 16mb, this is the maximum size allowed by the commercetools API: https://docs.commercetools.com/api/limits
-		app.use(express.json({ limit: "16mb" }));
+		const app = Fastify({
+			// Set limit to 16mb, this is the maximum size allowed by the commercetools API: https://docs.commercetools.com/api/limits
+			bodyLimit: 16 * 1024 * 1024,
+			logger: !options?.silent ? { level: "info" } : false,
+			routerOptions: {
+				querystringParser: (str) => qs.parse(str),
+			},
+		});
 
-		const projectRouter = express.Router({ mergeParams: true });
+		// Register OAuth routes
+		app.register(this._oauth2.createPlugin(), { prefix: "/oauth" });
 
-		if (!options?.silent) {
-			app.use(morgan("tiny"));
-		}
-		app.use("/oauth", this._oauth2.createRouter());
+		// Register project routes
+		const repositories = this._repositories;
+		const oauth2 = this._oauth2;
+		const enableAuth = this.options.enableAuthentication;
 
-		// Only enable auth middleware if we have enabled this
-		if (this.options.enableAuthentication) {
-			app.use("/:projectKey", this._oauth2.createMiddleware(), projectRouter);
-			app.use(
-				"/:projectKey/in-store/key=:storeKey",
-				this._oauth2.createMiddleware(),
-				projectRouter,
-			);
-		} else {
-			app.use("/:projectKey", projectRouter);
-			app.use("/:projectKey/in-store/key=:storeKey", projectRouter);
-		}
+		const projectPlugin = async (instance: FastifyInstance) => {
+			if (enableAuth) {
+				instance.addHook("preHandler", oauth2.createMiddleware());
+			}
+			createServices(instance, repositories);
+			new ProjectService(instance, repositories.project as ProjectRepository);
+		};
 
-		// Register the rest api services in the router
-		createServices(projectRouter, this._repositories);
-		this._projectService = new ProjectService(
-			projectRouter,
-			this._repositories.project as ProjectRepository,
-		);
+		app.register(projectPlugin, { prefix: "/:projectKey" });
+		app.register(projectPlugin, {
+			prefix: "/:projectKey/in-store/key=:storeKey",
+		});
 
-		app.use((err: Error, req: Request, resp: Response, next: NextFunction) => {
-			if (err instanceof CommercetoolsError) {
-				if (err.errors?.length > 0) {
-					resp.status(err.statusCode).send({
-						statusCode: err.statusCode,
-						message: err.message,
-						errors: err.errors,
+		// Error handler
+		app.setErrorHandler((error, request, reply) => {
+			if (error instanceof CommercetoolsError) {
+				if (error.errors?.length > 0) {
+					return reply.status(error.statusCode).send({
+						statusCode: error.statusCode,
+						message: error.message,
+						errors: error.errors,
 					});
-					return;
 				}
 
-				resp.status(err.statusCode).send({
-					statusCode: err.statusCode,
-					message: err.message,
-					errors: [err.info],
+				return reply.status(error.statusCode).send({
+					statusCode: error.statusCode,
+					message: error.message,
+					errors: [error.info],
 				});
-				return;
 			}
-			resp.status(500).send({
-				error: err.message,
+			return reply.status(500).send({
+				error: error instanceof Error ? error.message : String(error),
 			});
-			return;
 		});
 
 		return app;
@@ -191,11 +187,12 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await inject(app)
-					.post(`${url.pathname}?${url.searchParams.toString()}`)
-					.body(body)
-					.headers(headers)
-					.end();
+				const res = await app.inject({
+					method: "POST",
+					url: `${url.pathname}?${url.searchParams.toString()}`,
+					body,
+					headers,
+				});
 				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
@@ -206,16 +203,15 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await inject(app)
-					.get(`${url.pathname}?${url.searchParams.toString()}`)
-					.body(body)
-					.headers(headers)
-					.end();
+				const res = await app.inject({
+					method: "GET",
+					url: `${url.pathname}?${url.searchParams.toString()}`,
+					body,
+					headers,
+				});
 
 				if (res.statusCode === 200) {
 					const parsedBody = JSON.parse(res.body);
-					// Check if we have a count property (e.g. for query-lookups)
-					// or if we have a result object (e.g. for single lookups)
 					const resultCount =
 						"count" in parsedBody
 							? parsedBody.count
@@ -237,11 +233,12 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await inject(app)
-					.get(`${url.pathname}?${url.searchParams.toString()}`)
-					.body(body)
-					.headers(headers)
-					.end();
+				const res = await app.inject({
+					method: "GET",
+					url: `${url.pathname}?${url.searchParams.toString()}`,
+					body,
+					headers,
+				});
 				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
@@ -252,11 +249,12 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await inject(app)
-					.post(`${url.pathname}?${url.searchParams.toString()}`)
-					.body(body)
-					.headers(headers)
-					.end();
+				const res = await app.inject({
+					method: "POST",
+					url: `${url.pathname}?${url.searchParams.toString()}`,
+					body,
+					headers,
+				});
 				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
@@ -267,11 +265,12 @@ export class CommercetoolsMock {
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
 
-				const res = await inject(app)
-					.delete(`${url.pathname}?${url.searchParams.toString()}`)
-					.body(body)
-					.headers(headers)
-					.end();
+				const res = await app.inject({
+					method: "DELETE",
+					url: `${url.pathname}?${url.searchParams.toString()}`,
+					body,
+					headers,
+				});
 				return new HttpResponse(res.body, {
 					status: res.statusCode,
 					headers: mapHeaderType(res.headers),
@@ -282,34 +281,5 @@ export class CommercetoolsMock {
 
 	public mswServer() {
 		return this._mswServer;
-	}
-
-	private startServer() {
-		// Check if there are any other servers running
-		if (_globalListeners.length > 0) {
-			if (this._mswServer !== undefined) {
-				throw new Error("Server already started");
-			}
-			process.emitWarning("Server wasn't stopped properly, clearing");
-			for (const listener of _globalListeners) {
-				listener.close();
-			}
-			_globalListeners.length = 0;
-		}
-
-		const server = setupServer();
-		this.registerHandlers(server);
-		server.listen({
-			// We need to allow requests done by supertest
-			onUnhandledRequest: (request, print) => {
-				const url = new URL(request.url);
-				if (url.hostname === "127.0.0.1") {
-					return;
-				}
-				print.error();
-			},
-		});
-		_globalListeners.push(server);
-		this._mswServer = server;
 	}
 }

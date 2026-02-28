@@ -1,5 +1,4 @@
 import type { ChannelDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -11,13 +10,15 @@ describe("Channel", () => {
 			key: "my-channel",
 			roles: ["InventorySupply"],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/channels")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/channels",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			address: undefined,
 			createdAt: expect.anything(),
 			custom: undefined,
@@ -37,18 +38,21 @@ describe("Channel", () => {
 			key: "my-channel",
 			roles: ["InventorySupply"],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/channels")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/channels",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			`/dummy/channels/${createResponse.body.id}`,
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/channels/${createResponse.json().id}`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Get channel by key", async () => {
@@ -56,18 +60,21 @@ describe("Channel", () => {
 			key: "my-channel-key",
 			roles: ["InventorySupply"],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/channels")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/channels",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get(
-			"/dummy/channels/key=my-channel-key",
-		);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/channels/key=my-channel-key",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(createResponse.json());
 	});
 
 	test("Query channels", async () => {
@@ -75,16 +82,21 @@ describe("Channel", () => {
 			key: "test-channel",
 			roles: ["InventorySupply"],
 		};
-		const createResponse = await supertest(ctMock.app)
-			.post("/dummy/channels")
-			.send(draft);
+		const createResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/channels",
+			payload: draft,
+		});
 
-		expect(createResponse.status).toBe(201);
+		expect(createResponse.statusCode).toBe(201);
 
-		const response = await supertest(ctMock.app).get("/dummy/channels");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/channels",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.count).toBeGreaterThan(0);
-		expect(response.body.results).toContainEqual(createResponse.body);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().count).toBeGreaterThan(0);
+		expect(response.json().results).toContainEqual(createResponse.json());
 	});
 });

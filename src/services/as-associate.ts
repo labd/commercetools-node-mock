@@ -1,4 +1,4 @@
-import { Router } from "express";
+import type { FastifyInstance } from "fastify";
 import type {
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
@@ -18,8 +18,6 @@ type Repositories = {
 };
 
 export class AsAssociateService {
-	router: Router;
-
 	subServices: {
 		cart: AsAssociateCartService;
 		order: AsAssociateOrderService;
@@ -27,24 +25,27 @@ export class AsAssociateService {
 		"shopping-list": AsAssociateShoppingListService;
 	};
 
-	constructor(parent: Router, repositories: Repositories) {
-		this.router = Router({ mergeParams: true });
-
-		this.subServices = {
-			order: new AsAssociateOrderService(this.router, repositories.order),
-			cart: new AsAssociateCartService(this.router, repositories.cart),
-			"quote-request": new AsAssociateQuoteRequestService(
-				this.router,
-				repositories["quote-request"],
-			),
-			"shopping-list": new AsAssociateShoppingListService(
-				this.router,
-				repositories["shopping-list"],
-			),
-		};
-		parent.use(
-			"/as-associate/:associateId/in-business-unit/key=:businessUnitId",
-			this.router,
+	constructor(parent: FastifyInstance, repositories: Repositories) {
+		parent.register(
+			(instance, opts, done) => {
+				this.subServices = {
+					order: new AsAssociateOrderService(instance, repositories.order),
+					cart: new AsAssociateCartService(instance, repositories.cart),
+					"quote-request": new AsAssociateQuoteRequestService(
+						instance,
+						repositories["quote-request"],
+					),
+					"shopping-list": new AsAssociateShoppingListService(
+						instance,
+						repositories["shopping-list"],
+					),
+				};
+				done();
+			},
+			{
+				prefix:
+					"/as-associate/:associateId/in-business-unit/key=:businessUnitId",
+			},
 		);
 	}
 }

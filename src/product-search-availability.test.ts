@@ -4,7 +4,6 @@ import type {
 	ProductPagedSearchResponse,
 	ProductSearchRequest,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "./index.ts";
 
@@ -20,9 +19,11 @@ describe("Product Search - Availability Filtering", () => {
 			description: "Test Product Type",
 		};
 
-		await supertest(ctMock.app)
-			.post("/dummy/product-types")
-			.send(productTypeDraft);
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/product-types",
+			payload: productTypeDraft,
+		});
 
 		// Create a test product
 		const productDraft: ProductDraft = {
@@ -42,19 +43,24 @@ describe("Product Search - Availability Filtering", () => {
 			],
 		};
 
-		const productResponse = await supertest(ctMock.app)
-			.post("/dummy/products")
-			.send(productDraft);
+		const productResponse = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products",
+			payload: productDraft,
+		});
 
-		productId = productResponse.body.id;
+		const productBody = productResponse.json();
+		productId = productBody.id;
 
 		// Publish the product
-		await supertest(ctMock.app)
-			.post(`/dummy/products/${productId}`)
-			.send({
-				version: productResponse.body.version,
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/products/${productId}`,
+			payload: {
+				version: productBody.version,
 				actions: [{ action: "publish" }],
-			});
+			},
+		});
 	});
 
 	afterEach(() => {
@@ -77,7 +83,11 @@ describe("Product Search - Availability Filtering", () => {
 			}),
 		};
 
-		await supertest(ctMock.app).post("/dummy/inventory").send(inventoryEntry);
+		await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/inventory",
+			payload: inventoryEntry,
+		});
 	}
 
 	async function searchProducts(
@@ -90,11 +100,13 @@ describe("Product Search - Availability Filtering", () => {
 			},
 		};
 
-		const response = await supertest(ctMock.app)
-			.post("/dummy/products/search")
-			.send(searchRequest);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/products/search",
+			payload: searchRequest,
+		});
 
-		return response.body;
+		return response.json();
 	}
 
 	test("should filter products by variants.availability.isOnStock = true", async () => {

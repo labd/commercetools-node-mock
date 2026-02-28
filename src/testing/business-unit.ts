@@ -3,18 +3,19 @@ import type {
 	BusinessUnitDraft,
 } from "@commercetools/platform-sdk";
 import { Factory } from "fishery";
-import supertest from "supertest";
 import type { CommercetoolsMock } from "#src/ctMock.ts";
 
 export const businessUnitDraftFactory = (m: CommercetoolsMock) =>
 	Factory.define<BusinessUnitDraft, BusinessUnitDraft, BusinessUnit>(
 		({ onCreate }) => {
 			onCreate(async (draft) => {
-				const response = await supertest(m.app)
-					.post("/dummy/business-units")
-					.send(draft);
+				const response = await m.app.inject({
+					method: "POST",
+					url: "/dummy/business-units",
+					payload: draft,
+				});
 
-				return response.body;
+				return response.json();
 			});
 
 			return {

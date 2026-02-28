@@ -1,5 +1,4 @@
 import type { Project } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -7,10 +6,13 @@ const ctMock = new CommercetoolsMock();
 
 describe("Project", () => {
 	test("Get project by key", async () => {
-		const response = await supertest(ctMock.app).get("/dummy/");
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy",
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual({
 			version: 1,
 			carts: {
 				countryTaxRateFallbackEnabled: false,
@@ -53,14 +55,18 @@ describe("Project", () => {
 	});
 
 	test("Post empty update ", async () => {
-		const response = await supertest(ctMock.app).post("/dummy/");
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy",
+		});
 		expect(response.statusCode).toBe(400);
 	});
 
 	test("Post successful update", async () => {
-		const response = await supertest(ctMock.app)
-			.post("/dummy/")
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy",
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -68,9 +74,10 @@ describe("Project", () => {
 						name: "Updated Project Name",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.name).toBe("Updated Project Name");
-		expect(response.body.version).toBe(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().name).toBe("Updated Project Name");
+		expect(response.json().version).toBe(2);
 	});
 });

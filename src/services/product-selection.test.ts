@@ -1,5 +1,4 @@
 import type { ProductSelectionDraft } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -13,13 +12,15 @@ describe("product-selection", () => {
 			},
 			key: "foo",
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/product-selections")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/product-selections",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
+		expect(response.statusCode).toBe(201);
 
-		expect(response.body).toEqual({
+		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),

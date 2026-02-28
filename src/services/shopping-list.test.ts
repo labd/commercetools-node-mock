@@ -3,7 +3,6 @@ import type {
 	ShoppingList,
 	ShoppingListDraft,
 } from "@commercetools/platform-sdk";
-import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "../ctMock.ts";
 
@@ -88,21 +87,24 @@ describe("Shopping List", () => {
 			name: {},
 			lineItems: [{ sku: "22241940260" }],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/shopping-lists")
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shopping-lists",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
-		expect(response.body.lineItems[0].variantId).toBe(2);
+		expect(response.statusCode).toBe(201);
+		expect(response.json().lineItems[0].variantId).toBe(2);
 	});
 
 	test("Expands variant on lineItems when getting", async () => {
-		const response = await supertest(ctMock.app)
-			.get(`/dummy/shopping-lists/${shoppingList.id}`)
-			.query({ expand: "lineItems[*].variant" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/shopping-lists/${shoppingList.id}?expand=lineItems[*].variant`,
+		});
 
-		expect(response.status).toBe(200);
-		expect(response.body.lineItems[0].variant).toEqual({
+		expect(response.statusCode).toBe(200);
+		expect(response.json().lineItems[0].variant).toEqual({
 			id: 2,
 			sku: "22241940260",
 		});
@@ -113,13 +115,14 @@ describe("Shopping List", () => {
 			name: {},
 			lineItems: [{ sku: "22241940260" }],
 		};
-		const response = await supertest(ctMock.app)
-			.post("/dummy/shopping-lists")
-			.query({ expand: "lineItems[*].variant" })
-			.send(draft);
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/shopping-lists?expand=lineItems[*].variant",
+			payload: draft,
+		});
 
-		expect(response.status).toBe(201);
-		expect(response.body.lineItems[0].variant).toEqual({
+		expect(response.statusCode).toBe(201);
+		expect(response.json().lineItems[0].variant).toEqual({
 			id: 2,
 			sku: "22241940260",
 		});
@@ -145,9 +148,10 @@ describe("Shopping List Update Actions", () => {
 		ctMock.project().unsafeAdd("product", product);
 		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -156,11 +160,13 @@ describe("Shopping List Update Actions", () => {
 						variantId: product.masterData.current.variants[0].id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].variantId).toEqual(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems).toHaveLength(1);
+		expect(body.lineItems[0].variantId).toEqual(2);
 	});
 
 	test("addLineItem by productID", async () => {
@@ -168,9 +174,10 @@ describe("Shopping List Update Actions", () => {
 		ctMock.project().unsafeAdd("product", product);
 		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -178,11 +185,13 @@ describe("Shopping List Update Actions", () => {
 						productId: product.id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].variantId).toEqual(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems).toHaveLength(1);
+		expect(body.lineItems[0].variantId).toEqual(1);
 	});
 
 	test("addLineItem by sku", async () => {
@@ -190,9 +199,10 @@ describe("Shopping List Update Actions", () => {
 		ctMock.project().unsafeAdd("product", product);
 		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -200,17 +210,20 @@ describe("Shopping List Update Actions", () => {
 						sku: "22241940260",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].variantId).toEqual(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems).toHaveLength(1);
+		expect(body.lineItems[0].variantId).toEqual(2);
 	});
 
 	test("addLineItem increases quantity", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -218,23 +231,27 @@ describe("Shopping List Update Actions", () => {
 						sku: "22241940260",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].variantId).toEqual(2);
-		expect(response.body.lineItems[0].quantity).toEqual(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems).toHaveLength(1);
+		expect(body.lineItems[0].variantId).toEqual(2);
+		expect(body.lineItems[0].quantity).toEqual(2);
 	});
 
 	test("addLineItem unknown product", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [{ action: "addLineItem", productId: "123", variantId: 1 }],
-			});
-		expect(response.status).toBe(400);
-		expect(response.body.message).toBe("A product with ID '123' not found.");
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toBe("A product with ID '123' not found.");
 	});
 
 	test("addLineItem by productID", async () => {
@@ -242,9 +259,10 @@ describe("Shopping List Update Actions", () => {
 		ctMock.project().unsafeAdd("product", product);
 		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -253,18 +271,21 @@ describe("Shopping List Update Actions", () => {
 						key: "my-key",
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].key).toBeDefined();
-		expect(response.body.lineItems[0].key).toEqual("my-key");
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems).toHaveLength(1);
+		expect(body.lineItems[0].key).toBeDefined();
+		expect(body.lineItems[0].key).toEqual("my-key");
 	});
 
 	test("removeLineItem", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -272,16 +293,19 @@ describe("Shopping List Update Actions", () => {
 						lineItemId: shoppingList.lineItems[0].id,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems).toHaveLength(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems).toHaveLength(0);
 	});
 
 	test("removeLineItem decreases quantity", async () => {
-		await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -289,11 +313,13 @@ describe("Shopping List Update Actions", () => {
 						sku: "22241940260",
 					},
 				],
-			});
+			},
+		});
 
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 2,
 				actions: [
 					{
@@ -302,17 +328,20 @@ describe("Shopping List Update Actions", () => {
 						quantity: 1,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(3);
-		expect(response.body.lineItems).toHaveLength(1);
-		expect(response.body.lineItems[0].quantity).toBe(1);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(3);
+		expect(body.lineItems).toHaveLength(1);
+		expect(body.lineItems[0].quantity).toBe(1);
 	});
 
 	test("changeLineItemQuantity sets quantity", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -321,17 +350,20 @@ describe("Shopping List Update Actions", () => {
 						quantity: 2,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems.length).toBe(1);
-		expect(response.body.lineItems[0].quantity).toBe(2);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems.length).toBe(1);
+		expect(body.lineItems[0].quantity).toBe(2);
 	});
 
 	test("changeLineItemQuantity removes line item if quantity is 0", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -340,16 +372,19 @@ describe("Shopping List Update Actions", () => {
 						quantity: 0,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.version).toBe(2);
-		expect(response.body.lineItems.length).toBe(0);
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.version).toBe(2);
+		expect(body.lineItems.length).toBe(0);
 	});
 
 	test("various setters", async () => {
-		const response = await supertest(ctMock.app)
-			.post(`/dummy/shopping-lists/${shoppingList.id}`)
-			.send({
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shopping-lists/${shoppingList.id}`,
+			payload: {
 				version: 1,
 				actions: [
 					{
@@ -379,18 +414,20 @@ describe("Shopping List Update Actions", () => {
 						deleteDaysAfterLastModification: 1,
 					},
 				],
-			});
-		expect(response.status).toBe(200);
-		expect(response.body.key).toBe("new-key");
-		expect(response.body.slug).toBe("new-slug");
-		expect(response.body.name).toEqual({ en: "new name" });
-		expect(response.body.description).toEqual({ en: "new description" });
-		expect(response.body.customer).toEqual({
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.key).toBe("new-key");
+		expect(body.slug).toBe("new-slug");
+		expect(body.name).toEqual({ en: "new name" });
+		expect(body.description).toEqual({ en: "new description" });
+		expect(body.customer).toEqual({
 			typeId: "customer",
 			id: "customer-id",
 		});
-		expect(response.body.store).toEqual({ typeId: "store", key: "store-key" });
-		expect(response.body.anonymousId).toEqual("new-anonymous-id");
-		expect(response.body.deleteDaysAfterLastModification).toEqual(1);
+		expect(body.store).toEqual({ typeId: "store", key: "store-key" });
+		expect(body.anonymousId).toEqual("new-anonymous-id");
+		expect(body.deleteDaysAfterLastModification).toEqual(1);
 	});
 });
