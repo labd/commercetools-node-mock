@@ -1,10 +1,8 @@
 import { z } from "zod";
 
-const UpdateActionSchema = z
-	.object({
-		action: z.string(),
-	})
-	.passthrough();
+const UpdateActionSchema = z.looseObject({
+	action: z.string(),
+});
 
 export const updateRequestSchema = z.object({
 	version: z.number(),
