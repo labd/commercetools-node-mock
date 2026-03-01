@@ -12,10 +12,7 @@ import type {
 	CartDiscountSetValidFromAndUntilAction,
 	CartDiscountSetValidUntilAction,
 	CartDiscountUpdateAction,
-	InvalidOperationError,
-	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "#src/exceptions.ts";
 import { getStoreKeyReference } from "#src/repositories/helpers.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
@@ -55,24 +52,7 @@ export class CartDiscountUpdateHandler
 		resource: Writable<CartDiscount>,
 		{ name, value }: CartDiscountSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			if (name in resource.custom.fields) {
-				delete resource.custom.fields[name];
-			} else {
-				throw new CommercetoolsError<InvalidOperationError>(
-					{
-						code: "InvalidOperation",
-						message: `Cannot remove custom field ${name} because it does not exist.`,
-					},
-					400,
-				);
-			}
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -80,34 +60,7 @@ export class CartDiscountUpdateHandler
 		resource: Writable<CartDiscount>,
 		{ type, fields }: CartDiscountSetCustomTypeAction,
 	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
-					{
-						code: "ReferencedResourceNotFound",
-						message: `Type ${type} not found`,
-						typeId: "type",
-						id: type.id,
-						key: type.key,
-					},
-					400,
-				);
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields || {},
-			};
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDescription(

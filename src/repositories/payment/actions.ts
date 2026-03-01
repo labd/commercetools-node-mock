@@ -164,14 +164,7 @@ export class PaymentUpdateHandler
 		resource: Payment,
 		{ name, value }: PaymentSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>({
-				code: "InvalidOperation",
-				message: "Resource has no custom field",
-			});
-		}
-
-		resource.custom.fields[name] = value;
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -179,29 +172,7 @@ export class PaymentUpdateHandler
 		resource: Writable<Payment>,
 		{ type, fields }: PaymentSetCustomTypeAction,
 	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
-					code: "ReferencedResourceNotFound",
-					message: `Type ${type} not found`,
-					typeId: "type",
-				});
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields ?? {},
-			};
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setInterfaceId(

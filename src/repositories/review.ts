@@ -1,9 +1,7 @@
 import type {
 	ChannelReference,
 	CustomerReference,
-	InvalidOperationError,
 	ProductReference,
-	ReferencedResourceNotFoundError,
 	RequiredFieldError,
 	Review,
 	ReviewDraft,
@@ -102,16 +100,7 @@ class ReviewUpdateHandler
 		resource: Writable<Review>,
 		{ name, value }: ReviewSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>(
-				{
-					code: "InvalidOperation",
-					message: "Resource has no custom field",
-				},
-				400,
-			);
-		}
-		resource.custom.fields[name] = value;
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -119,34 +108,7 @@ class ReviewUpdateHandler
 		resource: Writable<Review>,
 		{ type, fields }: ReviewSetCustomTypeAction,
 	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
-					{
-						code: "ReferencedResourceNotFound",
-						message: `Type ${type} not found`,
-						typeId: "type",
-						id: type.id,
-						key: type.key,
-					},
-					400,
-				);
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields ?? {},
-			};
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setCustomer(

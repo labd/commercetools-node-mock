@@ -1,7 +1,5 @@
 import type {
 	InvalidJsonInputError,
-	InvalidOperationError,
-	ReferencedResourceNotFoundError,
 	StagedQuote,
 	StagedQuoteSetCustomFieldAction,
 	StagedQuoteSetCustomTypeAction,
@@ -25,16 +23,7 @@ export class StagedQuoteUpdateHandler
 		resource: StagedQuote,
 		{ name, value }: StagedQuoteSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>(
-				{
-					code: "InvalidOperation",
-					message: "Resource has no custom field",
-				},
-				400,
-			);
-		}
-		resource.custom.fields[name] = value;
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -42,32 +31,7 @@ export class StagedQuoteUpdateHandler
 		resource: Writable<StagedQuote>,
 		{ type, fields }: StagedQuoteSetCustomTypeAction,
 	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
-					{
-						code: "ReferencedResourceNotFound",
-						message: `Type ${type} not found`,
-						typeId: "type",
-					},
-					400,
-				);
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields || {},
-			};
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	transitionState(

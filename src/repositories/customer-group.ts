@@ -58,14 +58,7 @@ class CustomerGroupUpdateHandler
 		resource: Writable<CustomerGroup>,
 		{ name, value }: CustomerGroupSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -73,15 +66,7 @@ class CustomerGroupUpdateHandler
 		resource: Writable<CustomerGroup>,
 		{ type, fields }: CustomerGroupSetCustomTypeAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setKey(

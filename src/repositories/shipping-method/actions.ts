@@ -22,10 +22,7 @@ import type {
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
-import {
-	createCustomFields,
-	getReferenceFromResourceIdentifier,
-} from "../helpers.ts";
+import { getReferenceFromResourceIdentifier } from "../helpers.ts";
 import { transformShippingRate } from "./helpers.ts";
 
 export class ShippingMethodUpdateHandler
@@ -136,14 +133,7 @@ export class ShippingMethodUpdateHandler
 		resource: Writable<ShippingMethod>,
 		{ name, value }: ShippingMethodSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -151,15 +141,7 @@ export class ShippingMethodUpdateHandler
 		resource: Writable<ShippingMethod>,
 		{ type, fields }: ShippingMethodSetCustomTypeAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDescription(

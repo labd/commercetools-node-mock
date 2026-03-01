@@ -45,7 +45,7 @@ import { hashPassword } from "#src/lib/password.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
-import { createAddress, createCustomFields } from "../helpers.ts";
+import { createAddress } from "../helpers.ts";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
@@ -346,16 +346,7 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		{ name, value }: CustomerSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>(
-				{
-					code: "InvalidOperation",
-					message: "Resource has no custom field",
-				},
-				400,
-			);
-		}
-		resource.custom.fields[name] = value;
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -363,15 +354,7 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		{ type, fields }: CustomerSetCustomTypeAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDateOfBirth(

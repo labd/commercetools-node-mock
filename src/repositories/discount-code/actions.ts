@@ -18,7 +18,6 @@ import type {
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
-import { createCustomFields } from "../helpers.ts";
 
 export class DiscountCodeUpdateHandler
 	extends AbstractUpdateHandler
@@ -59,14 +58,7 @@ export class DiscountCodeUpdateHandler
 		resource: Writable<DiscountCode>,
 		{ name, value }: DiscountCodeSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			return;
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -74,15 +66,7 @@ export class DiscountCodeUpdateHandler
 		resource: Writable<DiscountCode>,
 		{ type, fields }: DiscountCodeSetCustomTypeAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDescription(

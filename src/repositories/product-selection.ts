@@ -6,7 +6,6 @@ import type {
 	ProductSelectionUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
-import { createCustomFields } from "#src/repositories/helpers.ts";
 import { ProductSelectionDraftSchema } from "#src/schemas/generated/product-selection.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
@@ -58,14 +57,6 @@ class ProductSelectionUpdateHandler
 		resource: Writable<ProductSelection>,
 		{ type, fields }: ProductSelectionSetCustomTypeAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 }

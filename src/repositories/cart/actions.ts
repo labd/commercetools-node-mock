@@ -616,14 +616,7 @@ export class CartUpdateHandler
 		resource: Cart,
 		{ name, value }: CartSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>({
-				code: "InvalidOperation",
-				message: "Resource has no custom field",
-			});
-		}
-
-		resource.custom.fields[name] = value;
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomShippingMethod(
@@ -672,31 +665,7 @@ export class CartUpdateHandler
 		resource: Writable<Cart>,
 		{ type, fields }: CartSetCustomTypeAction,
 	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
-					code: "ReferencedResourceNotFound",
-					message: `Type ${type} not found`,
-					typeId: "type",
-					id: type?.id,
-					key: type?.key,
-				});
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields || {},
-			};
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDirectDiscounts(
