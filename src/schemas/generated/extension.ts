@@ -2,7 +2,10 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { ExtensionDestinationSchema, ExtensionTriggerSchema } from "./common.ts";
+import {
+	ExtensionDestinationSchema,
+	ExtensionTriggerSchema,
+} from "./common.ts";
 
 export const ExtensionDraftSchema = z.object({
 	key: z.string().optional(),

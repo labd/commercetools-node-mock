@@ -2,7 +2,11 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { FieldDefinitionSchema, LocalizedStringSchema, ResourceTypeIdSchema } from "./common.ts";
+import {
+	FieldDefinitionSchema,
+	LocalizedStringSchema,
+	ResourceTypeIdSchema,
+} from "./common.ts";
 
 export const TypeDraftSchema = z.object({
 	key: z.string(),

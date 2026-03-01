@@ -3,9 +3,102 @@
 
 import { z } from "zod";
 
-export const PermissionSchema = z.enum(["AddChildUnits", "UpdateAssociates", "UpdateBusinessUnitDetails", "UpdateParentUnit", "ViewMyCarts", "ViewOthersCarts", "UpdateMyCarts", "UpdateOthersCarts", "CreateMyCarts", "CreateOthersCarts", "DeleteMyCarts", "DeleteOthersCarts", "ViewMyOrders", "ViewOthersOrders", "UpdateMyOrders", "UpdateOthersOrders", "CreateMyOrdersFromMyCarts", "CreateMyOrdersFromMyQuotes", "CreateOrdersFromOthersCarts", "CreateOrdersFromOthersQuotes", "ViewMyQuotes", "ViewOthersQuotes", "AcceptMyQuotes", "AcceptOthersQuotes", "DeclineMyQuotes", "DeclineOthersQuotes", "RenegotiateMyQuotes", "RenegotiateOthersQuotes", "ReassignMyQuotes", "ReassignOthersQuotes", "ViewMyQuoteRequests", "ViewOthersQuoteRequests", "UpdateMyQuoteRequests", "UpdateOthersQuoteRequests", "CreateMyQuoteRequestsFromMyCarts", "CreateQuoteRequestsFromOthersCarts", "CreateApprovalRules", "UpdateApprovalRules", "UpdateApprovalFlows", "ViewMyShoppingLists", "ViewOthersShoppingLists", "UpdateMyShoppingLists", "UpdateOthersShoppingLists", "CreateMyShoppingLists", "CreateOthersShoppingLists", "DeleteMyShoppingLists", "DeleteOthersShoppingLists"]);
+export const PermissionSchema = z.enum([
+	"AddChildUnits",
+	"UpdateAssociates",
+	"UpdateBusinessUnitDetails",
+	"UpdateParentUnit",
+	"ViewMyCarts",
+	"ViewOthersCarts",
+	"UpdateMyCarts",
+	"UpdateOthersCarts",
+	"CreateMyCarts",
+	"CreateOthersCarts",
+	"DeleteMyCarts",
+	"DeleteOthersCarts",
+	"ViewMyOrders",
+	"ViewOthersOrders",
+	"UpdateMyOrders",
+	"UpdateOthersOrders",
+	"CreateMyOrdersFromMyCarts",
+	"CreateMyOrdersFromMyQuotes",
+	"CreateOrdersFromOthersCarts",
+	"CreateOrdersFromOthersQuotes",
+	"ViewMyQuotes",
+	"ViewOthersQuotes",
+	"AcceptMyQuotes",
+	"AcceptOthersQuotes",
+	"DeclineMyQuotes",
+	"DeclineOthersQuotes",
+	"RenegotiateMyQuotes",
+	"RenegotiateOthersQuotes",
+	"ReassignMyQuotes",
+	"ReassignOthersQuotes",
+	"ViewMyQuoteRequests",
+	"ViewOthersQuoteRequests",
+	"UpdateMyQuoteRequests",
+	"UpdateOthersQuoteRequests",
+	"CreateMyQuoteRequestsFromMyCarts",
+	"CreateQuoteRequestsFromOthersCarts",
+	"CreateApprovalRules",
+	"UpdateApprovalRules",
+	"UpdateApprovalFlows",
+	"ViewMyShoppingLists",
+	"ViewOthersShoppingLists",
+	"UpdateMyShoppingLists",
+	"UpdateOthersShoppingLists",
+	"CreateMyShoppingLists",
+	"CreateOthersShoppingLists",
+	"DeleteMyShoppingLists",
+	"DeleteOthersShoppingLists",
+]);
 
-export const ReferenceTypeIdSchema = z.enum(["approval-flow", "approval-rule", "associate-role", "attribute-group", "business-unit", "cart", "cart-discount", "category", "channel", "customer", "customer-email-token", "customer-group", "customer-password-token", "direct-discount", "discount-code", "discount-group", "extension", "inventory-entry", "key-value-document", "order", "order-edit", "payment-method", "payment", "product", "product-discount", "product-price", "product-selection", "product-tailoring", "product-type", "quote", "quote-request", "recurrence-policy", "recurring-order", "review", "shipping-method", "shopping-list", "staged-quote", "standalone-price", "state", "store", "subscription", "tax-category", "type", "zone"]);
+export const ReferenceTypeIdSchema = z.enum([
+	"approval-flow",
+	"approval-rule",
+	"associate-role",
+	"attribute-group",
+	"business-unit",
+	"cart",
+	"cart-discount",
+	"category",
+	"channel",
+	"customer",
+	"customer-email-token",
+	"customer-group",
+	"customer-password-token",
+	"direct-discount",
+	"discount-code",
+	"discount-group",
+	"extension",
+	"inventory-entry",
+	"key-value-document",
+	"order",
+	"order-edit",
+	"payment-method",
+	"payment",
+	"product",
+	"product-discount",
+	"product-price",
+	"product-selection",
+	"product-tailoring",
+	"product-type",
+	"quote",
+	"quote-request",
+	"recurrence-policy",
+	"recurring-order",
+	"review",
+	"shipping-method",
+	"shopping-list",
+	"staged-quote",
+	"standalone-price",
+	"state",
+	"store",
+	"subscription",
+	"tax-category",
+	"type",
+	"zone",
+]);
 
 export const BusinessUnitStatusSchema = z.enum(["Active", "Inactive"]);
 
@@ -13,83 +106,312 @@ export const BusinessUnitStoreModeSchema = z.enum(["Explicit", "FromParent"]);
 
 export const BusinessUnitTypeSchema = z.enum(["Company", "Division"]);
 
-export const BusinessUnitAssociateModeSchema = z.enum(["Explicit", "ExplicitAndFromParent"]);
+export const BusinessUnitAssociateModeSchema = z.enum([
+	"Explicit",
+	"ExplicitAndFromParent",
+]);
 
-export const AssociateRoleInheritanceModeSchema = z.enum(["Enabled", "Disabled"]);
+export const AssociateRoleInheritanceModeSchema = z.enum([
+	"Enabled",
+	"Disabled",
+]);
 
 export const AssociateRoleDeprecatedSchema = z.enum(["Admin", "Buyer"]);
 
-export const BusinessUnitApprovalRuleModeSchema = z.enum(["Explicit", "ExplicitAndFromParent"]);
+export const BusinessUnitApprovalRuleModeSchema = z.enum([
+	"Explicit",
+	"ExplicitAndFromParent",
+]);
 
-export const InventoryModeSchema = z.enum(["None", "TrackOnly", "ReserveOnOrder"]);
+export const InventoryModeSchema = z.enum([
+	"None",
+	"TrackOnly",
+	"ReserveOnOrder",
+]);
 
 export const PriceSelectionModeSchema = z.enum(["Fixed", "Dynamic"]);
 
 export const CustomLineItemPriceModeSchema = z.enum(["Standard", "External"]);
 
-export const TaxModeSchema = z.enum(["Platform", "External", "ExternalAmount", "Disabled"]);
+export const TaxModeSchema = z.enum([
+	"Platform",
+	"External",
+	"ExternalAmount",
+	"Disabled",
+]);
 
 export const RoundingModeSchema = z.enum(["HalfEven", "HalfUp", "HalfDown"]);
 
-export const TaxCalculationModeSchema = z.enum(["LineItemLevel", "UnitPriceLevel"]);
+export const TaxCalculationModeSchema = z.enum([
+	"LineItemLevel",
+	"UnitPriceLevel",
+]);
 
 export const ShippingModeSchema = z.enum(["Single", "Multiple"]);
 
-export const ShippingRateTierTypeSchema = z.enum(["CartValue", "CartClassification", "CartScore"]);
+export const ShippingRateTierTypeSchema = z.enum([
+	"CartValue",
+	"CartClassification",
+	"CartScore",
+]);
 
-export const CartOriginSchema = z.enum(["Customer", "Merchant", "Quote", "RecurringOrder"]);
+export const CartOriginSchema = z.enum([
+	"Customer",
+	"Merchant",
+	"Quote",
+	"RecurringOrder",
+]);
 
-export const DiscountApplicationModeSchema = z.enum(["ProportionateDistribution", "EvenDistribution", "IndividualApplication"]);
+export const DiscountApplicationModeSchema = z.enum([
+	"ProportionateDistribution",
+	"EvenDistribution",
+	"IndividualApplication",
+]);
 
 export const MoneyTypeSchema = z.enum(["centPrecision", "highPrecision"]);
 
 export const StackingModeSchema = z.enum(["Stacking", "StopAfterThisDiscount"]);
 
-export const ChannelRoleEnumSchema = z.enum(["InventorySupply", "ProductDistribution", "OrderExport", "OrderImport", "Primary"]);
+export const ChannelRoleEnumSchema = z.enum([
+	"InventorySupply",
+	"ProductDistribution",
+	"OrderExport",
+	"OrderImport",
+	"Primary",
+]);
 
 export const AuthenticationModeSchema = z.enum(["Password", "ExternalAuth"]);
 
-export const ExtensionResourceTypeIdSchema = z.enum(["cart", "order", "payment", "payment-method", "customer", "customer-group", "quote-request", "staged-quote", "quote", "business-unit", "shopping-list"]);
+export const ExtensionResourceTypeIdSchema = z.enum([
+	"cart",
+	"order",
+	"payment",
+	"payment-method",
+	"customer",
+	"customer-group",
+	"quote-request",
+	"staged-quote",
+	"quote",
+	"business-unit",
+	"shopping-list",
+]);
 
 export const ExtensionActionSchema = z.enum(["Create", "Update"]);
 
-export const PaymentStateSchema = z.enum(["BalanceDue", "Failed", "Pending", "CreditOwed", "Paid"]);
+export const PaymentStateSchema = z.enum([
+	"BalanceDue",
+	"Failed",
+	"Pending",
+	"CreditOwed",
+	"Paid",
+]);
 
-export const ShipmentStateSchema = z.enum(["Shipped", "Delivered", "Ready", "Pending", "Delayed", "Partial", "Backorder", "Canceled"]);
+export const ShipmentStateSchema = z.enum([
+	"Shipped",
+	"Delivered",
+	"Ready",
+	"Pending",
+	"Delayed",
+	"Partial",
+	"Backorder",
+	"Canceled",
+]);
 
-export const OrderStateSchema = z.enum(["Open", "Confirmed", "Complete", "Cancelled"]);
+export const OrderStateSchema = z.enum([
+	"Open",
+	"Confirmed",
+	"Complete",
+	"Cancelled",
+]);
 
-export const TransactionTypeSchema = z.enum(["Authorization", "CancelAuthorization", "Charge", "Refund", "Chargeback"]);
+export const TransactionTypeSchema = z.enum([
+	"Authorization",
+	"CancelAuthorization",
+	"Charge",
+	"Refund",
+	"Chargeback",
+]);
 
-export const TransactionStateSchema = z.enum(["Initial", "Pending", "Success", "Failure"]);
+export const TransactionStateSchema = z.enum([
+	"Initial",
+	"Pending",
+	"Success",
+	"Failure",
+]);
 
 export const ProductPriceModeEnumSchema = z.enum(["Embedded", "Standalone"]);
 
-export const ProductSelectionTypeEnumSchema = z.enum(["individual", "individualExclusion"]);
+export const ProductSelectionTypeEnumSchema = z.enum([
+	"individual",
+	"individualExclusion",
+]);
 
-export const ProductSelectionModeSchema = z.enum(["Individual", "IndividualExclusion"]);
+export const ProductSelectionModeSchema = z.enum([
+	"Individual",
+	"IndividualExclusion",
+]);
 
 export const AttributeLevelEnumSchema = z.enum(["Product", "Variant"]);
 
-export const AttributeConstraintEnumSchema = z.enum(["None", "Unique", "CombinationUnique", "SameForAll"]);
+export const AttributeConstraintEnumSchema = z.enum([
+	"None",
+	"Unique",
+	"CombinationUnique",
+	"SameForAll",
+]);
 
 export const TextInputHintSchema = z.enum(["SingleLine", "MultiLine"]);
 
 export const IntervalUnitSchema = z.enum(["Days", "Weeks", "Months"]);
 
-export const StateTypeEnumSchema = z.enum(["OrderState", "RecurringOrderState", "LineItemState", "ProductState", "ReviewState", "PaymentState", "QuoteRequestState", "StagedQuoteState", "QuoteState"]);
+export const StateTypeEnumSchema = z.enum([
+	"OrderState",
+	"RecurringOrderState",
+	"LineItemState",
+	"ProductState",
+	"ReviewState",
+	"PaymentState",
+	"QuoteRequestState",
+	"StagedQuoteState",
+	"QuoteState",
+]);
 
-export const StateRoleEnumSchema = z.enum(["ReviewIncludedInStatistics", "Return"]);
+export const StateRoleEnumSchema = z.enum([
+	"ReviewIncludedInStatistics",
+	"Return",
+]);
 
-export const MessageSubscriptionResourceTypeIdSchema = z.enum(["approval-flow", "approval-rule", "associate-role", "business-unit", "category", "customer", "customer-email-token", "customer-group", "customer-password-token", "inventory-entry", "order", "payment", "product", "product-selection", "product-tailoring", "quote", "quote-request", "review", "shopping-list", "staged-quote", "standalone-price", "store"]);
+export const MessageSubscriptionResourceTypeIdSchema = z.enum([
+	"approval-flow",
+	"approval-rule",
+	"associate-role",
+	"business-unit",
+	"category",
+	"customer",
+	"customer-email-token",
+	"customer-group",
+	"customer-password-token",
+	"inventory-entry",
+	"order",
+	"payment",
+	"product",
+	"product-selection",
+	"product-tailoring",
+	"quote",
+	"quote-request",
+	"review",
+	"shopping-list",
+	"staged-quote",
+	"standalone-price",
+	"store",
+]);
 
-export const ChangeSubscriptionResourceTypeIdSchema = z.enum(["approval-flow", "approval-rule", "associate-role", "attribute-group", "business-unit", "cart", "cart-discount", "category", "channel", "customer", "customer-email-token", "customer-group", "customer-password-token", "discount-code", "discount-group", "extension", "inventory-entry", "key-value-document", "order", "order-edit", "payment", "product", "product-discount", "product-selection", "product-tailoring", "product-type", "quote", "quote-request", "recurrence-policy", "recurring-order", "review", "shipping-method", "shopping-list", "staged-quote", "standalone-price", "state", "store", "subscription", "tax-category", "type", "zone"]);
+export const ChangeSubscriptionResourceTypeIdSchema = z.enum([
+	"approval-flow",
+	"approval-rule",
+	"associate-role",
+	"attribute-group",
+	"business-unit",
+	"cart",
+	"cart-discount",
+	"category",
+	"channel",
+	"customer",
+	"customer-email-token",
+	"customer-group",
+	"customer-password-token",
+	"discount-code",
+	"discount-group",
+	"extension",
+	"inventory-entry",
+	"key-value-document",
+	"order",
+	"order-edit",
+	"payment",
+	"product",
+	"product-discount",
+	"product-selection",
+	"product-tailoring",
+	"product-type",
+	"quote",
+	"quote-request",
+	"recurrence-policy",
+	"recurring-order",
+	"review",
+	"shipping-method",
+	"shopping-list",
+	"staged-quote",
+	"standalone-price",
+	"state",
+	"store",
+	"subscription",
+	"tax-category",
+	"type",
+	"zone",
+]);
 
-export const EventSubscriptionResourceTypeIdSchema = z.enum(["checkout", "import-api"]);
+export const EventSubscriptionResourceTypeIdSchema = z.enum([
+	"checkout",
+	"import-api",
+]);
 
-export const EventTypeSchema = z.enum(["CheckoutOrderCreationFailed", "CheckoutPaymentAuthorizationCancelled", "CheckoutPaymentAuthorizationFailed", "CheckoutPaymentAuthorized", "CheckoutPaymentCancelAuthorizationFailed", "CheckoutPaymentCharged", "CheckoutPaymentChargeFailed", "CheckoutPaymentRefunded", "CheckoutPaymentRefundFailed", "ImportContainerCreated", "ImportContainerDeleted", "ImportOperationRejected", "ImportUnresolved", "ImportValidationFailed", "ImportWaitForMasterVariant"]);
+export const EventTypeSchema = z.enum([
+	"CheckoutOrderCreationFailed",
+	"CheckoutPaymentAuthorizationCancelled",
+	"CheckoutPaymentAuthorizationFailed",
+	"CheckoutPaymentAuthorized",
+	"CheckoutPaymentCancelAuthorizationFailed",
+	"CheckoutPaymentCharged",
+	"CheckoutPaymentChargeFailed",
+	"CheckoutPaymentRefunded",
+	"CheckoutPaymentRefundFailed",
+	"ImportContainerCreated",
+	"ImportContainerDeleted",
+	"ImportOperationRejected",
+	"ImportUnresolved",
+	"ImportValidationFailed",
+	"ImportWaitForMasterVariant",
+]);
 
-export const ResourceTypeIdSchema = z.enum(["address", "asset", "approval-flow", "approval-rule", "associate-role", "business-unit", "cart-discount", "category", "channel", "customer", "customer-group", "custom-line-item", "discount-code", "inventory-entry", "line-item", "order", "order-edit", "order-delivery", "order-parcel", "order-return-item", "payment", "payment-interface-interaction", "payment-method", "payment-method-info", "product-price", "product-selection", "product-tailoring", "quote", "review", "recurring-order", "shipping", "shipping-method", "shopping-list", "shopping-list-text-line-item", "standalone-price", "store", "transaction"]);
+export const ResourceTypeIdSchema = z.enum([
+	"address",
+	"asset",
+	"approval-flow",
+	"approval-rule",
+	"associate-role",
+	"business-unit",
+	"cart-discount",
+	"category",
+	"channel",
+	"customer",
+	"customer-group",
+	"custom-line-item",
+	"discount-code",
+	"inventory-entry",
+	"line-item",
+	"order",
+	"order-edit",
+	"order-delivery",
+	"order-parcel",
+	"order-return-item",
+	"payment",
+	"payment-interface-interaction",
+	"payment-method",
+	"payment-method-info",
+	"product-price",
+	"product-selection",
+	"product-tailoring",
+	"quote",
+	"review",
+	"recurring-order",
+	"shipping",
+	"shipping-method",
+	"shopping-list",
+	"shopping-list-text-line-item",
+	"standalone-price",
+	"store",
+	"transaction",
+]);
 
 export const TypeTextInputHintSchema = z.enum(["SingleLine", "MultiLine"]);
 
@@ -99,11 +421,15 @@ export const CurrencyCodeSchema = z.string();
 
 export const LocaleSchema = z.string();
 
-export const TypeResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const TypeResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const FieldContainerSchema = z.record(z.string(), z.unknown());
 
@@ -118,28 +444,40 @@ export const AttributeReferenceSchema = z.object({
 	key: z.string(),
 });
 
-export const StoreResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const StoreResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
-export const AssociateRoleResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const AssociateRoleResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const AssociateRoleAssignmentDraftSchema = z.object({
 	associateRole: AssociateRoleResourceIdentifierSchema,
 	inheritance: AssociateRoleInheritanceModeSchema.optional(),
 });
 
-export const CustomerResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const CustomerResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const AssociateDraftSchema = z.object({
 	associateRoleAssignments: z.array(AssociateRoleAssignmentDraftSchema),
@@ -175,11 +513,15 @@ export const BaseAddressSchema = z.object({
 	externalId: z.string().optional(),
 });
 
-export const CustomerGroupResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const CustomerGroupResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const CustomerGroupAssignmentDraftSchema = z.object({
 	customerGroup: CustomerGroupResourceIdentifierSchema,
@@ -202,14 +544,20 @@ export const CompanyDraftSchema = z.object({
 	billingAddresses: z.array(z.number().int()).optional(),
 	defaultBillingAddress: z.number().int().optional(),
 	custom: CustomFieldsDraftSchema.optional(),
-	customerGroupAssignments: z.array(CustomerGroupAssignmentDraftSchema).optional(),
+	customerGroupAssignments: z
+		.array(CustomerGroupAssignmentDraftSchema)
+		.optional(),
 });
 
-export const BusinessUnitResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const BusinessUnitResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const DivisionDraftSchema = z.object({
 	key: z.string(),
@@ -228,15 +576,21 @@ export const DivisionDraftSchema = z.object({
 	billingAddresses: z.array(z.number().int()).optional(),
 	defaultBillingAddress: z.number().int().optional(),
 	custom: CustomFieldsDraftSchema.optional(),
-	customerGroupAssignments: z.array(CustomerGroupAssignmentDraftSchema).optional(),
+	customerGroupAssignments: z
+		.array(CustomerGroupAssignmentDraftSchema)
+		.optional(),
 	parentUnit: BusinessUnitResourceIdentifierSchema,
 });
 
-export const ChannelResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const ChannelResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const MoneySchema = z.object({
 	centAmount: z.number().int(),
@@ -277,11 +631,15 @@ export const ItemShippingDetailsDraftSchema = z.object({
 	targets: z.array(ItemShippingTargetSchema),
 });
 
-export const RecurrencePolicyResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const RecurrencePolicyResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const LineItemRecurrenceInfoDraftSchema = z.object({
 	recurrencePolicy: RecurrencePolicyResourceIdentifierSchema,
@@ -300,18 +658,24 @@ export const LineItemDraftSchema = z.object({
 	externalPrice: MoneySchema.optional(),
 	externalTotalPrice: ExternalLineItemTotalPriceSchema.optional(),
 	externalTaxRate: ExternalTaxRateDraftSchema.optional(),
-	perMethodExternalTaxRate: z.array(MethodExternalTaxRateDraftSchema).optional(),
+	perMethodExternalTaxRate: z
+		.array(MethodExternalTaxRateDraftSchema)
+		.optional(),
 	inventoryMode: InventoryModeSchema.optional(),
 	shippingDetails: ItemShippingDetailsDraftSchema.optional(),
 	custom: CustomFieldsDraftSchema.optional(),
 	recurrenceInfo: LineItemRecurrenceInfoDraftSchema.optional(),
 });
 
-export const TaxCategoryResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const TaxCategoryResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const CustomLineItemRecurrenceInfoDraftSchema = z.object({
 	recurrencePolicy: RecurrencePolicyResourceIdentifierSchema,
@@ -331,11 +695,15 @@ export const CustomLineItemDraftSchema = z.object({
 	recurrenceInfo: CustomLineItemRecurrenceInfoDraftSchema.optional(),
 });
 
-export const ShippingMethodResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const ShippingMethodResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const ClassificationShippingRateInputDraftSchema = z.object({
 	type: z.string(),
@@ -499,11 +867,15 @@ export const CartDiscountValueFixedDraftSchema = z.object({
 	applicationMode: DiscountApplicationModeSchema.optional(),
 });
 
-export const ProductResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const ProductResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const CartDiscountValueGiftLineItemDraftSchema = z.object({
 	type: z.string(),
@@ -527,11 +899,15 @@ export const CartDiscountTargetSchema = z.object({
 	type: z.string(),
 });
 
-export const DiscountGroupResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const DiscountGroupResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const AnyOrderDraftSchema = z.object({
 	type: z.string(),
@@ -554,11 +930,15 @@ export const RecurringOrderScopeDraftSchema = z.object({
 	type: z.string(),
 });
 
-export const CategoryResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const CategoryResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const AssetDimensionsSchema = z.object({
 	w: z.number().int(),
@@ -591,17 +971,25 @@ export const GeoJsonSchema = z.object({
 	coordinates: z.array(z.number()),
 });
 
-export const CartResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const CartResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
-export const CartDiscountResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const CartDiscountResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const AWSLambdaDestinationSchema = z.object({
 	type: z.string(),
@@ -654,11 +1042,15 @@ export const StagedOrderUpdateActionSchema = z.object({
 	action: z.string(),
 });
 
-export const StateResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const StateResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const PaymentMethodTokenSchema = z.object({
 	value: z.string(),
@@ -689,11 +1081,15 @@ export const TransactionDraftSchema = z.object({
 	interfaceId: z.string().optional(),
 });
 
-export const ProductTypeResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const ProductTypeResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const CategoryOrderHintsSchema = z.record(z.string(), z.string());
 
@@ -820,11 +1216,15 @@ export const AttributeDefinitionDraftSchema = z.object({
 	isSearchable: z.boolean().optional(),
 });
 
-export const StagedQuoteResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const StagedQuoteResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const StateReferenceSchema = z.object({
 	typeId: ReferenceTypeIdSchema,
@@ -846,11 +1246,15 @@ export const RecurrencePolicyScheduleDraftSchema = z.object({
 	type: z.string(),
 });
 
-export const ZoneResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const ZoneResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const ZoneRateDraftSchema = z.object({
 	zone: ZoneResourceIdentifierSchema,
@@ -880,21 +1284,29 @@ export const StagedPriceDraftSchema = z.object({
 	value: TypedMoneyDraftSchema,
 });
 
-export const QuoteRequestResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const QuoteRequestResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const StoreCountrySchema = z.object({
 	code: CountryCodeSchema,
 });
 
-export const ProductSelectionResourceIdentifierSchema = z.object({
-	typeId: ReferenceTypeIdSchema,
-	id: z.string().optional(),
-	key: z.string().optional(),
-}).refine((data) => data.id !== undefined || data.key !== undefined, { message: "Either 'id' or 'key' must be provided" });
+export const ProductSelectionResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().optional(),
+		key: z.string().optional(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
 
 export const ProductSelectionSettingDraftSchema = z.object({
 	productSelection: ProductSelectionResourceIdentifierSchema,

@@ -2,7 +2,29 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { BaseAddressSchema, BusinessUnitResourceIdentifierSchema, CartOriginSchema, CountryCodeSchema, CurrencyCodeSchema, CustomFieldsDraftSchema, CustomLineItemDraftSchema, CustomShippingDraftSchema, CustomerGroupResourceIdentifierSchema, ExternalTaxRateDraftSchema, InventoryModeSchema, LineItemDraftSchema, LocaleSchema, RoundingModeSchema, ShippingDraftSchema, ShippingMethodResourceIdentifierSchema, ShippingModeSchema, ShippingRateInputDraftSchema, StoreResourceIdentifierSchema, TaxCalculationModeSchema, TaxModeSchema } from "./common.ts";
+import {
+	BaseAddressSchema,
+	BusinessUnitResourceIdentifierSchema,
+	CartOriginSchema,
+	CountryCodeSchema,
+	CurrencyCodeSchema,
+	CustomerGroupResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	CustomLineItemDraftSchema,
+	CustomShippingDraftSchema,
+	ExternalTaxRateDraftSchema,
+	InventoryModeSchema,
+	LineItemDraftSchema,
+	LocaleSchema,
+	RoundingModeSchema,
+	ShippingDraftSchema,
+	ShippingMethodResourceIdentifierSchema,
+	ShippingModeSchema,
+	ShippingRateInputDraftSchema,
+	StoreResourceIdentifierSchema,
+	TaxCalculationModeSchema,
+	TaxModeSchema,
+} from "./common.ts";
 
 export const CartDraftSchema = z.object({
 	currency: CurrencyCodeSchema,

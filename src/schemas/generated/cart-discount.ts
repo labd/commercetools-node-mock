@@ -2,7 +2,16 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CartDiscountTargetSchema, CartDiscountValueDraftSchema, CustomFieldsDraftSchema, DiscountGroupResourceIdentifierSchema, LocalizedStringSchema, RecurringOrderScopeDraftSchema, StackingModeSchema, StoreResourceIdentifierSchema } from "./common.ts";
+import {
+	CartDiscountTargetSchema,
+	CartDiscountValueDraftSchema,
+	CustomFieldsDraftSchema,
+	DiscountGroupResourceIdentifierSchema,
+	LocalizedStringSchema,
+	RecurringOrderScopeDraftSchema,
+	StackingModeSchema,
+	StoreResourceIdentifierSchema,
+} from "./common.ts";
 
 export const CartDiscountDraftSchema = z.object({
 	name: LocalizedStringSchema,

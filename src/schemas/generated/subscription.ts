@@ -2,7 +2,13 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { ChangeSubscriptionSchema, DeliveryFormatSchema, DestinationSchema, EventSubscriptionSchema, MessageSubscriptionSchema } from "./common.ts";
+import {
+	ChangeSubscriptionSchema,
+	DeliveryFormatSchema,
+	DestinationSchema,
+	EventSubscriptionSchema,
+	MessageSubscriptionSchema,
+} from "./common.ts";
 
 export const SubscriptionDraftSchema = z.object({
 	destination: DestinationSchema,

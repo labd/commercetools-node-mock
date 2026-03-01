@@ -2,7 +2,12 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CustomFieldsDraftSchema, LocalizedStringSchema, ProductSelectionModeSchema, ProductSelectionTypeEnumSchema } from "./common.ts";
+import {
+	CustomFieldsDraftSchema,
+	LocalizedStringSchema,
+	ProductSelectionModeSchema,
+	ProductSelectionTypeEnumSchema,
+} from "./common.ts";
 
 export const ProductSelectionDraftSchema = z.object({
 	key: z.string().optional(),

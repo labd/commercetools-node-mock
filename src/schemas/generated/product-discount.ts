@@ -2,7 +2,10 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { LocalizedStringSchema, ProductDiscountValueDraftSchema } from "./common.ts";
+import {
+	LocalizedStringSchema,
+	ProductDiscountValueDraftSchema,
+} from "./common.ts";
 
 export const ProductDiscountDraftSchema = z.object({
 	name: LocalizedStringSchema,

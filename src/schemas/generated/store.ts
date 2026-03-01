@@ -2,7 +2,14 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { ChannelResourceIdentifierSchema, CustomFieldsDraftSchema, LocaleSchema, LocalizedStringSchema, ProductSelectionSettingDraftSchema, StoreCountrySchema } from "./common.ts";
+import {
+	ChannelResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	LocaleSchema,
+	LocalizedStringSchema,
+	ProductSelectionSettingDraftSchema,
+	StoreCountrySchema,
+} from "./common.ts";
 
 export const StoreDraftSchema = z.object({
 	key: z.string(),

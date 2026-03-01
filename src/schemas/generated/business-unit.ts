@@ -2,7 +2,18 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { AssociateDraftSchema, BaseAddressSchema, BusinessUnitApprovalRuleModeSchema, BusinessUnitAssociateModeSchema, BusinessUnitStatusSchema, BusinessUnitStoreModeSchema, BusinessUnitTypeSchema, CompanyDraftSchema, CustomFieldsDraftSchema, CustomerGroupAssignmentDraftSchema, DivisionDraftSchema, StoreResourceIdentifierSchema } from "./common.ts";
+import {
+	AssociateDraftSchema,
+	BaseAddressSchema,
+	BusinessUnitApprovalRuleModeSchema,
+	BusinessUnitAssociateModeSchema,
+	BusinessUnitStatusSchema,
+	BusinessUnitStoreModeSchema,
+	BusinessUnitTypeSchema,
+	CustomerGroupAssignmentDraftSchema,
+	CustomFieldsDraftSchema,
+	StoreResourceIdentifierSchema,
+} from "./common.ts";
 
 export const BusinessUnitDraftSchema = z.object({
 	key: z.string(),
@@ -21,5 +32,7 @@ export const BusinessUnitDraftSchema = z.object({
 	billingAddresses: z.array(z.number().int()).optional(),
 	defaultBillingAddress: z.number().int().optional(),
 	custom: CustomFieldsDraftSchema.optional(),
-	customerGroupAssignments: z.array(CustomerGroupAssignmentDraftSchema).optional(),
+	customerGroupAssignments: z
+		.array(CustomerGroupAssignmentDraftSchema)
+		.optional(),
 });

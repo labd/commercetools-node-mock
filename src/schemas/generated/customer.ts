@@ -2,7 +2,16 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { AuthenticationModeSchema, BaseAddressSchema, CartResourceIdentifierSchema, CustomFieldsDraftSchema, CustomerGroupAssignmentDraftSchema, CustomerGroupResourceIdentifierSchema, LocaleSchema, StoreResourceIdentifierSchema } from "./common.ts";
+import {
+	AuthenticationModeSchema,
+	BaseAddressSchema,
+	CartResourceIdentifierSchema,
+	CustomerGroupAssignmentDraftSchema,
+	CustomerGroupResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	LocaleSchema,
+	StoreResourceIdentifierSchema,
+} from "./common.ts";
 
 export const CustomerDraftSchema = z.object({
 	key: z.string().optional(),
@@ -27,7 +36,9 @@ export const CustomerDraftSchema = z.object({
 	billingAddresses: z.array(z.number().int()).optional(),
 	isEmailVerified: z.boolean().optional(),
 	customerGroup: CustomerGroupResourceIdentifierSchema.optional(),
-	customerGroupAssignments: z.array(CustomerGroupAssignmentDraftSchema).optional(),
+	customerGroupAssignments: z
+		.array(CustomerGroupAssignmentDraftSchema)
+		.optional(),
 	custom: CustomFieldsDraftSchema.optional(),
 	locale: LocaleSchema.optional(),
 	salutation: z.string().optional(),
