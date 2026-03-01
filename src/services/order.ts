@@ -1,3 +1,7 @@
+import type {
+	OrderImportDraft,
+	OrderSearchRequest,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
@@ -24,7 +28,13 @@ export class OrderService extends AbstractService {
 		);
 	}
 
-	import(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	import(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: OrderImportDraft;
+		}>,
+		reply: FastifyReply,
+	) {
 		const importDraft = request.body;
 		const resource = this.repository.import(
 			getRepositoryContext(request),
@@ -61,7 +71,13 @@ export class OrderService extends AbstractService {
 		});
 	}
 
-	search(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	search(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: OrderSearchRequest;
+		}>,
+		reply: FastifyReply,
+	) {
 		const resource = this.repository.search(
 			getRepositoryContext(request),
 			request.body,

@@ -1,4 +1,11 @@
-import type { Update } from "@commercetools/platform-sdk";
+import type {
+	MyCustomerChangePassword,
+	MyCustomerDraft,
+	MyCustomerEmailVerify,
+	MyCustomerResetPassword,
+	MyCustomerSignin,
+	Update,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData } from "#src/validate.ts";
@@ -43,7 +50,10 @@ export class MyCustomerService extends AbstractService {
 		);
 	}
 
-	getMe(request: FastifyRequest, reply: FastifyReply) {
+	getMe(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 		if (!resource) {
 			return reply.status(404).send({ statusCode: 404 });
@@ -51,7 +61,13 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(resource);
 	}
 
-	updateMe(request: FastifyRequest, reply: FastifyReply) {
+	updateMe(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const resource = this.repository.getMe(getRepositoryContext(request));
 
 		if (!resource) {
@@ -72,7 +88,10 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	deleteMe(request: FastifyRequest, reply: FastifyReply) {
+	deleteMe(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const resource = this.repository.deleteMe(getRepositoryContext(request));
 		if (!resource) {
 			return reply.status(404).send({ statusCode: 404 });
@@ -81,7 +100,14 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(resource);
 	}
 
-	signUp(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	signUp(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+			Body: MyCustomerDraft;
+		}>,
+		reply: FastifyReply,
+	) {
 		const draft = request.body;
 		const resource = this.repository.create(
 			getRepositoryContext(request),
@@ -91,7 +117,13 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(this.createStatusCode).send({ customer: result });
 	}
 
-	changePassword(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	changePassword(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: MyCustomerChangePassword;
+		}>,
+		reply: FastifyReply,
+	) {
 		const customer = this.repository.changePassword(
 			getRepositoryContext(request),
 			request.body,
@@ -100,7 +132,13 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	resetPassword(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	resetPassword(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: MyCustomerResetPassword;
+		}>,
+		reply: FastifyReply,
+	) {
 		const customer = this.repository.passwordReset(
 			getRepositoryContext(request),
 			request.body,
@@ -109,7 +147,13 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	emailConfirm(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	emailConfirm(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: MyCustomerEmailVerify;
+		}>,
+		reply: FastifyReply,
+	) {
 		const customer = this.repository.confirmEmail(
 			getRepositoryContext(request),
 			request.body,
@@ -118,7 +162,13 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	signIn(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	signIn(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: MyCustomerSignin;
+		}>,
+		reply: FastifyReply,
+	) {
 		const body = request.body;
 		const { email, password } = body;
 		const encodedPassword = hashPassword(password);
