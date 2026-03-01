@@ -299,8 +299,12 @@ export class AbstractUpdateHandler {
 			const updateFunc = this[action.action].bind(this);
 
 			if (!updateFunc) {
-				throw new Error(
-					`No mock implemented for update action ${action.action}`,
+				throw new CommercetoolsError<InvalidInputError>(
+					{
+						code: "InvalidInput",
+						message: `No mock implemented for update action ${action.action}`,
+					},
+					400,
 				);
 			}
 

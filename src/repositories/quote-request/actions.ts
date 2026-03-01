@@ -1,10 +1,12 @@
 import type {
 	InvalidJsonInputError,
+	InvalidOperationError,
 	QuoteRequest,
 	QuoteRequestSetCustomFieldAction,
 	QuoteRequestSetCustomTypeAction,
 	QuoteRequestTransitionStateAction,
 	QuoteRequestUpdateAction,
+	ReferencedResourceNotFoundError,
 	StateReference,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "#src/exceptions.ts";
@@ -24,7 +26,13 @@ export class QuoteRequestUpdateHandler
 		{ name, value }: QuoteRequestSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom field",
+				},
+				400,
+			);
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -42,7 +50,14 @@ export class QuoteRequestUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+					{
+						code: "ReferencedResourceNotFound",
+						message: `Type ${type} not found`,
+						typeId: "type",
+					},
+					400,
+				);
 			}
 
 			resource.custom = {

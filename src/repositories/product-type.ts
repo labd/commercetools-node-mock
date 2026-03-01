@@ -2,6 +2,7 @@ import type {
 	AttributeDefinition,
 	AttributeDefinitionDraft,
 	AttributeType,
+	InvalidOperationError,
 	ProductType,
 	ProductTypeAddAttributeDefinitionAction,
 	ProductTypeChangeAttributeOrderByNameAction,
@@ -13,6 +14,7 @@ import type {
 	ProductTypeUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { ProductTypeDraftSchema } from "#src/schemas/generated/product-type.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
@@ -88,7 +90,14 @@ class ProductTypeUpdateHandler
 		attributeNames.forEach((attrName) => {
 			const attr = attrs.get(attrName);
 			if (attr === undefined) {
-				throw new Error("New attr");
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message:
+							"Adding new attribute definitions is not fully supported yet",
+					},
+					400,
+				);
 			}
 			result.push(attr);
 

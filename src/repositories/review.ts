@@ -1,7 +1,10 @@
 import type {
 	ChannelReference,
 	CustomerReference,
+	InvalidOperationError,
 	ProductReference,
+	ReferencedResourceNotFoundError,
+	RequiredFieldError,
 	Review,
 	ReviewDraft,
 	ReviewSetAuthorNameAction,
@@ -19,6 +22,7 @@ import type {
 	StateReference,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { ReviewDraftSchema } from "#src/schemas/generated/review.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
@@ -40,7 +44,15 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 	}
 
 	create(context: RepositoryContext, draft: ReviewDraft): Review {
-		if (!draft.target) throw new Error("Missing target");
+		if (!draft.target)
+			throw new CommercetoolsError<RequiredFieldError>(
+				{
+					code: "RequiredField",
+					message: "Missing target",
+					field: "target",
+				},
+				400,
+			);
 		const resource: Review = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -91,7 +103,13 @@ class ReviewUpdateHandler
 		{ name, value }: ReviewSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom field",
+				},
+				400,
+			);
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -109,7 +127,16 @@ class ReviewUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+					{
+						code: "ReferencedResourceNotFound",
+						message: `Type ${type} not found`,
+						typeId: "type",
+						id: type.id,
+						key: type.key,
+					},
+					400,
+				);
 			}
 
 			resource.custom = {

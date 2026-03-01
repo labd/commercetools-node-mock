@@ -1,5 +1,6 @@
 import type {
 	CustomerReference,
+	InvalidOperationError,
 	Payment,
 	PaymentAddInterfaceInteractionAction,
 	PaymentAddTransactionAction,
@@ -28,9 +29,11 @@ import type {
 	PaymentSetTransactionInterfaceIdAction,
 	PaymentTransitionStateAction,
 	PaymentUpdateAction,
+	ReferencedResourceNotFoundError,
 	State,
 	Transaction,
 } from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
@@ -162,7 +165,10 @@ export class PaymentUpdateHandler
 		{ name, value }: PaymentSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 
 		resource.custom.fields[name] = value;
@@ -181,7 +187,11 @@ export class PaymentUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+				});
 			}
 
 			resource.custom = {
@@ -260,7 +270,10 @@ export class PaymentUpdateHandler
 		);
 		if (transaction) {
 			if (!transaction.custom) {
-				throw new Error("Transaction has no custom field");
+				throw new CommercetoolsError<InvalidOperationError>({
+					code: "InvalidOperation",
+					message: "Transaction has no custom field",
+				});
 			}
 
 			transaction.custom.fields[name] = value;
@@ -284,7 +297,11 @@ export class PaymentUpdateHandler
 					type,
 				);
 				if (!resolvedType) {
-					throw new Error(`Type ${type} not found`);
+					throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+						code: "ReferencedResourceNotFound",
+						message: `Type ${type} not found`,
+						typeId: "type",
+					});
 				}
 
 				transaction.custom = {
@@ -309,7 +326,11 @@ export class PaymentUpdateHandler
 		) as State | null;
 
 		if (!stateObj) {
-			throw new Error(`State ${state} not found`);
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `State ${state} not found`,
+				typeId: "state",
+			});
 		}
 
 		resource.paymentStatus.state = {
@@ -353,7 +374,10 @@ export class PaymentUpdateHandler
 		{ name, value }: PaymentSetMethodInfoCustomFieldAction,
 	) {
 		if (!resource.paymentMethodInfo.custom) {
-			throw new Error("PaymentMethodInfo has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "PaymentMethodInfo has no custom field",
+			});
 		}
 
 		resource.paymentMethodInfo.custom.fields[name] = value;
@@ -372,7 +396,11 @@ export class PaymentUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+				});
 			}
 
 			resource.paymentMethodInfo.custom = {

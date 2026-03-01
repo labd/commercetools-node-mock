@@ -1181,8 +1181,9 @@ describe("Product update actions", () => {
 				],
 			},
 		});
-		expect(response.statusCode).toBe(500);
-		expect(response.json().error).toBe(
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidOperation");
+		expect(response.json().message).toBe(
 			`Can not remove the variant [ID:1] for [Product:${productPublished.id}] since it's the master variant`,
 		);
 	});

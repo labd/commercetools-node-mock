@@ -8,6 +8,7 @@ import type {
 	DuplicateFieldError,
 	InvalidInputError,
 	MyCustomerResetPassword,
+	RequiredFieldError,
 	ResourceNotFoundError,
 	Store,
 	StoreKeyReference,
@@ -77,7 +78,14 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			if (addressId < addresses.length) {
 				const id = addresses[addressId].id;
 				if (!id) {
-					throw new Error("Address ID is missing");
+					throw new CommercetoolsError<RequiredFieldError>(
+						{
+							code: "RequiredField",
+							message: "Address ID is missing",
+							field: "addressId",
+						},
+						400,
+					);
 				}
 				return id;
 			}

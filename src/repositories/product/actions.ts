@@ -75,8 +75,12 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -85,8 +89,12 @@ export class ProductUpdateHandler
 			} else {
 				const existingImage = variant.images.find((x) => x.url === image.url);
 				if (existingImage) {
-					throw new Error(
-						`Cannot add image '${image.url}' because product '${resource.id}' already has that image.`,
+					throw new CommercetoolsError<InvalidOperationError>(
+						{
+							code: "InvalidOperation",
+							message: `Cannot add image '${image.url}' because product '${resource.id}' already has that image.`,
+						},
+						400,
 					);
 				}
 			}
@@ -134,8 +142,12 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -272,8 +284,12 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -325,8 +341,12 @@ export class ProductUpdateHandler
 				variant.prices?.some((x) => x.id === priceId),
 			);
 			if (!priceVariant) {
-				throw new Error(
-					`Price with id ${priceId} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Price with id ${priceId} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -336,8 +356,12 @@ export class ProductUpdateHandler
 				priceVariant.sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -405,22 +429,35 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
 			const variantImages = variant.images ?? [];
 			const existingImage = variantImages.find((x) => x.url === imageUrl);
 			if (!existingImage) {
-				throw new Error(
-					`Cannot move image '${imageUrl}' because product '${resource.id}' does not have that image.`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Cannot move image '${imageUrl}' because product '${resource.id}' does not have that image.`,
+					},
+					400,
 				);
 			}
 
 			if (position >= variantImages.length) {
-				throw new Error(
-					"Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.",
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message:
+							"Invalid position given. Position in images where the image should be moved. Must be between 0 and the total number of images minus 1.",
+					},
+					400,
 				);
 			}
 
@@ -543,16 +580,24 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
 			const variantImages = variant.images ?? [];
 			const existingImage = variantImages.find((x) => x.url === imageUrl);
 			if (!existingImage) {
-				throw new Error(
-					`Cannot remove image '${imageUrl}' because product '${resource.id}' does not have that image.`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Cannot remove image '${imageUrl}' because product '${resource.id}' does not have that image.`,
+					},
+					400,
 				);
 			}
 
@@ -595,8 +640,12 @@ export class ProductUpdateHandler
 				variant.prices?.some((x) => x.id === priceId),
 			);
 			if (!priceVariant) {
-				throw new Error(
-					`Price with id ${priceId} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Price with id ${priceId} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -606,8 +655,12 @@ export class ProductUpdateHandler
 				priceVariant.sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${priceVariant.id} or sku ${priceVariant.sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -650,13 +703,21 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${id} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${id} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 			if (isMasterVariant) {
-				throw new Error(
-					`Can not remove the variant [ID:${id}] for [Product:${resource.id}] since it's the master variant`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Can not remove the variant [ID:${id}] for [Product:${resource.id}] since it's the master variant`,
+					},
+					400,
 				);
 			}
 
@@ -687,8 +748,12 @@ export class ProductUpdateHandler
 				sku,
 			);
 			if (!variant) {
-				throw new Error(
-					`Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Variant with id ${variantId} or sku ${sku} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 
@@ -869,8 +934,12 @@ export class ProductUpdateHandler
 				.find((price) => price.id === priceId);
 
 			if (!price) {
-				throw new Error(
-					`Price with id ${priceId} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Price with id ${priceId} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 			if (price.custom) {
@@ -918,8 +987,12 @@ export class ProductUpdateHandler
 					price.custom = undefined;
 				}
 			} else {
-				throw new Error(
-					`Price with id ${priceId} not found on product ${resource.id}`,
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Price with id ${priceId} not found on product ${resource.id}`,
+					},
+					400,
 				);
 			}
 			return data;

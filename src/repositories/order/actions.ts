@@ -2,6 +2,7 @@ import type {
 	CustomLineItemReturnItem,
 	Delivery,
 	GeneralError,
+	InvalidOperationError,
 	LineItemReturnItem,
 	Order,
 	OrderAddDeliveryAction,
@@ -28,6 +29,9 @@ import type {
 	OrderUpdateAction,
 	OrderUpdateSyncInfoAction,
 	Parcel,
+	ReferencedResourceNotFoundError,
+	RequiredFieldError,
+	ResourceNotFoundError,
 	ReturnInfo,
 	State,
 	Store,
@@ -54,7 +58,11 @@ export class OrderUpdateHandler
 			payment,
 		);
 		if (!resolvedPayment) {
-			throw new Error(`Payment ${payment.id} not found`);
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Payment ${payment.id} not found`,
+				typeId: "payment",
+			});
 		}
 
 		if (!resource.paymentInfo) {
@@ -170,7 +178,10 @@ export class OrderUpdateHandler
 		{ name, value }: OrderSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -188,7 +199,11 @@ export class OrderUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+				});
 			}
 
 			resource.custom = {
@@ -207,11 +222,18 @@ export class OrderUpdateHandler
 		{ action, items, ...deliveryDraft }: OrderAddDeliveryAction,
 	) {
 		if (!resource.shippingInfo) {
-			throw new Error("Resource has no shipping info");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no shipping info",
+			});
 		}
 
 		if (!items) {
-			throw new Error("Delivery items are required");
+			throw new CommercetoolsError<RequiredFieldError>({
+				code: "RequiredField",
+				message: "Delivery items are required",
+				field: "items",
+			});
 		}
 
 		if (!resource.shippingInfo.deliveries) {
@@ -251,7 +273,10 @@ export class OrderUpdateHandler
 		{ deliveryId, name, value }: OrderSetDeliveryCustomFieldAction,
 	) {
 		if (!resource.shippingInfo) {
-			throw new Error("Resource has no shipping info");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no shipping info",
+			});
 		}
 
 		for (const delivery of resource.shippingInfo.deliveries || []) {
@@ -283,7 +308,10 @@ export class OrderUpdateHandler
 		}
 
 		if (!lineItem.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 
 		lineItem.custom.fields[name] = value;
@@ -318,7 +346,11 @@ export class OrderUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+				});
 			}
 
 			lineItem.custom = {
@@ -353,7 +385,10 @@ export class OrderUpdateHandler
 		{ parcelId, name, value }: OrderSetParcelCustomFieldAction,
 	) {
 		if (!resource.shippingInfo) {
-			throw new Error("Resource has no shipping info");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no shipping info",
+			});
 		}
 
 		for (const delivery of resource.shippingInfo.deliveries || []) {
@@ -396,7 +431,11 @@ export class OrderUpdateHandler
 			store,
 		);
 		if (!resolvedType) {
-			throw new Error(`No store found with key=${store.key}`);
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `No store found with key=${store.key}`,
+				typeId: "store",
+			});
 		}
 
 		const storeReference = resolvedType as Store;
@@ -417,8 +456,12 @@ export class OrderUpdateHandler
 		) as State | null;
 
 		if (!resolvedType) {
-			throw new Error(
-				`No state found with key=${state.key} or id=${state.key}`,
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `No state found with key=${state.key} or id=${state.key}`,
+				},
+				404,
 			);
 		}
 
@@ -440,7 +483,11 @@ export class OrderUpdateHandler
 			channel,
 		);
 		if (!resolvedType) {
-			throw new Error(`Channel ${channel} not found`);
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Channel ${channel} not found`,
+				typeId: "channel",
+			});
 		}
 
 		const syncData: SyncInfo = {

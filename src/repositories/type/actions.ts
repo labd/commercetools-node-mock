@@ -47,7 +47,13 @@ export class TypeUpdateHandler
 				) {
 					field.type.elementType.values.push(value);
 				} else {
-					throw new Error("Type is not a Enum (or Set of Enum)");
+					throw new CommercetoolsError<InvalidOperationError>(
+						{
+							code: "InvalidOperation",
+							message: "Type is not a Enum (or Set of Enum)",
+						},
+						400,
+					);
 				}
 			}
 		});
@@ -85,7 +91,13 @@ export class TypeUpdateHandler
 						}
 					});
 				} else {
-					throw new Error("Type is not a Enum (or Set of Enum)");
+					throw new CommercetoolsError<InvalidOperationError>(
+						{
+							code: "InvalidOperation",
+							message: "Type is not a Enum (or Set of Enum)",
+						},
+						400,
+					);
 				}
 			}
 		});
@@ -105,7 +117,13 @@ export class TypeUpdateHandler
 		fieldNames.forEach((fieldName) => {
 			const field = fields.get(fieldName);
 			if (field === undefined) {
-				throw new Error("New field");
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: "Adding new field definitions is not fully supported yet",
+					},
+					400,
+				);
 			}
 			result.push(field);
 

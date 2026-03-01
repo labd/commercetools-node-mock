@@ -18,8 +18,10 @@ import type {
 	CategorySetMetaKeywordsAction,
 	CategorySetMetaTitleAction,
 	CategoryUpdateAction,
+	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
@@ -74,7 +76,16 @@ export class CategoryUpdateHandler
 			parent,
 		);
 		if (!category) {
-			throw new Error("No category found for reference");
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+				{
+					code: "ReferencedResourceNotFound",
+					message: "No category found for reference",
+					typeId: "category",
+					id: parent.id,
+					key: parent.key,
+				},
+				400,
+			);
 		}
 		resource.parent = {
 			typeId: "category",

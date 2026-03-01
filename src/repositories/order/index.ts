@@ -4,6 +4,7 @@ import type {
 	CartReference,
 	CustomLineItem,
 	CustomLineItemImportDraft,
+	DuplicateFieldError,
 	GeneralError,
 	LineItem,
 	LineItemImportDraft,
@@ -15,6 +16,8 @@ import type {
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
+	ReferencedResourceNotFoundError,
+	ResourceNotFoundError,
 	ShippingInfo,
 	ShippingMethodDoesNotMatchCartError,
 	ShippingMethodReference,
@@ -81,7 +84,13 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			cartReference,
 		) as Cart | null;
 		if (!cart) {
-			throw new Error("Cannot find cart");
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "Cannot find cart",
+				},
+				404,
+			);
 		}
 
 		const resource: Writable<Order> = {
@@ -264,7 +273,11 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				throw new Error("Internal state error");
 			}
 		} else {
-			throw new Error("No product found");
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: "No product found",
+				typeId: "product",
+			});
 		}
 
 		const quantity = draft.quantity ?? 1;
@@ -357,7 +370,12 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 
 		// Catch this for now, should be checked when creating/updating
 		if (result.count > 1) {
-			throw new Error("Duplicate order numbers");
+			throw new CommercetoolsError<DuplicateFieldError>({
+				code: "DuplicateField",
+				message: "Duplicate order numbers",
+				field: "orderNumber",
+				duplicateValue: orderNumber,
+			});
 		}
 
 		return;

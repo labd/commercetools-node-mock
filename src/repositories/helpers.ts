@@ -16,6 +16,7 @@ import type {
 	CustomFieldsDraft,
 	HighPrecisionMoney,
 	HighPrecisionMoneyDraft,
+	InvalidInputError,
 	InvalidJsonInputError,
 	Price,
 	PriceDraft,
@@ -45,7 +46,14 @@ export const createAddress = (
 	if (!base) return undefined;
 
 	if (!base?.country) {
-		throw new Error("Country is required");
+		throw new CommercetoolsError<InvalidJsonInputError>(
+			{
+				code: "InvalidJsonInput",
+				message: "Country is required",
+				detailedErrorMessage: "Country is required",
+			},
+			400,
+		);
 	}
 
 	// Generate a random 8-character alphanumeric string
@@ -72,8 +80,13 @@ export const createCustomFields = (
 	) as Type;
 
 	if (!typeResource) {
-		throw new Error(
-			`No type '${draft.type.typeId}' with id=${draft.type.id} or key=${draft.type.key}`,
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+			{
+				code: "ReferencedResourceNotFound",
+				typeId: draft.type.typeId,
+				message: `No type '${draft.type.typeId}' with id=${draft.type.id} or key=${draft.type.key}`,
+			},
+			400,
 		);
 	}
 
@@ -106,7 +119,13 @@ export const roundDecimal = (decimal: Decimal, roundingMode: RoundingMode) => {
 		case "HalfDown":
 			return decimal.toDecimalPlaces(0, Decimal.ROUND_HALF_DOWN);
 		default:
-			throw new Error(`Unknown rounding mode: ${roundingMode}`);
+			throw new CommercetoolsError<InvalidInputError>(
+				{
+					code: "InvalidInput",
+					message: `Unknown rounding mode: ${roundingMode}`,
+				},
+				400,
+			);
 	}
 };
 
@@ -190,11 +209,25 @@ export const createHighPrecisionMoney = (
 	value: HighPrecisionMoney | HighPrecisionMoneyDraft,
 ): HighPrecisionMoney => {
 	if (value.preciseAmount === undefined) {
-		throw new Error("HighPrecisionMoney requires preciseAmount");
+		throw new CommercetoolsError<InvalidJsonInputError>(
+			{
+				code: "InvalidJsonInput",
+				message: "HighPrecisionMoney requires preciseAmount",
+				detailedErrorMessage: "HighPrecisionMoney requires preciseAmount",
+			},
+			400,
+		);
 	}
 
 	if (value.fractionDigits === undefined) {
-		throw new Error("HighPrecisionMoney requires fractionDigits");
+		throw new CommercetoolsError<InvalidJsonInputError>(
+			{
+				code: "InvalidJsonInput",
+				message: "HighPrecisionMoney requires fractionDigits",
+				detailedErrorMessage: "HighPrecisionMoney requires fractionDigits",
+			},
+			400,
+		);
 	}
 
 	const centAmount =
@@ -260,7 +293,14 @@ export const resolveStoreReference = (
 	if (!ref) return undefined;
 	const resource = storage.getByResourceIdentifier(projectKey, ref);
 	if (!resource) {
-		throw new Error("No such store");
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+			{
+				code: "ReferencedResourceNotFound",
+				typeId: "store",
+				message: "The referenced object of type 'store' was not found.",
+			},
+			400,
+		);
 	}
 
 	const store = resource as Store;
@@ -329,7 +369,14 @@ export const getStoreKeyReference = (
 	);
 
 	if (!value.obj?.key) {
-		throw new Error("No store found for reference");
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+			{
+				code: "ReferencedResourceNotFound",
+				typeId: "store",
+				message: "The referenced object of type 'store' was not found.",
+			},
+			400,
+		);
 	}
 	return {
 		typeId: "store",
@@ -353,7 +400,14 @@ export const createAssociate = (
 	if (!a) return undefined;
 
 	if (!a.associateRoleAssignments) {
-		throw new Error("AssociateRoleAssignments is required");
+		throw new CommercetoolsError<InvalidJsonInputError>(
+			{
+				code: "InvalidJsonInput",
+				message: "AssociateRoleAssignments is required",
+				detailedErrorMessage: "AssociateRoleAssignments is required",
+			},
+			400,
+		);
 	}
 
 	return {
@@ -394,7 +448,15 @@ export const getAssociateRoleKeyReference = (
 	);
 
 	if (!value.obj?.key) {
-		throw new Error("No associate-role found for reference");
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+			{
+				code: "ReferencedResourceNotFound",
+				typeId: "associate-role",
+				message:
+					"The referenced object of type 'associate-role' was not found.",
+			},
+			400,
+		);
 	}
 
 	return {
@@ -421,7 +483,14 @@ export const getBusinessUnitKeyReference = (
 	);
 
 	if (!resource?.key) {
-		throw new Error("No business-unit found for reference");
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+			{
+				code: "ReferencedResourceNotFound",
+				typeId: "business-unit",
+				message: "The referenced object of type 'business-unit' was not found.",
+			},
+			400,
+		);
 	}
 
 	return {

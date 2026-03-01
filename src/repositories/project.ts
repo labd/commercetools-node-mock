@@ -1,4 +1,5 @@
 import type {
+	InvalidOperationError,
 	Project,
 	ProjectChangeBusinessUnitSearchStatusAction,
 	ProjectChangeBusinessUnitStatusOnCreationAction,
@@ -21,6 +22,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { ProjectSetBusinessUnitAssociateRoleOnCreationAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/project";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { maskSecretValue } from "../lib/masking.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -132,7 +134,13 @@ class ProjectUpdateHandler
 		{ status }: ProjectChangeCustomerSearchStatusAction,
 	) {
 		if (!resource.searchIndexing?.customers) {
-			throw new Error("Invalid project state");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Invalid project state",
+				},
+				400,
+			);
 		}
 		resource.searchIndexing.customers.status = status;
 		resource.searchIndexing.customers.lastModifiedAt = new Date().toISOString();
@@ -144,7 +152,13 @@ class ProjectUpdateHandler
 		{ status }: ProjectChangeBusinessUnitSearchStatusAction,
 	) {
 		if (!resource.searchIndexing?.businessUnits) {
-			throw new Error("Invalid project state");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Invalid project state",
+				},
+				400,
+			);
 		}
 		resource.searchIndexing.businessUnits.status = status;
 		resource.searchIndexing.businessUnits.lastModifiedAt =
@@ -197,7 +211,13 @@ class ProjectUpdateHandler
 		{ status }: ProjectChangeOrderSearchStatusAction,
 	) {
 		if (!resource.searchIndexing?.orders) {
-			throw new Error("Invalid project state");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Invalid project state",
+				},
+				400,
+			);
 		}
 		resource.searchIndexing.orders.status = status;
 		resource.searchIndexing.orders.lastModifiedAt = new Date().toISOString();
@@ -210,7 +230,13 @@ class ProjectUpdateHandler
 	) {
 		if (mode === "ProductsSearch") {
 			if (!resource.searchIndexing?.productsSearch) {
-				throw new Error("Invalid project state");
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: "Invalid project state",
+					},
+					400,
+				);
 			}
 			resource.searchIndexing.productsSearch.status = enabled
 				? "Activated"
@@ -221,7 +247,13 @@ class ProjectUpdateHandler
 		}
 
 		if (!resource.searchIndexing?.products) {
-			throw new Error("Invalid project state");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Invalid project state",
+				},
+				400,
+			);
 		}
 		resource.searchIndexing.products.status = enabled
 			? "Activated"

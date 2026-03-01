@@ -890,8 +890,8 @@ describe("Customer Update Actions (old-style)", () => {
 				],
 			},
 		});
-		expect(response.statusCode).toBe(500);
-		expect(response.json().error).toBe(
+		expect(response.statusCode).toBe(400);
+		expect(response.json().message).toBe(
 			"A Customer number already exists and cannot be set again.",
 		);
 	});

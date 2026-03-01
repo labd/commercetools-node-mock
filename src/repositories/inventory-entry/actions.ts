@@ -1,4 +1,5 @@
 import type {
+	InvalidOperationError,
 	InventoryEntry,
 	InventoryEntryChangeQuantityAction,
 	InventoryEntryRemoveQuantityAction,
@@ -7,7 +8,9 @@ import type {
 	InventoryEntrySetExpectedDeliveryAction,
 	InventoryEntrySetRestockableInDaysAction,
 	InventoryEntryUpdateAction,
+	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
@@ -44,7 +47,13 @@ export class InventoryEntryUpdateHandler
 		{ name, value }: InventoryEntrySetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom field",
+				},
+				400,
+			);
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -62,7 +71,16 @@ export class InventoryEntryUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+					{
+						code: "ReferencedResourceNotFound",
+						message: `Type ${type} not found`,
+						typeId: "type",
+						id: type.id,
+						key: type.key,
+					},
+					400,
+				);
 			}
 
 			resource.custom = {

@@ -102,7 +102,13 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		action: CustomerAddStoreAction,
 	) {
-		throw new Error("Method not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "The action 'addStore' is not implemented yet",
+			},
+			400,
+		);
 	}
 
 	changeAddress(
@@ -214,7 +220,13 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		action: CustomerRemoveStoreAction,
 	) {
-		throw new Error("Method not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "The action 'removeStore' is not implemented yet",
+			},
+			400,
+		);
 	}
 
 	setAddressCustomField(
@@ -222,7 +234,13 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		action: CustomerSetAddressCustomFieldAction,
 	) {
-		throw new Error("Method not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "The action 'setAddressCustomField' is not implemented yet",
+			},
+			400,
+		);
 	}
 
 	setAddressCustomType(
@@ -230,7 +248,13 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		action: CustomerSetAddressCustomTypeAction,
 	) {
-		throw new Error("Method not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "The action 'setAddressCustomType' is not implemented yet",
+			},
+			400,
+		);
 	}
 
 	setAuthenticationMode(
@@ -306,8 +330,12 @@ export class CustomerUpdateHandler
 		{ customerNumber }: CustomerSetCustomerNumberAction,
 	) {
 		if (resource.customerNumber) {
-			throw new Error(
-				"A Customer number already exists and cannot be set again.",
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "A Customer number already exists and cannot be set again.",
+				},
+				400,
 			);
 		}
 		resource.customerNumber = customerNumber;
@@ -319,7 +347,13 @@ export class CustomerUpdateHandler
 		{ name, value }: CustomerSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom field",
+				},
+				400,
+			);
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -453,7 +487,13 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		action: CustomerSetStoresAction,
 	) {
-		throw new Error("Method not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "The action 'setStores' is not implemented yet",
+			},
+			400,
+		);
 	}
 
 	setTitle(

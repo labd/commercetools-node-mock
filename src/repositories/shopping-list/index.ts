@@ -2,11 +2,13 @@ import type {
 	CustomerReference,
 	LineItemDraft,
 	ProductPagedQueryResponse,
+	ReferencedResourceNotFoundError,
 	ShoppingList,
 	ShoppingListDraft,
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { ShoppingListDraftSchema } from "#src/schemas/generated/shopping-list.ts";
 import { getBaseResourceProperties } from "../../helpers.ts";
 import type { Writable } from "../../types.ts";
@@ -99,7 +101,11 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			}) as ProductPagedQueryResponse;
 
 			if (items.count === 0) {
-				throw new Error(`Product with sku ${sku} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Product with sku ${sku} not found`,
+					typeId: "product",
+				});
 			}
 
 			const product = items.results[0];
@@ -119,7 +125,11 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			}) as ProductPagedQueryResponse;
 
 			if (items.count === 0) {
-				throw new Error(`Product with id ${productId} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Product with id ${productId} not found`,
+					typeId: "product",
+				});
 			}
 
 			const variantId = items.results[0].masterData.current.masterVariant.id;
@@ -127,8 +137,11 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			return lineItem;
 		}
 
-		throw new Error(
-			"must provide either sku, productId or variantId for ShoppingListLineItem",
-		);
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+			code: "ReferencedResourceNotFound",
+			message:
+				"must provide either sku, productId or variantId for ShoppingListLineItem",
+			typeId: "product",
+		});
 	};
 }

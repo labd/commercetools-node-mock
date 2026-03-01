@@ -1,8 +1,10 @@
 import type {
+	ResourceNotFoundError,
 	StagedQuote,
 	StagedQuoteDraft,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { StagedQuoteDraftSchema } from "#src/schemas/generated/staged-quote.ts";
 import type { RepositoryContext } from "../abstract.ts";
@@ -23,7 +25,13 @@ export class StagedQuoteRepository extends AbstractResourceRepository<"staged-qu
 		);
 
 		if (!quoteRequest.cart) {
-			throw new Error("Cannot find quote request");
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "Cannot find quote request",
+				},
+				404,
+			);
 		}
 
 		const cart = this._storage.getByResourceIdentifier<"cart">(
