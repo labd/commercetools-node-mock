@@ -7,6 +7,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { SubscriptionDraftSchema } from "#src/schemas/generated/subscription.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -19,6 +20,7 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 	constructor(config: Config) {
 		super("subscription", config);
 		this.actions = new SubscriptionUpdateHandler(config.storage);
+		this.draftSchema = SubscriptionDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: SubscriptionDraft): Subscription {

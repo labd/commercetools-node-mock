@@ -9,6 +9,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { CartDiscountDraftSchema } from "#src/schemas/generated/cart-discount.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -24,6 +25,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 	constructor(config: Config) {
 		super("cart-discount", config);
 		this.actions = new CartDiscountUpdateHandler(config.storage);
+		this.draftSchema = CartDiscountDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {

@@ -16,6 +16,7 @@ import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { calculateTaxTotals } from "#src/lib/tax.ts";
+import { CartDraftSchema } from "#src/schemas/generated/cart.ts";
 import {
 	createShippingInfoFromMethod,
 	getShippingMethodsMatchingCart,
@@ -43,6 +44,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 	constructor(config: Config) {
 		super("cart", config);
 		this.actions = new CartUpdateHandler(this._storage, this);
+		this.draftSchema = CartDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: CartDraft): Cart {

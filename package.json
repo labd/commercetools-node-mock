@@ -29,7 +29,8 @@
 		"start": "tsdown src/server.ts --watch --onSuccess 'node dist/server'",
 		"test": "vitest run",
 		"test:ci": "vitest run --coverage",
-		"test:watch": "vitest --watch"
+		"test:watch": "vitest --watch",
+		"generate:schemas": "node --experimental-strip-types scripts/generate-schemas.ts"
 	},
 	"dependencies": {
 		"@fastify/formbody": "8.0.2",
@@ -55,7 +56,8 @@
 		"timekeeper": "2.3.1",
 		"tsdown": "0.20.3",
 		"typescript": "5.9.3",
-		"vitest": "4.0.18"
+		"vitest": "4.0.18",
+		"yaml": "^2.8.2"
 	},
 	"packageManager": "pnpm@10.24.0",
 	"engines": {

@@ -9,6 +9,7 @@ import type {
 	ZoneUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ZoneDraftSchema } from "#src/schemas/generated/zone.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -21,6 +22,7 @@ export class ZoneRepository extends AbstractResourceRepository<"zone"> {
 	constructor(config: Config) {
 		super("zone", config);
 		this.actions = new ZoneUpdateHandler(config.storage);
+		this.draftSchema = ZoneDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ZoneDraft): Zone {

@@ -4,6 +4,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { RecurrencePolicyDraftSchema } from "#src/schemas/generated/recurrence-policy.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -14,6 +15,7 @@ export class RecurrencePolicyRepository extends AbstractResourceRepository<"recu
 	constructor(config: Config) {
 		super("recurrence-policy", config);
 		this.actions = new RecurrencePolicyUpdateHandler(config.storage);
+		this.draftSchema = RecurrencePolicyDraftSchema;
 	}
 
 	create(

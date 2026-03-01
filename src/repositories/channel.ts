@@ -11,6 +11,7 @@ import type {
 	ChannelUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ChannelDraftSchema } from "#src/schemas/generated/channel.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
@@ -25,6 +26,7 @@ export class ChannelRepository extends AbstractResourceRepository<"channel"> {
 	constructor(config: Config) {
 		super("channel", config);
 		this.actions = new ChannelUpdateHandler(this._storage);
+		this.draftSchema = ChannelDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ChannelDraft): Channel {

@@ -15,6 +15,7 @@ import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { ReviewStatisticsService } from "#src/lib/review-statistics.ts";
 import { ProductSearch } from "#src/product-search.ts";
+import { ProductDraftSchema } from "#src/schemas/generated/product.ts";
 import type { GetParams, RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository } from "../abstract.ts";
 import { getReferenceFromResourceIdentifier } from "../helpers.ts";
@@ -30,6 +31,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		this.actions = new ProductUpdateHandler(config.storage);
 		this._searchService = new ProductSearch(config);
 		this._reviewStatisticsService = new ReviewStatisticsService(config.storage);
+		this.draftSchema = ProductDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): Product {

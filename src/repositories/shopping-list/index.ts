@@ -7,6 +7,7 @@ import type {
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ShoppingListDraftSchema } from "#src/schemas/generated/shopping-list.ts";
 import { getBaseResourceProperties } from "../../helpers.ts";
 import type { Writable } from "../../types.ts";
 import type { RepositoryContext } from "../abstract.ts";
@@ -23,6 +24,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 	constructor(config: Config) {
 		super("shopping-list", config);
 		this.actions = new ShoppingListUpdateHandler(config.storage);
+		this.draftSchema = ShoppingListDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {

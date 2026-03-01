@@ -5,6 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { RecurringOrderDraftSchema } from "#src/schemas/generated/recurring-order.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -16,6 +17,7 @@ export class RecurringOrderRepository extends AbstractResourceRepository<"recurr
 	constructor(config: Config) {
 		super("recurring-order", config);
 		this.actions = new RecurringOrderUpdateHandler(config.storage);
+		this.draftSchema = RecurringOrderDraftSchema;
 	}
 
 	create(

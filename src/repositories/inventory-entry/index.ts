@@ -4,6 +4,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { InventoryEntryDraftSchema } from "#src/schemas/generated/inventory-entry.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -15,6 +16,7 @@ export class InventoryEntryRepository extends AbstractResourceRepository<"invent
 	constructor(config: Config) {
 		super("inventory-entry", config);
 		this.actions = new InventoryEntryUpdateHandler(config.storage);
+		this.draftSchema = InventoryEntryDraftSchema;
 	}
 
 	create(

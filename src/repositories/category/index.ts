@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { parseExpandClause } from "#src/lib/expandParser.ts";
+import { CategoryDraftSchema } from "#src/schemas/generated/category.ts";
 import type { Writable } from "#src/types.ts";
 import type { GetParams } from "../abstract.ts";
 import {
@@ -20,6 +21,7 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 	constructor(config: Config) {
 		super("category", config);
 		this.actions = new CategoryUpdateHandler(this._storage);
+		this.draftSchema = CategoryDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: CategoryDraft): Category {

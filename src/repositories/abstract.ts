@@ -7,6 +7,7 @@ import type {
 	ResourceNotFoundError,
 	UpdateAction,
 } from "@commercetools/platform-sdk";
+import type { z } from "zod";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { cloneObject } from "../helpers.ts";
@@ -96,9 +97,24 @@ export abstract class AbstractResourceRepository<
 > extends AbstractRepository<ResourceMap[T]> {
 	protected _typeId: T;
 
+	/**
+	 * Optional Zod schema for validating creation drafts.
+	 * When set and strict mode is enabled, the service layer will
+	 * validate incoming request bodies against this schema before
+	 * passing them to create().
+	 */
+	draftSchema?: z.ZodType;
+
 	constructor(typeId: T, config: Config) {
 		super(config);
 		this._typeId = typeId;
+	}
+
+	/**
+	 * Whether strict validation is enabled.
+	 */
+	get strict(): boolean {
+		return this.config.strict;
 	}
 
 	abstract create(context: RepositoryContext, draft: any): ResourceMap[T];
@@ -239,7 +255,8 @@ export type UpdateHandlerInterface<
 };
 
 export class AbstractUpdateHandler {
-	constructor(protected _storage: AbstractStorage) {
+	_storage: AbstractStorage;
+	constructor(_storage: AbstractStorage) {
 		if (!_storage) {
 			throw new Error("No storage provided");
 		}

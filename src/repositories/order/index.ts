@@ -30,6 +30,7 @@ import {
 	calculateTaxTotals,
 } from "#src/lib/tax.ts";
 import { OrderSearch } from "#src/orderSearch.ts";
+import { OrderFromCartDraftSchema } from "#src/schemas/generated/order-from-cart.ts";
 import {
 	createShippingInfoFromMethod,
 	getShippingMethodsMatchingCart,
@@ -55,6 +56,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		super("order", config);
 		this.actions = new OrderUpdateHandler(config.storage);
 		this._searchService = new OrderSearch(config);
+		this.draftSchema = OrderFromCartDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: OrderFromCartDraft): Order {

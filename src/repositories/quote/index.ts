@@ -1,6 +1,7 @@
 import type { Quote, QuoteDraft } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { QuoteDraftSchema } from "#src/schemas/generated/quote.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository } from "../abstract.ts";
 import { QuoteUpdateHandler } from "./actions.ts";
@@ -9,6 +10,7 @@ export class QuoteRepository extends AbstractResourceRepository<"quote"> {
 	constructor(config: Config) {
 		super("quote", config);
 		this.actions = new QuoteUpdateHandler(config.storage);
+		this.draftSchema = QuoteDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: QuoteDraft): Quote {

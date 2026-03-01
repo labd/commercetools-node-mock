@@ -5,6 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { DiscountCodeDraftSchema } from "#src/schemas/generated/discount-code.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -16,6 +17,7 @@ export class DiscountCodeRepository extends AbstractResourceRepository<"discount
 	constructor(config: Config) {
 		super("discount-code", config);
 		this.actions = new DiscountCodeUpdateHandler(config.storage);
+		this.draftSchema = DiscountCodeDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {

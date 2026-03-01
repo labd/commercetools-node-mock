@@ -13,6 +13,7 @@ import type {
 	ProductTypeUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ProductTypeDraftSchema } from "#src/schemas/generated/product-type.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -25,6 +26,7 @@ export class ProductTypeRepository extends AbstractResourceRepository<"product-t
 	constructor(config: Config) {
 		super("product-type", config);
 		this.actions = new ProductTypeUpdateHandler(config.storage);
+		this.draftSchema = ProductTypeDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ProductTypeDraft): ProductType {

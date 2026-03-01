@@ -38,6 +38,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { BusinessUnitDraftSchema } from "#src/schemas/generated/business-unit.ts";
 import { generateRandomString, getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
@@ -58,6 +59,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 	constructor(config: Config) {
 		super("business-unit", config);
 		this.actions = new BusinessUnitUpdateHandler(this._storage);
+		this.draftSchema = BusinessUnitDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: BusinessUnitDraft): BusinessUnit {

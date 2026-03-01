@@ -26,6 +26,7 @@ import {
 	validateEmailVerifyToken,
 	validatePasswordResetToken,
 } from "#src/lib/password.ts";
+import { CustomerDraftSchema } from "#src/schemas/generated/customer.ts";
 import type { ResourceMap, ShallowWritable, Writable } from "#src/types.ts";
 import {
 	AbstractResourceRepository,
@@ -38,6 +39,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 	constructor(config: Config) {
 		super("customer", config);
 		this.actions = new CustomerUpdateHandler(config.storage);
+		this.draftSchema = CustomerDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: CustomerDraft): Customer {

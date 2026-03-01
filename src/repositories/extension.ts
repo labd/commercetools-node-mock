@@ -8,6 +8,7 @@ import type {
 	ExtensionUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ExtensionDraftSchema } from "#src/schemas/generated/extension.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import { maskSecretValue } from "../lib/masking.ts";
 import type { Writable } from "../types.ts";
@@ -22,6 +23,7 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 	constructor(config: Config) {
 		super("extension", config);
 		this.actions = new ExtensionUpdateHandler(config.storage);
+		this.draftSchema = ExtensionDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ExtensionDraft): Extension {

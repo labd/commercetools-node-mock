@@ -4,6 +4,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { StagedQuoteDraftSchema } from "#src/schemas/generated/staged-quote.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository } from "../abstract.ts";
 import { StagedQuoteUpdateHandler } from "./actions.ts";
@@ -12,6 +13,7 @@ export class StagedQuoteRepository extends AbstractResourceRepository<"staged-qu
 	constructor(config: Config) {
 		super("staged-quote", config);
 		this.actions = new StagedQuoteUpdateHandler(config.storage);
+		this.draftSchema = StagedQuoteDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: StagedQuoteDraft): StagedQuote {

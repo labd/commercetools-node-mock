@@ -8,6 +8,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { QuoteRequestDraftSchema } from "#src/schemas/generated/quote-request.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository } from "../abstract.ts";
 import { QuoteRequestUpdateHandler } from "./actions.ts";
@@ -16,6 +17,7 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 	constructor(config: Config) {
 		super("quote-request", config);
 		this.actions = new QuoteRequestUpdateHandler(config.storage);
+		this.draftSchema = QuoteRequestDraftSchema;
 	}
 
 	create(

@@ -4,6 +4,7 @@ import type {
 	OrderEditResult,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { OrderEditDraftSchema } from "#src/schemas/generated/order-edit.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { RepositoryContext } from "./abstract.ts";
 import { AbstractResourceRepository } from "./abstract.ts";
@@ -11,6 +12,7 @@ import { AbstractResourceRepository } from "./abstract.ts";
 export class OrderEditRepository extends AbstractResourceRepository<"order-edit"> {
 	constructor(config: Config) {
 		super("order-edit", config);
+		this.draftSchema = OrderEditDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: OrderEditDraft): OrderEdit {
