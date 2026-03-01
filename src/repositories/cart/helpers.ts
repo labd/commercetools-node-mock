@@ -145,7 +145,7 @@ export const createDiscountCodeInfoFromCode = (
 			code: "DiscountCodeNonApplicable",
 			message: `The discount code '${code}' was not found.`,
 			reason: "DoesNotExist",
-			discountCode: "nonexistent",
+			discountCode: code,
 		});
 	}
 	return {

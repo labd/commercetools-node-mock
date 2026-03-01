@@ -94,18 +94,21 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				),
 			) ?? [];
 
-		// Validate that discount codes exist
+		// Validate that discount codes exist and deduplicate
 		const discountCodeInfo: DiscountCodeInfo[] = [];
 		if (draft.discountCodes?.length) {
-			draft.discountCodes.forEach((code) => {
-				discountCodeInfo.push(
-					createDiscountCodeInfoFromCode(
-						context.projectKey,
-						this._storage,
-						code,
-					),
+			const seen = new Set<string>();
+			for (const code of draft.discountCodes) {
+				const info = createDiscountCodeInfoFromCode(
+					context.projectKey,
+					this._storage,
+					code,
 				);
-			});
+				if (!seen.has(info.discountCode.id)) {
+					seen.add(info.discountCode.id);
+					discountCodeInfo.push(info);
+				}
+			}
 		}
 
 		const resource: Writable<Cart> = {
