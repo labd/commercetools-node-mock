@@ -327,7 +327,7 @@ describe("RecurringOrder", () => {
 				actions: [
 					{
 						action: "setOrderSkipConfiguration",
-						skipConfiguration: {
+						skipConfigurationInputDraft: {
 							type: "totalSkip",
 							totalToSkip: 2,
 						},

@@ -47,6 +47,7 @@ describe("Me", () => {
 				lastModifiedAt: expect.anything(),
 				lastModifiedBy: expect.anything(),
 				stores: [],
+				customerGroupAssignments: [],
 				firstName: "John",
 				lastName: "Doe",
 			},
@@ -118,6 +119,9 @@ describe("/me", () => {
 				},
 			},
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		});
 	});
 
@@ -147,6 +151,9 @@ describe("/me", () => {
 				},
 			},
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		});
 
 		const newResponse = await ctMock.app.inject({
