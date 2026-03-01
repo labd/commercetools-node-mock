@@ -14,6 +14,7 @@ import {
 	cartDraftFactory,
 	customerDraftFactory,
 	productDraftFactory,
+	productTypeDraftFactory,
 	shippingMethodDraftFactory,
 	taxCategoryDraftFactory,
 	typeDraftFactory,
@@ -119,6 +120,9 @@ describe("Cart Update Actions", () => {
 	const ctMock = new CommercetoolsMock();
 	let cart: Cart | undefined;
 	let taxCategory: TaxCategory;
+	let productDraft: Parameters<
+		ReturnType<typeof productDraftFactory>["create"]
+	>[0];
 
 	const cartFactory = cartDraftFactory(ctMock);
 	const taxCategoryFactory = taxCategoryDraftFactory(ctMock);
@@ -127,45 +131,22 @@ describe("Cart Update Actions", () => {
 	const zoneFactory = zoneDraftFactory(ctMock);
 	const shippingMethodFactory = shippingMethodDraftFactory(ctMock);
 
-	const productDraft = {
-		name: {
-			"nl-NL": "test product",
-		},
-		productType: {
-			typeId: "product-type" as const,
-			id: "some-uuid",
-		},
-		masterVariant: {
-			sku: "1337",
-			prices: [
-				{
-					value: {
-						type: "centPrecision",
-						currencyCode: "EUR",
-						centAmount: 14900,
-						fractionDigits: 2,
-					} as CentPrecisionMoney,
-				},
-				{
-					value: {
-						type: "centPrecision",
-						currencyCode: "GBP",
-						centAmount: 18900,
-						fractionDigits: 2,
-					} as CentPrecisionMoney,
-				},
-			],
+	beforeEach(async () => {
+		const productType = await productTypeDraftFactory(ctMock).create({
+			name: "Test Product Type",
+			description: "Product type for cart tests",
+		});
 
-			attributes: [
-				{
-					name: "test",
-					value: "test",
-				},
-			],
-		},
-		variants: [
-			{
-				sku: "1338",
+		productDraft = {
+			name: {
+				"nl-NL": "test product",
+			},
+			productType: {
+				typeId: "product-type" as const,
+				id: productType.id,
+			},
+			masterVariant: {
+				sku: "1337",
 				prices: [
 					{
 						value: {
@@ -175,22 +156,50 @@ describe("Cart Update Actions", () => {
 							fractionDigits: 2,
 						} as CentPrecisionMoney,
 					},
+					{
+						value: {
+							type: "centPrecision",
+							currencyCode: "GBP",
+							centAmount: 18900,
+							fractionDigits: 2,
+						} as CentPrecisionMoney,
+					},
 				],
+
 				attributes: [
 					{
-						name: "test2",
-						value: "test2",
+						name: "test",
+						value: "test",
 					},
 				],
 			},
-		],
-		slug: {
-			"nl-NL": "test-product",
-		},
-		publish: true,
-	};
+			variants: [
+				{
+					sku: "1338",
+					prices: [
+						{
+							value: {
+								type: "centPrecision",
+								currencyCode: "EUR",
+								centAmount: 14900,
+								fractionDigits: 2,
+							} as CentPrecisionMoney,
+						},
+					],
+					attributes: [
+						{
+							name: "test2",
+							value: "test2",
+						},
+					],
+				},
+			],
+			slug: {
+				"nl-NL": "test-product",
+			},
+			publish: true,
+		};
 
-	beforeEach(async () => {
 		cart = await cartFactory.create({
 			currency: "EUR",
 			country: "NL",

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "#src/index.ts";
 import {
 	productDraftFactory,
+	productTypeDraftFactory,
 	reviewDraftFactory,
 	stateDraftFactory,
 } from "#src/testing/index.ts";
@@ -20,13 +21,20 @@ describe("Review Update Actions", () => {
 	beforeEach(async () => {
 		ctMock = new CommercetoolsMock();
 
+		// Create a product type first
+		const productType = await productTypeDraftFactory(ctMock).create({
+			key: "dummy-product-type",
+			name: "Dummy Product Type",
+			description: "Product type for testing reviews",
+		});
+
 		// Create a product to target
 		product = await createProductDraft().create({
 			name: { en: "Test Product" },
 			slug: { en: "test-product" },
 			productType: {
 				typeId: "product-type",
-				key: "dummy-product-type",
+				id: productType.id,
 			},
 			masterVariant: {
 				sku: "test-sku-1",

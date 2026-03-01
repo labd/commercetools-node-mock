@@ -51,7 +51,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 
 			// For now accept missing product types (but warn)
 			process.emitWarning(
-				`Error resolving product-type '${draft.productType.id}'. This will be throw an error in later releases.`,
+				`Error resolving product-type '${draft.productType.id}'. This will throw an error in later releases.`,
 			);
 			productType = {
 				typeId: "product-type",
