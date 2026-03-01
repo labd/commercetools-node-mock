@@ -19,6 +19,7 @@ import type {
 	ProductDiscountValueRelative,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ProductDiscountDraftSchema } from "#src/schemas/generated/product-discount.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -32,6 +33,7 @@ export class ProductDiscountRepository extends AbstractResourceRepository<"produ
 	constructor(config: Config) {
 		super("product-discount", config);
 		this.actions = new ProductDiscountUpdateHandler(this._storage);
+		this.draftSchema = ProductDiscountDraftSchema;
 	}
 
 	create(

@@ -14,6 +14,7 @@ import type {
 	StateUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { StateDraftSchema } from "#src/schemas/generated/state.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -27,6 +28,7 @@ export class StateRepository extends AbstractResourceRepository<"state"> {
 	constructor(config: Config) {
 		super("state", config);
 		this.actions = new StateUpdateHandler(config.storage);
+		this.draftSchema = StateDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: StateDraft): State {

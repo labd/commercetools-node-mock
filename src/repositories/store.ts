@@ -12,6 +12,7 @@ import type {
 	StoreUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { StoreDraftSchema } from "#src/schemas/generated/store.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { AbstractStorage } from "../storage/abstract.ts";
 import type { Writable } from "../types.ts";
@@ -29,6 +30,7 @@ export class StoreRepository extends AbstractResourceRepository<"store"> {
 	constructor(config: Config) {
 		super("store", config);
 		this.actions = new StoreUpdateHandler(this._storage);
+		this.draftSchema = StoreDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: StoreDraft): Store {

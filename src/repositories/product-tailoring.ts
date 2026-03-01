@@ -3,6 +3,7 @@ import type {
 	ProductTailoringUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ProductTailoringDraftSchema } from "#src/schemas/generated/product-tailoring.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
 import {
 	AbstractResourceRepository,
@@ -13,6 +14,7 @@ export class ProductTailoringRepository extends AbstractResourceRepository<"prod
 	constructor(config: Config) {
 		super("product-tailoring", config);
 		this.actions = new ProductTailoringUpdateHandler(this._storage);
+		this.draftSchema = ProductTailoringDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: any): ProductTailoring {

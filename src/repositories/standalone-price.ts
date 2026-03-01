@@ -10,6 +10,7 @@ import type {
 	StandalonePriceUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { StandalonePriceDraftSchema } from "#src/schemas/generated/standalone-price.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -23,6 +24,7 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<"stand
 	constructor(config: Config) {
 		super("standalone-price", config);
 		this.actions = new StandalonePriceUpdateHandler(this._storage);
+		this.draftSchema = StandalonePriceDraftSchema;
 	}
 
 	create(

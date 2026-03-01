@@ -6,6 +6,7 @@ import type {
 	ZoneReference,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ShippingMethodDraftSchema } from "#src/schemas/generated/shipping-method.ts";
 import { getBaseResourceProperties } from "../../helpers.ts";
 import { getShippingMethodsMatchingCart } from "../../shipping.ts";
 import type { GetParams, RepositoryContext } from "../abstract.ts";
@@ -21,6 +22,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository<"shippi
 	constructor(config: Config) {
 		super("shipping-method", config);
 		this.actions = new ShippingMethodUpdateHandler(config.storage);
+		this.draftSchema = ShippingMethodDraftSchema;
 	}
 
 	create(

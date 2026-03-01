@@ -8,6 +8,7 @@ import type {
 	AttributeGroupUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { AttributeGroupDraftSchema } from "#src/schemas/generated/attribute-group.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
@@ -21,6 +22,7 @@ export class AttributeGroupRepository extends AbstractResourceRepository<"attrib
 	constructor(config: Config) {
 		super("attribute-group", config);
 		this.actions = new AttributeGroupUpdateHandler(this._storage);
+		this.draftSchema = AttributeGroupDraftSchema;
 	}
 
 	create(

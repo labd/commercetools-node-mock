@@ -5,6 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { PaymentDraftSchema } from "#src/schemas/generated/payment.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository } from "../abstract.ts";
 import {
@@ -19,6 +20,7 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 	constructor(config: Config) {
 		super("payment", config);
 		this.actions = new PaymentUpdateHandler(this._storage);
+		this.draftSchema = PaymentDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: PaymentDraft): Payment {

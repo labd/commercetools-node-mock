@@ -7,6 +7,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { createCustomFields } from "#src/repositories/helpers.ts";
+import { ProductSelectionDraftSchema } from "#src/schemas/generated/product-selection.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -19,6 +20,7 @@ export class ProductSelectionRepository extends AbstractResourceRepository<"prod
 	constructor(config: Config) {
 		super("product-selection", config);
 		this.actions = new ProductSelectionUpdateHandler(this._storage);
+		this.draftSchema = ProductSelectionDraftSchema;
 	}
 
 	create(

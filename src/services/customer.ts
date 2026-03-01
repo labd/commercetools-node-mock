@@ -7,6 +7,7 @@ import type {
 	CustomerSignInResult,
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { validateDraft } from "#src/validate.ts";
 import type { CustomerRepository } from "../repositories/customer/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import AbstractService from "./abstract.ts";
@@ -38,10 +39,14 @@ export class CustomerService extends AbstractService {
 		}>,
 		reply: FastifyReply,
 	) {
-		const draft = request.body;
+		// Validate the draft against the schema when strict mode is enabled
+		if (this.repository.strict && this.repository.draftSchema) {
+			validateDraft(request.body, this.repository.draftSchema);
+		}
+
 		const resource = this.repository.create(
 			getRepositoryContext(request),
-			draft,
+			request.body,
 		);
 		const expanded = this._expandWithId(request, resource.id);
 

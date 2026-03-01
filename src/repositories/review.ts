@@ -19,6 +19,7 @@ import type {
 	StateReference,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { ReviewDraftSchema } from "#src/schemas/generated/review.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -35,6 +36,7 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 	constructor(config: Config) {
 		super("review", config);
 		this.actions = new ReviewUpdateHandler(config.storage);
+		this.draftSchema = ReviewDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: ReviewDraft): Review {

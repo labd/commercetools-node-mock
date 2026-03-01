@@ -11,6 +11,7 @@ import type {
 	AssociateRoleUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { AssociateRoleDraftSchema } from "#src/schemas/generated/associate-role.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
@@ -25,6 +26,7 @@ export class AssociateRoleRepository extends AbstractResourceRepository<"associa
 	constructor(config: Config) {
 		super("associate-role", config);
 		this.actions = new AssociateRoleUpdateHandler(this._storage);
+		this.draftSchema = AssociateRoleDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: AssociateRoleDraft): AssociateRole {

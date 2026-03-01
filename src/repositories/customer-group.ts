@@ -8,6 +8,7 @@ import type {
 	CustomerGroupUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CustomerGroupDraftSchema } from "#src/schemas/generated/customer-group.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
@@ -22,6 +23,7 @@ export class CustomerGroupRepository extends AbstractResourceRepository<"custome
 	constructor(config: Config) {
 		super("customer-group", config);
 		this.actions = new CustomerGroupUpdateHandler(config.storage);
+		this.draftSchema = CustomerGroupDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: CustomerGroupDraft): CustomerGroup {

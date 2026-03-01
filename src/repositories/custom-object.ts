@@ -5,6 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { CustomObjectDraftSchema } from "#src/schemas/generated/custom-object.ts";
 import { cloneObject, getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { QueryParams } from "./abstract.ts";
@@ -17,6 +18,7 @@ import { checkConcurrentModification } from "./errors.ts";
 export class CustomObjectRepository extends AbstractResourceRepository<"key-value-document"> {
 	constructor(config: Config) {
 		super("key-value-document", config);
+		this.draftSchema = CustomObjectDraftSchema;
 	}
 
 	create(

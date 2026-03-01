@@ -2,7 +2,7 @@ import type { Update } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { ParsedQs } from "qs";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
-import { validateData } from "#src/validate.ts";
+import { validateData, validateDraft } from "#src/validate.ts";
 import { queryParamsArray } from "../helpers.ts";
 import type {
 	AbstractResourceRepository,
@@ -178,10 +178,14 @@ export default abstract class AbstractService {
 	}
 
 	post(request: FastifyRequest, reply: FastifyReply) {
-		const draft = request.body;
+		// Validate the draft against the schema when strict mode is enabled
+		if (this.repository.strict && this.repository.draftSchema) {
+			validateDraft(request.body, this.repository.draftSchema);
+		}
+
 		const resource = this.repository.create(
 			getRepositoryContext(request),
-			draft,
+			request.body,
 		);
 		const result = this._expandWithId(request, resource.id);
 		return reply.status(this.createStatusCode).send(result);

@@ -4,6 +4,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
+import { DiscountGroupDraftSchema } from "#src/schemas/generated/discount-group.ts";
 import {
 	AbstractResourceRepository,
 	type RepositoryContext,
@@ -14,6 +15,7 @@ export class DiscountGroupRepository extends AbstractResourceRepository<"discoun
 	constructor(config: Config) {
 		super("discount-group", config);
 		this.actions = new DiscountGroupUpdateHandler(config.storage);
+		this.draftSchema = DiscountGroupDraftSchema;
 	}
 
 	create(context: RepositoryContext, draft: DiscountGroupDraft): DiscountGroup {
