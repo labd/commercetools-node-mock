@@ -1,4 +1,11 @@
-import type { CustomerSignInResult } from "@commercetools/platform-sdk";
+import type {
+	CustomerCreateEmailToken,
+	CustomerCreatePasswordResetToken,
+	CustomerDraft,
+	CustomerEmailVerify,
+	CustomerResetPassword,
+	CustomerSignInResult,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { CustomerRepository } from "../repositories/customer/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
@@ -23,7 +30,14 @@ export class CustomerService extends AbstractService {
 		parent.post("/email/confirm", this.emailTokenConfirm.bind(this));
 	}
 
-	post(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	post(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+			Body: CustomerDraft;
+		}>,
+		reply: FastifyReply,
+	) {
 		const draft = request.body;
 		const resource = this.repository.create(
 			getRepositoryContext(request),
@@ -38,7 +52,10 @@ export class CustomerService extends AbstractService {
 	}
 
 	passwordResetToken(
-		request: FastifyRequest<{ Body: any }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: CustomerCreatePasswordResetToken;
+		}>,
 		reply: FastifyReply,
 	) {
 		const customer = this.repository.passwordResetToken(
@@ -49,7 +66,13 @@ export class CustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	passwordReset(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	passwordReset(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: CustomerResetPassword;
+		}>,
+		reply: FastifyReply,
+	) {
 		const customer = this.repository.passwordReset(
 			getRepositoryContext(request),
 			request.body,
@@ -58,7 +81,13 @@ export class CustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	emailToken(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	emailToken(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: CustomerCreateEmailToken;
+		}>,
+		reply: FastifyReply,
+	) {
 		const body = request.body;
 		const id = body.id;
 		const token = this.repository.emailToken(getRepositoryContext(request), id);
@@ -66,7 +95,10 @@ export class CustomerService extends AbstractService {
 	}
 
 	emailTokenConfirm(
-		request: FastifyRequest<{ Body: any }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: CustomerEmailVerify;
+		}>,
 		reply: FastifyReply,
 	) {
 		const customer = this.repository.emailTokenConfirm(

@@ -1,4 +1,9 @@
-import type { Cart, CartDraft, Order } from "@commercetools/platform-sdk";
+import type {
+	Cart,
+	CartDraft,
+	Order,
+	ReplicaCartDraft,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { CartRepository } from "../repositories/cart/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
@@ -29,7 +34,10 @@ export class CartService extends AbstractService {
 	}
 
 	replicate(
-		request: FastifyRequest<{ Params: Record<string, string>; Body: any }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: ReplicaCartDraft;
+		}>,
 		reply: FastifyReply,
 	) {
 		const context = getRepositoryContext(request);

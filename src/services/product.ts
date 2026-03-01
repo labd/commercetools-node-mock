@@ -1,3 +1,4 @@
+import type { ProductSearchRequest } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { getRepositoryContext } from "#src/repositories/helpers.ts";
 import type { ProductRepository } from "../repositories/product/index.ts";
@@ -19,7 +20,13 @@ export class ProductService extends AbstractService {
 		instance.post("/search", this.search.bind(this));
 	}
 
-	search(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	search(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: ProductSearchRequest;
+		}>,
+		reply: FastifyReply,
+	) {
 		const searchBody = request.body;
 		const resource = this.repository.search(
 			getRepositoryContext(request),

@@ -98,7 +98,10 @@ export class CustomObjectService extends AbstractService {
 	}
 
 	createWithContainerAndKey(
-		request: FastifyRequest<{ Params: Record<string, string>; Body: any }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: CustomObjectDraft;
+		}>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
