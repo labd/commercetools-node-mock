@@ -34,7 +34,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			) ?? [];
 
 		const resource: ShoppingList = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			...draft,
 			custom: createCustomFields(
 				draft.custom,

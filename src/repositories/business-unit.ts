@@ -86,7 +86,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		);
 
 		const resource = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			status: draft.status,
 			stores: draft.stores?.map((s) =>

@@ -32,7 +32,7 @@ export class StagedQuoteRepository extends AbstractResourceRepository<"staged-qu
 		);
 
 		const resource: StagedQuote = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			stagedQuoteState: "InProgress",
 			quoteRequest: {
 				typeId: "quote-request",

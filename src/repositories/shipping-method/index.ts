@@ -30,7 +30,7 @@ export class ShippingMethodRepository extends AbstractResourceRepository<"shippi
 		draft: ShippingMethodDraft,
 	): ShippingMethod {
 		const resource: ShippingMethod = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			...draft,
 			active: draft.active ?? true,
 			taxCategory: getReferenceFromResourceIdentifier(

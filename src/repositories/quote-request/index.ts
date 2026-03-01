@@ -53,7 +53,7 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 		}
 
 		const resource: QuoteRequest = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			billingAddress: cart.billingAddress,
 			cart: cartReference,
 			country: cart.country,

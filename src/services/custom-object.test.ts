@@ -184,9 +184,11 @@ describe("CustomObject retrieve", () => {
 		expect(response.json()).toEqual({
 			container: "my-container",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			key: "my-key",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			value: "my-value",
 			version: 1,
 		});
@@ -213,9 +215,11 @@ describe("CustomObject retrieve", () => {
 		expect(response.json()).toEqual({
 			container: "my-other-container",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			key: "my-key",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			value: "new-value",
 			version: 3,
 		});
@@ -231,9 +235,11 @@ describe("CustomObject retrieve", () => {
 		expect(response.json()).toEqual({
 			container: "my-container",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			key: "my-key",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			value: "my-value",
 			version: 1,
 		});

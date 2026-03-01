@@ -11,6 +11,7 @@ type Token = {
 
 export class OAuth2Store {
 	tokens: Token[] = [];
+	private tokenClientMap: Map<string, string> = new Map();
 
 	validate = true;
 
@@ -18,8 +19,15 @@ export class OAuth2Store {
 		this.validate = validate;
 	}
 
-	addToken(token: Token) {
+	addToken(token: Token, clientId?: string) {
 		this.tokens.push(token);
+		if (clientId) {
+			this.tokenClientMap.set(token.access_token, clientId);
+		}
+	}
+
+	getClientIdForToken(accessToken: string): string | undefined {
+		return this.tokenClientMap.get(accessToken);
 	}
 
 	getClientToken(clientId: string, clientSecret: string, scope?: string) {
@@ -30,7 +38,7 @@ export class OAuth2Store {
 			scope: scope || "todo",
 			refresh_token: `my-project-${randomBytes(16).toString("base64")}`,
 		};
-		this.addToken(token);
+		this.addToken(token, clientId);
 		return token;
 	}
 
@@ -38,6 +46,7 @@ export class OAuth2Store {
 		projectKey: string,
 		anonymousId: string | undefined,
 		scope: string,
+		clientId?: string,
 	) {
 		if (!anonymousId) {
 			anonymousId = uuidv4();
@@ -51,11 +60,16 @@ export class OAuth2Store {
 				: `anonymous_id:${anonymousId}`,
 			refresh_token: `${projectKey}:${randomBytes(16).toString("base64")}`,
 		};
-		this.addToken(token);
+		this.addToken(token, clientId);
 		return token;
 	}
 
-	getCustomerToken(projectKey: string, customerId: string, scope: string) {
+	getCustomerToken(
+		projectKey: string,
+		customerId: string,
+		scope: string,
+		clientId?: string,
+	) {
 		const token: Token = {
 			access_token: randomBytes(16).toString("base64"),
 			token_type: "Bearer",
@@ -65,7 +79,7 @@ export class OAuth2Store {
 				: `customer_id:${customerId}`,
 			refresh_token: `${projectKey}:${randomBytes(16).toString("base64")}`,
 		};
-		this.addToken(token);
+		this.addToken(token, clientId);
 		return token;
 	}
 
@@ -78,7 +92,7 @@ export class OAuth2Store {
 			...existing,
 			access_token: randomBytes(16).toString("base64"),
 		};
-		this.addToken(token);
+		this.addToken(token, clientId);
 
 		// We don't want to return the refresh_token again
 		return {

@@ -23,7 +23,7 @@ export class RecurrencePolicyRepository extends AbstractResourceRepository<"recu
 		draft: RecurrencePolicyDraft,
 	): RecurrencePolicy {
 		const resource: RecurrencePolicy = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			description: draft.description,

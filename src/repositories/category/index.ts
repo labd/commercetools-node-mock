@@ -26,7 +26,7 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 
 	create(context: RepositoryContext, draft: CategoryDraft): Category {
 		const resource: Category = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			slug: draft.slug,

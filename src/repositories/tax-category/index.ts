@@ -19,7 +19,7 @@ export class TaxCategoryRepository extends AbstractResourceRepository<"tax-categ
 
 	create(context: RepositoryContext, draft: TaxCategoryDraft): TaxCategory {
 		const resource: TaxCategory = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			...draft,
 			rates: draft.rates?.map(taxRateFromTaxRateDraft) || [],
 		};

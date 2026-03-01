@@ -27,7 +27,7 @@ export class ZoneRepository extends AbstractResourceRepository<"zone"> {
 
 	create(context: RepositoryContext, draft: ZoneDraft): Zone {
 		const resource: Zone = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			locations: draft.locations || [],
 			name: draft.name,

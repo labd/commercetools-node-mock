@@ -35,7 +35,7 @@ export class StoreRepository extends AbstractResourceRepository<"store"> {
 
 	create(context: RepositoryContext, draft: StoreDraft): Store {
 		const resource: Store = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			languages: draft.languages ?? [],

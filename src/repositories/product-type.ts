@@ -31,7 +31,7 @@ export class ProductTypeRepository extends AbstractResourceRepository<"product-t
 
 	create(context: RepositoryContext, draft: ProductTypeDraft): ProductType {
 		const resource: ProductType = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			description: draft.description,

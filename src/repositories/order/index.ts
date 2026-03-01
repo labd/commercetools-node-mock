@@ -85,7 +85,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		}
 
 		const resource: Writable<Order> = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			anonymousId: cart.anonymousId,
 			billingAddress: cart.billingAddress,
 			cart: cartReference,
@@ -136,7 +136,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		// TODO: Check if order with given orderNumber already exists
 		assert(this, "OrderRepository not valid");
 		const resource: Writable<Order> = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 
 			billingAddress: createAddress(
 				draft.billingAddress,
@@ -274,7 +274,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		});
 
 		return {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,
@@ -318,7 +318,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		});
 
 		return {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,

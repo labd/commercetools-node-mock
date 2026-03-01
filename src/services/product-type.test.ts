@@ -46,10 +46,12 @@ describe("Product type", () => {
 				},
 			],
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			description: "bar",
 			id: expect.anything(),
 			key: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: "foo",
 			version: 1,
 		});

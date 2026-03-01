@@ -29,7 +29,7 @@ export class QuoteRepository extends AbstractResourceRepository<"quote"> {
 		}
 
 		const resource: Quote = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			quoteState: "Accepted",
 			quoteRequest: staged.quoteRequest,
 			lineItems: cart.lineItems,

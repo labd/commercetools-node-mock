@@ -17,7 +17,7 @@ export class OrderEditRepository extends AbstractResourceRepository<"order-edit"
 
 	create(context: RepositoryContext, draft: OrderEditDraft): OrderEdit {
 		const resource: OrderEdit = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			stagedActions: draft.stagedActions ?? [],
 			resource: draft.resource,
 			result: {

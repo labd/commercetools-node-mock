@@ -30,7 +30,7 @@ export class AttributeGroupRepository extends AbstractResourceRepository<"attrib
 		draft: AttributeGroupDraft,
 	): AttributeGroup {
 		const resource: AttributeGroup = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			name: draft.name,
 			description: draft.description,
 			key: draft.key,

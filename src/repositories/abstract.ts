@@ -37,6 +37,7 @@ export type GetParams = {
 export type RepositoryContext = {
 	projectKey: string;
 	storeKey?: string;
+	clientId?: string;
 };
 
 export abstract class AbstractRepository<R extends BaseResource | Project> {
@@ -234,6 +235,10 @@ export abstract class AbstractResourceRepository<
 			throw new Error("Internal error: no changes to save");
 		}
 		resource.lastModifiedAt = new Date().toISOString();
+		(resource as any).lastModifiedBy = {
+			clientId: context.clientId ?? "",
+			isPlatformClient: false,
+		};
 
 		this._storage.add(context.projectKey, this.getTypeId(), resource as any);
 

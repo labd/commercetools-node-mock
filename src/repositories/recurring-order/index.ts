@@ -34,7 +34,7 @@ export class RecurringOrderRepository extends AbstractResourceRepository<"recurr
 		});
 
 		const resource: RecurringOrder = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			cart: {
 				typeId: "cart",

@@ -2,12 +2,20 @@ import type { OutgoingHttpHeaders } from "node:http";
 import type { ParsedQs } from "qs";
 import { v4 as uuidv4 } from "uuid";
 
-export const getBaseResourceProperties = () => ({
-	id: uuidv4(),
-	createdAt: new Date().toISOString(),
-	lastModifiedAt: new Date().toISOString(),
-	version: 0,
-});
+export const getBaseResourceProperties = (clientId?: string) => {
+	const clientInfo = {
+		clientId: clientId ?? "",
+		isPlatformClient: false,
+	};
+	return {
+		id: uuidv4(),
+		createdAt: new Date().toISOString(),
+		lastModifiedAt: new Date().toISOString(),
+		version: 0,
+		createdBy: clientInfo,
+		lastModifiedBy: clientInfo,
+	};
+};
 
 /**
  * Do a nested lookup by using a path. For example `foo.bar.value` will

@@ -54,9 +54,11 @@ describe("Shipping method", () => {
 		expect(response.statusCode).toBe(201);
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			isDefault: true,
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: "foo",
 			taxCategory: {
 				id: expect.anything(),

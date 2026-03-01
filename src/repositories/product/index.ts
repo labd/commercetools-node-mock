@@ -129,7 +129,7 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		};
 
 		const resource: Product = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			productType: productType,
 			taxCategory: taxCategoryReference,

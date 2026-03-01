@@ -58,7 +58,7 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 				400,
 			);
 		}
-		const baseProperties = getBaseResourceProperties();
+		const baseProperties = getBaseResourceProperties(context.clientId);
 		const resource: CustomObject = {
 			...baseProperties,
 			container: draft.container,

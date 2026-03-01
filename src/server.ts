@@ -4,7 +4,11 @@ process.on("SIGINT", () => {
 	process.exit();
 });
 
-const instance = new CommercetoolsMock({ strict: true });
+const instance = new CommercetoolsMock({
+	strict: true,
+	// enableAuthentication: true,
+	// validateCredentials: true,
+});
 
 let port = 3000;
 

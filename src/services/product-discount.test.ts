@@ -34,6 +34,7 @@ describe("ProductDiscount", () => {
 		expect(response.statusCode).toBe(201);
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			description: {
 				en: "20% off all products",
 			},
@@ -41,6 +42,7 @@ describe("ProductDiscount", () => {
 			isActive: true,
 			key: "summer-sale",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: {
 				en: "Summer Sale",
 			},

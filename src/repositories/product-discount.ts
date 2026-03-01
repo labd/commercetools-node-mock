@@ -41,7 +41,7 @@ export class ProductDiscountRepository extends AbstractResourceRepository<"produ
 		draft: ProductDiscountDraft,
 	): ProductDiscount {
 		const resource: ProductDiscount = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			description: draft.description,

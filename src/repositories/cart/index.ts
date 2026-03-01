@@ -114,7 +114,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		}
 
 		const resource: Writable<Cart> = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			anonymousId: draft.anonymousId,
 			businessUnit:
 				storedBusinessUnit && draft.businessUnit

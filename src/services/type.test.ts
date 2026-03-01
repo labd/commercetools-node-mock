@@ -39,6 +39,7 @@ describe("Type", () => {
 		const type = response.json();
 		expect(type).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			description: {
 				en: "Type description",
 			},
@@ -57,6 +58,7 @@ describe("Type", () => {
 			id: expect.anything(),
 			key: "my-custom-type",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: {
 				en: "My Custom Type",
 			},
