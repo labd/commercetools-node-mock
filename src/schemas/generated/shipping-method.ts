@@ -2,7 +2,12 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CustomFieldsDraftSchema, LocalizedStringSchema, TaxCategoryResourceIdentifierSchema, ZoneRateDraftSchema } from "./common.ts";
+import {
+	CustomFieldsDraftSchema,
+	LocalizedStringSchema,
+	TaxCategoryResourceIdentifierSchema,
+	ZoneRateDraftSchema,
+} from "./common.ts";
 
 export const ShippingMethodDraftSchema = z.object({
 	key: z.string().optional(),

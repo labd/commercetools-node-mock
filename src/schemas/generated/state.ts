@@ -2,7 +2,12 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { LocalizedStringSchema, StateResourceIdentifierSchema, StateRoleEnumSchema, StateTypeEnumSchema } from "./common.ts";
+import {
+	LocalizedStringSchema,
+	StateResourceIdentifierSchema,
+	StateRoleEnumSchema,
+	StateTypeEnumSchema,
+} from "./common.ts";
 
 export const StateDraftSchema = z.object({
 	key: z.string(),

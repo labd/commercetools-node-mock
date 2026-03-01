@@ -2,7 +2,17 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { ChannelResourceIdentifierSchema, CountryCodeSchema, CustomFieldsDraftSchema, CustomerGroupResourceIdentifierSchema, DiscountedPriceDraftSchema, MoneySchema, PriceTierDraftSchema, RecurrencePolicyResourceIdentifierSchema, StagedPriceDraftSchema } from "./common.ts";
+import {
+	ChannelResourceIdentifierSchema,
+	CountryCodeSchema,
+	CustomerGroupResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	DiscountedPriceDraftSchema,
+	MoneySchema,
+	PriceTierDraftSchema,
+	RecurrencePolicyResourceIdentifierSchema,
+	StagedPriceDraftSchema,
+} from "./common.ts";
 
 export const StandalonePriceDraftSchema = z.object({
 	key: z.string().optional(),

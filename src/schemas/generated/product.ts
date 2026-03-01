@@ -2,7 +2,18 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { AttributeSchema, CategoryOrderHintsSchema, CategoryResourceIdentifierSchema, LocalizedStringSchema, ProductPriceModeEnumSchema, ProductTypeResourceIdentifierSchema, ProductVariantDraftSchema, SearchKeywordsSchema, StateResourceIdentifierSchema, TaxCategoryResourceIdentifierSchema } from "./common.ts";
+import {
+	AttributeSchema,
+	CategoryOrderHintsSchema,
+	CategoryResourceIdentifierSchema,
+	LocalizedStringSchema,
+	ProductPriceModeEnumSchema,
+	ProductTypeResourceIdentifierSchema,
+	ProductVariantDraftSchema,
+	SearchKeywordsSchema,
+	StateResourceIdentifierSchema,
+	TaxCategoryResourceIdentifierSchema,
+} from "./common.ts";
 
 export const ProductDraftSchema = z.object({
 	productType: ProductTypeResourceIdentifierSchema,

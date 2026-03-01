@@ -2,7 +2,11 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CartResourceIdentifierSchema, CustomFieldsDraftSchema, StateReferenceSchema } from "./common.ts";
+import {
+	CartResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	StateReferenceSchema,
+} from "./common.ts";
 
 export const QuoteRequestDraftSchema = z.object({
 	cart: CartResourceIdentifierSchema,

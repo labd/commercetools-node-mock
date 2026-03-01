@@ -2,7 +2,11 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CustomFieldsDraftSchema, OrderReferenceSchema, StagedOrderUpdateActionSchema } from "./common.ts";
+import {
+	CustomFieldsDraftSchema,
+	OrderReferenceSchema,
+	StagedOrderUpdateActionSchema,
+} from "./common.ts";
 
 export const OrderEditDraftSchema = z.object({
 	key: z.string().optional(),

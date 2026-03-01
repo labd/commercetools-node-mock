@@ -2,7 +2,15 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { BusinessUnitResourceIdentifierSchema, CustomFieldsDraftSchema, CustomerResourceIdentifierSchema, LocalizedStringSchema, ShoppingListLineItemDraftSchema, StoreResourceIdentifierSchema, TextLineItemDraftSchema } from "./common.ts";
+import {
+	BusinessUnitResourceIdentifierSchema,
+	CustomerResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	LocalizedStringSchema,
+	ShoppingListLineItemDraftSchema,
+	StoreResourceIdentifierSchema,
+	TextLineItemDraftSchema,
+} from "./common.ts";
 
 export const ShoppingListDraftSchema = z.object({
 	name: LocalizedStringSchema,

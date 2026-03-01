@@ -2,7 +2,14 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CustomFieldsDraftSchema, CustomerResourceIdentifierSchema, MoneySchema, PaymentMethodInfoDraftSchema, PaymentStatusDraftSchema, TransactionDraftSchema } from "./common.ts";
+import {
+	CustomerResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	MoneySchema,
+	PaymentMethodInfoDraftSchema,
+	PaymentStatusDraftSchema,
+	TransactionDraftSchema,
+} from "./common.ts";
 
 export const PaymentDraftSchema = z.object({
 	customer: CustomerResourceIdentifierSchema.optional(),

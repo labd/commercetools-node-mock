@@ -2,7 +2,11 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CustomFieldsDraftSchema, StagedQuoteResourceIdentifierSchema, StateReferenceSchema } from "./common.ts";
+import {
+	CustomFieldsDraftSchema,
+	StagedQuoteResourceIdentifierSchema,
+	StateReferenceSchema,
+} from "./common.ts";
 
 export const QuoteDraftSchema = z.object({
 	key: z.string().optional(),

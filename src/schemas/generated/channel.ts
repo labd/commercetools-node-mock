@@ -2,7 +2,13 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { BaseAddressSchema, ChannelRoleEnumSchema, CustomFieldsDraftSchema, GeoJsonSchema, LocalizedStringSchema } from "./common.ts";
+import {
+	BaseAddressSchema,
+	ChannelRoleEnumSchema,
+	CustomFieldsDraftSchema,
+	GeoJsonSchema,
+	LocalizedStringSchema,
+} from "./common.ts";
 
 export const ChannelDraftSchema = z.object({
 	key: z.string(),

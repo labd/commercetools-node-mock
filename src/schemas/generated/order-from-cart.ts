@@ -2,7 +2,14 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { CartResourceIdentifierSchema, CustomFieldsDraftSchema, OrderStateSchema, PaymentStateSchema, ShipmentStateSchema, StateResourceIdentifierSchema } from "./common.ts";
+import {
+	CartResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+	OrderStateSchema,
+	PaymentStateSchema,
+	ShipmentStateSchema,
+	StateResourceIdentifierSchema,
+} from "./common.ts";
 
 export const OrderFromCartDraftSchema = z.object({
 	id: z.string().optional(),

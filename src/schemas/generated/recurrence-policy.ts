@@ -2,7 +2,10 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { LocalizedStringSchema, RecurrencePolicyScheduleDraftSchema } from "./common.ts";
+import {
+	LocalizedStringSchema,
+	RecurrencePolicyScheduleDraftSchema,
+} from "./common.ts";
 
 export const RecurrencePolicyDraftSchema = z.object({
 	key: z.string(),

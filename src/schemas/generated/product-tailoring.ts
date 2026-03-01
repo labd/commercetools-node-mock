@@ -2,7 +2,13 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { LocalizedStringSchema, ProductResourceIdentifierSchema, ProductTailoringAttributeSchema, ProductVariantTailoringDraftSchema, StoreResourceIdentifierSchema } from "./common.ts";
+import {
+	LocalizedStringSchema,
+	ProductResourceIdentifierSchema,
+	ProductTailoringAttributeSchema,
+	ProductVariantTailoringDraftSchema,
+	StoreResourceIdentifierSchema,
+} from "./common.ts";
 
 export const ProductTailoringDraftSchema = z.object({
 	key: z.string().optional(),

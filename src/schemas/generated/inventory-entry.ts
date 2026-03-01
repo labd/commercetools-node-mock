@@ -2,7 +2,10 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import { ChannelResourceIdentifierSchema, CustomFieldsDraftSchema } from "./common.ts";
+import {
+	ChannelResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
+} from "./common.ts";
 
 export const InventoryEntryDraftSchema = z.object({
 	sku: z.string(),
