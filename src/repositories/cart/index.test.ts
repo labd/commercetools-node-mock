@@ -1,4 +1,5 @@
 import type { CartDraft, LineItem } from "@commercetools/platform-sdk";
+import type { CartAddDiscountCodeAction } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/cart";
 import { beforeEach, describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
@@ -747,5 +748,108 @@ describe("createShippingInfo", () => {
 				state: "MatchesCart",
 			},
 		]);
+	});
+
+	test("create cart with non-existent discount code throws error", () => {
+		const cart: CartDraft = {
+			country: "NL",
+			currency: "EUR",
+			discountCodes: ["non-existent-code"],
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+
+		expect(() => repository.create(ctx, cart)).toThrow(
+			"The discount code 'non-existent-code' was not found.",
+		);
+	});
+
+	test("create cart with duplicate discount codes deduplicates them", () => {
+		const code = storage.add("dummy", "discount-code", {
+			...getBaseResourceProperties(),
+			code: "duplicate-test",
+			cartDiscounts: [],
+			isActive: true,
+			references: [],
+			groups: [],
+		});
+
+		const cart: CartDraft = {
+			country: "NL",
+			currency: "EUR",
+			discountCodes: ["duplicate-test", "duplicate-test"],
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+
+		const result = repository.create(ctx, cart);
+		expect(result.discountCodes).toHaveLength(1);
+		expect(result.discountCodes).toEqual([
+			{
+				discountCode: {
+					typeId: "discount-code",
+					id: code.id,
+				},
+				state: "MatchesCart",
+			},
+		]);
+	});
+
+	test("addDiscountCode action adds discount code to cart", () => {
+		const code = storage.add("dummy", "discount-code", {
+			...getBaseResourceProperties(),
+			code: "action-test-code",
+			cartDiscounts: [],
+			isActive: true,
+			references: [],
+			groups: [],
+		});
+
+		const cart: CartDraft = {
+			country: "NL",
+			currency: "EUR",
+		};
+
+		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
+
+		const createdCart = repository.create(ctx, cart);
+		expect(createdCart.discountCodes).toHaveLength(0);
+
+		const updatedCart = repository.processUpdateActions(
+			ctx,
+			createdCart,
+			createdCart.version,
+			[
+				{
+					action: "addDiscountCode",
+					code: "action-test-code",
+				} as CartAddDiscountCodeAction,
+			],
+		);
+
+		expect(updatedCart.discountCodes).toEqual([
+			{
+				discountCode: {
+					typeId: "discount-code",
+					id: code.id,
+				},
+				state: "MatchesCart",
+			},
+		]);
+
+		// Adding the same discount code again should not create a duplicate
+		const updatedCart2 = repository.processUpdateActions(
+			ctx,
+			updatedCart,
+			updatedCart.version,
+			[
+				{
+					action: "addDiscountCode",
+					code: "action-test-code",
+				} as CartAddDiscountCodeAction,
+			],
+		);
+
+		expect(updatedCart2.discountCodes).toHaveLength(1);
 	});
 });
