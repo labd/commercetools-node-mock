@@ -5,7 +5,11 @@ import type {
 import type { AbstractStorage } from "../storage/index.ts";
 
 export class ReviewStatisticsService {
-	constructor(private _storage: AbstractStorage) {}
+	private _storage: AbstractStorage;
+
+	constructor(_storage: AbstractStorage) {
+		this._storage = _storage;
+	}
 
 	calculateProductReviewStatistics(
 		projectKey: string,
