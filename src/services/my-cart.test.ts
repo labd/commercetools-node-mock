@@ -1,23 +1,22 @@
-import type { Cart, MyCartDraft } from "@commercetools/platform-sdk";
+import type { Cart } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { cartDraftFactory, typeDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("MyCart", () => {
+	const cartDraft = cartDraftFactory(ctMock);
+	const typeDraft = typeDraftFactory(ctMock);
+
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "custom-payment",
-				name: {
-					"nl-NL": "custom-payment",
-				},
-				resourceTypeIds: ["payment"],
+		await typeDraft.create({
+			key: "custom-payment",
+			name: {
+				"nl-NL": "custom-payment",
 			},
+			resourceTypeIds: ["payment"],
 		});
-		expect(response.statusCode).toBe(201);
 	});
 
 	afterEach(() => {
@@ -25,9 +24,9 @@ describe("MyCart", () => {
 	});
 
 	test("Create my cart", async () => {
-		const draft: MyCartDraft = {
+		const draft = cartDraft.build({
 			currency: "EUR",
-		};
+		});
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -66,42 +65,38 @@ describe("MyCart", () => {
 	});
 
 	test("Get my cart by ID", async () => {
-		const draft: MyCartDraft = {
+		const cart = await cartDraft.create({
 			currency: "EUR",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/me/carts",
-			payload: draft,
 		});
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/me/carts/${createResponse.json().id}`,
+			url: `/dummy/me/carts/${cart.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(cart);
 	});
 
 	test("Get my active cart", async () => {
-		const draft: MyCartDraft = {
+		const cart = await cartDraft.create({
 			currency: "EUR",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/me/carts",
-			payload: draft,
 		});
 
-		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me/active-cart" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me/active-cart",
+		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(cart);
 	});
 
 	test("Get my active cart which doesnt exists", async () => {
-		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me/active-cart" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me/active-cart",
+		});
 
 		expect(response.statusCode).toBe(404);
 	});

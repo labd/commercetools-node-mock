@@ -1,9 +1,6 @@
-import type {
-	Product,
-	ShoppingList,
-	ShoppingListDraft,
-} from "@commercetools/platform-sdk";
+import type { Product, ShoppingList } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { shoppingListDraftFactory } from "#src/testing/shopping-list.ts";
 import { CommercetoolsMock } from "../ctMock.ts";
 
 const shoppingList: ShoppingList = {
@@ -83,10 +80,10 @@ describe("Shopping List", () => {
 	});
 
 	test("Adds variant ID on lineItems when creating", async () => {
-		const draft: ShoppingListDraft = {
+		const draft = shoppingListDraftFactory(ctMock).build({
 			name: {},
 			lineItems: [{ sku: "22241940260" }],
-		};
+		});
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/shopping-lists",
@@ -111,10 +108,10 @@ describe("Shopping List", () => {
 	});
 
 	test("Expands variant on lineItems when creating", async () => {
-		const draft: ShoppingListDraft = {
+		const draft = shoppingListDraftFactory(ctMock).build({
 			name: {},
 			lineItems: [{ sku: "22241940260" }],
-		};
+		});
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/shopping-lists?expand=lineItems[*].variant",
@@ -146,7 +143,9 @@ describe("Shopping List Update Actions", () => {
 	test("addLineItem by productID & variantID", async () => {
 		ctMock.clear();
 		ctMock.project().unsafeAdd("product", product);
-		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
+		ctMock
+			.project()
+			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -172,7 +171,9 @@ describe("Shopping List Update Actions", () => {
 	test("addLineItem by productID", async () => {
 		ctMock.clear();
 		ctMock.project().unsafeAdd("product", product);
-		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
+		ctMock
+			.project()
+			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -197,7 +198,9 @@ describe("Shopping List Update Actions", () => {
 	test("addLineItem by sku", async () => {
 		ctMock.clear();
 		ctMock.project().unsafeAdd("product", product);
-		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
+		ctMock
+			.project()
+			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -257,7 +260,9 @@ describe("Shopping List Update Actions", () => {
 	test("addLineItem by productID", async () => {
 		ctMock.clear();
 		ctMock.project().unsafeAdd("product", product);
-		ctMock.project().unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
+		ctMock
+			.project()
+			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
 		const response = await ctMock.app.inject({
 			method: "POST",

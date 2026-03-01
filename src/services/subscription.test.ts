@@ -1,12 +1,14 @@
-import type { SubscriptionDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { subscriptionDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Subscription", () => {
+	const subscriptionDraft = subscriptionDraftFactory(ctMock);
+
 	test("Create subscription", async () => {
-		const draft: SubscriptionDraft = {
+		const draft = subscriptionDraft.build({
 			key: "order-notifications",
 			destination: {
 				type: "SQS",
@@ -21,7 +23,8 @@ describe("Subscription", () => {
 					types: ["OrderCreated", "OrderStateChanged"],
 				},
 			],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/subscriptions",
@@ -29,7 +32,6 @@ describe("Subscription", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			changes: [],
 			createdAt: expect.anything(),
@@ -59,7 +61,7 @@ describe("Subscription", () => {
 	});
 
 	test("Get subscription", async () => {
-		const draft: SubscriptionDraft = {
+		const subscription = await subscriptionDraft.create({
 			key: "test-subscription",
 			destination: {
 				type: "SQS",
@@ -74,26 +76,19 @@ describe("Subscription", () => {
 					types: ["CustomerCreated"],
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/subscriptions",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/subscriptions/${createResponse.json().id}`,
+			url: `/dummy/subscriptions/${subscription.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(subscription);
 	});
 
 	test("Get subscription by key", async () => {
-		const draft: SubscriptionDraft = {
+		const subscription = await subscriptionDraft.create({
 			key: "key-subscription",
 			destination: {
 				type: "SQS",
@@ -108,14 +103,7 @@ describe("Subscription", () => {
 					types: ["ProductPublished"],
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/subscriptions",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -123,11 +111,11 @@ describe("Subscription", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(subscription);
 	});
 
 	test("Query subscriptions", async () => {
-		const draft: SubscriptionDraft = {
+		const subscription = await subscriptionDraft.create({
 			key: "query-subscription",
 			destination: {
 				type: "SQS",
@@ -142,14 +130,7 @@ describe("Subscription", () => {
 					types: ["CartCreated"],
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/subscriptions",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -158,6 +139,6 @@ describe("Subscription", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(subscription);
 	});
 });

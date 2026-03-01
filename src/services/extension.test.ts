@@ -1,12 +1,14 @@
-import type { ExtensionDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { extensionDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Extension", () => {
+	const extensionDraft = extensionDraftFactory(ctMock);
+
 	test("Create extension", async () => {
-		const draft: ExtensionDraft = {
+		const draft = extensionDraft.build({
 			key: "order-validation",
 			destination: {
 				type: "HTTP",
@@ -18,7 +20,8 @@ describe("Extension", () => {
 					actions: ["Create"],
 				},
 			],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/extensions",
@@ -26,7 +29,6 @@ describe("Extension", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			destination: {
@@ -47,7 +49,7 @@ describe("Extension", () => {
 	});
 
 	test("Get extension", async () => {
-		const draft: ExtensionDraft = {
+		const extension = await extensionDraft.create({
 			key: "test-extension",
 			destination: {
 				type: "HTTP",
@@ -59,26 +61,19 @@ describe("Extension", () => {
 					actions: ["Update"],
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/extensions",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/extensions/${createResponse.json().id}`,
+			url: `/dummy/extensions/${extension.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(extension);
 	});
 
 	test("Get extension by key", async () => {
-		const draft: ExtensionDraft = {
+		const extension = await extensionDraft.create({
 			key: "key-extension",
 			destination: {
 				type: "HTTP",
@@ -90,14 +85,7 @@ describe("Extension", () => {
 					actions: ["Create", "Update"],
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/extensions",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -105,11 +93,11 @@ describe("Extension", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(extension);
 	});
 
 	test("Query extensions", async () => {
-		const draft: ExtensionDraft = {
+		const extension = await extensionDraft.create({
 			key: "query-extension",
 			destination: {
 				type: "HTTP",
@@ -121,14 +109,7 @@ describe("Extension", () => {
 					actions: ["Delete"],
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/extensions",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -137,6 +118,6 @@ describe("Extension", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(extension);
 	});
 });

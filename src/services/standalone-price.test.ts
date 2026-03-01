@@ -1,4 +1,3 @@
-import type { StandalonePriceDraft } from "@commercetools/platform-sdk";
 import {
 	afterAll,
 	afterEach,
@@ -8,13 +7,16 @@ import {
 	expect,
 	test,
 } from "vitest";
+import { standalonePriceDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Standalone price Query", () => {
+	const standalonePriceDraft = standalonePriceDraftFactory(ctMock);
+
 	beforeAll(async () => {
-		const draft: StandalonePriceDraft = {
+		await standalonePriceDraft.create({
 			value: {
 				centAmount: 100,
 				currencyCode: "EUR",
@@ -36,13 +38,7 @@ describe("Standalone price Query", () => {
 					id: "baz",
 				},
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/standalone-prices",
-			payload: draft,
 		});
-		expect(createResponse.statusCode).toEqual(201);
 	});
 
 	afterAll(async () => {
@@ -94,9 +90,11 @@ describe("Standalone price Query", () => {
 });
 
 describe("Standalone price Actions", () => {
+	const standalonePriceDraft = standalonePriceDraftFactory(ctMock);
 	let id: string | undefined;
+
 	beforeEach(async () => {
-		const draft: StandalonePriceDraft = {
+		const resource = await standalonePriceDraft.create({
 			value: {
 				centAmount: 100,
 				currencyCode: "EUR",
@@ -108,14 +106,8 @@ describe("Standalone price Actions", () => {
 				typeId: "channel",
 				id: "bar",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/standalone-prices",
-			payload: draft,
 		});
-		expect(createResponse.statusCode).toEqual(201);
-		id = createResponse.json().id;
+		id = resource.id;
 	});
 
 	afterEach(async () => {

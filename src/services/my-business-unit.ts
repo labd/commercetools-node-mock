@@ -32,10 +32,7 @@ export class MyBusinessUnitService extends AbstractService {
 				instance.delete("/business-units/:id", this.deleteWithId.bind(this));
 
 				instance.post("/business-units", this.post.bind(this));
-				instance.post(
-					"/business-units/key=:key",
-					this.postWithKey.bind(this),
-				);
+				instance.post("/business-units/key=:key", this.postWithKey.bind(this));
 				instance.post("/business-units/:id", this.postWithId.bind(this));
 
 				done();

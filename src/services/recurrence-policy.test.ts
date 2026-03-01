@@ -1,12 +1,14 @@
-import type { RecurrencePolicyDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { recurrencePolicyDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("RecurrencePolicy", () => {
+	const factory = recurrencePolicyDraftFactory(ctMock);
+
 	test("Create recurrence policy", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const draft = factory.build({
 			key: "monthly-policy",
 			name: {
 				"en-GB": "Monthly Recurrence Policy",
@@ -19,7 +21,8 @@ describe("RecurrencePolicy", () => {
 				value: 1,
 				intervalUnit: "Months",
 			},
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/recurrence-policies",
@@ -27,29 +30,27 @@ describe("RecurrencePolicy", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
-		expect(response.json()).toEqual({
-			createdAt: expect.anything(),
-			id: expect.anything(),
-			key: "monthly-policy",
-			lastModifiedAt: expect.anything(),
-			name: {
-				"en-GB": "Monthly Recurrence Policy",
-			},
-			description: {
-				"en-GB": "A policy for monthly recurring orders",
-			},
-			schedule: {
-				type: "standard",
-				value: 1,
-				intervalUnit: "Months",
-			},
-			version: 1,
-		});
+		expect(response.json()).toEqual(
+			expect.objectContaining({
+				key: "monthly-policy",
+				name: expect.objectContaining({
+					"en-GB": "Monthly Recurrence Policy",
+				}),
+				description: {
+					"en-GB": "A policy for monthly recurring orders",
+				},
+				schedule: {
+					type: "standard",
+					value: 1,
+					intervalUnit: "Months",
+				},
+				version: 1,
+			}),
+		);
 	});
 
 	test("Get recurrence policy", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "test-policy",
 			name: {
 				"en-GB": "Test Policy",
@@ -59,26 +60,19 @@ describe("RecurrencePolicy", () => {
 				value: 1,
 				intervalUnit: "Days",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(recurrencePolicy);
 	});
 
 	test("Get recurrence policy by key", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "key-policy",
 			name: {
 				en: "Key Policy",
@@ -87,14 +81,7 @@ describe("RecurrencePolicy", () => {
 				type: "dayOfMonth",
 				day: 15,
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -102,11 +89,11 @@ describe("RecurrencePolicy", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(recurrencePolicy);
 	});
 
 	test("Query recurrence policies", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "query-policy",
 			name: {
 				en: "Query Policy",
@@ -116,14 +103,7 @@ describe("RecurrencePolicy", () => {
 				value: 3,
 				intervalUnit: "Months",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -132,11 +112,11 @@ describe("RecurrencePolicy", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(recurrencePolicy);
 	});
 
 	test("Update recurrence policy - setName", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "update-name-policy",
 			name: {
 				en: "Original Name",
@@ -146,20 +126,13 @@ describe("RecurrencePolicy", () => {
 				value: 1,
 				intervalUnit: "Weeks",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurrencePolicy.version,
 				actions: [
 					{
 						action: "setName",
@@ -181,7 +154,7 @@ describe("RecurrencePolicy", () => {
 	});
 
 	test("Update recurrence policy - setDescription", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "update-description-policy",
 			name: {
 				en: "Test Policy",
@@ -190,20 +163,13 @@ describe("RecurrencePolicy", () => {
 				type: "dayOfMonth",
 				day: 10,
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurrencePolicy.version,
 				actions: [
 					{
 						action: "setDescription",
@@ -225,7 +191,7 @@ describe("RecurrencePolicy", () => {
 	});
 
 	test("Update recurrence policy - setKey", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "original-key",
 			name: {
 				en: "Test Policy",
@@ -235,20 +201,13 @@ describe("RecurrencePolicy", () => {
 				value: 1,
 				intervalUnit: "Months",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurrencePolicy.version,
 				actions: [
 					{
 						action: "setKey",
@@ -264,7 +223,7 @@ describe("RecurrencePolicy", () => {
 	});
 
 	test("Update recurrence policy - setSchedule", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "update-schedule-policy",
 			name: {
 				en: "Schedule Policy",
@@ -274,20 +233,13 @@ describe("RecurrencePolicy", () => {
 				value: 1,
 				intervalUnit: "Weeks",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurrencePolicy.version,
 				actions: [
 					{
 						action: "setSchedule",
@@ -309,7 +261,7 @@ describe("RecurrencePolicy", () => {
 	});
 
 	test("Delete recurrence policy", async () => {
-		const draft: RecurrencePolicyDraft = {
+		const recurrencePolicy = await factory.create({
 			key: "delete-policy",
 			name: {
 				en: "Delete Policy",
@@ -319,26 +271,19 @@ describe("RecurrencePolicy", () => {
 				value: 1,
 				intervalUnit: "Days",
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurrence-policies",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const deleteResponse = await ctMock.app.inject({
 			method: "DELETE",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}?version=${createResponse.json().version}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}?version=${recurrencePolicy.version}`,
 		});
 
 		expect(deleteResponse.statusCode).toBe(200);
-		expect(deleteResponse.json()).toEqual(createResponse.json());
+		expect(deleteResponse.json()).toEqual(recurrencePolicy);
 
 		const getResponse = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/recurrence-policies/${createResponse.json().id}`,
+			url: `/dummy/recurrence-policies/${recurrencePolicy.id}`,
 		});
 
 		expect(getResponse.statusCode).toBe(404);

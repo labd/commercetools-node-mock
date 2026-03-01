@@ -1,10 +1,11 @@
 import type {
-	InventoryEntryDraft,
-	ProductDraft,
 	ProductPagedSearchResponse,
 	ProductSearchRequest,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { inventoryEntryDraftFactory } from "#src/testing/inventory-entry.ts";
+import { productDraftFactory } from "#src/testing/product.ts";
+import { productTypeDraftFactory } from "#src/testing/product-type.ts";
 import { CommercetoolsMock } from "./index.ts";
 
 describe("Product Search - Availability Filtering", () => {
@@ -12,27 +13,13 @@ describe("Product Search - Availability Filtering", () => {
 	let productId: string;
 
 	beforeEach(async () => {
-		// Create a product type first
-		const productTypeDraft = {
-			name: "Test Product Type",
-			key: "test-type",
-			description: "Test Product Type",
-		};
+		const productType = await productTypeDraftFactory(ctMock).create();
 
-		await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-types",
-			payload: productTypeDraft,
-		});
-
-		// Create a test product
-		const productDraft: ProductDraft = {
-			name: { "en-US": "Test Product" },
+		const product = await productDraftFactory(ctMock).create({
 			productType: {
 				typeId: "product-type",
-				key: "test-type",
+				id: productType.id,
 			},
-			slug: { "en-US": "test-product" },
 			masterVariant: {
 				sku: "TEST-SKU-001",
 			},
@@ -41,23 +28,16 @@ describe("Product Search - Availability Filtering", () => {
 					sku: "TEST-SKU-002",
 				},
 			],
-		};
-
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
 		});
 
-		const productBody = productResponse.json();
-		productId = productBody.id;
+		productId = product.id;
 
 		// Publish the product
 		await ctMock.app.inject({
 			method: "POST",
 			url: `/dummy/products/${productId}`,
 			payload: {
-				version: productBody.version,
+				version: product.version,
 				actions: [{ action: "publish" }],
 			},
 		});
@@ -72,7 +52,7 @@ describe("Product Search - Availability Filtering", () => {
 		quantityOnStock: number,
 		channelId?: string,
 	) {
-		const inventoryEntry: InventoryEntryDraft = {
+		await inventoryEntryDraftFactory(ctMock).create({
 			sku,
 			quantityOnStock,
 			...(channelId && {
@@ -81,12 +61,6 @@ describe("Product Search - Availability Filtering", () => {
 					id: channelId,
 				},
 			}),
-		};
-
-		await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/inventory",
-			payload: inventoryEntry,
 		});
 	}
 
@@ -110,7 +84,6 @@ describe("Product Search - Availability Filtering", () => {
 	}
 
 	test("should filter products by variants.availability.isOnStock = true", async () => {
-		// Create inventory with stock for one variant
 		await createInventoryEntry("TEST-SKU-001", 10);
 
 		const result = await searchProducts({
@@ -128,7 +101,6 @@ describe("Product Search - Availability Filtering", () => {
 	});
 
 	test("should filter products by variants.availability.isOnStock = false", async () => {
-		// Create inventory with zero stock
 		await createInventoryEntry("TEST-SKU-001", 0);
 
 		const result = await searchProducts({
@@ -138,7 +110,6 @@ describe("Product Search - Availability Filtering", () => {
 			},
 		});
 
-		// Should find the product because it's not on stock
 		expect(result.results).toHaveLength(1);
 		expect(
 			result.results[0].productProjection?.masterVariant?.availability
@@ -149,7 +120,6 @@ describe("Product Search - Availability Filtering", () => {
 	test("should filter products by variants.availability.isOnStockForChannel", async () => {
 		const channelId = "test-channel-1";
 
-		// Create inventory for specific channel
 		await createInventoryEntry("TEST-SKU-001", 5, channelId);
 
 		const result = await searchProducts({
@@ -170,7 +140,6 @@ describe("Product Search - Availability Filtering", () => {
 		const channelId = "test-channel-1";
 		const otherChannelId = "test-channel-2";
 
-		// Create inventory for specific channel
 		await createInventoryEntry("TEST-SKU-001", 5, channelId);
 
 		const result = await searchProducts({
@@ -184,8 +153,6 @@ describe("Product Search - Availability Filtering", () => {
 	});
 
 	test("should handle products without inventory entries", async () => {
-		// Don't create any inventory entries
-
 		const result = await searchProducts({
 			exact: {
 				field: "variants.availability.isOnStock",
@@ -193,7 +160,6 @@ describe("Product Search - Availability Filtering", () => {
 			},
 		});
 
-		// Should find the product because it has no stock
 		expect(result.results).toHaveLength(1);
 		expect(
 			result.results[0].productProjection?.masterVariant?.availability
@@ -202,7 +168,6 @@ describe("Product Search - Availability Filtering", () => {
 	});
 
 	test("should work with OR queries for availability", async () => {
-		// Create inventory with stock
 		await createInventoryEntry("TEST-SKU-001", 10);
 
 		const result = await searchProducts({
@@ -222,7 +187,6 @@ describe("Product Search - Availability Filtering", () => {
 			],
 		});
 
-		// Should find the product regardless of stock status
 		expect(result.results).toHaveLength(1);
 	});
 

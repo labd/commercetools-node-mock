@@ -37,7 +37,10 @@ export class CustomerService extends AbstractService {
 		return reply.status(this.createStatusCode).send(result);
 	}
 
-	passwordResetToken(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	passwordResetToken(
+		request: FastifyRequest<{ Body: any }>,
+		reply: FastifyReply,
+	) {
 		const customer = this.repository.passwordResetToken(
 			getRepositoryContext(request),
 			request.body,
@@ -62,7 +65,10 @@ export class CustomerService extends AbstractService {
 		return reply.status(200).send(token);
 	}
 
-	emailTokenConfirm(request: FastifyRequest<{ Body: any }>, reply: FastifyReply) {
+	emailTokenConfirm(
+		request: FastifyRequest<{ Body: any }>,
+		reply: FastifyReply,
+	) {
 		const customer = this.repository.emailTokenConfirm(
 			getRepositoryContext(request),
 			request.body,

@@ -4,70 +4,66 @@ import type {
 	Cart,
 	CentPrecisionMoney,
 	HighPrecisionMoneyDraft,
-	ProductDraft,
 	ShippingMethod,
-	ShippingMethodDraft,
 	ShippingMethodResourceIdentifier,
 	TaxCategory,
-	TaxCategoryDraft,
-	Zone,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { calculateMoneyTotalCentAmount } from "#src/repositories/helpers.ts";
-import { customerDraftFactory } from "#src/testing/customer.ts";
+import {
+	cartDraftFactory,
+	customerDraftFactory,
+	productDraftFactory,
+	shippingMethodDraftFactory,
+	taxCategoryDraftFactory,
+	typeDraftFactory,
+	zoneDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Carts Query", () => {
 	const ctMock = new CommercetoolsMock();
 
 	beforeEach(async () => {
-		let response;
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-cart",
-				name: {
-					en: "Test",
-				},
-				description: {
-					en: "Test Type",
-				},
-				resourceTypeIds: ["order"],
-				fieldDefinitions: [
-					{
-						name: "offer_name",
-						label: {
-							en: "offer_name",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
-			},
-		});
-		expect(response.statusCode).toBe(201);
+		const typeFactory = typeDraftFactory(ctMock);
+		const cartFactory = cartDraftFactory(ctMock);
 
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: {
-				currency: "EUR",
-				custom: {
+		await typeFactory.create({
+			key: "my-cart",
+			name: {
+				en: "Test",
+			},
+			description: {
+				en: "Test Type",
+			},
+			resourceTypeIds: ["order"],
+			fieldDefinitions: [
+				{
+					name: "offer_name",
+					label: {
+						en: "offer_name",
+					},
+					required: false,
 					type: {
-						typeId: "type",
-						key: "my-cart",
+						name: "String",
 					},
-					fields: {
-						description: "example description",
-					},
+					inputHint: "SingleLine",
+				},
+			],
+		});
+
+		await cartFactory.create({
+			currency: "EUR",
+			custom: {
+				type: {
+					typeId: "type",
+					key: "my-cart",
+				},
+				fields: {
+					description: "example description",
 				},
 			},
 		});
-		expect(response.statusCode).toBe(201);
 	});
 
 	test("no filter", async () => {
@@ -124,66 +120,19 @@ describe("Cart Update Actions", () => {
 	let cart: Cart | undefined;
 	let taxCategory: TaxCategory;
 
-	const createCart = async (currency: string) => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: {
-				currency,
-				country: "NL",
-			},
-		});
-		expect(response.statusCode).toBe(201);
-		cart = response.json();
-	};
+	const cartFactory = cartDraftFactory(ctMock);
+	const taxCategoryFactory = taxCategoryDraftFactory(ctMock);
+	const productFactory = productDraftFactory(ctMock);
+	const typeFactory = typeDraftFactory(ctMock);
+	const zoneFactory = zoneDraftFactory(ctMock);
+	const shippingMethodFactory = shippingMethodDraftFactory(ctMock);
 
-	const createZone = async (country: string): Promise<Zone> => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/zones",
-			payload: {
-				name: country,
-				locations: [
-					{
-						country,
-					},
-				],
-			},
-		});
-		expect(response.statusCode).toBe(201);
-		return response.json();
-	};
-
-	const createTaxCategory = async (
-		draft: TaxCategoryDraft,
-	): Promise<TaxCategory> => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/tax-categories",
-			payload: draft,
-		});
-		expect(response.statusCode).toBe(201);
-		return response.json();
-	};
-
-	const createShippingMethod = async (
-		draft: ShippingMethodDraft,
-	): Promise<ShippingMethod> => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/shipping-methods",
-			payload: draft,
-		});
-		expect(response.statusCode).toBe(201);
-		return response.json();
-	};
-
-	const productDraft: ProductDraft = {
+	const productDraft = {
 		name: {
 			"nl-NL": "test product",
 		},
 		productType: {
-			typeId: "product-type",
+			typeId: "product-type" as const,
 			id: "some-uuid",
 		},
 		masterVariant: {
@@ -242,8 +191,11 @@ describe("Cart Update Actions", () => {
 	};
 
 	beforeEach(async () => {
-		await createCart("EUR");
-		taxCategory = await createTaxCategory({
+		cart = await cartFactory.create({
+			currency: "EUR",
+			country: "NL",
+		});
+		taxCategory = await taxCategoryFactory.create({
 			name: "Standard VAT",
 			key: "standard-vat",
 			rates: [
@@ -290,12 +242,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("addLineItem", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
@@ -321,12 +268,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("addLineItem by SKU", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
@@ -349,14 +291,12 @@ describe("Cart Update Actions", () => {
 		["EUR", 29800],
 		["GBP", 37800],
 	])("addLineItem with price selection", async (currency, total) => {
-		await createCart(currency);
-
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
+		cart = await cartFactory.create({
+			currency,
+			country: "NL",
 		});
-		const product = productResponse.json();
+
+		const product = await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
@@ -372,45 +312,37 @@ describe("Cart Update Actions", () => {
 		expect(response.statusCode).toBe(200);
 		expect(response.json().version).toBe(2);
 		expect(response.json().lineItems).toHaveLength(1);
-		expect(response.json().lineItems[0].price.value.currencyCode).toBe(currency);
+		expect(response.json().lineItems[0].price.value.currencyCode).toBe(
+			currency,
+		);
 		expect(response.json().totalPrice.centAmount).toEqual(total);
 	});
 
 	test("addLineItem with custom field", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const type = await typeFactory.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		assert(type, "type not created");
 		assert(cart, "cart not created");
@@ -444,40 +376,30 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("addLineItem with key", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const type = await typeFactory.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		assert(type, "type not created");
 		assert(cart, "cart not created");
@@ -525,11 +447,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("addItemShippingAddress", async () => {
-		await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
+		await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 
@@ -581,11 +499,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("recalculate", async () => {
-		await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
+		await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 
@@ -608,12 +522,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("removeLineItem", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
@@ -651,12 +560,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("removeLineItem decrease quantity", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
@@ -792,22 +696,11 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemPrice sets an external price for a line item", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: { currency: "EUR" },
-		});
-		expect(baseCartResponse.statusCode).toBe(201);
-		const baseCart = baseCartResponse.json() as Cart;
+		const baseCart = await cartFactory.create({ currency: "EUR" });
 
 		const addLineItemResponse = await ctMock.app.inject({
 			method: "POST",
@@ -872,22 +765,11 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemPrice supports high precision external price", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: { currency: "EUR" },
-		});
-		expect(baseCartResponse.statusCode).toBe(201);
-		const baseCart = baseCartResponse.json() as Cart;
+		const baseCart = await cartFactory.create({ currency: "EUR" });
 
 		const addLineItemResponse = await ctMock.app.inject({
 			method: "POST",
@@ -960,22 +842,11 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemPrice supports high precision external price with fractionDigits 5", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: { currency: "EUR" },
-		});
-		expect(baseCartResponse.statusCode).toBe(201);
-		const baseCart = baseCartResponse.json() as Cart;
+		const baseCart = await cartFactory.create({ currency: "EUR" });
 
 		const addLineItemResponse = await ctMock.app.inject({
 			method: "POST",
@@ -1048,22 +919,11 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemPrice fails when the money uses another currency", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: { currency: "EUR" },
-		});
-		expect(baseCartResponse.statusCode).toBe(201);
-		const baseCart = baseCartResponse.json() as Cart;
+		const baseCart = await cartFactory.create({ currency: "EUR" });
 
 		const addLineItemResponse = await ctMock.app.inject({
 			method: "POST",
@@ -1109,22 +969,11 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemPrice removes external price when no value is provided", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const baseCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: { currency: "EUR" },
-		});
-		expect(baseCartResponse.statusCode).toBe(201);
-		const baseCart = baseCartResponse.json() as Cart;
+		const baseCart = await cartFactory.create({ currency: "EUR" });
 
 		const addLineItemResponse = await ctMock.app.inject({
 			method: "POST",
@@ -1185,7 +1034,9 @@ describe("Cart Update Actions", () => {
 		});
 
 		expect(resetResponse.statusCode).toBe(200);
-		expect(resetResponse.json().version).toBe(cartWithExternalPrice.version + 1);
+		expect(resetResponse.json().version).toBe(
+			cartWithExternalPrice.version + 1,
+		);
 		expect(resetResponse.json().lineItems).toHaveLength(1);
 
 		const revertedLineItem = resetResponse.json().lineItems[0];
@@ -1205,66 +1056,51 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemCustomField", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const type = await typeFactory.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
-		const myCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: {
-				currency: "EUR",
-				lineItems: [
-					{
-						sku: product.masterData.current.masterVariant.sku,
-						quantity: 1,
-						custom: {
-							type: {
-								typeId: "type",
-								key: "my-type",
-							},
-							fields: {},
+		const myCart = await cartFactory.create({
+			currency: "EUR",
+			lineItems: [
+				{
+					sku: product.masterData.current.masterVariant.sku,
+					quantity: 1,
+					custom: {
+						type: {
+							typeId: "type",
+							key: "my-type",
 						},
+						fields: {},
 					},
-				],
-			},
+				},
+			],
 		});
-		const myCart = myCartResponse.json();
 
 		const lineItem = myCart.lineItems[0];
 		assert(lineItem, "lineItem not created");
@@ -1300,59 +1136,44 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemCustomType", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(product, "product not created");
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const type = await typeFactory.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
-		const myCartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: {
-				currency: "EUR",
-				lineItems: [
-					{
-						sku: product.masterData.current.masterVariant.sku,
-						quantity: 1,
-					},
-				],
-			},
+		const myCart = await cartFactory.create({
+			currency: "EUR",
+			lineItems: [
+				{
+					sku: product.masterData.current.masterVariant.sku,
+					quantity: 1,
+				},
+			],
 		});
-		const myCart = myCartResponse.json();
 
 		const lineItem = myCart.lineItems[0];
 		assert(lineItem, "lineItem not created");
@@ -1437,33 +1258,28 @@ describe("Cart Update Actions", () => {
 			country: "NL",
 		};
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const type = await typeFactory.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
@@ -1510,33 +1326,28 @@ describe("Cart Update Actions", () => {
 			country: "NL",
 		};
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const type = await typeFactory.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		assert(type, "type not created");
 
@@ -1578,9 +1389,15 @@ describe("Cart Update Actions", () => {
 		let standardExcludedShippingMethod: ShippingMethod;
 		beforeEach(async () => {
 			assert(cart, "cart not created");
-			const nlZone = await createZone("NL");
-			const frZone = await createZone("FR");
-			const standardTax = await createTaxCategory({
+			const nlZone = await zoneFactory.create({
+				name: "NL",
+				locations: [{ country: "NL" }],
+			});
+			const frZone = await zoneFactory.create({
+				name: "FR",
+				locations: [{ country: "FR" }],
+			});
+			const standardTax = await taxCategoryFactory.create({
 				name: "Standard tax category",
 				key: "standard",
 				rates: [
@@ -1598,7 +1415,7 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
-			await createTaxCategory({
+			await taxCategoryFactory.create({
 				name: "Reduced tax category",
 				key: "reduced",
 				rates: [
@@ -1616,7 +1433,7 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
-			const standardExcludedTax = await createTaxCategory({
+			const standardExcludedTax = await taxCategoryFactory.create({
 				name: "Tax category that is excluded from price",
 				key: "standard-excluded",
 				rates: [
@@ -1634,7 +1451,7 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
-			standardShippingMethod = await createShippingMethod({
+			standardShippingMethod = await shippingMethodFactory.create({
 				isDefault: false,
 				key: "standard",
 				name: "Standard shipping",
@@ -1678,7 +1495,7 @@ describe("Cart Update Actions", () => {
 				],
 			});
 
-			standardExcludedShippingMethod = await createShippingMethod({
+			standardExcludedShippingMethod = await shippingMethodFactory.create({
 				isDefault: false,
 				key: "standard-excluded",
 				name: "Standard shipping with tax excluded from price",
@@ -1721,7 +1538,7 @@ describe("Cart Update Actions", () => {
 					},
 				],
 			});
-			await createShippingMethod({
+			await shippingMethodFactory.create({
 				isDefault: false,
 				key: "express",
 				name: "Express shipping",
@@ -1991,12 +1808,7 @@ describe("Cart Update Actions", () => {
 	});
 
 	test("setLineItemShippingDetails", async () => {
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		const product = productResponse.json();
+		const product = await productFactory.create(productDraft);
 
 		assert(cart, "cart not created");
 		assert(product, "product not created");
@@ -2054,25 +1866,20 @@ describe("Cart Update Actions", () => {
 
 	test("addCustomLineItem", async () => {
 		assert(cart, "cart not created");
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "custom-line-item-type",
-				name: { en: "Custom Line Item Type" },
-				resourceTypeIds: ["custom-line-item"],
-				fieldDefinitions: [
-					{
-						name: "description",
-						label: { en: "Description" },
-						required: false,
-						type: { name: "String" },
-						inputHint: "SingleLine",
-					},
-				],
-			},
+		const type = await typeFactory.create({
+			key: "custom-line-item-type",
+			name: { en: "Custom Line Item Type" },
+			resourceTypeIds: ["custom-line-item"],
+			fieldDefinitions: [
+				{
+					name: "description",
+					label: { en: "Description" },
+					required: false,
+					type: { name: "String" },
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "POST",

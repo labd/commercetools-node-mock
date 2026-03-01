@@ -46,7 +46,10 @@ export default abstract class AbstractService {
 		);
 	}
 
-	get(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
+	get(
+		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		reply: FastifyReply,
+	) {
 		const query = request.query;
 		const limit = this._parseParam(query.limit);
 		const offset = this._parseParam(query.offset);
@@ -70,7 +73,10 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	getWithId(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+	getWithId(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const result = this._expandWithId(request, params.id);
 		if (!result) {
@@ -88,7 +94,13 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	getWithKey(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+	getWithKey(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const query = request.query;
 		const result = this.repository.getByKey(
@@ -113,7 +125,13 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	deleteWithId(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+	deleteWithId(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const query = request.query;
 		const result = this.repository.delete(
@@ -129,7 +147,13 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	deleteWithKey(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+	deleteWithKey(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const query = request.query;
 		const resource = this.repository.getByKey(
@@ -163,7 +187,10 @@ export default abstract class AbstractService {
 		return reply.status(this.createStatusCode).send(result);
 	}
 
-	postWithId(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+	postWithId(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const updateRequest = validateData<Update>(
 			request.body,
@@ -188,7 +215,10 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	postWithKey(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+	postWithKey(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const updateRequest = validateData<Update>(
 			request.body,
@@ -214,7 +244,10 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	protected _expandWithId(request: FastifyRequest<{ Querystring: Record<string, any> }>, resourceId: string) {
+	protected _expandWithId(
+		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		resourceId: string,
+	) {
 		const query = request.query;
 		const result = this.repository.get(
 			getRepositoryContext(request),

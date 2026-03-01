@@ -1,93 +1,82 @@
 import assert from "node:assert";
-import type { CartDiscount, TypeDraft } from "@commercetools/platform-sdk";
+import type { CartDiscount } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import {
+	cartDiscountDraftFactory,
+	typeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "..";
-
-const typeDraft: TypeDraft = {
-	key: "my-type",
-	name: {
-		en: "TestType",
-	},
-	description: {
-		en: "Test Type",
-	},
-	resourceTypeIds: ["cart-discount"],
-	fieldDefinitions: [
-		{
-			name: "discount_name",
-			label: {
-				en: "Discount name",
-			},
-			required: false,
-			type: {
-				name: "String",
-			},
-			inputHint: "SingleLine",
-		},
-		{
-			name: "fixedAmount",
-			label: {
-				en: "Fixed Amount",
-			},
-			required: true,
-			type: {
-				name: "Money",
-			},
-			inputHint: "SingleLine",
-		},
-	],
-};
-
-const getCartDiscountDraft = (typeId: string) => ({
-	version: 1,
-	key: "my-relative-cart-discount",
-	name: { en: "myRelativeCartDiscount" },
-	value: {
-		type: "relative",
-		permyriad: 1000,
-	},
-	description: { en: "My relative cart discount" },
-	target: { type: "lineItems", predicate: "1=1" },
-	isActive: false,
-	custom: {
-		type: {
-			typeId: "type",
-			id: typeId,
-		},
-		fields: {
-			discount_name: "MyDiscount",
-			fixedAmount: {
-				type: "centPrecision",
-				currencyCode: "USD",
-				centAmount: 15000,
-				fractionDigits: 2,
-			},
-		},
-	},
-	validFrom: "2000-01-01T00:00:01.000Z",
-	validUntil: "2000-12-31T23:59:59.999Z",
-	sortOrder: "0.1",
-});
 
 describe("Cart Discounts Query", () => {
 	const ctMock = new CommercetoolsMock();
+	const typeDraft = typeDraftFactory(ctMock);
+	const cartDiscountDraft = cartDiscountDraftFactory(ctMock);
 
 	beforeEach(async () => {
-		let response;
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: typeDraft,
+		const type = await typeDraft.create({
+			key: "my-type",
+			name: {
+				en: "TestType",
+			},
+			description: {
+				en: "Test Type",
+			},
+			resourceTypeIds: ["cart-discount"],
+			fieldDefinitions: [
+				{
+					name: "discount_name",
+					label: {
+						en: "Discount name",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+				{
+					name: "fixedAmount",
+					label: {
+						en: "Fixed Amount",
+					},
+					required: true,
+					type: {
+						name: "Money",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		expect(response.statusCode).toBe(201);
-		const typeId = response.json().id;
 
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/cart-discounts",
-			payload: getCartDiscountDraft(typeId),
+		await cartDiscountDraft.create({
+			key: "my-relative-cart-discount",
+			name: { en: "myRelativeCartDiscount" },
+			value: {
+				type: "relative",
+				permyriad: 1000,
+			},
+			description: { en: "My relative cart discount" },
+			target: { type: "lineItems", predicate: "1=1" },
+			isActive: false,
+			custom: {
+				type: {
+					typeId: "type",
+					id: type.id,
+				},
+				fields: {
+					discount_name: "MyDiscount",
+					fixedAmount: {
+						type: "centPrecision",
+						currencyCode: "USD",
+						centAmount: 15000,
+						fractionDigits: 2,
+					},
+				},
+			},
+			validFrom: "2000-01-01T00:00:01.000Z",
+			validUntil: "2000-12-31T23:59:59.999Z",
+			sortOrder: "0.1",
 		});
-		expect(response.statusCode).toBe(201);
 	});
 
 	test("no filter", async () => {
@@ -137,32 +126,75 @@ describe("Cart Discounts Query", () => {
 
 describe("Cart Discounts Update Actions", () => {
 	const ctMock = new CommercetoolsMock();
+	const typeDraft = typeDraftFactory(ctMock);
+	const cartDiscountDraft = cartDiscountDraftFactory(ctMock);
 	let cartDiscount: CartDiscount | undefined;
 
-	const createType = async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: typeDraft,
-		});
-		expect(response.statusCode).toBe(201);
-		return response.json().id;
-	};
-
-	const createCartDiscount = async (typeId: string) => {
-		const cartDiscountDraft = getCartDiscountDraft(typeId);
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/cart-discounts",
-			payload: cartDiscountDraft,
-		});
-		expect(response.statusCode).toBe(201);
-		cartDiscount = response.json();
-	};
-
 	beforeEach(async () => {
-		const typeId = await createType();
-		await createCartDiscount(typeId);
+		const type = await typeDraft.create({
+			key: "my-type",
+			name: {
+				en: "TestType",
+			},
+			description: {
+				en: "Test Type",
+			},
+			resourceTypeIds: ["cart-discount"],
+			fieldDefinitions: [
+				{
+					name: "discount_name",
+					label: {
+						en: "Discount name",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+				{
+					name: "fixedAmount",
+					label: {
+						en: "Fixed Amount",
+					},
+					required: true,
+					type: {
+						name: "Money",
+					},
+					inputHint: "SingleLine",
+				},
+			],
+		});
+
+		cartDiscount = await cartDiscountDraft.create({
+			key: "my-relative-cart-discount",
+			name: { en: "myRelativeCartDiscount" },
+			value: {
+				type: "relative",
+				permyriad: 1000,
+			},
+			description: { en: "My relative cart discount" },
+			target: { type: "lineItems", predicate: "1=1" },
+			isActive: false,
+			custom: {
+				type: {
+					typeId: "type",
+					id: type.id,
+				},
+				fields: {
+					discount_name: "MyDiscount",
+					fixedAmount: {
+						type: "centPrecision",
+						currencyCode: "USD",
+						centAmount: 15000,
+						fractionDigits: 2,
+					},
+				},
+			},
+			validFrom: "2000-01-01T00:00:01.000Z",
+			validUntil: "2000-12-31T23:59:59.999Z",
+			sortOrder: "0.1",
+		});
 	});
 
 	afterEach(() => {

@@ -1,23 +1,21 @@
 import type { MyPaymentDraft } from "@commercetools/platform-sdk";
 import { beforeEach, describe, expect, test } from "vitest";
+import { typeDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("MyPayment", () => {
+	const typeFactory = typeDraftFactory(ctMock);
+
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "custom-payment",
-				name: {
-					"nl-NL": "custom-payment",
-				},
-				resourceTypeIds: ["payment"],
+		await typeFactory.create({
+			key: "custom-payment",
+			name: {
+				"nl-NL": "custom-payment",
 			},
+			resourceTypeIds: ["payment"],
 		});
-		expect(response.statusCode).toBe(201);
 	});
 
 	test("Create payment", async () => {

@@ -1,10 +1,6 @@
 import type { InvalidTokenError } from "@commercetools/platform-sdk";
 import auth from "basic-auth";
-import type {
-	FastifyInstance,
-	FastifyReply,
-	FastifyRequest,
-} from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { AuthError, InvalidRequestError } from "#src/exceptions.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { hashPassword } from "../lib/password.ts";
@@ -47,10 +43,7 @@ export class OAuth2Server {
 		return async (instance: FastifyInstance) => {
 			await instance.register(import("@fastify/formbody"));
 			instance.decorateRequest("credentials", undefined);
-			instance.addHook(
-				"preHandler",
-				this.validateClientCredentials.bind(this),
-			);
+			instance.addHook("preHandler", this.validateClientCredentials.bind(this));
 			instance.post("/token", this.tokenHandler.bind(this));
 			instance.post(
 				"/:projectKey/customers/token",
@@ -132,7 +125,13 @@ export class OAuth2Server {
 		};
 	}
 
-	async tokenHandler(request: FastifyRequest<{ Querystring: Record<string, any>; Body: Record<string, any> }>, reply: FastifyReply) {
+	async tokenHandler(
+		request: FastifyRequest<{
+			Querystring: Record<string, any>;
+			Body: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		if (!request.credentials) {
 			throw new CommercetoolsError<InvalidClientError>(
 				{
@@ -204,7 +203,14 @@ export class OAuth2Server {
 		);
 	}
 
-	async customerTokenHandler(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any>; Body: Record<string, any> }>, reply: FastifyReply) {
+	async customerTokenHandler(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+			Body: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const query = request.query;
 		const body = request.body;
@@ -249,7 +255,11 @@ export class OAuth2Server {
 	}
 
 	async inStoreCustomerTokenHandler(
-		request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any>; Body: Record<string, any> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+			Body: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
@@ -296,7 +306,14 @@ export class OAuth2Server {
 		}
 	}
 
-	async anonymousTokenHandler(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any>; Body: Record<string, any> }>, reply: FastifyReply) {
+	async anonymousTokenHandler(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+			Body: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const query = request.query;
 		const body = request.body;

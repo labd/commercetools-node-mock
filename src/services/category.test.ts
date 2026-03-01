@@ -5,29 +5,24 @@ import type {
 	CategoryRemoveAssetAction,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { categoryDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Categories Query", () => {
 	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/categories",
-			payload: {
-				name: {
-					en: "Top hat",
-				},
-				slug: {
-					en: "top-hat",
-				},
-				orderHint: "0.1",
+		category = await categoryDraft.create({
+			name: {
+				en: "Top hat",
 			},
+			slug: {
+				en: "top-hat",
+			},
+			orderHint: "0.1",
 		});
-		expect(response.statusCode).toBe(201);
-
-		category = response.json() as Category;
 	});
 
 	afterEach(() => {
@@ -51,24 +46,19 @@ describe("Categories Query", () => {
 
 describe("categories changeName", () => {
 	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/categories",
-			payload: {
-				name: {
-					en: "Top hat",
-				},
-				slug: {
-					en: "top-hat",
-				},
-				orderHint: "0.1",
+		category = await categoryDraft.create({
+			name: {
+				en: "Top hat",
 			},
+			slug: {
+				en: "top-hat",
+			},
+			orderHint: "0.1",
 		});
-		expect(response.statusCode).toBe(201);
-		category = response.json() as Category;
 	});
 
 	test("changeName", async () => {
@@ -95,41 +85,30 @@ describe("categories changeName", () => {
 
 describe("categories changeParent", () => {
 	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
 	let category1: Category | undefined;
 	let category2: Category | undefined;
 
 	beforeEach(async () => {
-		const response1 = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/categories",
-			payload: {
-				name: {
-					en: "Top hat",
-				},
-				slug: {
-					en: "top-hat",
-				},
-				orderHint: "0.1",
+		category1 = await categoryDraft.create({
+			name: {
+				en: "Top hat",
 			},
+			slug: {
+				en: "top-hat",
+			},
+			orderHint: "0.1",
 		});
-		expect(response1.statusCode).toBe(201);
-		category1 = response1.json() as Category;
 
-		const response2 = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/categories",
-			payload: {
-				name: {
-					en: "Top hat",
-				},
-				slug: {
-					en: "top-hat",
-				},
-				orderHint: "0.1",
+		category2 = await categoryDraft.create({
+			name: {
+				en: "Top hat",
 			},
+			slug: {
+				en: "top-hat",
+			},
+			orderHint: "0.1",
 		});
-		expect(response2.statusCode).toBe(201);
-		category2 = response2.json() as Category;
 	});
 
 	test("changeParent", async () => {
@@ -162,30 +141,24 @@ describe("categories changeParent", () => {
 
 describe("Categories add asset", () => {
 	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/categories",
-			payload: {
-				name: {
-					en: "Top hat",
-				},
-				slug: {
-					en: "top-hat",
-				},
-				orderHint: "0.1",
-				assets: [
-					{
-						key: "some-key",
-					},
-				],
+		category = await categoryDraft.create({
+			name: {
+				en: "Top hat",
 			},
+			slug: {
+				en: "top-hat",
+			},
+			orderHint: "0.1",
+			assets: [
+				{
+					key: "some-key",
+				},
+			],
 		});
-		expect(response.statusCode).toBe(201);
-
-		category = response.json() as Category;
 	});
 
 	test("add second asset", async () => {
@@ -216,33 +189,27 @@ describe("Categories add asset", () => {
 
 describe("Categories remove asset", () => {
 	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
 	let category: Category | undefined;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/categories",
-			payload: {
-				name: {
-					en: "Top hat",
-				},
-				slug: {
-					en: "top-hat",
-				},
-				orderHint: "0.1",
-				assets: [
-					{
-						key: "some-key",
-					},
-					{
-						key: "some-other-key",
-					},
-				],
+		category = await categoryDraft.create({
+			name: {
+				en: "Top hat",
 			},
+			slug: {
+				en: "top-hat",
+			},
+			orderHint: "0.1",
+			assets: [
+				{
+					key: "some-key",
+				},
+				{
+					key: "some-other-key",
+				},
+			],
 		});
-		expect(response.statusCode).toBe(201);
-
-		category = response.json() as Category;
 	});
 
 	test("remove assets by id and key", async () => {

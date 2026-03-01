@@ -1,24 +1,17 @@
 import assert from "node:assert";
 import type {
 	Category,
-	CategoryDraft,
 	Image,
-	InventoryEntryDraft,
 	PriceDraft,
 	Product,
 	ProductData,
-	ProductDraft,
 	ProductPagedSearchResponse,
 	ProductSearchRequest,
 	ProductSearchResult,
 	ProductType,
-	ProductTypeDraft,
 	State,
-	StateDraft,
 	TaxCategory,
-	TaxCategoryDraft,
 	Type,
-	TypeDraft,
 } from "@commercetools/platform-sdk";
 import {
 	afterAll,
@@ -28,93 +21,119 @@ import {
 	expect,
 	test,
 } from "vitest";
+import {
+	categoryDraftFactory,
+	inventoryEntryDraftFactory,
+	productDraftFactory,
+	productTypeDraftFactory,
+	stateDraftFactory,
+	taxCategoryDraftFactory,
+	typeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
-const productTypeDraft: ProductTypeDraft = {
-	key: "test-product-type",
-	name: "Test Product Type",
-	description: "Test Product Type description",
-};
+let productType: ProductType;
+let category1: Category;
+let category2: Category;
+let taxCategory1: TaxCategory;
+let taxCategory2: TaxCategory;
+let productState1: State;
+let productState2: State;
+let productPriceType: Type;
 
-const categoryDraft1: CategoryDraft = {
-	key: "category-1",
-	name: {
-		"nl-NL": "Category One",
-	},
-	slug: {
-		"nl-NL": "category_1",
-	},
-};
+async function beforeAllProductTests(mock: CommercetoolsMock) {
+	const productTypeFactory = productTypeDraftFactory(mock);
+	const categoryFactory = categoryDraftFactory(mock);
+	const taxCategoryFactory = taxCategoryDraftFactory(mock);
+	const stateFactory = stateDraftFactory(mock);
+	const typeFactory = typeDraftFactory(mock);
 
-const categoryDraft2: CategoryDraft = {
-	key: "category-2",
-	name: {
-		"nl-NL": "Category Two",
-	},
-	slug: {
-		"nl-NL": "category_2",
-	},
-};
+	productType = await productTypeFactory.create({
+		key: "test-product-type",
+		name: "Test Product Type",
+		description: "Test Product Type description",
+	});
 
-const taxcategoryDraft1: TaxCategoryDraft = {
-	name: "Tax category 1",
-	key: "tax-category-1",
-};
-
-const taxcategoryDraft2: TaxCategoryDraft = {
-	name: "Tax category 2",
-	key: "tax-category-2",
-};
-
-const productState1Draft: StateDraft = {
-	key: "initial-state",
-	type: "ProductState",
-	initial: true,
-	name: {
-		"nl-NL": "Initial state",
-	},
-	description: {
-		"nl-NL": "Product initial state",
-	},
-};
-
-const productState2Draft: StateDraft = {
-	key: "another-state",
-	type: "ProductState",
-	initial: true,
-	name: {
-		"nl-NL": "Another state",
-	},
-	description: {
-		"nl-NL": "Product another state",
-	},
-};
-
-const productPriceTypeDraft: TypeDraft = {
-	key: "product-price",
-	name: {
-		en: "ProductPriceType",
-	},
-	description: {
-		en: "Product Price Type",
-	},
-	resourceTypeIds: ["product-price"],
-	fieldDefinitions: [
-		{
-			name: "lastModifiedAt",
-			label: {
-				en: "Last modified at",
-			},
-			required: false,
-			type: {
-				name: "DateTime",
-			},
-			inputHint: "SingleLine",
+	category1 = await categoryFactory.create({
+		key: "category-1",
+		name: {
+			"nl-NL": "Category One",
 		},
-	],
-};
+		slug: {
+			"nl-NL": "category_1",
+		},
+	});
 
-const publishedProductDraft: ProductDraft = {
+	category2 = await categoryFactory.create({
+		key: "category-2",
+		name: {
+			"nl-NL": "Category Two",
+		},
+		slug: {
+			"nl-NL": "category_2",
+		},
+	});
+
+	taxCategory1 = await taxCategoryFactory.create({
+		name: "Tax category 1",
+		key: "tax-category-1",
+	});
+
+	taxCategory2 = await taxCategoryFactory.create({
+		name: "Tax category 2",
+		key: "tax-category-2",
+	});
+
+	productState1 = await stateFactory.create({
+		key: "initial-state",
+		type: "ProductState",
+		initial: true,
+		name: {
+			"nl-NL": "Initial state",
+		},
+		description: {
+			"nl-NL": "Product initial state",
+		},
+	});
+
+	productState2 = await stateFactory.create({
+		key: "another-state",
+		type: "ProductState",
+		initial: true,
+		name: {
+			"nl-NL": "Another state",
+		},
+		description: {
+			"nl-NL": "Product another state",
+		},
+	});
+
+	productPriceType = await typeFactory.create({
+		key: "product-price",
+		name: {
+			en: "ProductPriceType",
+		},
+		description: {
+			en: "Product Price Type",
+		},
+		resourceTypeIds: ["product-price"],
+		fieldDefinitions: [
+			{
+				name: "lastModifiedAt",
+				label: {
+					en: "Last modified at",
+				},
+				required: false,
+				type: {
+					name: "DateTime",
+				},
+				inputHint: "SingleLine",
+			},
+		],
+	});
+}
+
+const publishedProductDraftOverrides = {
 	name: {
 		"nl-NL": "test published product",
 	},
@@ -122,21 +141,21 @@ const publishedProductDraft: ProductDraft = {
 		"nl-NL": "Test published product description",
 	},
 	productType: {
-		typeId: "product-type",
+		typeId: "product-type" as const,
 		key: "test-product-type",
 	},
 	categories: [
 		{
-			typeId: "category",
+			typeId: "category" as const,
 			key: "category-1",
 		},
 	],
 	taxCategory: {
-		typeId: "tax-category",
-		key: taxcategoryDraft1.key,
+		typeId: "tax-category" as const,
+		key: "tax-category-1",
 	},
 	state: {
-		typeId: "state",
+		typeId: "state" as const,
 		key: "initial-state",
 	},
 	masterVariant: {
@@ -196,7 +215,7 @@ const publishedProductDraft: ProductDraft = {
 	publish: true,
 };
 
-const unpublishedProductDraft: ProductDraft = {
+const unpublishedProductDraftOverrides = {
 	key: "test-unpublished-product",
 	name: {
 		"nl-NL": "test unpublished product",
@@ -205,21 +224,21 @@ const unpublishedProductDraft: ProductDraft = {
 		"nl-NL": "Test published product description",
 	},
 	productType: {
-		typeId: "product-type",
+		typeId: "product-type" as const,
 		key: "test-product-type",
 	},
 	categories: [
 		{
-			typeId: "category",
+			typeId: "category" as const,
 			key: "category-1",
 		},
 	],
 	taxCategory: {
-		typeId: "tax-category",
-		key: taxcategoryDraft1.key,
+		typeId: "tax-category" as const,
+		key: "tax-category-1",
 	},
 	state: {
-		typeId: "state",
+		typeId: "state" as const,
 		key: "initial-state",
 	},
 	masterVariant: {
@@ -279,98 +298,10 @@ const unpublishedProductDraft: ProductDraft = {
 	publish: false,
 };
 
-let productType: ProductType;
-let category1: Category;
-let category2: Category;
-let taxCategory1: TaxCategory;
-let taxCategory2: TaxCategory;
-let productState1: State;
-let productState2: State;
-let productPriceType: Type;
-
-async function beforeAllProductTests(mock: CommercetoolsMock) {
-	let response;
-	// Create Product Type
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/product-types",
-		payload: productTypeDraft,
-	});
-
-	expect(response.statusCode).toBe(201);
-	productType = response.json();
-
-	// Create Category 1
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/categories",
-		payload: categoryDraft1,
-	});
-
-	expect(response.statusCode).toBe(201);
-	category1 = response.json();
-
-	// Create Category 2
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/categories",
-		payload: categoryDraft2,
-	});
-
-	expect(response.statusCode).toBe(201);
-	category2 = response.json();
-
-	// Create Tax Category 1
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/tax-categories",
-		payload: taxcategoryDraft1,
-	});
-
-	expect(response.statusCode).toBe(201);
-	taxCategory1 = response.json();
-
-	// Create Tax Category 2
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/tax-categories",
-		payload: taxcategoryDraft2,
-	});
-
-	expect(response.statusCode).toBe(201);
-	taxCategory2 = response.json();
-
-	// Create Product State 1
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/states",
-		payload: productState1Draft,
-	});
-
-	expect(response.statusCode).toBe(201);
-	productState1 = response.json();
-
-	// Create Product State 2
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/states",
-		payload: productState2Draft,
-	});
-
-	expect(response.statusCode).toBe(201);
-	productState2 = response.json();
-
-	response = await mock.app.inject({
-		method: "POST",
-		url: "/dummy/types",
-		payload: productPriceTypeDraft,
-	});
-	expect(response.statusCode).toBe(201);
-	productPriceType = response.json();
-}
-
 describe("Product", () => {
 	const ctMock = new CommercetoolsMock();
+	const productFactory = productDraftFactory(ctMock);
+
 	beforeAll(async () => {
 		await beforeAllProductTests(ctMock);
 	});
@@ -378,20 +309,20 @@ describe("Product", () => {
 	test("Create product", async () => {
 		assert(productType, "product type not created");
 
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: unpublishedProductDraft,
-		});
+		const product = await productFactory.create(
+			unpublishedProductDraftOverrides,
+		);
 
 		const productData: ProductData = {
 			name: {
+				en: expect.any(String),
 				"nl-NL": "test unpublished product",
 			},
 			description: {
 				"nl-NL": "Test published product description",
 			},
 			slug: {
+				en: expect.any(String),
 				"nl-NL": "test-unpublished-product",
 			},
 			categories: [
@@ -467,7 +398,7 @@ describe("Product", () => {
 			searchKeywords: {},
 		};
 
-		expect(response.json()).toEqual({
+		expect(product).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),
@@ -497,29 +428,19 @@ describe("Product", () => {
 
 describe("Product update actions", () => {
 	const ctMock = new CommercetoolsMock();
+	const productFactory = productDraftFactory(ctMock);
 	let productPublished: Product | undefined;
+
 	beforeAll(async () => {
 		await beforeAllProductTests(ctMock);
 	});
 
 	beforeEach(async () => {
-		let response;
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: publishedProductDraft,
-		});
+		productPublished = await productFactory.create(
+			publishedProductDraftOverrides,
+		);
 
-		expect(response.statusCode).toBe(201);
-		productPublished = response.json();
-
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: unpublishedProductDraft,
-		});
-
-		expect(response.statusCode).toBe(201);
+		await productFactory.create(unpublishedProductDraftOverrides);
 	});
 
 	afterAll(async () => {
@@ -627,9 +548,7 @@ describe("Product update actions", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.version).toBe(2);
-		expect(body.masterData.staged.variants[0].attributes).toHaveLength(
-			2,
-		);
+		expect(body.masterData.staged.variants[0].attributes).toHaveLength(2);
 		const attr = body.masterData.staged.variants[0].attributes[1];
 		expect(attr).toEqual({ name: "foo", value: "bar" });
 	});
@@ -651,9 +570,7 @@ describe("Product update actions", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.version).toBe(3);
-		expect(
-			body.masterData.current.variants[0].attributes,
-		).toHaveLength(2);
+		expect(body.masterData.current.variants[0].attributes).toHaveLength(2);
 		const attr = body.masterData.current.variants[0].attributes[1];
 		expect(attr).toEqual({ name: "foo", value: "bar" });
 	});
@@ -674,9 +591,7 @@ describe("Product update actions", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.version).toBe(2);
-		expect(
-			body.masterData.staged.masterVariant.attributes,
-		).toHaveLength(1);
+		expect(body.masterData.staged.masterVariant.attributes).toHaveLength(1);
 		const attr = body.masterData.staged.masterVariant.attributes[0];
 		expect(attr).toEqual({ name: "test", value: "foo" });
 	});
@@ -1016,9 +931,7 @@ describe("Product update actions", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.version).toBe(2);
-		expect(body.masterData.staged.masterVariant.prices).toHaveLength(
-			0,
-		);
+		expect(body.masterData.staged.masterVariant.prices).toHaveLength(0);
 	});
 
 	test("changeName product", async () => {
@@ -1040,12 +953,8 @@ describe("Product update actions", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.version).toBe(2);
-		expect(body.masterData.staged.name).toBe(
-			"new test published product",
-		);
-		expect(body.masterData.current.name).toBe(
-			"new test published product",
-		);
+		expect(body.masterData.staged.name).toBe("new test published product");
+		expect(body.masterData.current.name).toBe("new test published product");
 	});
 
 	test("changeSlug product", async () => {
@@ -1629,36 +1538,14 @@ describe("Product update actions", () => {
 // Test the general product search implementation
 describe("Product Search - Generic", () => {
 	const ctMock = new CommercetoolsMock();
-
-	async function addInventoryEntry(sku: string, quantity: number) {
-		const inventoryEntryDraft: InventoryEntryDraft = {
-			key: `${sku}_stock`,
-			sku,
-			quantityOnStock: quantity,
-			supplyChannel: {
-				typeId: "channel",
-				id: "dummy-inventory-channel",
-			},
-		};
-
-		await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/inventory",
-			payload: inventoryEntryDraft,
-		});
-	}
+	const productFactory = productDraftFactory(ctMock);
+	const inventoryFactory = inventoryEntryDraftFactory(ctMock);
 
 	beforeAll(async () => {
 		await beforeAllProductTests(ctMock);
 
 		for (let i = 0; i < 24; i++) {
-			const response = await ctMock.app.inject({
-				method: "POST",
-				url: "/dummy/products",
-				payload: publishedProductDraft,
-			});
-
-			expect(response.statusCode).toBe(201);
+			await productFactory.create(publishedProductDraftOverrides);
 		}
 	});
 
@@ -1762,10 +1649,15 @@ describe("Product Search - Generic", () => {
 
 		expect(pagedSearchResponse1.results.length).toBe(0);
 
-		await addInventoryEntry(
-			publishedProductDraft.variants?.[0]?.sku as string,
-			10,
-		);
+		await inventoryFactory.create({
+			key: "1338_stock",
+			sku: "1338",
+			quantityOnStock: 10,
+			supplyChannel: {
+				typeId: "channel",
+				id: "dummy-inventory-channel",
+			},
+		});
 
 		const response2 = await ctMock.app.inject({
 			method: "POST",

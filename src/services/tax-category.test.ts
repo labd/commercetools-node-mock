@@ -1,19 +1,22 @@
-import type { TaxCategoryDraft } from "@commercetools/platform-sdk";
 import { afterEach, describe, expect, test } from "vitest";
+import { taxCategoryDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Tax Category", () => {
+	const taxCategoryDraft = taxCategoryDraftFactory(ctMock);
+
 	afterEach(() => {
 		ctMock.clear();
 	});
 	test("Create tax category", async () => {
-		const draft: TaxCategoryDraft = {
+		const draft = taxCategoryDraft.build({
 			name: "foo",
 			key: "standard",
 			rates: [],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/tax-categories",
@@ -21,7 +24,6 @@ describe("Tax Category", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -34,47 +36,31 @@ describe("Tax Category", () => {
 	});
 
 	test("Get tax category", async () => {
-		const draft: TaxCategoryDraft = {
+		const taxCategory = await taxCategoryDraft.create({
 			name: "foo",
 			key: "standard",
 			rates: [],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/tax-categories",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/tax-categories/${createBody.id}`,
+			url: `/dummy/tax-categories/${taxCategory.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createBody);
+		expect(response.json()).toEqual(taxCategory);
 	});
 
 	test("Get tax category with key", async () => {
-		const draft: TaxCategoryDraft = {
+		const taxCategory = await taxCategoryDraft.create({
 			name: "foo",
 			key: "standard",
 			rates: [],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/tax-categories",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/tax-categories/?where=${encodeURIComponent(`key="${createBody.key}"`)}`,
+			url: `/dummy/tax-categories/?where=${encodeURIComponent(`key="${taxCategory.key}"`)}`,
 		});
 
 		expect(response.statusCode).toBe(200);
@@ -83,7 +69,7 @@ describe("Tax Category", () => {
 			limit: 20,
 			offset: 0,
 			total: 1,
-			results: [createBody],
+			results: [taxCategory],
 		});
 	});
 });

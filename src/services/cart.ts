@@ -28,7 +28,10 @@ export class CartService extends AbstractService {
 		parent.post("/replicate", this.replicate.bind(this));
 	}
 
-	replicate(request: FastifyRequest<{ Params: Record<string, string>; Body: any }>, reply: FastifyReply) {
+	replicate(
+		request: FastifyRequest<{ Params: Record<string, string>; Body: any }>,
+		reply: FastifyReply,
+	) {
 		const context = getRepositoryContext(request);
 		const body = request.body;
 

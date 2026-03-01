@@ -1,15 +1,18 @@
-import type { CustomerGroupDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { customerGroupDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("CustomerGroup", () => {
+	const customerGroupDraft = customerGroupDraftFactory(ctMock);
+
 	test("Create customer group", async () => {
-		const draft: CustomerGroupDraft = {
+		const draft = customerGroupDraft.build({
 			key: "premium-customers",
 			groupName: "Premium Customers",
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/customer-groups",
@@ -17,7 +20,6 @@ describe("CustomerGroup", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -29,39 +31,25 @@ describe("CustomerGroup", () => {
 	});
 
 	test("Get customer group", async () => {
-		const draft: CustomerGroupDraft = {
+		const customerGroup = await customerGroupDraft.create({
 			key: "test-group",
 			groupName: "Test Group",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/customer-groups",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/customer-groups/${createResponse.json().id}`,
+			url: `/dummy/customer-groups/${customerGroup.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(customerGroup);
 	});
 
 	test("Get customer group by key", async () => {
-		const draft: CustomerGroupDraft = {
+		const customerGroup = await customerGroupDraft.create({
 			key: "key-group",
 			groupName: "Key Group",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/customer-groups",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -69,21 +57,14 @@ describe("CustomerGroup", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(customerGroup);
 	});
 
 	test("Query customer groups", async () => {
-		const draft: CustomerGroupDraft = {
+		const customerGroup = await customerGroupDraft.create({
 			key: "query-group",
 			groupName: "Query Group",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/customer-groups",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -92,6 +73,6 @@ describe("CustomerGroup", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(customerGroup);
 	});
 });

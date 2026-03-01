@@ -1,15 +1,16 @@
 import type {
 	Product,
-	ProductDraft,
 	ProductProjection,
 	ProductProjectionPagedSearchResponse,
 	ProductType,
-	ProductTypeDraft,
 } from "@commercetools/platform-sdk";
 import * as timekeeper from "timekeeper";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import {
+	productDraftFactory,
+	productTypeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
-import type { Writable } from "../types.ts";
 
 const ctMock = new CommercetoolsMock();
 
@@ -18,72 +19,55 @@ let productProjection: ProductProjection;
 let publishedProduct: Product;
 let unpublishedProduct: Product;
 
+const productTypeFactory = productTypeDraftFactory(ctMock);
+const productFactory = productDraftFactory(ctMock);
+
 beforeEach(async () => {
 	timekeeper.freeze(new Date("2022-07-22T13:31:49.840Z"));
 
 	// Create the product type
-	{
-		const draft: ProductTypeDraft = {
-			name: "Default Product Type",
-			description: "Product type for testing",
-		};
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-types",
-			payload: draft,
-		});
-
-		expect(response.statusCode >= 200 && response.statusCode < 300).toBe(true);
-		productType = response.json();
-	}
+	productType = await productTypeFactory.create({
+		name: "Default Product Type",
+		description: "Product type for testing",
+	});
 
 	// Create an unpublished product
-	{
-		const productDraft: Writable<ProductDraft> = {
-			publish: false,
-			key: "my-unpublished-product",
-			attributes: [{ name: "number", value: 11 as any }],
-			masterVariant: {
-				sku: "my-unpub-sku",
-				prices: [
-					{
-						value: {
-							currencyCode: "EUR",
-							centAmount: 189,
-						},
+	unpublishedProduct = await productFactory.create({
+		publish: false,
+		key: "my-unpublished-product",
+		attributes: [{ name: "number", value: 11 as any }],
+		masterVariant: {
+			sku: "my-unpub-sku",
+			prices: [
+				{
+					value: {
+						currencyCode: "EUR",
+						centAmount: 189,
 					},
-				],
-				attributes: [
-					{
-						name: "number",
-						value: 1 as any,
-					},
-				],
-			},
-			name: {
-				"nl-NL": "test unpublished product",
-			},
-			productType: {
-				typeId: "product-type",
-				id: productType.id,
-			},
-			slug: {
-				"nl-NL": "test-unpublished-product",
-			},
-		};
-
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		expect(response.statusCode >= 200 && response.statusCode < 300).toBe(true);
-		unpublishedProduct = response.json();
-	}
+				},
+			],
+			attributes: [
+				{
+					name: "number",
+					value: 1 as any,
+				},
+			],
+		},
+		name: {
+			"nl-NL": "test unpublished product",
+		},
+		productType: {
+			typeId: "product-type",
+			id: productType.id,
+		},
+		slug: {
+			"nl-NL": "test-unpublished-product",
+		},
+	});
 
 	// Create a published product
 	{
-		const productDraft: Writable<ProductDraft> = {
+		const productDraft = {
 			publish: true,
 			key: "my-product-key",
 			attributes: [{ name: "number", value: 111 as any }],
@@ -131,7 +115,7 @@ beforeEach(async () => {
 				"nl-NL": "test product",
 			},
 			productType: {
-				typeId: "product-type",
+				typeId: "product-type" as const,
 				id: productType.id,
 			},
 			slug: {
@@ -139,14 +123,8 @@ beforeEach(async () => {
 			},
 		};
 
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: productDraft,
-		});
-		expect(response.statusCode >= 200 && response.statusCode < 300).toBe(true);
-		const product = response.json();
-		publishedProduct = response.json();
+		const product = await productFactory.create(productDraft);
+		publishedProduct = product;
 
 		// Create the expected ProductProjection object
 		productProjection = {
@@ -163,7 +141,7 @@ beforeEach(async () => {
 				sku: "my-sku",
 				prices: [
 					{
-						id: product.masterData.current.masterVariant.prices[0].id,
+						id: product.masterData.current.masterVariant.prices![0].id,
 						value: {
 							type: "centPrecision",
 							currencyCode: "EUR",
@@ -182,7 +160,7 @@ beforeEach(async () => {
 					sku: "my-other-sku",
 					prices: [
 						{
-							id: product.masterData.current.variants[0].prices[0].id,
+							id: product.masterData.current.variants[0].prices![0].id,
 							value: {
 								type: "centPrecision",
 								currencyCode: "EUR",
@@ -196,8 +174,8 @@ beforeEach(async () => {
 					attributes: productDraft.variants?.[0].attributes,
 				},
 			],
-			name: productDraft.name,
-			slug: productDraft.slug,
+			name: product.masterData.current.name,
+			slug: product.masterData.current.slug,
 			categories: [],
 			productType: {
 				typeId: "product-type",
@@ -277,7 +255,8 @@ describe("Product Projection Query - Generic", () => {
 				url: "/dummy/product-projections",
 				query: {
 					limit: "50",
-					where: 'slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))',
+					where:
+						'slug(nl-NL=:slug) and variants(attributes(name="store" and value="test-store"))',
 					"var.slug": "test-product",
 					"var.store": "test-store",
 				},
@@ -530,7 +509,8 @@ describe("Product Projection Search - Facets", () => {
 			method: "GET",
 			url: "/dummy/product-projections/search",
 			query: {
-				facet: "variants.attributes.number:range(* TO 5), (5 TO 25), (25 TO 100)",
+				facet:
+					"variants.attributes.number:range(* TO 5), (5 TO 25), (25 TO 100)",
 			},
 		});
 

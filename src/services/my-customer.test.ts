@@ -2,24 +2,26 @@ import type {
 	Customer,
 	CustomerChangePassword,
 	CustomerToken,
-	MyCustomerDraft,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { customerDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 import { hashPassword } from "../lib/password.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Me", () => {
+	const customerFactory = customerDraftFactory(ctMock);
+
 	afterEach(() => {
 		ctMock.clear();
 	});
 
 	test("Create me", async () => {
-		const draft: MyCustomerDraft = {
+		const draft = customerFactory.build({
 			email: "test@example.org",
 			password: "p4ssw0rd",
-		};
+		});
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -30,38 +32,38 @@ describe("Me", () => {
 		expect(response.statusCode).toBe(201);
 		expect(response.json()).toEqual({
 			customer: {
-				...draft,
+				email: "test@example.org",
 				password: "cDRzc3cwcmQ=",
-				lowercaseEmail: draft.email.toLowerCase(),
+				lowercaseEmail: "test@example.org",
 				authenticationMode: "Password",
 				version: 1,
 				isEmailVerified: false,
-				addresses: [],
+				addresses: expect.anything(),
 				billingAddressIds: [],
 				shippingAddressIds: [],
 				id: expect.anything(),
 				createdAt: expect.anything(),
 				lastModifiedAt: expect.anything(),
 				stores: [],
+				firstName: "John",
+				lastName: "Doe",
 			},
 		});
 	});
 
 	test("Get me", async () => {
-		const draft: MyCustomerDraft = {
+		const customer = await customerFactory.create({
 			email: "test@example.org",
 			password: "p4ssw0rd",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/me/signup",
-			payload: draft,
 		});
 
-		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me",
+		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json().customer);
+		expect(response.json()).toEqual(customer);
 	});
 });
 
@@ -86,7 +88,10 @@ describe("/me", () => {
 	});
 
 	test("Get me", async () => {
-		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/me" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me",
+		});
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json()).toEqual({
@@ -110,7 +115,10 @@ describe("/me", () => {
 	});
 
 	test("Delete me", async () => {
-		const response = await ctMock.app.inject({ method: "DELETE", url: "/dummy/me" });
+		const response = await ctMock.app.inject({
+			method: "DELETE",
+			url: "/dummy/me",
+		});
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json()).toEqual({
@@ -132,7 +140,10 @@ describe("/me", () => {
 			stores: [],
 		});
 
-		const newResponse = await ctMock.app.inject({ method: "GET", url: "/dummy/me" });
+		const newResponse = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me",
+		});
 		expect(newResponse.statusCode).toBe(404);
 	});
 
@@ -316,7 +327,10 @@ describe("/me", () => {
 	});
 
 	test("deleteMe", async () => {
-		const response = await ctMock.app.inject({ method: "DELETE", url: "/dummy/me" });
+		const response = await ctMock.app.inject({
+			method: "DELETE",
+			url: "/dummy/me",
+		});
 		expect(response.statusCode).toBe(200);
 		expect(response.json().id).toBeDefined();
 	});
