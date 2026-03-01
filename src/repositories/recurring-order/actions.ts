@@ -81,14 +81,14 @@ export class RecurringOrderUpdateHandler
 		context: RepositoryContext,
 		resource: Writable<RecurringOrder>,
 		{
-			skipConfiguration,
+			skipConfigurationInputDraft,
 			updatedExpiresAt,
 		}: RecurringOrderSetOrderSkipConfigurationAction,
 	) {
-		if (skipConfiguration) {
+		if (skipConfigurationInputDraft) {
 			resource.skipConfiguration = {
-				type: skipConfiguration.type,
-				totalToSkip: skipConfiguration.totalToSkip,
+				type: skipConfigurationInputDraft.type,
+				totalToSkip: skipConfigurationInputDraft.totalToSkip,
 				skipped: 0,
 				lastSkippedAt: undefined,
 			};

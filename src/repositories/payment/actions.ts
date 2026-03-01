@@ -25,6 +25,7 @@ import type {
 	PaymentSetStatusInterfaceTextAction,
 	PaymentSetTransactionCustomFieldAction,
 	PaymentSetTransactionCustomTypeAction,
+	PaymentSetTransactionInterfaceIdAction,
 	PaymentTransitionStateAction,
 	PaymentUpdateAction,
 	State,
@@ -86,6 +87,19 @@ export class PaymentUpdateHandler
 		);
 		if (transaction) {
 			transaction.interactionId = interactionId;
+		}
+	}
+
+	setTransactionInterfaceId(
+		_context: RepositoryContext,
+		resource: Writable<Payment>,
+		{ transactionId, interfaceId }: PaymentSetTransactionInterfaceIdAction,
+	) {
+		const transaction = resource.transactions.find(
+			(e: Transaction) => e.id === transactionId,
+		);
+		if (transaction) {
+			transaction.interfaceId = interfaceId;
 		}
 	}
 

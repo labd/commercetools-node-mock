@@ -146,6 +146,9 @@ describe("OAuth2Server", () => {
 				authenticationMode: "password",
 				isEmailVerified: true,
 				stores: [],
+				shippingAddressIds: [],
+				billingAddressIds: [],
+				customerGroupAssignments: [],
 			});
 
 			const response = await app.inject({
@@ -190,6 +193,9 @@ describe("OAuth2Server", () => {
 						key: storeKey,
 					},
 				],
+				shippingAddressIds: [],
+				billingAddressIds: [],
+				customerGroupAssignments: [],
 			});
 
 			const response = await app.inject({

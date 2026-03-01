@@ -47,7 +47,10 @@ export default abstract class AbstractService {
 	}
 
 	get(
-		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const query = request.query;
@@ -74,7 +77,10 @@ export default abstract class AbstractService {
 	}
 
 	getWithId(
-		request: FastifyRequest<{ Params: Record<string, string> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
@@ -177,7 +183,13 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	post(request: FastifyRequest, reply: FastifyReply) {
+	post(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		// Validate the draft against the schema when strict mode is enabled
 		if (this.repository.strict && this.repository.draftSchema) {
 			validateDraft(request.body, this.repository.draftSchema);
@@ -192,7 +204,10 @@ export default abstract class AbstractService {
 	}
 
 	postWithId(
-		request: FastifyRequest<{ Params: Record<string, string> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
@@ -220,7 +235,10 @@ export default abstract class AbstractService {
 	}
 
 	postWithKey(
-		request: FastifyRequest<{ Params: Record<string, string> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
@@ -249,7 +267,10 @@ export default abstract class AbstractService {
 	}
 
 	protected _expandWithId(
-		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		resourceId: string,
 	) {
 		const query = request.query;

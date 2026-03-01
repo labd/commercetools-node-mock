@@ -321,6 +321,8 @@ describe("Order repository", () => {
 				key: "test-business-unit",
 			},
 			approvalRuleMode: "Explicit",
+			shippingAddressIds: [],
+			billingAddressIds: [],
 		});
 
 		storage.add("dummy", "customer", {
@@ -339,6 +341,9 @@ describe("Order repository", () => {
 			stores: [],
 			isEmailVerified: true,
 			authenticationMode: "Password" as const,
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		});
 
 		const draft: OrderImportDraft = {

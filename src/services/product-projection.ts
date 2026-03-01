@@ -27,7 +27,10 @@ export class ProductProjectionService extends AbstractService {
 	}
 
 	get(
-		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const query = request.query;
@@ -45,7 +48,10 @@ export class ProductProjectionService extends AbstractService {
 	}
 
 	search(
-		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
 		reply: FastifyReply,
 	) {
 		const query = request.query;

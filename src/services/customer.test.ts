@@ -448,6 +448,9 @@ describe("Customer Update Actions (old-style)", () => {
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 	});
@@ -930,6 +933,9 @@ describe("Customer Password Reset", () => {
 			authenticationMode: "password",
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		});
 	});
 
