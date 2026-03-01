@@ -88,11 +88,11 @@ export default abstract class AbstractService {
 		if (!result) {
 			return reply.status(404).send({
 				statusCode: 404,
-				message: `The Resource with ID '${params.id} was not found.`,
+				message: `The Resource with ID '${params.id}' was not found.`,
 				errors: [
 					{
 						code: "ResourceNotFound",
-						message: `The Resource with ID '${params.id} was not found.`,
+						message: `The Resource with ID '${params.id}' was not found.`,
 					},
 				],
 			});
@@ -119,11 +119,11 @@ export default abstract class AbstractService {
 		if (!result) {
 			return reply.status(404).send({
 				statusCode: 404,
-				message: `The Resource with key '${params.id} was not found.`,
+				message: `The Resource with key '${params.key}' was not found.`,
 				errors: [
 					{
 						code: "ResourceNotFound",
-						message: `The Resource with key '${params.id} was not found.`,
+						message: `The Resource with key '${params.key}' was not found.`,
 					},
 				],
 			});

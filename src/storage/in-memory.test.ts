@@ -280,7 +280,8 @@ describe("InMemoryStorage", () => {
 			expect(result.results).toHaveLength(20);
 			expect(result.limit).toBe(20);
 			expect(result.offset).toBe(0);
-			expect(result.count).toBe(25);
+			expect(result.count).toBe(20);
+			expect(result.total).toBe(25);
 		});
 
 		test("respects custom limit", () => {
@@ -306,7 +307,8 @@ describe("InMemoryStorage", () => {
 			});
 
 			expect(result.results).toHaveLength(0);
-			expect(result.count).toBe(25);
+			expect(result.count).toBe(0);
+			expect(result.total).toBe(25);
 		});
 
 		test("filters with where predicate", () => {

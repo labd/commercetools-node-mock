@@ -331,10 +331,10 @@ describe("Product Projection Search - Generic", () => {
 
 			const projection: ProductProjection = response.json();
 			expect(projection).toEqual({
-				count: 1,
+				count: 0,
 				limit: 50,
 				offset: 50,
-				total: 0,
+				total: 1,
 				facets: {},
 				results: [],
 			});

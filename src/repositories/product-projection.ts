@@ -130,8 +130,8 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 		const results = resources.slice(offset, offset + limit);
 
 		return {
-			count: totalResults,
-			total: results.length,
+			count: results.length,
+			total: totalResults,
 			offset: offset,
 			limit: limit,
 			results: results,

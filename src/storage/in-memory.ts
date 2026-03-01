@@ -283,10 +283,10 @@ export class InMemoryStorage extends AbstractStorage {
 		params: GetParams = {},
 	): ResourceMap[RT] | null {
 		const store = this.forProjectKey(projectKey);
-		const resourceStore = store[typeId];
 		if (!store) {
 			throw new Error("No type");
 		}
+		const resourceStore = store[typeId];
 
 		const resources: any[] = Array.from(resourceStore.values());
 		const resource = resources.find((e) => e.key === key);
@@ -364,8 +364,8 @@ export class InMemoryStorage extends AbstractStorage {
 		}
 
 		return {
-			count: totalResources,
-			total: resources.length,
+			count: resources.length,
+			total: totalResources,
 			offset: offset,
 			limit: limit,
 			results: resources.map(cloneObject),
@@ -411,8 +411,8 @@ export class InMemoryStorage extends AbstractStorage {
 		}
 
 		return {
-			count: totalResources,
-			total: resources.length,
+			count: resources.length,
+			total: totalResources,
 			offset: offset,
 			limit: limit,
 			results: resources,
