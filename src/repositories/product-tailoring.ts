@@ -1,8 +1,10 @@
 import type {
+	InvalidOperationError,
 	ProductTailoring,
 	ProductTailoringUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { ProductTailoringDraftSchema } from "#src/schemas/generated/product-tailoring.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
 import {
@@ -18,7 +20,13 @@ export class ProductTailoringRepository extends AbstractResourceRepository<"prod
 	}
 
 	create(context: RepositoryContext, draft: any): ProductTailoring {
-		throw new Error("Create method for product-tailoring not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "Create method for product-tailoring not implemented.",
+			},
+			400,
+		);
 	}
 }
 
@@ -30,6 +38,12 @@ class ProductTailoringUpdateHandler
 		>
 {
 	setSlug() {
-		throw new Error("SetSlug method for product-tailoring not implemented.");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "SetSlug method for product-tailoring not implemented.",
+			},
+			400,
+		);
 	}
 }

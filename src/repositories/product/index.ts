@@ -7,6 +7,7 @@ import type {
 	ProductPagedSearchResponse,
 	ProductSearchRequest,
 	ProductTypeReference,
+	RequiredFieldError,
 	StateReference,
 	TaxCategoryReference,
 } from "@commercetools/platform-sdk";
@@ -36,7 +37,14 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 
 	create(context: RepositoryContext, draft: ProductDraft): Product {
 		if (!draft.masterVariant) {
-			throw new Error("Missing master variant");
+			throw new CommercetoolsError<RequiredFieldError>(
+				{
+					code: "RequiredField",
+					message: "Missing master variant",
+					field: "masterVariant",
+				},
+				400,
+			);
 		}
 
 		let productType: ProductTypeReference | undefined;

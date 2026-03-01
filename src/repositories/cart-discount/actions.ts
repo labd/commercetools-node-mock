@@ -13,6 +13,7 @@ import type {
 	CartDiscountSetValidUntilAction,
 	CartDiscountUpdateAction,
 	InvalidOperationError,
+	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { getStoreKeyReference } from "#src/repositories/helpers.ts";
@@ -87,7 +88,16 @@ export class CartDiscountUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+					{
+						code: "ReferencedResourceNotFound",
+						message: `Type ${type} not found`,
+						typeId: "type",
+						id: type.id,
+						key: type.key,
+					},
+					400,
+				);
 			}
 
 			resource.custom = {

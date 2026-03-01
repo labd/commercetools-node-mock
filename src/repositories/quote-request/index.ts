@@ -2,11 +2,14 @@ import assert from "node:assert";
 import type {
 	Cart,
 	CartReference,
+	InvalidOperationError,
 	MyQuoteRequestDraft,
 	QuoteRequest,
 	QuoteRequestDraft,
+	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { QuoteRequestDraftSchema } from "#src/schemas/generated/quote-request.ts";
 import type { RepositoryContext } from "../abstract.ts";
@@ -45,11 +48,23 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 			cartReference,
 		) as Cart | null;
 		if (!cart) {
-			throw new Error("Cannot find cart");
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "Cannot find cart",
+				},
+				404,
+			);
 		}
 
 		if (!cart.customerId) {
-			throw new Error("Cart does not have a customer");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Cart does not have a customer",
+				},
+				400,
+			);
 		}
 
 		const resource: QuoteRequest = {

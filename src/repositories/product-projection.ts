@@ -1,5 +1,6 @@
 import type {
 	InvalidInputError,
+	InvalidOperationError,
 	ProductDraft,
 	ProductProjection,
 	QueryParam,
@@ -38,7 +39,13 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 	}
 
 	create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
-		throw new Error("No valid action");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "No valid action",
+			},
+			400,
+		);
 	}
 
 	get(

@@ -1,5 +1,7 @@
 import type {
 	InvalidJsonInputError,
+	InvalidOperationError,
+	ReferencedResourceNotFoundError,
 	StagedQuote,
 	StagedQuoteSetCustomFieldAction,
 	StagedQuoteSetCustomTypeAction,
@@ -24,7 +26,13 @@ export class StagedQuoteUpdateHandler
 		{ name, value }: StagedQuoteSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom field",
+				},
+				400,
+			);
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -42,7 +50,14 @@ export class StagedQuoteUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+					{
+						code: "ReferencedResourceNotFound",
+						message: `Type ${type} not found`,
+						typeId: "type",
+					},
+					400,
+				);
 			}
 
 			resource.custom = {

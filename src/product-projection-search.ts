@@ -2,6 +2,7 @@ import type {
 	FacetResults,
 	FilteredFacetResult,
 	InvalidInputError,
+	InvalidOperationError,
 	Product,
 	ProductProjection,
 	ProductProjectionPagedSearchResponse,
@@ -311,7 +312,13 @@ export class ProductProjectionSearch {
 				}
 			}
 		} else {
-			throw new Error("not supported");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "not supported",
+				},
+				400,
+			);
 		}
 
 		return {
@@ -358,7 +365,13 @@ export class ProductProjectionSearch {
 						mean: numValues > 0 ? mean(values) : 0,
 					};
 				}
-				throw new Error("not supported");
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: "not supported",
+					},
+					400,
+				);
 			}) || [];
 		const data: RangeFacetResult = {
 			type: "range",

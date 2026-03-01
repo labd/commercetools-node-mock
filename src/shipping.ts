@@ -42,7 +42,13 @@ export const markMatchingShippingRatePriceTiers = (
 	}
 
 	if (new Set(tiers.map((tier) => tier.type)).size > 1) {
-		throw new Error("Can't handle multiple types of tiers");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "Can't handle multiple types of tiers",
+			},
+			400,
+		);
 	}
 
 	const tierType = tiers[0].type;
@@ -54,7 +60,13 @@ export const markMatchingShippingRatePriceTiers = (
 		// case 'CartScore':
 		// 	return markMatchingCartScoreTiers(cart, tiers)
 		default:
-			throw new Error(`Unsupported tier type: ${tierType}`);
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `Unsupported tier type: ${tierType}`,
+				},
+				400,
+			);
 	}
 };
 
@@ -191,7 +203,13 @@ export const createShippingInfoFromMethod = (
 	if (!zoneRate) {
 		// This shouldn't happen because getShippingMethodsMatchingCart already
 		// filtered out shipping methods without any zones matching the address
-		throw new Error("Zone rate not found");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "Zone rate not found",
+			},
+			400,
+		);
 	}
 
 	// Shipping rates are defined by currency, and getShippingMethodsMatchingCart
@@ -201,7 +219,13 @@ export const createShippingInfoFromMethod = (
 	if (!shippingRate) {
 		// This shouldn't happen because getShippingMethodsMatchingCart already
 		// filtered out shipping methods without any matching rates
-		throw new Error("Shipping rate not found");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "Shipping rate not found",
+			},
+			400,
+		);
 	}
 
 	const taxCategory = storage.getByResourceIdentifier<"tax-category">(
@@ -222,7 +246,13 @@ export const createShippingInfoFromMethod = (
 
 	const shippingRateTier = shippingRate.tiers.find((tier) => tier.isMatching);
 	if (shippingRateTier && shippingRateTier.type !== "CartValue") {
-		throw new Error("Non-CartValue shipping rate tier is not supported");
+		throw new CommercetoolsError<InvalidOperationError>(
+			{
+				code: "InvalidOperation",
+				message: "Non-CartValue shipping rate tier is not supported",
+			},
+			400,
+		);
 	}
 
 	let shippingPrice = shippingRateTier

@@ -35,11 +35,13 @@ import type {
 	CartUpdateAction,
 	CustomFields,
 	GeneralError,
+	InvalidOperationError,
 	ItemShippingDetails,
 	LineItem,
 	Product,
 	ProductPagedQueryResponse,
 	ProductVariant,
+	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import type {
 	CartAddDiscountCodeAction,
@@ -182,9 +184,10 @@ export class CartUpdateHandler
 				country: resource.country,
 			});
 			if (!price) {
-				throw new Error(
-					`No valid price found for ${productId} for country ${resource.country} and currency ${currency}`,
-				);
+				throw new CommercetoolsError<InvalidOperationError>({
+					code: "InvalidOperation",
+					message: `No valid price found for ${productId} for country ${resource.country} and currency ${currency}`,
+				});
 			}
 			const totalPrice = createCentPrecisionMoney({
 				currencyCode: price.value.currencyCode,
@@ -548,7 +551,10 @@ export class CartUpdateHandler
 		custom: CartSetBillingAddressCustomTypeAction,
 	) {
 		if (!resource.billingAddress) {
-			throw new Error("Resource has no billing address");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no billing address",
+			});
 		}
 
 		if (!custom.type) {
@@ -562,7 +568,13 @@ export class CartUpdateHandler
 		);
 
 		if (!resolvedType) {
-			throw new Error(`Type ${custom.type} not found`);
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Type ${custom.type} not found`,
+				typeId: "type",
+				id: custom.type?.id,
+				key: custom.type?.key,
+			});
 		}
 
 		resource.billingAddress.custom = {
@@ -605,7 +617,10 @@ export class CartUpdateHandler
 		{ name, value }: CartSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 
 		resource.custom.fields[name] = value;
@@ -622,7 +637,10 @@ export class CartUpdateHandler
 		}: CartSetCustomShippingMethodAction,
 	) {
 		if (externalTaxRate) {
-			throw new Error("External tax rate is not supported");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "External tax rate is not supported",
+			});
 		}
 
 		const tax = taxCategory
@@ -662,7 +680,13 @@ export class CartUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+					id: type?.id,
+					key: type?.key,
+				});
 			}
 
 			resource.custom = {
@@ -718,7 +742,10 @@ export class CartUpdateHandler
 		}
 
 		if (!lineItem.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 
 		lineItem.custom.fields[name] = value;
@@ -753,7 +780,13 @@ export class CartUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+					id: type?.id,
+					key: type?.key,
+				});
 			}
 
 			lineItem.custom = {
@@ -816,9 +849,10 @@ export class CartUpdateHandler
 			});
 
 			if (!price) {
-				throw new Error(
-					`No valid price found for ${lineItem.productId} for country ${resource.country} and currency ${resource.totalPrice.currencyCode}`,
-				);
+				throw new CommercetoolsError<InvalidOperationError>({
+					code: "InvalidOperation",
+					message: `No valid price found for ${lineItem.productId} for country ${resource.country} and currency ${resource.totalPrice.currencyCode}`,
+				});
 			}
 
 			lineItem.price = price;
@@ -903,7 +937,10 @@ export class CartUpdateHandler
 		custom: CartSetShippingAddressCustomTypeAction,
 	) {
 		if (!resource.shippingAddress) {
-			throw new Error("Resource has no shipping address");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no shipping address",
+			});
 		}
 
 		if (!custom.type) {
@@ -917,7 +954,13 @@ export class CartUpdateHandler
 		);
 
 		if (!resolvedType) {
-			throw new Error(`Type ${custom.type} not found`);
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Type ${custom.type} not found`,
+				typeId: "type",
+				id: custom.type?.id,
+				key: custom.type?.key,
+			});
 		}
 
 		resource.shippingAddress.custom = {
@@ -951,10 +994,16 @@ export class CartUpdateHandler
 		{ name, value }: CartSetShippingAddressCustomFieldAction,
 	) {
 		if (!resource.shippingAddress) {
-			throw new Error("Resource has no shipping address");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no shipping address",
+			});
 		}
 		if (!resource.shippingAddress.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 		resource.shippingAddress.custom.fields[name] = value;
 	}
@@ -977,7 +1026,12 @@ export class CartUpdateHandler
 			);
 
 		if (resource.shippingInfo?.shippingMethod?.id !== shippingMethod.id) {
-			throw new Error("Shipping method with key not found");
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: "Shipping method with key not found",
+				typeId: "shipping-method",
+				key: shippingKey,
+			});
 		}
 
 		resource.shippingInfo = undefined;

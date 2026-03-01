@@ -35,6 +35,7 @@ import type {
 	CompanyDraft,
 	Division,
 	DivisionDraft,
+	InvalidJsonInputError,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
@@ -154,7 +155,14 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			return company;
 		}
 
-		throw new Error("Invalid business unit type");
+		throw new CommercetoolsError<InvalidJsonInputError>(
+			{
+				code: "InvalidJsonInput",
+				message: "Invalid business unit type",
+				detailedErrorMessage: "Invalid business unit type",
+			},
+			400,
+		);
 	}
 
 	private _isCompanyDraft(draft: BusinessUnitDraft): draft is CompanyDraft {
@@ -317,8 +325,12 @@ class BusinessUnitUpdateHandler
 			(a) => a.customer.id === associate.customer.id,
 		);
 		if (existingAssociateIndex === -1) {
-			throw new Error(
-				`Associate with customer id ${associate.customer.id} not found`,
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `Associate with customer id ${associate.customer.id} not found`,
+				},
+				400,
 			);
 		}
 
@@ -469,7 +481,13 @@ class BusinessUnitUpdateHandler
 		{ name, value }: BusinessUnitSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom type");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom type",
+				},
+				400,
+			);
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -481,13 +499,24 @@ class BusinessUnitUpdateHandler
 	) {
 		const address = resource.addresses.find((addr) => addr.id === addressId);
 		if (!address) {
-			throw new Error(`Address with id ${addressId} not found`);
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `Address with id ${addressId} not found`,
+				},
+				400,
+			);
 		}
 		if (!address.custom) {
 			// If the address doesn't have custom fields, we need to initialize them
 			// This might require a type to be set first, but we'll just create minimal structure
-			throw new Error(
-				"Address has no custom type set. Use setAddressCustomType first.",
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message:
+						"Address has no custom type set. Use setAddressCustomType first.",
+				},
+				400,
 			);
 		}
 		address.custom.fields[name] = value;
@@ -500,7 +529,13 @@ class BusinessUnitUpdateHandler
 	) {
 		const address = resource.addresses.find((addr) => addr.id === addressId);
 		if (!address) {
-			throw new Error(`Address with id ${addressId} not found`);
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `Address with id ${addressId} not found`,
+				},
+				400,
+			);
 		}
 
 		if (!type) {

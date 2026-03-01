@@ -11,6 +11,7 @@ import type {
 	ProductPagedQueryResponse,
 	ShippingMethodDoesNotMatchCartError,
 } from "@commercetools/platform-sdk";
+
 import { v4 as uuidv4 } from "uuid";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
@@ -248,20 +249,22 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 
 		if (!variant) {
 			// Check if variant is found
-			throw new Error(
-				sku
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: sku
 					? `A variant with SKU '${sku}' for product '${product.id}' not found.`
 					: `A variant with ID '${variantId}' for product '${product.id}' not found.`,
-			);
+			});
 		}
 
 		const quant = quantity ?? 1;
 
 		const price = selectPrice({ prices: variant.prices, currency, country });
 		if (!price) {
-			throw new Error(
-				`No valid price found for ${productId} for country ${country} and currency ${currency}`,
-			);
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: `No valid price found for ${productId} for country ${country} and currency ${currency}`,
+			});
 		}
 
 		const totalPrice = createCentPrecisionMoney({
@@ -300,7 +303,10 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		shippingMethodRef: NonNullable<CartDraft["shippingMethod"]>,
 	): NonNullable<Cart["shippingInfo"]> {
 		if (resource.taxMode === "External") {
-			throw new Error("External tax rate is not supported");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "External tax rate is not supported",
+			});
 		}
 
 		// Bit of a hack: calling this checks that the resource identifier is

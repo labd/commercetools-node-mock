@@ -1,7 +1,9 @@
 import type {
 	GeneralError,
+	InvalidOperationError,
 	Product,
 	ProductPagedQueryResponse,
+	ReferencedResourceNotFoundError,
 	ShoppingList,
 	ShoppingListAddLineItemAction,
 	ShoppingListChangeLineItemQuantityAction,
@@ -208,7 +210,10 @@ export class ShoppingListUpdateHandler
 		{ customer }: ShoppingListSetCustomerAction,
 	) {
 		if (customer?.key) {
-			throw new Error("set customer on shoppinglist by key not implemented");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "set customer on shoppinglist by key not implemented",
+			});
 		}
 		if (customer?.id) {
 			resource.customer = { typeId: "customer", id: customer.id };
@@ -221,7 +226,10 @@ export class ShoppingListUpdateHandler
 		{ name, value }: ShoppingListSetCustomFieldAction,
 	) {
 		if (!resource.custom) {
-			throw new Error("Resource has no custom field");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no custom field",
+			});
 		}
 		resource.custom.fields[name] = value;
 	}
@@ -239,7 +247,11 @@ export class ShoppingListUpdateHandler
 				type,
 			);
 			if (!resolvedType) {
-				throw new Error(`Type ${type} not found`);
+				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+					code: "ReferencedResourceNotFound",
+					message: `Type ${type} not found`,
+					typeId: "type",
+				});
 			}
 
 			resource.custom = {
@@ -295,7 +307,10 @@ export class ShoppingListUpdateHandler
 			resource.store = { typeId: "store", key: store.key };
 		}
 		if (store?.id) {
-			throw new Error("set store on shoppinglist by id not implemented");
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "set store on shoppinglist by id not implemented",
+			});
 		}
 	}
 }

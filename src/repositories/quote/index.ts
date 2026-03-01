@@ -1,5 +1,10 @@
-import type { Quote, QuoteDraft } from "@commercetools/platform-sdk";
+import type {
+	InvalidOperationError,
+	Quote,
+	QuoteDraft,
+} from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { QuoteDraftSchema } from "#src/schemas/generated/quote.ts";
 import type { RepositoryContext } from "../abstract.ts";
@@ -25,7 +30,13 @@ export class QuoteRepository extends AbstractResourceRepository<"quote"> {
 		);
 
 		if (!cart.customerId) {
-			throw new Error("Cart does not have a customer");
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Cart does not have a customer",
+				},
+				400,
+			);
 		}
 
 		const resource: Quote = {
