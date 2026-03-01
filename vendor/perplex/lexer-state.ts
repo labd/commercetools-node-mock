@@ -1,4 +1,4 @@
-import TokenTypes from "./token-types";
+import TokenTypes from "./token-types.ts";
 
 /**
  * @private

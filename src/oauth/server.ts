@@ -30,8 +30,10 @@ export class OAuth2Server {
 	store: OAuth2Store;
 
 	private customerRepository: CustomerRepository;
+	private options: { enabled: boolean; validate: boolean };
 
-	constructor(private options: { enabled: boolean; validate: boolean }) {
+	constructor(options: { enabled: boolean; validate: boolean }) {
+		this.options = options;
 		this.store = new OAuth2Store(options.validate);
 	}
 

@@ -1,6 +1,6 @@
-import LexerState from "./lexer-state";
-import Token, { EOF } from "./token";
-import TokenTypes from "./token-types";
+import LexerState from "./lexer-state.ts";
+import Token, { EOF } from "./token.ts";
+import TokenTypes from "./token-types.ts";
 
 /**
  * @typedef {{
