@@ -56,10 +56,12 @@ describe("DiscountCode", () => {
 			],
 			code: "SAVE10",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			groups: [],
 			id: expect.anything(),
 			isActive: true,
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: {
 				en: "Save 10% Discount",
 			},

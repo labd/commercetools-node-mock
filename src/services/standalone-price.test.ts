@@ -62,6 +62,7 @@ describe("Standalone price Query", () => {
 				},
 				country: "DE",
 				createdAt: expect.anything(),
+				createdBy: expect.anything(),
 				discounted: {
 					discount: {
 						id: "baz",
@@ -76,6 +77,7 @@ describe("Standalone price Query", () => {
 				},
 				id: expect.anything(),
 				lastModifiedAt: expect.anything(),
+				lastModifiedBy: expect.anything(),
 				sku: "foo",
 				value: {
 					centAmount: 100,
@@ -142,8 +144,10 @@ describe("Standalone price Actions", () => {
 			},
 			country: "DE",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: id,
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			sku: "foo",
 			value: {
 				centAmount: 200,
@@ -180,8 +184,10 @@ describe("Standalone price Actions", () => {
 			},
 			country: "DE",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: id,
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			sku: "foo",
 			value: {
 				centAmount: 100,
@@ -227,6 +233,7 @@ describe("Standalone price Actions", () => {
 			},
 			country: "DE",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			discounted: {
 				discount: {
 					id: "baz",
@@ -241,6 +248,7 @@ describe("Standalone price Actions", () => {
 			},
 			id: id,
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			sku: "foo",
 			value: {
 				centAmount: 100,
@@ -275,8 +283,10 @@ describe("Standalone price Actions", () => {
 			},
 			country: "DE",
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: id,
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			sku: "foo",
 			value: {
 				centAmount: 100,

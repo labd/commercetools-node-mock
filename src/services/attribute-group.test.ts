@@ -40,9 +40,11 @@ describe("AttributeGroup", () => {
 				},
 			],
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			key: "product-specifications",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: {
 				en: "Product Specifications",
 			},

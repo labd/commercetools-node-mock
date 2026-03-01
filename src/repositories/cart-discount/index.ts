@@ -30,7 +30,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 
 	create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {
 		const resource: CartDiscount = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			description: draft.description,
 			cartPredicate: draft.cartPredicate,

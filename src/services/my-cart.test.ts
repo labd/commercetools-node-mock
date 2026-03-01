@@ -38,7 +38,9 @@ describe("MyCart", () => {
 		expect(response.json()).toEqual({
 			id: expect.anything(),
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			version: 1,
 			cartState: "Active",
 			discountCodes: [],

@@ -30,10 +30,12 @@ describe("Zone", () => {
 		expect(response.statusCode).toBe(201);
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			description: undefined,
 			id: expect.anything(),
 			key: "europe-zone",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			locations: [
 				{
 					country: "DE",

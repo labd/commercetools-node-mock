@@ -39,7 +39,9 @@ describe("Payment", () => {
 		expect(response.json()).toEqual({
 			id: expect.anything(),
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			version: 1,
 			amountPlanned: {
 				type: "centPrecision",

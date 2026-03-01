@@ -84,9 +84,11 @@ describe("RecurringOrder", () => {
 
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			key: "weekly-order",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			cart: {
 				typeId: "cart",
 				id: cart.id,

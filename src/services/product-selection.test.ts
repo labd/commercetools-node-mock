@@ -27,8 +27,10 @@ describe("product-selection", () => {
 
 		expect(productSelection).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: {
 				en: "foo",
 			},

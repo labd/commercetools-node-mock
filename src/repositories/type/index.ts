@@ -15,7 +15,7 @@ export class TypeRepository extends AbstractResourceRepository<"type"> {
 
 	create(context: RepositoryContext, draft: TypeDraft): Type {
 		const resource: Type = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			resourceTypeIds: draft.resourceTypeIds,

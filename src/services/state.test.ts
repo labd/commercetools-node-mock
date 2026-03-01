@@ -20,10 +20,12 @@ describe("State", () => {
 		expect(response.json()).toEqual({
 			builtIn: false,
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			initial: false,
 			key: "foo",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			transitions: [],
 			type: "PaymentState",
 			version: 1,

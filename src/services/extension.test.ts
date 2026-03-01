@@ -31,6 +31,7 @@ describe("Extension", () => {
 		expect(response.statusCode).toBe(201);
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			destination: {
 				type: "HTTP",
 				url: "https://example.com/webhook",
@@ -38,6 +39,7 @@ describe("Extension", () => {
 			id: expect.anything(),
 			key: "order-validation",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			triggers: [
 				{
 					actions: ["Create"],

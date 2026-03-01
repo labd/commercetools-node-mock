@@ -31,7 +31,7 @@ export class ChannelRepository extends AbstractResourceRepository<"channel"> {
 
 	create(context: RepositoryContext, draft: ChannelDraft): Channel {
 		const resource: Channel = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			description: draft.description,

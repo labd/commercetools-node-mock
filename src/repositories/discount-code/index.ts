@@ -22,7 +22,7 @@ export class DiscountCodeRepository extends AbstractResourceRepository<"discount
 
 	create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {
 		const resource: DiscountCode = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			applicationVersion: 1,
 			cartDiscounts: draft.cartDiscounts.map(
 				(obj): CartDiscountReference => ({

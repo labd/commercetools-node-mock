@@ -26,8 +26,10 @@ describe("Tax Category", () => {
 		expect(response.statusCode).toBe(201);
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			name: "foo",
 			rates: [],
 			key: "standard",

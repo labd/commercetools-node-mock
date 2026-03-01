@@ -31,7 +31,7 @@ export class AssociateRoleRepository extends AbstractResourceRepository<"associa
 
 	create(context: RepositoryContext, draft: AssociateRoleDraft): AssociateRole {
 		const resource: AssociateRole = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			buyerAssignable: draft.buyerAssignable || false,

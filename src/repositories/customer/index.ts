@@ -121,7 +121,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		}
 
 		const resource: Customer = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			authenticationMode: draft.authenticationMode || "Password",
 			firstName: draft.firstName,
@@ -184,7 +184,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 
 		const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 		const customer = results.results[0] as Customer;
-		const rest = getBaseResourceProperties();
+		const rest = getBaseResourceProperties(context.clientId);
 
 		const token = createPasswordResetToken(customer, expiresAt);
 
@@ -246,7 +246,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		}
 		const expiresAt = new Date(Date.now() + 30 * 60);
 		const customer = results.results[0] as Customer;
-		const rest = getBaseResourceProperties();
+		const rest = getBaseResourceProperties(context.clientId);
 
 		const token = createEmailVerifyToken(customer);
 		return {

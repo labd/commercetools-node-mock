@@ -42,7 +42,7 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 		}
 
 		const resource: Subscription = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			changes: draft.changes || [],
 			destination: draft.destination,
 			format: draft.format || {

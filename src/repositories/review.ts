@@ -42,7 +42,7 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 	create(context: RepositoryContext, draft: ReviewDraft): Review {
 		if (!draft.target) throw new Error("Missing target");
 		const resource: Review = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			locale: draft.locale,
 			authorName: draft.authorName,

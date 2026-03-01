@@ -28,7 +28,7 @@ export class ProductSelectionRepository extends AbstractResourceRepository<"prod
 		draft: ProductSelectionDraft,
 	): ProductSelection {
 		const resource: ProductSelection = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			productCount: 0,
 			key: draft.key,
 			name: draft.name,

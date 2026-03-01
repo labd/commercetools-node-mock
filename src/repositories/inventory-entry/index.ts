@@ -24,17 +24,18 @@ export class InventoryEntryRepository extends AbstractResourceRepository<"invent
 		draft: InventoryEntryDraft,
 	): InventoryEntry {
 		const resource: InventoryEntry = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			sku: draft.sku,
 			quantityOnStock: draft.quantityOnStock,
 			availableQuantity: draft.quantityOnStock,
 			expectedDelivery: draft.expectedDelivery,
 			restockableInDays: draft.restockableInDays,
-			supplyChannel: {
-				...draft.supplyChannel,
-				typeId: "channel",
-				id: draft.supplyChannel?.id ?? "",
-			},
+			supplyChannel: draft.supplyChannel
+				? {
+						typeId: "channel",
+						id: draft.supplyChannel.id ?? "",
+					}
+				: undefined,
 			custom: createCustomFields(
 				draft.custom,
 				context.projectKey,

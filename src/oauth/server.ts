@@ -65,7 +65,16 @@ export class OAuth2Server {
 	createMiddleware() {
 		if (!this.options.validate) {
 			return async (request: FastifyRequest, reply: FastifyReply) => {
-				// No-op when validation is disabled
+				// When validation is disabled, still populate credentials
+				// so createdBy/lastModifiedBy can be set on resources
+				const token = getBearerToken(request);
+				const clientId = token
+					? this.store.getClientIdForToken(token)
+					: undefined;
+				request.credentials = {
+					clientId: clientId ?? "",
+					clientSecret: "",
+				};
 			};
 		}
 
@@ -91,6 +100,13 @@ export class OAuth2Server {
 					401,
 				);
 			}
+
+			// Populate credentials so createdBy/lastModifiedBy can be set
+			const clientId = this.store.getClientIdForToken(token);
+			request.credentials = {
+				clientId: clientId ?? "",
+				clientSecret: "",
+			};
 		};
 	}
 
@@ -251,7 +267,12 @@ export class OAuth2Server {
 			}
 
 			const customer = result.results[0];
-			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
+			const token = this.store.getCustomerToken(
+				projectKey,
+				customer.id,
+				scope,
+				request.credentials?.clientId,
+			);
 			return reply.status(200).send(token);
 		}
 	}
@@ -303,7 +324,12 @@ export class OAuth2Server {
 			}
 
 			const customer = result.results[0];
-			const token = this.store.getCustomerToken(projectKey, customer.id, scope);
+			const token = this.store.getCustomerToken(
+				projectKey,
+				customer.id,
+				scope,
+				request.credentials?.clientId,
+			);
 			return reply.status(200).send(token);
 		}
 	}
@@ -340,6 +366,7 @@ export class OAuth2Server {
 				projectKey,
 				anonymous_id,
 				scope,
+				request.credentials?.clientId,
 			);
 			return reply.status(200).send(token);
 		}

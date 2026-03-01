@@ -400,8 +400,10 @@ describe("Product", () => {
 
 		expect(product).toEqual({
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			key: "test-unpublished-product",
 			taxCategory: {
 				typeId: "tax-category",

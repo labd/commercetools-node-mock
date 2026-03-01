@@ -33,7 +33,7 @@ export class StateRepository extends AbstractResourceRepository<"state"> {
 
 	create(context: RepositoryContext, draft: StateDraft): State {
 		const resource: State = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			...draft,
 			builtIn: false,
 			initial: draft.initial || false,

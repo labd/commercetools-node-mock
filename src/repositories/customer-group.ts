@@ -28,7 +28,7 @@ export class CustomerGroupRepository extends AbstractResourceRepository<"custome
 
 	create(context: RepositoryContext, draft: CustomerGroupDraft): CustomerGroup {
 		const resource: CustomerGroup = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.groupName,
 			custom: createCustomFields(

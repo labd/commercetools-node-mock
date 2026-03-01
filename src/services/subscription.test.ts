@@ -35,6 +35,7 @@ describe("Subscription", () => {
 		expect(response.json()).toEqual({
 			changes: [],
 			createdAt: expect.anything(),
+			createdBy: expect.anything(),
 			destination: {
 				accessKey: "AKIAIOSFODNN7EXAMPLE",
 				accessSecret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -49,6 +50,7 @@ describe("Subscription", () => {
 			id: expect.anything(),
 			key: "order-notifications",
 			lastModifiedAt: expect.anything(),
+			lastModifiedBy: expect.anything(),
 			messages: [
 				{
 					resourceTypeId: "order",

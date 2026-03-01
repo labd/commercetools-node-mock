@@ -20,7 +20,7 @@ export class DiscountGroupRepository extends AbstractResourceRepository<"discoun
 
 	create(context: RepositoryContext, draft: DiscountGroupDraft): DiscountGroup {
 		const resource: DiscountGroup = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			description: draft.description,
 			name: draft.name,
 			key: draft.key,

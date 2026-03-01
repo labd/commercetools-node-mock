@@ -28,7 +28,7 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 
 	create(context: RepositoryContext, draft: ExtensionDraft): Extension {
 		const resource: Extension = {
-			...getBaseResourceProperties(),
+			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			timeoutInMs: draft.timeoutInMs,
 			destination: draft.destination,
