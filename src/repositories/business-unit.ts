@@ -357,15 +357,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ type, fields }: BusinessUnitSetCustomTypeAction,
 	) {
-		if (type) {
-			resource.custom = createCustomFields(
-				{ type, fields },
-				context.projectKey,
-				this._storage,
-			);
-		} else {
-			resource.custom = undefined;
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setStoreMode(
@@ -480,16 +472,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ name, value }: BusinessUnitSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>(
-				{
-					code: "InvalidOperation",
-					message: "Resource has no custom type",
-				},
-				400,
-			);
-		}
-		resource.custom.fields[name] = value;
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setAddressCustomField(

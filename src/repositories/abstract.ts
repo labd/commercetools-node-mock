@@ -1,10 +1,14 @@
 import { isDeepStrictEqual } from "node:util";
 import type {
 	BaseResource,
+	CustomFields,
+	FieldContainer,
 	InvalidInputError,
+	InvalidOperationError,
 	Project,
 	QueryParam,
 	ResourceNotFoundError,
+	TypeResourceIdentifier,
 	UpdateAction,
 } from "@commercetools/platform-sdk";
 import type { z } from "zod";
@@ -19,6 +23,7 @@ import type {
 	Writable,
 } from "./../types.ts";
 import { checkConcurrentModification } from "./errors.ts";
+import { createCustomFields } from "./helpers.ts";
 
 export type QueryParams = {
 	expand?: string[];
@@ -266,6 +271,67 @@ export class AbstractUpdateHandler {
 			throw new Error("No storage provided");
 		}
 		this._storage = _storage;
+	}
+
+	/**
+	 * Shared implementation for setCustomField update actions.
+	 *
+	 * Throws InvalidOperation if the resource has no custom type set.
+	 * When `value` is `null`, the field is removed; otherwise it is set.
+	 */
+	protected _setCustomFieldValues(
+		resource: { custom?: CustomFields },
+		{ name, value }: { name: string; value?: unknown },
+	): void {
+		if (!resource.custom) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Resource has no custom type",
+				},
+				400,
+			);
+		}
+		if (value === null) {
+			if (!(name in resource.custom.fields)) {
+				throw new CommercetoolsError<InvalidOperationError>(
+					{
+						code: "InvalidOperation",
+						message: `Cannot remove custom field ${name} because it does not exist.`,
+					},
+					400,
+				);
+			}
+			delete resource.custom.fields[name];
+		} else {
+			resource.custom.fields[name] = value;
+		}
+	}
+
+	/**
+	 * Shared implementation for setCustomType update actions.
+	 *
+	 * When `type` is provided, resolves the type reference and sets the
+	 * custom fields on the resource. When `type` is not provided, removes
+	 * the custom fields entirely.
+	 */
+	protected _setCustomType(
+		context: RepositoryContext,
+		resource: { custom?: CustomFields },
+		{
+			type,
+			fields,
+		}: { type?: TypeResourceIdentifier; fields?: FieldContainer },
+	): void {
+		if (type) {
+			resource.custom = createCustomFields(
+				{ type, fields },
+				context.projectKey,
+				this._storage,
+			);
+		} else {
+			resource.custom = undefined;
+		}
 	}
 
 	apply<R extends BaseResource | Project>(

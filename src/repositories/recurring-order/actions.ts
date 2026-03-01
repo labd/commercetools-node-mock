@@ -1,5 +1,4 @@
 import type {
-	InvalidOperationError,
 	RecurringOrder,
 	RecurringOrderSetCustomFieldAction,
 	RecurringOrderSetCustomTypeAction,
@@ -11,9 +10,7 @@ import type {
 	RecurringOrderSetStateAction,
 	RecurringOrderTransitionStateAction,
 	RecurringOrderUpdateAction,
-	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
-import { CommercetoolsError } from "#src/exceptions.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
@@ -28,20 +25,7 @@ export class RecurringOrderUpdateHandler
 		resource: Writable<RecurringOrder>,
 		{ name, value }: RecurringOrderSetCustomFieldAction,
 	) {
-		if (!resource.custom) {
-			throw new CommercetoolsError<InvalidOperationError>(
-				{
-					code: "InvalidOperation",
-					message: "Resource has no custom field",
-				},
-				400,
-			);
-		}
-		if (value === null) {
-			delete resource.custom.fields[name];
-		} else {
-			resource.custom.fields[name] = value;
-		}
+		this._setCustomFieldValues(resource, { name, value });
 	}
 
 	setCustomType(
@@ -49,34 +33,7 @@ export class RecurringOrderUpdateHandler
 		resource: Writable<RecurringOrder>,
 		{ type, fields }: RecurringOrderSetCustomTypeAction,
 	) {
-		if (!type) {
-			resource.custom = undefined;
-		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
-				context.projectKey,
-				type,
-			);
-			if (!resolvedType) {
-				throw new CommercetoolsError<ReferencedResourceNotFoundError>(
-					{
-						code: "ReferencedResourceNotFound",
-						message: `Type ${type} not found`,
-						typeId: "type",
-						id: type.id,
-						key: type.key,
-					},
-					400,
-				);
-			}
-
-			resource.custom = {
-				type: {
-					typeId: "type",
-					id: resolvedType.id,
-				},
-				fields: fields || {},
-			};
-		}
+		this._setCustomType(context, resource, { type, fields });
 	}
 
 	setExpiresAt(
