@@ -4,7 +4,7 @@ process.on("SIGINT", () => {
 	process.exit();
 });
 
-const instance = new CommercetoolsMock();
+const instance = new CommercetoolsMock({ strict: true });
 
 let port = 3000;
 
