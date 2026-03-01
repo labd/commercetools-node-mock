@@ -14,7 +14,9 @@ describe("Business units query", () => {
 	});
 
 	beforeEach(async () => {
-		const draft = businessUnitDraftFactory(ctMock).build();
+		const draft = businessUnitDraftFactory(ctMock).build({
+			key: "test-business-unit",
+		});
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -35,7 +37,7 @@ describe("Business units query", () => {
 		const body = response.json();
 		expect(body.count).toBe(1);
 		businessUnit = body.results[0] as BusinessUnit;
-		expect(businessUnit.key).toBe("test-business-unit");
+		expect(businessUnit!.key).toBe("test-business-unit");
 	});
 });
 
@@ -506,9 +508,7 @@ describe("Business Unit Update Actions", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.version).toBe(2);
-		expect(body.associates[0].associateRoleAssignments).toHaveLength(
-			1,
-		);
+		expect(body.associates[0].associateRoleAssignments).toHaveLength(1);
 	});
 
 	test("setCustomType", async () => {

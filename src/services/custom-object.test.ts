@@ -1,23 +1,28 @@
 import type { CustomObject } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { customObjectDraftFactory } from "#src/testing/index.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("CustomObject create", () => {
 	const ctMock = new CommercetoolsMock();
+	const customObjectDraft = customObjectDraftFactory(ctMock);
 
 	test("Create new object", async () => {
+		const draft = customObjectDraft.build({
+			container: "my-container",
+			key: "my-key",
+			value: "my-value",
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/custom-objects",
-			payload: {
-				container: "my-container",
-				key: "my-key",
-				value: "my-value",
-			},
+			payload: draft,
 		});
 
 		expect(response.statusCode).toBe(201);
+
 		const customObject = response.json();
 		expect(customObject.container).toBe("my-container");
 		expect(customObject.key).toBe("my-key");
@@ -27,21 +32,16 @@ describe("CustomObject create", () => {
 
 describe("CustomObject retrieve", () => {
 	const ctMock = new CommercetoolsMock();
+	const customObjectDraft = customObjectDraftFactory(ctMock);
 	let customObject: CustomObject;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/custom-objects",
-			payload: {
-				container: "my-container",
-				key: "my-key",
-				value: "my-value",
-			},
+		customObject = await customObjectDraft.create({
+			container: "my-container",
+			key: "my-key",
+			value: "my-value",
 		});
 
-		expect(response.statusCode).toBe(201);
-		customObject = response.json();
 		expect(customObject.container).toBe("my-container");
 		expect(customObject.key).toBe("my-key");
 		expect(customObject.value).toBe("my-value");
@@ -75,10 +75,10 @@ describe("CustomObject retrieve", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		const customObject = response.json();
-		expect(customObject.container).toBe("my-container");
-		expect(customObject.key).toBe("my-key");
-		expect(customObject.value).toBe("my-value");
+		const result = response.json();
+		expect(result.container).toBe("my-container");
+		expect(result.key).toBe("my-key");
+		expect(result.value).toBe("my-value");
 	});
 
 	test("query with container", async () => {

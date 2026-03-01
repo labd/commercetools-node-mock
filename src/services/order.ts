@@ -33,7 +33,10 @@ export class OrderService extends AbstractService {
 		return reply.status(200).send(resource);
 	}
 
-	getWithOrderNumber(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+	getWithOrderNumber(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const orderNumber = params.orderNumber;
 		const resource = this.repository.getWithOrderNumber(

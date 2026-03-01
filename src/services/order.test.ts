@@ -7,44 +7,41 @@ import type {
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, it, test } from "vitest";
 import { generateRandomString } from "#src/helpers.ts";
+import {
+	cartDraftFactory,
+	channelDraftFactory,
+	orderDraftFactory,
+	typeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
 describe("Order Query", () => {
 	const ctMock = new CommercetoolsMock();
+	const cartDraft = cartDraftFactory(ctMock);
+	const orderDraft = orderDraftFactory(ctMock);
 	let order: Order | undefined;
 
 	beforeEach(async () => {
-		let response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: {
-				currency: "EUR",
-				custom: {
-					type: {
-						key: "my-cart",
-					},
-					fields: {
-						description: "example description",
-					},
+		const cart = await cartDraft.create({
+			currency: "EUR",
+			custom: {
+				type: {
+					key: "my-cart",
+				},
+				fields: {
+					description: "example description",
 				},
 			},
 		});
-		expect(response.statusCode).toBe(201);
-		const cart = response.json();
 
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/orders",
-			payload: {
-				cart: {
-					typeId: "cart",
-					id: cart.id,
-				},
-				orderNumber: "foobar",
+		order = await orderDraft.create({
+			cart: {
+				typeId: "cart",
+				id: cart.id,
 			},
+			version: cart.version,
+			orderNumber: "foobar",
 		});
-		expect(response.statusCode).toBe(201);
-		order = response.json();
 	});
 
 	afterEach(() => {
@@ -54,7 +51,10 @@ describe("Order Query", () => {
 	test("no filter", async () => {
 		assert(order, "order not created");
 
-		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/orders" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/orders",
+		});
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBe(1);
 		expect(response.json().total).toBe(1);
@@ -316,31 +316,22 @@ describe("Order payment tests", () => {
 
 describe("Order Update Actions", () => {
 	const ctMock = new CommercetoolsMock();
+	const cartDraft = cartDraftFactory(ctMock);
+	const orderDraft = orderDraftFactory(ctMock);
 	let order: Order | undefined;
 
 	beforeEach(async () => {
-		let response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: {
-				currency: "EUR",
-			},
+		const cart = await cartDraft.create({
+			currency: "EUR",
 		});
-		expect(response.statusCode).toBe(201);
-		const cart = response.json();
 
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/orders",
-			payload: {
-				cart: {
-					typeId: "cart",
-					id: cart.id,
-				},
+		order = await orderDraft.create({
+			cart: {
+				typeId: "cart",
+				id: cart.id,
 			},
+			version: cart.version,
 		});
-		expect(response.statusCode).toBe(201);
-		order = response.json();
 	});
 
 	test("no update", async () => {
@@ -831,35 +822,29 @@ describe("Order Update Actions", () => {
 
 		ctMock.project("dummy").unsafeAdd("order", order);
 
-		const typeResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "my-type",
-				name: {
-					en: "My Type",
-				},
-				description: {
-					en: "My Type Description",
-				},
-				fieldDefinitions: [
-					{
-						name: "foo",
-						label: {
-							en: "foo",
-						},
-						required: false,
-						type: {
-							name: "String",
-						},
-						inputHint: "SingleLine",
-					},
-				],
+		const typeDraft = typeDraftFactory(ctMock);
+		const type = await typeDraft.create({
+			key: "my-type",
+			name: {
+				en: "My Type",
 			},
+			description: {
+				en: "My Type Description",
+			},
+			fieldDefinitions: [
+				{
+					name: "foo",
+					label: {
+						en: "foo",
+					},
+					required: false,
+					type: {
+						name: "String",
+					},
+					inputHint: "SingleLine",
+				},
+			],
 		});
-		const type = typeResponse.json();
-
-		assert(type, "type not created");
 
 		const lineItem = order.lineItems[0];
 		assert(lineItem, "lineItem not created");
@@ -1053,16 +1038,11 @@ describe("Order Update Actions", () => {
 	test("updateSyncInfo", async () => {
 		assert(order, "order not created");
 
-		const channelResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/channels",
-			payload: {
-				key: "order-sync",
-				roles: ["OrderImport", "OrderExport"],
-			},
+		const channelDraft = channelDraftFactory(ctMock);
+		const channel = await channelDraft.create({
+			key: "order-sync",
+			roles: ["OrderImport", "OrderExport"],
 		});
-		expect(channelResponse.statusCode).toBe(201);
-		const channel = channelResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "POST",

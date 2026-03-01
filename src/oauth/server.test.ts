@@ -1,4 +1,8 @@
-import Fastify, { type FastifyError, type FastifyReply, type FastifyRequest } from "fastify";
+import Fastify, {
+	type FastifyError,
+	type FastifyReply,
+	type FastifyRequest,
+} from "fastify";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
@@ -20,16 +24,18 @@ describe("OAuth2Server", () => {
 		server = new OAuth2Server({ enabled: true, validate: false });
 		app = Fastify();
 		app.register(server.createPlugin());
-		app.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-			if (error instanceof CommercetoolsError) {
-				return reply.status(error.statusCode).send({
-					statusCode: error.statusCode,
-					message: error.message,
-					errors: error.errors?.length > 0 ? error.errors : [error.info],
-				});
-			}
-			return reply.status(500).send({ error: error.message });
-		});
+		app.setErrorHandler(
+			(error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+				if (error instanceof CommercetoolsError) {
+					return reply.status(error.statusCode).send({
+						statusCode: error.statusCode,
+						message: error.message,
+						errors: error.errors?.length > 0 ? error.errors : [error.info],
+					});
+				}
+				return reply.status(500).send({ error: error.message });
+			},
+		);
 
 		storage = new InMemoryStorage();
 		const config: Config = { storage, strict: false };
@@ -188,12 +194,14 @@ describe("OAuth2Server", () => {
 
 			const response = await app.inject({
 				method: "POST",
-				url: `/${projectKey}/in-store/key=${storeKey}/customers/token?${new URLSearchParams({
-					grant_type: "password",
-					username: "j.doe@example.org",
-					password: "password",
-					scope: `${projectKey}:manage_my_profile`,
-				})}`,
+				url: `/${projectKey}/in-store/key=${storeKey}/customers/token?${new URLSearchParams(
+					{
+						grant_type: "password",
+						username: "j.doe@example.org",
+						password: "password",
+						scope: `${projectKey}:manage_my_profile`,
+					},
+				)}`,
 				headers: {
 					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
 				},

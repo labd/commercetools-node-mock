@@ -1,43 +1,36 @@
-import type {
-	Cart,
-	CartDraft,
-	ShippingMethodDraft,
-	TaxCategoryDraft,
-	ZoneDraft,
-} from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import {
+	cartDraftFactory,
+	shippingMethodDraftFactory,
+	taxCategoryDraftFactory,
+	zoneDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
-import { isType } from "../types.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Shipping method", () => {
-	beforeEach(async () => {
-		const taxCatResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/tax-categories",
-			payload: isType<TaxCategoryDraft>({
-				name: "foo",
-				key: "standard",
-				rates: [],
-			}),
-		});
-		expect(taxCatResponse.statusCode).toEqual(201);
+	const taxCategoryDraft = taxCategoryDraftFactory(ctMock);
+	const zoneDraft = zoneDraftFactory(ctMock);
+	const shippingMethodDraft = shippingMethodDraftFactory(ctMock);
+	const cartDraft = cartDraftFactory(ctMock);
 
-		const zoneResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/zones",
-			payload: isType<ZoneDraft>({
-				name: "The Netherlands",
-				key: "NL",
-				locations: [
-					{
-						country: "NL",
-					},
-				],
-			}),
+	beforeEach(async () => {
+		await taxCategoryDraft.create({
+			name: "foo",
+			key: "standard",
+			rates: [],
 		});
-		expect(zoneResponse.statusCode).toEqual(201);
+
+		await zoneDraft.create({
+			name: "The Netherlands",
+			key: "NL",
+			locations: [
+				{
+					country: "NL",
+				},
+			],
+		});
 	});
 
 	afterEach(async () => {
@@ -45,12 +38,13 @@ describe("Shipping method", () => {
 	});
 
 	test("Create shipping method", async () => {
-		const draft: ShippingMethodDraft = {
+		const draft = shippingMethodDraft.build({
 			name: "foo",
 			taxCategory: { typeId: "tax-category", key: "standard" },
 			isDefault: true,
 			zoneRates: [],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/shipping-methods",
@@ -58,7 +52,6 @@ describe("Shipping method", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
@@ -76,95 +69,73 @@ describe("Shipping method", () => {
 	});
 
 	test("Get shipping method", async () => {
-		const draft: ShippingMethodDraft = {
+		const shippingMethod = await shippingMethodDraft.create({
 			name: "foo",
 			taxCategory: { typeId: "tax-category", key: "standard" },
 			isDefault: true,
 			zoneRates: [],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/shipping-methods",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/shipping-methods/${createResponse.json().id}`,
+			url: `/dummy/shipping-methods/${shippingMethod.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(shippingMethod);
 	});
 
 	test("Get shipping methods matching cart", async () => {
-		const cartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: isType<CartDraft>({
-				currency: "EUR",
-				shippingAddress: {
-					country: "NL",
+		const cart = await cartDraft.create({
+			currency: "EUR",
+			shippingAddress: {
+				country: "NL",
+			},
+		});
+
+		await shippingMethodDraft.create({
+			name: "NL",
+			taxCategory: { typeId: "tax-category", key: "standard" },
+			isDefault: true,
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						key: "NL",
+					},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "EUR",
+								centAmount: 495,
+							},
+						},
+					],
 				},
-			}),
+			],
 		});
-		const cart = cartResponse.json() as Cart;
 
-		const smResponse1 = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/shipping-methods",
-			payload: isType<ShippingMethodDraft>({
-				name: "NL",
-				taxCategory: { typeId: "tax-category", key: "standard" },
-				isDefault: true,
-				zoneRates: [
-					{
-						zone: {
-							typeId: "zone",
-							key: "NL",
-						},
-						shippingRates: [
-							{
-								price: {
-									currencyCode: "EUR",
-									centAmount: 495,
-								},
-							},
-						],
+		await shippingMethodDraft.create({
+			name: "NL/GBP",
+			taxCategory: { typeId: "tax-category", key: "standard" },
+			isDefault: true,
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						key: "NL",
 					},
-				],
-			}),
-		});
-		expect(smResponse1.statusCode).toEqual(201);
-
-		const smResponse2 = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/shipping-methods",
-			payload: isType<ShippingMethodDraft>({
-				name: "NL/GBP",
-				taxCategory: { typeId: "tax-category", key: "standard" },
-				isDefault: true,
-				zoneRates: [
-					{
-						zone: {
-							typeId: "zone",
-							key: "NL",
-						},
-						shippingRates: [
-							{
-								price: {
-									currencyCode: "GBP",
-									centAmount: 495,
-								},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "GBP",
+								centAmount: 495,
 							},
-						],
-					},
-				],
-			}),
+						},
+					],
+				},
+			],
 		});
-		expect(smResponse2.statusCode).toEqual(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",

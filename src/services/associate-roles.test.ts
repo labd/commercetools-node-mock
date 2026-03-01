@@ -1,26 +1,18 @@
 import type { AssociateRole } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { associateRoleDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../ctMock.ts";
 
 describe("Associate roles query", () => {
 	const ctMock = new CommercetoolsMock();
+	const associateRoleDraft = associateRoleDraftFactory(ctMock);
 	let associateRole: AssociateRole | undefined;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/associate-roles",
-			payload: {
-				name: "example-role",
-				buyerAssignable: false,
-				key: "example-role-associate-role",
-				permissions: ["ViewMyQuotes", "ViewMyOrders", "ViewMyCarts"],
-			},
+		associateRole = await associateRoleDraft.create({
+			name: "example-role",
+			key: "example-role-associate-role",
 		});
-
-		expect(response.statusCode).toBe(201);
-
-		associateRole = response.json() as AssociateRole;
 	});
 
 	afterEach(() => {

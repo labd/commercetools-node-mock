@@ -1,12 +1,14 @@
-import type { AttributeGroupDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { attributeGroupDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("AttributeGroup", () => {
+	const attributeGroupDraft = attributeGroupDraftFactory(ctMock);
+
 	test("Create attribute group", async () => {
-		const draft: AttributeGroupDraft = {
+		const draft = attributeGroupDraft.build({
 			key: "product-specifications",
 			name: {
 				en: "Product Specifications",
@@ -19,7 +21,8 @@ describe("AttributeGroup", () => {
 					key: "color",
 				},
 			],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/attribute-groups",
@@ -27,7 +30,6 @@ describe("AttributeGroup", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			attributes: [
 				{
@@ -49,47 +51,31 @@ describe("AttributeGroup", () => {
 	});
 
 	test("Get attribute group", async () => {
-		const draft: AttributeGroupDraft = {
+		const attributeGroup = await attributeGroupDraft.create({
 			key: "test-group",
 			name: {
 				en: "Test Group",
 			},
 			attributes: [],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/attribute-groups",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/attribute-groups/${createBody.id}`,
+			url: `/dummy/attribute-groups/${attributeGroup.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createBody);
+		expect(response.json()).toEqual(attributeGroup);
 	});
 
 	test("Get attribute group by key", async () => {
-		const draft: AttributeGroupDraft = {
+		const attributeGroup = await attributeGroupDraft.create({
 			key: "key-group",
 			name: {
 				en: "Key Group",
 			},
 			attributes: [],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/attribute-groups",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -97,25 +83,17 @@ describe("AttributeGroup", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createBody);
+		expect(response.json()).toEqual(attributeGroup);
 	});
 
 	test("Query attribute groups", async () => {
-		const draft: AttributeGroupDraft = {
+		const attributeGroup = await attributeGroupDraft.create({
 			key: "query-group",
 			name: {
 				en: "Query Group",
 			},
 			attributes: [],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/attribute-groups",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -125,6 +103,6 @@ describe("AttributeGroup", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.count).toBeGreaterThan(0);
-		expect(body.results).toContainEqual(createBody);
+		expect(body.results).toContainEqual(attributeGroup);
 	});
 });

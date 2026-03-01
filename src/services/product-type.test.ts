@@ -1,12 +1,14 @@
-import type { ProductTypeDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { productTypeDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Product type", () => {
+	const productTypeDraft = productTypeDraftFactory(ctMock);
+
 	test("Create product type", async () => {
-		const draft: ProductTypeDraft = {
+		const draft = productTypeDraft.build({
 			name: "foo",
 			description: "bar",
 			attributes: [
@@ -17,7 +19,8 @@ describe("Product type", () => {
 					isRequired: false,
 				},
 			],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/product-types",
@@ -25,7 +28,6 @@ describe("Product type", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			attributes: [
 				{
@@ -46,6 +48,7 @@ describe("Product type", () => {
 			createdAt: expect.anything(),
 			description: "bar",
 			id: expect.anything(),
+			key: expect.anything(),
 			lastModifiedAt: expect.anything(),
 			name: "foo",
 			version: 1,
@@ -53,24 +56,17 @@ describe("Product type", () => {
 	});
 
 	test("Get product type", async () => {
-		const draft: ProductTypeDraft = {
+		const productType = await productTypeDraft.create({
 			name: "foo",
 			description: "bar",
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-types",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/product-types/${createResponse.json().id}`,
+			url: `/dummy/product-types/${productType.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(productType);
 	});
 });

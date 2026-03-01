@@ -1,15 +1,18 @@
-import type { ChannelDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { channelDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Channel", () => {
+	const channelDraft = channelDraftFactory(ctMock);
+
 	test("Create channel", async () => {
-		const draft: ChannelDraft = {
+		const draft = channelDraft.build({
 			key: "my-channel",
 			roles: ["InventorySupply"],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/channels",
@@ -17,7 +20,6 @@ describe("Channel", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			address: undefined,
 			createdAt: expect.anything(),
@@ -34,39 +36,25 @@ describe("Channel", () => {
 	});
 
 	test("Get channel", async () => {
-		const draft: ChannelDraft = {
+		const channel = await channelDraft.create({
 			key: "my-channel",
 			roles: ["InventorySupply"],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/channels",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/channels/${createResponse.json().id}`,
+			url: `/dummy/channels/${channel.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(channel);
 	});
 
 	test("Get channel by key", async () => {
-		const draft: ChannelDraft = {
+		const channel = await channelDraft.create({
 			key: "my-channel-key",
 			roles: ["InventorySupply"],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/channels",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -74,21 +62,14 @@ describe("Channel", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(channel);
 	});
 
 	test("Query channels", async () => {
-		const draft: ChannelDraft = {
+		const channel = await channelDraft.create({
 			key: "test-channel",
 			roles: ["InventorySupply"],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/channels",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -97,6 +78,6 @@ describe("Channel", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(channel);
 	});
 });

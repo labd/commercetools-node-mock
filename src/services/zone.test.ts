@@ -1,12 +1,14 @@
-import type { ZoneDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { zoneDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Zone", () => {
+	const zoneDraft = zoneDraftFactory(ctMock);
+
 	test("Create zone", async () => {
-		const draft: ZoneDraft = {
+		const draft = zoneDraft.build({
 			key: "europe-zone",
 			name: "Europe",
 			locations: [
@@ -17,7 +19,8 @@ describe("Zone", () => {
 					country: "NL",
 				},
 			],
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/zones",
@@ -25,7 +28,6 @@ describe("Zone", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			description: undefined,
@@ -46,7 +48,7 @@ describe("Zone", () => {
 	});
 
 	test("Get zone", async () => {
-		const draft: ZoneDraft = {
+		const zone = await zoneDraft.create({
 			key: "test-zone",
 			name: "Test Zone",
 			locations: [
@@ -54,27 +56,19 @@ describe("Zone", () => {
 					country: "US",
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/zones",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/zones/${createBody.id}`,
+			url: `/dummy/zones/${zone.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createBody);
+		expect(response.json()).toEqual(zone);
 	});
 
 	test("Get zone by key", async () => {
-		const draft: ZoneDraft = {
+		const zone = await zoneDraft.create({
 			key: "key-zone",
 			name: "Key Zone",
 			locations: [
@@ -82,15 +76,7 @@ describe("Zone", () => {
 					country: "CA",
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/zones",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -98,11 +84,11 @@ describe("Zone", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createBody);
+		expect(response.json()).toEqual(zone);
 	});
 
 	test("Query zones", async () => {
-		const draft: ZoneDraft = {
+		const zone = await zoneDraft.create({
 			key: "query-zone",
 			name: "Query Zone",
 			locations: [
@@ -110,15 +96,7 @@ describe("Zone", () => {
 					country: "FR",
 				},
 			],
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/zones",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -128,6 +106,6 @@ describe("Zone", () => {
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.count).toBeGreaterThan(0);
-		expect(body.results).toContainEqual(createBody);
+		expect(body.results).toContainEqual(zone);
 	});
 });

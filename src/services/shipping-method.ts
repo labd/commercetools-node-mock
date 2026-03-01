@@ -20,7 +20,10 @@ export class ShippingMethodService extends AbstractService {
 		parent.get("/matching-cart", this.matchingCart.bind(this));
 	}
 
-	matchingCart(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
+	matchingCart(
+		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		reply: FastifyReply,
+	) {
 		const query = request.query;
 		const cartId = queryParamsValue(query.cartId);
 		if (!cartId) {

@@ -10,7 +10,10 @@ import AbstractService from "./abstract.ts";
 export class ProductProjectionService extends AbstractService {
 	public repository: ProductProjectionRepository;
 
-	constructor(parent: FastifyInstance, repository: ProductProjectionRepository) {
+	constructor(
+		parent: FastifyInstance,
+		repository: ProductProjectionRepository,
+	) {
 		super(parent);
 		this.repository = repository;
 	}
@@ -23,7 +26,10 @@ export class ProductProjectionService extends AbstractService {
 		instance.get("/search", this.search.bind(this));
 	}
 
-	get(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
+	get(
+		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		reply: FastifyReply,
+	) {
 		const query = request.query;
 		const limit = this._parseParam(query.limit);
 		const offset = this._parseParam(query.offset);
@@ -38,7 +44,10 @@ export class ProductProjectionService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	search(request: FastifyRequest<{ Querystring: Record<string, any> }>, reply: FastifyReply) {
+	search(
+		request: FastifyRequest<{ Querystring: Record<string, any> }>,
+		reply: FastifyReply,
+	) {
 		const query = request.query;
 		const searchParams: ProductProjectionQueryParams = {
 			filter: queryParamsArray(query.filter),

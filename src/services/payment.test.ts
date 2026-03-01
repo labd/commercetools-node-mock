@@ -1,27 +1,25 @@
-import type { PaymentDraft } from "@commercetools/platform-sdk";
 import { beforeEach, describe, expect, test } from "vitest";
+import { paymentDraftFactory, typeDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("Payment", () => {
+	const paymentDraft = paymentDraftFactory(ctMock);
+	const typeDraft = typeDraftFactory(ctMock);
+
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "custom-payment",
-				name: {
-					"nl-NL": "custom-payment",
-				},
-				resourceTypeIds: ["payment"],
+		await typeDraft.create({
+			key: "custom-payment",
+			name: {
+				"nl-NL": "custom-payment",
 			},
+			resourceTypeIds: ["payment"],
 		});
-		expect(response.statusCode).toBe(201);
 	});
 
 	test("Create payment", async () => {
-		const draft: PaymentDraft = {
+		const draft = paymentDraft.build({
 			amountPlanned: { currencyCode: "EUR", centAmount: 1337 },
 			custom: {
 				type: { typeId: "type", key: "custom-payment" },
@@ -29,7 +27,8 @@ describe("Payment", () => {
 					foo: "bar",
 				},
 			},
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/payments",
@@ -59,7 +58,7 @@ describe("Payment", () => {
 		});
 	});
 	test("Get payment", async () => {
-		const draft: PaymentDraft = {
+		const payment = await paymentDraft.create({
 			amountPlanned: { currencyCode: "EUR", centAmount: 1337 },
 			custom: {
 				type: { typeId: "type", key: "custom-payment" },
@@ -67,19 +66,14 @@ describe("Payment", () => {
 					foo: "bar",
 				},
 			},
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/payments",
-			payload: draft,
 		});
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/payments/${createResponse.json().id}`,
+			url: `/dummy/payments/${payment.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(payment);
 	});
 });

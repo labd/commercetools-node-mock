@@ -1,23 +1,22 @@
 import assert from "node:assert";
 import type { InventoryEntry, Type } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import {
+	inventoryEntryDraftFactory,
+	typeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Inventory Entry Query", () => {
 	const ctMock = new CommercetoolsMock();
+	const inventoryEntryDraft = inventoryEntryDraftFactory(ctMock);
 	let inventoryEntry: InventoryEntry | undefined;
 
 	beforeEach(async () => {
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/inventory",
-			payload: {
-				sku: "1337",
-				quantityOnStock: 100,
-			},
+		inventoryEntry = await inventoryEntryDraft.create({
+			sku: "1337",
+			quantityOnStock: 100,
 		});
-		expect(response.statusCode).toBe(201);
-		inventoryEntry = response.json();
 	});
 
 	afterEach(() => {
@@ -27,7 +26,10 @@ describe("Inventory Entry Query", () => {
 	test("no filter", async () => {
 		assert(inventoryEntry, "inventory entry not created");
 
-		const response = await ctMock.app.inject({ method: "GET", url: "/dummy/inventory" });
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/inventory",
+		});
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBe(1);
 		expect(response.json().total).toBe(1);
@@ -61,34 +63,24 @@ describe("Inventory Entry Query", () => {
 
 describe("Inventory Entry Update Actions", () => {
 	const ctMock = new CommercetoolsMock();
+	const inventoryEntryDraft = inventoryEntryDraftFactory(ctMock);
+	const typeDraft = typeDraftFactory(ctMock);
 	let inventoryEntry: InventoryEntry | undefined;
 	let customType: Type | undefined;
 
 	beforeEach(async () => {
-		let response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/inventory",
-			payload: {
-				sku: "1337",
-				quantityOnStock: 100,
-			},
+		inventoryEntry = await inventoryEntryDraft.create({
+			sku: "1337",
+			quantityOnStock: 100,
 		});
-		expect(response.statusCode).toBe(201);
-		inventoryEntry = response.json();
 
-		response = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/types",
-			payload: {
-				key: "custom-inventory",
-				name: {
-					"nl-NL": "custom-inventory",
-				},
-				resourceTypeIds: ["inventory-entry"],
+		customType = await typeDraft.create({
+			key: "custom-inventory",
+			name: {
+				"nl-NL": "custom-inventory",
 			},
+			resourceTypeIds: ["inventory-entry"],
 		});
-		expect(response.statusCode).toBe(201);
-		customType = response.json();
 	});
 
 	test("changeQuantity", async () => {

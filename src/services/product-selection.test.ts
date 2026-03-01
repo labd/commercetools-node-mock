@@ -1,17 +1,20 @@
-import type { ProductSelectionDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { productSelectionDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("product-selection", () => {
+	const productSelectionDraft = productSelectionDraftFactory(ctMock);
+
 	test("Create product selection", async () => {
-		const draft: ProductSelectionDraft = {
+		const draft = productSelectionDraft.build({
 			name: {
 				en: "foo",
 			},
 			key: "foo",
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/product-selections",
@@ -20,7 +23,9 @@ describe("product-selection", () => {
 
 		expect(response.statusCode).toBe(201);
 
-		expect(response.json()).toEqual({
+		const productSelection = response.json();
+
+		expect(productSelection).toEqual({
 			createdAt: expect.anything(),
 			id: expect.anything(),
 			lastModifiedAt: expect.anything(),

@@ -54,7 +54,13 @@ export class CustomObjectService extends AbstractService {
 		);
 	}
 
-	getWithContainer(request: FastifyRequest<{ Params: Record<string, string>; Querystring: Record<string, any> }>, reply: FastifyReply) {
+	getWithContainer(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Querystring: Record<string, any>;
+		}>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const query = request.query;
 		const limit = this._parseParam(query.limit);
@@ -74,7 +80,10 @@ export class CustomObjectService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	getWithContainerAndKey(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+	getWithContainerAndKey(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const result = this.repository.getWithContainerAndKey(
 			getRepositoryContext(request),
@@ -88,7 +97,10 @@ export class CustomObjectService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	createWithContainerAndKey(request: FastifyRequest<{ Params: Record<string, string>; Body: any }>, reply: FastifyReply) {
+	createWithContainerAndKey(
+		request: FastifyRequest<{ Params: Record<string, string>; Body: any }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const draft: CustomObjectDraft = {
 			...request.body,
@@ -100,7 +112,10 @@ export class CustomObjectService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	deleteWithContainerAndKey(request: FastifyRequest<{ Params: Record<string, string> }>, reply: FastifyReply) {
+	deleteWithContainerAndKey(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const params = request.params;
 		const current = this.repository.getWithContainerAndKey(
 			getRepositoryContext(request),

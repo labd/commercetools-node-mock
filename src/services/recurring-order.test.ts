@@ -1,74 +1,50 @@
-import type {
-	CartDraft,
-	RecurringOrderDraft,
-} from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { cartDraftFactory } from "#src/testing/cart.ts";
+import { productDraftFactory } from "#src/testing/product.ts";
+import { productTypeDraftFactory } from "#src/testing/product-type.ts";
+import { recurringOrderDraftFactory } from "#src/testing/recurring-order.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("RecurringOrder", () => {
 	const createTestCart = async () => {
-		await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-types",
-			payload: {
-				key: "test-product-type",
-				name: "Test Product Type",
-				description: "A test product type",
-			},
-		});
+		const productType = await productTypeDraftFactory(ctMock).create();
 
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: {
-				key: "test-product",
-				name: { en: "Test Product" },
-				productType: {
-					typeId: "product-type",
-					key: "test-product-type",
-				},
-				slug: { en: "test-product" },
-				masterVariant: {
-					id: 1,
-					sku: "test-sku",
-					prices: [
-						{
-							value: {
-								type: "centPrecision",
-								currencyCode: "EUR",
-								centAmount: 1000,
-							},
+		const product = await productDraftFactory(ctMock).create({
+			productType: {
+				typeId: "product-type",
+				id: productType.id,
+			},
+			masterVariant: {
+				sku: "test-sku",
+				prices: [
+					{
+						value: {
+							type: "centPrecision",
+							currencyCode: "EUR",
+							centAmount: 1000,
 						},
-					],
-				},
-				variants: [],
+					},
+				],
 			},
+			variants: [],
 		});
 
-		const cartDraft: CartDraft = {
+		const cart = await cartDraftFactory(ctMock).create({
 			currency: "EUR",
 			country: "NL",
-		};
-
-		const cartResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/carts",
-			payload: cartDraft,
 		});
-
-		const cartBody = cartResponse.json();
 
 		await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/carts/${cartBody.id}`,
+			url: `/dummy/carts/${cart.id}`,
 			payload: {
-				version: cartBody.version,
+				version: cart.version,
 				actions: [
 					{
 						action: "addLineItem",
-						productId: productResponse.json().id,
+						productId: product.id,
 						variantId: 1,
 						quantity: 2,
 					},
@@ -78,7 +54,7 @@ describe("RecurringOrder", () => {
 
 		const updatedCartResponse = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/carts/${cartBody.id}`,
+			url: `/dummy/carts/${cart.id}`,
 		});
 
 		return updatedCartResponse.json();
@@ -87,7 +63,7 @@ describe("RecurringOrder", () => {
 	test("Create recurring order", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const draft = recurringOrderDraftFactory(ctMock).build({
 			key: "weekly-order",
 			cart: {
 				typeId: "cart",
@@ -96,7 +72,7 @@ describe("RecurringOrder", () => {
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
 			expiresAt: "2025-12-31T23:59:59.000Z",
-		};
+		});
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -134,7 +110,7 @@ describe("RecurringOrder", () => {
 	test("Get recurring order", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "get-test-order",
 			cart: {
 				typeId: "cart",
@@ -142,29 +118,21 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(recurringOrder);
 	});
 
 	test("Get recurring order by key", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "key-test-order",
 			cart: {
 				typeId: "cart",
@@ -172,15 +140,7 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -188,13 +148,13 @@ describe("RecurringOrder", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(recurringOrder);
 	});
 
 	test("Query recurring orders", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "query-test-order",
 			cart: {
 				typeId: "cart",
@@ -202,15 +162,7 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -219,13 +171,13 @@ describe("RecurringOrder", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(recurringOrder);
 	});
 
 	test("Update recurring order - setKey", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "original-key",
 			cart: {
 				typeId: "cart",
@@ -233,21 +185,13 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurringOrder.version,
 				actions: [
 					{
 						action: "setKey",
@@ -265,7 +209,7 @@ describe("RecurringOrder", () => {
 	test("Update recurring order - setStartsAt", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "starts-at-test",
 			cart: {
 				typeId: "cart",
@@ -273,21 +217,13 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurringOrder.version,
 				actions: [
 					{
 						action: "setStartsAt",
@@ -305,7 +241,7 @@ describe("RecurringOrder", () => {
 	test("Update recurring order - setExpiresAt", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "expires-at-test",
 			cart: {
 				typeId: "cart",
@@ -313,21 +249,13 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurringOrder.version,
 				actions: [
 					{
 						action: "setExpiresAt",
@@ -345,7 +273,7 @@ describe("RecurringOrder", () => {
 	test("Update recurring order - setRecurringOrderState to paused", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "state-test",
 			cart: {
 				typeId: "cart",
@@ -353,21 +281,13 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurringOrder.version,
 				actions: [
 					{
 						action: "setRecurringOrderState",
@@ -387,7 +307,7 @@ describe("RecurringOrder", () => {
 	test("Update recurring order - setOrderSkipConfiguration", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "skip-test",
 			cart: {
 				typeId: "cart",
@@ -395,21 +315,13 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const updateResponse = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 			payload: {
-				version: createResponse.json().version,
+				version: recurringOrder.version,
 				actions: [
 					{
 						action: "setOrderSkipConfiguration",
@@ -437,7 +349,7 @@ describe("RecurringOrder", () => {
 	test("Delete recurring order", async () => {
 		const cart = await createTestCart();
 
-		const draft: RecurringOrderDraft = {
+		const recurringOrder = await recurringOrderDraftFactory(ctMock).create({
 			key: "delete-test",
 			cart: {
 				typeId: "cart",
@@ -445,27 +357,19 @@ describe("RecurringOrder", () => {
 			},
 			cartVersion: cart.version,
 			startsAt: "2025-01-01T10:00:00.000Z",
-		};
-
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/recurring-orders",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const deleteResponse = await ctMock.app.inject({
 			method: "DELETE",
-			url: `/dummy/recurring-orders/${createResponse.json().id}?version=${createResponse.json().version}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}?version=${recurringOrder.version}`,
 		});
 
 		expect(deleteResponse.statusCode).toBe(200);
-		expect(deleteResponse.json()).toEqual(createResponse.json());
+		expect(deleteResponse.json()).toEqual(recurringOrder);
 
 		const getResponse = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/recurring-orders/${createResponse.json().id}`,
+			url: `/dummy/recurring-orders/${recurringOrder.id}`,
 		});
 
 		expect(getResponse.statusCode).toBe(404);

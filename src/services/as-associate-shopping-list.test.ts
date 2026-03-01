@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { shoppingListDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
@@ -7,47 +8,34 @@ const customerId = "5fac8fca-2484-4b14-a1d1-cfdce2f8d3c4";
 const businessUnitKey = "test-business-unit";
 
 describe("AsAssociateShoppingList", () => {
+	const factory = shoppingListDraftFactory(ctMock);
+
 	test("Create shopping list", async () => {
-		const draft = {
+		const shoppingList = await factory.create({
 			name: { en: "My list" },
-		};
-		const response = await ctMock.app.inject({
-			method: "POST",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/shopping-lists`,
-			payload: draft,
 		});
 
-		expect(response.statusCode).toBe(201);
-		expect(response.json().id).toBeDefined();
+		expect(shoppingList.id).toBeDefined();
 	});
 
 	test("Get shopping list", async () => {
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/shopping-lists`,
-			payload: { name: { en: "Groceries" } },
+		const shoppingList = await factory.create({
+			name: { en: "Groceries" },
 		});
-
-		expect(createResponse.statusCode).toBe(201);
-		const createBody = createResponse.json();
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/shopping-lists/${createBody.id}`,
+			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/shopping-lists/${shoppingList.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createBody);
+		expect(response.json()).toEqual(shoppingList);
 	});
 
 	test("Query shopping lists", async () => {
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/shopping-lists`,
-			payload: { name: { en: "Errands" } },
+		await factory.create({
+			name: { en: "Errands" },
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",

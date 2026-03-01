@@ -7,7 +7,7 @@ import type { CommercetoolsMock } from "#src/ctMock.ts";
 
 export const businessUnitDraftFactory = (m: CommercetoolsMock) =>
 	Factory.define<BusinessUnitDraft, BusinessUnitDraft, BusinessUnit>(
-		({ onCreate }) => {
+		({ sequence, onCreate }) => {
 			onCreate(async (draft) => {
 				const response = await m.app.inject({
 					method: "POST",
@@ -19,9 +19,9 @@ export const businessUnitDraftFactory = (m: CommercetoolsMock) =>
 			});
 
 			return {
-				key: "test-business-unit",
+				key: `business-unit-${sequence}`,
 				unitType: "Company",
-				name: "Test Business Unit",
+				name: `Test Business Unit ${sequence}`,
 				status: "Active",
 				contactEmail: "contact@businessunit.com",
 				storeMode: "Explicit",

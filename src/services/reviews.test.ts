@@ -1,6 +1,11 @@
 import type { Product, Review, State } from "@commercetools/platform-sdk";
 import { beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsMock } from "#src/index.ts";
+import {
+	productDraftFactory,
+	reviewDraftFactory,
+	stateDraftFactory,
+} from "#src/testing/index.ts";
 
 describe("Review Update Actions", () => {
 	let ctMock: CommercetoolsMock;
@@ -8,68 +13,54 @@ describe("Review Update Actions", () => {
 	let product: Product;
 	let state: State;
 
+	const createProductDraft = () => productDraftFactory(ctMock);
+	const createStateDraft = () => stateDraftFactory(ctMock);
+	const createReviewDraft = () => reviewDraftFactory(ctMock);
+
 	beforeEach(async () => {
 		ctMock = new CommercetoolsMock();
 
 		// Create a product to target
-		const productResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/products",
-			payload: {
-				name: { en: "Test Product" },
-				slug: { en: "test-product" },
-				productType: {
-					typeId: "product-type",
-					key: "dummy-product-type",
-				},
-				masterVariant: {
-					sku: "test-sku-1",
-					prices: [
-						{
-							value: {
-								currencyCode: "EUR",
-								centAmount: 1000,
-							},
+		product = await createProductDraft().create({
+			name: { en: "Test Product" },
+			slug: { en: "test-product" },
+			productType: {
+				typeId: "product-type",
+				key: "dummy-product-type",
+			},
+			masterVariant: {
+				sku: "test-sku-1",
+				prices: [
+					{
+						value: {
+							currencyCode: "EUR",
+							centAmount: 1000,
 						},
-					],
-				},
+					},
+				],
 			},
 		});
-		expect(productResponse.statusCode).toBe(201);
-		product = productResponse.json();
 
 		// Create a state
-		const stateResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/states",
-			payload: {
-				key: "review-state",
-				type: "ReviewState",
-				name: { en: "Review State" },
-				initial: true,
-			},
+		state = await createStateDraft().create({
+			key: "review-state",
+			type: "ReviewState",
+			name: { en: "Review State" },
+			initial: true,
 		});
-		expect(stateResponse.statusCode).toBe(201);
-		state = stateResponse.json();
 
 		// Create a review
-		const reviewResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/reviews",
-			payload: {
-				key: "test-review",
-				authorName: "John Doe",
-				title: "Great product!",
-				text: "I really love this product.",
-				rating: 5,
-				target: {
-					typeId: "product",
-					id: product.id,
-				},
+		review = await createReviewDraft().create({
+			key: "test-review",
+			authorName: "John Doe",
+			title: "Great product!",
+			text: "I really love this product.",
+			rating: 5,
+			target: {
+				typeId: "product",
+				id: product.id,
 			},
 		});
-		expect(reviewResponse.statusCode).toBe(201);
-		review = reviewResponse.json();
 	});
 
 	test("setAuthorName", async () => {

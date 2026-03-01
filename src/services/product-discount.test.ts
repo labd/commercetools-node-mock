@@ -1,12 +1,14 @@
-import type { ProductDiscountDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { productDiscountDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
 describe("ProductDiscount", () => {
+	const productDiscountDraft = productDiscountDraftFactory(ctMock);
+
 	test("Create product discount", async () => {
-		const draft: ProductDiscountDraft = {
+		const draft = productDiscountDraft.build({
 			key: "summer-sale",
 			name: {
 				en: "Summer Sale",
@@ -21,7 +23,8 @@ describe("ProductDiscount", () => {
 			predicate: "1=1",
 			sortOrder: "0.1",
 			isActive: true,
-		};
+		});
+
 		const response = await ctMock.app.inject({
 			method: "POST",
 			url: "/dummy/product-discounts",
@@ -29,7 +32,6 @@ describe("ProductDiscount", () => {
 		});
 
 		expect(response.statusCode).toBe(201);
-
 		expect(response.json()).toEqual({
 			createdAt: expect.anything(),
 			description: {
@@ -56,7 +58,7 @@ describe("ProductDiscount", () => {
 	});
 
 	test("Get product discount", async () => {
-		const draft: ProductDiscountDraft = {
+		const productDiscount = await productDiscountDraft.create({
 			key: "test-discount",
 			name: {
 				en: "Test Discount",
@@ -73,26 +75,19 @@ describe("ProductDiscount", () => {
 			predicate: "1=1",
 			sortOrder: "0.2",
 			isActive: true,
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-discounts",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/product-discounts/${createResponse.json().id}`,
+			url: `/dummy/product-discounts/${productDiscount.id}`,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(productDiscount);
 	});
 
 	test("Get product discount by key", async () => {
-		const draft: ProductDiscountDraft = {
+		const productDiscount = await productDiscountDraft.create({
 			key: "key-discount",
 			name: {
 				en: "Key Discount",
@@ -104,14 +99,7 @@ describe("ProductDiscount", () => {
 			predicate: "1=1",
 			sortOrder: "0.3",
 			isActive: false,
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-discounts",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -119,11 +107,11 @@ describe("ProductDiscount", () => {
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(createResponse.json());
+		expect(response.json()).toEqual(productDiscount);
 	});
 
 	test("Query product discounts", async () => {
-		const draft: ProductDiscountDraft = {
+		const productDiscount = await productDiscountDraft.create({
 			key: "query-discount",
 			name: {
 				en: "Query Discount",
@@ -135,14 +123,7 @@ describe("ProductDiscount", () => {
 			predicate: "1=1",
 			sortOrder: "0.4",
 			isActive: true,
-		};
-		const createResponse = await ctMock.app.inject({
-			method: "POST",
-			url: "/dummy/product-discounts",
-			payload: draft,
 		});
-
-		expect(createResponse.statusCode).toBe(201);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -151,6 +132,6 @@ describe("ProductDiscount", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().count).toBeGreaterThan(0);
-		expect(response.json().results).toContainEqual(createResponse.json());
+		expect(response.json().results).toContainEqual(productDiscount);
 	});
 });
