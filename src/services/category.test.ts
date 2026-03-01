@@ -156,6 +156,8 @@ describe("Categories add asset", () => {
 			assets: [
 				{
 					key: "some-key",
+					sources: [],
+					name: { en: "Some Asset" },
 				},
 			],
 		});
@@ -204,9 +206,13 @@ describe("Categories remove asset", () => {
 			assets: [
 				{
 					key: "some-key",
+					sources: [],
+					name: { en: "Some Asset" },
 				},
 				{
 					key: "some-other-key",
+					sources: [],
+					name: { en: "Some Other Asset" },
 				},
 			],
 		});

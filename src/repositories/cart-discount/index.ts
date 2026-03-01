@@ -6,6 +6,7 @@ import type {
 	CartDiscountValueFixed,
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
+	RecurringOrderScope,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
@@ -53,6 +54,9 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 				context.projectKey,
 				this._storage,
 			),
+			recurringOrderScope: draft.recurringOrderScope
+				? ({ type: draft.recurringOrderScope.type } as RecurringOrderScope)
+				: ({ type: "AnyOrder" } as RecurringOrderScope),
 		};
 		return this.saveNew(context, resource);
 	}

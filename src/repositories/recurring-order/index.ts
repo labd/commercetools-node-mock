@@ -44,7 +44,7 @@ export class RecurringOrderRepository extends AbstractResourceRepository<"recurr
 				typeId: "order",
 				id: initialOrder.id,
 			},
-			startsAt: draft.startsAt,
+			startsAt: draft.startsAt ?? new Date().toISOString(),
 			expiresAt: draft.expiresAt,
 			recurringOrderState: "Active",
 			schedule: { type: "standard", intervalUnit: "month", value: 1 },

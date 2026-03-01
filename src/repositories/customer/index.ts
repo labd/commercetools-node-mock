@@ -147,6 +147,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 				this._storage,
 			),
 			stores: storesForCustomer,
+			customerGroupAssignments: [],
 		} satisfies unknown as Customer;
 
 		return this.saveNew(context, resource);

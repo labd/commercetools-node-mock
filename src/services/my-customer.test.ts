@@ -86,6 +86,9 @@ describe("/me", () => {
 			authenticationMode: "password",
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		});
 	});
 
@@ -164,6 +167,9 @@ describe("/me", () => {
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
@@ -219,6 +225,9 @@ describe("/me", () => {
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 
@@ -275,6 +284,9 @@ describe("/me", () => {
 			authenticationMode: "Password", //default in Commercetools
 			version: 1,
 			stores: [],
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
 		};
 		ctMock.project("dummy").unsafeAdd("customer", customer);
 

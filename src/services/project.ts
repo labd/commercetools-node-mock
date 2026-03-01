@@ -18,12 +18,18 @@ export class ProjectService {
 		parent.post("", this.post.bind(this));
 	}
 
-	get(request: FastifyRequest, reply: FastifyReply) {
+	get(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const project = this.repository.get(getRepositoryContext(request));
 		return reply.status(200).send(project);
 	}
 
-	post(request: FastifyRequest, reply: FastifyReply) {
+	post(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		reply: FastifyReply,
+	) {
 		const updateRequest = validateData<Update>(
 			request.body,
 			updateRequestSchema,

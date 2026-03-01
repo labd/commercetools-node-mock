@@ -16,6 +16,7 @@ import type {
 	BusinessUnitChangeParentUnitAction,
 	BusinessUnitChangeStatusAction,
 	BusinessUnitDraft,
+	BusinessUnitKeyReference,
 	BusinessUnitRemoveAddressAction,
 	BusinessUnitRemoveAssociateAction,
 	BusinessUnitRemoveBillingAddressIdAction,
@@ -115,14 +116,25 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		};
 
 		if (this._isDivisionDraft(draft)) {
+			const parentUnit = getBusinessUnitKeyReference(
+				draft.parentUnit,
+				context.projectKey,
+				this._storage,
+			);
+			// Look up the parent to determine the topLevelUnit
+			const parent = this._storage.getByResourceIdentifier(
+				context.projectKey,
+				parentUnit,
+			) as BusinessUnit | undefined;
+			const topLevelUnit: BusinessUnitKeyReference = parent?.topLevelUnit ?? {
+				typeId: "business-unit",
+				key: parentUnit.key!,
+			};
 			const division = {
 				...resource,
 				unitType: "Division" as const,
-				parentUnit: getBusinessUnitKeyReference(
-					draft.parentUnit,
-					context.projectKey,
-					this._storage,
-				),
+				parentUnit,
+				topLevelUnit,
 			} as Division;
 
 			this.saveNew(context, division);
@@ -132,6 +144,10 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			const company = {
 				...resource,
 				unitType: "Company" as const,
+				topLevelUnit: {
+					typeId: "business-unit" as const,
+					key: draft.key,
+				},
 			} as Company;
 
 			this.saveNew(context, company);

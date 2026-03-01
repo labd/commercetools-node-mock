@@ -88,6 +88,9 @@ describe("Review Repository", () => {
 		stores: [],
 		authenticationMode: "Password" as const,
 		isEmailVerified: false,
+		shippingAddressIds: [],
+		billingAddressIds: [],
+		customerGroupAssignments: [],
 	});
 
 	storage.add("dummy", "state", {

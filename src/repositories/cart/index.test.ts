@@ -308,6 +308,8 @@ describe("Cart repository", () => {
 				key: "business-unit-key",
 			},
 			approvalRuleMode: "Explicit",
+			shippingAddressIds: [],
+			billingAddressIds: [],
 		});
 
 		const cart: CartDraft = {

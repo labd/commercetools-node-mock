@@ -104,6 +104,9 @@ export class InMemoryStorage extends AbstractStorage {
 						status: "Deactivated",
 					},
 				},
+				discounts: {
+					discountCombinationMode: "Stacking",
+				},
 				version: 1,
 			};
 		}

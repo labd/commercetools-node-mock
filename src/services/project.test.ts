@@ -51,6 +51,9 @@ describe("Project", () => {
 			shoppingLists: {
 				deleteDaysAfterLastModification: 360,
 			},
+			discounts: {
+				discountCombinationMode: "Stacking",
+			},
 		} as Project);
 	});
 
