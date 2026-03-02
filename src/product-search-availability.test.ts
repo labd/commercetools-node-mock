@@ -3,6 +3,7 @@ import type {
 	ProductSearchRequest,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { channelDraftFactory } from "#src/testing/channel.ts";
 import { inventoryEntryDraftFactory } from "#src/testing/inventory-entry.ts";
 import { productDraftFactory } from "#src/testing/product.ts";
 import { productTypeDraftFactory } from "#src/testing/product-type.ts";
@@ -118,7 +119,8 @@ describe("Product Search - Availability Filtering", () => {
 	});
 
 	test("should filter products by variants.availability.isOnStockForChannel", async () => {
-		const channelId = "test-channel-1";
+		const channel = await channelDraftFactory(ctMock).create();
+		const channelId = channel.id;
 
 		await createInventoryEntry("TEST-SKU-001", 5, channelId);
 
@@ -137,8 +139,9 @@ describe("Product Search - Availability Filtering", () => {
 	});
 
 	test("should not find products when filtering by non-matching channel", async () => {
-		const channelId = "test-channel-1";
-		const otherChannelId = "test-channel-2";
+		const channel = await channelDraftFactory(ctMock).create();
+		const channelId = channel.id;
+		const otherChannelId = "non-existent-channel-id";
 
 		await createInventoryEntry("TEST-SKU-001", 5, channelId);
 
