@@ -1,4 +1,5 @@
 import type {
+	ChannelReference,
 	InventoryEntry,
 	InventoryEntryDraft,
 } from "@commercetools/platform-sdk";
@@ -9,7 +10,10 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract.ts";
-import { createCustomFields } from "../helpers.ts";
+import {
+	createCustomFields,
+	getReferenceFromResourceIdentifier,
+} from "../helpers.ts";
 import { InventoryEntryUpdateHandler } from "./actions.ts";
 
 export class InventoryEntryRepository extends AbstractResourceRepository<"inventory-entry"> {
@@ -31,10 +35,11 @@ export class InventoryEntryRepository extends AbstractResourceRepository<"invent
 			expectedDelivery: draft.expectedDelivery,
 			restockableInDays: draft.restockableInDays,
 			supplyChannel: draft.supplyChannel
-				? {
-						typeId: "channel",
-						id: draft.supplyChannel.id ?? "",
-					}
+				? getReferenceFromResourceIdentifier<ChannelReference>(
+						draft.supplyChannel,
+						context.projectKey,
+						this._storage,
+					)
 				: undefined,
 			custom: createCustomFields(
 				draft.custom,

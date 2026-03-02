@@ -23,6 +23,7 @@ import {
 } from "vitest";
 import {
 	categoryDraftFactory,
+	channelDraftFactory,
 	inventoryEntryDraftFactory,
 	productDraftFactory,
 	productTypeDraftFactory,
@@ -1626,11 +1627,15 @@ describe("Product Search - Generic", () => {
 	});
 
 	test("Filter on inventory", async () => {
+		const channel = await channelDraftFactory(ctMock).create({
+			roles: ["InventorySupply"],
+		});
+
 		const body: ProductSearchRequest = {
 			query: {
 				exact: {
 					field: "variants.availability.isOnStockForChannel",
-					value: "dummy-inventory-channel",
+					value: channel.id,
 				},
 			},
 			productProjectionParameters: {
@@ -1658,7 +1663,7 @@ describe("Product Search - Generic", () => {
 			quantityOnStock: 10,
 			supplyChannel: {
 				typeId: "channel",
-				id: "dummy-inventory-channel",
+				id: channel.id,
 			},
 		});
 
