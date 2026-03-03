@@ -8,8 +8,11 @@ process.on("SIGINT", () => {
 	process.exit();
 });
 
+const enableLogging = process.env.ENABLE_LOGGING === "true";
+
 const instance = new CommercetoolsMock({
 	strict: true,
+	silent: !enableLogging,
 	storage,
 	// enableAuthentication: true,
 	// validateCredentials: true,
