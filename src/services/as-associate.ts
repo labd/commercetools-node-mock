@@ -18,7 +18,7 @@ type Repositories = {
 };
 
 export class AsAssociateService {
-	subServices: {
+	subServices!: {
 		cart: AsAssociateCartService;
 		order: AsAssociateOrderService;
 		"quote-request": AsAssociateQuoteRequestService;

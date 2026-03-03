@@ -41,8 +41,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
 	async postProcessResource(
 		context: RepositoryContext,
-		resource: Project,
-	): Promise<Project> {
+		resource: Project | null,
+	): Promise<Project | null> {
 		if (resource) {
 			return maskSecretValue(resource, "externalOAuth.authorizationHeader");
 		}

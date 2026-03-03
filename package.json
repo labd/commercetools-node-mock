@@ -26,7 +26,7 @@
 		"lint": "biome check",
 		"publish:ci": "pnpm build && pnpm changeset publish",
 		"publish:version": "pnpm changeset version && pnpm format",
-		"start": "node --watch src/server.ts",
+		"start": "node --experimental-strip-types --watch src/server.ts",
 		"test": "vitest run",
 		"test:ci": "vitest run --coverage",
 		"test:watch": "vitest --watch",
