@@ -16,8 +16,8 @@ describe(`Storage (${storageEngineName})`, () => {
 	let storage: AbstractStorage;
 	const projectKey = "test-project";
 
-	beforeEach(() => {
-		storage = createStorage();
+	beforeEach(async () => {
+		storage = await createStorage();
 	});
 
 	afterEach(() => {
