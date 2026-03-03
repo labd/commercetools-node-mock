@@ -67,14 +67,13 @@ export const makeType = (overrides: Partial<Writable<Type>> = {}): Type =>
 
 export const storageEngineName = process.env.STORAGE_ENGINE || "in-memory";
 
-export function createStorage(): AbstractStorage {
+export async function createStorage(): Promise<AbstractStorage> {
 	switch (storageEngineName) {
 		case "in-memory":
 			return new InMemoryStorage();
 		case "sqlite": {
-			// Dynamic require to avoid importing node:sqlite on runtimes that don't have it
-			const { SQLiteStorage } =
-				require("./sqlite.ts") as typeof import("./sqlite.ts");
+			// Dynamic import to avoid importing node:sqlite on runtimes that don't have it
+			const { SQLiteStorage } = await import("./sqlite.ts");
 			return new SQLiteStorage({ filename: ":memory:" });
 		}
 		default:
