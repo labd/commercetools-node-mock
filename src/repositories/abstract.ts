@@ -141,6 +141,20 @@ export abstract class AbstractResourceRepository<
 		return this._typeId;
 	}
 
+	/**
+	 * Apply expand clauses to a resource without re-fetching from storage.
+	 */
+	async expand(
+		context: RepositoryContext,
+		resource: ResourceMap[T],
+		expand: string[] | undefined,
+	): Promise<ResourceMap[T]> {
+		if (!expand || expand.length === 0) {
+			return resource;
+		}
+		return this._storage.expand(context.projectKey, resource, expand);
+	}
+
 	async delete(
 		context: RepositoryContext,
 		id: string,

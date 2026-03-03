@@ -84,6 +84,9 @@ const SCHEMA = `
 export class SQLiteStorage extends AbstractStorage {
 	private db: DatabaseSync;
 
+	// Cache of known project keys to avoid redundant INSERT+SELECT on every add()
+	private _knownProjects: Set<string> = new Set();
+
 	// Prepared statements (lazily created)
 	private _stmtInsertProject: StatementSync | null = null;
 	private _stmtGetProject: StatementSync | null = null;
@@ -193,11 +196,18 @@ export class SQLiteStorage extends AbstractStorage {
 		return this._stmtClearResources;
 	}
 
-	async addProject(projectKey: string): Promise<Project> {
+	private ensureProject(projectKey: string): void {
+		if (this._knownProjects.has(projectKey)) {
+			return;
+		}
 		const project: Project = { ...DEFAULT_PROJECT, key: projectKey };
 		this.stmtInsertProject.run(projectKey, JSON.stringify(project));
+		this._knownProjects.add(projectKey);
+	}
 
-		// Return the existing or newly inserted project
+	async addProject(projectKey: string): Promise<Project> {
+		this.ensureProject(projectKey);
+
 		const row = this.stmtGetProject.get(projectKey) as
 			| { data: string }
 			| undefined;
@@ -218,6 +228,7 @@ export class SQLiteStorage extends AbstractStorage {
 
 	async clear(): Promise<void> {
 		this.stmtClearResources.run();
+		this._knownProjects.clear();
 	}
 
 	async all<RT extends ResourceType>(
@@ -236,8 +247,8 @@ export class SQLiteStorage extends AbstractStorage {
 		obj: ResourceMap[RT],
 		params: GetParams = {},
 	): Promise<ResourceMap[RT]> {
-		// Ensure the project exists
-		await this.addProject(projectKey);
+		// Ensure the project exists (cached, no DB round-trip after first call)
+		this.ensureProject(projectKey);
 
 		const key = (obj as any).key ?? null;
 		this.stmtInsertResource.run(
@@ -248,13 +259,9 @@ export class SQLiteStorage extends AbstractStorage {
 			JSON.stringify(obj),
 		);
 
-		const resource = await this.get(projectKey, typeId, obj.id, params);
-		if (!resource) {
-			throw new Error(
-				`resource of type ${typeId} with id ${obj.id} not created`,
-			);
-		}
-		return resource;
+		// Return the object directly instead of re-fetching from the database.
+		// We just inserted it, so we know it exists. Only apply expand if needed.
+		return this.expand(projectKey, obj, params.expand);
 	}
 
 	async get<RT extends ResourceType>(
