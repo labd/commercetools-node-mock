@@ -447,7 +447,7 @@ describe("Product update actions", () => {
 	});
 
 	afterAll(async () => {
-		ctMock.clear();
+		await ctMock.clear();
 	});
 
 	test("setAttribute masterVariant (staged)", async () => {

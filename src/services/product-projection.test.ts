@@ -187,7 +187,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
 	timekeeper.reset();
-	ctMock.clear();
+	await ctMock.clear();
 });
 // Test the general product projection implementation
 describe("Product Projection Get By ID", () => {

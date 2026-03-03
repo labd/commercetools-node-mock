@@ -69,8 +69,8 @@ describe("InMemoryStorage", () => {
 	});
 
 	describe("project management", () => {
-		test("addProject creates a new project with defaults", () => {
-			const project = storage.addProject(projectKey);
+		test("addProject creates a new project with defaults", async () => {
+			const project = await storage.addProject(projectKey);
 
 			expect(project.key).toBe(projectKey);
 			expect(project.version).toBe(1);
@@ -82,40 +82,40 @@ describe("InMemoryStorage", () => {
 			expect(project.searchIndexing).toBeDefined();
 		});
 
-		test("addProject returns existing project if already created", () => {
-			const first = storage.addProject(projectKey);
+		test("addProject returns existing project if already created", async () => {
+			const first = await storage.addProject(projectKey);
 			const modified = { ...first, name: "Modified" };
-			storage.saveProject(modified);
+			await storage.saveProject(modified);
 
-			const second = storage.addProject(projectKey);
+			const second = await storage.addProject(projectKey);
 			expect(second.name).toBe("Modified");
 		});
 
-		test("getProject returns (or creates) the project", () => {
-			const project = storage.getProject(projectKey);
+		test("getProject returns (or creates) the project", async () => {
+			const project = await storage.getProject(projectKey);
 			expect(project.key).toBe(projectKey);
 		});
 
-		test("saveProject persists changes", () => {
-			const project = storage.addProject(projectKey);
+		test("saveProject persists changes", async () => {
+			const project = await storage.addProject(projectKey);
 			const updated = {
 				...project,
 				name: "Updated Name",
 				countries: ["US", "DE"],
 			};
-			storage.saveProject(updated);
+			await storage.saveProject(updated);
 
-			const retrieved = storage.getProject(projectKey);
+			const retrieved = await storage.getProject(projectKey);
 			expect(retrieved.name).toBe("Updated Name");
 			expect(retrieved.countries).toEqual(["US", "DE"]);
 		});
 
-		test("separate project keys are independent", () => {
-			storage.addProject("project-a");
-			storage.addProject("project-b");
+		test("separate project keys are independent", async () => {
+			await storage.addProject("project-a");
+			await storage.addProject("project-b");
 
-			const a = storage.getProject("project-a");
-			const b = storage.getProject("project-b");
+			const a = await storage.getProject("project-a");
+			const b = await storage.getProject("project-b");
 
 			expect(a.key).toBe("project-a");
 			expect(b.key).toBe("project-b");
@@ -124,9 +124,9 @@ describe("InMemoryStorage", () => {
 
 	describe("CRUD operations", () => {
 		describe("add", () => {
-			test("adds a resource and returns a clone", () => {
+			test("adds a resource and returns a clone", async () => {
 				const category = makeCategory();
-				const result = storage.add(projectKey, "category", category);
+				const result = await storage.add(projectKey, "category", category);
 
 				expect(result.id).toBe("cat-1");
 				expect(result.name).toEqual({ en: "Test Category" });
@@ -136,37 +136,41 @@ describe("InMemoryStorage", () => {
 				expect(result).toEqual(category);
 			});
 
-			test("returned clone is independent of stored resource", () => {
-				storage.add(projectKey, "category", makeCategory());
+			test("returned clone is independent of stored resource", async () => {
+				await storage.add(projectKey, "category", makeCategory());
 
 				// Mutate the returned value - should not affect stored version
-				const returned = storage.get(projectKey, "category", "cat-1");
+				const returned = await storage.get(projectKey, "category", "cat-1");
 				(returned as Writable<Category>).name = { en: "Mutated" };
 
-				const retrieved = storage.get(projectKey, "category", "cat-1");
+				const retrieved = await storage.get(projectKey, "category", "cat-1");
 				expect(retrieved?.name).toEqual({ en: "Test Category" });
 			});
 		});
 
 		describe("get", () => {
-			test("returns resource by id", () => {
-				storage.add(projectKey, "category", makeCategory());
+			test("returns resource by id", async () => {
+				await storage.add(projectKey, "category", makeCategory());
 
-				const result = storage.get(projectKey, "category", "cat-1");
+				const result = await storage.get(projectKey, "category", "cat-1");
 				expect(result).not.toBeNull();
 				expect(result?.id).toBe("cat-1");
 			});
 
-			test("returns null for non-existent id", () => {
-				const result = storage.get(projectKey, "category", "non-existent");
+			test("returns null for non-existent id", async () => {
+				const result = await storage.get(
+					projectKey,
+					"category",
+					"non-existent",
+				);
 				expect(result).toBeNull();
 			});
 
-			test("returns a clone each time", () => {
-				storage.add(projectKey, "category", makeCategory());
+			test("returns a clone each time", async () => {
+				await storage.add(projectKey, "category", makeCategory());
 
-				const first = storage.get(projectKey, "category", "cat-1");
-				const second = storage.get(projectKey, "category", "cat-1");
+				const first = await storage.get(projectKey, "category", "cat-1");
+				const second = await storage.get(projectKey, "category", "cat-1");
 
 				expect(first).toEqual(second);
 				expect(first).not.toBe(second);
@@ -174,18 +178,27 @@ describe("InMemoryStorage", () => {
 		});
 
 		describe("getByKey", () => {
-			test("returns resource by key", () => {
-				storage.add(projectKey, "category", makeCategory({ key: "my-key" }));
+			test("returns resource by key", async () => {
+				await storage.add(
+					projectKey,
+					"category",
+					makeCategory({ key: "my-key" }),
+				);
 
-				const result = storage.getByKey(projectKey, "category", "my-key", {});
+				const result = await storage.getByKey(
+					projectKey,
+					"category",
+					"my-key",
+					{},
+				);
 				expect(result).not.toBeNull();
 				expect(result?.id).toBe("cat-1");
 			});
 
-			test("returns null for non-existent key", () => {
-				storage.add(projectKey, "category", makeCategory());
+			test("returns null for non-existent key", async () => {
+				await storage.add(projectKey, "category", makeCategory());
 
-				const result = storage.getByKey(
+				const result = await storage.getByKey(
 					projectKey,
 					"category",
 					"does-not-exist",
@@ -196,57 +209,74 @@ describe("InMemoryStorage", () => {
 		});
 
 		describe("all", () => {
-			test("returns empty array when no resources exist", () => {
-				const result = storage.all(projectKey, "category");
+			test("returns empty array when no resources exist", async () => {
+				const result = await storage.all(projectKey, "category");
 				expect(result).toEqual([]);
 			});
 
-			test("returns all resources of a type", () => {
-				storage.add(projectKey, "category", makeCategory({ id: "cat-1" }));
-				storage.add(projectKey, "category", makeCategory({ id: "cat-2" }));
-				storage.add(projectKey, "category", makeCategory({ id: "cat-3" }));
+			test("returns all resources of a type", async () => {
+				await storage.add(
+					projectKey,
+					"category",
+					makeCategory({ id: "cat-1" }),
+				);
+				await storage.add(
+					projectKey,
+					"category",
+					makeCategory({ id: "cat-2" }),
+				);
+				await storage.add(
+					projectKey,
+					"category",
+					makeCategory({ id: "cat-3" }),
+				);
 
-				const result = storage.all(projectKey, "category");
+				const result = await storage.all(projectKey, "category");
 				expect(result).toHaveLength(3);
 			});
 
-			test("returns clones of all resources", () => {
-				storage.add(projectKey, "category", makeCategory());
+			test("returns clones of all resources", async () => {
+				await storage.add(projectKey, "category", makeCategory());
 
-				const results = storage.all(projectKey, "category");
+				const results = await storage.all(projectKey, "category");
 				(results[0] as Writable<Category>).name = { en: "Mutated" };
 
-				const fresh = storage.all(projectKey, "category");
+				const fresh = await storage.all(projectKey, "category");
 				expect(fresh[0].name).toEqual({ en: "Test Category" });
 			});
 
-			test("does not return resources from other types", () => {
-				storage.add(projectKey, "category", makeCategory());
-				storage.add(projectKey, "channel", makeChannel());
+			test("does not return resources from other types", async () => {
+				await storage.add(projectKey, "category", makeCategory());
+				await storage.add(projectKey, "channel", makeChannel());
 
-				const categories = storage.all(projectKey, "category");
+				const categories = await storage.all(projectKey, "category");
 				expect(categories).toHaveLength(1);
 
-				const channels = storage.all(projectKey, "channel");
+				const channels = await storage.all(projectKey, "channel");
 				expect(channels).toHaveLength(1);
 			});
 		});
 
 		describe("delete", () => {
-			test("deletes a resource and returns it", () => {
-				storage.add(projectKey, "category", makeCategory());
+			test("deletes a resource and returns it", async () => {
+				await storage.add(projectKey, "category", makeCategory());
 
-				const deleted = storage.delete(projectKey, "category", "cat-1", {});
+				const deleted = await storage.delete(
+					projectKey,
+					"category",
+					"cat-1",
+					{},
+				);
 				expect(deleted).not.toBeNull();
 				expect(deleted?.id).toBe("cat-1");
 
 				// Should no longer be retrievable
-				const result = storage.get(projectKey, "category", "cat-1");
+				const result = await storage.get(projectKey, "category", "cat-1");
 				expect(result).toBeNull();
 			});
 
-			test("returns null when deleting non-existent resource", () => {
-				const result = storage.delete(
+			test("returns null when deleting non-existent resource", async () => {
+				const result = await storage.delete(
 					projectKey,
 					"category",
 					"non-existent",
@@ -258,10 +288,10 @@ describe("InMemoryStorage", () => {
 	});
 
 	describe("query", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Add 25 categories for pagination tests
 			for (let i = 1; i <= 25; i++) {
-				storage.add(
+				await storage.add(
 					projectKey,
 					"category",
 					makeCategory({
@@ -274,8 +304,8 @@ describe("InMemoryStorage", () => {
 			}
 		});
 
-		test("returns paginated results with default limit of 20", () => {
-			const result = storage.query(projectKey, "category", {});
+		test("returns paginated results with default limit of 20", async () => {
+			const result = await storage.query(projectKey, "category", {});
 
 			expect(result.results).toHaveLength(20);
 			expect(result.limit).toBe(20);
@@ -284,15 +314,15 @@ describe("InMemoryStorage", () => {
 			expect(result.total).toBe(25);
 		});
 
-		test("respects custom limit", () => {
-			const result = storage.query(projectKey, "category", { limit: 5 });
+		test("respects custom limit", async () => {
+			const result = await storage.query(projectKey, "category", { limit: 5 });
 
 			expect(result.results).toHaveLength(5);
 			expect(result.limit).toBe(5);
 		});
 
-		test("respects offset", () => {
-			const result = storage.query(projectKey, "category", {
+		test("respects offset", async () => {
+			const result = await storage.query(projectKey, "category", {
 				offset: 20,
 				limit: 10,
 			});
@@ -301,8 +331,8 @@ describe("InMemoryStorage", () => {
 			expect(result.offset).toBe(20);
 		});
 
-		test("returns empty results when offset exceeds total", () => {
-			const result = storage.query(projectKey, "category", {
+		test("returns empty results when offset exceeds total", async () => {
+			const result = await storage.query(projectKey, "category", {
 				offset: 100,
 			});
 
@@ -311,8 +341,8 @@ describe("InMemoryStorage", () => {
 			expect(result.total).toBe(25);
 		});
 
-		test("filters with where predicate", () => {
-			const result = storage.query(projectKey, "category", {
+		test("filters with where predicate", async () => {
+			const result = await storage.query(projectKey, "category", {
 				where: 'key = "category-5"',
 			});
 
@@ -321,8 +351,8 @@ describe("InMemoryStorage", () => {
 			expect(result.count).toBe(1);
 		});
 
-		test("filters with where predicate using variables", () => {
-			const result = storage.query(projectKey, "category", {
+		test("filters with where predicate using variables", async () => {
+			const result = await storage.query(projectKey, "category", {
 				where: "key = :myKey",
 				"var.myKey": "category-3",
 			});
@@ -331,27 +361,27 @@ describe("InMemoryStorage", () => {
 			expect(result.results[0].key).toBe("category-3");
 		});
 
-		test("throws CommercetoolsError on invalid where predicate", () => {
-			expect(() =>
+		test("throws CommercetoolsError on invalid where predicate", async () => {
+			await expect(
 				storage.query(projectKey, "category", {
 					where: "invalid !!! predicate",
 				}),
-			).toThrow(CommercetoolsError);
+			).rejects.toThrow(CommercetoolsError);
 		});
 
-		test("returns cloned results", () => {
-			const result = storage.query(projectKey, "category", { limit: 1 });
+		test("returns cloned results", async () => {
+			const result = await storage.query(projectKey, "category", { limit: 1 });
 			(result.results[0] as Writable<Category>).name = { en: "Mutated" };
 
-			const fresh = storage.query(projectKey, "category", { limit: 1 });
+			const fresh = await storage.query(projectKey, "category", { limit: 1 });
 			expect(fresh.results[0].name).not.toEqual({ en: "Mutated" });
 		});
 	});
 
 	describe("search", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			for (let i = 1; i <= 10; i++) {
-				storage.add(
+				await storage.add(
 					projectKey,
 					"category",
 					makeCategory({
@@ -363,8 +393,8 @@ describe("InMemoryStorage", () => {
 			}
 		});
 
-		test("returns all resources with default pagination", () => {
-			const result = storage.search(projectKey, "category", {});
+		test("returns all resources with default pagination", async () => {
+			const result = await storage.search(projectKey, "category", {});
 
 			expect(result.results).toHaveLength(10);
 			expect(result.count).toBe(10);
@@ -372,8 +402,8 @@ describe("InMemoryStorage", () => {
 			expect(result.limit).toBe(20);
 		});
 
-		test("respects limit and offset", () => {
-			const result = storage.search(projectKey, "category", {
+		test("respects limit and offset", async () => {
+			const result = await storage.search(projectKey, "category", {
 				limit: 3,
 				offset: 2,
 			});
@@ -383,8 +413,8 @@ describe("InMemoryStorage", () => {
 			expect(result.limit).toBe(3);
 		});
 
-		test("filters with where predicate", () => {
-			const result = storage.search(projectKey, "category", {
+		test("filters with where predicate", async () => {
+			const result = await storage.search(projectKey, "category", {
 				where: 'key = "category-5"',
 			});
 
@@ -392,20 +422,20 @@ describe("InMemoryStorage", () => {
 			expect(result.count).toBe(1);
 		});
 
-		test("throws on invalid where predicate", () => {
-			expect(() =>
+		test("throws on invalid where predicate", async () => {
+			await expect(
 				storage.search(projectKey, "category", {
 					where: "invalid !!! predicate",
 				}),
-			).toThrow(CommercetoolsError);
+			).rejects.toThrow(CommercetoolsError);
 		});
 	});
 
 	describe("getByResourceIdentifier", () => {
-		test("finds resource by id", () => {
-			storage.add(projectKey, "category", makeCategory());
+		test("finds resource by id", async () => {
+			await storage.add(projectKey, "category", makeCategory());
 
-			const result = storage.getByResourceIdentifier(projectKey, {
+			const result = await storage.getByResourceIdentifier(projectKey, {
 				typeId: "category",
 				id: "cat-1",
 			});
@@ -413,10 +443,14 @@ describe("InMemoryStorage", () => {
 			expect(result.id).toBe("cat-1");
 		});
 
-		test("finds resource by key", () => {
-			storage.add(projectKey, "category", makeCategory({ key: "my-cat-key" }));
+		test("finds resource by key", async () => {
+			await storage.add(
+				projectKey,
+				"category",
+				makeCategory({ key: "my-cat-key" }),
+			);
 
-			const result = storage.getByResourceIdentifier(projectKey, {
+			const result = await storage.getByResourceIdentifier(projectKey, {
 				typeId: "category",
 				key: "my-cat-key",
 			});
@@ -424,9 +458,9 @@ describe("InMemoryStorage", () => {
 			expect(result.id).toBe("cat-1");
 		});
 
-		test("throws ReferencedResourceNotFoundError when id not found", () => {
+		test("throws ReferencedResourceNotFoundError when id not found", async () => {
 			try {
-				storage.getByResourceIdentifier(projectKey, {
+				await storage.getByResourceIdentifier(projectKey, {
 					typeId: "category",
 					id: "non-existent",
 				});
@@ -440,9 +474,9 @@ describe("InMemoryStorage", () => {
 			}
 		});
 
-		test("throws ReferencedResourceNotFoundError when key not found", () => {
+		test("throws ReferencedResourceNotFoundError when key not found", async () => {
 			try {
-				storage.getByResourceIdentifier(projectKey, {
+				await storage.getByResourceIdentifier(projectKey, {
 					typeId: "category",
 					key: "non-existent-key",
 				});
@@ -458,9 +492,9 @@ describe("InMemoryStorage", () => {
 			}
 		});
 
-		test("throws InvalidJsonInput when neither id nor key provided", () => {
+		test("throws InvalidJsonInput when neither id nor key provided", async () => {
 			try {
-				storage.getByResourceIdentifier(projectKey, {
+				await storage.getByResourceIdentifier(projectKey, {
 					typeId: "category",
 				} as any);
 				expect.fail("Should have thrown");
@@ -474,16 +508,16 @@ describe("InMemoryStorage", () => {
 	});
 
 	describe("expand", () => {
-		test("returns object unchanged when clause is undefined", () => {
+		test("returns object unchanged when clause is undefined", async () => {
 			const obj = { foo: "bar" };
-			const result = storage.expand(projectKey, obj, undefined);
+			const result = await storage.expand(projectKey, obj, undefined);
 
 			expect(result).toEqual(obj);
 		});
 
-		test("expands a single reference", () => {
+		test("expands a single reference", async () => {
 			const typeResource = makeType();
-			storage.add(projectKey, "type", typeResource);
+			await storage.add(projectKey, "type", typeResource);
 
 			const category = makeCategory({
 				custom: {
@@ -491,9 +525,9 @@ describe("InMemoryStorage", () => {
 					fields: {},
 				},
 			});
-			storage.add(projectKey, "category", category);
+			await storage.add(projectKey, "category", category);
 
-			const retrieved = storage.get(projectKey, "category", "cat-1", {
+			const retrieved = await storage.get(projectKey, "category", "cat-1", {
 				expand: ["custom.type"],
 			});
 
@@ -502,11 +536,11 @@ describe("InMemoryStorage", () => {
 			expect((retrieved as any).custom.type.obj.id).toBe("type-1");
 		});
 
-		test("expands array references with wildcard", () => {
+		test("expands array references with wildcard", async () => {
 			const cat1 = makeCategory({ id: "cat-a" });
 			const cat2 = makeCategory({ id: "cat-b" });
-			storage.add(projectKey, "category", cat1);
-			storage.add(projectKey, "category", cat2);
+			await storage.add(projectKey, "category", cat1);
+			await storage.add(projectKey, "category", cat2);
 
 			const obj = {
 				categories: [
@@ -515,7 +549,7 @@ describe("InMemoryStorage", () => {
 				],
 			};
 
-			const result = storage.expand(projectKey, obj, ["categories[*]"]);
+			const result = await storage.expand(projectKey, obj, ["categories[*]"]);
 
 			expect((result.categories[0] as any).obj).toBeDefined();
 			expect((result.categories[0] as any).obj.id).toBe("cat-a");
@@ -523,19 +557,19 @@ describe("InMemoryStorage", () => {
 			expect((result.categories[1] as any).obj.id).toBe("cat-b");
 		});
 
-		test("handles missing reference element gracefully", () => {
+		test("handles missing reference element gracefully", async () => {
 			const obj = { name: "test" };
 			// Should not throw when trying to expand a non-existent field
-			const result = storage.expand(projectKey, obj, ["nonExistent"]);
+			const result = await storage.expand(projectKey, obj, ["nonExistent"]);
 			expect(result).toEqual(obj);
 		});
 
-		test("expands multiple clauses", () => {
+		test("expands multiple clauses", async () => {
 			const typeResource = makeType();
-			storage.add(projectKey, "type", typeResource);
+			await storage.add(projectKey, "type", typeResource);
 
 			const channelResource = makeChannel();
-			storage.add(projectKey, "channel", channelResource);
+			await storage.add(projectKey, "channel", channelResource);
 
 			const obj = {
 				custom: {
@@ -545,7 +579,7 @@ describe("InMemoryStorage", () => {
 				supplyChannel: { typeId: "channel", id: "channel-1" },
 			};
 
-			const result = storage.expand(projectKey, obj, [
+			const result = await storage.expand(projectKey, obj, [
 				"custom.type",
 				"supplyChannel",
 			]);
@@ -554,9 +588,9 @@ describe("InMemoryStorage", () => {
 			expect((result.supplyChannel as any).obj).toBeDefined();
 		});
 
-		test("expand with string clause (non-array)", () => {
+		test("expand with string clause (non-array)", async () => {
 			const typeResource = makeType();
-			storage.add(projectKey, "type", typeResource);
+			await storage.add(projectKey, "type", typeResource);
 
 			const obj = {
 				custom: {
@@ -565,72 +599,86 @@ describe("InMemoryStorage", () => {
 				},
 			};
 
-			const result = storage.expand(projectKey, obj, "custom.type");
+			const result = await storage.expand(projectKey, obj, "custom.type");
 			expect((result.custom.type as any).obj).toBeDefined();
 			expect((result.custom.type as any).obj.id).toBe("type-1");
 		});
 	});
 
 	describe("clear", () => {
-		test("removes all resources from all projects", () => {
-			storage.add(projectKey, "category", makeCategory());
-			storage.add(projectKey, "channel", makeChannel());
-			storage.add("other-project", "category", makeCategory({ id: "cat-2" }));
+		test("removes all resources from all projects", async () => {
+			await storage.add(projectKey, "category", makeCategory());
+			await storage.add(projectKey, "channel", makeChannel());
+			await storage.add(
+				"other-project",
+				"category",
+				makeCategory({ id: "cat-2" }),
+			);
 
-			storage.clear();
+			await storage.clear();
 
-			expect(storage.all(projectKey, "category")).toHaveLength(0);
-			expect(storage.all(projectKey, "channel")).toHaveLength(0);
-			expect(storage.all("other-project", "category")).toHaveLength(0);
+			expect(await storage.all(projectKey, "category")).toHaveLength(0);
+			expect(await storage.all(projectKey, "channel")).toHaveLength(0);
+			expect(await storage.all("other-project", "category")).toHaveLength(0);
 		});
 
-		test("clear does not affect projects themselves", () => {
-			storage.addProject(projectKey);
-			storage.add(projectKey, "category", makeCategory());
+		test("clear does not affect projects themselves", async () => {
+			await storage.addProject(projectKey);
+			await storage.add(projectKey, "category", makeCategory());
 
-			storage.clear();
+			await storage.clear();
 
 			// Projects still exist, can still add resources after clear
-			const project = storage.getProject(projectKey);
+			const project = await storage.getProject(projectKey);
 			expect(project.key).toBe(projectKey);
 		});
 	});
 
 	describe("cross-project isolation", () => {
-		test("resources in different projects are isolated", () => {
-			storage.add("project-a", "category", makeCategory({ id: "cat-a" }));
-			storage.add("project-b", "category", makeCategory({ id: "cat-b" }));
+		test("resources in different projects are isolated", async () => {
+			await storage.add("project-a", "category", makeCategory({ id: "cat-a" }));
+			await storage.add("project-b", "category", makeCategory({ id: "cat-b" }));
 
-			expect(storage.get("project-a", "category", "cat-a")).not.toBeNull();
-			expect(storage.get("project-a", "category", "cat-b")).toBeNull();
+			expect(
+				await storage.get("project-a", "category", "cat-a"),
+			).not.toBeNull();
+			expect(await storage.get("project-a", "category", "cat-b")).toBeNull();
 
-			expect(storage.get("project-b", "category", "cat-b")).not.toBeNull();
-			expect(storage.get("project-b", "category", "cat-a")).toBeNull();
+			expect(
+				await storage.get("project-b", "category", "cat-b"),
+			).not.toBeNull();
+			expect(await storage.get("project-b", "category", "cat-a")).toBeNull();
 		});
 
-		test("deleting from one project does not affect another", () => {
-			storage.add("project-a", "category", makeCategory({ id: "cat-1" }));
-			storage.add("project-b", "category", makeCategory({ id: "cat-1" }));
+		test("deleting from one project does not affect another", async () => {
+			await storage.add("project-a", "category", makeCategory({ id: "cat-1" }));
+			await storage.add("project-b", "category", makeCategory({ id: "cat-1" }));
 
-			storage.delete("project-a", "category", "cat-1", {});
+			await storage.delete("project-a", "category", "cat-1", {});
 
-			expect(storage.get("project-a", "category", "cat-1")).toBeNull();
-			expect(storage.get("project-b", "category", "cat-1")).not.toBeNull();
+			expect(await storage.get("project-a", "category", "cat-1")).toBeNull();
+			expect(
+				await storage.get("project-b", "category", "cat-1"),
+			).not.toBeNull();
 		});
 	});
 
 	describe("multiple resource types", () => {
-		test("stores and retrieves different resource types independently", () => {
-			storage.add(projectKey, "category", makeCategory());
-			storage.add(projectKey, "channel", makeChannel());
-			storage.add(projectKey, "customer", makeCustomer());
+		test("stores and retrieves different resource types independently", async () => {
+			await storage.add(projectKey, "category", makeCategory());
+			await storage.add(projectKey, "channel", makeChannel());
+			await storage.add(projectKey, "customer", makeCustomer());
 
-			expect(storage.get(projectKey, "category", "cat-1")).not.toBeNull();
-			expect(storage.get(projectKey, "channel", "channel-1")).not.toBeNull();
-			expect(storage.get(projectKey, "customer", "customer-1")).not.toBeNull();
+			expect(await storage.get(projectKey, "category", "cat-1")).not.toBeNull();
+			expect(
+				await storage.get(projectKey, "channel", "channel-1"),
+			).not.toBeNull();
+			expect(
+				await storage.get(projectKey, "customer", "customer-1"),
+			).not.toBeNull();
 
 			// Cross-type lookup should return null
-			expect(storage.get(projectKey, "category", "channel-1")).toBeNull();
+			expect(await storage.get(projectKey, "category", "channel-1")).toBeNull();
 		});
 	});
 });

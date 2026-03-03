@@ -74,9 +74,9 @@ describe("Shopping List", () => {
 		defaultProjectKey: "dummy",
 	});
 
-	beforeEach(() => {
-		ctMock.project().unsafeAdd("product", product);
-		ctMock.project().unsafeAdd("shopping-list", shoppingList);
+	beforeEach(async () => {
+		await ctMock.project().unsafeAdd("product", product);
+		await ctMock.project().unsafeAdd("shopping-list", shoppingList);
 	});
 
 	test("Adds variant ID on lineItems when creating", async () => {
@@ -131,19 +131,19 @@ describe("Shopping List Update Actions", () => {
 		defaultProjectKey: "dummy",
 	});
 
-	beforeEach(() => {
-		ctMock.project().unsafeAdd("product", product);
-		ctMock.project().unsafeAdd("shopping-list", shoppingList);
+	beforeEach(async () => {
+		await ctMock.project().unsafeAdd("product", product);
+		await ctMock.project().unsafeAdd("shopping-list", shoppingList);
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("addLineItem by productID & variantID", async () => {
-		ctMock.clear();
-		ctMock.project().unsafeAdd("product", product);
-		ctMock
+		await ctMock.clear();
+		await ctMock.project().unsafeAdd("product", product);
+		await ctMock
 			.project()
 			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
@@ -169,9 +169,9 @@ describe("Shopping List Update Actions", () => {
 	});
 
 	test("addLineItem by productID", async () => {
-		ctMock.clear();
-		ctMock.project().unsafeAdd("product", product);
-		ctMock
+		await ctMock.clear();
+		await ctMock.project().unsafeAdd("product", product);
+		await ctMock
 			.project()
 			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
@@ -196,9 +196,9 @@ describe("Shopping List Update Actions", () => {
 	});
 
 	test("addLineItem by sku", async () => {
-		ctMock.clear();
-		ctMock.project().unsafeAdd("product", product);
-		ctMock
+		await ctMock.clear();
+		await ctMock.project().unsafeAdd("product", product);
+		await ctMock
 			.project()
 			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 
@@ -258,9 +258,9 @@ describe("Shopping List Update Actions", () => {
 	});
 
 	test("addLineItem by productID", async () => {
-		ctMock.clear();
-		ctMock.project().unsafeAdd("product", product);
-		ctMock
+		await ctMock.clear();
+		await ctMock.project().unsafeAdd("product", product);
+		await ctMock
 			.project()
 			.unsafeAdd("shopping-list", { ...shoppingList, lineItems: [] });
 

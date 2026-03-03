@@ -57,16 +57,17 @@ export class ShippingMethodUpdateHandler
 		});
 	}
 
-	addZone(
+	async addZone(
 		context: RepositoryContext,
 		resource: Writable<ShippingMethod>,
 		{ zone }: ShippingMethodAddZoneAction,
 	) {
-		const zoneReference = getReferenceFromResourceIdentifier<ZoneReference>(
-			zone,
-			context.projectKey,
-			this._storage,
-		);
+		const zoneReference =
+			await getReferenceFromResourceIdentifier<ZoneReference>(
+				zone,
+				context.projectKey,
+				this._storage,
+			);
 
 		if (resource.zoneRates === undefined) {
 			resource.zoneRates = [];
@@ -136,12 +137,12 @@ export class ShippingMethodUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<ShippingMethod>,
 		{ type, fields }: ShippingMethodSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDescription(

@@ -1,5 +1,6 @@
 import type {
 	InvalidInputError,
+	InventoryEntry,
 	Product,
 	ProductPagedSearchResponse,
 	ProductProjection,
@@ -26,13 +27,19 @@ export class ProductSearch {
 		this._storage = config.storage;
 	}
 
-	search(
+	async search(
 		projectKey: string,
 		params: ProductSearchRequest,
-	): ProductPagedSearchResponse {
-		const availabilityBySku = this._storage
-			.all(projectKey, "inventory-entry")
-			.reduce((acc, entry) => {
+	): Promise<ProductPagedSearchResponse> {
+		const inventoryEntries = await this._storage.all(
+			projectKey,
+			"inventory-entry",
+		);
+		const availabilityBySku = inventoryEntries.reduce(
+			(
+				acc: Map<string, ProductSearchVariantAvailability>,
+				entry: InventoryEntry,
+			) => {
 				const existingEntry = acc.get(entry.sku);
 
 				acc.set(entry.sku, {
@@ -46,18 +53,20 @@ export class ProductSearch {
 				});
 
 				return acc;
-			}, new Map<string, ProductSearchVariantAvailability>());
+			},
+			new Map<string, ProductSearchVariantAvailability>(),
+		);
 
-		let productResources = this._storage
-			.all(projectKey, "product")
-			.map((r) =>
+		const allProducts = await this._storage.all(projectKey, "product");
+		let productResources = allProducts
+			.map((r: Product) =>
 				this.transformProduct(
 					r,
 					params.productProjectionParameters?.staged ?? false,
 					availabilityBySku,
 				),
 			)
-			.filter((p) => {
+			.filter((p: ProductProjection) => {
 				if (!(params.productProjectionParameters?.staged ?? false)) {
 					return p.published;
 				}

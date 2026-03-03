@@ -48,24 +48,31 @@ export class PaymentUpdateHandler
 	extends AbstractUpdateHandler
 	implements UpdateHandlerInterface<Payment, PaymentUpdateAction>
 {
-	addInterfaceInteraction(
+	async addInterfaceInteraction(
 		context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ type, fields }: PaymentAddInterfaceInteractionAction,
 	) {
-		resource.interfaceInteractions.push(
-			createCustomFields({ type, fields }, context.projectKey, this._storage)!,
+		const customFields = await createCustomFields(
+			{ type, fields },
+			context.projectKey,
+			this._storage,
 		);
+		resource.interfaceInteractions.push(customFields!);
 	}
 
-	addTransaction(
+	async addTransaction(
 		context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ transaction }: PaymentAddTransactionAction,
 	) {
 		resource.transactions = [
 			...resource.transactions,
-			transactionFromTransactionDraft(context, this._storage, transaction),
+			await transactionFromTransactionDraft(
+				context,
+				this._storage,
+				transaction,
+			),
 		];
 	}
 
@@ -143,13 +150,13 @@ export class PaymentUpdateHandler
 		resource.customer = undefined;
 	}
 
-	setCustomer(
+	async setCustomer(
 		_context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ customer }: PaymentSetCustomerAction,
 	) {
 		if (customer) {
-			const c = getReferenceFromResourceIdentifier<CustomerReference>(
+			const c = await getReferenceFromResourceIdentifier<CustomerReference>(
 				customer,
 				_context.projectKey,
 				this._storage,
@@ -167,12 +174,12 @@ export class PaymentUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ type, fields }: PaymentSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setInterfaceId(
@@ -251,7 +258,7 @@ export class PaymentUpdateHandler
 		}
 	}
 
-	setTransactionCustomType(
+	async setTransactionCustomType(
 		context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ transactionId, type, fields }: PaymentSetTransactionCustomTypeAction,
@@ -263,7 +270,7 @@ export class PaymentUpdateHandler
 			if (!type) {
 				transaction.custom = undefined;
 			} else {
-				const resolvedType = this._storage.getByResourceIdentifier(
+				const resolvedType = await this._storage.getByResourceIdentifier(
 					context.projectKey,
 					type,
 				);
@@ -286,15 +293,15 @@ export class PaymentUpdateHandler
 		}
 	}
 
-	transitionState(
+	async transitionState(
 		context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ state }: PaymentTransitionStateAction,
 	) {
-		const stateObj = this._storage.getByResourceIdentifier(
+		const stateObj = (await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			state,
-		) as State | null;
+		)) as State | null;
 
 		if (!stateObj) {
 			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
@@ -354,7 +361,7 @@ export class PaymentUpdateHandler
 		resource.paymentMethodInfo.custom.fields[name] = value;
 	}
 
-	setMethodInfoCustomType(
+	async setMethodInfoCustomType(
 		context: RepositoryContext,
 		resource: Writable<Payment>,
 		{ type, fields }: PaymentSetMethodInfoCustomTypeAction,
@@ -362,7 +369,7 @@ export class PaymentUpdateHandler
 		if (!type) {
 			resource.paymentMethodInfo.custom = undefined;
 		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
+			const resolvedType = await this._storage.getByResourceIdentifier(
 				context.projectKey,
 				type,
 			);

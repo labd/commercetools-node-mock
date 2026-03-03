@@ -55,12 +55,12 @@ export class CartDiscountUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<CartDiscount>,
 		{ type, fields }: CartDiscountSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDescription(
@@ -79,14 +79,19 @@ export class CartDiscountUpdateHandler
 		resource.key = key;
 	}
 
-	setStores(
+	async setStores(
 		context: RepositoryContext,
 		resource: Writable<CartDiscount>,
 		{ stores }: CartDiscountSetStoresAction,
 	) {
-		resource.stores = stores?.map((s) =>
-			getStoreKeyReference(s, context.projectKey, this._storage),
-		);
+		const resolvedStores = stores
+			? await Promise.all(
+					stores.map((s) =>
+						getStoreKeyReference(s, context.projectKey, this._storage),
+					),
+				)
+			: undefined;
+		resource.stores = resolvedStores as Writable<CartDiscount>["stores"];
 	}
 
 	setValidFrom(

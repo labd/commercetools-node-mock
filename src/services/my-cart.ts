@@ -36,12 +36,12 @@ export class MyCartService extends AbstractService {
 		);
 	}
 
-	activeCart(
+	async activeCart(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
-		const resource = this.repository.getActiveCart(params.projectKey);
+		const resource = await this.repository.getActiveCart(params.projectKey);
 		if (!resource) {
 			return reply.status(404).send({
 				statusCode: 404,

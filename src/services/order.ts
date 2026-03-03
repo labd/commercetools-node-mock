@@ -28,7 +28,7 @@ export class OrderService extends AbstractService {
 		);
 	}
 
-	import(
+	async import(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: OrderImportDraft;
@@ -36,20 +36,20 @@ export class OrderService extends AbstractService {
 		reply: FastifyReply,
 	) {
 		const importDraft = request.body;
-		const resource = this.repository.import(
+		const resource = await this.repository.import(
 			getRepositoryContext(request),
 			importDraft,
 		);
 		return reply.status(200).send(resource);
 	}
 
-	getWithOrderNumber(
+	async getWithOrderNumber(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
 		const orderNumber = params.orderNumber;
-		const resource = this.repository.getWithOrderNumber(
+		const resource = await this.repository.getWithOrderNumber(
 			getRepositoryContext(request),
 			orderNumber,
 
@@ -71,14 +71,14 @@ export class OrderService extends AbstractService {
 		});
 	}
 
-	search(
+	async search(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: OrderSearchRequest;
 		}>,
 		reply: FastifyReply,
 	) {
-		const resource = this.repository.search(
+		const resource = await this.repository.search(
 			getRepositoryContext(request),
 			request.body,
 		);

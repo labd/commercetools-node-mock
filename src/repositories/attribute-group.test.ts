@@ -15,7 +15,7 @@ describe("AttributeGroup Repository", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new AttributeGroupRepository(config);
 
-	test("create attribute group", () => {
+	test("create attribute group", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Size Attributes", "de-DE": "Größenattribute" },
 			description: { "en-US": "Attributes related to product size" },
@@ -31,7 +31,7 @@ describe("AttributeGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -41,19 +41,19 @@ describe("AttributeGroup Repository", () => {
 		expect(result.attributes).toEqual(draft.attributes);
 
 		// Test that the attribute group is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create attribute group with minimal data", () => {
+	test("create attribute group with minimal data", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Minimal Attributes" },
 			attributes: [],
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.name).toEqual(draft.name);
@@ -62,7 +62,7 @@ describe("AttributeGroup Repository", () => {
 		expect(result.attributes).toEqual([]);
 	});
 
-	test("update attribute group - changeName", () => {
+	test("update attribute group - changeName", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Original Name" },
 			key: "test-attributes",
@@ -70,9 +70,9 @@ describe("AttributeGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const attributeGroup = repository.create(ctx, draft);
+		const attributeGroup = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			attributeGroup,
 			attributeGroup.version,
@@ -91,7 +91,7 @@ describe("AttributeGroup Repository", () => {
 		expect(result.version).toBe(attributeGroup.version + 1);
 	});
 
-	test("update attribute group - setDescription", () => {
+	test("update attribute group - setDescription", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Test Attributes" },
 			key: "test-attributes-2",
@@ -99,9 +99,9 @@ describe("AttributeGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const attributeGroup = repository.create(ctx, draft);
+		const attributeGroup = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			attributeGroup,
 			attributeGroup.version,
@@ -123,7 +123,7 @@ describe("AttributeGroup Repository", () => {
 		expect(result.version).toBe(attributeGroup.version + 1);
 	});
 
-	test("update attribute group - setKey", () => {
+	test("update attribute group - setKey", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Key Test Attributes" },
 			key: "original-key",
@@ -131,9 +131,9 @@ describe("AttributeGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const attributeGroup = repository.create(ctx, draft);
+		const attributeGroup = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			attributeGroup,
 			attributeGroup.version,
@@ -149,7 +149,7 @@ describe("AttributeGroup Repository", () => {
 		expect(result.version).toBe(attributeGroup.version + 1);
 	});
 
-	test("update attribute group - setAttributes", () => {
+	test("update attribute group - setAttributes", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Attributes Test" },
 			key: "attributes-test",
@@ -161,9 +161,9 @@ describe("AttributeGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const attributeGroup = repository.create(ctx, draft);
+		const attributeGroup = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			attributeGroup,
 			attributeGroup.version,
@@ -189,7 +189,7 @@ describe("AttributeGroup Repository", () => {
 		expect(result.version).toBe(attributeGroup.version + 1);
 	});
 
-	test("get and delete attribute group", () => {
+	test("get and delete attribute group", async () => {
 		const draft: AttributeGroupDraft = {
 			name: { "en-US": "Delete Test Attributes" },
 			key: "delete-test",
@@ -197,25 +197,25 @@ describe("AttributeGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const attributeGroup = repository.create(ctx, draft);
+		const attributeGroup = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, attributeGroup.id);
+		const retrieved = await repository.get(ctx, attributeGroup.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(attributeGroup.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, attributeGroup.key!);
+		const retrievedByKey = await repository.getByKey(ctx, attributeGroup.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(attributeGroup.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, attributeGroup.id);
+		const deleted = await repository.delete(ctx, attributeGroup.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(attributeGroup.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, attributeGroup.id);
+		const notFound = await repository.get(ctx, attributeGroup.id);
 		expect(notFound).toBeNull();
 	});
 });

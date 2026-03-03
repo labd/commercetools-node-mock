@@ -12,7 +12,7 @@ describe("Subscription Repository", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new SubscriptionRepository(config);
 
-	test("create subscription with SQS destination", () => {
+	test("create subscription with SQS destination", async () => {
 		const draft: SubscriptionDraft = {
 			key: "test-subscription",
 			destination: {
@@ -30,7 +30,7 @@ describe("Subscription Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -43,12 +43,12 @@ describe("Subscription Repository", () => {
 		expect(result.events).toEqual([]);
 
 		// Test that the subscription is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create subscription with Google Cloud Pub/Sub destination", () => {
+	test("create subscription with Google Cloud Pub/Sub destination", async () => {
 		const draft: SubscriptionDraft = {
 			key: "pubsub-subscription",
 			destination: {
@@ -69,7 +69,7 @@ describe("Subscription Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -79,7 +79,7 @@ describe("Subscription Repository", () => {
 		expect(result.status).toBe("Healthy");
 	});
 
-	test("create subscription with Azure Event Grid destination", () => {
+	test("create subscription with Azure Event Grid destination", async () => {
 		const draft: SubscriptionDraft = {
 			key: "azure-subscription",
 			destination: {
@@ -96,7 +96,7 @@ describe("Subscription Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -105,7 +105,7 @@ describe("Subscription Repository", () => {
 		expect(result.status).toBe("Healthy");
 	});
 
-	test("create subscription with Azure Service Bus destination", () => {
+	test("create subscription with Azure Service Bus destination", async () => {
 		const draft: SubscriptionDraft = {
 			key: "servicebus-subscription",
 			destination: {
@@ -116,7 +116,7 @@ describe("Subscription Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -124,7 +124,7 @@ describe("Subscription Repository", () => {
 		expect(result.status).toBe("Healthy");
 	});
 
-	test("create subscription fails with invalid SQS account ID", () => {
+	test("create subscription fails with invalid SQS account ID", async () => {
 		const draft: SubscriptionDraft = {
 			key: "invalid-subscription",
 			destination: {
@@ -138,12 +138,12 @@ describe("Subscription Repository", () => {
 
 		const ctx = { projectKey: "dummy" };
 
-		expect(() => {
-			repository.create(ctx, draft);
-		}).toThrow("A test message could not be delivered to this destination");
+		await expect(repository.create(ctx, draft)).rejects.toThrow(
+			"A test message could not be delivered to this destination",
+		);
 	});
 
-	test("update subscription - setKey", () => {
+	test("update subscription - setKey", async () => {
 		const draft: SubscriptionDraft = {
 			key: "test-subscription-update",
 			destination: {
@@ -154,9 +154,9 @@ describe("Subscription Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const subscription = repository.create(ctx, draft);
+		const subscription = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			subscription,
 			subscription.version,
@@ -172,7 +172,7 @@ describe("Subscription Repository", () => {
 		expect(result.version).toBe(subscription.version + 1);
 	});
 
-	test("get and delete subscription", () => {
+	test("get and delete subscription", async () => {
 		const draft: SubscriptionDraft = {
 			key: "delete-test",
 			destination: {
@@ -183,25 +183,25 @@ describe("Subscription Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const subscription = repository.create(ctx, draft);
+		const subscription = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, subscription.id);
+		const retrieved = await repository.get(ctx, subscription.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(subscription.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, subscription.key!);
+		const retrievedByKey = await repository.getByKey(ctx, subscription.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(subscription.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, subscription.id);
+		const deleted = await repository.delete(ctx, subscription.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(subscription.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, subscription.id);
+		const notFound = await repository.get(ctx, subscription.id);
 		expect(notFound).toBeNull();
 	});
 });

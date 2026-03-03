@@ -26,7 +26,10 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 		this.draftSchema = ExtensionDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ExtensionDraft): Extension {
+	async create(
+		context: RepositoryContext,
+		draft: ExtensionDraft,
+	): Promise<Extension> {
 		const resource: Extension = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -34,13 +37,13 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 			destination: draft.destination,
 			triggers: draft.triggers,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	postProcessResource(
+	async postProcessResource(
 		context: RepositoryContext,
 		resource: Extension,
-	): Extension {
+	): Promise<Extension> {
 		if (resource) {
 			const extension = resource as Extension;
 			if (

@@ -10,12 +10,12 @@ describe("Customer repository", () => {
 	const repository = new CustomerRepository(config);
 
 	test("query by lowercaseEmail", async () => {
-		const customer = repository.create(
+		const customer = await repository.create(
 			{ projectKey: "dummy" },
 			{ email: "my-customer-UPPERCASE@email.com" },
 		);
 
-		const result = repository.query(
+		const result = await repository.query(
 			{ projectKey: "dummy" },
 			{ where: [`lowercaseEmail = "my-customer-uppercase@email.com"`] },
 		);
@@ -25,18 +25,18 @@ describe("Customer repository", () => {
 	});
 
 	test("updating lowercaseEmail", async () => {
-		const customer = repository.create(
+		const customer = await repository.create(
 			{ projectKey: "dummy" },
 			{ email: "my-customer-UPPERCASE-v1@email.com" },
 		);
 
-		repository.saveUpdate({ projectKey: "dummy" }, customer.version, {
+		await repository.saveUpdate({ projectKey: "dummy" }, customer.version, {
 			...customer,
 			email: "my-customer-UPPERCASE-v2@email.com",
 			version: customer.version + 1,
 		});
 
-		const result = repository.query(
+		const result = await repository.query(
 			{ projectKey: "dummy" },
 			{ where: [`lowercaseEmail = "my-customer-uppercase-v2@email.com"`] },
 		);
@@ -81,10 +81,10 @@ describe("Customer repository", () => {
 			productSelections: [],
 		};
 
-		storage.add("dummy", "store", store1);
-		storage.add("dummy", "store", store2);
+		await storage.add("dummy", "store", store1);
+		await storage.add("dummy", "store", store2);
 
-		const result = repository.create(
+		const result = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				email: "my-customer@email.com",
@@ -131,9 +131,9 @@ describe("Customer repository", () => {
 			productSelections: [],
 		};
 
-		storage.add("dummy", "store", store1);
+		await storage.add("dummy", "store", store1);
 
-		const result = repository.create(
+		const result = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				email: "my-customer2@email.com",
@@ -155,7 +155,7 @@ describe("Customer repository", () => {
 	});
 
 	test("adding customer without linked stores", async () => {
-		const result = repository.create(
+		const result = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				email: "my-customer-without-stores@email.com",

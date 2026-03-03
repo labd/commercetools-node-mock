@@ -69,45 +69,58 @@ export const checkForStagedChanges = (product: Writable<Product>) => {
 	}
 };
 
-export const variantFromDraft = (
+export const variantFromDraft = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	variantId: number,
 	variant: ProductVariantDraft,
-): ProductVariant => ({
-	id: variantId,
-	sku: variant?.sku,
-	key: variant?.key,
-	attributes: variant?.attributes ?? [],
-	prices: variant?.prices?.map((p) => priceFromDraft(context, storage, p)),
-	assets: variant.assets?.map((a) => assetFromDraft(context, storage, a)) ?? [],
-	images: variant.images ?? [],
-});
+): Promise<ProductVariant> => {
+	const prices = variant?.prices
+		? await Promise.all(
+				variant.prices.map((p) => priceFromDraft(context, storage, p)),
+			)
+		: undefined;
+	const assets = variant.assets
+		? await Promise.all(
+				variant.assets.map((a) => assetFromDraft(context, storage, a)),
+			)
+		: [];
 
-export const assetFromDraft = (
+	return {
+		id: variantId,
+		sku: variant?.sku,
+		key: variant?.key,
+		attributes: variant?.attributes ?? [],
+		prices,
+		assets,
+		images: variant.images ?? [],
+	};
+};
+
+export const assetFromDraft = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	draft: AssetDraft,
-): Asset => {
+): Promise<Asset> => {
 	const asset: Asset = {
 		...draft,
 		id: uuidv4(),
-		custom: createCustomFields(draft.custom, context.projectKey, storage),
+		custom: await createCustomFields(draft.custom, context.projectKey, storage),
 	};
 	return asset;
 };
 
-export const priceFromDraft = (
+export const priceFromDraft = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	draft: PriceDraft,
-): Price => ({
+): Promise<Price> => ({
 	id: uuidv4(),
 	key: draft.key,
 	country: draft.country,
 	value: createTypedMoney(draft.value),
 	channel: draft.channel
-		? getReferenceFromResourceIdentifier<ChannelReference>(
+		? await getReferenceFromResourceIdentifier<ChannelReference>(
 				draft.channel,
 				context.projectKey,
 				storage,

@@ -9,7 +9,7 @@ describe("Order repository", () => {
 	const repository = new CategoryRepository(config);
 
 	test("valid ancestors", async () => {
-		const root = repository.create(
+		const root = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				key: "root",
@@ -22,7 +22,7 @@ describe("Order repository", () => {
 			},
 		);
 
-		const level1 = repository.create(
+		const level1 = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				key: "level-1",
@@ -39,7 +39,7 @@ describe("Order repository", () => {
 			},
 		);
 
-		const level2 = repository.create(
+		const level2 = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				key: "level-2",
@@ -56,7 +56,7 @@ describe("Order repository", () => {
 			},
 		);
 
-		const level3 = repository.create(
+		const level3 = await repository.create(
 			{ projectKey: "dummy" },
 			{
 				key: "level-3",
@@ -73,7 +73,7 @@ describe("Order repository", () => {
 			},
 		);
 
-		const result = repository.get({ projectKey: "dummy" }, level3.id);
+		const result = await repository.get({ projectKey: "dummy" }, level3.id);
 		expect(result?.ancestors).toHaveLength(3);
 		expect(result?.ancestors).toEqual([
 			{ id: level2.id, typeId: "category" },
@@ -81,9 +81,13 @@ describe("Order repository", () => {
 			{ id: root.id, typeId: "category" },
 		]);
 
-		const expandResult = repository.get({ projectKey: "dummy" }, level3.id, {
-			expand: ["ancestors[*]"],
-		});
+		const expandResult = await repository.get(
+			{ projectKey: "dummy" },
+			level3.id,
+			{
+				expand: ["ancestors[*]"],
+			},
+		);
 		expect(expandResult?.ancestors).toHaveLength(3);
 		expect(expandResult?.ancestors).toEqual([
 			{ id: level2.id, typeId: "category", obj: level2 },
@@ -91,7 +95,7 @@ describe("Order repository", () => {
 			{ id: root.id, typeId: "category", obj: root },
 		]);
 
-		const queryResult = repository.query(
+		const queryResult = await repository.query(
 			{ projectKey: "dummy" },
 			{
 				where: [`id="${level3.id}"`],

@@ -29,7 +29,16 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 		this.draftSchema = CartDiscountDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: CartDiscountDraft): CartDiscount {
+	async create(
+		context: RepositoryContext,
+		draft: CartDiscountDraft,
+	): Promise<CartDiscount> {
+		const stores = await Promise.all(
+			draft.stores?.map((s) =>
+				getStoreKeyReference(s, context.projectKey, this._storage),
+			) ?? [],
+		);
+
 		const resource: CartDiscount = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -37,10 +46,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 			cartPredicate: draft.cartPredicate,
 			isActive: draft.isActive || false,
 			name: draft.name,
-			stores:
-				draft.stores?.map((s) =>
-					getStoreKeyReference(s, context.projectKey, this._storage),
-				) ?? [],
+			stores,
 			references: [],
 			target: draft.target,
 			requiresDiscountCode: draft.requiresDiscountCode || false,
@@ -49,7 +55,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 			value: this.transformValueDraft(draft.value),
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -58,7 +64,7 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 				? ({ type: draft.recurringOrderScope.type } as RecurringOrderScope)
 				: ({ type: "AnyOrder" } as RecurringOrderScope),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
 	private transformValueDraft(value: CartDiscountValueDraft) {

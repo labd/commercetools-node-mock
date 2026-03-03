@@ -25,7 +25,7 @@ export class ZoneRepository extends AbstractResourceRepository<"zone"> {
 		this.draftSchema = ZoneDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ZoneDraft): Zone {
+	async create(context: RepositoryContext, draft: ZoneDraft): Promise<Zone> {
 		const resource: Zone = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -33,7 +33,7 @@ export class ZoneRepository extends AbstractResourceRepository<"zone"> {
 			name: draft.name,
 			description: draft.description,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 

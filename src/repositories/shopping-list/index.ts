@@ -29,16 +29,20 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 		this.draftSchema = ShoppingListDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ShoppingListDraft): ShoppingList {
-		const lineItems =
+	async create(
+		context: RepositoryContext,
+		draft: ShoppingListDraft,
+	): Promise<ShoppingList> {
+		const lineItems = await Promise.all(
 			draft.lineItems?.map((draftLineItem) =>
 				this.draftLineItemtoLineItem(context.projectKey, draftLineItem),
-			) ?? [];
+			) ?? [],
+		);
 
 		const resource: ShoppingList = {
 			...getBaseResourceProperties(context.clientId),
 			...draft,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -46,30 +50,34 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			textLineItems: [],
 			lineItems,
 			customer: draft.customer
-				? getReferenceFromResourceIdentifier<CustomerReference>(
+				? await getReferenceFromResourceIdentifier<CustomerReference>(
 						draft.customer,
 						context.projectKey,
 						this._storage,
 					)
 				: undefined,
 			store: draft.store
-				? getStoreKeyReference(draft.store, context.projectKey, this._storage)
+				? await getStoreKeyReference(
+						draft.store,
+						context.projectKey,
+						this._storage,
+					)
 				: undefined,
 			businessUnit: draft.businessUnit
-				? getBusinessUnitKeyReference(
+				? await getBusinessUnitKeyReference(
 						draft.businessUnit,
 						context.projectKey,
 						this._storage,
 					)
 				: undefined,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	draftLineItemtoLineItem = (
+	draftLineItemtoLineItem = async (
 		projectKey: string,
 		draftLineItem: LineItemDraft,
-	): ShoppingListLineItem => {
+	): Promise<ShoppingListLineItem> => {
 		const { sku, productId, variantId } = draftLineItem;
 
 		const lineItem: Writable<ShoppingListLineItem> = {
@@ -82,7 +90,7 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 			published: true,
 			quantity: draftLineItem.quantity ?? 1,
 			productType: { typeId: "product-type", id: "" },
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draftLineItem.custom,
 				projectKey,
 				this._storage,
@@ -94,11 +102,11 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 		}
 
 		if (sku) {
-			const items = this._storage.query(projectKey, "product", {
+			const items = (await this._storage.query(projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			}) as ProductPagedQueryResponse;
+			})) as ProductPagedQueryResponse;
 
 			if (items.count === 0) {
 				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
@@ -120,9 +128,9 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 		}
 
 		if (productId) {
-			const items = this._storage.query(projectKey, "product", {
+			const items = (await this._storage.query(projectKey, "product", {
 				where: [`id="${productId}"`],
-			}) as ProductPagedQueryResponse;
+			})) as ProductPagedQueryResponse;
 
 			if (items.count === 0) {
 				throw new CommercetoolsError<ReferencedResourceNotFoundError>({

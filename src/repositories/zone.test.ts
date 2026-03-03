@@ -16,7 +16,7 @@ describe("Zone Repository", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new ZoneRepository(config);
 
-	test("create zone", () => {
+	test("create zone", async () => {
 		const draft: ZoneDraft = {
 			key: "europe-zone",
 			name: "Europe Zone",
@@ -32,7 +32,7 @@ describe("Zone Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -42,18 +42,18 @@ describe("Zone Repository", () => {
 		expect(result.locations).toEqual(draft.locations);
 
 		// Test that the zone is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create zone without optional fields", () => {
+	test("create zone without optional fields", async () => {
 		const draft: ZoneDraft = {
 			name: "Simple Zone",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.name).toBe(draft.name);
@@ -62,67 +62,82 @@ describe("Zone Repository", () => {
 		expect(result.locations).toEqual([]);
 	});
 
-	test("update zone - changeName", () => {
+	test("update zone - changeName", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone",
 			name: "Test Zone",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "changeName",
-				name: "Updated Test Zone",
-			} as ZoneChangeNameAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "changeName",
+					name: "Updated Test Zone",
+				} as ZoneChangeNameAction,
+			],
+		);
 
 		expect(result.name).toBe("Updated Test Zone");
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("update zone - setKey", () => {
+	test("update zone - setKey", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone-2",
 			name: "Test Zone 2",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "setKey",
-				key: "new-zone-key",
-			} as ZoneSetKeyAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "setKey",
+					key: "new-zone-key",
+				} as ZoneSetKeyAction,
+			],
+		);
 
 		expect(result.key).toBe("new-zone-key");
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("update zone - setDescription", () => {
+	test("update zone - setDescription", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone-3",
 			name: "Test Zone 3",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "setDescription",
-				description: "New zone description",
-			} as ZoneSetDescriptionAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "setDescription",
+					description: "New zone description",
+				} as ZoneSetDescriptionAction,
+			],
+		);
 
 		expect(result.description).toBe("New zone description");
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("update zone - addLocation", () => {
+	test("update zone - addLocation", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone-4",
 			name: "Test Zone 4",
@@ -134,16 +149,21 @@ describe("Zone Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "addLocation",
-				location: {
-					country: "FR",
-				},
-			} as ZoneAddLocationAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "addLocation",
+					location: {
+						country: "FR",
+					},
+				} as ZoneAddLocationAction,
+			],
+		);
 
 		expect(result.locations).toHaveLength(2);
 		expect(result.locations).toContainEqual({ country: "DE" });
@@ -151,7 +171,7 @@ describe("Zone Repository", () => {
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("update zone - addLocation with state", () => {
+	test("update zone - addLocation with state", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone-5",
 			name: "Test Zone 5",
@@ -159,24 +179,29 @@ describe("Zone Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "addLocation",
-				location: {
-					country: "US",
-					state: "CA",
-				},
-			} as ZoneAddLocationAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "addLocation",
+					location: {
+						country: "US",
+						state: "CA",
+					},
+				} as ZoneAddLocationAction,
+			],
+		);
 
 		expect(result.locations).toHaveLength(1);
 		expect(result.locations[0]).toEqual({ country: "US", state: "CA" });
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("update zone - removeLocation", () => {
+	test("update zone - removeLocation", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone-6",
 			name: "Test Zone 6",
@@ -195,16 +220,21 @@ describe("Zone Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "removeLocation",
-				location: {
-					country: "FR",
-				},
-			} as ZoneRemoveLocationAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "removeLocation",
+					location: {
+						country: "FR",
+					},
+				} as ZoneRemoveLocationAction,
+			],
+		);
 
 		expect(result.locations).toHaveLength(2);
 		expect(result.locations).toContainEqual({ country: "DE" });
@@ -213,7 +243,7 @@ describe("Zone Repository", () => {
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("update zone - removeLocation with state", () => {
+	test("update zone - removeLocation with state", async () => {
 		const draft: ZoneDraft = {
 			key: "test-zone-7",
 			name: "Test Zone 7",
@@ -230,49 +260,54 @@ describe("Zone Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(ctx, zone, zone.version, [
-			{
-				action: "removeLocation",
-				location: {
-					country: "US",
-					state: "CA",
-				},
-			} as ZoneRemoveLocationAction,
-		]);
+		const result = await repository.processUpdateActions(
+			ctx,
+			zone,
+			zone.version,
+			[
+				{
+					action: "removeLocation",
+					location: {
+						country: "US",
+						state: "CA",
+					},
+				} as ZoneRemoveLocationAction,
+			],
+		);
 
 		expect(result.locations).toHaveLength(1);
 		expect(result.locations[0]).toEqual({ country: "US", state: "NY" });
 		expect(result.version).toBe(zone.version + 1);
 	});
 
-	test("get and delete zone", () => {
+	test("get and delete zone", async () => {
 		const draft: ZoneDraft = {
 			key: "delete-test",
 			name: "Delete Test Zone",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const zone = repository.create(ctx, draft);
+		const zone = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, zone.id);
+		const retrieved = await repository.get(ctx, zone.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(zone.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, zone.key!);
+		const retrievedByKey = await repository.getByKey(ctx, zone.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(zone.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, zone.id);
+		const deleted = await repository.delete(ctx, zone.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(zone.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, zone.id);
+		const notFound = await repository.get(ctx, zone.id);
 		expect(notFound).toBeNull();
 	});
 });

@@ -21,13 +21,13 @@ export class ProjectAPI {
 		this._repositories = repositories;
 	}
 
-	unsafeAdd<T extends keyof RepositoryMap & keyof ResourceMap>(
+	async unsafeAdd<T extends keyof RepositoryMap & keyof ResourceMap>(
 		typeId: T,
 		resource: ResourceMap[T],
 	) {
 		const repository = this._repositories[typeId];
 		if (repository) {
-			this._storage.add(this.projectKey, typeId, {
+			await this._storage.add(this.projectKey, typeId, {
 				...getBaseResourceProperties(),
 				...resource,
 			});
@@ -36,17 +36,13 @@ export class ProjectAPI {
 		}
 	}
 
-	get<RT extends ResourceType>(
+	async get<RT extends ResourceType>(
 		typeId: RT,
 		id: string,
 		params?: GetParams,
-	): ResourceMap[RT] {
-		return this._storage.get(
-			this.projectKey,
-			typeId,
-			id,
-			params,
-		) as ResourceMap[RT];
+	): Promise<ResourceMap[RT]> {
+		const result = await this._storage.get(this.projectKey, typeId, id, params);
+		return result as ResourceMap[RT];
 	}
 
 	// TODO: Not sure if we want to expose this...

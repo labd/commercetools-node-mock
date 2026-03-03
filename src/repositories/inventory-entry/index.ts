@@ -23,10 +23,10 @@ export class InventoryEntryRepository extends AbstractResourceRepository<"invent
 		this.draftSchema = InventoryEntryDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: InventoryEntryDraft,
-	): InventoryEntry {
+	): Promise<InventoryEntry> {
 		const resource: InventoryEntry = {
 			...getBaseResourceProperties(context.clientId),
 			sku: draft.sku,
@@ -35,18 +35,18 @@ export class InventoryEntryRepository extends AbstractResourceRepository<"invent
 			expectedDelivery: draft.expectedDelivery,
 			restockableInDays: draft.restockableInDays,
 			supplyChannel: draft.supplyChannel
-				? getReferenceFromResourceIdentifier<ChannelReference>(
+				? await getReferenceFromResourceIdentifier<ChannelReference>(
 						draft.supplyChannel,
 						context.projectKey,
 						this._storage,
 					)
 				: undefined,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

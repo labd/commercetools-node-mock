@@ -18,7 +18,10 @@ export class DiscountGroupRepository extends AbstractResourceRepository<"discoun
 		this.draftSchema = DiscountGroupDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: DiscountGroupDraft): DiscountGroup {
+	async create(
+		context: RepositoryContext,
+		draft: DiscountGroupDraft,
+	): Promise<DiscountGroup> {
 		const resource: DiscountGroup = {
 			...getBaseResourceProperties(context.clientId),
 			description: draft.description,
@@ -27,6 +30,6 @@ export class DiscountGroupRepository extends AbstractResourceRepository<"discoun
 			sortOrder: draft.sortOrder,
 			isActive: true,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

@@ -31,7 +31,7 @@ export class ShoppingListUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<ShoppingList, ShoppingListUpdateAction>>
 {
-	addLineItem(
+	async addLineItem(
 		context: RepositoryContext,
 		resource: Writable<ShoppingList>,
 		{
@@ -47,14 +47,19 @@ export class ShoppingListUpdateHandler
 
 		if (productId) {
 			// Fetch product and variant by ID
-			product = this._storage.get(context.projectKey, "product", productId, {});
+			product = await this._storage.get(
+				context.projectKey,
+				"product",
+				productId,
+				{},
+			);
 		} else if (sku) {
 			// Fetch product and variant by SKU
-			const items = this._storage.query(context.projectKey, "product", {
+			const items = (await this._storage.query(context.projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			}) as ProductPagedQueryResponse;
+			})) as ProductPagedQueryResponse;
 
 			if (items.count === 1) {
 				product = items.results[0];
@@ -227,12 +232,12 @@ export class ShoppingListUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<ShoppingList>,
 		{ type, fields }: ShoppingListSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDeleteDaysAfterLastModification(

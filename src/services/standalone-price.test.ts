@@ -42,7 +42,7 @@ describe("Standalone price Query", () => {
 	});
 
 	afterAll(async () => {
-		ctMock.clear();
+		await ctMock.clear();
 	});
 
 	test("Get standalone price", async () => {
@@ -113,7 +113,7 @@ describe("Standalone price Actions", () => {
 	});
 
 	afterEach(async () => {
-		ctMock.clear();
+		await ctMock.clear();
 	});
 
 	test("changeValue", async () => {

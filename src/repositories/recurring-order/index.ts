@@ -20,15 +20,15 @@ export class RecurringOrderRepository extends AbstractResourceRepository<"recurr
 		this.draftSchema = RecurringOrderDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: RecurringOrderDraft,
-	): RecurringOrder {
+	): Promise<RecurringOrder> {
 		assert(draft.cart, "draft.cart is missing");
 
 		const orderRepo = new OrderRepository(this.config);
 
-		const initialOrder = orderRepo.createFromCart(context, {
+		const initialOrder = await orderRepo.createFromCart(context, {
 			id: draft.cart.id!,
 			typeId: "cart",
 		});
@@ -49,6 +49,6 @@ export class RecurringOrderRepository extends AbstractResourceRepository<"recurr
 			recurringOrderState: "Active",
 			schedule: { type: "standard", intervalUnit: "month", value: 1 },
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

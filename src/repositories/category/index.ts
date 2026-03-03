@@ -24,7 +24,28 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 		this.draftSchema = CategoryDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: CategoryDraft): Category {
+	async create(
+		context: RepositoryContext,
+		draft: CategoryDraft,
+	): Promise<Category> {
+		const assets = draft.assets
+			? await Promise.all(
+					draft.assets.map(async (d) => ({
+						id: uuidv4(),
+						name: d.name,
+						description: d.description,
+						sources: d.sources,
+						tags: d.tags,
+						key: d.key,
+						custom: await createCustomFields(
+							draft.custom,
+							context.projectKey,
+							this._storage,
+						),
+					})),
+				)
+			: [];
+
 		const resource: Category = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -39,34 +60,21 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 				? { typeId: "category", id: draft.parent.id! }
 				: undefined,
 			ancestors: [], // Resolved at runtime
-			assets:
-				draft.assets?.map((d) => ({
-					id: uuidv4(),
-					name: d.name,
-					description: d.description,
-					sources: d.sources,
-					tags: d.tags,
-					key: d.key,
-					custom: createCustomFields(
-						draft.custom,
-						context.projectKey,
-						this._storage,
-					),
-				})) || [],
-			custom: createCustomFields(
+			assets,
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	postProcessResource(
+	async postProcessResource(
 		context: RepositoryContext,
 		resource: Writable<Category>,
 		params?: GetParams,
-	): Category {
+	): Promise<Category> {
 		let node: Category = resource;
 		const ancestors: CategoryReference[] = [];
 
@@ -81,7 +89,7 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 		);
 
 		while (node.parent) {
-			node = this._storage.getByResourceIdentifier<"category">(
+			node = await this._storage.getByResourceIdentifier<"category">(
 				context.projectKey,
 				node.parent,
 			);

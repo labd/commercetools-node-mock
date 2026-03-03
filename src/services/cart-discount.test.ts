@@ -197,8 +197,8 @@ describe("Cart Discounts Update Actions", () => {
 		});
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("set key", async () => {

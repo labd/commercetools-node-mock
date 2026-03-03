@@ -25,29 +25,33 @@ export class ShippingMethodRepository extends AbstractResourceRepository<"shippi
 		this.draftSchema = ShippingMethodDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: ShippingMethodDraft,
-	): ShippingMethod {
+	): Promise<ShippingMethod> {
+		const zoneRates = draft.zoneRates
+			? await Promise.all(
+					draft.zoneRates.map((z) => this._transformZoneRateDraft(context, z)),
+				)
+			: [];
+
 		const resource: ShippingMethod = {
 			...getBaseResourceProperties(context.clientId),
 			...draft,
 			active: draft.active ?? true,
-			taxCategory: getReferenceFromResourceIdentifier(
+			taxCategory: await getReferenceFromResourceIdentifier(
 				draft.taxCategory,
 				context.projectKey,
 				this._storage,
 			),
-			zoneRates: draft.zoneRates?.map((z) =>
-				this._transformZoneRateDraft(context, z),
-			),
-			custom: createCustomFields(
+			zoneRates,
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
 	/*
@@ -56,26 +60,31 @@ export class ShippingMethodRepository extends AbstractResourceRepository<"shippi
 	 * the flag isMatching set to true. This ShippingRate is used when the
 	 * ShippingMethod is added to the Cart.
 	 */
-	public matchingCart(
+	public async matchingCart(
 		context: RepositoryContext,
 		cartId: string,
 		params: GetParams = {},
 	) {
-		const cart = this._storage.get(context.projectKey, "cart", cartId);
+		const cart = await this._storage.get(context.projectKey, "cart", cartId);
 		if (!cart) {
 			return undefined;
 		}
 
-		return getShippingMethodsMatchingCart(context, this._storage, cart, params);
+		return await getShippingMethodsMatchingCart(
+			context,
+			this._storage,
+			cart,
+			params,
+		);
 	}
 
-	private _transformZoneRateDraft(
+	private async _transformZoneRateDraft(
 		context: RepositoryContext,
 		draft: ZoneRateDraft,
-	): ZoneRate {
+	): Promise<ZoneRate> {
 		return {
 			...draft,
-			zone: getReferenceFromResourceIdentifier<ZoneReference>(
+			zone: await getReferenceFromResourceIdentifier<ZoneReference>(
 				draft.zone,
 				context.projectKey,
 				this._storage,

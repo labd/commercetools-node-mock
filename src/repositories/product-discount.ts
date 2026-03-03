@@ -36,10 +36,10 @@ export class ProductDiscountRepository extends AbstractResourceRepository<"produ
 		this.draftSchema = ProductDiscountDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: ProductDiscountDraft,
-	): ProductDiscount {
+	): Promise<ProductDiscount> {
 		const resource: ProductDiscount = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -53,7 +53,7 @@ export class ProductDiscountRepository extends AbstractResourceRepository<"produ
 			validUntil: draft.validUntil,
 			references: [],
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 

@@ -34,25 +34,37 @@ export class ProjectRepository extends AbstractRepository<Project> {
 		this.actions = new ProjectUpdateHandler(config.storage);
 	}
 
-	get(context: RepositoryContext): Project | null {
-		const resource = this._storage.getProject(context.projectKey);
-		return this.postProcessResource(context, resource);
+	async get(context: RepositoryContext): Promise<Project | null> {
+		const resource = await this._storage.getProject(context.projectKey);
+		return await this.postProcessResource(context, resource);
 	}
 
-	postProcessResource(context: RepositoryContext, resource: Project): Project {
+	async postProcessResource(
+		context: RepositoryContext,
+		resource: Project,
+	): Promise<Project> {
 		if (resource) {
 			return maskSecretValue(resource, "externalOAuth.authorizationHeader");
 		}
 		return resource;
 	}
 
-	saveNew(context: RepositoryContext, resource: Writable<Project>) {
+	async saveNew(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+	): Promise<Project> {
 		resource.version = 1;
-		this._storage.saveProject(resource);
+		await this._storage.saveProject(resource);
+		return resource;
 	}
 
-	saveUpdate(context: RepositoryContext, version: number, resource: Project) {
-		this._storage.saveProject(resource);
+	async saveUpdate(
+		context: RepositoryContext,
+		version: number,
+		resource: Project,
+	): Promise<Project> {
+		await this._storage.saveProject(resource);
+		return resource;
 	}
 }
 

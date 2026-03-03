@@ -106,7 +106,7 @@ const markMatchingCartValueTiers = (
  * the flag isMatching set to true. This ShippingRate is used when the
  * ShippingMethod is added to the Cart.
  */
-export const getShippingMethodsMatchingCart = (
+export const getShippingMethodsMatchingCart = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	cart: Cart,
@@ -120,12 +120,12 @@ export const getShippingMethodsMatchingCart = (
 	}
 
 	// Get all shipping methods that have a zone that matches the shipping address
-	const zones = storage.query<"zone">(context.projectKey, "zone", {
+	const zones = await storage.query<"zone">(context.projectKey, "zone", {
 		where: [`locations(country="${cart.shippingAddress.country}"))`],
 		limit: 100,
 	});
 	const zoneIds = zones.results.map((zone) => zone.id);
-	const shippingMethods = storage.query<"shipping-method">(
+	const shippingMethods = await storage.query<"shipping-method">(
 		context.projectKey,
 		"shipping-method",
 		{
@@ -185,12 +185,12 @@ interface ShippingCalculationSource {
 /**
  * Creates shipping info from a shipping method, handling all tax calculations and pricing logic.
  */
-export const createShippingInfoFromMethod = (
+export const createShippingInfoFromMethod = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	resource: ShippingCalculationSource,
 	method: ShippingMethod,
-): Omit<ShippingInfo, "deliveries"> => {
+): Promise<Omit<ShippingInfo, "deliveries">> => {
 	const country = resource.shippingAddress!.country;
 
 	// There should only be one zone rate matching the address, since
@@ -228,7 +228,7 @@ export const createShippingInfoFromMethod = (
 		);
 	}
 
-	const taxCategory = storage.getByResourceIdentifier<"tax-category">(
+	const taxCategory = await storage.getByResourceIdentifier<"tax-category">(
 		context.projectKey,
 		method.taxCategory,
 	);

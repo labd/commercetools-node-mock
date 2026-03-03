@@ -20,7 +20,10 @@ export class DiscountCodeRepository extends AbstractResourceRepository<"discount
 		this.draftSchema = DiscountCodeDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: DiscountCodeDraft): DiscountCode {
+	async create(
+		context: RepositoryContext,
+		draft: DiscountCodeDraft,
+	): Promise<DiscountCode> {
 		const resource: DiscountCode = {
 			...getBaseResourceProperties(context.clientId),
 			applicationVersion: 1,
@@ -41,12 +44,12 @@ export class DiscountCodeRepository extends AbstractResourceRepository<"discount
 			validUntil: draft.validUntil,
 			maxApplications: draft.maxApplications,
 			maxApplicationsPerCustomer: draft.maxApplicationsPerCustomer,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

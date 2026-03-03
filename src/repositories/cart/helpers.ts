@@ -64,16 +64,16 @@ export const calculateCartTotalPrice = (cart: Cart): number => {
 	return lineItemsTotal + customLineItemsTotal;
 };
 
-export const createCustomLineItemFromDraft = (
+export const createCustomLineItemFromDraft = async (
 	projectKey: string,
 	draft: CustomLineItemDraft,
 	storage: AbstractStorage,
 	country?: string,
-): CustomLineItem => {
+): Promise<CustomLineItem> => {
 	const quantity = draft.quantity ?? 1;
 
 	const taxCategoryRef = draft.taxCategory
-		? getReferenceFromResourceIdentifier<TaxCategoryReference>(
+		? await getReferenceFromResourceIdentifier<TaxCategoryReference>(
 				draft.taxCategory,
 				projectKey,
 				storage,
@@ -83,9 +83,13 @@ export const createCustomLineItemFromDraft = (
 	let taxCategory: TaxCategory | undefined;
 	if (taxCategoryRef) {
 		try {
-			taxCategory =
-				storage.get(projectKey, "tax-category", taxCategoryRef.id, {}) ||
-				undefined;
+			const result = await storage.get(
+				projectKey,
+				"tax-category",
+				taxCategoryRef.id,
+				{},
+			);
+			taxCategory = result || undefined;
 		} catch (_error) {
 			// Tax category not found, continue without tax calculation
 		}
@@ -122,7 +126,7 @@ export const createCustomLineItemFromDraft = (
 		taxCategory: taxCategoryRef,
 		taxRate,
 		taxedPrice,
-		custom: createCustomFields(draft.custom, projectKey, storage),
+		custom: await createCustomFields(draft.custom, projectKey, storage),
 		discountedPricePerQuantity: [],
 		perMethodTaxRate: [],
 		priceMode: draft.priceMode ?? "Standard",
@@ -131,12 +135,12 @@ export const createCustomLineItemFromDraft = (
 	};
 };
 
-export const createDiscountCodeInfoFromCode = (
+export const createDiscountCodeInfoFromCode = async (
 	projectKey: string,
 	storage: AbstractStorage,
 	code: string,
-): DiscountCodeInfo => {
-	const discountCodes = storage.query(projectKey, "discount-code", {
+): Promise<DiscountCodeInfo> => {
+	const discountCodes = await storage.query(projectKey, "discount-code", {
 		where: `code="${code}"`,
 	});
 	// Does not validate anything besides existence of the DiscountCode object

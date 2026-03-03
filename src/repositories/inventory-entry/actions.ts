@@ -46,12 +46,12 @@ export class InventoryEntryUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<InventoryEntry>,
 		{ type, fields }: InventoryEntrySetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setExpectedDelivery(

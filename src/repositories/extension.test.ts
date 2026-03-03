@@ -16,7 +16,7 @@ describe("Extension Repository", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new ExtensionRepository(config);
 
-	test("create extension with HTTP destination", () => {
+	test("create extension with HTTP destination", async () => {
 		const draft: ExtensionDraft = {
 			key: "test-extension",
 			timeoutInMs: 2000,
@@ -37,7 +37,7 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -46,11 +46,11 @@ describe("Extension Repository", () => {
 		expect(result.triggers).toEqual(draft.triggers);
 
 		// Test that the extension is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 	});
 
-	test("create extension with AWSLambda destination", () => {
+	test("create extension with AWSLambda destination", async () => {
 		const draft: ExtensionDraft = {
 			key: "aws-extension",
 			destination: {
@@ -68,7 +68,7 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -76,7 +76,7 @@ describe("Extension Repository", () => {
 		expect(result.triggers).toEqual(draft.triggers);
 	});
 
-	test("postProcessResource masks HTTP authentication header", () => {
+	test("postProcessResource masks HTTP authentication header", async () => {
 		const extension: Extension = {
 			id: "test-id",
 			version: 1,
@@ -95,7 +95,7 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.postProcessResource(ctx, extension);
+		const result = await repository.postProcessResource(ctx, extension);
 
 		expect(result.destination.type).toBe("HTTP");
 		if (
@@ -106,7 +106,7 @@ describe("Extension Repository", () => {
 		}
 	});
 
-	test("postProcessResource masks AWSLambda access secret", () => {
+	test("postProcessResource masks AWSLambda access secret", async () => {
 		const extension: Extension = {
 			id: "test-id",
 			version: 1,
@@ -123,7 +123,7 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.postProcessResource(ctx, extension);
+		const result = await repository.postProcessResource(ctx, extension);
 
 		expect(result.destination.type).toBe("AWSLambda");
 		if (result.destination.type === "AWSLambda") {
@@ -131,7 +131,7 @@ describe("Extension Repository", () => {
 		}
 	});
 
-	test("update extension - changeDestination", () => {
+	test("update extension - changeDestination", async () => {
 		const draft: ExtensionDraft = {
 			key: "test-extension",
 			destination: {
@@ -147,14 +147,14 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const extension = repository.create(ctx, draft);
+		const extension = await repository.create(ctx, draft);
 
 		const newDestination = {
 			type: "HTTP" as const,
 			url: "https://new-example.com/webhook",
 		};
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			extension,
 			extension.version,
@@ -172,7 +172,7 @@ describe("Extension Repository", () => {
 		expect(result.version).toBe(extension.version + 1);
 	});
 
-	test("update extension - changeTriggers", () => {
+	test("update extension - changeTriggers", async () => {
 		const draft: ExtensionDraft = {
 			key: "test-extension",
 			destination: {
@@ -188,7 +188,7 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const extension = repository.create(ctx, draft);
+		const extension = await repository.create(ctx, draft);
 
 		const newTriggers = [
 			{
@@ -197,7 +197,7 @@ describe("Extension Repository", () => {
 			},
 		];
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			extension,
 			extension.version,
@@ -213,7 +213,7 @@ describe("Extension Repository", () => {
 		expect(result.version).toBe(extension.version + 1);
 	});
 
-	test("update extension - setKey", () => {
+	test("update extension - setKey", async () => {
 		const draft: ExtensionDraft = {
 			key: "test-extension",
 			destination: {
@@ -224,9 +224,9 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const extension = repository.create(ctx, draft);
+		const extension = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			extension,
 			extension.version,
@@ -242,7 +242,7 @@ describe("Extension Repository", () => {
 		expect(result.version).toBe(extension.version + 1);
 	});
 
-	test("update extension - setTimeoutInMs", () => {
+	test("update extension - setTimeoutInMs", async () => {
 		const draft: ExtensionDraft = {
 			key: "test-extension",
 			destination: {
@@ -253,9 +253,9 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const extension = repository.create(ctx, draft);
+		const extension = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			extension,
 			extension.version,
@@ -271,7 +271,7 @@ describe("Extension Repository", () => {
 		expect(result.version).toBe(extension.version + 1);
 	});
 
-	test("get and delete extension", () => {
+	test("get and delete extension", async () => {
 		const draft: ExtensionDraft = {
 			key: "test-extension",
 			destination: {
@@ -282,25 +282,25 @@ describe("Extension Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const extension = repository.create(ctx, draft);
+		const extension = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, extension.id);
+		const retrieved = await repository.get(ctx, extension.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(extension.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, extension.key!);
+		const retrievedByKey = await repository.getByKey(ctx, extension.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(extension.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, extension.id);
+		const deleted = await repository.delete(ctx, extension.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(extension.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, extension.id);
+		const notFound = await repository.get(ctx, extension.id);
 		expect(notFound).toBeNull();
 	});
 });

@@ -7,8 +7,8 @@ const ctMock = new CommercetoolsMock();
 describe("MyBusinessUnit", () => {
 	const businessUnitFactory = businessUnitDraftFactory(ctMock);
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("Get my business units", async () => {

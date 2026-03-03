@@ -26,18 +26,21 @@ export class CustomerGroupRepository extends AbstractResourceRepository<"custome
 		this.draftSchema = CustomerGroupDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: CustomerGroupDraft): CustomerGroup {
+	async create(
+		context: RepositoryContext,
+		draft: CustomerGroupDraft,
+	): Promise<CustomerGroup> {
 		const resource: CustomerGroup = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.groupName,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 
@@ -61,12 +64,12 @@ class CustomerGroupUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<CustomerGroup>,
 		{ type, fields }: CustomerGroupSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setKey(

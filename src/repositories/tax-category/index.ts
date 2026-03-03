@@ -17,12 +17,15 @@ export class TaxCategoryRepository extends AbstractResourceRepository<"tax-categ
 		this.draftSchema = TaxCategoryDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: TaxCategoryDraft): TaxCategory {
+	async create(
+		context: RepositoryContext,
+		draft: TaxCategoryDraft,
+	): Promise<TaxCategory> {
 		const resource: TaxCategory = {
 			...getBaseResourceProperties(context.clientId),
 			...draft,
 			rates: draft.rates?.map(taxRateFromTaxRateDraft) || [],
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

@@ -48,12 +48,12 @@ describe('A module', () => {
     mswServer.listen({ onUnhandledRequest: "error" })
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     ctMock.registerHandlers(mswServer)
 
-    ctMock.project().add('type', {
-      ...getBaseResourceProperties()
-      key: 'my-customt-type',
+    await ctMock.project().unsafeAdd('type', {
+      ...getBaseResourceProperties(),
+      key: 'my-custom-type',
       fieldDefinitions: [],
     })
   })
@@ -62,19 +62,42 @@ describe('A module', () => {
     mswServer.close()
   })
 
-  afterEach(() => {
-    server.clearHandlers()
-    ctMock.clear()
+  afterEach(async () => {
+    mswServer.resetHandlers()
+    await ctMock.clear()
   })
 
   test('my function', async () => {
-    ctMock.project().add('customer', customerFixture)
+    await ctMock.project().unsafeAdd('customer', customerFixture)
 
     const res = await myFunction()
 
     expect(res).toEqual(true)
   })
 })
+```
+
+## Custom storage backends
+
+By default, `CommercetoolsMock` uses an in-memory storage backend. You can
+provide a custom storage backend by extending `AbstractStorage` and passing it
+via the `storage` option:
+
+```typescript
+import {
+  CommercetoolsMock,
+  AbstractStorage,
+  InMemoryStorage,
+} from '@labdigital/commercetools-mock'
+
+// Use the default in-memory storage (same as not passing the option)
+const ctMock = new CommercetoolsMock({
+  defaultProjectKey: 'my-project',
+  storage: new InMemoryStorage(),
+})
+
+// Or implement your own storage backend by extending AbstractStorage
+// All methods must return Promises.
 ```
 
 ## Contributing

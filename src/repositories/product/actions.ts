@@ -53,7 +53,7 @@ type ProductUpdateHandlerMethod<T> = (
 	context: RepositoryContext,
 	resource: Writable<Product>,
 	action: T,
-) => void;
+) => void | Promise<void>;
 
 type ProductUpdateActions = Partial<{
 	[P in ProductUpdateAction as P["action"]]: ProductUpdateHandlerMethod<P>;
@@ -123,11 +123,9 @@ export class ProductUpdateHandler
 			addImg(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
-	addPrice(
+	async addPrice(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{ variantId, sku, price, staged }: ProductAddPriceAction,
@@ -165,7 +163,7 @@ export class ProductUpdateHandler
 		};
 
 		// Pre-creating the price object ensures consistency between staged and current versions
-		const priceToAdd = priceFromDraft(context, this._storage, price);
+		const priceToAdd = await priceFromDraft(context, this._storage, price);
 
 		// If true, only the staged Attribute is set. If false, both current and
 		// staged Attribute is set.  Default is true
@@ -181,19 +179,17 @@ export class ProductUpdateHandler
 			addVariantPrice(resource.masterData.current, priceToAdd);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
-	addToCategory(
+	async addToCategory(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{ category, staged, orderHint }: ProductAddToCategoryAction,
 	) {
-		const addCategory = (data: Writable<ProductData>) => {
+		const addCategory = async (data: Writable<ProductData>) => {
 			if (category) {
 				data.categories.push(
-					getReferenceFromResourceIdentifier<CategoryReference>(
+					await getReferenceFromResourceIdentifier<CategoryReference>(
 						category,
 						context.projectKey,
 						this._storage,
@@ -213,17 +209,15 @@ export class ProductUpdateHandler
 
 		const onlyStaged = staged !== undefined ? staged : true;
 
-		addCategory(resource.masterData.staged);
+		await addCategory(resource.masterData.staged);
 
 		if (!onlyStaged) {
-			addCategory(resource.masterData.current);
+			await addCategory(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
-	addVariant(
+	async addVariant(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{
@@ -254,7 +248,7 @@ export class ProductUpdateHandler
 			(max, element) => (element.id > max ? element.id : max),
 			0,
 		);
-		const variant = variantFromDraft(
+		const variant = await variantFromDraft(
 			context,
 			this._storage,
 			maxId + 1,
@@ -268,8 +262,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.variants.push(variant);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	changeMasterVariant(
@@ -312,8 +304,6 @@ export class ProductUpdateHandler
 			setMaster(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	changeName(
@@ -327,7 +317,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.name = name;
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
 	changePrice(
@@ -393,8 +382,6 @@ export class ProductUpdateHandler
 			changeVariantPrice(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	changeSlug(
@@ -408,7 +395,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.slug = slug;
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
 	moveImageToPosition(
@@ -488,8 +474,6 @@ export class ProductUpdateHandler
 			moveImg(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	publish(
@@ -502,15 +486,15 @@ export class ProductUpdateHandler
 		checkForStagedChanges(resource);
 	}
 
-	removeFromCategory(
+	async removeFromCategory(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{ category, staged }: ProductRemoveFromCategoryAction,
 	) {
-		const removeCategory = (data: Writable<ProductData>) => {
+		const removeCategory = async (data: Writable<ProductData>) => {
 			if (category) {
 				const resolvedCategory =
-					getReferenceFromResourceIdentifier<CategoryReference>(
+					await getReferenceFromResourceIdentifier<CategoryReference>(
 						category,
 						context.projectKey,
 						this._storage,
@@ -558,14 +542,12 @@ export class ProductUpdateHandler
 		};
 
 		const onlyStaged = staged !== undefined ? staged : true;
-		removeCategory(resource.masterData.staged);
+		await removeCategory(resource.masterData.staged);
 
 		if (!onlyStaged) {
-			removeCategory(resource.masterData.current);
+			await removeCategory(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	removeImage(
@@ -625,8 +607,6 @@ export class ProductUpdateHandler
 			removeImg(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	removePrice(
@@ -687,8 +667,6 @@ export class ProductUpdateHandler
 			removeVariantPrice(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	removeVariant(
@@ -732,8 +710,6 @@ export class ProductUpdateHandler
 			removeVariant(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	setAttribute(
@@ -793,8 +769,6 @@ export class ProductUpdateHandler
 			setAttr(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	setAttributeInAllVariants(
@@ -853,8 +827,6 @@ export class ProductUpdateHandler
 			setAttrInAllVariants(resource.masterData.current);
 		}
 		checkForStagedChanges(resource);
-
-		return resource;
 	}
 
 	setDescription(
@@ -869,7 +841,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.description = description;
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
 	setKey(
@@ -878,7 +849,6 @@ export class ProductUpdateHandler
 		{ key }: ProductSetKeyAction,
 	) {
 		resource.key = key;
-		return resource;
 	}
 
 	setMetaDescription(
@@ -892,7 +862,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.metaDescription = metaDescription;
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
 	setMetaKeywords(
@@ -906,7 +875,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.metaKeywords = metaKeywords;
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
 	setMetaTitle(
@@ -920,7 +888,6 @@ export class ProductUpdateHandler
 			resource.masterData.current.metaTitle = metaTitle;
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
 	setProductPriceCustomField(
@@ -963,22 +930,21 @@ export class ProductUpdateHandler
 			);
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
-	setProductPriceCustomType(
+	async setProductPriceCustomType(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{ type, fields, staged, priceId }: ProductSetProductPriceCustomTypeAction,
 	) {
-		const updatePriceCustomType = (data: Writable<ProductData>) => {
+		const updatePriceCustomType = async (data: Writable<ProductData>) => {
 			const price = [data.masterVariant, ...(data.variants ?? [])]
 				.flatMap((variant) => variant.prices ?? [])
 				.find((price) => price.id === priceId);
 
 			if (price) {
 				if (type) {
-					price.custom = createCustomFields(
+					price.custom = await createCustomFields(
 						{ type, fields },
 						context.projectKey,
 						this._storage,
@@ -998,21 +964,20 @@ export class ProductUpdateHandler
 			return data;
 		};
 
-		resource.masterData.staged = updatePriceCustomType(
+		resource.masterData.staged = await updatePriceCustomType(
 			resource.masterData.staged,
 		);
 
 		const onlyStaged = staged !== undefined ? staged : true;
 		if (!onlyStaged) {
-			resource.masterData.current = updatePriceCustomType(
+			resource.masterData.current = await updatePriceCustomType(
 				resource.masterData.current,
 			);
 		}
 		checkForStagedChanges(resource);
-		return resource;
 	}
 
-	setTaxCategory(
+	async setTaxCategory(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{ taxCategory }: ProductSetTaxCategoryAction,
@@ -1020,7 +985,7 @@ export class ProductUpdateHandler
 		let taxCategoryReference: TaxCategoryReference | undefined;
 		if (taxCategory) {
 			taxCategoryReference =
-				getReferenceFromResourceIdentifier<TaxCategoryReference>(
+				await getReferenceFromResourceIdentifier<TaxCategoryReference>(
 					taxCategory,
 					context.projectKey,
 					this._storage,
@@ -1037,10 +1002,9 @@ export class ProductUpdateHandler
 			);
 		}
 		resource.taxCategory = taxCategoryReference;
-		return resource;
 	}
 
-	transitionState(
+	async transitionState(
 		context: RepositoryContext,
 		resource: Writable<Product>,
 		{ state, force }: ProductTransitionStateAction,
@@ -1048,7 +1012,7 @@ export class ProductUpdateHandler
 		let productStateReference: StateReference | undefined;
 		if (state) {
 			productStateReference =
-				getReferenceFromResourceIdentifier<StateReference>(
+				await getReferenceFromResourceIdentifier<StateReference>(
 					state,
 					context.projectKey,
 					this._storage,
@@ -1064,8 +1028,6 @@ export class ProductUpdateHandler
 				400,
 			);
 		}
-
-		return resource;
 	}
 
 	unpublish(

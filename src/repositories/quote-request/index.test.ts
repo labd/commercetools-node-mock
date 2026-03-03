@@ -132,10 +132,10 @@ describe("QuoteRequest repository", () => {
 			},
 		};
 
-		storage.add("dummy", "cart", cart);
+		await storage.add("dummy", "cart", cart);
 		const ctx = { projectKey: "dummy" };
 
-		const result = repository.create(ctx, {
+		const result = await repository.create(ctx, {
 			cart: {
 				id: cart.id,
 				typeId: "cart",
@@ -144,7 +144,7 @@ describe("QuoteRequest repository", () => {
 		});
 		expect(result.cart?.id).toBe(cart.id);
 
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 
 		expect(result.billingAddress).toEqual(cart.billingAddress);

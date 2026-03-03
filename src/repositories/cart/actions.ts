@@ -95,7 +95,7 @@ export class CartUpdateHandler
 		}
 	}
 
-	addLineItem(
+	async addLineItem(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{
@@ -112,14 +112,19 @@ export class CartUpdateHandler
 
 		if (productId && variantId) {
 			// Fetch product and variant by ID
-			product = this._storage.get(context.projectKey, "product", productId, {});
+			product = await this._storage.get(
+				context.projectKey,
+				"product",
+				productId,
+				{},
+			);
 		} else if (sku) {
 			// Fetch product and variant by SKU
-			const items = this._storage.query(context.projectKey, "product", {
+			const items = (await this._storage.query(context.projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			}) as ProductPagedQueryResponse;
+			})) as ProductPagedQueryResponse;
 
 			if (items.count === 1) {
 				product = items.results[0];
@@ -212,7 +217,11 @@ export class CartUpdateHandler
 				lineItemMode: "Standard",
 				priceMode: "Platform",
 				state: [],
-				custom: createCustomFields(custom, context.projectKey, this._storage),
+				custom: await createCustomFields(
+					custom,
+					context.projectKey,
+					this._storage,
+				),
 			});
 		}
 
@@ -286,12 +295,12 @@ export class CartUpdateHandler
 		// and prices on related Products have changed in the meanwhile.
 	}
 
-	addDiscountCode(
+	async addDiscountCode(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ code }: CartAddDiscountCodeAction,
 	) {
-		const info = createDiscountCodeInfoFromCode(
+		const info = await createDiscountCodeInfoFromCode(
 			context.projectKey,
 			this._storage,
 			code,
@@ -349,7 +358,7 @@ export class CartUpdateHandler
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 	}
 
-	addCustomLineItem(
+	async addCustomLineItem(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{
@@ -363,7 +372,7 @@ export class CartUpdateHandler
 			key,
 		}: CartAddCustomLineItemAction,
 	) {
-		const customLineItem = createCustomLineItemFromDraft(
+		const customLineItem = await createCustomLineItemFromDraft(
 			context.projectKey,
 			{ money, name, slug, quantity, taxCategory, custom, priceMode, key },
 			this._storage,
@@ -545,7 +554,7 @@ export class CartUpdateHandler
 		);
 	}
 
-	setBillingAddressCustomType(
+	async setBillingAddressCustomType(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		custom: CartSetBillingAddressCustomTypeAction,
@@ -562,7 +571,7 @@ export class CartUpdateHandler
 			return;
 		}
 
-		const resolvedType = this._storage.getByResourceIdentifier<"type">(
+		const resolvedType = await this._storage.getByResourceIdentifier<"type">(
 			context.projectKey,
 			custom.type,
 		);
@@ -619,7 +628,7 @@ export class CartUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomShippingMethod(
+	async setCustomShippingMethod(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{
@@ -637,7 +646,7 @@ export class CartUpdateHandler
 		}
 
 		const tax = taxCategory
-			? this._storage.getByResourceIdentifier<"tax-category">(
+			? await this._storage.getByResourceIdentifier<"tax-category">(
 					context.projectKey,
 					taxCategory,
 				)
@@ -660,12 +669,12 @@ export class CartUpdateHandler
 		};
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ type, fields }: CartSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDirectDiscounts(
@@ -720,7 +729,7 @@ export class CartUpdateHandler
 		lineItem.custom.fields[name] = value;
 	}
 
-	setLineItemCustomType(
+	async setLineItemCustomType(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ lineItemId, lineItemKey, type, fields }: CartSetLineItemCustomTypeAction,
@@ -744,7 +753,7 @@ export class CartUpdateHandler
 		if (!type) {
 			lineItem.custom = undefined;
 		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
+			const resolvedType = await this._storage.getByResourceIdentifier(
 				context.projectKey,
 				type,
 			);
@@ -875,7 +884,7 @@ export class CartUpdateHandler
 		resource.locale = locale;
 	}
 
-	setShippingAddress(
+	async setShippingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ address }: CartSetShippingAddressAction,
@@ -887,7 +896,7 @@ export class CartUpdateHandler
 
 		let custom: CustomFields | undefined;
 		if ((address as Address & AddressDraft).custom) {
-			custom = createCustomFields(
+			custom = await createCustomFields(
 				(address as Address & AddressDraft).custom,
 				context.projectKey,
 				this._storage,
@@ -900,7 +909,7 @@ export class CartUpdateHandler
 		};
 	}
 
-	setShippingAddressCustomType(
+	async setShippingAddressCustomType(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		custom: CartSetShippingAddressCustomTypeAction,
@@ -917,7 +926,7 @@ export class CartUpdateHandler
 			return;
 		}
 
-		const resolvedType = this._storage.getByResourceIdentifier<"type">(
+		const resolvedType = await this._storage.getByResourceIdentifier<"type">(
 			context.projectKey,
 			custom.type,
 		);
@@ -941,13 +950,13 @@ export class CartUpdateHandler
 		};
 	}
 
-	setShippingMethod(
+	async setShippingMethod(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ shippingMethod }: CartSetShippingMethodAction,
 	) {
 		if (shippingMethod) {
-			resource.shippingInfo = this.repository.createShippingInfo(
+			resource.shippingInfo = await this.repository.createShippingInfo(
 				context,
 				resource,
 				shippingMethod,
@@ -977,7 +986,7 @@ export class CartUpdateHandler
 		resource.shippingAddress.custom.fields[name] = value;
 	}
 
-	removeShippingMethod(
+	async removeShippingMethod(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ shippingKey }: CartRemoveShippingMethodAction,
@@ -986,7 +995,7 @@ export class CartUpdateHandler
 			return;
 		}
 		const shippingMethod =
-			this._storage.getByResourceIdentifier<"shipping-method">(
+			await this._storage.getByResourceIdentifier<"shipping-method">(
 				context.projectKey,
 				{
 					typeId: "shipping-method",

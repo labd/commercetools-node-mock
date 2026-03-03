@@ -19,8 +19,8 @@ describe("Order repository", () => {
 	};
 	const repository = new OrderRepository(config);
 
-	beforeEach(() => {
-		storage.clear();
+	beforeEach(async () => {
+		await storage.clear();
 	});
 
 	test("create from cart", async () => {
@@ -143,10 +143,10 @@ describe("Order repository", () => {
 			},
 		};
 
-		storage.add("dummy", "cart", cart);
+		await storage.add("dummy", "cart", cart);
 		const ctx = { projectKey: "dummy" };
 
-		const result = repository.create(ctx, {
+		const result = await repository.create(ctx, {
 			cart: {
 				id: cart.id,
 				typeId: "cart",
@@ -155,7 +155,7 @@ describe("Order repository", () => {
 		});
 		expect(result.cart?.id).toBe(cart.id);
 
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 
 		expect(result.orderNumber).not.toBeUndefined();
@@ -192,7 +192,7 @@ describe("Order repository", () => {
 		expect(result.shippingInfo).toEqual(cart.shippingInfo);
 	});
 
-	test("should calculate taxed price when creating order from cart", () => {
+	test("should calculate taxed price when creating order from cart", async () => {
 		const cart: Cart = {
 			...getBaseResourceProperties(),
 			id: "cart-with-taxed-items",
@@ -279,9 +279,9 @@ describe("Order repository", () => {
 			inventoryMode: "None",
 		};
 
-		storage.add("dummy", "cart", cart);
+		await storage.add("dummy", "cart", cart);
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, {
+		const result = await repository.create(ctx, {
 			cart: { id: cart.id, typeId: "cart" },
 			version: cart.version,
 		});
@@ -293,7 +293,7 @@ describe("Order repository", () => {
 	});
 
 	test("create order in store", async () => {
-		storage.add("dummy", "store", {
+		await storage.add("dummy", "store", {
 			...getBaseResourceProperties(),
 			id: "store-123",
 			key: "testStore",
@@ -305,7 +305,7 @@ describe("Order repository", () => {
 			productSelections: [],
 		});
 
-		storage.add("dummy", "business-unit", {
+		await storage.add("dummy", "business-unit", {
 			...getBaseResourceProperties(),
 			id: "business-unit-123",
 			unitType: "Company",
@@ -325,7 +325,7 @@ describe("Order repository", () => {
 			billingAddressIds: [],
 		});
 
-		storage.add("dummy", "customer", {
+		await storage.add("dummy", "customer", {
 			...getBaseResourceProperties(),
 			id: "customer-123",
 			email: "test@example.com",
@@ -367,7 +367,7 @@ describe("Order repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy", storeKey: "testStore" };
-		const result = repository.import(ctx, draft);
+		const result = await repository.import(ctx, draft);
 
 		expect(result.orderNumber).toBe("100000002");
 		expect(result.store?.key).toBe("testStore");
@@ -379,8 +379,8 @@ describe("Order repository", () => {
 		expect(result.paymentState).toBe("Paid");
 	});
 
-	test("should calculate taxed price when importing order", () => {
-		storage.add("dummy", "product", {
+	test("should calculate taxed price when importing order", async () => {
+		await storage.add("dummy", "product", {
 			...getBaseResourceProperties(),
 			id: "product-import",
 			productType: {
@@ -455,7 +455,7 @@ describe("Order repository", () => {
 			customLineItems: [],
 		};
 
-		const result = repository.import({ projectKey: "dummy" }, draft);
+		const result = await repository.import({ projectKey: "dummy" }, draft);
 		expect(result.taxedPrice).toBeDefined();
 		expect(result.taxedPrice?.totalNet.centAmount).toBe(1000);
 		expect(result.taxedPrice?.totalGross.centAmount).toBe(1210);
@@ -463,7 +463,7 @@ describe("Order repository", () => {
 	});
 
 	test("import exiting product", async () => {
-		storage.add("dummy", "product", {
+		await storage.add("dummy", "product", {
 			id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
 			masterData: {
 				// @ts-expect-error
@@ -568,7 +568,7 @@ describe("Order repository", () => {
 			],
 		};
 
-		repository.import({ projectKey: "dummy" }, draft);
+		await repository.import({ projectKey: "dummy" }, draft);
 	});
 	/*
   test('import non exiting product', async () => {
@@ -702,7 +702,7 @@ describe("Order repository", () => {
   */
 
 	describe("shippingInfo functionality", () => {
-		test("createShippingInfo creates basic shipping info", () => {
+		test("createShippingInfo creates basic shipping info", async () => {
 			// Create a zone for Netherlands
 			const zone = {
 				...getBaseResourceProperties(),
@@ -762,9 +762,9 @@ describe("Order repository", () => {
 				],
 			};
 
-			storage.add("dummy", "zone", zone);
-			storage.add("dummy", "shipping-method", shippingMethod);
-			storage.add("dummy", "tax-category", taxCategory);
+			await storage.add("dummy", "zone", zone);
+			await storage.add("dummy", "shipping-method", shippingMethod);
+			await storage.add("dummy", "tax-category", taxCategory);
 
 			const order: Order = {
 				...getBaseResourceProperties(),
@@ -800,7 +800,7 @@ describe("Order repository", () => {
 			};
 
 			const ctx = { projectKey: "dummy" };
-			const result = repository.createShippingInfo(ctx, order, {
+			const result = await repository.createShippingInfo(ctx, order, {
 				typeId: "shipping-method",
 				id: "shipping-method-123",
 			});
@@ -815,7 +815,7 @@ describe("Order repository", () => {
 			expect(result.taxCategory?.id).toBe("tax-category-123");
 		});
 
-		test("import order with shippingInfo", () => {
+		test("import order with shippingInfo", async () => {
 			// Create required resources
 			const zone = {
 				...getBaseResourceProperties(),
@@ -874,9 +874,9 @@ describe("Order repository", () => {
 				],
 			};
 
-			storage.add("dummy", "zone", zone);
-			storage.add("dummy", "shipping-method", shippingMethod);
-			storage.add("dummy", "tax-category", taxCategory);
+			await storage.add("dummy", "zone", zone);
+			await storage.add("dummy", "shipping-method", shippingMethod);
+			await storage.add("dummy", "tax-category", taxCategory);
 
 			const draft: OrderImportDraft = {
 				orderNumber: "imported-order-123",
@@ -943,7 +943,7 @@ describe("Order repository", () => {
 			};
 
 			const ctx = { projectKey: "dummy" };
-			const result = repository.import(ctx, draft);
+			const result = await repository.import(ctx, draft);
 
 			expect(result.shippingInfo).toBeDefined();
 			expect(result.shippingInfo?.shippingMethodName).toBe("Standard Shipping");
@@ -957,7 +957,7 @@ describe("Order repository", () => {
 			expect(result.shippingInfo?.deliveries).toEqual([]);
 		});
 
-		test("createShippingInfo throws error for non-existent shipping method", () => {
+		test("createShippingInfo throws error for non-existent shipping method", async () => {
 			const order: Order = {
 				...getBaseResourceProperties(),
 				orderNumber: "order-456",
@@ -994,12 +994,12 @@ describe("Order repository", () => {
 
 			const ctx = { projectKey: "dummy" };
 
-			expect(() => {
+			await expect(
 				repository.createShippingInfo(ctx, order, {
 					typeId: "shipping-method",
 					id: "non-existent-shipping-method",
-				});
-			}).toThrow(
+				}),
+			).rejects.toThrow(
 				/The shipping method with ID 'non-existent-shipping-method' is not allowed/,
 			);
 		});

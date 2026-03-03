@@ -60,19 +60,22 @@ export class ProductProjectionSearch {
 		this._reviewStatisticsService = new ReviewStatisticsService(config.storage);
 	}
 
-	search(
+	async search(
 		projectKey: string,
 		params: ProductProjectionSearchParams,
-	): ProductProjectionPagedSearchResponse {
-		let resources = this._storage
-			.all(projectKey, "product")
-			.map((r) => this.transform(r, params.staged ?? false, projectKey))
-			.filter((p) => {
-				if (!(params.staged ?? false)) {
-					return p.published;
-				}
-				return true;
-			});
+	): Promise<ProductProjectionPagedSearchResponse> {
+		const allProducts = await this._storage.all(projectKey, "product");
+		let resources = await Promise.all(
+			allProducts.map((r) =>
+				this.transform(r, params.staged ?? false, projectKey),
+			),
+		);
+		resources = resources.filter((p) => {
+			if (!(params.staged ?? false)) {
+				return p.published;
+			}
+			return true;
+		});
 
 		const markMatchingVariant = params.markMatchingVariants ?? false;
 
@@ -127,8 +130,10 @@ export class ProductProjectionSearch {
 
 		// Expand the resources
 		if (params.expand !== undefined) {
-			resources = resources.map((resource) =>
-				this._storage.expand(projectKey, resource, params.expand),
+			resources = await Promise.all(
+				resources.map((resource) =>
+					this._storage.expand(projectKey, resource, params.expand),
+				),
 			);
 		}
 
@@ -150,18 +155,18 @@ export class ProductProjectionSearch {
 		};
 	}
 
-	transform(
+	async transform(
 		product: Product,
 		staged: boolean,
 		projectKey: string,
-	): ProductProjection {
+	): Promise<ProductProjection> {
 		const obj = !staged
 			? product.masterData.current
 			: product.masterData.staged;
 
 		// Calculate review statistics for this product
 		const reviewRatingStatistics =
-			this._reviewStatisticsService.calculateProductReviewStatistics(
+			await this._reviewStatisticsService.calculateProductReviewStatistics(
 				projectKey,
 				product.id,
 			);

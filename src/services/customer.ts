@@ -31,7 +31,7 @@ export class CustomerService extends AbstractService {
 		parent.post("/email/confirm", this.emailTokenConfirm.bind(this));
 	}
 
-	post(
+	async post(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -44,11 +44,11 @@ export class CustomerService extends AbstractService {
 			validateDraft(request.body, this.repository.draftSchema);
 		}
 
-		const resource = this.repository.create(
+		const resource = await this.repository.create(
 			getRepositoryContext(request),
 			request.body,
 		);
-		const expanded = this._expandWithId(request, resource.id);
+		const expanded = await this._expandWithId(request, resource.id);
 
 		const result: CustomerSignInResult = {
 			customer: expanded,
@@ -56,14 +56,14 @@ export class CustomerService extends AbstractService {
 		return reply.status(this.createStatusCode).send(result);
 	}
 
-	passwordResetToken(
+	async passwordResetToken(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: CustomerCreatePasswordResetToken;
 		}>,
 		reply: FastifyReply,
 	) {
-		const customer = this.repository.passwordResetToken(
+		const customer = await this.repository.passwordResetToken(
 			getRepositoryContext(request),
 			request.body,
 		);
@@ -71,14 +71,14 @@ export class CustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	passwordReset(
+	async passwordReset(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: CustomerResetPassword;
 		}>,
 		reply: FastifyReply,
 	) {
-		const customer = this.repository.passwordReset(
+		const customer = await this.repository.passwordReset(
 			getRepositoryContext(request),
 			request.body,
 		);
@@ -86,7 +86,7 @@ export class CustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	emailToken(
+	async emailToken(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: CustomerCreateEmailToken;
@@ -95,18 +95,21 @@ export class CustomerService extends AbstractService {
 	) {
 		const body = request.body;
 		const id = body.id;
-		const token = this.repository.emailToken(getRepositoryContext(request), id);
+		const token = await this.repository.emailToken(
+			getRepositoryContext(request),
+			id,
+		);
 		return reply.status(200).send(token);
 	}
 
-	emailTokenConfirm(
+	async emailTokenConfirm(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: CustomerEmailVerify;
 		}>,
 		reply: FastifyReply,
 	) {
-		const customer = this.repository.emailTokenConfirm(
+		const customer = await this.repository.emailTokenConfirm(
 			getRepositoryContext(request),
 			request.body,
 		);

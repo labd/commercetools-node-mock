@@ -27,10 +27,10 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<"stand
 		this.draftSchema = StandalonePriceDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: StandalonePriceDraft,
-	): StandalonePrice {
+	): Promise<StandalonePrice> {
 		const resource: StandalonePrice = {
 			...getBaseResourceProperties(context.clientId),
 			active: draft.active ? draft.active : false,
@@ -46,7 +46,7 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<"stand
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
 	transformChannelReferenceDraft(

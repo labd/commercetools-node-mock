@@ -13,11 +13,11 @@ export class OrderSearch {
 		this._storage = config.storage;
 	}
 
-	search(
+	async search(
 		projectKey: string,
 		params: OrderSearchRequest,
-	): OrderPagedSearchResponse {
-		const orderResources = this._storage.all(projectKey, "order");
+	): Promise<OrderPagedSearchResponse> {
+		const orderResources = await this._storage.all(projectKey, "order");
 
 		// TODO: implement filtering based on params.query
 		const offset = params.offset || 0;

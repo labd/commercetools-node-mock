@@ -19,8 +19,8 @@ describe("MyCart", () => {
 		});
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("Create my cart", async () => {

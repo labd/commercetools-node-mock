@@ -12,7 +12,7 @@ import type {
 	ReviewSetTitleAction,
 	ReviewTransitionStateAction,
 } from "@commercetools/platform-sdk";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
@@ -24,105 +24,107 @@ describe("Review Repository", () => {
 	const repository = new ReviewRepository(config);
 
 	// Add required dependencies for testing
-	storage.add("dummy", "product", {
-		...getBaseResourceProperties(),
-		id: "product-123",
-		key: "test-product",
-		productType: {
-			typeId: "product-type",
-			id: "product-type-123",
-		},
-		masterData: {
-			current: {
-				name: { "en-US": "Test Product" },
-				slug: { "en-US": "test-product" },
-				attributes: [],
-				categories: [],
-				masterVariant: {
-					id: 1,
-					sku: "test-sku",
-					prices: [],
+	beforeAll(async () => {
+		await storage.add("dummy", "product", {
+			...getBaseResourceProperties(),
+			id: "product-123",
+			key: "test-product",
+			productType: {
+				typeId: "product-type",
+				id: "product-type-123",
+			},
+			masterData: {
+				current: {
+					name: { "en-US": "Test Product" },
+					slug: { "en-US": "test-product" },
+					attributes: [],
+					categories: [],
+					masterVariant: {
+						id: 1,
+						sku: "test-sku",
+						prices: [],
+					},
+					variants: [],
+					searchKeywords: {},
 				},
-				variants: [],
-				searchKeywords: {},
-			},
-			published: true,
-			staged: {
-				name: { "en-US": "Test Product" },
-				slug: { "en-US": "test-product" },
-				attributes: [],
-				categories: [],
-				masterVariant: {
-					id: 1,
-					sku: "test-sku",
-					prices: [],
+				published: true,
+				staged: {
+					name: { "en-US": "Test Product" },
+					slug: { "en-US": "test-product" },
+					attributes: [],
+					categories: [],
+					masterVariant: {
+						id: 1,
+						sku: "test-sku",
+						prices: [],
+					},
+					variants: [],
+					searchKeywords: {},
 				},
-				variants: [],
-				searchKeywords: {},
+				hasStagedChanges: false,
 			},
-			hasStagedChanges: false,
-		},
+		});
+
+		await storage.add("dummy", "channel", {
+			...getBaseResourceProperties(),
+			id: "channel-123",
+			key: "test-channel",
+			name: { "en-US": "Test Channel" },
+			roles: ["ProductDistribution"],
+		});
+
+		await storage.add("dummy", "customer", {
+			...getBaseResourceProperties(),
+			id: "customer-123",
+			email: "test@example.com",
+			firstName: "John",
+			lastName: "Doe",
+			password: "hashed-password",
+			addresses: [],
+			defaultShippingAddressId: "",
+			defaultBillingAddressId: "",
+			customerNumber: "",
+			externalId: "",
+			key: "",
+			stores: [],
+			authenticationMode: "Password" as const,
+			isEmailVerified: false,
+			shippingAddressIds: [],
+			billingAddressIds: [],
+			customerGroupAssignments: [],
+		});
+
+		await storage.add("dummy", "state", {
+			...getBaseResourceProperties(),
+			id: "state-123",
+			key: "approved",
+			type: "ReviewState",
+			name: { "en-US": "Approved" },
+			roles: ["ReviewIncludedInStatistics"],
+			transitions: [],
+			initial: false,
+			builtIn: false,
+		});
+
+		await storage.add("dummy", "type", {
+			...getBaseResourceProperties(),
+			id: "type-123",
+			key: "review-type",
+			name: { "en-US": "Review Type" },
+			resourceTypeIds: ["review"],
+			fieldDefinitions: [
+				{
+					name: "helpfulVotes",
+					label: { "en-US": "Helpful Votes" },
+					required: false,
+					type: { name: "Number" },
+					inputHint: "SingleLine",
+				},
+			],
+		});
 	});
 
-	storage.add("dummy", "channel", {
-		...getBaseResourceProperties(),
-		id: "channel-123",
-		key: "test-channel",
-		name: { "en-US": "Test Channel" },
-		roles: ["ProductDistribution"],
-	});
-
-	storage.add("dummy", "customer", {
-		...getBaseResourceProperties(),
-		id: "customer-123",
-		email: "test@example.com",
-		firstName: "John",
-		lastName: "Doe",
-		password: "hashed-password",
-		addresses: [],
-		defaultShippingAddressId: "",
-		defaultBillingAddressId: "",
-		customerNumber: "",
-		externalId: "",
-		key: "",
-		stores: [],
-		authenticationMode: "Password" as const,
-		isEmailVerified: false,
-		shippingAddressIds: [],
-		billingAddressIds: [],
-		customerGroupAssignments: [],
-	});
-
-	storage.add("dummy", "state", {
-		...getBaseResourceProperties(),
-		id: "state-123",
-		key: "approved",
-		type: "ReviewState",
-		name: { "en-US": "Approved" },
-		roles: ["ReviewIncludedInStatistics"],
-		transitions: [],
-		initial: false,
-		builtIn: false,
-	});
-
-	storage.add("dummy", "type", {
-		...getBaseResourceProperties(),
-		id: "type-123",
-		key: "review-type",
-		name: { "en-US": "Review Type" },
-		resourceTypeIds: ["review"],
-		fieldDefinitions: [
-			{
-				name: "helpfulVotes",
-				label: { "en-US": "Helpful Votes" },
-				required: false,
-				type: { name: "Number" },
-				inputHint: "SingleLine",
-			},
-		],
-	});
-
-	test("create review with product target", () => {
+	test("create review with product target", async () => {
 		const draft: ReviewDraft = {
 			key: "product-review-1",
 			authorName: "John Doe",
@@ -136,7 +138,7 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -150,12 +152,12 @@ describe("Review Repository", () => {
 		expect(result.includedInStatistics).toBe(true);
 
 		// Test that the review is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create review with channel target", () => {
+	test("create review with channel target", async () => {
 		const draft: ReviewDraft = {
 			key: "channel-review-1",
 			authorName: "Jane Smith",
@@ -169,14 +171,14 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.target?.typeId).toBe("channel");
 		expect(result.target?.id).toBe("channel-123");
 	});
 
-	test("create review with all optional fields", () => {
+	test("create review with all optional fields", async () => {
 		const draft: ReviewDraft = {
 			key: "full-review",
 			authorName: "Alice Johnson",
@@ -205,7 +207,7 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.locale).toBe(draft.locale);
@@ -214,7 +216,7 @@ describe("Review Repository", () => {
 		expect(result.custom?.fields.helpfulVotes).toBe(10);
 	});
 
-	test("create review fails without target", () => {
+	test("create review fails without target", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Bob Wilson",
 			title: "No target review",
@@ -224,12 +226,12 @@ describe("Review Repository", () => {
 
 		const ctx = { projectKey: "dummy" };
 
-		expect(() => {
-			repository.create(ctx, draft);
-		}).toThrow("Missing target");
+		await expect(repository.create(ctx, draft)).rejects.toThrow(
+			"Missing target",
+		);
 	});
 
-	test("update review - setAuthorName", () => {
+	test("update review - setAuthorName", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Original Author",
 			title: "Test Review",
@@ -241,9 +243,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -259,7 +261,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setTitle", () => {
+	test("update review - setTitle", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Original Title",
@@ -271,9 +273,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -289,7 +291,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setText", () => {
+	test("update review - setText", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -302,9 +304,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -320,7 +322,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setRating", () => {
+	test("update review - setRating", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -332,9 +334,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -350,7 +352,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setLocale", () => {
+	test("update review - setLocale", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -362,9 +364,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -380,7 +382,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setKey", () => {
+	test("update review - setKey", async () => {
 		const draft: ReviewDraft = {
 			key: "original-key",
 			authorName: "Test Author",
@@ -393,9 +395,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -411,7 +413,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setCustomer", () => {
+	test("update review - setCustomer", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -423,9 +425,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -444,7 +446,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setTarget", () => {
+	test("update review - setTarget", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -456,9 +458,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -478,7 +480,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - transitionState", () => {
+	test("update review - transitionState", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -490,9 +492,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -511,7 +513,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("update review - setCustomType", () => {
+	test("update review - setCustomType", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -523,10 +525,10 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
 		// Set custom type
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -549,7 +551,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 
 		// Remove custom type
-		const result2 = repository.processUpdateActions(
+		const result2 = await repository.processUpdateActions(
 			ctx,
 			result,
 			result.version,
@@ -564,7 +566,7 @@ describe("Review Repository", () => {
 		expect(result2.version).toBe(result.version + 1);
 	});
 
-	test("update review - setCustomField", () => {
+	test("update review - setCustomField", async () => {
 		const draft: ReviewDraft = {
 			authorName: "Test Author",
 			title: "Test Review",
@@ -585,9 +587,9 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			review,
 			review.version,
@@ -604,7 +606,7 @@ describe("Review Repository", () => {
 		expect(result.version).toBe(review.version + 1);
 	});
 
-	test("get and delete review", () => {
+	test("get and delete review", async () => {
 		const draft: ReviewDraft = {
 			key: "delete-test",
 			authorName: "Test Author",
@@ -617,25 +619,25 @@ describe("Review Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const review = repository.create(ctx, draft);
+		const review = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, review.id);
+		const retrieved = await repository.get(ctx, review.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(review.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, review.key!);
+		const retrievedByKey = await repository.getByKey(ctx, review.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(review.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, review.id);
+		const deleted = await repository.delete(ctx, review.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(review.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, review.id);
+		const notFound = await repository.get(ctx, review.id);
 		expect(notFound).toBeNull();
 	});
 });

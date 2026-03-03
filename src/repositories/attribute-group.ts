@@ -25,10 +25,10 @@ export class AttributeGroupRepository extends AbstractResourceRepository<"attrib
 		this.draftSchema = AttributeGroupDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: AttributeGroupDraft,
-	): AttributeGroup {
+	): Promise<AttributeGroup> {
 		const resource: AttributeGroup = {
 			...getBaseResourceProperties(context.clientId),
 			name: draft.name,
@@ -36,7 +36,7 @@ export class AttributeGroupRepository extends AbstractResourceRepository<"attrib
 			key: draft.key,
 			attributes: draft.attributes,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 

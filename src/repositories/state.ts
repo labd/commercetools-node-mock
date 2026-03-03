@@ -31,22 +31,26 @@ export class StateRepository extends AbstractResourceRepository<"state"> {
 		this.draftSchema = StateDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: StateDraft): State {
-		const resource: State = {
-			...getBaseResourceProperties(context.clientId),
-			...draft,
-			builtIn: false,
-			initial: draft.initial || false,
-			transitions: (draft.transitions || []).map((t) =>
-				getReferenceFromResourceIdentifier(
+	async create(context: RepositoryContext, draft: StateDraft): Promise<State> {
+		const transitions = await Promise.all(
+			(draft.transitions || []).map((t) =>
+				getReferenceFromResourceIdentifier<StateReference>(
 					t,
 					context.projectKey,
 					this._storage,
 				),
 			),
+		);
+
+		const resource: State = {
+			...getBaseResourceProperties(context.clientId),
+			...draft,
+			builtIn: false,
+			initial: draft.initial || false,
+			transitions,
 		};
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 

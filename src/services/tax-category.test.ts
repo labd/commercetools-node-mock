@@ -7,8 +7,8 @@ const ctMock = new CommercetoolsMock();
 describe("Tax Category", () => {
 	const taxCategoryDraft = taxCategoryDraftFactory(ctMock);
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 	test("Create tax category", async () => {
 		const draft = taxCategoryDraft.build({

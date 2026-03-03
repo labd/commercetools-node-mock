@@ -14,7 +14,7 @@ describe("As Associate Repositories", () => {
 	const storage = new InMemoryStorage();
 	const config: Config = { storage, strict: false };
 
-	test("AsAssociateCartRepository can create and retrieve carts", () => {
+	test("AsAssociateCartRepository can create and retrieve carts", async () => {
 		const repository = new AsAssociateCartRepository(config);
 		const ctx = { projectKey: "test-project" };
 
@@ -26,23 +26,23 @@ describe("As Associate Repositories", () => {
 			taxCalculationMode: "UnitPriceLevel" as const,
 		};
 
-		const cart = repository.create(ctx, cartDraft);
+		const cart = await repository.create(ctx, cartDraft);
 		expect(cart.id).toBeDefined();
 		expect(cart.version).toBe(1);
 		expect(cart.totalPrice.currencyCode).toBe("EUR");
 
 		// Test query
-		const result = repository.query(ctx);
+		const result = await repository.query(ctx);
 		expect(result.count).toBe(1);
 		expect(result.results[0].id).toBe(cart.id);
 
 		// Test get
-		const retrieved = repository.get(ctx, cart.id);
+		const retrieved = await repository.get(ctx, cart.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(cart.id);
 	});
 
-	test("AsAssociateOrderRepository can create and retrieve orders", () => {
+	test("AsAssociateOrderRepository can create and retrieve orders", async () => {
 		const repository = new AsAssociateOrderRepository(config);
 		const ctx = { projectKey: "test-project" };
 
@@ -55,7 +55,7 @@ describe("As Associate Repositories", () => {
 			taxRoundingMode: "HalfEven" as const,
 			taxCalculationMode: "UnitPriceLevel" as const,
 		};
-		const cart = cartRepository.create(ctx, cartDraft);
+		const cart = await cartRepository.create(ctx, cartDraft);
 
 		const orderDraft = {
 			cart: {
@@ -65,29 +65,29 @@ describe("As Associate Repositories", () => {
 			version: cart.version,
 		};
 
-		const order = repository.create(ctx, orderDraft);
+		const order = await repository.create(ctx, orderDraft);
 		expect(order.id).toBeDefined();
 		expect(order.version).toBe(1);
 		expect(order.cart?.id).toBe(cart.id);
 
 		// Test query
-		const result = repository.query(ctx);
+		const result = await repository.query(ctx);
 		expect(result.count).toBe(1);
 		expect(result.results[0].id).toBe(order.id);
 
 		// Test get
-		const retrieved = repository.get(ctx, order.id);
+		const retrieved = await repository.get(ctx, order.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(order.id);
 	});
 
-	test("AsAssociateQuoteRequestRepository can create and retrieve quote requests", () => {
+	test("AsAssociateQuoteRequestRepository can create and retrieve quote requests", async () => {
 		const repository = new AsAssociateQuoteRequestRepository(config);
 		const ctx = { projectKey: "test-project" };
 
 		// Create a customer using the customer repository
 		const customerRepository = new CustomerRepository(config);
-		const customer = customerRepository.create(ctx, {
+		const customer = await customerRepository.create(ctx, {
 			email: "test@example.com",
 			password: "password123",
 			firstName: "John",
@@ -100,7 +100,7 @@ describe("As Associate Repositories", () => {
 			currency: "EUR",
 			customerId: customer.id,
 		};
-		const cart = cartRepository.create(ctx, cartDraft);
+		const cart = await cartRepository.create(ctx, cartDraft);
 
 		const quoteRequestDraft = {
 			cart: {
@@ -110,23 +110,23 @@ describe("As Associate Repositories", () => {
 			cartVersion: cart.version,
 		};
 
-		const quoteRequest = repository.create(ctx, quoteRequestDraft);
+		const quoteRequest = await repository.create(ctx, quoteRequestDraft);
 		expect(quoteRequest.id).toBeDefined();
 		expect(quoteRequest.version).toBe(1);
 		expect(quoteRequest.cart?.id).toBe(cart.id);
 
 		// Test query
-		const result = repository.query(ctx);
+		const result = await repository.query(ctx);
 		expect(result.count).toBe(1);
 		expect(result.results[0].id).toBe(quoteRequest.id);
 
 		// Test get
-		const retrieved = repository.get(ctx, quoteRequest.id);
+		const retrieved = await repository.get(ctx, quoteRequest.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(quoteRequest.id);
 	});
 
-	test("AsAssociateShoppingListRepository can create and retrieve shopping lists", () => {
+	test("AsAssociateShoppingListRepository can create and retrieve shopping lists", async () => {
 		const repository = new AsAssociateShoppingListRepository(config);
 		const ctx = { projectKey: "test-project" };
 
@@ -134,17 +134,17 @@ describe("As Associate Repositories", () => {
 			name: { "en-US": "My Shopping List" },
 		};
 
-		const shoppingList = repository.create(ctx, shoppingListDraft);
+		const shoppingList = await repository.create(ctx, shoppingListDraft);
 		expect(shoppingList.id).toBeDefined();
 		expect(shoppingList.version).toBe(1);
 
 		// Test query
-		const result = repository.query(ctx);
+		const result = await repository.query(ctx);
 		expect(result.count).toBe(1);
 		expect(result.results[0].id).toBe(shoppingList.id);
 
 		// Test get
-		const retrieved = repository.get(ctx, shoppingList.id);
+		const retrieved = await repository.get(ctx, shoppingList.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(shoppingList.id);
 	});

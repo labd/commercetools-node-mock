@@ -54,7 +54,7 @@ export class CustomObjectService extends AbstractService {
 		);
 	}
 
-	getWithContainer(
+	async getWithContainer(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -66,7 +66,7 @@ export class CustomObjectService extends AbstractService {
 		const limit = this._parseParam(query.limit);
 		const offset = this._parseParam(query.offset);
 
-		const result = this.repository.queryWithContainer(
+		const result = await this.repository.queryWithContainer(
 			getRepositoryContext(request),
 			params.container,
 			{
@@ -80,12 +80,12 @@ export class CustomObjectService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	getWithContainerAndKey(
+	async getWithContainerAndKey(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
-		const result = this.repository.getWithContainerAndKey(
+		const result = await this.repository.getWithContainerAndKey(
 			getRepositoryContext(request),
 			params.container,
 			params.key,
@@ -97,7 +97,7 @@ export class CustomObjectService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	createWithContainerAndKey(
+	async createWithContainerAndKey(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: CustomObjectDraft;
@@ -111,16 +111,19 @@ export class CustomObjectService extends AbstractService {
 			container: params.container,
 		};
 
-		const result = this.repository.create(getRepositoryContext(request), draft);
+		const result = await this.repository.create(
+			getRepositoryContext(request),
+			draft,
+		);
 		return reply.status(200).send(result);
 	}
 
-	deleteWithContainerAndKey(
+	async deleteWithContainerAndKey(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
 		const params = request.params;
-		const current = this.repository.getWithContainerAndKey(
+		const current = await this.repository.getWithContainerAndKey(
 			getRepositoryContext(request),
 			params.container,
 			params.key,
@@ -130,7 +133,7 @@ export class CustomObjectService extends AbstractService {
 			return reply.status(404).send({ statusCode: 404 });
 		}
 
-		const result = this.repository.delete(
+		const result = await this.repository.delete(
 			getRepositoryContext(request),
 			current.id,
 		);

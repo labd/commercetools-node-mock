@@ -20,7 +20,7 @@ export class ShippingMethodService extends AbstractService {
 		parent.get("/matching-cart", this.matchingCart.bind(this));
 	}
 
-	matchingCart(
+	async matchingCart(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -32,7 +32,7 @@ export class ShippingMethodService extends AbstractService {
 		if (!cartId) {
 			return reply.status(400).send();
 		}
-		const result = this.repository.matchingCart(
+		const result = await this.repository.matchingCart(
 			getRepositoryContext(request),
 			cartId,
 			{

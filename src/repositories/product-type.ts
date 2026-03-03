@@ -31,7 +31,10 @@ export class ProductTypeRepository extends AbstractResourceRepository<"product-t
 		this.draftSchema = ProductTypeDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ProductTypeDraft): ProductType {
+	async create(
+		context: RepositoryContext,
+		draft: ProductTypeDraft,
+	): Promise<ProductType> {
 		const resource: ProductType = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -42,7 +45,7 @@ export class ProductTypeRepository extends AbstractResourceRepository<"product-t
 			),
 		};
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 

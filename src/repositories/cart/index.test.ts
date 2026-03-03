@@ -21,7 +21,7 @@ describe("Cart repository", () => {
 	});
 
 	test("create cart in store", async () => {
-		storage.add("dummy", "product", {
+		await storage.add("dummy", "product", {
 			createdAt: "",
 			lastModifiedAt: "",
 			productType: {
@@ -84,7 +84,7 @@ describe("Cart repository", () => {
 			},
 		});
 
-		storage.add("dummy", "tax-category", {
+		await storage.add("dummy", "tax-category", {
 			...getBaseResourceProperties(),
 			id: "tax-category-id",
 			key: "standard-tax",
@@ -100,7 +100,7 @@ describe("Cart repository", () => {
 			],
 		});
 
-		storage.add("dummy", "zone", {
+		await storage.add("dummy", "zone", {
 			...getBaseResourceProperties(),
 			id: "nl-zone-id",
 			key: "nl-zone",
@@ -112,7 +112,7 @@ describe("Cart repository", () => {
 			],
 		});
 
-		storage.add("dummy", "shipping-method", {
+		await storage.add("dummy", "shipping-method", {
 			...getBaseResourceProperties(),
 			id: "shipping-method-id",
 			key: "standard-shipping",
@@ -240,10 +240,10 @@ describe("Cart repository", () => {
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
 
-		const result = repository.create(ctx, cart);
+		const result = await repository.create(ctx, cart);
 		expect(result.id).toBeDefined();
 
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 
 		expect(result.anonymousId).toEqual(cart.anonymousId);
@@ -282,18 +282,18 @@ describe("Cart repository", () => {
 		expect(result.shippingInfo?.taxRate?.name).toBe("Standard VAT");
 	});
 
-	test("create start with store from draft", () => {
+	test("create start with store from draft", async () => {
 		const ctx = { projectKey: "dummy" };
 		const draft: CartDraft = {
 			currency: "USD",
 			store: { key: "draftStore", typeId: "store" },
 		};
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 		expect(result.store).toEqual({ typeId: "store", key: "draftStore" });
 	});
 
 	test("create cart with business unit", async () => {
-		storage.add("dummy", "business-unit", {
+		await storage.add("dummy", "business-unit", {
 			...getBaseResourceProperties(),
 			unitType: "Company",
 			key: "business-unit-key",
@@ -323,7 +323,7 @@ describe("Cart repository", () => {
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
 
-		const result = repository.create(ctx, cart);
+		const result = await repository.create(ctx, cart);
 		expect(result.id).toBeDefined();
 
 		expect(result.businessUnit).toEqual({
@@ -332,8 +332,8 @@ describe("Cart repository", () => {
 		});
 	});
 
-	test("should calculate taxed price for custom line items with tax category", () => {
-		storage.add("dummy", "tax-category", {
+	test("should calculate taxed price for custom line items with tax category", async () => {
+		await storage.add("dummy", "tax-category", {
 			...getBaseResourceProperties(),
 			id: "tax-category-with-rate",
 			key: "vat-tax",
@@ -370,7 +370,7 @@ describe("Cart repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
-		const result = repository.create(ctx, cart);
+		const result = await repository.create(ctx, cart);
 
 		expect(result.customLineItems).toHaveLength(1);
 		const customLineItem = result.customLineItems[0];
@@ -388,8 +388,8 @@ describe("Cart repository", () => {
 		expect(customLineItem.taxRate?.country).toBe("NL");
 	});
 
-	test("should calculate taxed price for the cart", () => {
-		storage.add("dummy", "tax-category", {
+	test("should calculate taxed price for the cart", async () => {
+		await storage.add("dummy", "tax-category", {
 			...getBaseResourceProperties(),
 			id: "cart-tax-category",
 			key: "cart-vat-tax",
@@ -426,7 +426,7 @@ describe("Cart repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
-		const result = repository.create(ctx, cart);
+		const result = await repository.create(ctx, cart);
 
 		expect(result.taxedPrice).toBeDefined();
 		expect(result.taxedPrice?.totalNet.centAmount).toBe(1000);
@@ -442,8 +442,8 @@ describe("createShippingInfo", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new CartRepository(config);
 
-	beforeEach(() => {
-		storage.add("dummy", "tax-category", {
+	beforeEach(async () => {
+		await storage.add("dummy", "tax-category", {
 			...getBaseResourceProperties(),
 			id: "shipping-tax-category-id",
 			key: "shipping-tax",
@@ -459,7 +459,7 @@ describe("createShippingInfo", () => {
 			],
 		});
 
-		storage.add("dummy", "zone", {
+		await storage.add("dummy", "zone", {
 			...getBaseResourceProperties(),
 			id: "test-zone-id",
 			name: "Test Zone",
@@ -471,8 +471,8 @@ describe("createShippingInfo", () => {
 		});
 	});
 
-	test("should calculate shipping info", () => {
-		storage.add("dummy", "shipping-method", {
+	test("should calculate shipping info", async () => {
+		await storage.add("dummy", "shipping-method", {
 			...getBaseResourceProperties(),
 			id: "basic-shipping-id",
 			name: "Standard Shipping",
@@ -536,7 +536,7 @@ describe("createShippingInfo", () => {
 			id: "basic-shipping-id",
 		};
 
-		const result = repository.createShippingInfo(
+		const result = await repository.createShippingInfo(
 			context,
 			cart,
 			shippingMethodRef,
@@ -550,8 +550,8 @@ describe("createShippingInfo", () => {
 		expect(result.taxedPrice!.totalGross.centAmount).toBe(720);
 	});
 
-	test("should apply free shipping when cart total is above freeAbove threshold", () => {
-		storage.add("dummy", "shipping-method", {
+	test("should apply free shipping when cart total is above freeAbove threshold", async () => {
+		await storage.add("dummy", "shipping-method", {
 			...getBaseResourceProperties(),
 			id: "free-above-shipping-id",
 			key: "free-above-shipping",
@@ -623,7 +623,7 @@ describe("createShippingInfo", () => {
 			id: "free-above-shipping-id",
 		};
 
-		const result = repository.createShippingInfo(
+		const result = await repository.createShippingInfo(
 			context,
 			cart,
 			shippingMethodRef,
@@ -635,8 +635,8 @@ describe("createShippingInfo", () => {
 		expect(result.taxedPrice!.totalNet.centAmount).toBe(0);
 	});
 
-	test("should charge normal shipping when cart total is below freeAbove threshold", () => {
-		storage.add("dummy", "shipping-method", {
+	test("should charge normal shipping when cart total is below freeAbove threshold", async () => {
+		await storage.add("dummy", "shipping-method", {
 			...getBaseResourceProperties(),
 			id: "free-above-shipping-id-2",
 			key: "free-above-shipping-2",
@@ -708,7 +708,7 @@ describe("createShippingInfo", () => {
 			id: "free-above-shipping-id-2",
 		};
 
-		const result = repository.createShippingInfo(
+		const result = await repository.createShippingInfo(
 			context,
 			cart,
 			shippingMethodRef,
@@ -721,7 +721,7 @@ describe("createShippingInfo", () => {
 	});
 
 	test("create cart with discount code", async () => {
-		const code = storage.add("dummy", "discount-code", {
+		const code = await storage.add("dummy", "discount-code", {
 			...getBaseResourceProperties(),
 			code: "test-1234",
 			cartDiscounts: [],
@@ -738,7 +738,7 @@ describe("createShippingInfo", () => {
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
 
-		const result = repository.create(ctx, cart);
+		const result = await repository.create(ctx, cart);
 		expect(result.id).toBeDefined();
 
 		expect(result.discountCodes).toEqual([
@@ -752,7 +752,7 @@ describe("createShippingInfo", () => {
 		]);
 	});
 
-	test("create cart with non-existent discount code throws error", () => {
+	test("create cart with non-existent discount code throws error", async () => {
 		const cart: CartDraft = {
 			country: "NL",
 			currency: "EUR",
@@ -761,13 +761,13 @@ describe("createShippingInfo", () => {
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
 
-		expect(() => repository.create(ctx, cart)).toThrow(
+		await expect(repository.create(ctx, cart)).rejects.toThrow(
 			"The discount code 'non-existent-code' was not found.",
 		);
 	});
 
-	test("create cart with duplicate discount codes deduplicates them", () => {
-		const code = storage.add("dummy", "discount-code", {
+	test("create cart with duplicate discount codes deduplicates them", async () => {
+		const code = await storage.add("dummy", "discount-code", {
 			...getBaseResourceProperties(),
 			code: "duplicate-test",
 			cartDiscounts: [],
@@ -784,7 +784,7 @@ describe("createShippingInfo", () => {
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
 
-		const result = repository.create(ctx, cart);
+		const result = await repository.create(ctx, cart);
 		expect(result.discountCodes).toHaveLength(1);
 		expect(result.discountCodes).toEqual([
 			{
@@ -797,8 +797,8 @@ describe("createShippingInfo", () => {
 		]);
 	});
 
-	test("addDiscountCode action adds discount code to cart", () => {
-		const code = storage.add("dummy", "discount-code", {
+	test("addDiscountCode action adds discount code to cart", async () => {
+		const code = await storage.add("dummy", "discount-code", {
 			...getBaseResourceProperties(),
 			code: "action-test-code",
 			cartDiscounts: [],
@@ -814,10 +814,10 @@ describe("createShippingInfo", () => {
 
 		const ctx = { projectKey: "dummy", storeKey: "dummyStore" };
 
-		const createdCart = repository.create(ctx, cart);
+		const createdCart = await repository.create(ctx, cart);
 		expect(createdCart.discountCodes).toHaveLength(0);
 
-		const updatedCart = repository.processUpdateActions(
+		const updatedCart = await repository.processUpdateActions(
 			ctx,
 			createdCart,
 			createdCart.version,
@@ -840,7 +840,7 @@ describe("createShippingInfo", () => {
 		]);
 
 		// Adding the same discount code again should not create a duplicate
-		const updatedCart2 = repository.processUpdateActions(
+		const updatedCart2 = await repository.processUpdateActions(
 			ctx,
 			updatedCart,
 			updatedCart.version,
