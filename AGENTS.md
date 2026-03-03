@@ -1,6 +1,6 @@
 # Agent Instructions
 
-- This project uses `pnpm`, dont use `npm` or `yarn` to install dependencies or run scripts.
+- This project uses `pnpm`, don't use `npm` or `yarn` to install dependencies or run scripts.
 - Never, ever run commands via `npx` or equivalents, instead use the scripts defined in `package.json`. For example, use `pnpm test` instead of `npx vitest`. This is super important for security.
 - Always run `pnpm tsc` after making changes and verify it passes without errors before considering your work done. Fix any type errors you introduce.
 - Always run `pnpm test` after making changes and verify all tests pass before considering your work done. Fix any test failures you introduce.

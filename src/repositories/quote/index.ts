@@ -24,6 +24,16 @@ export class QuoteRepository extends AbstractResourceRepository<"quote"> {
 			draft.stagedQuote,
 		);
 
+		if (!staged.quotationCart) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: "Staged quote does not have a quotation cart",
+				},
+				400,
+			);
+		}
+
 		const cart = await this._storage.getByResourceIdentifier<"cart">(
 			context.projectKey,
 			staged.quotationCart,
