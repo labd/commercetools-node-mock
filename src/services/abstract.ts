@@ -202,7 +202,19 @@ export default abstract class AbstractService {
 			getRepositoryContext(request),
 			request.body,
 		);
-		const result = await this._expandWithId(request, resource.id);
+
+		const query = request.query;
+		const expand = this._parseParam(query.expand);
+
+		// Apply expand on the already-created resource and post-process it
+		// instead of re-fetching from storage via _expandWithId.
+		const context = getRepositoryContext(request);
+		const expanded = await this.repository.expand(context, resource, expand);
+		const result = await this.repository.postProcessResource(
+			context,
+			expanded,
+			{ expand },
+		);
 		return reply.status(this.createStatusCode).send(result);
 	}
 

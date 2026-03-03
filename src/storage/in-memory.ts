@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import type {
 	AssociateRole,
 	AttributeGroup,
@@ -192,12 +191,10 @@ export class InMemoryStorage extends AbstractStorage {
 		const store = await this.forProjectKey(projectKey);
 		store[typeId]?.set(obj.id, obj);
 
-		const resource = await this.get(projectKey, typeId, obj.id, params);
-		assert(
-			resource,
-			`resource of type ${typeId} with id ${obj.id} not created`,
-		);
-		return cloneObject(resource);
+		// Return the object directly instead of re-fetching from the store.
+		// We just inserted it, so we know it exists. Only apply expand if needed.
+		const clone = cloneObject(obj);
+		return this.expand(projectKey, clone, params.expand);
 	}
 
 	async get<RT extends ResourceType>(
