@@ -5,7 +5,8 @@
 	"author": "Michael van Tellingen",
 	"type": "module",
 	"exports": {
-		".": "./dist/index.mjs"
+		".": "./dist/index.mjs",
+		"./sqlite": "./dist/storage/sqlite.mjs"
 	},
 	"imports": {
 		"#src/*": "./src/*",
