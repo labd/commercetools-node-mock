@@ -14,7 +14,6 @@ import type {
 	OrderPagedSearchResponse,
 	OrderSearchRequest,
 	Product,
-	ProductPagedQueryResponse,
 	ProductVariant,
 	ReferencedResourceNotFoundError,
 	ResourceNotFoundError,
@@ -259,11 +258,11 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				sku: draft.variant.sku,
 			};
 
-			const items = (await this._storage.query(context.projectKey, "product", {
+			const items = await this._storage.query(context.projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${draft.variant.sku}"))) or masterData(current(variants(sku="${draft.variant.sku}")))`,
 				],
-			})) as ProductPagedQueryResponse;
+			});
 
 			if (items.count !== 1) {
 				throw new CommercetoolsError<GeneralError>({

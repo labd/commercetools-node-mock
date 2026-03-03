@@ -1,7 +1,6 @@
 import type {
 	CustomerReference,
 	LineItemDraft,
-	ProductPagedQueryResponse,
 	ReferencedResourceNotFoundError,
 	ShoppingList,
 	ShoppingListDraft,
@@ -102,11 +101,11 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 		}
 
 		if (sku) {
-			const items = (await this._storage.query(projectKey, "product", {
+			const items = await this._storage.query(projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			})) as ProductPagedQueryResponse;
+			});
 
 			if (items.count === 0) {
 				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
@@ -128,9 +127,9 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 		}
 
 		if (productId) {
-			const items = (await this._storage.query(projectKey, "product", {
+			const items = await this._storage.query(projectKey, "product", {
 				where: [`id="${productId}"`],
-			})) as ProductPagedQueryResponse;
+			});
 
 			if (items.count === 0) {
 				throw new CommercetoolsError<ReferencedResourceNotFoundError>({
