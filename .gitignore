@@ -1,9 +1,21 @@
-*.log
+# Generated files
 .yalc/
-.vscode/
-.claude/
-.DS_Store
 node_modules
 dist
 coverage/
+
+# Runtime files
+*.db
+*.log
+
+
+# Agents
+.claude/
+.opencode/
+
+# Editors
+.vscode/
 .idea
+
+# MacOS
+.DS_Store
