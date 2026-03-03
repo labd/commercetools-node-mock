@@ -14,7 +14,10 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract.ts";
-import { createCustomFields } from "../helpers.ts";
+import {
+	createCustomFields,
+	getReferenceFromResourceIdentifier,
+} from "../helpers.ts";
 import { CategoryUpdateHandler } from "./actions.ts";
 
 export class CategoryRepository extends AbstractResourceRepository<"category"> {
@@ -57,7 +60,11 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 			orderHint: draft.orderHint || "",
 			externalId: draft.externalId || "",
 			parent: draft.parent
-				? { typeId: "category", id: draft.parent.id! }
+				? await getReferenceFromResourceIdentifier<CategoryReference>(
+						draft.parent,
+						context.projectKey,
+						this._storage,
+					)
 				: undefined,
 			ancestors: [], // Resolved at runtime
 			assets,
