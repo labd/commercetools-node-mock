@@ -151,20 +151,36 @@ export class CommercetoolsMock {
 		// Error handler
 		app.setErrorHandler((error, request, reply) => {
 			if (error instanceof CommercetoolsError) {
-				if (error.errors?.length > 0) {
-					return reply.status(error.statusCode).send({
-						statusCode: error.statusCode,
-						message: error.message,
-						errors: error.errors,
-					});
+				const responseBody =
+					error.errors?.length > 0
+						? {
+								statusCode: error.statusCode,
+								message: error.message,
+								errors: error.errors,
+							}
+						: {
+								statusCode: error.statusCode,
+								message: error.message,
+								errors: [error.info],
+							};
+
+				if (!options?.silent) {
+					// biome-ignore lint/suspicious/noConsole: intentional logging when silent is false
+					console.error(
+						`commercetools-mock: ${request.method} ${request.url} - ${error.statusCode}: ${error.message}`,
+					);
 				}
 
-				return reply.status(error.statusCode).send({
-					statusCode: error.statusCode,
-					message: error.message,
-					errors: [error.info],
-				});
+				return reply.status(error.statusCode).send(responseBody);
 			}
+
+			if (!options?.silent) {
+				// biome-ignore lint/suspicious/noConsole: intentional logging when silent is false
+				console.error(
+					`commercetools-mock: ${request.method} ${request.url} - 500: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
+
 			return reply.status(500).send({
 				error: error instanceof Error ? error.message : String(error),
 			});
