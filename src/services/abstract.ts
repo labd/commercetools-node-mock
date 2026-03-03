@@ -46,7 +46,7 @@ export default abstract class AbstractService {
 		);
 	}
 
-	get(
+	async get(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -72,11 +72,14 @@ export default abstract class AbstractService {
 			}
 		}
 
-		const result = this.repository.query(getRepositoryContext(request), params);
+		const result = await this.repository.query(
+			getRepositoryContext(request),
+			params,
+		);
 		return reply.status(200).send(result);
 	}
 
-	getWithId(
+	async getWithId(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -84,7 +87,7 @@ export default abstract class AbstractService {
 		reply: FastifyReply,
 	) {
 		const params = request.params;
-		const result = this._expandWithId(request, params.id);
+		const result = await this._expandWithId(request, params.id);
 		if (!result) {
 			return reply.status(404).send({
 				statusCode: 404,
@@ -100,7 +103,7 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	getWithKey(
+	async getWithKey(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -109,7 +112,7 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
-		const result = this.repository.getByKey(
+		const result = await this.repository.getByKey(
 			getRepositoryContext(request),
 			params.key,
 			{
@@ -131,7 +134,7 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	deleteWithId(
+	async deleteWithId(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -140,7 +143,7 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
-		const result = this.repository.delete(
+		const result = await this.repository.delete(
 			getRepositoryContext(request),
 			params.id,
 			{
@@ -153,7 +156,7 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	deleteWithKey(
+	async deleteWithKey(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -162,7 +165,7 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
-		const resource = this.repository.getByKey(
+		const resource = await this.repository.getByKey(
 			getRepositoryContext(request),
 			params.key,
 		);
@@ -170,7 +173,7 @@ export default abstract class AbstractService {
 			return reply.status(404).send({ statusCode: 404 });
 		}
 
-		const result = this.repository.delete(
+		const result = await this.repository.delete(
 			getRepositoryContext(request),
 			resource.id,
 			{
@@ -183,7 +186,7 @@ export default abstract class AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	post(
+	async post(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -195,15 +198,15 @@ export default abstract class AbstractService {
 			validateDraft(request.body, this.repository.draftSchema);
 		}
 
-		const resource = this.repository.create(
+		const resource = await this.repository.create(
 			getRepositoryContext(request),
 			request.body,
 		);
-		const result = this._expandWithId(request, resource.id);
+		const result = await this._expandWithId(request, resource.id);
 		return reply.status(this.createStatusCode).send(result);
 	}
 
-	postWithId(
+	async postWithId(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -215,7 +218,7 @@ export default abstract class AbstractService {
 			request.body,
 			updateRequestSchema,
 		);
-		const resource = this.repository.get(
+		const resource = await this.repository.get(
 			getRepositoryContext(request),
 			params.id,
 		);
@@ -223,18 +226,18 @@ export default abstract class AbstractService {
 			return reply.status(404).send({ statusCode: 404 });
 		}
 
-		const updatedResource = this.repository.processUpdateActions(
+		const updatedResource = await this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			resource,
 			updateRequest.version,
 			updateRequest.actions,
 		);
 
-		const result = this._expandWithId(request, updatedResource.id);
+		const result = await this._expandWithId(request, updatedResource.id);
 		return reply.status(200).send(result);
 	}
 
-	postWithKey(
+	async postWithKey(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -247,7 +250,7 @@ export default abstract class AbstractService {
 			updateRequestSchema,
 		);
 
-		const resource = this.repository.getByKey(
+		const resource = await this.repository.getByKey(
 			getRepositoryContext(request),
 			params.key,
 		);
@@ -255,18 +258,18 @@ export default abstract class AbstractService {
 			return reply.status(404).send({ statusCode: 404 });
 		}
 
-		const updatedResource = this.repository.processUpdateActions(
+		const updatedResource = await this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			resource,
 			updateRequest.version,
 			updateRequest.actions,
 		);
 
-		const result = this._expandWithId(request, updatedResource.id);
+		const result = await this._expandWithId(request, updatedResource.id);
 		return reply.status(200).send(result);
 	}
 
-	protected _expandWithId(
+	protected async _expandWithId(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -274,7 +277,7 @@ export default abstract class AbstractService {
 		resourceId: string,
 	) {
 		const query = request.query;
-		const result = this.repository.get(
+		const result = await this.repository.get(
 			getRepositoryContext(request),
 			resourceId,
 			{

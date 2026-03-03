@@ -18,13 +18,13 @@ export class QuoteRepository extends AbstractResourceRepository<"quote"> {
 		this.draftSchema = QuoteDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: QuoteDraft): Quote {
-		const staged = this._storage.getByResourceIdentifier<"staged-quote">(
+	async create(context: RepositoryContext, draft: QuoteDraft): Promise<Quote> {
+		const staged = await this._storage.getByResourceIdentifier<"staged-quote">(
 			context.projectKey,
 			draft.stagedQuote,
 		);
 
-		const cart = this._storage.getByResourceIdentifier<"cart">(
+		const cart = await this._storage.getByResourceIdentifier<"cart">(
 			context.projectKey,
 			staged.quotationCart,
 		);

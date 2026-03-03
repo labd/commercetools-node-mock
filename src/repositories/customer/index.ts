@@ -43,11 +43,18 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		this.draftSchema = CustomerDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: CustomerDraft): Customer {
+	async create(
+		context: RepositoryContext,
+		draft: CustomerDraft,
+	): Promise<Customer> {
 		// Check uniqueness
-		const results = this._storage.query(context.projectKey, this.getTypeId(), {
-			where: [`lowercaseEmail="${draft.email.toLowerCase()}"`],
-		});
+		const results = await this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{
+				where: [`lowercaseEmail="${draft.email.toLowerCase()}"`],
+			},
+		);
 		if (results.count > 0) {
 			throw new CommercetoolsError<any>({
 				code: "CustomerAlreadyExists",
@@ -122,7 +129,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		let storesForCustomer: StoreKeyReference[] = [];
 
 		if (draft.stores && draft.stores.length > 0) {
-			storesForCustomer = this.storeReferenceToStoreKeyReference(
+			storesForCustomer = await this.storeReferenceToStoreKeyReference(
 				draft.stores,
 				context.projectKey,
 			);
@@ -149,7 +156,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			defaultShippingAddressId: defaultShippingAddressId,
 			shippingAddressIds: shippingAddressIds,
 			billingAddressIds: billingAddressIds,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -158,30 +165,34 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			customerGroupAssignments: [],
 		} satisfies unknown as Customer;
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	saveUpdate(
+	async saveUpdate(
 		context: RepositoryContext,
 		version: number,
 		resource: ShallowWritable<ResourceMap["customer"]>,
-	): ShallowWritable<ResourceMap["customer"]> {
+	): Promise<ShallowWritable<ResourceMap["customer"]>> {
 		// Also update lowercaseEmail attribute
 		const updatedResource: Customer = {
 			...resource,
 			lowercaseEmail: resource.email.toLowerCase(),
 		} satisfies unknown as Customer;
 
-		return super.saveUpdate(context, version, updatedResource);
+		return await super.saveUpdate(context, version, updatedResource);
 	}
 
-	passwordResetToken(
+	async passwordResetToken(
 		context: RepositoryContext,
 		request: CustomerCreatePasswordResetToken,
-	): CustomerToken {
-		const results = this._storage.query(context.projectKey, this.getTypeId(), {
-			where: [`email="${request.email.toLocaleLowerCase()}"`],
-		});
+	): Promise<CustomerToken> {
+		const results = await this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{
+				where: [`email="${request.email.toLocaleLowerCase()}"`],
+			},
+		);
 		if (results.count === 0) {
 			throw new CommercetoolsError<ResourceNotFoundError>({
 				code: "ResourceNotFound",
@@ -208,7 +219,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		};
 	}
 
-	passwordReset(
+	async passwordReset(
 		context: RepositoryContext,
 		resetPassword: CustomerResetPassword | MyCustomerResetPassword,
 	) {
@@ -222,11 +233,11 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		}
 
-		const customer = this._storage.get(
+		const customer = (await this._storage.get(
 			context.projectKey,
 			"customer",
 			customerId,
-		) as Writable<Customer> | undefined;
+		)) as Writable<Customer> | undefined;
 
 		if (!customer) {
 			throw new CommercetoolsError<ResourceNotFoundError>({
@@ -239,14 +250,21 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		customer.version += 1;
 
 		// Update storage
-		this._storage.add(context.projectKey, "customer", customer);
+		await this._storage.add(context.projectKey, "customer", customer);
 		return customer;
 	}
 
-	emailToken(context: RepositoryContext, id: string): CustomerToken {
-		const results = this._storage.query(context.projectKey, this.getTypeId(), {
-			where: [`id="${id.toLocaleLowerCase()}"`],
-		});
+	async emailToken(
+		context: RepositoryContext,
+		id: string,
+	): Promise<CustomerToken> {
+		const results = await this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{
+				where: [`id="${id.toLocaleLowerCase()}"`],
+			},
+		);
 		if (results.count === 0) {
 			throw new CommercetoolsError<ResourceNotFoundError>({
 				code: "ResourceNotFound",
@@ -269,7 +287,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		};
 	}
 
-	emailTokenConfirm(
+	async emailTokenConfirm(
 		context: RepositoryContext,
 		request: { tokenValue: string },
 	) {
@@ -281,11 +299,11 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		}
 
-		const customer = this._storage.get(
+		const customer = (await this._storage.get(
 			context.projectKey,
 			"customer",
 			customerId,
-		) as Writable<Customer> | undefined;
+		)) as Writable<Customer> | undefined;
 
 		if (!customer) {
 			throw new CommercetoolsError<ResourceNotFoundError>({
@@ -298,14 +316,14 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		customer.version += 1;
 
 		// Update storage
-		this._storage.add(context.projectKey, "customer", customer);
+		await this._storage.add(context.projectKey, "customer", customer);
 		return customer;
 	}
 
-	private storeReferenceToStoreKeyReference(
+	private async storeReferenceToStoreKeyReference(
 		draftStores: StoreResourceIdentifier[],
 		projectKey: string,
-	): StoreKeyReference[] {
+	): Promise<StoreKeyReference[]> {
 		const storeIds = draftStores
 			.map((storeReference) => storeReference.id)
 			.filter(Boolean);
@@ -313,9 +331,10 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		let stores: Store[] = [];
 
 		if (storeIds.length > 0) {
-			stores = this._storage.query(projectKey, "store", {
+			const storeResult = await this._storage.query(projectKey, "store", {
 				where: storeIds.map((id) => `id="${id}"`),
-			}).results;
+			});
+			stores = storeResult.results;
 
 			if (storeIds.length !== stores.length) {
 				throw new CommercetoolsError<ResourceNotFoundError>({

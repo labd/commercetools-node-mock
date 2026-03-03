@@ -26,22 +26,22 @@ export class StagedQuoteUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<StagedQuote>,
 		{ type, fields }: StagedQuoteSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
-	transitionState(
+	async transitionState(
 		context: RepositoryContext,
 		resource: Writable<StagedQuote>,
 		{ state, force }: StagedQuoteTransitionStateAction,
 	) {
 		let stateReference: StateReference | undefined;
 		if (state) {
-			stateReference = getReferenceFromResourceIdentifier<StateReference>(
+			stateReference = await getReferenceFromResourceIdentifier<StateReference>(
 				state,
 				context.projectKey,
 				this._storage,
@@ -57,7 +57,5 @@ export class StagedQuoteUpdateHandler
 				400,
 			);
 		}
-
-		return resource;
 	}
 }

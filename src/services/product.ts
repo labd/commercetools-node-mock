@@ -20,7 +20,7 @@ export class ProductService extends AbstractService {
 		instance.post("/search", this.search.bind(this));
 	}
 
-	search(
+	async search(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: ProductSearchRequest;
@@ -28,7 +28,7 @@ export class ProductService extends AbstractService {
 		reply: FastifyReply,
 	) {
 		const searchBody = request.body;
-		const resource = this.repository.search(
+		const resource = await this.repository.search(
 			getRepositoryContext(request),
 			searchBody,
 		);

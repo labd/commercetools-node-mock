@@ -18,10 +18,10 @@ export class RecurrencePolicyRepository extends AbstractResourceRepository<"recu
 		this.draftSchema = RecurrencePolicyDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: RecurrencePolicyDraft,
-	): RecurrencePolicy {
+	): Promise<RecurrencePolicy> {
 		const resource: RecurrencePolicy = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -29,6 +29,6 @@ export class RecurrencePolicyRepository extends AbstractResourceRepository<"recu
 			description: draft.description,
 			schedule: draft.schedule,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

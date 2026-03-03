@@ -15,7 +15,10 @@ export class OrderEditRepository extends AbstractResourceRepository<"order-edit"
 		this.draftSchema = OrderEditDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: OrderEditDraft): OrderEdit {
+	async create(
+		context: RepositoryContext,
+		draft: OrderEditDraft,
+	): Promise<OrderEdit> {
 		const resource: OrderEdit = {
 			...getBaseResourceProperties(context.clientId),
 			stagedActions: draft.stagedActions ?? [],
@@ -24,6 +27,6 @@ export class OrderEditRepository extends AbstractResourceRepository<"order-edit"
 				type: "NotProcessed",
 			} as OrderEditResult,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

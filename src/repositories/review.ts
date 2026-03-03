@@ -41,7 +41,10 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 		this.draftSchema = ReviewDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ReviewDraft): Review {
+	async create(
+		context: RepositoryContext,
+		draft: ReviewDraft,
+	): Promise<Review> {
 		if (!draft.target)
 			throw new CommercetoolsError<RequiredFieldError>(
 				{
@@ -61,25 +64,25 @@ export class ReviewRepository extends AbstractResourceRepository<"review"> {
 			rating: draft.rating,
 			uniquenessValue: draft.uniquenessValue,
 			state: draft.state
-				? getReferenceFromResourceIdentifier<StateReference>(
+				? await getReferenceFromResourceIdentifier<StateReference>(
 						draft.state,
 						context.projectKey,
 						this._storage,
 					)
 				: undefined,
 			target: draft.target
-				? getReferenceFromResourceIdentifier<
+				? await getReferenceFromResourceIdentifier<
 						ProductReference | ChannelReference
 					>(draft.target, context.projectKey, this._storage)
 				: undefined,
 			includedInStatistics: true,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 
@@ -103,21 +106,21 @@ class ReviewUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Review>,
 		{ type, fields }: ReviewSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
-	setCustomer(
+	async setCustomer(
 		context: RepositoryContext,
 		resource: Writable<Review>,
 		{ customer }: ReviewSetCustomerAction,
 	) {
 		resource.customer = customer
-			? getReferenceFromResourceIdentifier<CustomerReference>(
+			? await getReferenceFromResourceIdentifier<CustomerReference>(
 					customer,
 					context.projectKey,
 					this._storage,
@@ -149,12 +152,12 @@ class ReviewUpdateHandler
 		resource.rating = rating;
 	}
 
-	setTarget(
+	async setTarget(
 		context: RepositoryContext,
 		resource: Writable<Review>,
 		{ target }: ReviewSetTargetAction,
 	) {
-		resource.target = getReferenceFromResourceIdentifier<
+		resource.target = await getReferenceFromResourceIdentifier<
 			ProductReference | ChannelReference
 		>(target, context.projectKey, this._storage);
 	}
@@ -175,12 +178,12 @@ class ReviewUpdateHandler
 		resource.title = title;
 	}
 
-	transitionState(
+	async transitionState(
 		context: RepositoryContext,
 		resource: Writable<Review>,
 		{ state }: ReviewTransitionStateAction,
 	) {
-		resource.state = getReferenceFromResourceIdentifier<StateReference>(
+		resource.state = await getReferenceFromResourceIdentifier<StateReference>(
 			state,
 			context.projectKey,
 			this._storage,

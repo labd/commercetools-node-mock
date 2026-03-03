@@ -11,12 +11,15 @@ export class ReviewStatisticsService {
 		this._storage = _storage;
 	}
 
-	calculateProductReviewStatistics(
+	async calculateProductReviewStatistics(
 		projectKey: string,
 		productId: string,
-	): ReviewRatingStatistics | undefined {
+	): Promise<ReviewRatingStatistics | undefined> {
 		// Get all reviews for this product
-		const allReviews = this._storage.all(projectKey, "review") as Review[];
+		const allReviews = (await this._storage.all(
+			projectKey,
+			"review",
+		)) as Review[];
 		const productReviews = allReviews.filter(
 			(review) =>
 				review.target?.typeId === "product" &&

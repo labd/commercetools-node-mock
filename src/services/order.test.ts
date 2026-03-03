@@ -5,7 +5,15 @@ import type {
 	Payment,
 	State,
 } from "@commercetools/platform-sdk";
-import { afterEach, beforeEach, describe, expect, it, test } from "vitest";
+import {
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	test,
+} from "vitest";
 import { generateRandomString } from "#src/helpers.ts";
 import {
 	cartDraftFactory,
@@ -44,8 +52,8 @@ describe("Order Query", () => {
 		});
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("no filter", async () => {
@@ -104,8 +112,8 @@ describe("Order payment tests", () => {
 		defaultProjectKey: "dummy",
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("query payment id", async () => {
@@ -180,9 +188,9 @@ describe("Order payment tests", () => {
 			},
 		};
 
-		ctMock.project().unsafeAdd("state", state);
-		ctMock.project().unsafeAdd("payment", payment);
-		ctMock.project().unsafeAdd("order", order);
+		await ctMock.project().unsafeAdd("state", state);
+		await ctMock.project().unsafeAdd("payment", payment);
+		await ctMock.project().unsafeAdd("order", order);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -277,9 +285,9 @@ describe("Order payment tests", () => {
 			},
 		};
 
-		ctMock.project().unsafeAdd("state", state);
-		ctMock.project().unsafeAdd("payment", payment);
-		ctMock.project().unsafeAdd("order", order);
+		await ctMock.project().unsafeAdd("state", state);
+		await ctMock.project().unsafeAdd("payment", payment);
+		await ctMock.project().unsafeAdd("order", order);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -600,7 +608,7 @@ describe("Order Update Actions", () => {
 				currencyCode: "EUR",
 			},
 		};
-		ctMock.project("dummy").unsafeAdd("order", order);
+		await ctMock.project("dummy").unsafeAdd("order", order);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -722,7 +730,7 @@ describe("Order Update Actions", () => {
 			},
 		};
 
-		ctMock.project("dummy").unsafeAdd("order", order);
+		await ctMock.project("dummy").unsafeAdd("order", order);
 
 		const lineItem = order.lineItems[0];
 		assert(lineItem, "lineItem not created");
@@ -820,7 +828,7 @@ describe("Order Update Actions", () => {
 			},
 		};
 
-		ctMock.project("dummy").unsafeAdd("order", order);
+		await ctMock.project("dummy").unsafeAdd("order", order);
 
 		const typeDraft = typeDraftFactory(ctMock);
 		const type = await typeDraft.create({
@@ -1004,7 +1012,7 @@ describe("Order Update Actions", () => {
 				currencyCode: "EUR",
 			},
 		};
-		ctMock.project("dummy").unsafeAdd("order", order);
+		await ctMock.project("dummy").unsafeAdd("order", order);
 
 		const response = await ctMock.app.inject({
 			method: "GET",
@@ -1246,9 +1254,6 @@ describe("Order Update Actions", () => {
 			shippingInfo: shippingInfoWithoutDeliveries,
 		};
 
-		ctMock.project("dummy").unsafeAdd("order", order);
-		ctMock.project("dummy").unsafeAdd("order", orderWithoutDeliveries);
-
 		const deliveryDraft: DeliveryDraft = {
 			key: `${order.orderNumber}-2`,
 			items: [
@@ -1258,6 +1263,11 @@ describe("Order Update Actions", () => {
 				},
 			],
 		};
+
+		beforeAll(async () => {
+			await ctMock.project("dummy").unsafeAdd("order", order);
+			await ctMock.project("dummy").unsafeAdd("order", orderWithoutDeliveries);
+		});
 
 		it.each([
 			[order, 1],
@@ -1293,21 +1303,23 @@ describe("Order Update Actions", () => {
 describe("Order Import", () => {
 	const ctMock = new CommercetoolsMock();
 
-	ctMock.project("dummy").unsafeAdd("product", {
-		id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
-		masterData: {
-			// @ts-expect-error
-			current: {
-				name: { "nl-NL": "Dummy" },
-				slug: { "nl-NL": "Dummy" },
-				categories: [],
-				masterVariant: {
-					id: 0,
-					sku: "MYSKU",
+	beforeAll(async () => {
+		await ctMock.project("dummy").unsafeAdd("product", {
+			id: "15fc56ba-a74e-4cf8-b4b0-bada5c101541",
+			masterData: {
+				// @ts-expect-error
+				current: {
+					name: { "nl-NL": "Dummy" },
+					slug: { "nl-NL": "Dummy" },
+					categories: [],
+					masterVariant: {
+						id: 0,
+						sku: "MYSKU",
+					},
+					variants: [],
 				},
-				variants: [],
 			},
-		},
+		});
 	});
 
 	test("Import", async () => {

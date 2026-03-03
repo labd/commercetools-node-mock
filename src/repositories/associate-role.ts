@@ -29,21 +29,24 @@ export class AssociateRoleRepository extends AbstractResourceRepository<"associa
 		this.draftSchema = AssociateRoleDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: AssociateRoleDraft): AssociateRole {
+	async create(
+		context: RepositoryContext,
+		draft: AssociateRoleDraft,
+	): Promise<AssociateRole> {
 		const resource: AssociateRole = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			buyerAssignable: draft.buyerAssignable || false,
 			permissions: draft.permissions || [],
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 
@@ -100,12 +103,12 @@ class AssociateRoleUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<AssociateRole>,
 		{ type, fields }: AssociateRoleSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setName(

@@ -35,7 +35,10 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		this.draftSchema = ProductDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ProductDraft): Product {
+	async create(
+		context: RepositoryContext,
+		draft: ProductDraft,
+	): Promise<Product> {
 		if (!draft.masterVariant) {
 			throw new CommercetoolsError<RequiredFieldError>(
 				{
@@ -49,11 +52,12 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 
 		let productType: ProductTypeReference | undefined;
 		try {
-			productType = getReferenceFromResourceIdentifier<ProductTypeReference>(
-				draft.productType,
-				context.projectKey,
-				this._storage,
-			);
+			productType =
+				await getReferenceFromResourceIdentifier<ProductTypeReference>(
+					draft.productType,
+					context.projectKey,
+					this._storage,
+				);
 		} catch (err) {
 			if (this.config.strict) {
 				throw err;
@@ -71,10 +75,10 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 
 		// Resolve Product categories
 		const categoryReferences: CategoryReference[] = [];
-		draft.categories?.forEach((category) => {
+		for (const category of draft.categories ?? []) {
 			if (category) {
 				categoryReferences.push(
-					getReferenceFromResourceIdentifier<CategoryReference>(
+					await getReferenceFromResourceIdentifier<CategoryReference>(
 						category,
 						context.projectKey,
 						this._storage,
@@ -90,13 +94,13 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 					400,
 				);
 			}
-		});
+		}
 
 		// Resolve Tax category
 		let taxCategoryReference: TaxCategoryReference | undefined;
 		if (draft.taxCategory) {
 			taxCategoryReference =
-				getReferenceFromResourceIdentifier<TaxCategoryReference>(
+				await getReferenceFromResourceIdentifier<TaxCategoryReference>(
 					draft.taxCategory,
 					context.projectKey,
 					this._storage,
@@ -107,12 +111,18 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		let productStateReference: StateReference | undefined;
 		if (draft.state) {
 			productStateReference =
-				getReferenceFromResourceIdentifier<StateReference>(
+				await getReferenceFromResourceIdentifier<StateReference>(
 					draft.state,
 					context.projectKey,
 					this._storage,
 				);
 		}
+
+		const variants = await Promise.all(
+			draft.variants?.map((variant, index) =>
+				variantFromDraft(context, this._storage, index + 2, variant),
+			) ?? [],
+		);
 
 		const productData: ProductData = {
 			name: draft.name,
@@ -120,16 +130,13 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 			description: draft.description,
 			attributes: draft.attributes ?? [],
 			categories: categoryReferences,
-			masterVariant: variantFromDraft(
+			masterVariant: await variantFromDraft(
 				context,
 				this._storage,
 				1,
 				draft.masterVariant,
 			),
-			variants:
-				draft.variants?.map((variant, index) =>
-					variantFromDraft(context, this._storage, index + 2, variant),
-				) ?? [],
+			variants,
 			metaTitle: draft.metaTitle,
 			metaDescription: draft.metaDescription,
 			metaKeywords: draft.metaKeywords,
@@ -150,17 +157,17 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 			},
 		};
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	postProcessResource(
+	async postProcessResource(
 		context: RepositoryContext,
 		resource: Product,
 		params?: GetParams,
-	): Product {
+	): Promise<Product> {
 		// Add review statistics to the product
 		const reviewStatistics =
-			this._reviewStatisticsService.calculateProductReviewStatistics(
+			await this._reviewStatisticsService.calculateProductReviewStatistics(
 				context.projectKey,
 				resource.id,
 			);
@@ -171,10 +178,10 @@ export class ProductRepository extends AbstractResourceRepository<"product"> {
 		};
 	}
 
-	search(
+	async search(
 		context: RepositoryContext,
 		searchRequest: ProductSearchRequest,
-	): ProductPagedSearchResponse {
+	): Promise<ProductPagedSearchResponse> {
 		return this._searchService.search(context.projectKey, searchRequest);
 	}
 }

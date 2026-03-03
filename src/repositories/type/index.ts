@@ -13,7 +13,7 @@ export class TypeRepository extends AbstractResourceRepository<"type"> {
 		this.draftSchema = TypeDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: TypeDraft): Type {
+	async create(context: RepositoryContext, draft: TypeDraft): Promise<Type> {
 		const resource: Type = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -22,6 +22,6 @@ export class TypeRepository extends AbstractResourceRepository<"type"> {
 			fieldDefinitions: draft.fieldDefinitions || [],
 			description: draft.description,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

@@ -62,9 +62,12 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		this.draftSchema = OrderFromCartDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: OrderFromCartDraft): Order {
+	async create(
+		context: RepositoryContext,
+		draft: OrderFromCartDraft,
+	): Promise<Order> {
 		assert(draft.cart, "draft.cart is missing");
-		return this.createFromCart(
+		return await this.createFromCart(
 			context,
 			{
 				id: draft.cart.id!,
@@ -74,15 +77,15 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		);
 	}
 
-	createFromCart(
+	async createFromCart(
 		context: RepositoryContext,
 		cartReference: CartReference,
 		orderNumber?: string,
 	) {
-		const cart = this._storage.getByResourceIdentifier(
+		const cart = (await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			cartReference,
-		) as Cart | null;
+		)) as Cart | null;
 		if (!cart) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
 				{
@@ -138,12 +141,26 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		resource.taxedPrice = resource.taxedPrice ?? taxedPrice;
 		resource.taxedShippingPrice =
 			resource.taxedShippingPrice ?? taxedShippingPrice;
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	import(context: RepositoryContext, draft: OrderImportDraft): Order {
+	async import(
+		context: RepositoryContext,
+		draft: OrderImportDraft,
+	): Promise<Order> {
 		// TODO: Check if order with given orderNumber already exists
 		assert(this, "OrderRepository not valid");
+		const lineItems = await Promise.all(
+			draft.lineItems?.map((item) =>
+				this.lineItemFromImportDraft(context, item),
+			) || [],
+		);
+		const customLineItems = await Promise.all(
+			draft.customLineItems?.map((item) =>
+				this.customLineItemFromImportDraft(context, item),
+			) || [],
+		);
+
 		const resource: Writable<Order> = {
 			...getBaseResourceProperties(context.clientId),
 
@@ -158,7 +175,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				this._storage,
 			),
 
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -177,21 +194,15 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			shippingMode: "Single",
 			shipping: [],
 			shippingInfo: undefined,
-			store: resolveStoreReference(
+			store: await resolveStoreReference(
 				draft.store,
 				context.projectKey,
 				this._storage,
 			),
 			syncInfo: [],
 
-			lineItems:
-				draft.lineItems?.map((item) =>
-					this.lineItemFromImportDraft.bind(this)(context, item),
-				) || [],
-			customLineItems:
-				draft.customLineItems?.map((item) =>
-					this.customLineItemFromImportDraft.bind(this)(context, item),
-				) || [],
+			lineItems,
+			customLineItems,
 
 			totalPrice: createCentPrecisionMoney(draft.totalPrice),
 		};
@@ -203,7 +214,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			// get id when reference is by key only
 			if (shippingMethodRef.key && !shippingMethodRef.id) {
 				const shippingMethod =
-					this._storage.getByResourceIdentifier<"shipping-method">(
+					await this._storage.getByResourceIdentifier<"shipping-method">(
 						context.projectKey,
 						shippingMethodRef,
 					);
@@ -216,7 +227,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				shippingMethodRef.id = shippingMethod.id;
 			}
 
-			resource.shippingInfo = this.createShippingInfo(context, resource, {
+			resource.shippingInfo = await this.createShippingInfo(context, resource, {
 				typeId: "shipping-method",
 				id: shippingMethodRef.id as string,
 			});
@@ -232,13 +243,13 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		resource.taxedShippingPrice =
 			resource.taxedShippingPrice ?? taxedShippingPrice;
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	private lineItemFromImportDraft(
+	private async lineItemFromImportDraft(
 		context: RepositoryContext,
 		draft: LineItemImportDraft,
-	): LineItem {
+	): Promise<LineItem> {
 		let product: Product;
 		let variant: ProductVariant | undefined;
 
@@ -248,11 +259,11 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 				sku: draft.variant.sku,
 			};
 
-			const items = this._storage.query(context.projectKey, "product", {
+			const items = (await this._storage.query(context.projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${draft.variant.sku}"))) or masterData(current(variants(sku="${draft.variant.sku}")))`,
 				],
-			}) as ProductPagedQueryResponse;
+			})) as ProductPagedQueryResponse;
 
 			if (items.count !== 1) {
 				throw new CommercetoolsError<GeneralError>({
@@ -288,7 +299,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 
 		return {
 			...getBaseResourceProperties(context.clientId),
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -320,10 +331,10 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		} satisfies LineItem;
 	}
 
-	private customLineItemFromImportDraft(
+	private async customLineItemFromImportDraft(
 		context: RepositoryContext,
 		draft: CustomLineItemImportDraft,
-	): CustomLineItem {
+	): Promise<CustomLineItem> {
 		const quantity = draft.quantity ?? 1;
 		const totalPrice = createCentPrecisionMoney({
 			currencyCode: draft.money.currencyCode,
@@ -332,7 +343,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 
 		return {
 			...getBaseResourceProperties(context.clientId),
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -355,15 +366,19 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		} satisfies CustomLineItem;
 	}
 
-	getWithOrderNumber(
+	async getWithOrderNumber(
 		context: RepositoryContext,
 		orderNumber: string,
 		params: QueryParams = {},
-	): Order | undefined {
-		const result = this._storage.query(context.projectKey, this.getTypeId(), {
-			...params,
-			where: [`orderNumber="${orderNumber}"`],
-		});
+	): Promise<Order | undefined> {
+		const result = await this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{
+				...params,
+				where: [`orderNumber="${orderNumber}"`],
+			},
+		);
 		if (result.count === 1) {
 			return result.results[0] as Order;
 		}
@@ -381,11 +396,11 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		return;
 	}
 
-	createShippingInfo(
+	async createShippingInfo(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		shippingMethodRef: ShippingMethodReference,
-	): ShippingInfo {
+	): Promise<ShippingInfo> {
 		const cartLikeForMatching: Writable<Cart> = {
 			...resource,
 			cartState: "Active" as const,
@@ -400,7 +415,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			shippingInfo: undefined,
 		};
 
-		const shippingMethods = getShippingMethodsMatchingCart(
+		const shippingMethods = await getShippingMethodsMatchingCart(
 			context,
 			this._storage,
 			cartLikeForMatching,
@@ -420,7 +435,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			});
 		}
 
-		const baseShippingInfo = createShippingInfoFromMethod(
+		const baseShippingInfo = await createShippingInfoFromMethod(
 			context,
 			this._storage,
 			resource,
@@ -433,10 +448,10 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		};
 	}
 
-	search(
+	async search(
 		context: RepositoryContext,
 		searchRequest: OrderSearchRequest,
-	): OrderPagedSearchResponse {
-		return this._searchService.search(context.projectKey, searchRequest);
+	): Promise<OrderPagedSearchResponse> {
+		return await this._searchService.search(context.projectKey, searchRequest);
 	}
 }

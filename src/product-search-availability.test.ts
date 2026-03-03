@@ -44,8 +44,8 @@ describe("Product Search - Availability Filtering", () => {
 		});
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	async function createInventoryEntry(

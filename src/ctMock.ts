@@ -25,6 +25,7 @@ export type CommercetoolsMockOptions = {
 	authHost: RegExp | string;
 	silent: boolean;
 	strict: boolean;
+	storage: AbstractStorage | undefined;
 };
 
 type AppOptions = { silent?: boolean };
@@ -37,6 +38,7 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	authHost: DEFAULT_AUTH_HOSTNAME,
 	silent: true,
 	strict: false,
+	storage: undefined,
 };
 
 const _globalListeners: SetupServer[] = [];
@@ -62,7 +64,7 @@ export class CommercetoolsMock {
 		this._repositories = null;
 		this._projectService = undefined;
 
-		this._storage = new InMemoryStorage();
+		this._storage = this.options.storage ?? new InMemoryStorage();
 		this._oauth2 = new OAuth2Server({
 			enabled: this.options.enableAuthentication,
 			validate: this.options.validateCredentials,
@@ -75,8 +77,8 @@ export class CommercetoolsMock {
 		return this.app.server;
 	}
 
-	clear() {
-		this._storage.clear();
+	async clear() {
+		await this._storage.clear();
 	}
 
 	project(projectKey?: string) {

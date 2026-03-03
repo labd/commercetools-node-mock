@@ -66,18 +66,18 @@ export const createAddress = (
 	};
 };
 
-export const createCustomFields = (
+export const createCustomFields = async (
 	draft: CustomFieldsDraft | undefined,
 	projectKey: string,
 	storage: AbstractStorage,
-): CustomFields | undefined => {
+): Promise<CustomFields | undefined> => {
 	if (!draft) return undefined;
 	if (!draft.type) return undefined;
 	if (!draft.type.typeId) return undefined;
-	const typeResource = storage.getByResourceIdentifier(
+	const typeResource = (await storage.getByResourceIdentifier(
 		projectKey,
 		draft.type,
-	) as Type;
+	)) as Type;
 
 	if (!typeResource) {
 		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
@@ -285,13 +285,13 @@ export const calculateMoneyTotalCentAmount = (
 	);
 };
 
-export const resolveStoreReference = (
+export const resolveStoreReference = async (
 	ref: StoreResourceIdentifier | undefined,
 	projectKey: string,
 	storage: AbstractStorage,
-): StoreKeyReference | undefined => {
+): Promise<StoreKeyReference | undefined> => {
 	if (!ref) return undefined;
-	const resource = storage.getByResourceIdentifier(projectKey, ref);
+	const resource = await storage.getByResourceIdentifier(projectKey, ref);
 	if (!resource) {
 		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
 			{
@@ -310,11 +310,11 @@ export const resolveStoreReference = (
 	};
 };
 
-export const getReferenceFromResourceIdentifier = <T extends Reference>(
+export const getReferenceFromResourceIdentifier = async <T extends Reference>(
 	resourceIdentifier: ResourceIdentifier,
 	projectKey: string,
 	storage: AbstractStorage,
-): T => {
+): Promise<T> => {
 	if (!resourceIdentifier.id && !resourceIdentifier.key) {
 		throw new CommercetoolsError<InvalidJsonInputError>(
 			{
@@ -326,7 +326,7 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
 		);
 	}
 
-	const resource = storage.getByResourceIdentifier(
+	const resource = await storage.getByResourceIdentifier(
 		projectKey,
 		resourceIdentifier,
 	);
@@ -351,18 +351,18 @@ export const getReferenceFromResourceIdentifier = <T extends Reference>(
 	} as unknown as T;
 };
 
-export const getStoreKeyReference = (
+export const getStoreKeyReference = async (
 	id: StoreResourceIdentifier,
 	projectKey: string,
 	storage: AbstractStorage,
-): StoreKeyReference => {
+): Promise<StoreKeyReference> => {
 	if (id.key) {
 		return {
 			typeId: "store",
 			key: id.key,
 		};
 	}
-	const value = getReferenceFromResourceIdentifier<StoreReference>(
+	const value = await getReferenceFromResourceIdentifier<StoreReference>(
 		id,
 		projectKey,
 		storage,
@@ -392,11 +392,11 @@ export const getRepositoryContext = (
 	clientId: request.credentials?.clientId,
 });
 
-export const createAssociate = (
+export const createAssociate = async (
 	a: AssociateDraft,
 	projectKey: string,
 	storage: AbstractStorage,
-): Associate | undefined => {
+): Promise<Associate | undefined> => {
 	if (!a) return undefined;
 
 	if (!a.associateRoleAssignments) {
@@ -410,15 +410,12 @@ export const createAssociate = (
 		);
 	}
 
-	return {
-		customer: getReferenceFromResourceIdentifier(
-			a.customer,
-			projectKey,
-			storage,
-		),
-		associateRoleAssignments: a.associateRoleAssignments?.map(
-			(a: AssociateRoleAssignmentDraft): AssociateRoleAssignment => ({
-				associateRole: getAssociateRoleKeyReference(
+	const associateRoleAssignments = await Promise.all(
+		a.associateRoleAssignments.map(
+			async (
+				a: AssociateRoleAssignmentDraft,
+			): Promise<AssociateRoleAssignment> => ({
+				associateRole: await getAssociateRoleKeyReference(
 					a.associateRole,
 					projectKey,
 					storage,
@@ -426,14 +423,23 @@ export const createAssociate = (
 				inheritance: a.inheritance as string,
 			}),
 		),
+	);
+
+	return {
+		customer: await getReferenceFromResourceIdentifier(
+			a.customer,
+			projectKey,
+			storage,
+		),
+		associateRoleAssignments,
 	};
 };
 
-export const getAssociateRoleKeyReference = (
+export const getAssociateRoleKeyReference = async (
 	id: AssociateRoleResourceIdentifier,
 	projectKey: string,
 	storage: AbstractStorage,
-): AssociateRoleKeyReference => {
+): Promise<AssociateRoleKeyReference> => {
 	if (id.key) {
 		return {
 			typeId: "associate-role",
@@ -441,11 +447,12 @@ export const getAssociateRoleKeyReference = (
 		};
 	}
 
-	const value = getReferenceFromResourceIdentifier<AssociateRoleReference>(
-		id,
-		projectKey,
-		storage,
-	);
+	const value =
+		await getReferenceFromResourceIdentifier<AssociateRoleReference>(
+			id,
+			projectKey,
+			storage,
+		);
 
 	if (!value.obj?.key) {
 		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
@@ -465,11 +472,11 @@ export const getAssociateRoleKeyReference = (
 	};
 };
 
-export const getBusinessUnitKeyReference = (
+export const getBusinessUnitKeyReference = async (
 	id: BusinessUnitResourceIdentifier,
 	projectKey: string,
 	storage: AbstractStorage,
-): BusinessUnitKeyReference => {
+): Promise<BusinessUnitKeyReference> => {
 	if (id.key) {
 		return {
 			typeId: "business-unit",
@@ -477,7 +484,7 @@ export const getBusinessUnitKeyReference = (
 		};
 	}
 
-	const resource = storage.getByResourceIdentifier<"business-unit">(
+	const resource = await storage.getByResourceIdentifier<"business-unit">(
 		projectKey,
 		id,
 	);

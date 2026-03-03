@@ -19,7 +19,10 @@ export class ProductTailoringRepository extends AbstractResourceRepository<"prod
 		this.draftSchema = ProductTailoringDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: any): ProductTailoring {
+	async create(
+		context: RepositoryContext,
+		draft: any,
+	): Promise<ProductTailoring> {
 		throw new CommercetoolsError<InvalidOperationError>(
 			{
 				code: "InvalidOperation",

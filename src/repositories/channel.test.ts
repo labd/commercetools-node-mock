@@ -8,7 +8,7 @@ import type {
 	ChannelSetCustomTypeAction,
 	ChannelSetGeoLocationAction,
 } from "@commercetools/platform-sdk";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
@@ -19,25 +19,27 @@ describe("Channel Repository", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new ChannelRepository(config);
 
-	// Add a custom type for testing
-	storage.add("dummy", "type", {
-		...getBaseResourceProperties(),
-		id: "custom-type-id",
-		key: "custom-type-key",
-		name: { "en-US": "Custom Type" },
-		resourceTypeIds: ["channel"],
-		fieldDefinitions: [
-			{
-				name: "description",
-				label: { "en-US": "Description" },
-				required: false,
-				type: { name: "String" },
-				inputHint: "SingleLine",
-			},
-		],
+	beforeAll(async () => {
+		// Add a custom type for testing
+		await storage.add("dummy", "type", {
+			...getBaseResourceProperties(),
+			id: "custom-type-id",
+			key: "custom-type-key",
+			name: { "en-US": "Custom Type" },
+			resourceTypeIds: ["channel"],
+			fieldDefinitions: [
+				{
+					name: "description",
+					label: { "en-US": "Description" },
+					required: false,
+					type: { name: "String" },
+					inputHint: "SingleLine",
+				},
+			],
+		});
 	});
 
-	test("create channel", () => {
+	test("create channel", async () => {
 		const draft: ChannelDraft = {
 			key: "distribution-center-1",
 			name: { "en-US": "Distribution Center 1" },
@@ -46,7 +48,7 @@ describe("Channel Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -59,12 +61,12 @@ describe("Channel Repository", () => {
 		expect(result.custom).toBeUndefined();
 
 		// Test that the channel is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create channel with all optional fields", () => {
+	test("create channel with all optional fields", async () => {
 		const draft: ChannelDraft = {
 			key: "store-berlin",
 			name: { "en-US": "Berlin Store", "de-DE": "Berlin Geschäft" },
@@ -93,7 +95,7 @@ describe("Channel Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -104,16 +106,16 @@ describe("Channel Repository", () => {
 		expect(result.custom?.fields.description).toBe("Custom description");
 	});
 
-	test("update channel - changeName", () => {
+	test("update channel - changeName", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel",
 			name: { "en-US": "Test Channel" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -129,16 +131,16 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 	});
 
-	test("update channel - changeKey", () => {
+	test("update channel - changeKey", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel-2",
 			name: { "en-US": "Test Channel 2" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -154,16 +156,16 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 	});
 
-	test("update channel - changeDescription", () => {
+	test("update channel - changeDescription", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel-3",
 			name: { "en-US": "Test Channel 3" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -179,16 +181,16 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 	});
 
-	test("update channel - setAddress", () => {
+	test("update channel - setAddress", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel-4",
 			name: { "en-US": "Test Channel 4" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -211,16 +213,16 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 	});
 
-	test("update channel - setGeoLocation", () => {
+	test("update channel - setGeoLocation", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel-5",
 			name: { "en-US": "Test Channel 5" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -242,17 +244,17 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 	});
 
-	test("update channel - setCustomType", () => {
+	test("update channel - setCustomType", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel-6",
 			name: { "en-US": "Test Channel 6" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
 		// Set custom type
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -275,7 +277,7 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 
 		// Remove custom type
-		const result2 = repository.processUpdateActions(
+		const result2 = await repository.processUpdateActions(
 			ctx,
 			result,
 			result.version,
@@ -290,7 +292,7 @@ describe("Channel Repository", () => {
 		expect(result2.version).toBe(result.version + 1);
 	});
 
-	test("update channel - setCustomField", () => {
+	test("update channel - setCustomField", async () => {
 		const draft: ChannelDraft = {
 			key: "test-channel-7",
 			name: { "en-US": "Test Channel 7" },
@@ -306,10 +308,10 @@ describe("Channel Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
 		// Update custom field
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			channel,
 			channel.version,
@@ -326,7 +328,7 @@ describe("Channel Repository", () => {
 		expect(result.version).toBe(channel.version + 1);
 
 		// Remove custom field
-		const result2 = repository.processUpdateActions(
+		const result2 = await repository.processUpdateActions(
 			ctx,
 			result,
 			result.version,
@@ -343,32 +345,32 @@ describe("Channel Repository", () => {
 		expect(result2.version).toBe(result.version + 1);
 	});
 
-	test("get and delete channel", () => {
+	test("get and delete channel", async () => {
 		const draft: ChannelDraft = {
 			key: "delete-test",
 			name: { "en-US": "Delete Test Channel" },
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const channel = repository.create(ctx, draft);
+		const channel = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, channel.id);
+		const retrieved = await repository.get(ctx, channel.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(channel.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, channel.key!);
+		const retrievedByKey = await repository.getByKey(ctx, channel.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(channel.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, channel.id);
+		const deleted = await repository.delete(ctx, channel.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(channel.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, channel.id);
+		const notFound = await repository.get(ctx, channel.id);
 		expect(notFound).toBeNull();
 	});
 });

@@ -23,7 +23,10 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 		this.draftSchema = SubscriptionDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: SubscriptionDraft): Subscription {
+	async create(
+		context: RepositoryContext,
+		draft: SubscriptionDraft,
+	): Promise<Subscription> {
 		// TODO: We could actually test this here by using the aws sdk. For now
 		// hardcode a failed check when account id is 0000000000
 		if (draft.destination.type === "SQS") {
@@ -53,7 +56,7 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 			status: "Healthy",
 			events: draft.events || [],
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 

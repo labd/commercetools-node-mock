@@ -33,46 +33,48 @@ export class StoreRepository extends AbstractResourceRepository<"store"> {
 		this.draftSchema = StoreDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: StoreDraft): Store {
+	async create(context: RepositoryContext, draft: StoreDraft): Promise<Store> {
 		const resource: Store = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			name: draft.name,
 			languages: draft.languages ?? [],
 			countries: draft.countries ?? [],
-			distributionChannels: transformChannels(
+			distributionChannels: await transformChannels(
 				context,
 				this._storage,
 				draft.distributionChannels,
 			),
-			supplyChannels: transformChannels(
+			supplyChannels: await transformChannels(
 				context,
 				this._storage,
 				draft.supplyChannels,
 			),
 			productSelections: [],
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 
-const transformChannels = (
+const transformChannels = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	channels?: ChannelResourceIdentifier[],
 ) => {
 	if (!channels) return [];
 
-	return channels.map((ref) =>
-		getReferenceFromResourceIdentifier<ChannelReference>(
-			ref,
-			context.projectKey,
-			storage,
+	return Promise.all(
+		channels.map((ref) =>
+			getReferenceFromResourceIdentifier<ChannelReference>(
+				ref,
+				context.projectKey,
+				storage,
+			),
 		),
 	);
 };
@@ -97,20 +99,20 @@ class StoreUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Store>,
 		{ type, fields }: StoreSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
-	setDistributionChannels(
+	async setDistributionChannels(
 		context: RepositoryContext,
 		resource: Writable<Store>,
 		{ distributionChannels }: StoreSetDistributionChannelsAction,
 	) {
-		resource.distributionChannels = transformChannels(
+		resource.distributionChannels = await transformChannels(
 			context,
 			this._storage,
 			distributionChannels,

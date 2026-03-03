@@ -29,7 +29,10 @@ export class ChannelRepository extends AbstractResourceRepository<"channel"> {
 		this.draftSchema = ChannelDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: ChannelDraft): Channel {
+	async create(
+		context: RepositoryContext,
+		draft: ChannelDraft,
+	): Promise<Channel> {
 		const resource: Channel = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -38,13 +41,13 @@ export class ChannelRepository extends AbstractResourceRepository<"channel"> {
 			roles: draft.roles || [],
 			geoLocation: draft.geoLocation,
 			address: createAddress(draft.address, context.projectKey, this._storage),
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 
@@ -96,12 +99,12 @@ class ChannelUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Channel>,
 		{ type, fields }: ChannelSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setGeoLocation(

@@ -64,7 +64,10 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		this.draftSchema = BusinessUnitDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: BusinessUnitDraft): BusinessUnit {
+	async create(
+		context: RepositoryContext,
+		draft: BusinessUnitDraft,
+	): Promise<BusinessUnit> {
 		const addresses =
 			draft.addresses?.map((address) => ({
 				...address,
@@ -87,18 +90,32 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			(i) => addresses[i].id,
 		);
 
+		const stores = draft.stores
+			? await Promise.all(
+					draft.stores.map((s) =>
+						getStoreKeyReference(s, context.projectKey, this._storage),
+					),
+				)
+			: undefined;
+
+		const associates = draft.associates
+			? await Promise.all(
+					draft.associates.map((a) =>
+						createAssociate(a, context.projectKey, this._storage),
+					),
+				)
+			: [];
+
 		const resource = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
 			status: draft.status,
-			stores: draft.stores?.map((s) =>
-				getStoreKeyReference(s, context.projectKey, this._storage),
-			),
+			stores,
 			storeMode: draft.storeMode,
 			name: draft.name,
 			contactEmail: draft.contactEmail,
 			addresses: addresses,
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -109,24 +126,20 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 			defaultBillingAddressId: defaultBillingAddressId,
 			associateMode: draft.associateMode,
 			approvalRuleMode: draft.approvalRuleMode,
-
-			associates:
-				draft.associates?.map((a) =>
-					createAssociate(a, context.projectKey, this._storage),
-				) ?? [],
+			associates,
 		};
 
 		if (this._isDivisionDraft(draft)) {
-			const parentUnit = getBusinessUnitKeyReference(
+			const parentUnit = await getBusinessUnitKeyReference(
 				draft.parentUnit,
 				context.projectKey,
 				this._storage,
 			);
 			// Look up the parent to determine the topLevelUnit
-			const parent = this._storage.getByResourceIdentifier(
+			const parent = (await this._storage.getByResourceIdentifier(
 				context.projectKey,
 				parentUnit,
-			) as BusinessUnit | undefined;
+			)) as BusinessUnit | undefined;
 			const topLevelUnit: BusinessUnitKeyReference = parent?.topLevelUnit ?? {
 				typeId: "business-unit",
 				key: parentUnit.key!,
@@ -138,7 +151,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 				topLevelUnit,
 			} as Division;
 
-			this.saveNew(context, division);
+			await this.saveNew(context, division);
 			return division;
 		}
 		if (this._isCompanyDraft(draft)) {
@@ -151,7 +164,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 				},
 			} as Company;
 
-			this.saveNew(context, company);
+			await this.saveNew(context, company);
 			return company;
 		}
 
@@ -179,7 +192,7 @@ class BusinessUnitUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<BusinessUnit, BusinessUnitUpdateAction>>
 {
-	addAddress(
+	async addAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ address }: BusinessUnitAddAddressAction,
@@ -194,12 +207,12 @@ class BusinessUnitUpdateHandler
 		}
 	}
 
-	addAssociate(
+	async addAssociate(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ associate }: BusinessUnitAddAssociateAction,
 	) {
-		const newAssociate = createAssociate(
+		const newAssociate = await createAssociate(
 			associate,
 			context.projectKey,
 			this._storage,
@@ -209,12 +222,12 @@ class BusinessUnitUpdateHandler
 		}
 	}
 
-	addStore(
+	async addStore(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ store }: BusinessUnitAddStoreAction,
 	) {
-		const newStore = getStoreKeyReference(
+		const newStore = await getStoreKeyReference(
 			store,
 			context.projectKey,
 			this._storage,
@@ -275,12 +288,12 @@ class BusinessUnitUpdateHandler
 		resource.name = name;
 	}
 
-	changeParentUnit(
+	async changeParentUnit(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ parentUnit }: BusinessUnitChangeParentUnitAction,
 	) {
-		resource.parentUnit = getBusinessUnitKeyReference(
+		resource.parentUnit = await getBusinessUnitKeyReference(
 			parentUnit,
 			context.projectKey,
 			this._storage,
@@ -295,14 +308,18 @@ class BusinessUnitUpdateHandler
 		resource.status = status;
 	}
 
-	setAssociates(
+	async setAssociates(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ associates }: BusinessUnitSetAssociatesAction,
 	) {
-		const newAssociates = associates
-			.map((a) => createAssociate(a, context.projectKey, this._storage))
-			.filter((a): a is Writable<Associate> => a !== undefined);
+		const newAssociates = (
+			await Promise.all(
+				associates.map((a) =>
+					createAssociate(a, context.projectKey, this._storage),
+				),
+			)
+		).filter((a): a is Writable<Associate> => a !== undefined);
 		resource.associates = newAssociates || undefined;
 	}
 
@@ -316,7 +333,7 @@ class BusinessUnitUpdateHandler
 		);
 	}
 
-	changeAssociate(
+	async changeAssociate(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ associate }: BusinessUnitChangeAssociateAction,
@@ -334,7 +351,7 @@ class BusinessUnitUpdateHandler
 			);
 		}
 
-		const newAssociate = createAssociate(
+		const newAssociate = await createAssociate(
 			associate,
 			context.projectKey,
 			this._storage,
@@ -352,12 +369,12 @@ class BusinessUnitUpdateHandler
 		resource.contactEmail = contactEmail;
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ type, fields }: BusinessUnitSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setStoreMode(
@@ -400,7 +417,6 @@ class BusinessUnitUpdateHandler
 		if (!resource.shippingAddressIds.includes(address.id)) {
 			resource.shippingAddressIds.push(address.id);
 		}
-		return resource;
 	}
 
 	removeShippingAddressId(
@@ -505,7 +521,7 @@ class BusinessUnitUpdateHandler
 		address.custom.fields[name] = value;
 	}
 
-	setAddressCustomType(
+	async setAddressCustomType(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ addressId, type, fields }: BusinessUnitSetAddressCustomTypeAction,
@@ -524,7 +540,7 @@ class BusinessUnitUpdateHandler
 		if (!type) {
 			address.custom = undefined;
 		} else {
-			address.custom = createCustomFields(
+			address.custom = await createCustomFields(
 				{ type, fields },
 				context.projectKey,
 				this._storage,

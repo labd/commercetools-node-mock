@@ -26,7 +26,7 @@ export class ProductProjectionService extends AbstractService {
 		instance.get("/search", this.search.bind(this));
 	}
 
-	get(
+	async get(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -37,7 +37,7 @@ export class ProductProjectionService extends AbstractService {
 		const limit = this._parseParam(query.limit);
 		const offset = this._parseParam(query.offset);
 
-		const result = this.repository.query(getRepositoryContext(request), {
+		const result = await this.repository.query(getRepositoryContext(request), {
 			...query,
 			expand: this._parseParam(query.expand),
 			where: this._parseParam(query.where),
@@ -47,7 +47,7 @@ export class ProductProjectionService extends AbstractService {
 		return reply.status(200).send(result);
 	}
 
-	search(
+	async search(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -70,7 +70,7 @@ export class ProductProjectionService extends AbstractService {
 			offset: query.offset ? Number(queryParamsValue(query.offset)) : undefined,
 			limit: query.limit ? Number(queryParamsValue(query.limit)) : undefined,
 		};
-		const resource = this.repository.search(
+		const resource = await this.repository.search(
 			getRepositoryContext(request),
 			searchParams,
 		);

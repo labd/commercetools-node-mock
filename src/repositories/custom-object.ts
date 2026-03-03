@@ -21,15 +21,15 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 		this.draftSchema = CustomObjectDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: Writable<CustomObjectDraft>,
-	): CustomObject {
-		const current = this.getWithContainerAndKey(
+	): Promise<CustomObject> {
+		const current = (await this.getWithContainerAndKey(
 			context,
 			draft.container,
 			draft.key,
-		) as Writable<CustomObject | undefined>;
+		)) as Writable<CustomObject | undefined>;
 
 		if (current) {
 			// Only check version if it is passed in the draft
@@ -43,7 +43,7 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 				const updated = cloneObject(current) as Writable<CustomObject>;
 				updated.value = draft.value;
 				updated.version += 1;
-				this.saveUpdate(context, draft.version, updated);
+				await this.saveUpdate(context, draft.version, updated);
 				return updated;
 			}
 			return current;
@@ -66,38 +66,44 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 			value: draft.value,
 		};
 
-		this.saveNew(context, resource);
+		await this.saveNew(context, resource);
 		return resource;
 	}
 
-	getWithContainerAndKey(
+	async getWithContainerAndKey(
 		context: RepositoryContext,
 		container: string,
 		key: string,
 	) {
-		const items = this._storage.all(context.projectKey, this.getTypeId());
+		const items = await this._storage.all(context.projectKey, this.getTypeId());
 		return items.find(
 			(item) => item.container === container && item.key === key,
 		);
 	}
 
-	queryWithContainer(
+	async queryWithContainer(
 		context: RepositoryContext,
 		container: string,
 		params: QueryParams = {},
 	) {
 		const whereClause = params.where || [];
 		whereClause.push(`container="${container}"`);
-		const result = this._storage.query(context.projectKey, this.getTypeId(), {
-			...params,
-			where: whereClause,
-		});
+		const result = await this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{
+				...params,
+				where: whereClause,
+			},
+		);
 
 		// @ts-expect-error
-		result.results = result.results.map((r) =>
-			this.postProcessResource(context, r as CustomObject, {
-				expand: params.expand,
-			}),
+		result.results = await Promise.all(
+			result.results.map((r) =>
+				this.postProcessResource(context, r as CustomObject, {
+					expand: params.expand,
+				}),
+			),
 		);
 		return result;
 	}

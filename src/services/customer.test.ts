@@ -7,8 +7,8 @@ import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
 
-afterEach(() => {
-	ctMock.clear();
+afterEach(async () => {
+	await ctMock.clear();
 });
 
 describe("Customer create", () => {
@@ -452,7 +452,7 @@ describe("Customer Update Actions (old-style)", () => {
 			billingAddressIds: [],
 			customerGroupAssignments: [],
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 	});
 
 	test("exists", async () => {
@@ -605,7 +605,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			custom: { type: { typeId: "type", id: "" }, fields: {} },
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -629,7 +629,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			firstName: "John",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -651,7 +651,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			firstName: "John",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -673,7 +673,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			lastName: "Doe",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -695,7 +695,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			salutation: "Mr.",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -717,7 +717,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			salutation: "Mr.",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -739,7 +739,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			companyName: "Acme",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -761,7 +761,7 @@ describe("Customer Update Actions (old-style)", () => {
 			...customer,
 			vatId: "123456789",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -805,7 +805,7 @@ describe("Customer Update Actions (old-style)", () => {
 			],
 			defaultBillingAddressId: "address-uuid",
 		};
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -855,7 +855,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setCustomerNumber", async () => {
 		assert(customer, "customer not created");
 
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -875,7 +875,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setCustomerNumber error when already have a customer number", async () => {
 		assert(customer, "customer not created");
 
-		ctMock.project("dummy").unsafeAdd("customer", {
+		await ctMock.project("dummy").unsafeAdd("customer", {
 			...customer,
 			customerNumber: "CUSTOMER-002",
 		});
@@ -899,7 +899,7 @@ describe("Customer Update Actions (old-style)", () => {
 	test("setKey", async () => {
 		assert(customer, "customer not created");
 
-		ctMock.project("dummy").unsafeAdd("customer", customer);
+		await ctMock.project("dummy").unsafeAdd("customer", customer);
 
 		const response = await ctMock.app.inject({
 			method: "POST",
@@ -916,12 +916,12 @@ describe("Customer Update Actions (old-style)", () => {
 });
 
 describe("Customer Password Reset", () => {
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
-	beforeEach(() => {
-		ctMock.project("dummy").unsafeAdd("customer", {
+	beforeEach(async () => {
+		await ctMock.project("dummy").unsafeAdd("customer", {
 			id: "123",
 			createdAt: "2021-03-18T14:00:00.000Z",
 			version: 2,

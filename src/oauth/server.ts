@@ -249,7 +249,7 @@ export class OAuth2Server {
 			const password = hashPassword(query.password || body.password);
 			const scope = query.scope?.toString() || body?.scope?.toString();
 
-			const result = this.customerRepository.query(
+			const result = await this.customerRepository.query(
 				{ projectKey: params.projectKey },
 				{
 					where: [`email = "${username}"`, `password = "${password}"`],
@@ -306,7 +306,7 @@ export class OAuth2Server {
 			const password = hashPassword(query.password || body.password);
 			const scope = query.scope?.toString() || body.scope?.toString();
 
-			const result = this.customerRepository.query(
+			const result = await this.customerRepository.query(
 				{ projectKey, storeKey },
 				{
 					where: [`email = "${username}"`, `password = "${password}"`],

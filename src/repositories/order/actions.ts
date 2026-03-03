@@ -48,12 +48,12 @@ export class OrderUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Order, OrderUpdateAction>>
 {
-	addPayment(
+	async addPayment(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ payment }: OrderAddPaymentAction,
 	) {
-		const resolvedPayment = this._storage.getByResourceIdentifier(
+		const resolvedPayment = await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			payment,
 		);
@@ -77,7 +77,7 @@ export class OrderUpdateHandler
 		});
 	}
 
-	addReturnInfo(
+	async addReturnInfo(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		info: OrderAddReturnInfoAction,
@@ -86,15 +86,15 @@ export class OrderUpdateHandler
 			resource.returnInfo = [];
 		}
 
-		const resolved: ReturnInfo = {
-			items: info.items.map((item) => {
+		const items = await Promise.all(
+			info.items.map(async (item) => {
 				const common = {
 					...getBaseResourceProperties(),
 					quantity: item.quantity,
 					paymentState: "Initial",
 					shipmentState: item.shipmentState ?? "Advised",
 					comment: item.comment,
-					custom: createCustomFields(
+					custom: await createCustomFields(
 						item.custom,
 						context.projectKey,
 						this._storage,
@@ -113,6 +113,10 @@ export class OrderUpdateHandler
 					lineItemId: item.customLineItemId || item.lineItemId,
 				} as LineItemReturnItem;
 			}),
+		);
+
+		const resolved: ReturnInfo = {
+			items,
 			returnTrackingId: info.returnTrackingId,
 			returnDate: info.returnDate,
 		};
@@ -180,15 +184,15 @@ export class OrderUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ type, fields }: OrderSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
-	addDelivery(
+	async addDelivery(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ action, items, ...deliveryDraft }: OrderAddDeliveryAction,
@@ -212,12 +216,17 @@ export class OrderUpdateHandler
 			resource.shippingInfo.deliveries = [];
 		}
 
-		const parcels: Parcel[] =
-			deliveryDraft.parcels?.map((p) => ({
+		const parcels: Parcel[] = await Promise.all(
+			deliveryDraft.parcels?.map(async (p) => ({
 				...getBaseResourceProperties(),
 				...p,
-				custom: createCustomFields(p.custom, context.projectKey, this._storage),
-			})) ?? [];
+				custom: await createCustomFields(
+					p.custom,
+					context.projectKey,
+					this._storage,
+				),
+			})) ?? [],
+		);
 
 		const delivery: Delivery = {
 			...getBaseResourceProperties(),
@@ -229,7 +238,7 @@ export class OrderUpdateHandler
 				context.projectKey,
 				this._storage,
 			),
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				deliveryDraft.custom,
 				context.projectKey,
 				this._storage,
@@ -289,7 +298,7 @@ export class OrderUpdateHandler
 		lineItem.custom.fields[name] = value;
 	}
 
-	setLineItemCustomType(
+	async setLineItemCustomType(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ lineItemId, lineItemKey, type, fields }: OrderSetLineItemCustomTypeAction,
@@ -313,7 +322,7 @@ export class OrderUpdateHandler
 		if (!type) {
 			lineItem.custom = undefined;
 		} else {
-			const resolvedType = this._storage.getByResourceIdentifier(
+			const resolvedType = await this._storage.getByResourceIdentifier(
 				context.projectKey,
 				type,
 			);
@@ -392,13 +401,13 @@ export class OrderUpdateHandler
 		);
 	}
 
-	setStore(
+	async setStore(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ store }: OrderSetStoreAction,
 	) {
 		if (!store) return;
-		const resolvedType = this._storage.getByResourceIdentifier(
+		const resolvedType = await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			store,
 		);
@@ -417,15 +426,15 @@ export class OrderUpdateHandler
 		};
 	}
 
-	transitionState(
+	async transitionState(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ state }: OrderTransitionStateAction,
 	) {
-		const resolvedType = this._storage.getByResourceIdentifier(
+		const resolvedType = (await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			state,
-		) as State | null;
+		)) as State | null;
 
 		if (!resolvedType) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
@@ -444,13 +453,13 @@ export class OrderUpdateHandler
 		};
 	}
 
-	updateSyncInfo(
+	async updateSyncInfo(
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		{ channel, externalId, syncedAt }: OrderUpdateSyncInfoAction,
 	) {
 		if (!channel) return;
-		const resolvedType = this._storage.getByResourceIdentifier(
+		const resolvedType = await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			channel,
 		);

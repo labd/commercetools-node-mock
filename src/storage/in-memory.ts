@@ -14,10 +14,8 @@ import type {
 	DiscountGroup,
 	Extension,
 	InvalidInputError,
-	InvalidJsonInputError,
 	InventoryEntry,
 	Order,
-	PagedQueryResponse,
 	Payment,
 	Product,
 	ProductDiscount,
@@ -29,12 +27,8 @@ import type {
 	QuoteRequest,
 	RecurrencePolicy,
 	RecurringOrder,
-	Reference,
-	ReferencedResourceNotFoundError,
-	ResourceIdentifier,
 	ShippingMethod,
 	ShoppingList,
-	ShoppingListLineItem,
 	StagedQuote,
 	State,
 	Store,
@@ -45,13 +39,11 @@ import type {
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { cloneObject } from "../helpers.ts";
-import { parseExpandClause } from "../lib/expandParser.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
 import type {
 	PagedQueryResponseMap,
 	ResourceMap,
 	ResourceType,
-	Writable,
 } from "../types.ts";
 import type { GetParams, ProjectStorage, QueryParams } from "./abstract.ts";
 import { AbstractStorage } from "./abstract.ts";
@@ -65,7 +57,7 @@ export class InMemoryStorage extends AbstractStorage {
 		[projectKey: string]: Project;
 	} = {};
 
-	addProject = (projectKey: string): Project => {
+	async addProject(projectKey: string): Promise<Project> {
 		if (!this.projects[projectKey]) {
 			this.projects[projectKey] = {
 				key: projectKey,
@@ -111,74 +103,19 @@ export class InMemoryStorage extends AbstractStorage {
 			};
 		}
 		return this.projects[projectKey];
-	};
+	}
 
-	saveProject = (project: Project): Project => {
+	async saveProject(project: Project): Promise<Project> {
 		this.projects[project.key] = project;
 		return project;
-	};
+	}
 
-	getProject = (projectKey: string): Project => this.addProject(projectKey);
+	async getProject(projectKey: string): Promise<Project> {
+		return this.addProject(projectKey);
+	}
 
-	// Expand resolves a nested reference and injects the object in the given obj
-	public expand = <T>(
-		projectKey: string,
-		obj: T,
-		clause: undefined | string | string[],
-	): T => {
-		if (!clause) return obj;
-		const newObj = cloneObject(obj);
-		if (Array.isArray(clause)) {
-			for (const c of clause) {
-				this._resolveResource(projectKey, newObj, c);
-			}
-		} else {
-			this._resolveResource(projectKey, newObj, clause);
-		}
-		return newObj;
-	};
-
-	private _resolveResource = (projectKey: string, obj: any, expand: string) => {
-		const params = parseExpandClause(expand);
-
-		// 'lineItems[*].variant' on ShoppingList is an exception, these variants are not references
-		if (params.index === "*") {
-			const reference = obj[params.element];
-			if (
-				params.element === "lineItems" &&
-				params.rest?.startsWith("variant") &&
-				reference.every(
-					(item: any) =>
-						item.variant === undefined && item.variantId !== undefined,
-				)
-			) {
-				for (const item of reference as ShoppingListLineItem[]) {
-					this._resolveShoppingListLineItemVariant(projectKey, item);
-				}
-			}
-		}
-
-		if (!params.index) {
-			const reference = obj[params.element];
-			if (reference === undefined) {
-				return;
-			}
-			this._resolveReference(projectKey, reference, params.rest);
-		} else if (params.index === "*") {
-			const reference = obj[params.element];
-			if (reference === undefined || !Array.isArray(reference)) return;
-			for (const itemRef of reference as Writable<Reference>[]) {
-				this._resolveReference(projectKey, itemRef, params.rest);
-			}
-		} else {
-			const reference = obj[params.element][params.index];
-			if (reference === undefined) return;
-			this._resolveReference(projectKey, reference, params.rest);
-		}
-	};
-
-	private forProjectKey(projectKey: string): ProjectStorage {
-		this.addProject(projectKey);
+	private async forProjectKey(projectKey: string): Promise<ProjectStorage> {
+		await this.addProject(projectKey);
 
 		let projectStorage = this.resources[projectKey];
 		if (!projectStorage) {
@@ -226,7 +163,7 @@ export class InMemoryStorage extends AbstractStorage {
 		return projectStorage;
 	}
 
-	clear() {
+	async clear(): Promise<void> {
 		for (const [, projectStorage] of Object.entries(this.resources)) {
 			for (const [, value] of Object.entries(projectStorage)) {
 				value?.clear();
@@ -234,27 +171,28 @@ export class InMemoryStorage extends AbstractStorage {
 		}
 	}
 
-	all<RT extends ResourceType>(
+	async all<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
-	): ResourceMap[RT][] {
-		const store = this.forProjectKey(projectKey)[typeId];
+	): Promise<ResourceMap[RT][]> {
+		const projectStorage = await this.forProjectKey(projectKey);
+		const store = projectStorage[typeId];
 		if (store) {
 			return Array.from(store.values()).map(cloneObject) as ResourceMap[RT][];
 		}
 		return [];
 	}
 
-	add<RT extends ResourceType>(
+	async add<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		obj: ResourceMap[RT],
 		params: GetParams = {},
-	): ResourceMap[RT] {
-		const store = this.forProjectKey(projectKey);
+	): Promise<ResourceMap[RT]> {
+		const store = await this.forProjectKey(projectKey);
 		store[typeId]?.set(obj.id, obj);
 
-		const resource = this.get(projectKey, typeId, obj.id, params);
+		const resource = await this.get(projectKey, typeId, obj.id, params);
 		assert(
 			resource,
 			`resource of type ${typeId} with id ${obj.id} not created`,
@@ -262,27 +200,29 @@ export class InMemoryStorage extends AbstractStorage {
 		return cloneObject(resource);
 	}
 
-	get<RT extends ResourceType>(
+	async get<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		id: string,
 		params: GetParams = {},
-	): ResourceMap[RT] | null {
-		const resource = this.forProjectKey(projectKey)[typeId]?.get(id);
+	): Promise<ResourceMap[RT] | null> {
+		const projectStorage = await this.forProjectKey(projectKey);
+		const resource = projectStorage[typeId]?.get(id);
 		if (resource) {
 			const clone = cloneObject(resource);
-			return this.expand(projectKey, clone, params.expand) as ResourceMap[RT];
+			const expanded = await this.expand(projectKey, clone, params.expand);
+			return expanded as ResourceMap[RT];
 		}
 		return null;
 	}
 
-	getByKey<RT extends ResourceType>(
+	async getByKey<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		key: string,
 		params: GetParams = {},
-	): ResourceMap[RT] | null {
-		const store = this.forProjectKey(projectKey);
+	): Promise<ResourceMap[RT] | null> {
+		const store = await this.forProjectKey(projectKey);
 		if (!store) {
 			throw new Error("No type");
 		}
@@ -292,37 +232,40 @@ export class InMemoryStorage extends AbstractStorage {
 		const resource = resources.find((e) => e.key === key);
 		if (resource) {
 			const clone = cloneObject(resource);
-			return this.expand(projectKey, clone, params.expand) as ResourceMap[RT];
+			const expanded = await this.expand(projectKey, clone, params.expand);
+			return expanded as ResourceMap[RT];
 		}
 		return null;
 	}
 
-	delete<RT extends ResourceType>(
+	async delete<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		id: string,
 		params: GetParams = {},
-	): ResourceMap[RT] | null {
-		const resource = this.get(projectKey, typeId, id);
+	): Promise<ResourceMap[RT] | null> {
+		const resource = await this.get(projectKey, typeId, id);
 
 		if (resource) {
-			this.forProjectKey(projectKey)[typeId]?.delete(id);
+			const projectStorage = await this.forProjectKey(projectKey);
+			projectStorage[typeId]?.delete(id);
 			return this.expand(projectKey, resource, params.expand);
 		}
 		return resource;
 	}
 
-	query<RT extends ResourceType>(
+	async query<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
 		params: QueryParams,
-	): PagedQueryResponseMap[RT] {
-		const store = this.forProjectKey(projectKey)[typeId];
+	): Promise<PagedQueryResponseMap[RT]> {
+		const projectStorage = await this.forProjectKey(projectKey);
+		const store = projectStorage[typeId];
 		if (!store) {
 			throw new Error("No type");
 		}
 
-		let resources = this.all<RT>(projectKey, typeId);
+		let resources = await this.all<RT>(projectKey, typeId);
 
 		// Apply predicates
 		if (params.where) {
@@ -358,8 +301,10 @@ export class InMemoryStorage extends AbstractStorage {
 
 		// Expand the resources
 		if (params.expand !== undefined) {
-			resources = resources.map((resource) =>
-				this.expand(projectKey, resource, params.expand),
+			resources = await Promise.all(
+				resources.map((resource) =>
+					this.expand(projectKey, resource, params.expand),
+				),
 			);
 		}
 
@@ -370,145 +315,5 @@ export class InMemoryStorage extends AbstractStorage {
 			limit: limit,
 			results: resources.map(cloneObject),
 		} as PagedQueryResponseMap[RT];
-	}
-
-	search(
-		projectKey: string,
-		typeId: ResourceType,
-		params: QueryParams,
-	): PagedQueryResponse {
-		let resources = this.all(projectKey, typeId);
-
-		// Apply predicates
-		if (params.where) {
-			try {
-				const filterFunc = parseQueryExpression(params.where);
-				resources = resources.filter((resource) => filterFunc(resource, {}));
-			} catch (err) {
-				throw new CommercetoolsError<InvalidInputError>(
-					{
-						code: "InvalidInput",
-						message: (err as any).message,
-					},
-					400,
-				);
-			}
-		}
-
-		// Get the total before slicing the array
-		const totalResources = resources.length;
-
-		// Apply offset, limit
-		const offset = params.offset || 0;
-		const limit = params.limit || 20;
-		resources = resources.slice(offset, offset + limit);
-
-		// Expand the resources
-		if (params.expand !== undefined) {
-			resources = resources.map((resource) =>
-				this.expand(projectKey, resource, params.expand),
-			);
-		}
-
-		return {
-			count: resources.length,
-			total: totalResources,
-			offset: offset,
-			limit: limit,
-			results: resources,
-		};
-	}
-
-	getByResourceIdentifier<RT extends ResourceType>(
-		projectKey: string,
-		identifier: ResourceIdentifier,
-	): ResourceMap[RT] {
-		if (identifier.id) {
-			const resource = this.get(projectKey, identifier.typeId, identifier.id);
-			if (resource) {
-				return resource as ResourceMap[RT];
-			}
-
-			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
-				code: "ReferencedResourceNotFound",
-				message: `The referenced object of type '${identifier.typeId}' with id '${identifier.id}' was not found. It either doesn't exist, or it can't be accessed from this endpoint (e.g., if the endpoint filters by store or customer account).`,
-				typeId: identifier.typeId,
-				id: identifier.id,
-			});
-		}
-
-		if (identifier.key) {
-			const resource = this.getByKey(
-				projectKey,
-				identifier.typeId,
-				identifier.key,
-			);
-			if (resource) {
-				return resource as ResourceMap[RT];
-			}
-
-			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
-				code: "ReferencedResourceNotFound",
-				message: `The referenced object of type '${identifier.typeId}' with key '${identifier.key}' was not found. It either doesn't exist, or it can't be accessed from this endpoint (e.g., if the endpoint filters by store or customer account).`,
-				typeId: identifier.typeId,
-				key: identifier.key,
-			});
-		}
-		throw new CommercetoolsError<InvalidJsonInputError>({
-			code: "InvalidJsonInput",
-			message: "Request body does not contain valid JSON.",
-			detailedErrorMessage: "ResourceIdentifier requires an 'id' xor a 'key'",
-		});
-	}
-
-	private _resolveReference(
-		projectKey: string,
-		reference: any,
-		expand: string | undefined,
-	) {
-		if (reference === undefined) return;
-
-		if (
-			reference.typeId !== undefined &&
-			(reference.id !== undefined || reference.key !== undefined)
-		) {
-			// First check if the object is already resolved. This is the case when
-			// the complete resource is pushed via the .add() method.
-			if (!reference.obj) {
-				reference.obj = this.getByResourceIdentifier(projectKey, {
-					typeId: reference.typeId,
-					id: reference.id,
-					key: reference.key,
-				} as ResourceIdentifier);
-			}
-			if (expand) {
-				this._resolveResource(projectKey, reference.obj, expand);
-			}
-		} else {
-			if (expand) {
-				this._resolveResource(projectKey, reference, expand);
-			}
-		}
-	}
-
-	private _resolveShoppingListLineItemVariant(
-		projectKey: string,
-		lineItem: ShoppingListLineItem,
-	) {
-		const product = this.getByResourceIdentifier(projectKey, {
-			typeId: "product",
-			id: lineItem.productId,
-		}) as Product | undefined;
-
-		if (!product) {
-			return;
-		}
-
-		const variant = [
-			product.masterData.current.masterVariant,
-			...product.masterData.current.variants,
-		].find((e) => e.id === lineItem.variantId);
-		// @ts-expect-error
-		lineItem.variant = variant;
 	}
 }

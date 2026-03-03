@@ -23,30 +23,33 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 		this.draftSchema = QuoteRequestDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: QuoteRequestDraft | MyQuoteRequestDraft,
-	): QuoteRequest {
+	): Promise<QuoteRequest> {
 		// Handle the 'my' version of the draft
 		if ("cartId" in draft) {
-			return this.createFromCart(context, {
+			return await this.createFromCart(context, {
 				id: draft.cartId,
 				typeId: "cart",
 			});
 		}
 
 		assert(draft.cart, "draft.cart is missing");
-		return this.createFromCart(context, {
+		return await this.createFromCart(context, {
 			id: draft.cart.id!,
 			typeId: "cart",
 		});
 	}
 
-	createFromCart(context: RepositoryContext, cartReference: CartReference) {
-		const cart = this._storage.getByResourceIdentifier(
+	async createFromCart(
+		context: RepositoryContext,
+		cartReference: CartReference,
+	) {
+		const cart = (await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			cartReference,
-		) as Cart | null;
+		)) as Cart | null;
 		if (!cart) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
 				{
@@ -92,6 +95,6 @@ export class QuoteRequestRepository extends AbstractResourceRepository<"quote-re
 			totalPrice: cart.totalPrice,
 			store: cart.store,
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

@@ -23,7 +23,26 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 		this.draftSchema = PaymentDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: PaymentDraft): Payment {
+	async create(
+		context: RepositoryContext,
+		draft: PaymentDraft,
+	): Promise<Payment> {
+		const transactions = await Promise.all(
+			(draft.transactions || []).map((t) =>
+				transactionFromTransactionDraft(context, this._storage, t),
+			),
+		);
+		const interfaceInteractions = await Promise.all(
+			(draft.interfaceInteractions || []).map(async (interaction) => {
+				const customFields = await createCustomFields(
+					interaction,
+					context.projectKey,
+					this._storage,
+				);
+				return customFields!;
+			}),
+		);
+
 		const resource: Payment = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -33,7 +52,7 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 				? {
 						...draft.paymentStatus,
 						state: draft.paymentStatus.state
-							? getReferenceFromResourceIdentifier<StateReference>(
+							? await getReferenceFromResourceIdentifier<StateReference>(
 									draft.paymentStatus.state,
 									context.projectKey,
 									this._storage,
@@ -41,20 +60,15 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 							: undefined,
 					}
 				: {},
-			transactions: (draft.transactions || []).map((t) =>
-				transactionFromTransactionDraft(context, this._storage, t),
-			),
-			interfaceInteractions: (draft.interfaceInteractions || []).map(
-				(interaction) =>
-					createCustomFields(interaction, context.projectKey, this._storage)!,
-			),
-			custom: createCustomFields(
+			transactions,
+			interfaceInteractions,
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
 			),
 		};
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }

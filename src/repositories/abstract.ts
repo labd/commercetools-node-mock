@@ -57,27 +57,36 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 		this._storage = config.storage;
 	}
 
-	abstract saveNew({ projectKey }: RepositoryContext, resource: R): void;
+	async saveNew({ projectKey }: RepositoryContext, resource: R): Promise<R> {
+		throw new Error("Not implemented");
+	}
 
-	abstract saveUpdate(
+	async saveUpdate(
 		{ projectKey }: RepositoryContext,
 		version: number,
 		resource: R,
-	): void;
+	): Promise<R> {
+		throw new Error("Not implemented");
+	}
 
-	abstract postProcessResource(context: RepositoryContext, resource: any): any;
+	async postProcessResource(
+		context: RepositoryContext,
+		resource: any,
+	): Promise<any> {
+		throw new Error("Not implemented");
+	}
 
-	processUpdateActions(
+	async processUpdateActions(
 		context: RepositoryContext,
 		resource: R,
 		version: number,
 		actions: UpdateAction[],
-	): R {
+	): Promise<R> {
 		if (!this.actions) {
 			throw new Error("No actions defined");
 		}
 
-		const updatedResource = this.actions.apply(
+		const updatedResource = await this.actions.apply(
 			context,
 			resource,
 			version,
@@ -87,10 +96,10 @@ export abstract class AbstractRepository<R extends BaseResource | Project> {
 		// If all actions succeeded we write the new version
 		// to the storage.
 		if (resource.version !== updatedResource.version) {
-			this.saveUpdate(context, version, updatedResource);
+			await this.saveUpdate(context, version, updatedResource);
 		}
 
-		const result = this.postProcessResource(context, updatedResource);
+		const result = await this.postProcessResource(context, updatedResource);
 		if (!result) {
 			throw new Error("invalid post process action");
 		}
@@ -123,77 +132,86 @@ export abstract class AbstractResourceRepository<
 		return this.config.strict;
 	}
 
-	abstract create(context: RepositoryContext, draft: any): ResourceMap[T];
+	abstract create(
+		context: RepositoryContext,
+		draft: any,
+	): Promise<ResourceMap[T]>;
 
 	protected getTypeId(): T {
 		return this._typeId;
 	}
 
-	delete(
+	async delete(
 		context: RepositoryContext,
 		id: string,
 		params: GetParams = {},
-	): ResourceMap[T] | null {
-		const resource = this._storage.delete(
+	): Promise<ResourceMap[T] | null> {
+		const resource = await this._storage.delete(
 			context.projectKey,
 			this.getTypeId(),
 			id,
 			params,
 		);
 		return resource
-			? this.postProcessResource(context, resource, params)
+			? await this.postProcessResource(context, resource, params)
 			: null;
 	}
 
-	get(
+	async get(
 		context: RepositoryContext,
 		id: string,
 		params: GetParams = {},
-	): ResourceMap[T] | null {
-		const resource = this._storage.get(
+	): Promise<ResourceMap[T] | null> {
+		const resource = await this._storage.get(
 			context.projectKey,
 			this.getTypeId(),
 			id,
 			params,
 		);
 		return resource
-			? this.postProcessResource(context, resource, params)
+			? await this.postProcessResource(context, resource, params)
 			: null;
 	}
 
-	getByKey(
+	async getByKey(
 		context: RepositoryContext,
 		key: string,
 		params: GetParams = {},
-	): ResourceMap[T] | null {
-		const resource = this._storage.getByKey(
+	): Promise<ResourceMap[T] | null> {
+		const resource = await this._storage.getByKey(
 			context.projectKey,
 			this.getTypeId(),
 			key,
 			params,
 		);
 		return resource
-			? this.postProcessResource(context, resource, params)
+			? await this.postProcessResource(context, resource, params)
 			: null;
 	}
 
-	postProcessResource(
+	async postProcessResource(
 		context: RepositoryContext,
 		resource: ResourceMap[T],
 		params?: GetParams,
-	): ResourceMap[T] {
+	): Promise<ResourceMap[T]> {
 		return resource;
 	}
 
-	query(context: RepositoryContext, params: QueryParams = {}) {
-		const result = this._storage.query(context.projectKey, this.getTypeId(), {
-			...params,
-		});
+	async query(context: RepositoryContext, params: QueryParams = {}) {
+		const result = await this._storage.query(
+			context.projectKey,
+			this.getTypeId(),
+			{
+				...params,
+			},
+		);
 
-		const data = result.results.map((r) =>
-			this.postProcessResource(context, r as ResourceMap[T], {
-				expand: params.expand,
-			}),
+		const data = await Promise.all(
+			result.results.map((r) =>
+				this.postProcessResource(context, r as ResourceMap[T], {
+					expand: params.expand,
+				}),
+			),
 		);
 		return {
 			...result,
@@ -201,25 +219,25 @@ export abstract class AbstractResourceRepository<
 		};
 	}
 
-	saveNew(
+	async saveNew(
 		context: RepositoryContext,
 		resource: ShallowWritable<ResourceMap[T]>,
-	): ResourceMap[T] {
+	): Promise<ResourceMap[T]> {
 		resource.version = 1;
-		return this._storage.add(
+		return await this._storage.add(
 			context.projectKey,
 			this.getTypeId(),
 			resource as any,
 		);
 	}
 
-	saveUpdate(
+	async saveUpdate(
 		context: RepositoryContext,
 		version: number,
 		resource: ShallowWritable<ResourceMap[T]>,
-	) {
+	): Promise<ResourceMap[T]> {
 		// Check if the resource still exists.
-		const current = this._storage.get(
+		const current = await this._storage.get(
 			context.projectKey,
 			this.getTypeId(),
 			resource.id,
@@ -245,9 +263,13 @@ export abstract class AbstractResourceRepository<
 			isPlatformClient: false,
 		};
 
-		this._storage.add(context.projectKey, this.getTypeId(), resource as any);
+		await this._storage.add(
+			context.projectKey,
+			this.getTypeId(),
+			resource as any,
+		);
 
-		return resource;
+		return resource as ResourceMap[T];
 	}
 }
 
@@ -255,7 +277,7 @@ type UpdateActionHandlerMethod<A, T> = (
 	context: RepositoryContext,
 	resource: Writable<A>,
 	action: T,
-) => void;
+) => void | Promise<void>;
 
 export type UpdateHandlerInterface<
 	A extends BaseResource | Project,
@@ -315,16 +337,16 @@ export class AbstractUpdateHandler {
 	 * custom fields on the resource. When `type` is not provided, removes
 	 * the custom fields entirely.
 	 */
-	protected _setCustomType(
+	protected async _setCustomType(
 		context: RepositoryContext,
 		resource: { custom?: CustomFields },
 		{
 			type,
 			fields,
 		}: { type?: TypeResourceIdentifier; fields?: FieldContainer },
-	): void {
+	): Promise<void> {
 		if (type) {
-			resource.custom = createCustomFields(
+			resource.custom = await createCustomFields(
 				{ type, fields },
 				context.projectKey,
 				this._storage,
@@ -334,12 +356,12 @@ export class AbstractUpdateHandler {
 		}
 	}
 
-	apply<R extends BaseResource | Project>(
+	async apply<R extends BaseResource | Project>(
 		context: RepositoryContext,
 		resource: R,
 		version: number,
 		actions: UpdateAction[],
-	): R {
+	): Promise<R> {
 		const updatedResource = cloneObject(resource) as ShallowWritable<R>;
 		const identifier = (resource as BaseResource).id
 			? (resource as BaseResource).id
@@ -375,7 +397,7 @@ export class AbstractUpdateHandler {
 			}
 
 			const beforeUpdate = cloneObject(resource);
-			updateFunc(context, updatedResource, action);
+			await updateFunc(context, updatedResource, action);
 
 			// Check if the object is updated. We need to increase the version of
 			// an object per action which does an actual modification.

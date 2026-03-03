@@ -7,14 +7,14 @@ import type { AbstractStorage } from "#src/storage/index.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { createCentPrecisionMoney, createCustomFields } from "../helpers.ts";
 
-export const transactionFromTransactionDraft = (
+export const transactionFromTransactionDraft = async (
 	context: RepositoryContext,
 	storage: AbstractStorage,
 	draft: TransactionDraft,
-): Transaction => ({
+): Promise<Transaction> => ({
 	...draft,
 	id: uuidv4(),
 	amount: createCentPrecisionMoney(draft.amount),
-	custom: createCustomFields(draft.custom, context.projectKey, storage),
+	custom: await createCustomFields(draft.custom, context.projectKey, storage),
 	state: draft.state ?? "Initial", // Documented as default
 });

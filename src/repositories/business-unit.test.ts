@@ -8,7 +8,7 @@ import type {
 	CompanyDraft,
 	DivisionDraft,
 } from "@commercetools/platform-sdk";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
@@ -19,33 +19,36 @@ describe("BusinessUnit Repository", () => {
 	const storage = new InMemoryStorage();
 	const config: Config = { storage, strict: false };
 	const repository = new BusinessUnitRepository(config);
+	let customer: Awaited<ReturnType<CustomerRepository["create"]>>;
 
-	// Add required dependencies for testing
-	storage.add("dummy", "store", {
-		...getBaseResourceProperties(),
-		id: "store-123",
-		key: "test-store",
-		name: { "en-US": "Test Store" },
-		languages: ["en-US"],
-		countries: [{ code: "US" }],
-		distributionChannels: [],
-		supplyChannels: [],
-		productSelections: [],
+	beforeAll(async () => {
+		// Add required dependencies for testing
+		await storage.add("dummy", "store", {
+			...getBaseResourceProperties(),
+			id: "store-123",
+			key: "test-store",
+			name: { "en-US": "Test Store" },
+			languages: ["en-US"],
+			countries: [{ code: "US" }],
+			distributionChannels: [],
+			supplyChannels: [],
+			productSelections: [],
+		});
+
+		// Create a proper customer using the customer repository
+		const customerRepository = new CustomerRepository(config);
+		customer = await customerRepository.create(
+			{ projectKey: "dummy" },
+			{
+				email: "associate@example.com",
+				password: "password123",
+				firstName: "John",
+				lastName: "Associate",
+			},
+		);
 	});
 
-	// Create a proper customer using the customer repository
-	const customerRepository = new CustomerRepository(config);
-	const customer = customerRepository.create(
-		{ projectKey: "dummy" },
-		{
-			email: "associate@example.com",
-			password: "password123",
-			firstName: "John",
-			lastName: "Associate",
-		},
-	);
-
-	test("create company business unit", () => {
+	test("create company business unit", async () => {
 		const draft: CompanyDraft = {
 			key: "test-company",
 			unitType: "Company",
@@ -94,7 +97,7 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -112,12 +115,12 @@ describe("BusinessUnit Repository", () => {
 		expect(result.associates).toHaveLength(1);
 
 		// Test that the business unit is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create division business unit", () => {
+	test("create division business unit", async () => {
 		// First create a company to be the parent
 		const companyDraft: CompanyDraft = {
 			key: "parent-company",
@@ -126,7 +129,10 @@ describe("BusinessUnit Repository", () => {
 			name: "Parent Company",
 		};
 
-		const _company = repository.create({ projectKey: "dummy" }, companyDraft);
+		const _company = await repository.create(
+			{ projectKey: "dummy" },
+			companyDraft,
+		);
 
 		const draft: DivisionDraft = {
 			key: "test-division",
@@ -141,7 +147,7 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -155,7 +161,7 @@ describe("BusinessUnit Repository", () => {
 		}
 	});
 
-	test("create business unit with minimal data", () => {
+	test("create business unit with minimal data", async () => {
 		const draft: CompanyDraft = {
 			key: "minimal-company",
 			unitType: "Company",
@@ -163,7 +169,7 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -174,7 +180,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.stores).toBeUndefined();
 	});
 
-	test("update business unit - changeName", () => {
+	test("update business unit - changeName", async () => {
 		const draft: CompanyDraft = {
 			key: "update-test-company",
 			unitType: "Company",
@@ -182,9 +188,9 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			businessUnit,
 			businessUnit.version,
@@ -200,7 +206,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("update business unit - setContactEmail", () => {
+	test("update business unit - setContactEmail", async () => {
 		const draft: CompanyDraft = {
 			key: "email-test-company",
 			unitType: "Company",
@@ -208,9 +214,9 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			businessUnit,
 			businessUnit.version,
@@ -226,7 +232,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("update business unit - changeStatus", () => {
+	test("update business unit - changeStatus", async () => {
 		const draft: CompanyDraft = {
 			key: "status-test-company",
 			unitType: "Company",
@@ -235,9 +241,9 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			businessUnit,
 			businessUnit.version,
@@ -253,7 +259,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("update business unit - setDefaultShippingAddress", () => {
+	test("update business unit - setDefaultShippingAddress", async () => {
 		const draft: CompanyDraft = {
 			key: "default-shipping-company",
 			unitType: "Company",
@@ -278,10 +284,10 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 		const addressId = businessUnit.addresses[1].id;
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			businessUnit,
 			businessUnit.version,
@@ -297,7 +303,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("update business unit - addShippingAddressId", () => {
+	test("update business unit - addShippingAddressId", async () => {
 		const draft: CompanyDraft = {
 			key: "add-shipping-address-company",
 			unitType: "Company",
@@ -321,10 +327,10 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 		const addressId = businessUnit.addresses[1].id;
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			businessUnit,
 			businessUnit.version,
@@ -340,7 +346,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("update business unit - removeAddress", () => {
+	test("update business unit - removeAddress", async () => {
 		const draft: CompanyDraft = {
 			key: "remove-address-company",
 			unitType: "Company",
@@ -368,11 +374,11 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 		const addressIdToRemove = businessUnit.addresses[0].id;
 		const remainingAddressId = businessUnit.addresses[1].id;
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			businessUnit,
 			businessUnit.version,
@@ -393,7 +399,7 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
-	test("get and delete business unit", () => {
+	test("get and delete business unit", async () => {
 		const draft: CompanyDraft = {
 			key: "delete-test",
 			unitType: "Company",
@@ -401,25 +407,25 @@ describe("BusinessUnit Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const businessUnit = repository.create(ctx, draft);
+		const businessUnit = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, businessUnit.id);
+		const retrieved = await repository.get(ctx, businessUnit.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(businessUnit.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, businessUnit.key!);
+		const retrievedByKey = await repository.getByKey(ctx, businessUnit.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(businessUnit.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, businessUnit.id);
+		const deleted = await repository.delete(ctx, businessUnit.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(businessUnit.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, businessUnit.id);
+		const notFound = await repository.get(ctx, businessUnit.id);
 		expect(notFound).toBeNull();
 	});
 });

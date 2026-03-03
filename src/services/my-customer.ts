@@ -50,25 +50,25 @@ export class MyCustomerService extends AbstractService {
 		);
 	}
 
-	getMe(
+	async getMe(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
-		const resource = this.repository.getMe(getRepositoryContext(request));
+		const resource = await this.repository.getMe(getRepositoryContext(request));
 		if (!resource) {
 			return reply.status(404).send({ statusCode: 404 });
 		}
 		return reply.status(200).send(resource);
 	}
 
-	updateMe(
+	async updateMe(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
 		}>,
 		reply: FastifyReply,
 	) {
-		const resource = this.repository.getMe(getRepositoryContext(request));
+		const resource = await this.repository.getMe(getRepositoryContext(request));
 
 		if (!resource) {
 			return reply.status(404).send({ statusCode: 404 });
@@ -77,22 +77,24 @@ export class MyCustomerService extends AbstractService {
 			request.body,
 			updateRequestSchema,
 		);
-		const updatedResource = this.repository.processUpdateActions(
+		const updatedResource = await this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			resource,
 			updateRequest.version,
 			updateRequest.actions,
 		);
 
-		const result = this._expandWithId(request, updatedResource.id);
+		const result = await this._expandWithId(request, updatedResource.id);
 		return reply.status(200).send(result);
 	}
 
-	deleteMe(
+	async deleteMe(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
-		const resource = this.repository.deleteMe(getRepositoryContext(request));
+		const resource = await this.repository.deleteMe(
+			getRepositoryContext(request),
+		);
 		if (!resource) {
 			return reply.status(404).send({ statusCode: 404 });
 		}
@@ -100,7 +102,7 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(resource);
 	}
 
-	signUp(
+	async signUp(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Querystring: Record<string, any>;
@@ -109,22 +111,22 @@ export class MyCustomerService extends AbstractService {
 		reply: FastifyReply,
 	) {
 		const draft = request.body;
-		const resource = this.repository.create(
+		const resource = await this.repository.create(
 			getRepositoryContext(request),
 			draft,
 		);
-		const result = this._expandWithId(request, resource.id);
+		const result = await this._expandWithId(request, resource.id);
 		return reply.status(this.createStatusCode).send({ customer: result });
 	}
 
-	changePassword(
+	async changePassword(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: MyCustomerChangePassword;
 		}>,
 		reply: FastifyReply,
 	) {
-		const customer = this.repository.changePassword(
+		const customer = await this.repository.changePassword(
 			getRepositoryContext(request),
 			request.body,
 		);
@@ -132,14 +134,14 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	resetPassword(
+	async resetPassword(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: MyCustomerResetPassword;
 		}>,
 		reply: FastifyReply,
 	) {
-		const customer = this.repository.passwordReset(
+		const customer = await this.repository.passwordReset(
 			getRepositoryContext(request),
 			request.body,
 		);
@@ -147,14 +149,14 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	emailConfirm(
+	async emailConfirm(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: MyCustomerEmailVerify;
 		}>,
 		reply: FastifyReply,
 	) {
-		const customer = this.repository.confirmEmail(
+		const customer = await this.repository.confirmEmail(
 			getRepositoryContext(request),
 			request.body,
 		);
@@ -162,7 +164,7 @@ export class MyCustomerService extends AbstractService {
 		return reply.status(200).send(customer);
 	}
 
-	signIn(
+	async signIn(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: MyCustomerSignin;
@@ -173,7 +175,7 @@ export class MyCustomerService extends AbstractService {
 		const { email, password } = body;
 		const encodedPassword = hashPassword(password);
 
-		const result = this.repository.query(getRepositoryContext(request), {
+		const result = await this.repository.query(getRepositoryContext(request), {
 			where: [`email = "${email}"`, `password = "${encodedPassword}"`],
 		});
 

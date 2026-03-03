@@ -22,10 +22,10 @@ export class ProductSelectionRepository extends AbstractResourceRepository<"prod
 		this.draftSchema = ProductSelectionDraftSchema;
 	}
 
-	create(
+	async create(
 		context: RepositoryContext,
 		draft: ProductSelectionDraft,
-	): ProductSelection {
+	): Promise<ProductSelection> {
 		const resource: ProductSelection = {
 			...getBaseResourceProperties(context.clientId),
 			productCount: 0,
@@ -33,7 +33,7 @@ export class ProductSelectionRepository extends AbstractResourceRepository<"prod
 			name: draft.name,
 			mode: "Individual",
 		};
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 }
 
@@ -52,11 +52,11 @@ class ProductSelectionUpdateHandler
 		resource.name = name;
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<ProductSelection>,
 		{ type, fields }: ProductSelectionSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 }

@@ -19,8 +19,8 @@ describe("Inventory Entry Query", () => {
 		});
 	});
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	test("no filter", async () => {

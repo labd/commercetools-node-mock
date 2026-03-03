@@ -48,7 +48,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		this.draftSchema = CartDraftSchema;
 	}
 
-	create(context: RepositoryContext, draft: CartDraft): Cart {
+	async create(context: RepositoryContext, draft: CartDraft): Promise<Cart> {
 		if (draft.anonymousId && draft.customerId) {
 			throw new CommercetoolsError<InvalidOperationError>({
 				code: "InvalidOperation",
@@ -58,7 +58,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 
 		// Validate that the customer exists
 		if (draft.customerId) {
-			this._storage.getByResourceIdentifier(context.projectKey, {
+			await this._storage.getByResourceIdentifier(context.projectKey, {
 				typeId: "customer",
 				id: draft.customerId,
 			});
@@ -67,7 +67,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		let storedBusinessUnit: BusinessUnit | undefined;
 		if (draft.businessUnit?.id || draft.businessUnit?.key) {
 			storedBusinessUnit =
-				this._storage.getByResourceIdentifier<"business-unit">(
+				await this._storage.getByResourceIdentifier<"business-unit">(
 					context.projectKey,
 					{
 						typeId: "business-unit",
@@ -77,32 +77,38 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				);
 		}
 
-		const lineItems =
-			draft.lineItems?.map((draftLineItem) =>
-				this.draftLineItemtoLineItem(
-					context.projectKey,
-					draftLineItem,
-					draft.currency,
-					draft.country,
-				),
-			) ?? [];
+		const lineItems = draft.lineItems
+			? await Promise.all(
+					draft.lineItems.map((draftLineItem) =>
+						this.draftLineItemtoLineItem(
+							context.projectKey,
+							draftLineItem,
+							draft.currency,
+							draft.country,
+						),
+					),
+				)
+			: [];
 
-		const customLineItems =
-			draft.customLineItems?.map((draftCustomLineItem) =>
-				createCustomLineItemFromDraft(
-					context.projectKey,
-					draftCustomLineItem,
-					this._storage,
-					draft.shippingAddress?.country ?? draft.country,
-				),
-			) ?? [];
+		const customLineItems = draft.customLineItems
+			? await Promise.all(
+					draft.customLineItems.map((draftCustomLineItem) =>
+						createCustomLineItemFromDraft(
+							context.projectKey,
+							draftCustomLineItem,
+							this._storage,
+							draft.shippingAddress?.country ?? draft.country,
+						),
+					),
+				)
+			: [];
 
 		// Validate that discount codes exist and deduplicate
 		const discountCodeInfo: DiscountCodeInfo[] = [];
 		if (draft.discountCodes?.length) {
 			const seen = new Set<string>();
 			for (const code of draft.discountCodes) {
-				const info = createDiscountCodeInfoFromCode(
+				const info = await createDiscountCodeInfoFromCode(
 					context.projectKey,
 					this._storage,
 					code,
@@ -160,7 +166,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			shippingInfo: undefined,
 			origin: draft.origin ?? "Customer",
 			refusedGifts: [],
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
 				this._storage,
@@ -175,7 +181,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 
 		// Set shipping info after resource is created
 		if (draft.shippingMethod) {
-			resource.shippingInfo = this.createShippingInfo(
+			resource.shippingInfo = await this.createShippingInfo(
 				context,
 				resource,
 				draft.shippingMethod,
@@ -186,12 +192,12 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		resource.taxedPrice = taxedPrice;
 		resource.taxedShippingPrice = taxedShippingPrice;
 
-		return this.saveNew(context, resource);
+		return await this.saveNew(context, resource);
 	}
 
-	getActiveCart(projectKey: string): Cart | undefined {
+	async getActiveCart(projectKey: string): Promise<Cart | undefined> {
 		// Get first active cart
-		const results = this._storage.query(projectKey, this.getTypeId(), {
+		const results = await this._storage.query(projectKey, this.getTypeId(), {
 			where: [`cartState="Active"`],
 		});
 		if (results.count > 0) {
@@ -201,26 +207,26 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		return;
 	}
 
-	draftLineItemtoLineItem = (
+	draftLineItemtoLineItem = async (
 		projectKey: string,
 		draftLineItem: LineItemDraft,
 		currency: string,
 		country: string | undefined,
-	): LineItem => {
+	): Promise<LineItem> => {
 		const { productId, quantity, variantId, sku } = draftLineItem;
 
 		let product: Product | null = null;
 
 		if (productId && variantId) {
 			// Fetch product and variant by ID
-			product = this._storage.get(projectKey, "product", productId, {});
+			product = await this._storage.get(projectKey, "product", productId, {});
 		} else if (sku) {
 			// Fetch product and variant by SKU
-			const items = this._storage.query(projectKey, "product", {
+			const items = (await this._storage.query(projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			}) as ProductPagedQueryResponse;
+			})) as ProductPagedQueryResponse;
 
 			if (items.count === 1) {
 				product = items.results[0];
@@ -289,7 +295,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			lineItemMode: "Standard",
 			priceMode: "Platform",
 			state: [],
-			custom: createCustomFields(
+			custom: await createCustomFields(
 				draftLineItem.custom,
 				projectKey,
 				this._storage,
@@ -297,11 +303,11 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		};
 	};
 
-	createShippingInfo(
+	async createShippingInfo(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		shippingMethodRef: NonNullable<CartDraft["shippingMethod"]>,
-	): NonNullable<Cart["shippingInfo"]> {
+	): Promise<NonNullable<Cart["shippingInfo"]>> {
 		if (resource.taxMode === "External") {
 			throw new CommercetoolsError<InvalidOperationError>({
 				code: "InvalidOperation",
@@ -311,14 +317,14 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 
 		// Bit of a hack: calling this checks that the resource identifier is
 		// valid (i.e. id xor key) and that the shipping method exists.
-		this._storage.getByResourceIdentifier<"shipping-method">(
+		await this._storage.getByResourceIdentifier<"shipping-method">(
 			context.projectKey,
 			shippingMethodRef,
 		);
 
 		// getShippingMethodsMatchingCart does the work of determining whether the
 		// shipping method is allowed for the cart, and which shipping rate to use
-		const shippingMethods = getShippingMethodsMatchingCart(
+		const shippingMethods = await getShippingMethodsMatchingCart(
 			context,
 			this._storage,
 			resource,
@@ -327,10 +333,11 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			},
 		);
 
-		const method = shippingMethods.results.find((candidate) =>
-			shippingMethodRef.id
-				? candidate.id === shippingMethodRef.id
-				: candidate.key === shippingMethodRef.key,
+		const method = shippingMethods.results.find(
+			(candidate: { id: string; key?: string }) =>
+				shippingMethodRef.id
+					? candidate.id === shippingMethodRef.id
+					: candidate.key === shippingMethodRef.key,
 		);
 
 		// Not finding the method in the results means it's not allowed, since
@@ -344,7 +351,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		}
 
 		// Use the shared shipping info creation logic
-		return createShippingInfoFromMethod(
+		return await createShippingInfoFromMethod(
 			context,
 			this._storage,
 			resource,

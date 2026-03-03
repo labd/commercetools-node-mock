@@ -38,7 +38,10 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 		this._searchService = new ProductProjectionSearch(config);
 	}
 
-	create(context: RepositoryContext, draft: ProductDraft): ProductProjection {
+	async create(
+		context: RepositoryContext,
+		draft: ProductDraft,
+	): Promise<ProductProjection> {
 		throw new CommercetoolsError<InvalidOperationError>(
 			{
 				code: "InvalidOperation",
@@ -48,39 +51,47 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 		);
 	}
 
-	get(
+	async get(
 		context: RepositoryContext,
 		id: string,
 		params: GetParams = {},
-	): ProductProjection | null {
-		const resource = this._storage.get(
+	): Promise<ProductProjection | null> {
+		const resource = await this._storage.get(
 			context.projectKey,
 			"product",
 			id,
 			params,
 		);
 		if (resource) {
-			return this._searchService.transform(resource, false, context.projectKey);
+			return await this._searchService.transform(
+				resource,
+				false,
+				context.projectKey,
+			);
 		}
 		return null;
 	}
 
-	query(context: RepositoryContext, params: ProductProjectionQueryParams = {}) {
-		let resources = this._storage
-			.all(context.projectKey, "product")
-			.map((r) =>
+	async query(
+		context: RepositoryContext,
+		params: ProductProjectionQueryParams = {},
+	) {
+		const allProducts = await this._storage.all(context.projectKey, "product");
+		let resources = await Promise.all(
+			allProducts.map((r) =>
 				this._searchService.transform(
 					r,
 					params.staged ?? false,
 					context.projectKey,
 				),
-			)
-			.filter((p) => {
-				if (!(params.staged ?? false)) {
-					return p.published;
-				}
-				return true;
-			});
+			),
+		);
+		resources = resources.filter((p) => {
+			if (!(params.staged ?? false)) {
+				return p.published;
+			}
+			return true;
+		});
 
 		// Apply predicates
 		if (params.where) {
@@ -123,8 +134,10 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 
 		// Expand the resources
 		if (params.expand !== undefined) {
-			resources = resources.map((resource) =>
-				this._storage.expand(context.projectKey, resource, params.expand),
+			resources = await Promise.all(
+				resources.map((resource) =>
+					this._storage.expand(context.projectKey, resource, params.expand),
+				),
 			);
 		}
 

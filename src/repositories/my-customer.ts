@@ -12,14 +12,14 @@ import type { RepositoryContext } from "./abstract.ts";
 import { CustomerRepository } from "./customer/index.ts";
 
 export class MyCustomerRepository extends CustomerRepository {
-	changePassword(
+	async changePassword(
 		context: RepositoryContext,
 		changePassword: MyCustomerChangePassword,
 	) {
 		const { currentPassword, newPassword } = changePassword;
 		const encodedPassword = hashPassword(currentPassword);
 
-		const result = this._storage.query(context.projectKey, "customer", {
+		const result = await this._storage.query(context.projectKey, "customer", {
 			where: [`password = "${encodedPassword}"`],
 		});
 		if (result.count === 0) {
@@ -41,11 +41,11 @@ export class MyCustomerRepository extends CustomerRepository {
 		customer.version += 1;
 
 		// Update storage
-		this._storage.add(context.projectKey, "customer", customer);
+		await this._storage.add(context.projectKey, "customer", customer);
 		return customer;
 	}
 
-	confirmEmail(
+	async confirmEmail(
 		context: RepositoryContext,
 		resetPassword: MyCustomerEmailVerify,
 	) {
@@ -59,11 +59,11 @@ export class MyCustomerRepository extends CustomerRepository {
 			});
 		}
 
-		const customer = this._storage.get(
+		const customer = (await this._storage.get(
 			context.projectKey,
 			"customer",
 			customerId,
-		) as Writable<Customer> | undefined;
+		)) as Writable<Customer> | undefined;
 
 		if (!customer) {
 			throw new CommercetoolsError<ResourceNotFoundError>({
@@ -76,30 +76,31 @@ export class MyCustomerRepository extends CustomerRepository {
 		customer.version += 1;
 
 		// Update storage
-		this._storage.add(context.projectKey, "customer", customer);
+		await this._storage.add(context.projectKey, "customer", customer);
 		return customer;
 	}
 
-	deleteMe(context: RepositoryContext): Customer | undefined {
+	async deleteMe(context: RepositoryContext): Promise<Customer | undefined> {
 		// grab the first customer you can find for now. In the future we should
 		// use the customer id from the scope of the token
-		const results = this._storage.query(
+		const results = await this._storage.query(
 			context.projectKey,
 			this.getTypeId(),
 			{},
 		);
 
 		if (results.count > 0) {
-			return this.delete(context, results.results[0].id) as Customer;
+			const deleted = await this.delete(context, results.results[0].id);
+			return deleted as Customer;
 		}
 
 		return;
 	}
 
-	getMe(context: RepositoryContext): Customer | undefined {
+	async getMe(context: RepositoryContext): Promise<Customer | undefined> {
 		// grab the first customer you can find for now. In the future we should
 		// use the customer id from the scope of the token
-		const results = this._storage.query(
+		const results = await this._storage.query(
 			context.projectKey,
 			this.getTypeId(),
 			{},

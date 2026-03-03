@@ -18,15 +18,15 @@ export class ProjectService {
 		parent.post("", this.post.bind(this));
 	}
 
-	get(
+	async get(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
-		const project = this.repository.get(getRepositoryContext(request));
+		const project = await this.repository.get(getRepositoryContext(request));
 		return reply.status(200).send(project);
 	}
 
-	post(
+	async post(
 		request: FastifyRequest<{ Params: Record<string, string> }>,
 		reply: FastifyReply,
 	) {
@@ -34,13 +34,13 @@ export class ProjectService {
 			request.body,
 			updateRequestSchema,
 		);
-		const project = this.repository.get(getRepositoryContext(request));
+		const project = await this.repository.get(getRepositoryContext(request));
 
 		if (!project) {
 			return reply.status(404).send({ statusCode: 404 });
 		}
 
-		const updatedResource = this.repository.processUpdateActions(
+		const updatedResource = await this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			project,
 			updateRequest.version,

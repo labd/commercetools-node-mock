@@ -33,7 +33,7 @@ export class CartService extends AbstractService {
 		parent.post("/replicate", this.replicate.bind(this));
 	}
 
-	replicate(
+	async replicate(
 		request: FastifyRequest<{
 			Params: Record<string, string>;
 			Body: ReplicaCartDraft;
@@ -45,8 +45,8 @@ export class CartService extends AbstractService {
 
 		const cartOrOrder: Cart | Order | null =
 			body.reference.typeId === "order"
-				? this.orderRepository.get(context, body.reference.id)
-				: this.repository.get(context, body.reference.id);
+				? await this.orderRepository.get(context, body.reference.id)
+				: await this.repository.get(context, body.reference.id);
 
 		if (!cartOrOrder) {
 			return reply.status(400).send();
@@ -64,7 +64,7 @@ export class CartService extends AbstractService {
 			})),
 		};
 
-		const newCart = this.repository.create(context, cartDraft);
+		const newCart = await this.repository.create(context, cartDraft);
 
 		return reply.status(200).send(newCart);
 	}

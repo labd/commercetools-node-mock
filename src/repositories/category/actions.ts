@@ -31,15 +31,15 @@ export class CategoryUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Category, CategoryUpdateAction>>
 {
-	addAsset(
+	async addAsset(
 		context: RepositoryContext,
 		resource: Writable<Category>,
 		{ asset }: CategoryAddAssetAction,
 	) {
 		if (!resource.assets) {
-			resource.assets = [this.assetFromAssetDraft(asset, context)];
+			resource.assets = [await this.assetFromAssetDraft(asset, context)];
 		} else {
-			resource.assets.push(this.assetFromAssetDraft(asset, context));
+			resource.assets.push(await this.assetFromAssetDraft(asset, context));
 		}
 	}
 
@@ -66,12 +66,12 @@ export class CategoryUpdateHandler
 		resource.name = name;
 	}
 
-	changeParent(
+	async changeParent(
 		context: RepositoryContext,
 		resource: Writable<Category>,
 		{ parent }: CategoryChangeParentAction,
 	) {
-		const category = this._storage.getByResourceIdentifier(
+		const category = await this._storage.getByResourceIdentifier(
 			context.projectKey,
 			parent,
 		);
@@ -161,12 +161,12 @@ export class CategoryUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Category>,
 		{ type, fields }: CategorySetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDescription(
@@ -209,12 +209,16 @@ export class CategoryUpdateHandler
 		resource.metaTitle = metaTitle;
 	}
 
-	assetFromAssetDraft = (
+	assetFromAssetDraft = async (
 		draft: AssetDraft,
 		context: RepositoryContext,
-	): Asset => ({
+	): Promise<Asset> => ({
 		...draft,
 		id: uuidv4(),
-		custom: createCustomFields(draft.custom, context.projectKey, this._storage),
+		custom: await createCustomFields(
+			draft.custom,
+			context.projectKey,
+			this._storage,
+		),
 	});
 }

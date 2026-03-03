@@ -8,12 +8,15 @@ import type { RepositoryContext } from "./abstract.ts";
 import { OrderRepository } from "./order/index.ts";
 
 export class MyOrderRepository extends OrderRepository {
-	create(context: RepositoryContext, draft: MyOrderFromCartDraft): Order {
+	async create(
+		context: RepositoryContext,
+		draft: MyOrderFromCartDraft,
+	): Promise<Order> {
 		assert(draft.id, "draft.id is missing");
 		const cartIdentifier = {
 			id: draft.id,
 			typeId: "cart",
 		} as CartReference;
-		return this.createFromCart(context, cartIdentifier);
+		return await this.createFromCart(context, cartIdentifier);
 	}
 }

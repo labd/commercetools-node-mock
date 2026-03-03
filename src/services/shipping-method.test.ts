@@ -34,7 +34,7 @@ describe("Shipping method", () => {
 	});
 
 	afterEach(async () => {
-		ctMock.clear();
+		await ctMock.clear();
 	});
 
 	test("Create shipping method", async () => {

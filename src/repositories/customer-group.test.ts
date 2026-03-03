@@ -5,7 +5,7 @@ import type {
 	CustomerGroupSetCustomTypeAction,
 	CustomerGroupSetKeyAction,
 } from "@commercetools/platform-sdk";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
@@ -16,32 +16,34 @@ describe("CustomerGroup Repository", () => {
 	const config: Config = { storage, strict: false };
 	const repository = new CustomerGroupRepository(config);
 
-	// Add a custom type for testing
-	storage.add("dummy", "type", {
-		...getBaseResourceProperties(),
-		id: "custom-type-id",
-		key: "custom-type-key",
-		name: { "en-US": "Custom Type" },
-		resourceTypeIds: ["customer-group"],
-		fieldDefinitions: [
-			{
-				name: "description",
-				label: { "en-US": "Description" },
-				required: false,
-				type: { name: "String" },
-				inputHint: "SingleLine",
-			},
-		],
+	beforeAll(async () => {
+		// Add a custom type for testing
+		await storage.add("dummy", "type", {
+			...getBaseResourceProperties(),
+			id: "custom-type-id",
+			key: "custom-type-key",
+			name: { "en-US": "Custom Type" },
+			resourceTypeIds: ["customer-group"],
+			fieldDefinitions: [
+				{
+					name: "description",
+					label: { "en-US": "Description" },
+					required: false,
+					type: { name: "String" },
+					inputHint: "SingleLine",
+				},
+			],
+		});
 	});
 
-	test("create customer group", () => {
+	test("create customer group", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "premium-customers",
 			groupName: "Premium Customers",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.version).toBe(1);
@@ -50,12 +52,12 @@ describe("CustomerGroup Repository", () => {
 		expect(result.custom).toBeUndefined();
 
 		// Test that the customer group is stored
-		const items = repository.query(ctx);
+		const items = await repository.query(ctx);
 		expect(items.count).toBe(1);
 		expect(items.results[0].id).toBe(result.id);
 	});
 
-	test("create customer group with custom fields", () => {
+	test("create customer group with custom fields", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "vip-customers",
 			groupName: "VIP Customers",
@@ -71,7 +73,7 @@ describe("CustomerGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const result = repository.create(ctx, draft);
+		const result = await repository.create(ctx, draft);
 
 		expect(result.id).toBeDefined();
 		expect(result.key).toBe(draft.key);
@@ -80,16 +82,16 @@ describe("CustomerGroup Repository", () => {
 		expect(result.custom?.fields.description).toBe("Very important customers");
 	});
 
-	test("update customer group - changeName", () => {
+	test("update customer group - changeName", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "test-customers",
 			groupName: "Test Customers",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const customerGroup = repository.create(ctx, draft);
+		const customerGroup = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			customerGroup,
 			customerGroup.version,
@@ -105,16 +107,16 @@ describe("CustomerGroup Repository", () => {
 		expect(result.version).toBe(customerGroup.version + 1);
 	});
 
-	test("update customer group - setKey", () => {
+	test("update customer group - setKey", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "test-customers-2",
 			groupName: "Test Customers 2",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const customerGroup = repository.create(ctx, draft);
+		const customerGroup = await repository.create(ctx, draft);
 
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			customerGroup,
 			customerGroup.version,
@@ -130,17 +132,17 @@ describe("CustomerGroup Repository", () => {
 		expect(result.version).toBe(customerGroup.version + 1);
 	});
 
-	test("update customer group - setCustomType", () => {
+	test("update customer group - setCustomType", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "test-customers-3",
 			groupName: "Test Customers 3",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const customerGroup = repository.create(ctx, draft);
+		const customerGroup = await repository.create(ctx, draft);
 
 		// Set custom type
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			customerGroup,
 			customerGroup.version,
@@ -163,7 +165,7 @@ describe("CustomerGroup Repository", () => {
 		expect(result.version).toBe(customerGroup.version + 1);
 
 		// Remove custom type
-		const result2 = repository.processUpdateActions(
+		const result2 = await repository.processUpdateActions(
 			ctx,
 			result,
 			result.version,
@@ -178,7 +180,7 @@ describe("CustomerGroup Repository", () => {
 		expect(result2.version).toBe(result.version + 1);
 	});
 
-	test("update customer group - setCustomField", () => {
+	test("update customer group - setCustomField", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "test-customers-4",
 			groupName: "Test Customers 4",
@@ -194,10 +196,10 @@ describe("CustomerGroup Repository", () => {
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const customerGroup = repository.create(ctx, draft);
+		const customerGroup = await repository.create(ctx, draft);
 
 		// Update custom field
-		const result = repository.processUpdateActions(
+		const result = await repository.processUpdateActions(
 			ctx,
 			customerGroup,
 			customerGroup.version,
@@ -214,7 +216,7 @@ describe("CustomerGroup Repository", () => {
 		expect(result.version).toBe(customerGroup.version + 1);
 
 		// Remove custom field
-		const result2 = repository.processUpdateActions(
+		const result2 = await repository.processUpdateActions(
 			ctx,
 			result,
 			result.version,
@@ -231,32 +233,32 @@ describe("CustomerGroup Repository", () => {
 		expect(result2.version).toBe(result.version + 1);
 	});
 
-	test("get and delete customer group", () => {
+	test("get and delete customer group", async () => {
 		const draft: CustomerGroupDraft = {
 			key: "delete-test",
 			groupName: "Delete Test",
 		};
 
 		const ctx = { projectKey: "dummy" };
-		const customerGroup = repository.create(ctx, draft);
+		const customerGroup = await repository.create(ctx, draft);
 
 		// Test get
-		const retrieved = repository.get(ctx, customerGroup.id);
+		const retrieved = await repository.get(ctx, customerGroup.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(customerGroup.id);
 
 		// Test getByKey
-		const retrievedByKey = repository.getByKey(ctx, customerGroup.key!);
+		const retrievedByKey = await repository.getByKey(ctx, customerGroup.key!);
 		expect(retrievedByKey).toBeDefined();
 		expect(retrievedByKey?.key).toBe(customerGroup.key);
 
 		// Test delete
-		const deleted = repository.delete(ctx, customerGroup.id);
+		const deleted = await repository.delete(ctx, customerGroup.id);
 		expect(deleted).toBeDefined();
 		expect(deleted?.id).toBe(customerGroup.id);
 
 		// Verify it's deleted
-		const notFound = repository.get(ctx, customerGroup.id);
+		const notFound = await repository.get(ctx, customerGroup.id);
 		expect(notFound).toBeNull();
 	});
 });

@@ -12,8 +12,8 @@ describe("Quote Request Create", () => {
 	const cartFactory = cartDraftFactory(ctMock);
 	const quoteRequestFactory = quoteRequestDraftFactory(ctMock);
 
-	afterEach(() => {
-		ctMock.clear();
+	afterEach(async () => {
+		await ctMock.clear();
 	});
 
 	it("should create a quote request", async () => {

@@ -94,7 +94,6 @@ export class CustomerUpdateHandler
 		if (!resource.shippingAddressIds.includes(address.id)) {
 			resource.shippingAddressIds.push(address.id);
 		}
-		return resource;
 	}
 
 	addStore(
@@ -298,7 +297,7 @@ export class CustomerUpdateHandler
 		resource.companyName = companyName;
 	}
 
-	setCustomerGroup(
+	async setCustomerGroup(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
 		action: CustomerSetCustomerGroupAction,
@@ -313,7 +312,7 @@ export class CustomerUpdateHandler
 			);
 		}
 
-		const group = this._storage.getByResourceIdentifier<"customer-group">(
+		const group = await this._storage.getByResourceIdentifier<"customer-group">(
 			context.projectKey,
 			action.customerGroup,
 		);
@@ -349,12 +348,12 @@ export class CustomerUpdateHandler
 		this._setCustomFieldValues(resource, { name, value });
 	}
 
-	setCustomType(
+	async setCustomType(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
 		{ type, fields }: CustomerSetCustomTypeAction,
 	) {
-		this._setCustomType(context, resource, { type, fields });
+		await this._setCustomType(context, resource, { type, fields });
 	}
 
 	setDateOfBirth(
