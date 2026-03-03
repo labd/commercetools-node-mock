@@ -7,7 +7,6 @@ import type {
 import type { Writable } from "#src/types.ts";
 import type { AbstractStorage } from "./abstract.ts";
 import { InMemoryStorage } from "./in-memory.ts";
-import { SQLiteStorage } from "./sqlite.ts";
 
 export const makeCategory = (
 	overrides: Partial<Writable<Category>> = {},
@@ -72,8 +71,12 @@ export function createStorage(): AbstractStorage {
 	switch (storageEngineName) {
 		case "in-memory":
 			return new InMemoryStorage();
-		case "sqlite":
+		case "sqlite": {
+			// Dynamic require to avoid importing node:sqlite on runtimes that don't have it
+			const { SQLiteStorage } =
+				require("./sqlite.ts") as typeof import("./sqlite.ts");
 			return new SQLiteStorage({ filename: ":memory:" });
+		}
 		default:
 			throw new Error(`Unknown STORAGE_ENGINE: ${storageEngineName}`);
 	}
