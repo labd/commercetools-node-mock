@@ -1,71 +1,27 @@
-import type {
-	Category,
-	Channel,
-	Customer,
-	Type,
-} from "@commercetools/platform-sdk";
-import { beforeEach, describe, expect, test } from "vitest";
+import type { Category } from "@commercetools/platform-sdk";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import type { Writable } from "#src/types.ts";
-import { InMemoryStorage } from "./in-memory.ts";
+import type { AbstractStorage } from "./abstract.ts";
+import {
+	createStorage,
+	makeCategory,
+	makeChannel,
+	makeCustomer,
+	makeType,
+	storageEngineName,
+} from "./storage.test-helpers.ts";
 
-const makeCategory = (overrides: Partial<Writable<Category>> = {}): Category =>
-	({
-		id: "cat-1",
-		version: 1,
-		createdAt: "2024-01-01T00:00:00.000Z",
-		lastModifiedAt: "2024-01-01T00:00:00.000Z",
-		name: { en: "Test Category" },
-		slug: { en: "test-category" },
-		orderHint: "0.1",
-		ancestors: [],
-		...overrides,
-	}) as Category;
-
-const makeChannel = (overrides: Partial<Writable<Channel>> = {}): Channel =>
-	({
-		id: "channel-1",
-		version: 1,
-		key: "default-channel",
-		createdAt: "2024-01-01T00:00:00.000Z",
-		lastModifiedAt: "2024-01-01T00:00:00.000Z",
-		roles: [],
-		...overrides,
-	}) as Channel;
-
-const makeCustomer = (overrides: Partial<Writable<Customer>> = {}): Customer =>
-	({
-		id: "customer-1",
-		version: 1,
-		createdAt: "2024-01-01T00:00:00.000Z",
-		lastModifiedAt: "2024-01-01T00:00:00.000Z",
-		email: "test@example.com",
-		addresses: [],
-		isEmailVerified: false,
-		authenticationMode: "Password",
-		stores: [],
-		...overrides,
-	}) as Customer;
-
-const makeType = (overrides: Partial<Writable<Type>> = {}): Type =>
-	({
-		id: "type-1",
-		version: 1,
-		createdAt: "2024-01-01T00:00:00.000Z",
-		lastModifiedAt: "2024-01-01T00:00:00.000Z",
-		key: "my-type",
-		name: { en: "My Type" },
-		resourceTypeIds: ["category"],
-		fieldDefinitions: [],
-		...overrides,
-	}) as Type;
-
-describe("InMemoryStorage", () => {
-	let storage: InMemoryStorage;
+describe(`Storage (${storageEngineName})`, () => {
+	let storage: AbstractStorage;
 	const projectKey = "test-project";
 
 	beforeEach(() => {
-		storage = new InMemoryStorage();
+		storage = createStorage();
+	});
+
+	afterEach(() => {
+		storage.close();
 	});
 
 	describe("project management", () => {

@@ -37,6 +37,12 @@ export type QueryParams = {
 };
 
 export abstract class AbstractStorage {
+	/**
+	 * Close the storage backend and release any resources.
+	 * Override this in subclasses that hold external resources (e.g. database connections).
+	 */
+	close(): void {}
+
 	abstract clear(): Promise<void>;
 
 	abstract all<RT extends ResourceType>(

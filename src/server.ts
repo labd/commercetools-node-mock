@@ -1,11 +1,16 @@
 import { CommercetoolsMock } from "./index.ts";
+import { SQLiteStorage } from "./storage/sqlite.ts";
+
+const storage = new SQLiteStorage();
 
 process.on("SIGINT", () => {
+	storage.close();
 	process.exit();
 });
 
 const instance = new CommercetoolsMock({
 	strict: true,
+	storage,
 	// enableAuthentication: true,
 	// validateCredentials: true,
 });
