@@ -83,6 +83,92 @@ describe("categories changeName", () => {
 	});
 });
 
+describe("Categories create with parent by key", () => {
+	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
+
+	afterEach(async () => {
+		await ctMock.clear();
+	});
+
+	test("create child category with parent specified by key", async () => {
+		const parentCategory = await categoryDraft.create({
+			key: "parent-key",
+			name: {
+				en: "Parent",
+			},
+			slug: {
+				en: "parent",
+			},
+			orderHint: "0.1",
+		});
+
+		const childCategory = await categoryDraft.create({
+			name: {
+				en: "Child",
+			},
+			slug: {
+				en: "child",
+			},
+			orderHint: "0.2",
+			parent: {
+				typeId: "category",
+				key: "parent-key",
+			},
+		});
+
+		expect(childCategory.parent).toEqual({
+			typeId: "category",
+			id: parentCategory.id,
+		});
+		expect(childCategory.ancestors).toHaveLength(1);
+		expect(childCategory.ancestors[0].id).toEqual(parentCategory.id);
+	});
+
+	test("get child category by key resolves ancestors from parent specified by key", async () => {
+		const parentCategory = await categoryDraft.create({
+			key: "parent-key",
+			name: {
+				en: "Parent",
+			},
+			slug: {
+				en: "parent",
+			},
+			orderHint: "0.1",
+		});
+
+		await categoryDraft.create({
+			key: "child-key",
+			name: {
+				en: "Child",
+			},
+			slug: {
+				en: "child",
+			},
+			orderHint: "0.2",
+			parent: {
+				typeId: "category",
+				key: "parent-key",
+			},
+		});
+
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/categories/key=child-key",
+		});
+
+		expect(response.statusCode).toBe(200);
+
+		const result = response.json();
+		expect(result.parent).toEqual({
+			typeId: "category",
+			id: parentCategory.id,
+		});
+		expect(result.ancestors).toHaveLength(1);
+		expect(result.ancestors[0].id).toEqual(parentCategory.id);
+	});
+});
+
 describe("categories changeParent", () => {
 	const ctMock = new CommercetoolsMock();
 	const categoryDraft = categoryDraftFactory(ctMock);
