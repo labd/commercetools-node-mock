@@ -6,11 +6,14 @@ import type {
 	ProductType,
 	ProductTypeAddAttributeDefinitionAction,
 	ProductTypeChangeAttributeOrderByNameAction,
+	ProductTypeChangeDescriptionAction,
 	ProductTypeChangeLabelAction,
 	ProductTypeChangeLocalizedEnumValueLabelAction,
+	ProductTypeChangeNameAction,
 	ProductTypeDraft,
 	ProductTypeRemoveAttributeDefinitionAction,
 	ProductTypeRemoveEnumValuesAction,
+	ProductTypeSetKeyAction,
 	ProductTypeUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
@@ -185,5 +188,29 @@ class ProductTypeUpdateHandler
 				}
 			}
 		});
+	}
+
+	setKey(
+		_context: RepositoryContext,
+		resource: Writable<ProductType>,
+		{ key }: ProductTypeSetKeyAction,
+	) {
+		resource.key = key;
+	}
+
+	changeName(
+		_context: RepositoryContext,
+		resource: Writable<ProductType>,
+		{ name }: ProductTypeChangeNameAction,
+	) {
+		resource.name = name;
+	}
+
+	changeDescription(
+		_context: RepositoryContext,
+		resource: Writable<ProductType>,
+		{ description }: ProductTypeChangeDescriptionAction,
+	) {
+		resource.description = description;
 	}
 }

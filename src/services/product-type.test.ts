@@ -57,6 +57,63 @@ describe("Product type", () => {
 		});
 	});
 
+	test("Update product type - setKey", async () => {
+		const productType = await productTypeDraft.create({
+			name: "test-setKey",
+			description: "desc",
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/product-types/${productType.id}`,
+			payload: {
+				version: productType.version,
+				actions: [{ action: "setKey", key: "new-key" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().key).toBe("new-key");
+	});
+
+	test("Update product type - changeName", async () => {
+		const productType = await productTypeDraft.create({
+			name: "old-name",
+			description: "desc",
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/product-types/${productType.id}`,
+			payload: {
+				version: productType.version,
+				actions: [{ action: "changeName", name: "new-name" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().name).toBe("new-name");
+	});
+
+	test("Update product type - changeDescription", async () => {
+		const productType = await productTypeDraft.create({
+			name: "test-changeDesc",
+			description: "old-desc",
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/product-types/${productType.id}`,
+			payload: {
+				version: productType.version,
+				actions: [{ action: "changeDescription", description: "new-desc" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().description).toBe("new-desc");
+	});
+
 	test("Get product type", async () => {
 		const productType = await productTypeDraft.create({
 			name: "foo",
