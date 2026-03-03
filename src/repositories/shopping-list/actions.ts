@@ -2,7 +2,6 @@ import type {
 	GeneralError,
 	InvalidOperationError,
 	Product,
-	ProductPagedQueryResponse,
 	ShoppingList,
 	ShoppingListAddLineItemAction,
 	ShoppingListChangeLineItemQuantityAction,
@@ -55,11 +54,11 @@ export class ShoppingListUpdateHandler
 			);
 		} else if (sku) {
 			// Fetch product and variant by SKU
-			const items = (await this._storage.query(context.projectKey, "product", {
+			const items = await this._storage.query(context.projectKey, "product", {
 				where: [
 					`masterData(current(masterVariant(sku="${sku}"))) or masterData(current(variants(sku="${sku}")))`,
 				],
-			})) as ProductPagedQueryResponse;
+			});
 
 			if (items.count === 1) {
 				product = items.results[0];
