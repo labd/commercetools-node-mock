@@ -38,7 +38,7 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 						tags: d.tags,
 						key: d.key,
 						custom: await createCustomFields(
-							draft.custom,
+							d.custom,
 							context.projectKey,
 							this._storage,
 						),
