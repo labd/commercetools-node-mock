@@ -15,6 +15,12 @@ export class ReviewStatisticsService {
 		projectKey: string,
 		productId: string,
 	): Promise<ReviewRatingStatistics | undefined> {
+		// Fast path: if there are no reviews at all, skip the expensive load
+		const reviewCount = await this._storage.count(projectKey, "review");
+		if (reviewCount === 0) {
+			return undefined;
+		}
+
 		// Get all reviews for this product
 		const allReviews = (await this._storage.all(
 			projectKey,

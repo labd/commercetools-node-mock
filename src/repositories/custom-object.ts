@@ -75,9 +75,10 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 		container: string,
 		key: string,
 	) {
-		const items = await this._storage.all(context.projectKey, this.getTypeId());
-		return items.find(
-			(item) => item.container === container && item.key === key,
+		return this._storage.getByContainerAndKey(
+			context.projectKey,
+			container,
+			key,
 		);
 	}
 

@@ -56,6 +56,9 @@ export class InMemoryStorage extends AbstractStorage {
 		[projectKey: string]: Project;
 	} = {};
 
+	// Secondary index for custom objects: projectKey -> "container\0key" -> resource id
+	private _customObjectIndex: Map<string, Map<string, string>> = new Map();
+
 	async addProject(projectKey: string): Promise<Project> {
 		if (!this.projects[projectKey]) {
 			this.projects[projectKey] = {
@@ -168,6 +171,7 @@ export class InMemoryStorage extends AbstractStorage {
 				value?.clear();
 			}
 		}
+		this._customObjectIndex.clear();
 	}
 
 	async all<RT extends ResourceType>(
@@ -182,6 +186,12 @@ export class InMemoryStorage extends AbstractStorage {
 		return [];
 	}
 
+	async count(projectKey: string, typeId: ResourceType): Promise<number> {
+		const projectStorage = await this.forProjectKey(projectKey);
+		const store = projectStorage[typeId];
+		return store ? store.size : 0;
+	}
+
 	async add<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
@@ -190,6 +200,17 @@ export class InMemoryStorage extends AbstractStorage {
 	): Promise<ResourceMap[RT]> {
 		const store = await this.forProjectKey(projectKey);
 		store[typeId]?.set(obj.id, obj);
+
+		// Maintain secondary index for custom objects
+		if (typeId === "key-value-document") {
+			const co = obj as unknown as CustomObject;
+			let projectIndex = this._customObjectIndex.get(projectKey);
+			if (!projectIndex) {
+				projectIndex = new Map();
+				this._customObjectIndex.set(projectKey, projectIndex);
+			}
+			projectIndex.set(`${co.container}\0${co.key}`, co.id);
+		}
 
 		// Return the object directly instead of re-fetching from the store.
 		// We just inserted it, so we know it exists. Only apply expand if needed.
@@ -246,9 +267,35 @@ export class InMemoryStorage extends AbstractStorage {
 		if (resource) {
 			const projectStorage = await this.forProjectKey(projectKey);
 			projectStorage[typeId]?.delete(id);
+
+			// Remove from secondary index for custom objects
+			if (typeId === "key-value-document") {
+				const co = resource as unknown as CustomObject;
+				this._customObjectIndex
+					.get(projectKey)
+					?.delete(`${co.container}\0${co.key}`);
+			}
+
 			return this.expand(projectKey, resource, params.expand);
 		}
 		return resource;
+	}
+
+	async getByContainerAndKey(
+		projectKey: string,
+		container: string,
+		key: string,
+	): Promise<CustomObject | null> {
+		const projectIndex = this._customObjectIndex.get(projectKey);
+		if (!projectIndex) {
+			return null;
+		}
+		const id = projectIndex.get(`${container}\0${key}`);
+		if (!id) {
+			return null;
+		}
+		const resource = await this.get(projectKey, "key-value-document", id);
+		return resource as CustomObject | null;
 	}
 
 	async query<RT extends ResourceType>(

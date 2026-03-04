@@ -1,6 +1,10 @@
 import path from "node:path";
 import { DatabaseSync, type StatementSync } from "node:sqlite";
-import type { InvalidInputError, Project } from "@commercetools/platform-sdk";
+import type {
+	CustomObject,
+	InvalidInputError,
+	Project,
+} from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
 import type {
@@ -73,12 +77,18 @@ const SCHEMA = `
     type_id TEXT NOT NULL,
     id TEXT NOT NULL,
     key TEXT,
+    container TEXT,
+    co_key TEXT,
     data TEXT NOT NULL,
     PRIMARY KEY (project_key, type_id, id)
   );
 
   CREATE INDEX IF NOT EXISTS idx_resources_key
     ON resources (project_key, type_id, key) WHERE key IS NOT NULL;
+
+  CREATE INDEX IF NOT EXISTS idx_resources_container_key
+    ON resources (project_key, container, co_key)
+    WHERE type_id = 'key-value-document';
 `;
 
 export class SQLiteStorage extends AbstractStorage {
@@ -97,6 +107,8 @@ export class SQLiteStorage extends AbstractStorage {
 	private _stmtAllResources: StatementSync | null = null;
 	private _stmtDeleteResource: StatementSync | null = null;
 	private _stmtClearResources: StatementSync | null = null;
+	private _stmtGetResourceByContainerAndKey: StatementSync | null = null;
+	private _stmtCountResources: StatementSync | null = null;
 
 	constructor(options: SQLiteStorageOptions = {}) {
 		super();
@@ -106,6 +118,28 @@ export class SQLiteStorage extends AbstractStorage {
 
 		this.db = new DatabaseSync(filename);
 		this.db.exec(SCHEMA);
+
+		// Migration: add container and co_key columns for existing databases
+		this._migrateSchema();
+	}
+
+	/**
+	 * Add columns that may not exist in databases created before this version.
+	 * ALTER TABLE ADD COLUMN is a no-op if the column already exists in SQLite
+	 * when using IF NOT EXISTS (not supported), so we catch errors instead.
+	 */
+	private _migrateSchema(): void {
+		const columns = this.db
+			.prepare("PRAGMA table_info(resources)")
+			.all() as Array<{ name: string }>;
+		const columnNames = new Set(columns.map((c) => c.name));
+
+		if (!columnNames.has("container")) {
+			this.db.exec("ALTER TABLE resources ADD COLUMN container TEXT");
+		}
+		if (!columnNames.has("co_key")) {
+			this.db.exec("ALTER TABLE resources ADD COLUMN co_key TEXT");
+		}
 	}
 
 	/**
@@ -147,7 +181,7 @@ export class SQLiteStorage extends AbstractStorage {
 	private get stmtInsertResource() {
 		if (!this._stmtInsertResource) {
 			this._stmtInsertResource = this.db.prepare(
-				"INSERT OR REPLACE INTO resources (project_key, type_id, id, key, data) VALUES (?, ?, ?, ?, ?)",
+				"INSERT OR REPLACE INTO resources (project_key, type_id, id, key, container, co_key, data) VALUES (?, ?, ?, ?, ?, ?, ?)",
 			);
 		}
 		return this._stmtInsertResource;
@@ -180,6 +214,15 @@ export class SQLiteStorage extends AbstractStorage {
 		return this._stmtAllResources;
 	}
 
+	private get stmtCountResources() {
+		if (!this._stmtCountResources) {
+			this._stmtCountResources = this.db.prepare(
+				"SELECT COUNT(*) as cnt FROM resources WHERE project_key = ? AND type_id = ?",
+			);
+		}
+		return this._stmtCountResources;
+	}
+
 	private get stmtDeleteResource() {
 		if (!this._stmtDeleteResource) {
 			this._stmtDeleteResource = this.db.prepare(
@@ -194,6 +237,19 @@ export class SQLiteStorage extends AbstractStorage {
 			this._stmtClearResources = this.db.prepare("DELETE FROM resources");
 		}
 		return this._stmtClearResources;
+	}
+
+	private get stmtGetResourceByContainerAndKey() {
+		if (!this._stmtGetResourceByContainerAndKey) {
+			this._stmtGetResourceByContainerAndKey = this.db.prepare(
+				`SELECT data FROM resources
+				 WHERE project_key = ?
+				   AND type_id = 'key-value-document'
+				   AND container = ?
+				   AND co_key = ?`,
+			);
+		}
+		return this._stmtGetResourceByContainerAndKey;
 	}
 
 	private ensureProject(projectKey: string): void {
@@ -241,6 +297,13 @@ export class SQLiteStorage extends AbstractStorage {
 		return rows.map((row) => JSON.parse(row.data) as ResourceMap[RT]);
 	}
 
+	async count(projectKey: string, typeId: ResourceType): Promise<number> {
+		const row = this.stmtCountResources.get(projectKey, typeId) as {
+			cnt: number;
+		};
+		return row.cnt;
+	}
+
 	async add<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
@@ -251,11 +314,20 @@ export class SQLiteStorage extends AbstractStorage {
 		this.ensureProject(projectKey);
 
 		const key = (obj as any).key ?? null;
+
+		// Extract container and key for custom objects to enable indexed lookups
+		const container =
+			typeId === "key-value-document" ? ((obj as any).container ?? null) : null;
+		const coKey =
+			typeId === "key-value-document" ? ((obj as any).key ?? null) : null;
+
 		this.stmtInsertResource.run(
 			projectKey,
 			typeId,
 			obj.id,
 			key,
+			container,
+			coKey,
 			JSON.stringify(obj),
 		);
 
@@ -306,6 +378,22 @@ export class SQLiteStorage extends AbstractStorage {
 		if (resource) {
 			this.stmtDeleteResource.run(projectKey, typeId, id);
 			return this.expand(projectKey, resource, params.expand);
+		}
+		return null;
+	}
+
+	async getByContainerAndKey(
+		projectKey: string,
+		container: string,
+		key: string,
+	): Promise<CustomObject | null> {
+		const row = this.stmtGetResourceByContainerAndKey.get(
+			projectKey,
+			container,
+			key,
+		) as { data: string } | undefined;
+		if (row) {
+			return JSON.parse(row.data) as CustomObject;
 		}
 		return null;
 	}
