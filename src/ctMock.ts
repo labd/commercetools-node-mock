@@ -1,4 +1,4 @@
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify, { type FastifyBaseLogger, type FastifyInstance } from "fastify";
 import { HttpResponse, http } from "msw";
 import type { SetupServer, SetupServerApi } from "msw/node";
 import qs from "qs";
@@ -26,9 +26,8 @@ export type CommercetoolsMockOptions = {
 	silent: boolean;
 	strict: boolean;
 	storage: AbstractStorage | undefined;
+	logger: FastifyBaseLogger | undefined;
 };
-
-type AppOptions = { silent?: boolean };
 
 const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	enableAuthentication: false,
@@ -39,6 +38,7 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	silent: true,
 	strict: false,
 	storage: undefined,
+	logger: undefined,
 };
 
 const _globalListeners: SetupServer[] = [];
@@ -70,7 +70,7 @@ export class CommercetoolsMock {
 			validate: this.options.validateCredentials,
 		});
 
-		this.app = this.createApp({ silent: this.options.silent });
+		this.app = this.createApp();
 	}
 
 	get server() {
@@ -110,7 +110,7 @@ export class CommercetoolsMock {
 		await this.app.listen({ port, host: "0.0.0.0" });
 	}
 
-	private createApp(options?: AppOptions): FastifyInstance {
+	private createApp(): FastifyInstance {
 		const config: Config = {
 			strict: this.options.strict,
 			storage: this._storage,
@@ -118,14 +118,38 @@ export class CommercetoolsMock {
 		this._repositories = createRepositories(config);
 		this._oauth2.setCustomerRepository(this._repositories.customer);
 
+		const loggerConfig = this.options.logger
+			? { loggerInstance: this.options.logger }
+			: { logger: !this.options.silent ? { level: "info" as const } : false };
+
 		const app = Fastify({
 			// Set limit to 16mb, this is the maximum size allowed by the commercetools API: https://docs.commercetools.com/api/limits
 			bodyLimit: 16 * 1024 * 1024,
-			logger: !options?.silent ? { level: "info" } : false,
+			...loggerConfig,
 			routerOptions: {
 				querystringParser: (str) => qs.parse(str),
 			},
 		});
+
+		// Override the default JSON parser to accept empty bodies. This is
+		// needed because some HTTP clients (e.g. commercetools SDKs) send
+		// DELETE requests with a Content-Type: application/json header but
+		// without a body. Fastify 5 rejects these by default.
+		app.addContentTypeParser(
+			"application/json",
+			{ parseAs: "string" },
+			(_req, body, done) => {
+				if (!body || (typeof body === "string" && body.trim() === "")) {
+					done(null, undefined);
+					return;
+				}
+				try {
+					done(null, JSON.parse(body as string));
+				} catch (err) {
+					done(err as Error, undefined);
+				}
+			},
+		);
 
 		// Register OAuth routes
 		app.register(this._oauth2.createPlugin(), { prefix: "/oauth" });
@@ -164,22 +188,18 @@ export class CommercetoolsMock {
 								errors: [error.info],
 							};
 
-				if (!options?.silent) {
-					// biome-ignore lint/suspicious/noConsole: intentional logging when silent is false
-					console.error(
-						`commercetools-mock: ${request.method} ${request.url} - ${error.statusCode}: ${error.message}`,
-					);
-				}
+				request.log.error(
+					{ statusCode: error.statusCode, err: error },
+					`${request.method} ${request.url} - ${error.statusCode}: ${error.message}`,
+				);
 
 				return reply.status(error.statusCode).send(responseBody);
 			}
 
-			if (!options?.silent) {
-				// biome-ignore lint/suspicious/noConsole: intentional logging when silent is false
-				console.error(
-					`commercetools-mock: ${request.method} ${request.url} - 500: ${error instanceof Error ? error.message : String(error)}`,
-				);
-			}
+			request.log.error(
+				{ statusCode: 500, err: error },
+				`${request.method} ${request.url} - 500: ${error instanceof Error ? error.message : String(error)}`,
+			);
 
 			return reply.status(500).send({
 				error: error instanceof Error ? error.message : String(error),
