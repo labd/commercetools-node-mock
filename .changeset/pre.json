@@ -4,5 +4,23 @@
   "initialVersions": {
     "@labdigital/commercetools-mock": "2.66.0"
   },
-  "changesets": []
+  "changesets": [
+    "add-created-last-modified-by",
+    "add-draft-validation",
+    "add-product-type-update-actions",
+    "add-sqlite-storage",
+    "async-storage-layer",
+    "fix-cart-discount-codes",
+    "fix-category-parent-by-key",
+    "fix-empty-json-body-on-delete",
+    "log-errors-when-not-silent",
+    "move-to-fastify",
+    "optimize-custom-object-lookup",
+    "optimize-resource-creation-perf",
+    "optimize-sqlite-large-datasets",
+    "remove-deprecated-methods",
+    "unified-pino-logging",
+    "update-dependencies",
+    "upgrade-zod-v4"
+  ]
 }
