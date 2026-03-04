@@ -1,5 +1,6 @@
 import type {
 	BaseResource,
+	CustomObject,
 	InvalidInputError,
 	InvalidJsonInputError,
 	PagedQueryResponse,
@@ -50,6 +51,12 @@ export abstract class AbstractStorage {
 		typeId: RT,
 	): Promise<Array<ResourceMap[RT]>>;
 
+	/**
+	 * Return the number of resources of the given type.
+	 * This is more efficient than loading all resources and counting them.
+	 */
+	abstract count(projectKey: string, typeId: ResourceType): Promise<number>;
+
 	abstract add<RT extends ResourceType>(
 		projectKey: string,
 		typeId: RT,
@@ -89,6 +96,17 @@ export abstract class AbstractStorage {
 		typeId: RT,
 		params: QueryParams,
 	): Promise<PagedQueryResponseMap[RT]>;
+
+	/**
+	 * Look up a custom object by its container and key.
+	 * This is an O(1) operation for storage backends that maintain
+	 * a secondary index on (container, key).
+	 */
+	abstract getByContainerAndKey(
+		projectKey: string,
+		container: string,
+		key: string,
+	): Promise<CustomObject | null>;
 
 	// Expand resolves a nested reference and injects the object in the given obj
 	async expand<T>(
