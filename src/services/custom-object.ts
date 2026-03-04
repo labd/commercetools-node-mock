@@ -1,5 +1,9 @@
-import type { CustomObjectDraft } from "@commercetools/platform-sdk";
+import type {
+	CustomObjectDraft,
+	ResourceNotFoundError,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import type { CustomObjectRepository } from "../repositories/custom-object.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import AbstractService from "./abstract.ts";
@@ -92,7 +96,13 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!result) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The CustomObject with container '${params.container}' and key '${params.key}' was not found.`,
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(result);
 	}
@@ -130,7 +140,13 @@ export class CustomObjectService extends AbstractService {
 		);
 
 		if (!current) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The CustomObject with container '${params.container}' and key '${params.key}' was not found.`,
+				},
+				404,
+			);
 		}
 
 		const result = await this.repository.delete(

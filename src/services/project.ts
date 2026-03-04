@@ -1,5 +1,9 @@
-import type { Update } from "@commercetools/platform-sdk";
+import type {
+	ResourceNotFoundError,
+	Update,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
@@ -37,7 +41,13 @@ export class ProjectService {
 		const project = await this.repository.get(getRepositoryContext(request));
 
 		if (!project) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "The Resource was not found.",
+				},
+				404,
+			);
 		}
 
 		const updatedResource = await this.repository.processUpdateActions(

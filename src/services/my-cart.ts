@@ -1,4 +1,6 @@
+import type { ResourceNotFoundError } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import type { CartRepository } from "../repositories/cart/index.ts";
 import AbstractService from "./abstract.ts";
 
@@ -43,16 +45,13 @@ export class MyCartService extends AbstractService {
 		const params = request.params;
 		const resource = await this.repository.getActiveCart(params.projectKey);
 		if (!resource) {
-			return reply.status(404).send({
-				statusCode: 404,
-				message: "No active cart exists.",
-				errors: [
-					{
-						code: "ResourceNotFound",
-						message: "No active cart exists.",
-					},
-				],
-			});
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "No active cart exists.",
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(resource);
 	}

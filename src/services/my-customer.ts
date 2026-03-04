@@ -4,9 +4,11 @@ import type {
 	MyCustomerEmailVerify,
 	MyCustomerResetPassword,
 	MyCustomerSignin,
+	ResourceNotFoundError,
 	Update,
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData } from "#src/validate.ts";
 import { hashPassword } from "../lib/password.ts";
@@ -56,7 +58,13 @@ export class MyCustomerService extends AbstractService {
 	) {
 		const resource = await this.repository.getMe(getRepositoryContext(request));
 		if (!resource) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "The Resource was not found.",
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(resource);
 	}
@@ -71,7 +79,13 @@ export class MyCustomerService extends AbstractService {
 		const resource = await this.repository.getMe(getRepositoryContext(request));
 
 		if (!resource) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "The Resource was not found.",
+				},
+				404,
+			);
 		}
 		const updateRequest = validateData<Update>(
 			request.body,
@@ -96,7 +110,13 @@ export class MyCustomerService extends AbstractService {
 			getRepositoryContext(request),
 		);
 		if (!resource) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: "The Resource was not found.",
+				},
+				404,
+			);
 		}
 
 		return reply.status(200).send(resource);
@@ -180,15 +200,13 @@ export class MyCustomerService extends AbstractService {
 		});
 
 		if (result.count === 0) {
-			return reply.status(400).send({
-				message: "Account with the given credentials not found.",
-				errors: [
-					{
-						code: "InvalidCredentials",
-						message: "Account with the given credentials not found.",
-					},
-				],
-			});
+			throw new CommercetoolsError<any>(
+				{
+					code: "InvalidCredentials",
+					message: "Account with the given credentials not found.",
+				},
+				400,
+			);
 		}
 
 		return reply.status(200).send({ customer: result.results[0] });

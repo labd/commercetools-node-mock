@@ -372,6 +372,7 @@ describe("/me", () => {
 
 		expect(response.statusCode).toBe(400);
 		expect(response.json()).toEqual({
+			statusCode: 400,
 			message: "Account with the given credentials not found.",
 			errors: [
 				{

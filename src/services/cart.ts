@@ -1,10 +1,12 @@
 import type {
 	Cart,
 	CartDraft,
+	InvalidInputError,
 	Order,
 	ReplicaCartDraft,
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import type { CartRepository } from "../repositories/cart/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
@@ -49,7 +51,13 @@ export class CartService extends AbstractService {
 				: await this.repository.get(context, body.reference.id);
 
 		if (!cartOrOrder) {
-			return reply.status(400).send();
+			throw new CommercetoolsError<InvalidInputError>(
+				{
+					code: "InvalidInput",
+					message: `The referenced ${body.reference.typeId} with ID '${body.reference.id}' was not found.`,
+				},
+				400,
+			);
 		}
 
 		const cartDraft: CartDraft = {
