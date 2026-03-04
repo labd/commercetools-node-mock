@@ -1,8 +1,10 @@
 import type {
 	OrderImportDraft,
 	OrderSearchRequest,
+	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
 import AbstractService from "./abstract.ts";
@@ -59,16 +61,13 @@ export class OrderService extends AbstractService {
 		if (resource) {
 			return reply.status(200).send(resource);
 		}
-		return reply.status(404).send({
-			statusCode: 404,
-			message: `The Resource with key '${orderNumber}' was not found.`,
-			errors: [
-				{
-					code: "ResourceNotFound",
-					message: `The Resource with key '${orderNumber}' was not found.`,
-				},
-			],
-		});
+		throw new CommercetoolsError<ResourceNotFoundError>(
+			{
+				code: "ResourceNotFound",
+				message: `The Resource with key '${orderNumber}' was not found.`,
+			},
+			404,
+		);
 	}
 
 	async search(

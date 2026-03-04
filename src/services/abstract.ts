@@ -1,6 +1,10 @@
-import type { Update } from "@commercetools/platform-sdk";
+import type {
+	ResourceNotFoundError,
+	Update,
+} from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { ParsedQs } from "qs";
+import { CommercetoolsError } from "#src/exceptions.ts";
 import { updateRequestSchema } from "#src/schemas/update-request.ts";
 import { validateData, validateDraft } from "#src/validate.ts";
 import { queryParamsArray } from "../helpers.ts";
@@ -89,16 +93,13 @@ export default abstract class AbstractService {
 		const params = request.params;
 		const result = await this._expandWithId(request, params.id);
 		if (!result) {
-			return reply.status(404).send({
-				statusCode: 404,
-				message: `The Resource with ID '${params.id}' was not found.`,
-				errors: [
-					{
-						code: "ResourceNotFound",
-						message: `The Resource with ID '${params.id}' was not found.`,
-					},
-				],
-			});
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with ID '${params.id}' was not found.`,
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(result);
 	}
@@ -120,16 +121,13 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			return reply.status(404).send({
-				statusCode: 404,
-				message: `The Resource with key '${params.key}' was not found.`,
-				errors: [
-					{
-						code: "ResourceNotFound",
-						message: `The Resource with key '${params.key}' was not found.`,
-					},
-				],
-			});
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with key '${params.key}' was not found.`,
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(result);
 	}
@@ -151,7 +149,13 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with ID '${params.id}' was not found.`,
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(result);
 	}
@@ -170,7 +174,13 @@ export default abstract class AbstractService {
 			params.key,
 		);
 		if (!resource) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with key '${params.key}' was not found.`,
+				},
+				404,
+			);
 		}
 
 		const result = await this.repository.delete(
@@ -181,7 +191,13 @@ export default abstract class AbstractService {
 			},
 		);
 		if (!result) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with ID '${resource.id}' was not found.`,
+				},
+				404,
+			);
 		}
 		return reply.status(200).send(result);
 	}
@@ -235,7 +251,13 @@ export default abstract class AbstractService {
 			params.id,
 		);
 		if (!resource) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with ID '${params.id}' was not found.`,
+				},
+				404,
+			);
 		}
 
 		const updatedResource = await this.repository.processUpdateActions(
@@ -267,7 +289,13 @@ export default abstract class AbstractService {
 			params.key,
 		);
 		if (!resource) {
-			return reply.status(404).send({ statusCode: 404 });
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with key '${params.key}' was not found.`,
+				},
+				404,
+			);
 		}
 
 		const updatedResource = await this.repository.processUpdateActions(
