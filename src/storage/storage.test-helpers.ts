@@ -2,6 +2,7 @@ import type {
 	Category,
 	Channel,
 	Customer,
+	CustomObject,
 	Type,
 } from "@commercetools/platform-sdk";
 import type { Writable } from "#src/types.ts";
@@ -64,6 +65,20 @@ export const makeType = (overrides: Partial<Writable<Type>> = {}): Type =>
 		fieldDefinitions: [],
 		...overrides,
 	}) as Type;
+
+export const makeCustomObject = (
+	overrides: Partial<Writable<CustomObject>> = {},
+): CustomObject =>
+	({
+		id: "co-1",
+		version: 1,
+		createdAt: "2024-01-01T00:00:00.000Z",
+		lastModifiedAt: "2024-01-01T00:00:00.000Z",
+		container: "my-container",
+		key: "my-key",
+		value: { foo: "bar" },
+		...overrides,
+	}) as CustomObject;
 
 export const storageEngineName = process.env.STORAGE_ENGINE || "in-memory";
 

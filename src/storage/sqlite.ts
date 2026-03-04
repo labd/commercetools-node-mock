@@ -78,8 +78,6 @@ const SCHEMA = `
     type_id TEXT NOT NULL,
     id TEXT NOT NULL,
     key TEXT,
-    container TEXT,
-    co_key TEXT,
     data TEXT NOT NULL,
     PRIMARY KEY (project_key, type_id, id)
   );
@@ -88,7 +86,11 @@ const SCHEMA = `
     ON resources (project_key, type_id, key) WHERE key IS NOT NULL;
 
   CREATE INDEX IF NOT EXISTS idx_resources_container_key
-    ON resources (project_key, container, co_key)
+    ON resources (
+      project_key,
+      json_extract(data, '$.container'),
+      json_extract(data, '$.key')
+    )
     WHERE type_id = 'key-value-document';
 `;
 
@@ -119,28 +121,6 @@ export class SQLiteStorage extends AbstractStorage {
 
 		this.db = new DatabaseSync(filename);
 		this.db.exec(SCHEMA);
-
-		// Migration: add container and co_key columns for existing databases
-		this._migrateSchema();
-	}
-
-	/**
-	 * Add columns that may not exist in databases created before this version.
-	 * ALTER TABLE ADD COLUMN is a no-op if the column already exists in SQLite
-	 * when using IF NOT EXISTS (not supported), so we catch errors instead.
-	 */
-	private _migrateSchema(): void {
-		const columns = this.db
-			.prepare("PRAGMA table_info(resources)")
-			.all() as Array<{ name: string }>;
-		const columnNames = new Set(columns.map((c) => c.name));
-
-		if (!columnNames.has("container")) {
-			this.db.exec("ALTER TABLE resources ADD COLUMN container TEXT");
-		}
-		if (!columnNames.has("co_key")) {
-			this.db.exec("ALTER TABLE resources ADD COLUMN co_key TEXT");
-		}
 	}
 
 	/**
@@ -182,7 +162,7 @@ export class SQLiteStorage extends AbstractStorage {
 	private get stmtInsertResource() {
 		if (!this._stmtInsertResource) {
 			this._stmtInsertResource = this.db.prepare(
-				"INSERT OR REPLACE INTO resources (project_key, type_id, id, key, container, co_key, data) VALUES (?, ?, ?, ?, ?, ?, ?)",
+				"INSERT OR REPLACE INTO resources (project_key, type_id, id, key, data) VALUES (?, ?, ?, ?, ?)",
 			);
 		}
 		return this._stmtInsertResource;
@@ -246,8 +226,8 @@ export class SQLiteStorage extends AbstractStorage {
 				`SELECT data FROM resources
 				 WHERE project_key = ?
 				   AND type_id = 'key-value-document'
-				   AND container = ?
-				   AND co_key = ?`,
+				   AND json_extract(data, '$.container') = ?
+				   AND json_extract(data, '$.key') = ?`,
 			);
 		}
 		return this._stmtGetResourceByContainerAndKey;
@@ -299,10 +279,10 @@ export class SQLiteStorage extends AbstractStorage {
 	}
 
 	async count(projectKey: string, typeId: ResourceType): Promise<number> {
-		const row = this.stmtCountResources.get(projectKey, typeId) as {
-			cnt: number;
-		};
-		return row.cnt;
+		const row = this.stmtCountResources.get(projectKey, typeId) as
+			| { cnt: number }
+			| undefined;
+		return row?.cnt ?? 0;
 	}
 
 	async add<RT extends ResourceType>(
@@ -316,19 +296,11 @@ export class SQLiteStorage extends AbstractStorage {
 
 		const key = (obj as any).key ?? null;
 
-		// Extract container and key for custom objects to enable indexed lookups
-		const container =
-			typeId === "key-value-document" ? ((obj as any).container ?? null) : null;
-		const coKey =
-			typeId === "key-value-document" ? ((obj as any).key ?? null) : null;
-
 		this.stmtInsertResource.run(
 			projectKey,
 			typeId,
 			obj.id,
 			key,
-			container,
-			coKey,
 			JSON.stringify(obj),
 		);
 

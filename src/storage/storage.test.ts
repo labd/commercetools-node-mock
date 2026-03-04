@@ -8,6 +8,7 @@ import {
 	makeCategory,
 	makeChannel,
 	makeCustomer,
+	makeCustomObject,
 	makeType,
 	storageEngineName,
 } from "./storage.test-helpers.ts";
@@ -635,6 +636,167 @@ describe(`Storage (${storageEngineName})`, () => {
 
 			// Cross-type lookup should return null
 			expect(await storage.get(projectKey, "category", "channel-1")).toBeNull();
+		});
+	});
+
+	describe("count", () => {
+		test("returns 0 for an empty store", async () => {
+			const result = await storage.count(projectKey, "category");
+			expect(result).toBe(0);
+		});
+
+		test("returns correct count after adding resources", async () => {
+			await storage.add(projectKey, "category", makeCategory({ id: "cat-1" }));
+			await storage.add(projectKey, "category", makeCategory({ id: "cat-2" }));
+			await storage.add(projectKey, "category", makeCategory({ id: "cat-3" }));
+
+			const result = await storage.count(projectKey, "category");
+			expect(result).toBe(3);
+		});
+
+		test("returns correct count after deleting a resource", async () => {
+			await storage.add(projectKey, "category", makeCategory({ id: "cat-1" }));
+			await storage.add(projectKey, "category", makeCategory({ id: "cat-2" }));
+
+			await storage.delete(projectKey, "category", "cat-1", {});
+
+			const result = await storage.count(projectKey, "category");
+			expect(result).toBe(1);
+		});
+
+		test("counts are isolated per resource type", async () => {
+			await storage.add(projectKey, "category", makeCategory());
+			await storage.add(projectKey, "channel", makeChannel());
+
+			expect(await storage.count(projectKey, "category")).toBe(1);
+			expect(await storage.count(projectKey, "channel")).toBe(1);
+		});
+	});
+
+	describe("getByContainerAndKey", () => {
+		test("finds a custom object by container and key", async () => {
+			await storage.add(
+				projectKey,
+				"key-value-document",
+				makeCustomObject({
+					id: "co-1",
+					container: "my-container",
+					key: "my-key",
+				}),
+			);
+
+			const result = await storage.getByContainerAndKey(
+				projectKey,
+				"my-container",
+				"my-key",
+			);
+			expect(result).not.toBeNull();
+			expect(result?.id).toBe("co-1");
+			expect(result?.container).toBe("my-container");
+			expect(result?.key).toBe("my-key");
+		});
+
+		test("returns null when container does not match", async () => {
+			await storage.add(
+				projectKey,
+				"key-value-document",
+				makeCustomObject({
+					id: "co-1",
+					container: "my-container",
+					key: "my-key",
+				}),
+			);
+
+			const result = await storage.getByContainerAndKey(
+				projectKey,
+				"other-container",
+				"my-key",
+			);
+			expect(result).toBeNull();
+		});
+
+		test("returns null when key does not match", async () => {
+			await storage.add(
+				projectKey,
+				"key-value-document",
+				makeCustomObject({
+					id: "co-1",
+					container: "my-container",
+					key: "my-key",
+				}),
+			);
+
+			const result = await storage.getByContainerAndKey(
+				projectKey,
+				"my-container",
+				"other-key",
+			);
+			expect(result).toBeNull();
+		});
+
+		test("returns null when no custom objects exist", async () => {
+			const result = await storage.getByContainerAndKey(
+				projectKey,
+				"my-container",
+				"my-key",
+			);
+			expect(result).toBeNull();
+		});
+
+		test("returns null after custom object is deleted", async () => {
+			await storage.add(
+				projectKey,
+				"key-value-document",
+				makeCustomObject({
+					id: "co-1",
+					container: "my-container",
+					key: "my-key",
+				}),
+			);
+
+			await storage.delete(projectKey, "key-value-document", "co-1", {});
+
+			const result = await storage.getByContainerAndKey(
+				projectKey,
+				"my-container",
+				"my-key",
+			);
+			expect(result).toBeNull();
+		});
+
+		test("distinguishes between different container/key combinations", async () => {
+			await storage.add(
+				projectKey,
+				"key-value-document",
+				makeCustomObject({
+					id: "co-1",
+					container: "container-a",
+					key: "key-1",
+				}),
+			);
+			await storage.add(
+				projectKey,
+				"key-value-document",
+				makeCustomObject({
+					id: "co-2",
+					container: "container-b",
+					key: "key-1",
+				}),
+			);
+
+			const resultA = await storage.getByContainerAndKey(
+				projectKey,
+				"container-a",
+				"key-1",
+			);
+			const resultB = await storage.getByContainerAndKey(
+				projectKey,
+				"container-b",
+				"key-1",
+			);
+
+			expect(resultA?.id).toBe("co-1");
+			expect(resultB?.id).toBe("co-2");
 		});
 	});
 });
