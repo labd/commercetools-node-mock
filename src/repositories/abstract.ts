@@ -376,6 +376,10 @@ export class AbstractUpdateHandler {
 		version: number,
 		actions: UpdateAction[],
 	): Promise<R> {
+		// We need a separate working copy because the caller (processUpdateActions)
+		// compares resource.version with updatedResource.version to detect changes.
+		// The resource parameter is already a clone from storage, but we still need
+		// two distinct references.
 		const updatedResource = cloneObject(resource) as ShallowWritable<R>;
 		const identifier = (resource as BaseResource).id
 			? (resource as BaseResource).id
@@ -410,7 +414,9 @@ export class AbstractUpdateHandler {
 				);
 			}
 
-			const beforeUpdate = cloneObject(resource);
+			// Snapshot the current state before applying the action so we can
+			// detect whether it actually changed anything.
+			const beforeUpdate = cloneObject(updatedResource);
 			await updateFunc(context, updatedResource, action);
 
 			// Check if the object is updated. We need to increase the version of

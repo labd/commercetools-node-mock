@@ -6,6 +6,7 @@ import type {
 	Project,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { cloneObject } from "../helpers.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
 import type {
 	PagedQueryResponseMap,
@@ -331,9 +332,10 @@ export class SQLiteStorage extends AbstractStorage {
 			JSON.stringify(obj),
 		);
 
-		// Return the object directly instead of re-fetching from the database.
-		// We just inserted it, so we know it exists. Only apply expand if needed.
-		return this.expand(projectKey, obj, params.expand);
+		// Return a clone instead of the caller's reference so that expand()
+		// can safely mutate it without affecting the caller's object.
+		const clone = cloneObject(obj);
+		return this.expand(projectKey, clone, params.expand);
 	}
 
 	async get<RT extends ResourceType>(

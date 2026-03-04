@@ -13,7 +13,6 @@ import type {
 	ShoppingListLineItem,
 } from "@commercetools/platform-sdk";
 import { CommercetoolsError } from "#src/exceptions.ts";
-import { cloneObject } from "../helpers.ts";
 import { parseExpandClause } from "../lib/expandParser.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
 import type {
@@ -22,6 +21,7 @@ import type {
 	ResourceType,
 	Writable,
 } from "../types.ts";
+import type { StorageMap } from "./storage-map.ts";
 
 export type GetParams = {
 	expand?: string[];
@@ -108,22 +108,24 @@ export abstract class AbstractStorage {
 		key: string,
 	): Promise<CustomObject | null>;
 
-	// Expand resolves a nested reference and injects the object in the given obj
+	// Expand resolves a nested reference and injects the object in the given obj.
+	// NOTE: This method mutates the passed object in-place. Callers must ensure
+	// they pass an object that is safe to mutate (e.g. a clone from StorageMap
+	// or JSON.parse).
 	async expand<T>(
 		projectKey: string,
 		obj: T,
 		clause: undefined | string | string[],
 	): Promise<T> {
 		if (!clause) return obj;
-		const newObj = cloneObject(obj);
 		if (Array.isArray(clause)) {
 			for (const c of clause) {
-				await this._resolveResource(projectKey, newObj, c);
+				await this._resolveResource(projectKey, obj, c);
 			}
 		} else {
-			await this._resolveResource(projectKey, newObj, clause);
+			await this._resolveResource(projectKey, obj, clause);
 		}
-		return newObj;
+		return obj;
 	}
 
 	async getByResourceIdentifier<RT extends ResourceType>(
@@ -313,5 +315,5 @@ export abstract class AbstractStorage {
 }
 
 export type ProjectStorage = {
-	[index in ResourceType]: Map<string, BaseResource>;
+	[index in ResourceType]: StorageMap<string, BaseResource>;
 };

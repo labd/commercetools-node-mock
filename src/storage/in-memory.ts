@@ -46,6 +46,7 @@ import type {
 } from "../types.ts";
 import type { GetParams, ProjectStorage, QueryParams } from "./abstract.ts";
 import { AbstractStorage } from "./abstract.ts";
+import { StorageMap } from "./storage-map.ts";
 
 export class InMemoryStorage extends AbstractStorage {
 	protected resources: {
@@ -108,12 +109,13 @@ export class InMemoryStorage extends AbstractStorage {
 	}
 
 	async saveProject(project: Project): Promise<Project> {
-		this.projects[project.key] = project;
+		this.projects[project.key] = cloneObject(project);
 		return project;
 	}
 
 	async getProject(projectKey: string): Promise<Project> {
-		return this.addProject(projectKey);
+		await this.addProject(projectKey);
+		return cloneObject(this.projects[projectKey]);
 	}
 
 	private async forProjectKey(projectKey: string): Promise<ProjectStorage> {
@@ -122,44 +124,44 @@ export class InMemoryStorage extends AbstractStorage {
 		let projectStorage = this.resources[projectKey];
 		if (!projectStorage) {
 			projectStorage = this.resources[projectKey] = {
-				"associate-role": new Map<string, AssociateRole>(),
-				"attribute-group": new Map<string, AttributeGroup>(),
-				"business-unit": new Map<string, BusinessUnit>(),
-				cart: new Map<string, Cart>(),
-				"cart-discount": new Map<string, CartDiscount>(),
-				category: new Map<string, Category>(),
-				channel: new Map<string, Channel>(),
-				customer: new Map<string, Customer>(),
-				"customer-group": new Map<string, CustomerGroup>(),
-				"discount-code": new Map<string, DiscountCode>(),
-				"discount-group": new Map<string, DiscountGroup>(),
-				extension: new Map<string, Extension>(),
-				"inventory-entry": new Map<string, InventoryEntry>(),
-				"key-value-document": new Map<string, CustomObject>(),
-				order: new Map<string, Order>(),
-				"order-edit": new Map<string, any>(),
-				payment: new Map<string, Payment>(),
-				product: new Map<string, Product>(),
-				quote: new Map<string, Quote>(),
-				"quote-request": new Map<string, QuoteRequest>(),
-				"product-discount": new Map<string, ProductDiscount>(),
-				"product-selection": new Map<string, any>(),
-				"product-type": new Map<string, ProductType>(),
-				"product-projection": new Map<string, ProductProjection>(),
-				"product-tailoring": new Map<string, ProductTailoring>(),
-				"recurrence-policy": new Map<string, RecurrencePolicy>(),
-				"recurring-order": new Map<string, RecurringOrder>(),
-				review: new Map<string, any>(),
-				"shipping-method": new Map<string, ShippingMethod>(),
-				"staged-quote": new Map<string, StagedQuote>(),
-				state: new Map<string, State>(),
-				store: new Map<string, Store>(),
-				"shopping-list": new Map<string, ShoppingList>(),
-				"standalone-price": new Map<string, any>(),
-				subscription: new Map<string, Subscription>(),
-				"tax-category": new Map<string, TaxCategory>(),
-				type: new Map<string, Type>(),
-				zone: new Map<string, Zone>(),
+				"associate-role": new StorageMap<string, AssociateRole>(),
+				"attribute-group": new StorageMap<string, AttributeGroup>(),
+				"business-unit": new StorageMap<string, BusinessUnit>(),
+				cart: new StorageMap<string, Cart>(),
+				"cart-discount": new StorageMap<string, CartDiscount>(),
+				category: new StorageMap<string, Category>(),
+				channel: new StorageMap<string, Channel>(),
+				customer: new StorageMap<string, Customer>(),
+				"customer-group": new StorageMap<string, CustomerGroup>(),
+				"discount-code": new StorageMap<string, DiscountCode>(),
+				"discount-group": new StorageMap<string, DiscountGroup>(),
+				extension: new StorageMap<string, Extension>(),
+				"inventory-entry": new StorageMap<string, InventoryEntry>(),
+				"key-value-document": new StorageMap<string, CustomObject>(),
+				order: new StorageMap<string, Order>(),
+				"order-edit": new StorageMap<string, any>(),
+				payment: new StorageMap<string, Payment>(),
+				product: new StorageMap<string, Product>(),
+				quote: new StorageMap<string, Quote>(),
+				"quote-request": new StorageMap<string, QuoteRequest>(),
+				"product-discount": new StorageMap<string, ProductDiscount>(),
+				"product-selection": new StorageMap<string, any>(),
+				"product-type": new StorageMap<string, ProductType>(),
+				"product-projection": new StorageMap<string, ProductProjection>(),
+				"product-tailoring": new StorageMap<string, ProductTailoring>(),
+				"recurrence-policy": new StorageMap<string, RecurrencePolicy>(),
+				"recurring-order": new StorageMap<string, RecurringOrder>(),
+				review: new StorageMap<string, any>(),
+				"shipping-method": new StorageMap<string, ShippingMethod>(),
+				"staged-quote": new StorageMap<string, StagedQuote>(),
+				state: new StorageMap<string, State>(),
+				store: new StorageMap<string, Store>(),
+				"shopping-list": new StorageMap<string, ShoppingList>(),
+				"standalone-price": new StorageMap<string, any>(),
+				subscription: new StorageMap<string, Subscription>(),
+				"tax-category": new StorageMap<string, TaxCategory>(),
+				type: new StorageMap<string, Type>(),
+				zone: new StorageMap<string, Zone>(),
 			};
 		}
 		return projectStorage;
@@ -181,7 +183,8 @@ export class InMemoryStorage extends AbstractStorage {
 		const projectStorage = await this.forProjectKey(projectKey);
 		const store = projectStorage[typeId];
 		if (store) {
-			return Array.from(store.values()).map(cloneObject) as ResourceMap[RT][];
+			// StorageMap.values() already returns cloned values
+			return Array.from(store.values()) as ResourceMap[RT][];
 		}
 		return [];
 	}
@@ -199,6 +202,7 @@ export class InMemoryStorage extends AbstractStorage {
 		params: GetParams = {},
 	): Promise<ResourceMap[RT]> {
 		const store = await this.forProjectKey(projectKey);
+		// StorageMap.set() clones the value before storing
 		store[typeId]?.set(obj.id, obj);
 
 		// Maintain secondary index for custom objects
@@ -212,9 +216,8 @@ export class InMemoryStorage extends AbstractStorage {
 			projectIndex.set(`${co.container}\0${co.key}`, co.id);
 		}
 
-		// Return the object directly instead of re-fetching from the store.
-		// We just inserted it, so we know it exists. Only apply expand if needed.
-		const clone = cloneObject(obj);
+		// StorageMap.get() returns a clone, so we get a fresh copy for expand
+		const clone = store[typeId]?.get(obj.id) as ResourceMap[RT];
 		return this.expand(projectKey, clone, params.expand);
 	}
 
@@ -225,10 +228,10 @@ export class InMemoryStorage extends AbstractStorage {
 		params: GetParams = {},
 	): Promise<ResourceMap[RT] | null> {
 		const projectStorage = await this.forProjectKey(projectKey);
+		// StorageMap.get() already returns a clone
 		const resource = projectStorage[typeId]?.get(id);
 		if (resource) {
-			const clone = cloneObject(resource);
-			const expanded = await this.expand(projectKey, clone, params.expand);
+			const expanded = await this.expand(projectKey, resource, params.expand);
 			return expanded as ResourceMap[RT];
 		}
 		return null;
@@ -246,11 +249,11 @@ export class InMemoryStorage extends AbstractStorage {
 		}
 		const resourceStore = store[typeId];
 
+		// StorageMap.values() already returns cloned values
 		const resources: any[] = Array.from(resourceStore.values());
 		const resource = resources.find((e) => e.key === key);
 		if (resource) {
-			const clone = cloneObject(resource);
-			const expanded = await this.expand(projectKey, clone, params.expand);
+			const expanded = await this.expand(projectKey, resource, params.expand);
 			return expanded as ResourceMap[RT];
 		}
 		return null;
@@ -309,6 +312,7 @@ export class InMemoryStorage extends AbstractStorage {
 			throw new Error("No type");
 		}
 
+		// all() already returns cloned values via StorageMap
 		let resources = await this.all<RT>(projectKey, typeId);
 
 		// Apply predicates
@@ -357,7 +361,8 @@ export class InMemoryStorage extends AbstractStorage {
 			total: totalResources,
 			offset: offset,
 			limit: limit,
-			results: resources.map(cloneObject),
+			// Resources are already clones from StorageMap
+			results: resources,
 		} as PagedQueryResponseMap[RT];
 	}
 }

@@ -1,9 +1,8 @@
-import { cloneObject } from "../helpers.ts";
-
 export const maskSecretValue = <T>(resource: T, path: string): T => {
 	const parts = path.split(".");
-	const clone = cloneObject(resource) as any;
-	let val = clone;
+	// Callers are expected to pass objects that are safe to mutate
+	// (e.g. clones from storage retrieval).
+	let val = resource as any;
 
 	const target = parts.pop();
 	for (let i = 0; i < parts.length; i++) {
@@ -18,5 +17,5 @@ export const maskSecretValue = <T>(resource: T, path: string): T => {
 	if (val && target && val[target]) {
 		val[target] = "****";
 	}
-	return clone;
+	return resource;
 };

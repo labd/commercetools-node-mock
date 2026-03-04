@@ -6,7 +6,7 @@ import type {
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { CustomObjectDraftSchema } from "#src/schemas/generated/custom-object.ts";
-import { cloneObject, getBaseResourceProperties } from "../helpers.ts";
+import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { QueryParams } from "./abstract.ts";
 import {
@@ -40,11 +40,11 @@ export class CustomObjectRepository extends AbstractResourceRepository<"key-valu
 			}
 
 			if (draft.value !== current.value) {
-				const updated = cloneObject(current) as Writable<CustomObject>;
-				updated.value = draft.value;
-				updated.version += 1;
-				await this.saveUpdate(context, draft.version, updated);
-				return updated;
+				// current is already a clone from storage retrieval, safe to mutate
+				current.value = draft.value;
+				current.version += 1;
+				await this.saveUpdate(context, draft.version, current);
+				return current;
 			}
 			return current;
 		}
