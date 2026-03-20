@@ -5,8 +5,8 @@ import { z } from "zod";
 import { LocationSchema } from "./common.ts";
 
 export const ZoneDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	name: z.string(),
-	description: z.string().optional(),
-	locations: z.array(LocationSchema).optional(),
+	description: z.string().nullish(),
+	locations: z.array(LocationSchema).nullish(),
 });

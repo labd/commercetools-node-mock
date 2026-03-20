@@ -13,11 +13,11 @@ import {
 
 export const StoreDraftSchema = z.object({
 	key: z.string(),
-	name: LocalizedStringSchema.optional(),
-	languages: z.array(LocaleSchema).optional(),
-	countries: z.array(StoreCountrySchema).optional(),
-	distributionChannels: z.array(ChannelResourceIdentifierSchema).optional(),
-	supplyChannels: z.array(ChannelResourceIdentifierSchema).optional(),
-	productSelections: z.array(ProductSelectionSettingDraftSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	name: LocalizedStringSchema.nullish(),
+	languages: z.array(LocaleSchema).nullish(),
+	countries: z.array(StoreCountrySchema).nullish(),
+	distributionChannels: z.array(ChannelResourceIdentifierSchema).nullish(),
+	supplyChannels: z.array(ChannelResourceIdentifierSchema).nullish(),
+	productSelections: z.array(ProductSelectionSettingDraftSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

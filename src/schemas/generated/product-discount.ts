@@ -9,12 +9,12 @@ import {
 
 export const ProductDiscountDraftSchema = z.object({
 	name: LocalizedStringSchema,
-	key: z.string().optional(),
-	description: LocalizedStringSchema.optional(),
+	key: z.string().nullish(),
+	description: LocalizedStringSchema.nullish(),
 	value: ProductDiscountValueDraftSchema,
 	predicate: z.string(),
 	sortOrder: z.string(),
 	isActive: z.boolean(),
-	validFrom: z.string().optional(),
-	validUntil: z.string().optional(),
+	validFrom: z.string().nullish(),
+	validUntil: z.string().nullish(),
 });

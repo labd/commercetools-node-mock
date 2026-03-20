@@ -9,11 +9,11 @@ import {
 } from "./common.ts";
 
 export const RecurringOrderDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	cart: CartResourceIdentifierSchema,
 	cartVersion: z.number().int(),
-	startsAt: z.string().optional(),
-	expiresAt: z.string().optional(),
-	state: StateResourceIdentifierSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	startsAt: z.string().nullish(),
+	expiresAt: z.string().nullish(),
+	state: StateResourceIdentifierSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { CustomFieldsDraftSchema } from "./common.ts";
 
 export const CustomerGroupDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	groupName: z.string(),
-	custom: CustomFieldsDraftSchema.optional(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

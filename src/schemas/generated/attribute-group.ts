@@ -6,7 +6,7 @@ import { AttributeReferenceSchema, LocalizedStringSchema } from "./common.ts";
 
 export const AttributeGroupDraftSchema = z.object({
 	name: LocalizedStringSchema,
-	description: LocalizedStringSchema.optional(),
+	description: LocalizedStringSchema.nullish(),
 	attributes: z.array(AttributeReferenceSchema),
-	key: z.string().optional(),
+	key: z.string().nullish(),
 });
