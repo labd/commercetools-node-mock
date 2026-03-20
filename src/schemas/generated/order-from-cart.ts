@@ -12,14 +12,14 @@ import {
 } from "./common.ts";
 
 export const OrderFromCartDraftSchema = z.object({
-	id: z.string().optional(),
-	cart: CartResourceIdentifierSchema.optional(),
+	id: z.string().nullish(),
+	cart: CartResourceIdentifierSchema.nullish(),
 	version: z.number().int(),
-	orderNumber: z.string().optional(),
-	purchaseOrderNumber: z.string().optional(),
-	paymentState: PaymentStateSchema.optional(),
-	shipmentState: ShipmentStateSchema.optional(),
-	orderState: OrderStateSchema.optional(),
-	state: StateResourceIdentifierSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	orderNumber: z.string().nullish(),
+	purchaseOrderNumber: z.string().nullish(),
+	paymentState: PaymentStateSchema.nullish(),
+	shipmentState: ShipmentStateSchema.nullish(),
+	orderState: OrderStateSchema.nullish(),
+	state: StateResourceIdentifierSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

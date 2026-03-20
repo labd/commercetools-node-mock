@@ -11,7 +11,7 @@ import {
 export const TypeDraftSchema = z.object({
 	key: z.string(),
 	name: LocalizedStringSchema,
-	description: LocalizedStringSchema.optional(),
+	description: LocalizedStringSchema.nullish(),
 	resourceTypeIds: z.array(ResourceTypeIdSchema),
-	fieldDefinitions: z.array(FieldDefinitionSchema).optional(),
+	fieldDefinitions: z.array(FieldDefinitionSchema).nullish(),
 });

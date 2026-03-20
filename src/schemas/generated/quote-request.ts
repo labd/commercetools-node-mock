@@ -11,9 +11,9 @@ import {
 export const QuoteRequestDraftSchema = z.object({
 	cart: CartResourceIdentifierSchema,
 	cartVersion: z.number().int(),
-	key: z.string().optional(),
-	comment: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	state: StateReferenceSchema.optional(),
-	purchaseOrderNumber: z.string().optional(),
+	key: z.string().nullish(),
+	comment: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	state: StateReferenceSchema.nullish(),
+	purchaseOrderNumber: z.string().nullish(),
 });

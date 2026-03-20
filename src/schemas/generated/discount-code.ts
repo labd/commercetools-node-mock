@@ -9,17 +9,17 @@ import {
 } from "./common.ts";
 
 export const DiscountCodeDraftSchema = z.object({
-	key: z.string().optional(),
-	name: LocalizedStringSchema.optional(),
-	description: LocalizedStringSchema.optional(),
+	key: z.string().nullish(),
+	name: LocalizedStringSchema.nullish(),
+	description: LocalizedStringSchema.nullish(),
 	code: z.string(),
 	cartDiscounts: z.array(CartDiscountResourceIdentifierSchema),
-	cartPredicate: z.string().optional(),
-	isActive: z.boolean().optional(),
-	maxApplications: z.number().int().optional(),
-	maxApplicationsPerCustomer: z.number().int().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	groups: z.array(z.string()).optional(),
-	validFrom: z.string().optional(),
-	validUntil: z.string().optional(),
+	cartPredicate: z.string().nullish(),
+	isActive: z.boolean().nullish(),
+	maxApplications: z.number().int().nullish(),
+	maxApplicationsPerCustomer: z.number().int().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	groups: z.array(z.string()).nullish(),
+	validFrom: z.string().nullish(),
+	validUntil: z.string().nullish(),
 });

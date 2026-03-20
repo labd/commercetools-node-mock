@@ -12,8 +12,8 @@
  *   ../commercetools-api-reference
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 
@@ -459,7 +459,7 @@ export function generateObjectSchema(
 		if (isRequired) {
 			lines.push(`\t${propName}: ${zodType},`);
 		} else {
-			lines.push(`\t${propName}: ${zodType}.optional(),`);
+			lines.push(`\t${propName}: ${zodType}.nullish(),`);
 		}
 	}
 
@@ -510,7 +510,7 @@ export function generateAllOfSchema(
 		if (isRequired) {
 			lines.push(`\t${propName}: ${zodType},`);
 		} else {
-			lines.push(`\t${propName}: ${zodType}.optional(),`);
+			lines.push(`\t${propName}: ${zodType}.nullish(),`);
 		}
 	}
 
@@ -570,7 +570,7 @@ export function generateDiscriminatedUnionSchema(
 			if (isRequired) {
 				lines.push(`\t${propName}: ${zodType},`);
 			} else {
-				lines.push(`\t${propName}: ${zodType}.optional(),`);
+				lines.push(`\t${propName}: ${zodType}.nullish(),`);
 			}
 		}
 
@@ -591,7 +591,7 @@ export function generateDiscriminatedUnionSchema(
 		if (isRequired) {
 			lines.push(`\t${propName}: ${zodType},`);
 		} else {
-			lines.push(`\t${propName}: ${zodType}.optional(),`);
+			lines.push(`\t${propName}: ${zodType}.nullish(),`);
 		}
 	}
 

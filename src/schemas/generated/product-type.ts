@@ -5,8 +5,8 @@ import { z } from "zod";
 import { AttributeDefinitionDraftSchema } from "./common.ts";
 
 export const ProductTypeDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	name: z.string(),
 	description: z.string(),
-	attributes: z.array(AttributeDefinitionDraftSchema).optional(),
+	attributes: z.array(AttributeDefinitionDraftSchema).nullish(),
 });

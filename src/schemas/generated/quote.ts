@@ -9,10 +9,10 @@ import {
 } from "./common.ts";
 
 export const QuoteDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	stagedQuote: StagedQuoteResourceIdentifierSchema,
 	stagedQuoteVersion: z.number().int(),
-	stagedQuoteStateToSent: z.boolean().optional(),
-	state: StateReferenceSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	stagedQuoteStateToSent: z.boolean().nullish(),
+	state: StateReferenceSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

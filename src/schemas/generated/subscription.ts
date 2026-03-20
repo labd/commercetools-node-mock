@@ -12,9 +12,9 @@ import {
 
 export const SubscriptionDraftSchema = z.object({
 	destination: DestinationSchema,
-	key: z.string().optional(),
-	messages: z.array(MessageSubscriptionSchema).optional(),
-	changes: z.array(ChangeSubscriptionSchema).optional(),
-	events: z.array(EventSubscriptionSchema).optional(),
-	format: DeliveryFormatSchema.optional(),
+	key: z.string().nullish(),
+	messages: z.array(MessageSubscriptionSchema).nullish(),
+	changes: z.array(ChangeSubscriptionSchema).nullish(),
+	events: z.array(EventSubscriptionSchema).nullish(),
+	format: DeliveryFormatSchema.nullish(),
 });

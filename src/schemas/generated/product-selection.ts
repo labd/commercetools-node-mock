@@ -10,9 +10,9 @@ import {
 } from "./common.ts";
 
 export const ProductSelectionDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	name: LocalizedStringSchema,
-	custom: CustomFieldsDraftSchema.optional(),
-	type: ProductSelectionTypeEnumSchema.optional(),
-	mode: ProductSelectionModeSchema.optional(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	type: ProductSelectionTypeEnumSchema.nullish(),
+	mode: ProductSelectionModeSchema.nullish(),
 });

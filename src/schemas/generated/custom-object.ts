@@ -7,5 +7,5 @@ export const CustomObjectDraftSchema = z.object({
 	container: z.string(),
 	key: z.string(),
 	value: z.unknown(),
-	version: z.number().int().optional(),
+	version: z.number().int().nullish(),
 });

@@ -12,10 +12,10 @@ import {
 
 export const ChannelDraftSchema = z.object({
 	key: z.string(),
-	roles: z.array(ChannelRoleEnumSchema).optional(),
-	name: LocalizedStringSchema.optional(),
-	description: LocalizedStringSchema.optional(),
-	address: BaseAddressSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	geoLocation: GeoJsonSchema.optional(),
+	roles: z.array(ChannelRoleEnumSchema).nullish(),
+	name: LocalizedStringSchema.nullish(),
+	description: LocalizedStringSchema.nullish(),
+	address: BaseAddressSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	geoLocation: GeoJsonSchema.nullish(),
 });
