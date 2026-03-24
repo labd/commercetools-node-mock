@@ -2,4 +2,4 @@
 "@labdigital/commercetools-mock": patch
 ---
 
-Use SQLite when experimental env var is set
+Add experimental, opt-in SQLite storage enabled via the EXPERIMENTAL_SQLITE_STORAGE environment variable
