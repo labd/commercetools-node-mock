@@ -2,14 +2,16 @@ import pino from "pino";
 import { CommercetoolsMock } from "./index.ts";
 import { SQLiteStorage } from "./storage/sqlite.ts";
 
-const storage = new SQLiteStorage();
+const enableLogging = process.env.ENABLE_LOGGING === "true";
+const experimentalSQLiteStorage =
+	process.env.EXPERIMENTAL_SQLITE_STORAGE === "true";
+
+const storage = experimentalSQLiteStorage ? new SQLiteStorage() : undefined;
 
 process.on("SIGINT", () => {
-	storage.close();
+	if (storage) storage.close();
 	process.exit();
 });
-
-const enableLogging = process.env.ENABLE_LOGGING === "true";
 
 const logger = enableLogging
 	? pino({ transport: { target: "pino-pretty" } })
