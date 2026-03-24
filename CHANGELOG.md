@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.0.0-beta.1
+
+### Patch Changes
+
+- [#381](https://github.com/labd/commercetools-node-mock/pull/381) [`2d16f79`](https://github.com/labd/commercetools-node-mock/commit/2d16f79f24a12a84a87f1cc7e73ba6bb650d6c4c) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Made generated optional fields nullish instead of optional, as the commercetools API also accepts null as input and treats it as empty, but the mock explicitly expects undefined
+
+- [#381](https://github.com/labd/commercetools-node-mock/pull/381) [`2d16f79`](https://github.com/labd/commercetools-node-mock/commit/2d16f79f24a12a84a87f1cc7e73ba6bb650d6c4c) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Push multiple docker image tags so we can pin versions if necessary, ignore beta tags for latest
+
 ## 3.0.0-beta.0
 
 ### Major Changes
