@@ -9,12 +9,12 @@ import {
 
 export const InventoryEntryDraftSchema = z.object({
 	sku: z.string(),
-	key: z.string().optional(),
-	supplyChannel: ChannelResourceIdentifierSchema.optional(),
+	key: z.string().nullish(),
+	supplyChannel: ChannelResourceIdentifierSchema.nullish(),
 	quantityOnStock: z.number().int(),
-	minCartQuantity: z.number().int().optional(),
-	maxCartQuantity: z.number().int().optional(),
-	restockableInDays: z.number().int().optional(),
-	expectedDelivery: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	minCartQuantity: z.number().int().nullish(),
+	maxCartQuantity: z.number().int().nullish(),
+	restockableInDays: z.number().int().nullish(),
+	expectedDelivery: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

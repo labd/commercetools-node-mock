@@ -6,8 +6,8 @@ import { CustomFieldsDraftSchema, PermissionSchema } from "./common.ts";
 
 export const AssociateRoleDraftSchema = z.object({
 	key: z.string(),
-	name: z.string().optional(),
-	buyerAssignable: z.boolean().optional(),
-	permissions: z.array(PermissionSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	name: z.string().nullish(),
+	buyerAssignable: z.boolean().nullish(),
+	permissions: z.array(PermissionSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

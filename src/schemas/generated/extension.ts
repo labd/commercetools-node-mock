@@ -8,8 +8,8 @@ import {
 } from "./common.ts";
 
 export const ExtensionDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	destination: ExtensionDestinationSchema,
 	triggers: z.array(ExtensionTriggerSchema),
-	timeoutInMs: z.number().int().optional(),
+	timeoutInMs: z.number().int().nullish(),
 });

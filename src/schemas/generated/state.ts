@@ -12,9 +12,9 @@ import {
 export const StateDraftSchema = z.object({
 	key: z.string(),
 	type: StateTypeEnumSchema,
-	name: LocalizedStringSchema.optional(),
-	description: LocalizedStringSchema.optional(),
-	initial: z.boolean().optional(),
-	roles: z.array(StateRoleEnumSchema).optional(),
-	transitions: z.array(StateResourceIdentifierSchema).optional(),
+	name: LocalizedStringSchema.nullish(),
+	description: LocalizedStringSchema.nullish(),
+	initial: z.boolean().nullish(),
+	roles: z.array(StateRoleEnumSchema).nullish(),
+	transitions: z.array(StateResourceIdentifierSchema).nullish(),
 });

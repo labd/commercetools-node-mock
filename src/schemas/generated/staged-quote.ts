@@ -11,8 +11,8 @@ import {
 export const StagedQuoteDraftSchema = z.object({
 	quoteRequest: QuoteRequestResourceIdentifierSchema,
 	quoteRequestVersion: z.number().int(),
-	quoteRequestStateToAccepted: z.boolean().optional(),
-	key: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	state: StateReferenceSchema.optional(),
+	quoteRequestStateToAccepted: z.boolean().nullish(),
+	key: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	state: StateReferenceSchema.nullish(),
 });

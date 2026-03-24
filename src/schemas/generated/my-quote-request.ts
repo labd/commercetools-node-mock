@@ -6,5 +6,5 @@ import { z } from "zod";
 export const MyQuoteRequestDraftSchema = z.object({
 	cartId: z.string(),
 	cartVersion: z.number().int(),
-	comment: z.string().optional(),
+	comment: z.string().nullish(),
 });

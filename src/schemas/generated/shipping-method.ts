@@ -10,15 +10,15 @@ import {
 } from "./common.ts";
 
 export const ShippingMethodDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	name: z.string(),
-	localizedName: LocalizedStringSchema.optional(),
-	description: z.string().optional(),
-	localizedDescription: LocalizedStringSchema.optional(),
+	localizedName: LocalizedStringSchema.nullish(),
+	description: z.string().nullish(),
+	localizedDescription: LocalizedStringSchema.nullish(),
 	taxCategory: TaxCategoryResourceIdentifierSchema,
 	zoneRates: z.array(ZoneRateDraftSchema),
-	active: z.boolean().optional(),
+	active: z.boolean().nullish(),
 	isDefault: z.boolean(),
-	predicate: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	predicate: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

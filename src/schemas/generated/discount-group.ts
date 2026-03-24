@@ -5,9 +5,9 @@ import { z } from "zod";
 import { LocalizedStringSchema } from "./common.ts";
 
 export const DiscountGroupDraftSchema = z.object({
-	name: LocalizedStringSchema.optional(),
+	name: LocalizedStringSchema.nullish(),
 	key: z.string(),
-	description: LocalizedStringSchema.optional(),
+	description: LocalizedStringSchema.nullish(),
 	sortOrder: z.string(),
-	isActive: z.boolean().optional(),
+	isActive: z.boolean().nullish(),
 });

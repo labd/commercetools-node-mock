@@ -691,7 +691,7 @@ describe("generateObjectSchema", () => {
 		const result = generateObjectSchema(schemas, "ZoneDraft", schemas.ZoneDraft);
 		expect(result).toContain("export const ZoneDraftSchema = z.object({");
 		expect(result).toContain("name: z.string(),");
-		expect(result).toContain("description: z.string().optional(),");
+		expect(result).toContain("description: z.string().nullish(),");
 	});
 
 	it("handles schema with no required fields", () => {
@@ -706,8 +706,8 @@ describe("generateObjectSchema", () => {
 		};
 
 		const result = generateObjectSchema(schemas, "Foo", schemas.Foo);
-		expect(result).toContain("a: z.string().optional(),");
-		expect(result).toContain("b: z.number().optional(),");
+		expect(result).toContain("a: z.string().nullish(),");
+		expect(result).toContain("b: z.number().nullish(),");
 	});
 
 	it("delegates to allOf handler for allOf schemas", () => {
@@ -977,7 +977,7 @@ describe("generateDiscriminatedUnionSchema", () => {
 			schemas.MyUnion,
 		);
 		expect(result).toContain("type: z.string(),");
-		expect(result).toContain("value: z.string().optional(),");
+		expect(result).toContain("value: z.string().nullish(),");
 	});
 
 	it("adds .refine() for ResourceIdentifier base type", () => {

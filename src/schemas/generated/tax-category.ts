@@ -6,7 +6,7 @@ import { TaxRateDraftSchema } from "./common.ts";
 
 export const TaxCategoryDraftSchema = z.object({
 	name: z.string(),
-	description: z.string().optional(),
-	rates: z.array(TaxRateDraftSchema).optional(),
-	key: z.string().optional(),
+	description: z.string().nullish(),
+	rates: z.array(TaxRateDraftSchema).nullish(),
+	key: z.string().nullish(),
 });

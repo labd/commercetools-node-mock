@@ -424,8 +424,8 @@ export const LocaleSchema = z.string();
 export const TypeResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -435,7 +435,7 @@ export const FieldContainerSchema = z.record(z.string(), z.unknown());
 
 export const CustomFieldsDraftSchema = z.object({
 	type: TypeResourceIdentifierSchema,
-	fields: FieldContainerSchema.optional(),
+	fields: FieldContainerSchema.nullish(),
 });
 
 export const LocalizedStringSchema = z.record(z.string(), z.string());
@@ -447,8 +447,8 @@ export const AttributeReferenceSchema = z.object({
 export const StoreResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -457,8 +457,8 @@ export const StoreResourceIdentifierSchema = z
 export const AssociateRoleResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -466,14 +466,14 @@ export const AssociateRoleResourceIdentifierSchema = z
 
 export const AssociateRoleAssignmentDraftSchema = z.object({
 	associateRole: AssociateRoleResourceIdentifierSchema,
-	inheritance: AssociateRoleInheritanceModeSchema.optional(),
+	inheritance: AssociateRoleInheritanceModeSchema.nullish(),
 });
 
 export const CustomerResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -481,43 +481,43 @@ export const CustomerResourceIdentifierSchema = z
 
 export const AssociateDraftSchema = z.object({
 	associateRoleAssignments: z.array(AssociateRoleAssignmentDraftSchema),
-	roles: z.array(AssociateRoleDeprecatedSchema).optional(),
+	roles: z.array(AssociateRoleDeprecatedSchema).nullish(),
 	customer: CustomerResourceIdentifierSchema,
 });
 
 export const BaseAddressSchema = z.object({
-	id: z.string().optional(),
-	key: z.string().optional(),
+	id: z.string().nullish(),
+	key: z.string().nullish(),
 	country: CountryCodeSchema,
-	title: z.string().optional(),
-	salutation: z.string().optional(),
-	firstName: z.string().optional(),
-	lastName: z.string().optional(),
-	streetName: z.string().optional(),
-	streetNumber: z.string().optional(),
-	additionalStreetInfo: z.string().optional(),
-	postalCode: z.string().optional(),
-	city: z.string().optional(),
-	region: z.string().optional(),
-	state: z.string().optional(),
-	company: z.string().optional(),
-	department: z.string().optional(),
-	building: z.string().optional(),
-	apartment: z.string().optional(),
-	pOBox: z.string().optional(),
-	phone: z.string().optional(),
-	mobile: z.string().optional(),
-	email: z.string().optional(),
-	fax: z.string().optional(),
-	additionalAddressInfo: z.string().optional(),
-	externalId: z.string().optional(),
+	title: z.string().nullish(),
+	salutation: z.string().nullish(),
+	firstName: z.string().nullish(),
+	lastName: z.string().nullish(),
+	streetName: z.string().nullish(),
+	streetNumber: z.string().nullish(),
+	additionalStreetInfo: z.string().nullish(),
+	postalCode: z.string().nullish(),
+	city: z.string().nullish(),
+	region: z.string().nullish(),
+	state: z.string().nullish(),
+	company: z.string().nullish(),
+	department: z.string().nullish(),
+	building: z.string().nullish(),
+	apartment: z.string().nullish(),
+	pOBox: z.string().nullish(),
+	phone: z.string().nullish(),
+	mobile: z.string().nullish(),
+	email: z.string().nullish(),
+	fax: z.string().nullish(),
+	additionalAddressInfo: z.string().nullish(),
+	externalId: z.string().nullish(),
 });
 
 export const CustomerGroupResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -529,31 +529,31 @@ export const CustomerGroupAssignmentDraftSchema = z.object({
 
 export const CompanyDraftSchema = z.object({
 	key: z.string(),
-	status: BusinessUnitStatusSchema.optional(),
-	stores: z.array(StoreResourceIdentifierSchema).optional(),
-	storeMode: BusinessUnitStoreModeSchema.optional(),
+	status: BusinessUnitStatusSchema.nullish(),
+	stores: z.array(StoreResourceIdentifierSchema).nullish(),
+	storeMode: BusinessUnitStoreModeSchema.nullish(),
 	unitType: BusinessUnitTypeSchema,
 	name: z.string(),
-	contactEmail: z.string().optional(),
-	associateMode: BusinessUnitAssociateModeSchema.optional(),
-	associates: z.array(AssociateDraftSchema).optional(),
-	approvalRuleMode: BusinessUnitApprovalRuleModeSchema.optional(),
-	addresses: z.array(BaseAddressSchema).optional(),
-	shippingAddresses: z.array(z.number().int()).optional(),
-	defaultShippingAddress: z.number().int().optional(),
-	billingAddresses: z.array(z.number().int()).optional(),
-	defaultBillingAddress: z.number().int().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	contactEmail: z.string().nullish(),
+	associateMode: BusinessUnitAssociateModeSchema.nullish(),
+	associates: z.array(AssociateDraftSchema).nullish(),
+	approvalRuleMode: BusinessUnitApprovalRuleModeSchema.nullish(),
+	addresses: z.array(BaseAddressSchema).nullish(),
+	shippingAddresses: z.array(z.number().int()).nullish(),
+	defaultShippingAddress: z.number().int().nullish(),
+	billingAddresses: z.array(z.number().int()).nullish(),
+	defaultBillingAddress: z.number().int().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 	customerGroupAssignments: z
 		.array(CustomerGroupAssignmentDraftSchema)
-		.optional(),
+		.nullish(),
 });
 
 export const BusinessUnitResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -561,32 +561,32 @@ export const BusinessUnitResourceIdentifierSchema = z
 
 export const DivisionDraftSchema = z.object({
 	key: z.string(),
-	status: BusinessUnitStatusSchema.optional(),
-	stores: z.array(StoreResourceIdentifierSchema).optional(),
-	storeMode: BusinessUnitStoreModeSchema.optional(),
+	status: BusinessUnitStatusSchema.nullish(),
+	stores: z.array(StoreResourceIdentifierSchema).nullish(),
+	storeMode: BusinessUnitStoreModeSchema.nullish(),
 	unitType: BusinessUnitTypeSchema,
 	name: z.string(),
-	contactEmail: z.string().optional(),
-	associateMode: BusinessUnitAssociateModeSchema.optional(),
-	associates: z.array(AssociateDraftSchema).optional(),
-	approvalRuleMode: BusinessUnitApprovalRuleModeSchema.optional(),
-	addresses: z.array(BaseAddressSchema).optional(),
-	shippingAddresses: z.array(z.number().int()).optional(),
-	defaultShippingAddress: z.number().int().optional(),
-	billingAddresses: z.array(z.number().int()).optional(),
-	defaultBillingAddress: z.number().int().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	contactEmail: z.string().nullish(),
+	associateMode: BusinessUnitAssociateModeSchema.nullish(),
+	associates: z.array(AssociateDraftSchema).nullish(),
+	approvalRuleMode: BusinessUnitApprovalRuleModeSchema.nullish(),
+	addresses: z.array(BaseAddressSchema).nullish(),
+	shippingAddresses: z.array(z.number().int()).nullish(),
+	defaultShippingAddress: z.number().int().nullish(),
+	billingAddresses: z.array(z.number().int()).nullish(),
+	defaultBillingAddress: z.number().int().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 	customerGroupAssignments: z
 		.array(CustomerGroupAssignmentDraftSchema)
-		.optional(),
+		.nullish(),
 	parentUnit: BusinessUnitResourceIdentifierSchema,
 });
 
 export const ChannelResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -609,22 +609,22 @@ export const SubRateSchema = z.object({
 
 export const ExternalTaxRateDraftSchema = z.object({
 	name: z.string(),
-	amount: z.number().optional(),
-	includedInPrice: z.boolean().optional(),
+	amount: z.number().nullish(),
+	includedInPrice: z.boolean().nullish(),
 	country: CountryCodeSchema,
-	state: z.string().optional(),
-	subRates: z.array(SubRateSchema).optional(),
+	state: z.string().nullish(),
+	subRates: z.array(SubRateSchema).nullish(),
 });
 
 export const MethodExternalTaxRateDraftSchema = z.object({
 	shippingMethodKey: z.string(),
-	taxRate: ExternalTaxRateDraftSchema.optional(),
+	taxRate: ExternalTaxRateDraftSchema.nullish(),
 });
 
 export const ItemShippingTargetSchema = z.object({
 	addressKey: z.string(),
 	quantity: z.number().int(),
-	shippingMethodKey: z.string().optional(),
+	shippingMethodKey: z.string().nullish(),
 });
 
 export const ItemShippingDetailsDraftSchema = z.object({
@@ -634,8 +634,8 @@ export const ItemShippingDetailsDraftSchema = z.object({
 export const RecurrencePolicyResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -647,31 +647,29 @@ export const LineItemRecurrenceInfoDraftSchema = z.object({
 });
 
 export const LineItemDraftSchema = z.object({
-	key: z.string().optional(),
-	productId: z.string().optional(),
-	variantId: z.number().int().optional(),
-	sku: z.string().optional(),
-	quantity: z.number().int().optional(),
-	addedAt: z.string().optional(),
-	distributionChannel: ChannelResourceIdentifierSchema.optional(),
-	supplyChannel: ChannelResourceIdentifierSchema.optional(),
-	externalPrice: MoneySchema.optional(),
-	externalTotalPrice: ExternalLineItemTotalPriceSchema.optional(),
-	externalTaxRate: ExternalTaxRateDraftSchema.optional(),
-	perMethodExternalTaxRate: z
-		.array(MethodExternalTaxRateDraftSchema)
-		.optional(),
-	inventoryMode: InventoryModeSchema.optional(),
-	shippingDetails: ItemShippingDetailsDraftSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	recurrenceInfo: LineItemRecurrenceInfoDraftSchema.optional(),
+	key: z.string().nullish(),
+	productId: z.string().nullish(),
+	variantId: z.number().int().nullish(),
+	sku: z.string().nullish(),
+	quantity: z.number().int().nullish(),
+	addedAt: z.string().nullish(),
+	distributionChannel: ChannelResourceIdentifierSchema.nullish(),
+	supplyChannel: ChannelResourceIdentifierSchema.nullish(),
+	externalPrice: MoneySchema.nullish(),
+	externalTotalPrice: ExternalLineItemTotalPriceSchema.nullish(),
+	externalTaxRate: ExternalTaxRateDraftSchema.nullish(),
+	perMethodExternalTaxRate: z.array(MethodExternalTaxRateDraftSchema).nullish(),
+	inventoryMode: InventoryModeSchema.nullish(),
+	shippingDetails: ItemShippingDetailsDraftSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	recurrenceInfo: LineItemRecurrenceInfoDraftSchema.nullish(),
 });
 
 export const TaxCategoryResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -683,23 +681,23 @@ export const CustomLineItemRecurrenceInfoDraftSchema = z.object({
 
 export const CustomLineItemDraftSchema = z.object({
 	name: LocalizedStringSchema,
-	key: z.string().optional(),
-	quantity: z.number().int().optional(),
+	key: z.string().nullish(),
+	quantity: z.number().int().nullish(),
 	money: MoneySchema,
 	slug: z.string(),
-	taxCategory: TaxCategoryResourceIdentifierSchema.optional(),
-	externalTaxRate: ExternalTaxRateDraftSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	shippingDetails: ItemShippingDetailsDraftSchema.optional(),
-	priceMode: CustomLineItemPriceModeSchema.optional(),
-	recurrenceInfo: CustomLineItemRecurrenceInfoDraftSchema.optional(),
+	taxCategory: TaxCategoryResourceIdentifierSchema.nullish(),
+	externalTaxRate: ExternalTaxRateDraftSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	shippingDetails: ItemShippingDetailsDraftSchema.nullish(),
+	priceMode: CustomLineItemPriceModeSchema.nullish(),
+	recurrenceInfo: CustomLineItemRecurrenceInfoDraftSchema.nullish(),
 });
 
 export const ShippingMethodResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -723,7 +721,7 @@ export const CartClassificationTierSchema = z.object({
 	type: ShippingRateTierTypeSchema,
 	value: z.string(),
 	price: MoneySchema,
-	isMatching: z.boolean().optional(),
+	isMatching: z.boolean().nullish(),
 });
 
 export const PriceFunctionSchema = z.object({
@@ -734,16 +732,16 @@ export const PriceFunctionSchema = z.object({
 export const CartScoreTierSchema = z.object({
 	type: ShippingRateTierTypeSchema,
 	score: z.number().int(),
-	price: MoneySchema.optional(),
-	priceFunction: PriceFunctionSchema.optional(),
-	isMatching: z.boolean().optional(),
+	price: MoneySchema.nullish(),
+	priceFunction: PriceFunctionSchema.nullish(),
+	isMatching: z.boolean().nullish(),
 });
 
 export const CartValueTierSchema = z.object({
 	type: ShippingRateTierTypeSchema,
 	minimumCentAmount: z.number().int(),
 	price: MoneySchema,
-	isMatching: z.boolean().optional(),
+	isMatching: z.boolean().nullish(),
 });
 
 export const ShippingRatePriceTierSchema = z.object({
@@ -752,8 +750,8 @@ export const ShippingRatePriceTierSchema = z.object({
 
 export const ShippingRateDraftSchema = z.object({
 	price: MoneySchema,
-	freeAbove: MoneySchema.optional(),
-	tiers: z.array(ShippingRatePriceTierSchema).optional(),
+	freeAbove: MoneySchema.nullish(),
+	tiers: z.array(ShippingRatePriceTierSchema).nullish(),
 });
 
 export const DeliveryItemSchema = z.object({
@@ -762,75 +760,75 @@ export const DeliveryItemSchema = z.object({
 });
 
 export const ParcelMeasurementsSchema = z.object({
-	heightInMillimeter: z.number().int().optional(),
-	lengthInMillimeter: z.number().int().optional(),
-	widthInMillimeter: z.number().int().optional(),
-	weightInGram: z.number().int().optional(),
+	heightInMillimeter: z.number().int().nullish(),
+	lengthInMillimeter: z.number().int().nullish(),
+	widthInMillimeter: z.number().int().nullish(),
+	weightInGram: z.number().int().nullish(),
 });
 
 export const TrackingDataSchema = z.object({
-	trackingId: z.string().optional(),
-	carrier: z.string().optional(),
-	provider: z.string().optional(),
-	providerTransaction: z.string().optional(),
-	isReturn: z.boolean().optional(),
+	trackingId: z.string().nullish(),
+	carrier: z.string().nullish(),
+	provider: z.string().nullish(),
+	providerTransaction: z.string().nullish(),
+	isReturn: z.boolean().nullish(),
 });
 
 export const ParcelDraftSchema = z.object({
-	key: z.string().optional(),
-	measurements: ParcelMeasurementsSchema.optional(),
-	trackingData: TrackingDataSchema.optional(),
-	items: z.array(DeliveryItemSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	key: z.string().nullish(),
+	measurements: ParcelMeasurementsSchema.nullish(),
+	trackingData: TrackingDataSchema.nullish(),
+	items: z.array(DeliveryItemSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const AddressDraftSchema = z.object({
-	id: z.string().optional(),
-	key: z.string().optional(),
+	id: z.string().nullish(),
+	key: z.string().nullish(),
 	country: CountryCodeSchema,
-	title: z.string().optional(),
-	salutation: z.string().optional(),
-	firstName: z.string().optional(),
-	lastName: z.string().optional(),
-	streetName: z.string().optional(),
-	streetNumber: z.string().optional(),
-	additionalStreetInfo: z.string().optional(),
-	postalCode: z.string().optional(),
-	city: z.string().optional(),
-	region: z.string().optional(),
-	state: z.string().optional(),
-	company: z.string().optional(),
-	department: z.string().optional(),
-	building: z.string().optional(),
-	apartment: z.string().optional(),
-	pOBox: z.string().optional(),
-	phone: z.string().optional(),
-	mobile: z.string().optional(),
-	email: z.string().optional(),
-	fax: z.string().optional(),
-	additionalAddressInfo: z.string().optional(),
-	externalId: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	title: z.string().nullish(),
+	salutation: z.string().nullish(),
+	firstName: z.string().nullish(),
+	lastName: z.string().nullish(),
+	streetName: z.string().nullish(),
+	streetNumber: z.string().nullish(),
+	additionalStreetInfo: z.string().nullish(),
+	postalCode: z.string().nullish(),
+	city: z.string().nullish(),
+	region: z.string().nullish(),
+	state: z.string().nullish(),
+	company: z.string().nullish(),
+	department: z.string().nullish(),
+	building: z.string().nullish(),
+	apartment: z.string().nullish(),
+	pOBox: z.string().nullish(),
+	phone: z.string().nullish(),
+	mobile: z.string().nullish(),
+	email: z.string().nullish(),
+	fax: z.string().nullish(),
+	additionalAddressInfo: z.string().nullish(),
+	externalId: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const DeliveryDraftSchema = z.object({
-	key: z.string().optional(),
-	items: z.array(DeliveryItemSchema).optional(),
-	parcels: z.array(ParcelDraftSchema).optional(),
-	address: AddressDraftSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	key: z.string().nullish(),
+	items: z.array(DeliveryItemSchema).nullish(),
+	parcels: z.array(ParcelDraftSchema).nullish(),
+	address: AddressDraftSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const CustomShippingDraftSchema = z.object({
 	key: z.string(),
 	shippingMethodName: z.string(),
-	shippingAddress: BaseAddressSchema.optional(),
+	shippingAddress: BaseAddressSchema.nullish(),
 	shippingRate: ShippingRateDraftSchema,
-	shippingRateInput: ShippingRateInputDraftSchema.optional(),
-	taxCategory: TaxCategoryResourceIdentifierSchema.optional(),
-	externalTaxRate: ExternalTaxRateDraftSchema.optional(),
-	deliveries: z.array(DeliveryDraftSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	shippingRateInput: ShippingRateInputDraftSchema.nullish(),
+	taxCategory: TaxCategoryResourceIdentifierSchema.nullish(),
+	externalTaxRate: ExternalTaxRateDraftSchema.nullish(),
+	deliveries: z.array(DeliveryDraftSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const ShippingMethodReferenceSchema = z.object({
@@ -840,38 +838,38 @@ export const ShippingMethodReferenceSchema = z.object({
 
 export const ShippingDraftSchema = z.object({
 	key: z.string(),
-	shippingMethod: ShippingMethodReferenceSchema.optional(),
+	shippingMethod: ShippingMethodReferenceSchema.nullish(),
 	shippingAddress: BaseAddressSchema,
-	shippingRateInput: ShippingRateInputDraftSchema.optional(),
-	externalTaxRate: ExternalTaxRateDraftSchema.optional(),
-	deliveries: z.array(DeliveryDraftSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	shippingRateInput: ShippingRateInputDraftSchema.nullish(),
+	externalTaxRate: ExternalTaxRateDraftSchema.nullish(),
+	deliveries: z.array(DeliveryDraftSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const CartDiscountValueAbsoluteDraftSchema = z.object({
 	type: z.string(),
 	money: z.array(MoneySchema),
-	applicationMode: DiscountApplicationModeSchema.optional(),
+	applicationMode: DiscountApplicationModeSchema.nullish(),
 });
 
 export const TypedMoneyDraftSchema = z.object({
 	centAmount: z.number().int(),
 	currencyCode: CurrencyCodeSchema,
 	type: MoneyTypeSchema,
-	fractionDigits: z.number().int().optional(),
+	fractionDigits: z.number().int().nullish(),
 });
 
 export const CartDiscountValueFixedDraftSchema = z.object({
 	type: z.string(),
 	money: z.array(TypedMoneyDraftSchema),
-	applicationMode: DiscountApplicationModeSchema.optional(),
+	applicationMode: DiscountApplicationModeSchema.nullish(),
 });
 
 export const ProductResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -881,14 +879,14 @@ export const CartDiscountValueGiftLineItemDraftSchema = z.object({
 	type: z.string(),
 	product: ProductResourceIdentifierSchema,
 	variantId: z.number().int(),
-	supplyChannel: ChannelResourceIdentifierSchema.optional(),
-	distributionChannel: ChannelResourceIdentifierSchema.optional(),
+	supplyChannel: ChannelResourceIdentifierSchema.nullish(),
+	distributionChannel: ChannelResourceIdentifierSchema.nullish(),
 });
 
 export const CartDiscountValueRelativeDraftSchema = z.object({
 	type: z.string(),
 	permyriad: z.number().int(),
-	applicationMode: DiscountApplicationModeSchema.optional(),
+	applicationMode: DiscountApplicationModeSchema.nullish(),
 });
 
 export const CartDiscountValueDraftSchema = z.object({
@@ -902,8 +900,8 @@ export const CartDiscountTargetSchema = z.object({
 export const DiscountGroupResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -933,8 +931,8 @@ export const RecurringOrderScopeDraftSchema = z.object({
 export const CategoryResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -947,18 +945,18 @@ export const AssetDimensionsSchema = z.object({
 
 export const AssetSourceSchema = z.object({
 	uri: z.string(),
-	key: z.string().optional(),
-	dimensions: AssetDimensionsSchema.optional(),
-	contentType: z.string().optional(),
+	key: z.string().nullish(),
+	dimensions: AssetDimensionsSchema.nullish(),
+	contentType: z.string().nullish(),
 });
 
 export const AssetDraftSchema = z.object({
 	sources: z.array(AssetSourceSchema),
 	name: LocalizedStringSchema,
-	description: LocalizedStringSchema.optional(),
-	tags: z.array(z.string()).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	key: z.string().optional(),
+	description: LocalizedStringSchema.nullish(),
+	tags: z.array(z.string()).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	key: z.string().nullish(),
 });
 
 export const GeoJsonPointSchema = z.object({
@@ -974,8 +972,8 @@ export const GeoJsonSchema = z.object({
 export const CartResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -984,8 +982,8 @@ export const CartResourceIdentifierSchema = z
 export const CartDiscountResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1020,7 +1018,7 @@ export const HttpDestinationAuthenticationSchema = z.object({
 export const HttpDestinationSchema = z.object({
 	type: z.string(),
 	url: z.string(),
-	authentication: HttpDestinationAuthenticationSchema.optional(),
+	authentication: HttpDestinationAuthenticationSchema.nullish(),
 });
 
 export const ExtensionDestinationSchema = z.object({
@@ -1030,7 +1028,7 @@ export const ExtensionDestinationSchema = z.object({
 export const ExtensionTriggerSchema = z.object({
 	resourceTypeId: ExtensionResourceTypeIdSchema,
 	actions: z.array(ExtensionActionSchema),
-	condition: z.string().optional(),
+	condition: z.string().nullish(),
 });
 
 export const OrderReferenceSchema = z.object({
@@ -1045,8 +1043,8 @@ export const StagedOrderUpdateActionSchema = z.object({
 export const StateResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1057,35 +1055,35 @@ export const PaymentMethodTokenSchema = z.object({
 });
 
 export const PaymentMethodInfoDraftSchema = z.object({
-	paymentInterface: z.string().optional(),
-	method: z.string().optional(),
-	name: LocalizedStringSchema.optional(),
-	token: PaymentMethodTokenSchema.optional(),
-	interfaceAccount: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	paymentInterface: z.string().nullish(),
+	method: z.string().nullish(),
+	name: LocalizedStringSchema.nullish(),
+	token: PaymentMethodTokenSchema.nullish(),
+	interfaceAccount: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const PaymentStatusDraftSchema = z.object({
-	interfaceCode: z.string().optional(),
-	interfaceText: z.string().optional(),
-	state: StateResourceIdentifierSchema.optional(),
+	interfaceCode: z.string().nullish(),
+	interfaceText: z.string().nullish(),
+	state: StateResourceIdentifierSchema.nullish(),
 });
 
 export const TransactionDraftSchema = z.object({
-	timestamp: z.string().optional(),
+	timestamp: z.string().nullish(),
 	type: TransactionTypeSchema,
 	amount: MoneySchema,
-	interactionId: z.string().optional(),
-	state: TransactionStateSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	interfaceId: z.string().optional(),
+	interactionId: z.string().nullish(),
+	state: TransactionStateSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	interfaceId: z.string().nullish(),
 });
 
 export const ProductTypeResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1109,17 +1107,17 @@ export const PriceTierDraftSchema = z.object({
 });
 
 export const PriceDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	value: MoneySchema,
-	country: CountryCodeSchema.optional(),
-	customerGroup: CustomerGroupResourceIdentifierSchema.optional(),
-	channel: ChannelResourceIdentifierSchema.optional(),
-	validFrom: z.string().optional(),
-	validUntil: z.string().optional(),
-	discounted: DiscountedPriceDraftSchema.optional(),
-	tiers: z.array(PriceTierDraftSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	recurrencePolicy: RecurrencePolicyResourceIdentifierSchema.optional(),
+	country: CountryCodeSchema.nullish(),
+	customerGroup: CustomerGroupResourceIdentifierSchema.nullish(),
+	channel: ChannelResourceIdentifierSchema.nullish(),
+	validFrom: z.string().nullish(),
+	validUntil: z.string().nullish(),
+	discounted: DiscountedPriceDraftSchema.nullish(),
+	tiers: z.array(PriceTierDraftSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	recurrencePolicy: RecurrencePolicyResourceIdentifierSchema.nullish(),
 });
 
 export const AttributeSchema = z.object({
@@ -1135,16 +1133,16 @@ export const ImageDimensionsSchema = z.object({
 export const ImageSchema = z.object({
 	url: z.string(),
 	dimensions: ImageDimensionsSchema,
-	label: z.string().optional(),
+	label: z.string().nullish(),
 });
 
 export const ProductVariantDraftSchema = z.object({
-	sku: z.string().optional(),
-	key: z.string().optional(),
-	prices: z.array(PriceDraftSchema).optional(),
-	attributes: z.array(AttributeSchema).optional(),
-	images: z.array(ImageSchema).optional(),
-	assets: z.array(AssetDraftSchema).optional(),
+	sku: z.string().nullish(),
+	key: z.string().nullish(),
+	prices: z.array(PriceDraftSchema).nullish(),
+	attributes: z.array(AttributeSchema).nullish(),
+	images: z.array(ImageSchema).nullish(),
+	assets: z.array(AssetDraftSchema).nullish(),
 });
 
 export const SearchKeywordsSchema = z.record(z.string(), z.string());
@@ -1181,10 +1179,10 @@ export const AssetSchema = z.object({
 	id: z.string(),
 	sources: z.array(AssetSourceSchema),
 	name: LocalizedStringSchema,
-	description: LocalizedStringSchema.optional(),
-	tags: z.array(z.string()).optional(),
-	custom: CustomFieldsSchema.optional(),
-	key: z.string().optional(),
+	description: LocalizedStringSchema.nullish(),
+	tags: z.array(z.string()).nullish(),
+	custom: CustomFieldsSchema.nullish(),
+	key: z.string().nullish(),
 });
 
 export const ProductTailoringAttributeSchema = z.object({
@@ -1193,11 +1191,11 @@ export const ProductTailoringAttributeSchema = z.object({
 });
 
 export const ProductVariantTailoringDraftSchema = z.object({
-	id: z.number().int().optional(),
-	sku: z.string().optional(),
-	images: z.array(ImageSchema).optional(),
-	assets: z.array(AssetSchema).optional(),
-	attributes: z.array(ProductTailoringAttributeSchema).optional(),
+	id: z.number().int().nullish(),
+	sku: z.string().nullish(),
+	images: z.array(ImageSchema).nullish(),
+	assets: z.array(AssetSchema).nullish(),
+	attributes: z.array(ProductTailoringAttributeSchema).nullish(),
 });
 
 export const AttributeTypeSchema = z.object({
@@ -1209,18 +1207,18 @@ export const AttributeDefinitionDraftSchema = z.object({
 	name: z.string(),
 	label: LocalizedStringSchema,
 	isRequired: z.boolean(),
-	level: AttributeLevelEnumSchema.optional(),
-	attributeConstraint: AttributeConstraintEnumSchema.optional(),
-	inputTip: LocalizedStringSchema.optional(),
-	inputHint: TextInputHintSchema.optional(),
-	isSearchable: z.boolean().optional(),
+	level: AttributeLevelEnumSchema.nullish(),
+	attributeConstraint: AttributeConstraintEnumSchema.nullish(),
+	inputTip: LocalizedStringSchema.nullish(),
+	inputHint: TextInputHintSchema.nullish(),
+	isSearchable: z.boolean().nullish(),
 });
 
 export const StagedQuoteResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1249,8 +1247,8 @@ export const RecurrencePolicyScheduleDraftSchema = z.object({
 export const ZoneResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1262,22 +1260,22 @@ export const ZoneRateDraftSchema = z.object({
 });
 
 export const ShoppingListLineItemDraftSchema = z.object({
-	key: z.string().optional(),
-	productId: z.string().optional(),
-	variantId: z.number().int().optional(),
-	sku: z.string().optional(),
-	addedAt: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	quantity: z.number().int().optional(),
+	key: z.string().nullish(),
+	productId: z.string().nullish(),
+	variantId: z.number().int().nullish(),
+	sku: z.string().nullish(),
+	addedAt: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	quantity: z.number().int().nullish(),
 });
 
 export const TextLineItemDraftSchema = z.object({
-	key: z.string().optional(),
-	addedAt: z.string().optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	description: LocalizedStringSchema.optional(),
+	key: z.string().nullish(),
+	addedAt: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	description: LocalizedStringSchema.nullish(),
 	name: LocalizedStringSchema,
-	quantity: z.number().int().optional(),
+	quantity: z.number().int().nullish(),
 });
 
 export const StagedPriceDraftSchema = z.object({
@@ -1287,8 +1285,8 @@ export const StagedPriceDraftSchema = z.object({
 export const QuoteRequestResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1301,8 +1299,8 @@ export const StoreCountrySchema = z.object({
 export const ProductSelectionResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
-		id: z.string().optional(),
-		key: z.string().optional(),
+		id: z.string().nullish(),
+		key: z.string().nullish(),
 	})
 	.refine((data) => data.id !== undefined || data.key !== undefined, {
 		message: "Either 'id' or 'key' must be provided",
@@ -1310,7 +1308,7 @@ export const ProductSelectionResourceIdentifierSchema = z
 
 export const ProductSelectionSettingDraftSchema = z.object({
 	productSelection: ProductSelectionResourceIdentifierSchema,
-	active: z.boolean().optional(),
+	active: z.boolean().nullish(),
 });
 
 export const DestinationSchema = z.object({
@@ -1319,7 +1317,7 @@ export const DestinationSchema = z.object({
 
 export const MessageSubscriptionSchema = z.object({
 	resourceTypeId: MessageSubscriptionResourceTypeIdSchema,
-	types: z.array(z.string()).optional(),
+	types: z.array(z.string()).nullish(),
 });
 
 export const ChangeSubscriptionSchema = z.object({
@@ -1328,7 +1326,7 @@ export const ChangeSubscriptionSchema = z.object({
 
 export const EventSubscriptionSchema = z.object({
 	resourceTypeId: EventSubscriptionResourceTypeIdSchema,
-	types: z.array(EventTypeSchema).optional(),
+	types: z.array(EventTypeSchema).nullish(),
 });
 
 export const CloudEventsFormatSchema = z.object({
@@ -1346,12 +1344,12 @@ export const DeliveryFormatSchema = z.object({
 
 export const TaxRateDraftSchema = z.object({
 	name: z.string(),
-	amount: z.number().optional(),
+	amount: z.number().nullish(),
 	includedInPrice: z.boolean(),
 	country: CountryCodeSchema,
-	state: z.string().optional(),
-	subRates: z.array(SubRateSchema).optional(),
-	key: z.string().optional(),
+	state: z.string().nullish(),
+	subRates: z.array(SubRateSchema).nullish(),
+	key: z.string().nullish(),
 });
 
 export const FieldTypeSchema = z.object({
@@ -1363,10 +1361,10 @@ export const FieldDefinitionSchema = z.object({
 	name: z.string(),
 	label: LocalizedStringSchema,
 	required: z.boolean(),
-	inputHint: TypeTextInputHintSchema.optional(),
+	inputHint: TypeTextInputHintSchema.nullish(),
 });
 
 export const LocationSchema = z.object({
 	country: CountryCodeSchema,
-	state: z.string().optional(),
+	state: z.string().nullish(),
 });

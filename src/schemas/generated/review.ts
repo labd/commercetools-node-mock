@@ -10,15 +10,15 @@ import {
 } from "./common.ts";
 
 export const ReviewDraftSchema = z.object({
-	key: z.string().optional(),
-	uniquenessValue: z.string().optional(),
-	locale: LocaleSchema.optional(),
-	authorName: z.string().optional(),
-	title: z.string().optional(),
-	text: z.string().optional(),
-	target: z.unknown().optional(),
-	state: StateResourceIdentifierSchema.optional(),
-	rating: z.number().int().optional(),
-	customer: CustomerResourceIdentifierSchema.optional(),
-	custom: CustomFieldsDraftSchema.optional(),
+	key: z.string().nullish(),
+	uniquenessValue: z.string().nullish(),
+	locale: LocaleSchema.nullish(),
+	authorName: z.string().nullish(),
+	title: z.string().nullish(),
+	text: z.string().nullish(),
+	target: z.unknown().nullish(),
+	state: StateResourceIdentifierSchema.nullish(),
+	rating: z.number().int().nullish(),
+	customer: CustomerResourceIdentifierSchema.nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });

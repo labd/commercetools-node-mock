@@ -44,39 +44,6 @@ jobs:
       - name: Run build
         run: pnpm build
 
-  docker:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' &&  github.event.pull_request.draft == false
-    needs: validate
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # Build only if not main branch
-      - name: Build
-        uses: docker/build-push-action@v5
-        if: github.ref != 'refs/heads/main'
-        with:
-          push: false
-          tags: labdigital/commercetools-mock-server:latest
-
-      # Build and push if main branch
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        if: github.ref == 'refs/heads/main'
-        with:
-          push: true
-          tags: labdigital/commercetools-mock-server:latest
-
   release:
     timeout-minutes: 15
     runs-on: ubuntu-latest
@@ -86,6 +53,8 @@ jobs:
       contents: write
       pull-requests: write 
     environment: release
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
     needs: validate
     steps:
       - name: Checkout repo
@@ -102,6 +71,7 @@ jobs:
 
       - name: Create and publish versions
         uses: changesets/action@v1
+        id: changesets
         with:
           title: "Release new version"
           commit: "update version"
@@ -110,3 +80,59 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+
+  docker:
+    name: Publish Docker Image
+    runs-on: ubuntu-latest
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve newest release tag
+        id: latest_tag
+        shell: bash
+        run: |
+          TAG="$(git tag --points-at HEAD --sort=-v:refname | head -n 1)"
+          if [ -z "$TAG" ]; then
+            TAG="$(git tag --sort=-creatordate | head -n 1)"
+          fi
+          if [ -z "$TAG" ]; then
+            echo "No git tags found after release" >&2
+            exit 1
+          fi
+          echo "value=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: labdigital/commercetools-mock-server
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.latest_tag.outputs.value }}
+            type=raw,value=latest,enable=${{ !contains(steps.latest_tag.outputs.value, 'beta') }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

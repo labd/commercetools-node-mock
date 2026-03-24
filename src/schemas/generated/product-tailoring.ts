@@ -11,16 +11,16 @@ import {
 } from "./common.ts";
 
 export const ProductTailoringDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	store: StoreResourceIdentifierSchema,
 	product: ProductResourceIdentifierSchema,
-	name: LocalizedStringSchema.optional(),
-	description: LocalizedStringSchema.optional(),
-	metaTitle: LocalizedStringSchema.optional(),
-	metaDescription: LocalizedStringSchema.optional(),
-	metaKeywords: LocalizedStringSchema.optional(),
-	slug: LocalizedStringSchema.optional(),
-	publish: z.boolean().optional(),
-	variants: z.array(ProductVariantTailoringDraftSchema).optional(),
-	attributes: z.array(ProductTailoringAttributeSchema).optional(),
+	name: LocalizedStringSchema.nullish(),
+	description: LocalizedStringSchema.nullish(),
+	metaTitle: LocalizedStringSchema.nullish(),
+	metaDescription: LocalizedStringSchema.nullish(),
+	metaKeywords: LocalizedStringSchema.nullish(),
+	slug: LocalizedStringSchema.nullish(),
+	publish: z.boolean().nullish(),
+	variants: z.array(ProductVariantTailoringDraftSchema).nullish(),
+	attributes: z.array(ProductTailoringAttributeSchema).nullish(),
 });

@@ -9,10 +9,10 @@ import {
 } from "./common.ts";
 
 export const OrderEditDraftSchema = z.object({
-	key: z.string().optional(),
+	key: z.string().nullish(),
 	resource: OrderReferenceSchema,
-	stagedActions: z.array(StagedOrderUpdateActionSchema).optional(),
-	custom: CustomFieldsDraftSchema.optional(),
-	comment: z.string().optional(),
-	dryRun: z.boolean().optional(),
+	stagedActions: z.array(StagedOrderUpdateActionSchema).nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
+	comment: z.string().nullish(),
+	dryRun: z.boolean().nullish(),
 });

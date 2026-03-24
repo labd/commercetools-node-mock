@@ -9,7 +9,7 @@ import {
 
 export const RecurrencePolicyDraftSchema = z.object({
 	key: z.string(),
-	name: LocalizedStringSchema.optional(),
-	description: LocalizedStringSchema.optional(),
+	name: LocalizedStringSchema.nullish(),
+	description: LocalizedStringSchema.nullish(),
 	schedule: RecurrencePolicyScheduleDraftSchema,
 });
