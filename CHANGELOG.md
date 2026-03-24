@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.0.0-beta.2
+
+### Patch Changes
+
+- [#383](https://github.com/labd/commercetools-node-mock/pull/383) [`11acea0`](https://github.com/labd/commercetools-node-mock/commit/11acea0e61ba18ae8a06cf1fac40c5514059503c) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Add experimental, opt-in SQLite storage enabled via the EXPERIMENTAL_SQLITE_STORAGE environment variable
+
 ## 3.0.0-beta.1
 
 ### Patch Changes
