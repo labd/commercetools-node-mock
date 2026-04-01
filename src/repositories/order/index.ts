@@ -4,6 +4,7 @@ import type {
 	CartReference,
 	CustomLineItem,
 	CustomLineItemImportDraft,
+	Delivery,
 	DuplicateFieldError,
 	GeneralError,
 	LineItem,
@@ -18,6 +19,7 @@ import type {
 	ReferencedResourceNotFoundError,
 	ResourceNotFoundError,
 	ShippingInfo,
+	ShippingInfoImportDraft,
 	ShippingMethodDoesNotMatchCartError,
 	ShippingMethodReference,
 } from "@commercetools/platform-sdk";
@@ -206,30 +208,13 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			totalPrice: createCentPrecisionMoney(draft.totalPrice),
 		};
 
-		// Set shipping info after resource is created
-		if (draft.shippingInfo?.shippingMethod) {
-			const { ...shippingMethodRef } = draft.shippingInfo.shippingMethod;
 
-			// get id when reference is by key only
-			if (shippingMethodRef.key && !shippingMethodRef.id) {
-				const shippingMethod =
-					await this._storage.getByResourceIdentifier<"shipping-method">(
-						context.projectKey,
-						shippingMethodRef,
-					);
-				if (!shippingMethod) {
-					throw new CommercetoolsError<GeneralError>({
-						code: "General",
-						message: `A shipping method with key '${shippingMethodRef.key}' does not exist.`,
-					});
-				}
-				shippingMethodRef.id = shippingMethod.id;
-			}
-
-			resource.shippingInfo = await this.createShippingInfo(context, resource, {
-				typeId: "shipping-method",
-				id: shippingMethodRef.id as string,
-			});
+		if (draft.shippingInfo) {
+			resource.shippingInfo = await this.shippingInfoFromImportDraft(
+				context,
+				resource,
+				draft.shippingInfo,
+			);
 		}
 
 		const { taxedPrice, taxedShippingPrice } = calculateTaxTotals({
@@ -399,7 +384,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		context: RepositoryContext,
 		resource: Writable<Order>,
 		shippingMethodRef: ShippingMethodReference,
-	): Promise<ShippingInfo> {
+	): Promise<Writable<ShippingInfo>> {
 		const cartLikeForMatching: Writable<Cart> = {
 			...resource,
 			cartState: "Active" as const,
@@ -445,6 +430,77 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			...baseShippingInfo,
 			deliveries: [],
 		};
+	}
+
+	private async shippingInfoFromImportDraft(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		draft: ShippingInfoImportDraft,
+	): Promise<ShippingInfo | undefined> {
+		if (!draft.shippingMethod) {
+			return undefined
+		}
+
+		const { ...shippingMethodRef } = draft.shippingMethod;
+		if (shippingMethodRef.key && !shippingMethodRef.id) {
+			const shippingMethod =
+				await this._storage.getByResourceIdentifier<"shipping-method">(
+					context.projectKey,
+					shippingMethodRef,
+				);
+			if (!shippingMethod) {
+				throw new CommercetoolsError<GeneralError>({
+					code: "General",
+					message: `A shipping method with key '${shippingMethodRef.key}' does not exist.`,
+				});
+			}
+			shippingMethodRef.id = shippingMethod.id;
+		}
+
+		const shippingInfo = await this.createShippingInfo(context, resource, {
+			typeId: "shipping-method",
+			id: shippingMethodRef.id as string,
+		});
+
+		shippingInfo.deliveries = await this.deliveriesFromImportDraft(context, draft)
+		return shippingInfo;
+
+	}
+
+	private async deliveriesFromImportDraft(
+		context: RepositoryContext,
+		draft: ShippingInfoImportDraft,
+	): Promise<Delivery[]> {
+		if (!draft.deliveries) return [];
+
+		return Promise.all(
+			draft.deliveries.map(async (deliveryDraft) => ({
+				...getBaseResourceProperties(),
+				key: deliveryDraft.key,
+				items: deliveryDraft.items ?? [],
+				parcels: await Promise.all(
+					deliveryDraft.parcels?.map(async (parcel) => ({
+						...getBaseResourceProperties(),
+						...parcel,
+						custom: await createCustomFields(
+							parcel.custom,
+							context.projectKey,
+							this._storage,
+						),
+					})) ?? [],
+				),
+				address: createAddress(
+					deliveryDraft.address,
+					context.projectKey,
+					this._storage,
+				),
+				custom: await createCustomFields(
+					deliveryDraft.custom,
+					context.projectKey,
+					this._storage,
+				),
+			})),
+		);
 	}
 
 	async search(

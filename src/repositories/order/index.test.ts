@@ -953,9 +953,12 @@ describe("Order repository", () => {
 			);
 			expect(result.shippingInfo?.taxCategory?.id).toBe("tax-category-456");
 			expect(result.shippingInfo?.taxRate?.amount).toBe(0.19);
-			// Note: deliveries from import drafts are not currently supported in native implementation
-			expect(result.shippingInfo?.deliveries).toEqual([]);
+			expect(result.shippingInfo?.deliveries).toHaveLength(1);
+			expect(result.shippingInfo?.deliveries?.[0].key).toBe("delivery-1");
+			expect(result.shippingInfo?.deliveries?.[0].parcels).toHaveLength(1);
+			expect(result.shippingInfo?.deliveries?.[0].parcels[0].key).toBe("parcel-1");
 		});
+
 
 		test("createShippingInfo throws error for non-existent shipping method", async () => {
 			const order: Order = {
