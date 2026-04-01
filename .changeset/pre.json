@@ -24,6 +24,7 @@
     "remove-deprecated-methods",
     "unified-pino-logging",
     "update-dependencies",
-    "upgrade-zod-v4"
+    "upgrade-zod-v4",
+    "violet-towns-repeat"
   ]
 }
