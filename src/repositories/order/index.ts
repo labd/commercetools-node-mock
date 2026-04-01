@@ -208,7 +208,6 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			totalPrice: createCentPrecisionMoney(draft.totalPrice),
 		};
 
-
 		if (draft.shippingInfo) {
 			resource.shippingInfo = await this.shippingInfoFromImportDraft(
 				context,
@@ -438,7 +437,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		draft: ShippingInfoImportDraft,
 	): Promise<ShippingInfo | undefined> {
 		if (!draft.shippingMethod) {
-			return undefined
+			return undefined;
 		}
 
 		const { ...shippingMethodRef } = draft.shippingMethod;
@@ -462,9 +461,11 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			id: shippingMethodRef.id as string,
 		});
 
-		shippingInfo.deliveries = await this.deliveriesFromImportDraft(context, draft)
+		shippingInfo.deliveries = await this.deliveriesFromImportDraft(
+			context,
+			draft,
+		);
 		return shippingInfo;
-
 	}
 
 	private async deliveriesFromImportDraft(

@@ -956,9 +956,10 @@ describe("Order repository", () => {
 			expect(result.shippingInfo?.deliveries).toHaveLength(1);
 			expect(result.shippingInfo?.deliveries?.[0].key).toBe("delivery-1");
 			expect(result.shippingInfo?.deliveries?.[0].parcels).toHaveLength(1);
-			expect(result.shippingInfo?.deliveries?.[0].parcels[0].key).toBe("parcel-1");
+			expect(result.shippingInfo?.deliveries?.[0].parcels[0].key).toBe(
+				"parcel-1",
+			);
 		});
-
 
 		test("createShippingInfo throws error for non-existent shipping method", async () => {
 			const order: Order = {
