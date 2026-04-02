@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.0.0-beta.3
+
+### Patch Changes
+
+- [#385](https://github.com/labd/commercetools-node-mock/pull/385) [`886fd3b`](https://github.com/labd/commercetools-node-mock/commit/886fd3bee79403a4e8c10de3ef41da9e41692ae5) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Allow for deliveries on order import
+
 ## 3.0.0-beta.2
 
 ### Patch Changes
