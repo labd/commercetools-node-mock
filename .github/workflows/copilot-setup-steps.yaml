@@ -26,10 +26,10 @@ jobs:
     # If you do not check out your code, Copilot will do this for you.
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Set up Node.js
-        uses: labd/gh-actions-typescript/pnpm-install@main
+        uses: labd/gh-actions-typescript/pnpm-install@e7a21fb56b52bf2d91616e34f0bc3f4f9a821b62 # main
         with:
           node-version: 24
 
