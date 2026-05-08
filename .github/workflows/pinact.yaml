@@ -13,8 +13,8 @@ permissions: {}
 
 jobs:
   pinact:
-    # Only run on pull requests from the same repository
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Run on push, and only run pull_request jobs from the same repository
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
