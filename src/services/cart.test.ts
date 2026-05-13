@@ -2160,4 +2160,638 @@ describe("Cart Update Actions", () => {
 		expect(customLineItem.taxedPrice.taxPortions).toHaveLength(1);
 		expect(customLineItem.taxedPrice.taxPortions[0].rate).toBe(0.21);
 	});
+
+	describe("External tax mode", () => {
+		// €10.00 product, picked so tax math stays trivial: 1000 cents × rate.
+		const simpleProductDraft = (sku: string) => ({
+			...productDraft,
+			masterVariant: {
+				sku,
+				prices: [
+					{
+						value: {
+							type: "centPrecision" as const,
+							currencyCode: "EUR",
+							centAmount: 1000,
+							fractionDigits: 2,
+						} as CentPrecisionMoney,
+					},
+				],
+				attributes: [],
+			},
+			variants: [],
+			slug: { "nl-NL": `simple-${sku}` },
+		});
+
+		test("addLineItem applies externalTaxRate and aggregates cart taxedPrice", async () => {
+			const product = await productFactory.create(simpleProductDraft("ext-1"));
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "External",
+			});
+			assert(product, "product not created");
+
+			// €10 × 2 = €20 net; 10% tax = €2; gross = €22.
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "addLineItem",
+							sku: "ext-1",
+							quantity: 2,
+							externalTaxRate: {
+								name: "External NL VAT",
+								amount: 0.1,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const cart = response.json();
+			const lineItem = cart.lineItems[0];
+			expect(lineItem.taxRate.name).toBe("External NL VAT");
+			expect(lineItem.taxRate.amount).toBe(0.1);
+			expect(lineItem.taxedPrice.totalNet.centAmount).toBe(2000);
+			expect(lineItem.taxedPrice.totalGross.centAmount).toBe(2200);
+			expect(cart.taxedPrice).toBeDefined();
+			expect(cart.taxedPrice.totalNet.centAmount).toBe(2000);
+			expect(cart.taxedPrice.totalGross.centAmount).toBe(2200);
+		});
+
+		test("addCustomLineItem applies externalTaxRate", async () => {
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "External",
+			});
+
+			// €10 net; 20% tax = €2; gross = €12.
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "addCustomLineItem",
+							name: { en: "Service" },
+							slug: "service",
+							money: { currencyCode: "EUR", centAmount: 1000 },
+							quantity: 1,
+							externalTaxRate: {
+								name: "Ext",
+								amount: 0.2,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const customLineItem = response.json().customLineItems[0];
+			expect(customLineItem.taxRate.amount).toBe(0.2);
+			expect(customLineItem.taxedPrice.totalNet.centAmount).toBe(1000);
+			expect(customLineItem.taxedPrice.totalGross.centAmount).toBe(1200);
+		});
+
+		test("setLineItemTaxRate updates the line item tax", async () => {
+			const product = await productFactory.create(simpleProductDraft("ext-2"));
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "External",
+			});
+			assert(product, "product not created");
+
+			const added = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [{ action: "addLineItem", sku: "ext-2", quantity: 1 }],
+				},
+			});
+			expect(added.statusCode).toBe(200);
+			const lineItemId = added.json().lineItems[0].id;
+
+			// €10 net; 5% tax = €0.50; gross = €10.50.
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setLineItemTaxRate",
+							lineItemId,
+							externalTaxRate: {
+								name: "Late VAT",
+								amount: 0.05,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const lineItem = response.json().lineItems[0];
+			expect(lineItem.taxRate.amount).toBe(0.05);
+			expect(lineItem.taxedPrice.totalGross.centAmount).toBe(1050);
+		});
+
+		test("setLineItemTaxRate rejects non-External tax mode", async () => {
+			const product = await productFactory.create(simpleProductDraft("ext-3"));
+			assert(cart, "cart not created");
+			assert(product, "product not created");
+
+			const added = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
+					version: 1,
+					actions: [{ action: "addLineItem", sku: "ext-3", quantity: 1 }],
+				},
+			});
+			const lineItemId = added.json().lineItems[0].id;
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setLineItemTaxRate",
+							lineItemId,
+							externalTaxRate: {
+								name: "Bad",
+								amount: 0.1,
+								country: "NL",
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(400);
+		});
+
+		test("setCustomLineItemTaxRate updates the custom line item tax", async () => {
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "External",
+			});
+
+			const added = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "addCustomLineItem",
+							name: { en: "Svc" },
+							slug: "svc",
+							money: { currencyCode: "EUR", centAmount: 1000 },
+							quantity: 1,
+						},
+					],
+				},
+			});
+			const cliId = added.json().customLineItems[0].id;
+
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setCustomLineItemTaxRate",
+							customLineItemId: cliId,
+							externalTaxRate: {
+								name: "Ext",
+								amount: 0.25,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const cli = response.json().customLineItems[0];
+			expect(cli.taxRate.amount).toBe(0.25);
+			expect(cli.taxedPrice.totalGross.centAmount).toBe(1250);
+		});
+
+		test("setShippingMethodTaxRate updates the shipping tax", async () => {
+			const zone = await zoneFactory.create({
+				name: "NL",
+				locations: [{ country: "NL" }],
+			});
+			const shippingMethod = await shippingMethodFactory.create({
+				name: "Std",
+				taxCategory: { typeId: "tax-category", id: taxCategory.id },
+				zoneRates: [
+					{
+						zone: { typeId: "zone", id: zone.id },
+						shippingRates: [
+							{
+								price: { currencyCode: "EUR", centAmount: 500 },
+							},
+						],
+					},
+				],
+				isDefault: false,
+			});
+
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "External",
+				shippingAddress: { country: "NL" },
+			});
+
+			await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "setShippingMethod",
+							shippingMethod: {
+								typeId: "shipping-method",
+								id: shippingMethod.id,
+							},
+							externalTaxRate: {
+								name: "Initial",
+								amount: 0.1,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setShippingMethodTaxRate",
+							externalTaxRate: {
+								name: "Updated",
+								amount: 0.2,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const shippingInfo = response.json().shippingInfo;
+			expect(shippingInfo.taxRate.amount).toBe(0.2);
+			expect(shippingInfo.taxedPrice.totalGross.centAmount).toBe(600);
+		});
+
+		test("setCustomShippingMethod accepts externalTaxRate", async () => {
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "External",
+				shippingAddress: { country: "NL" },
+			});
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "setCustomShippingMethod",
+							shippingMethodName: "Custom",
+							shippingRate: {
+								price: { currencyCode: "EUR", centAmount: 1000 },
+							},
+							externalTaxRate: {
+								name: "Custom VAT",
+								amount: 0.15,
+								country: "NL",
+								includedInPrice: false,
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const shippingInfo = response.json().shippingInfo;
+			expect(shippingInfo.taxRate.amount).toBe(0.15);
+			expect(shippingInfo.taxedPrice.totalGross.centAmount).toBe(1150);
+		});
+	});
+
+	describe("ExternalAmount tax mode", () => {
+		const simpleProductDraft = (sku: string) => ({
+			...productDraft,
+			masterVariant: {
+				sku,
+				prices: [
+					{
+						value: {
+							type: "centPrecision" as const,
+							currencyCode: "EUR",
+							centAmount: 1000,
+							fractionDigits: 2,
+						} as CentPrecisionMoney,
+					},
+				],
+				attributes: [],
+			},
+			variants: [],
+			slug: { "nl-NL": `simple-${sku}` },
+		});
+
+		test("setLineItemTaxAmount sets explicit gross and derives net", async () => {
+			const product = await productFactory.create(simpleProductDraft("amt-1"));
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "ExternalAmount",
+			});
+			assert(product, "product not created");
+
+			const added = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [{ action: "addLineItem", sku: "amt-1", quantity: 1 }],
+				},
+			});
+			const lineItemId = added.json().lineItems[0].id;
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setLineItemTaxAmount",
+							lineItemId,
+							externalTaxAmount: {
+								totalGross: { currencyCode: "EUR", centAmount: 1210 },
+								taxRate: {
+									name: "Ext VAT",
+									amount: 0.21,
+									country: "NL",
+									includedInPrice: true,
+								},
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const lineItem = response.json().lineItems[0];
+			expect(lineItem.taxRate.amount).toBe(0.21);
+			expect(lineItem.taxedPrice.totalGross.centAmount).toBe(1210);
+			expect(lineItem.taxedPrice.totalNet.centAmount).toBe(1000);
+			expect(lineItem.taxedPrice.totalTax.centAmount).toBe(210);
+		});
+
+		test("setLineItemTaxAmount rejects non-ExternalAmount tax mode", async () => {
+			const product = await productFactory.create(simpleProductDraft("amt-2"));
+			assert(cart, "cart not created");
+			assert(product, "product not created");
+
+			const added = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
+					version: 1,
+					actions: [{ action: "addLineItem", sku: "amt-2", quantity: 1 }],
+				},
+			});
+			const lineItemId = added.json().lineItems[0].id;
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setLineItemTaxAmount",
+							lineItemId,
+							externalTaxAmount: {
+								totalGross: { currencyCode: "EUR", centAmount: 100 },
+								taxRate: {
+									name: "X",
+									amount: 0.21,
+									country: "NL",
+								},
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(400);
+		});
+
+		test("setCustomLineItemTaxAmount sets explicit gross", async () => {
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "ExternalAmount",
+			});
+
+			const added = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "addCustomLineItem",
+							name: { en: "Svc" },
+							slug: "svc",
+							money: { currencyCode: "EUR", centAmount: 1000 },
+							quantity: 1,
+						},
+					],
+				},
+			});
+			const cliId = added.json().customLineItems[0].id;
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setCustomLineItemTaxAmount",
+							customLineItemId: cliId,
+							externalTaxAmount: {
+								totalGross: { currencyCode: "EUR", centAmount: 1250 },
+								taxRate: {
+									name: "Ext",
+									amount: 0.25,
+									country: "NL",
+								},
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const cli = response.json().customLineItems[0];
+			expect(cli.taxedPrice.totalGross.centAmount).toBe(1250);
+			expect(cli.taxedPrice.totalNet.centAmount).toBe(1000);
+		});
+
+		test("setShippingMethodTaxAmount sets explicit shipping gross", async () => {
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "ExternalAmount",
+				shippingAddress: { country: "NL" },
+			});
+
+			await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "setCustomShippingMethod",
+							shippingMethodName: "Custom",
+							shippingRate: {
+								price: { currencyCode: "EUR", centAmount: 1000 },
+							},
+						},
+					],
+				},
+			});
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 2,
+					actions: [
+						{
+							action: "setShippingMethodTaxAmount",
+							externalTaxAmount: {
+								totalGross: { currencyCode: "EUR", centAmount: 1200 },
+								taxRate: {
+									name: "Ship Tax",
+									amount: 0.2,
+									country: "NL",
+								},
+							},
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const body = response.json();
+			expect(body.shippingInfo.taxedPrice.totalGross.centAmount).toBe(1200);
+			expect(body.shippingInfo.taxedPrice.totalNet.centAmount).toBe(1000);
+			// taxedShippingPrice mirrors shippingInfo.taxedPrice even in
+			// ExternalAmount mode (it's a subtotal, not the cart total).
+			expect(body.taxedShippingPrice.totalGross.centAmount).toBe(1200);
+			expect(body.taxedShippingPrice.totalNet.centAmount).toBe(1000);
+		});
+
+		test("setCartTotalTax overrides aggregated taxedPrice", async () => {
+			const product = await productFactory.create(simpleProductDraft("amt-3"));
+			const externalCart = await cartFactory.create({
+				currency: "EUR",
+				country: "NL",
+				taxMode: "ExternalAmount",
+			});
+			assert(product, "product not created");
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${externalCart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{ action: "addLineItem", sku: "amt-3", quantity: 1 },
+						{
+							action: "setCartTotalTax",
+							externalTotalGross: { currencyCode: "EUR", centAmount: 1210 },
+							externalTaxPortions: [
+								{
+									rate: 0.21,
+									name: "NL",
+									amount: { currencyCode: "EUR", centAmount: 210 },
+								},
+							],
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(200);
+			const body = response.json();
+			expect(body.taxedPrice.totalGross.centAmount).toBe(1210);
+			expect(body.taxedPrice.totalNet.centAmount).toBe(1000);
+			expect(body.taxedPrice.totalTax.centAmount).toBe(210);
+			expect(body.taxedPrice.taxPortions).toHaveLength(1);
+			expect(body.taxedPrice.taxPortions[0].rate).toBe(0.21);
+		});
+
+		test("setCartTotalTax rejects non-ExternalAmount tax mode", async () => {
+			assert(cart, "cart not created");
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/carts/${cart.id}`,
+				payload: {
+					version: 1,
+					actions: [
+						{
+							action: "setCartTotalTax",
+							externalTotalGross: { currencyCode: "EUR", centAmount: 100 },
+						},
+					],
+				},
+			});
+
+			expect(response.statusCode).toBe(400);
+		});
+	});
 });

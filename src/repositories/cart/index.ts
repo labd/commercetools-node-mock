@@ -3,6 +3,7 @@ import type {
 	Cart,
 	CartDraft,
 	DiscountCodeInfo,
+	ExternalTaxRateDraft,
 	GeneralError,
 	InvalidOperationError,
 	LineItem,
@@ -15,7 +16,11 @@ import { v4 as uuidv4 } from "uuid";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
-import { calculateTaxTotals } from "#src/lib/tax.ts";
+import {
+	calculateTaxedPriceFromRate,
+	calculateTaxTotals,
+	taxRateFromExternalDraft,
+} from "#src/lib/tax.ts";
 import { CartDraftSchema } from "#src/schemas/generated/cart.ts";
 import {
 	createShippingInfoFromMethod,
@@ -76,6 +81,9 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				);
 		}
 
+		const taxMode = draft.taxMode ?? "Platform";
+		const taxRoundingMode = draft.taxRoundingMode ?? "HalfEven";
+
 		const lineItems = draft.lineItems
 			? await Promise.all(
 					draft.lineItems.map((draftLineItem) =>
@@ -84,6 +92,8 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 							draftLineItem,
 							draft.currency,
 							draft.country,
+							taxMode,
+							taxRoundingMode,
 						),
 					),
 				)
@@ -97,6 +107,8 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 							draftCustomLineItem,
 							this._storage,
 							draft.shippingAddress?.country ?? draft.country,
+							taxMode,
+							taxRoundingMode,
 						),
 					),
 				)
@@ -145,8 +157,8 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			locale: draft.locale,
 			priceRoundingMode: draft.priceRoundingMode ?? "HalfEven",
 			taxCalculationMode: draft.taxCalculationMode ?? "LineItemLevel",
-			taxMode: draft.taxMode ?? "Platform",
-			taxRoundingMode: draft.taxRoundingMode ?? "HalfEven",
+			taxMode,
+			taxRoundingMode,
 			totalPrice: {
 				type: "centPrecision",
 				centAmount: 0,
@@ -184,6 +196,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 				context,
 				resource,
 				draft.shippingMethod,
+				draft.externalTaxRateForShippingMethod ?? undefined,
 			);
 		}
 
@@ -211,6 +224,8 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		draftLineItem: LineItemDraft,
 		currency: string,
 		country: string | undefined,
+		taxMode: Cart["taxMode"] = "Platform",
+		roundingMode: Cart["taxRoundingMode"] = "HalfEven",
 	): Promise<LineItem> => {
 		const { productId, quantity, variantId, sku } = draftLineItem;
 
@@ -277,6 +292,19 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			centAmount: calculateMoneyTotalCentAmount(price.value, quant),
 		});
 
+		const taxRate =
+			taxMode === "External" && draftLineItem.externalTaxRate
+				? taxRateFromExternalDraft(draftLineItem.externalTaxRate)
+				: undefined;
+		const taxedPrice = taxRate
+			? calculateTaxedPriceFromRate(
+					totalPrice.centAmount,
+					totalPrice.currencyCode,
+					taxRate,
+					roundingMode,
+				)
+			: undefined;
+
 		return {
 			id: uuidv4(),
 			productId: product.id,
@@ -287,6 +315,8 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			variant,
 			price: price,
 			totalPrice,
+			taxRate,
+			taxedPrice,
 			taxedPricePortions: [],
 			perMethodTaxRate: [],
 			quantity: quant,
@@ -306,11 +336,13 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		shippingMethodRef: NonNullable<CartDraft["shippingMethod"]>,
+		externalTaxRate?: ExternalTaxRateDraft,
 	): Promise<NonNullable<Cart["shippingInfo"]>> {
-		if (resource.taxMode === "External") {
+		if (resource.taxMode === "External" && !externalTaxRate) {
 			throw new CommercetoolsError<InvalidOperationError>({
 				code: "InvalidOperation",
-				message: "External tax rate is not supported",
+				message:
+					"An external tax rate is required for a cart with External tax mode.",
 			});
 		}
 
@@ -355,6 +387,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			this._storage,
 			resource,
 			method,
+			resource.taxMode === "External" ? externalTaxRate : undefined,
 		);
 	}
 }

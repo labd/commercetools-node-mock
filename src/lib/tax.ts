@@ -1,12 +1,82 @@
 import type {
 	Cart,
+	ExternalTaxAmountDraft,
+	ExternalTaxRateDraft,
+	RoundingMode,
 	TaxCategory,
 	TaxedItemPrice,
 	TaxedPrice,
 	TaxPortion,
 	TaxRate,
 } from "@commercetools/platform-sdk";
-import { createCentPrecisionMoney } from "#src/repositories/helpers.ts";
+import { Decimal } from "decimal.js";
+import {
+	createCentPrecisionMoney,
+	roundDecimal,
+} from "#src/repositories/helpers.ts";
+
+const roundCents = (value: number, mode: RoundingMode = "HalfEven"): number =>
+	roundDecimal(new Decimal(value), mode).toNumber();
+
+export const buildTaxedPriceFromExternalAmount = (
+	draft: ExternalTaxAmountDraft,
+	roundingMode: RoundingMode = "HalfEven",
+): TaxedItemPrice => {
+	const taxRate = taxRateFromExternalDraft(draft.taxRate);
+	const totalGross = createCentPrecisionMoney(draft.totalGross);
+	const currencyCode = totalGross.currencyCode;
+	const toMoney = (centAmount: number) =>
+		createCentPrecisionMoney({ currencyCode, centAmount });
+
+	const grossAmount = totalGross.centAmount;
+	// totalGross is authoritative in ExternalAmount mode, so net is always
+	// gross / (1 + rate) regardless of taxRate.includedInPrice. The flag is kept
+	// on the stored taxRate for callers that read it back.
+	const taxAmount =
+		taxRate.amount > 0
+			? roundCents(
+					new Decimal(grossAmount)
+						.mul(taxRate.amount)
+						.div(1 + taxRate.amount)
+						.toNumber(),
+					roundingMode,
+				)
+			: 0;
+	const netAmount = grossAmount - taxAmount;
+
+	return {
+		totalNet: toMoney(netAmount),
+		totalGross,
+		totalTax: taxAmount > 0 ? toMoney(taxAmount) : undefined,
+		taxPortions:
+			taxAmount > 0
+				? [
+						{
+							rate: taxRate.amount,
+							name: taxRate.name,
+							amount: toMoney(taxAmount),
+						},
+					]
+				: [],
+	};
+};
+
+export const taxRateFromExternalDraft = (
+	draft: ExternalTaxRateDraft,
+): TaxRate => {
+	const amount =
+		draft.amount ??
+		draft.subRates?.reduce((acc, subRate) => acc + subRate.amount, 0) ??
+		0;
+	return {
+		name: draft.name,
+		amount,
+		includedInPrice: draft.includedInPrice ?? false,
+		country: draft.country,
+		state: draft.state,
+		subRates: draft.subRates,
+	};
+};
 
 type TaxableResource = Pick<
 	Cart,
@@ -101,10 +171,11 @@ export const calculateTaxTotals = (
 	};
 };
 
-export const buildTaxedPriceFromRate = (
+export const calculateTaxedPriceFromRate = (
 	amount: number,
 	currencyCode: string,
 	taxRate?: TaxRate,
+	roundingMode: RoundingMode = "HalfEven",
 ): TaxedItemPrice | undefined => {
 	if (!taxRate) {
 		return undefined;
@@ -123,13 +194,20 @@ export const buildTaxedPriceFromRate = (
 
 	if (taxRate.includedInPrice) {
 		grossAmount = amount;
-		taxAmount = Math.round(
-			(grossAmount * taxRate.amount) / (1 + taxRate.amount),
+		taxAmount = roundCents(
+			new Decimal(grossAmount)
+				.mul(taxRate.amount)
+				.div(1 + taxRate.amount)
+				.toNumber(),
+			roundingMode,
 		);
 		netAmount = grossAmount - taxAmount;
 	} else {
 		netAmount = amount;
-		taxAmount = Math.round(netAmount * taxRate.amount);
+		taxAmount = roundCents(
+			new Decimal(netAmount).mul(taxRate.amount).toNumber(),
+			roundingMode,
+		);
 		grossAmount = netAmount + taxAmount;
 	}
 
@@ -150,18 +228,12 @@ export const buildTaxedPriceFromRate = (
 	};
 };
 
-export const calculateTaxedPriceFromRate = (
-	amount: number,
-	currencyCode: string,
-	taxRate?: TaxRate,
-): TaxedItemPrice | undefined =>
-	buildTaxedPriceFromRate(amount, currencyCode, taxRate);
-
 export const calculateTaxedPrice = (
 	amount: number,
 	taxCategory: TaxCategory | undefined,
 	currency: string,
 	country: string | undefined,
+	roundingMode: RoundingMode = "HalfEven",
 ): TaxedPrice | undefined => {
 	if (!taxCategory || !taxCategory.rates.length) {
 		return undefined;
@@ -172,7 +244,12 @@ export const calculateTaxedPrice = (
 			(rate) => !rate.country || rate.country === country,
 		) || taxCategory.rates[0];
 
-	const taxedItemPrice = buildTaxedPriceFromRate(amount, currency, taxRate);
+	const taxedItemPrice = calculateTaxedPriceFromRate(
+		amount,
+		currency,
+		taxRate,
+		roundingMode,
+	);
 	if (!taxedItemPrice) {
 		return undefined;
 	}

@@ -2,6 +2,7 @@ import type {
 	Cart,
 	CartValueTier,
 	CentPrecisionMoney,
+	ExternalTaxRateDraft,
 	InvalidOperationError,
 	MissingTaxRateForCountryError,
 	ShippingInfo,
@@ -10,9 +11,11 @@ import type {
 	ShippingRatePriceTier,
 	TaxedItemPrice,
 	TaxPortion,
+	TaxRate,
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js";
 import { CommercetoolsError } from "./exceptions.ts";
+import { taxRateFromExternalDraft } from "./lib/tax.ts";
 import type { GetParams, RepositoryContext } from "./repositories/abstract.ts";
 import {
 	createCentPrecisionMoney,
@@ -190,6 +193,7 @@ export const createShippingInfoFromMethod = async (
 	storage: AbstractStorage,
 	resource: ShippingCalculationSource,
 	method: ShippingMethod,
+	externalTaxRate?: ExternalTaxRateDraft,
 ): Promise<Omit<ShippingInfo, "deliveries">> => {
 	const country = resource.shippingAddress!.country;
 
@@ -228,20 +232,25 @@ export const createShippingInfoFromMethod = async (
 		);
 	}
 
-	const taxCategory = await storage.getByResourceIdentifier<"tax-category">(
-		context.projectKey,
-		method.taxCategory,
-	);
+	let taxRate: TaxRate | undefined;
+	if (externalTaxRate) {
+		taxRate = taxRateFromExternalDraft(externalTaxRate);
+	} else {
+		const taxCategory = await storage.getByResourceIdentifier<"tax-category">(
+			context.projectKey,
+			method.taxCategory,
+		);
 
-	// TODO: match state in addition to country
-	const taxRate = taxCategory.rates.find((rate) => rate.country === country);
+		// TODO: match state in addition to country
+		taxRate = taxCategory.rates.find((rate) => rate.country === country);
 
-	if (!taxRate) {
-		throw new CommercetoolsError<MissingTaxRateForCountryError>({
-			code: "MissingTaxRateForCountry",
-			message: `Tax category '${taxCategory.id}' is missing a tax rate for country '${country}'.`,
-			taxCategoryId: taxCategory.id,
-		});
+		if (!taxRate) {
+			throw new CommercetoolsError<MissingTaxRateForCountryError>({
+				code: "MissingTaxRateForCountry",
+				message: `Tax category '${taxCategory.id}' is missing a tax rate for country '${country}'.`,
+				taxCategoryId: taxCategory.id,
+			});
+		}
 	}
 
 	const shippingRateTier = shippingRate.tiers.find((tier) => tier.isMatching);

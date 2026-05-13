@@ -6,12 +6,19 @@ import type {
 	DiscountCodeNonApplicableError,
 	LineItem,
 	Price,
+	RoundingMode,
 	TaxCategory,
 	TaxCategoryReference,
+	TaxedItemPrice,
+	TaxRate,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "#src/exceptions.ts";
-import { calculateTaxedPrice } from "#src/lib/tax.ts";
+import {
+	calculateTaxedPrice,
+	calculateTaxedPriceFromRate,
+	taxRateFromExternalDraft,
+} from "#src/lib/tax.ts";
 import type { AbstractStorage } from "#src/storage/abstract.ts";
 import {
 	calculateMoneyTotalCentAmount,
@@ -52,6 +59,19 @@ export const calculateLineItemTotalPrice = (lineItem: LineItem): number => {
 	return calculateMoneyTotalCentAmount(lineItem.price.value, lineItem.quantity);
 };
 
+export const computeItemTaxedPrice = (
+	item: Pick<LineItem | CustomLineItem, "taxRate" | "totalPrice">,
+	roundingMode: RoundingMode = "HalfEven",
+): TaxedItemPrice | undefined => {
+	if (!item.taxRate) return undefined;
+	return calculateTaxedPriceFromRate(
+		item.totalPrice.centAmount,
+		item.totalPrice.currencyCode,
+		item.taxRate,
+		roundingMode,
+	);
+};
+
 export const calculateCartTotalPrice = (cart: Cart): number => {
 	const lineItemsTotal = cart.lineItems.reduce(
 		(cur, item) => cur + item.totalPrice.centAmount,
@@ -69,16 +89,21 @@ export const createCustomLineItemFromDraft = async (
 	draft: CustomLineItemDraft,
 	storage: AbstractStorage,
 	country?: string,
+	taxMode: Cart["taxMode"] = "Platform",
+	roundingMode: RoundingMode = "HalfEven",
 ): Promise<CustomLineItem> => {
 	const quantity = draft.quantity ?? 1;
 
-	const taxCategoryRef = draft.taxCategory
-		? await getReferenceFromResourceIdentifier<TaxCategoryReference>(
-				draft.taxCategory,
-				projectKey,
-				storage,
-			)
-		: undefined;
+	const isTaxExternal = taxMode === "External";
+
+	const taxCategoryRef =
+		!isTaxExternal && draft.taxCategory
+			? await getReferenceFromResourceIdentifier<TaxCategoryReference>(
+					draft.taxCategory,
+					projectKey,
+					storage,
+				)
+			: undefined;
 
 	let taxCategory: TaxCategory | undefined;
 	if (taxCategoryRef) {
@@ -100,20 +125,38 @@ export const createCustomLineItemFromDraft = async (
 		centAmount: calculateMoneyTotalCentAmount(draft.money, quantity),
 	});
 
-	const taxedPrice = taxCategory
-		? calculateTaxedPrice(
+	const resolveTax = (): {
+		taxRate?: TaxRate;
+		taxedPrice?: TaxedItemPrice;
+	} => {
+		if (isTaxExternal) {
+			if (!draft.externalTaxRate) return {};
+			const taxRate = taxRateFromExternalDraft(draft.externalTaxRate);
+			return {
+				taxRate,
+				taxedPrice: calculateTaxedPriceFromRate(
+					totalPrice.centAmount,
+					totalPrice.currencyCode,
+					taxRate,
+					roundingMode,
+				),
+			};
+		}
+		if (!taxCategory) return {};
+		return {
+			taxRate: taxCategory.rates.find(
+				(rate) => !rate.country || rate.country === country,
+			),
+			taxedPrice: calculateTaxedPrice(
 				totalPrice.centAmount,
 				taxCategory,
 				totalPrice.currencyCode,
 				country,
-			)
-		: undefined;
-
-	const taxRate = taxCategory
-		? taxCategory.rates.find(
-				(rate) => !rate.country || rate.country === country,
-			)
-		: undefined;
+				roundingMode,
+			),
+		};
+	};
+	const { taxRate, taxedPrice } = resolveTax();
 
 	return {
 		id: uuidv4(),
