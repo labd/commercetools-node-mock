@@ -796,7 +796,6 @@ describe("createShippingInfo", () => {
 		expect(result.taxedPrice!.totalGross.centAmount).toBe(1100);
 	});
 
-
 	test("create cart with discount code", async () => {
 		const code = await storage.add("dummy", "discount-code", {
 			...getBaseResourceProperties(),
