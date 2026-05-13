@@ -2373,7 +2373,6 @@ describe("Cart Update Actions", () => {
 			});
 			const cliId = added.json().customLineItems[0].id;
 
-
 			const response = await ctMock.app.inject({
 				method: "POST",
 				url: `/dummy/carts/${externalCart.id}`,
