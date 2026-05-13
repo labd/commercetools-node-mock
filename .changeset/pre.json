@@ -10,6 +10,7 @@
     "add-product-type-update-actions",
     "add-sqlite-storage",
     "async-storage-layer",
+    "external-tax-mode-support",
     "fix-cart-discount-codes",
     "fix-category-parent-by-key",
     "fix-empty-json-body-on-delete",
