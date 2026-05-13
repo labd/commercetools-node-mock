@@ -720,6 +720,83 @@ describe("createShippingInfo", () => {
 		expect(result.taxedPrice!.totalNet.centAmount).toBe(995);
 	});
 
+	test("should use external tax rate when cart taxMode is External", async () => {
+		await storage.add("dummy", "shipping-method", {
+			...getBaseResourceProperties(),
+			id: "external-tax-shipping-id",
+			name: "Standard Shipping",
+			taxCategory: {
+				typeId: "tax-category",
+				id: "shipping-tax-category-id",
+			},
+			zoneRates: [
+				{
+					zone: {
+						typeId: "zone",
+						id: "test-zone-id",
+						obj: {
+							...getBaseResourceProperties(),
+							id: "test-zone-id",
+							name: "Test Zone",
+							locations: [{ country: "NL" }],
+						},
+					},
+					shippingRates: [
+						{
+							price: {
+								currencyCode: "EUR",
+								centAmount: 1000,
+								type: "centPrecision",
+								fractionDigits: 2,
+							},
+							tiers: [],
+						},
+					],
+				},
+			],
+			active: true,
+			isDefault: false,
+		});
+
+		const cart: any = {
+			...getBaseResourceProperties(),
+			id: "external-tax-cart-id",
+			version: 1,
+			cartState: "Active",
+			taxMode: "External",
+			totalPrice: {
+				currencyCode: "EUR",
+				centAmount: 3000,
+				type: "centPrecision",
+				fractionDigits: 2,
+			},
+			shippingAddress: { country: "NL" },
+			taxRoundingMode: "HalfEven",
+		};
+
+		const context = { projectKey: "dummy", storeKey: "testStore" };
+
+		const result = await repository.createShippingInfo(
+			context,
+			cart,
+			{ typeId: "shipping-method", id: "external-tax-shipping-id" },
+			{
+				name: "External VAT",
+				amount: 0.1,
+				includedInPrice: false,
+				country: "NL",
+			},
+		);
+
+		expect(result.price.centAmount).toBe(1000);
+		expect(result.taxRate?.name).toBe("External VAT");
+		expect(result.taxRate?.amount).toBe(0.1);
+		expect(result.taxRate?.country).toBe("NL");
+		expect(result.taxedPrice!.totalNet.centAmount).toBe(1000);
+		expect(result.taxedPrice!.totalGross.centAmount).toBe(1100);
+	});
+
+
 	test("create cart with discount code", async () => {
 		const code = await storage.add("dummy", "discount-code", {
 			...getBaseResourceProperties(),

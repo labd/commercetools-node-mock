@@ -1,6 +1,7 @@
 import type {
 	Address,
 	AddressDraft,
+	BaseResource,
 	Cart,
 	CartAddCustomLineItemAction,
 	CartAddItemShippingAddressAction,
@@ -16,10 +17,13 @@ import type {
 	CartSetAnonymousIdAction,
 	CartSetBillingAddressAction,
 	CartSetBillingAddressCustomTypeAction,
+	CartSetCartTotalTaxAction,
 	CartSetCountryAction,
 	CartSetCustomerEmailAction,
 	CartSetCustomerIdAction,
 	CartSetCustomFieldAction,
+	CartSetCustomLineItemTaxAmountAction,
+	CartSetCustomLineItemTaxRateAction,
 	CartSetCustomShippingMethodAction,
 	CartSetCustomTypeAction,
 	CartSetDirectDiscountsAction,
@@ -27,11 +31,15 @@ import type {
 	CartSetLineItemCustomTypeAction,
 	CartSetLineItemPriceAction,
 	CartSetLineItemShippingDetailsAction,
+	CartSetLineItemTaxAmountAction,
+	CartSetLineItemTaxRateAction,
 	CartSetLocaleAction,
 	CartSetShippingAddressAction,
 	CartSetShippingAddressCustomFieldAction,
 	CartSetShippingAddressCustomTypeAction,
 	CartSetShippingMethodAction,
+	CartSetShippingMethodTaxAmountAction,
+	CartSetShippingMethodTaxRateAction,
 	CartUpdateAction,
 	CustomFields,
 	GeneralError,
@@ -40,7 +48,10 @@ import type {
 	LineItem,
 	Product,
 	ProductVariant,
+	Project,
 	ReferencedResourceNotFoundError,
+	TaxRate,
+	UpdateAction,
 } from "@commercetools/platform-sdk";
 import type {
 	CartAddDiscountCodeAction,
@@ -50,6 +61,12 @@ import type {
 import type { ShippingMethodResourceIdentifier } from "@commercetools/platform-sdk/dist/declarations/src/generated/models/shipping-method";
 import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import {
+	buildTaxedPriceFromExternalAmount,
+	calculateTaxedPriceFromRate,
+	calculateTaxTotals,
+	taxRateFromExternalDraft,
+} from "#src/lib/tax.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
@@ -63,6 +80,7 @@ import {
 import {
 	calculateCartTotalPrice,
 	calculateLineItemTotalPrice,
+	computeItemTaxedPrice,
 	createCustomLineItemFromDraft,
 	createDiscountCodeInfoFromCode,
 	selectPrice,
@@ -79,6 +97,30 @@ export class CartUpdateHandler
 		super(storage);
 		this.repository = repository;
 	}
+
+	async apply<R extends BaseResource | Project>(
+		context: RepositoryContext,
+		resource: R,
+		version: number,
+		actions: UpdateAction[],
+	): Promise<R> {
+		const updated = await super.apply(context, resource, version, actions);
+		if (updated.version !== resource.version) {
+			const cart = updated as unknown as Writable<Cart>;
+			if (cart.taxMode === "ExternalAmount") {
+				// Cart total tax is set explicitly via setCartTotalTax — never
+				// aggregate from line items. Shipping subtotal is just a mirror of
+				// shippingInfo.taxedPrice and should still be kept in sync.
+				cart.taxedShippingPrice = cart.shippingInfo?.taxedPrice;
+			} else {
+				const { taxedPrice, taxedShippingPrice } = calculateTaxTotals(cart);
+				cart.taxedPrice = taxedPrice;
+				cart.taxedShippingPrice = taxedShippingPrice;
+			}
+		}
+		return updated;
+	}
+
 	addItemShippingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
@@ -105,6 +147,7 @@ export class CartUpdateHandler
 			quantity = 1,
 			addedAt,
 			key,
+			externalTaxRate,
 		}: CartAddLineItemAction,
 	) {
 		let product: Product | null = null;
@@ -169,6 +212,7 @@ export class CartUpdateHandler
 				if (x.productId === product?.id && x.variant.id === variant?.id) {
 					x.quantity += quantity;
 					x.totalPrice.centAmount = calculateLineItemTotalPrice(x);
+					x.taxedPrice = computeItemTaxedPrice(x, resource.taxRoundingMode);
 				}
 			});
 		} else {
@@ -197,6 +241,18 @@ export class CartUpdateHandler
 				currencyCode: price.value.currencyCode,
 				centAmount: calculateMoneyTotalCentAmount(price.value, quantity),
 			});
+			const taxRate =
+				resource.taxMode === "External" && externalTaxRate
+					? taxRateFromExternalDraft(externalTaxRate)
+					: undefined;
+			const taxedPrice = taxRate
+				? calculateTaxedPriceFromRate(
+						totalPrice.centAmount,
+						totalPrice.currencyCode,
+						taxRate,
+						resource.taxRoundingMode,
+					)
+				: undefined;
 			resource.lineItems.push({
 				id: uuidv4(),
 				key,
@@ -208,6 +264,8 @@ export class CartUpdateHandler
 				name: product.masterData.current.name,
 				variant,
 				price: price,
+				taxRate,
+				taxedPrice,
 				taxedPricePortions: [],
 				perMethodTaxRate: [],
 				totalPrice,
@@ -268,6 +326,7 @@ export class CartUpdateHandler
 				if (x.id === lineItemId && quantity) {
 					x.quantity = quantity;
 					x.totalPrice.centAmount = calculateLineItemTotalPrice(x);
+					x.taxedPrice = computeItemTaxedPrice(x, resource.taxRoundingMode);
 				}
 			});
 		}
@@ -349,6 +408,7 @@ export class CartUpdateHandler
 				if (x.id === lineItemId && quantity) {
 					x.quantity -= quantity;
 					x.totalPrice.centAmount = calculateLineItemTotalPrice(x);
+					x.taxedPrice = computeItemTaxedPrice(x, resource.taxRoundingMode);
 				}
 			});
 		}
@@ -366,6 +426,7 @@ export class CartUpdateHandler
 			slug,
 			quantity = 1,
 			taxCategory,
+			externalTaxRate,
 			custom,
 			priceMode = "Standard",
 			key,
@@ -373,9 +434,21 @@ export class CartUpdateHandler
 	) {
 		const customLineItem = await createCustomLineItemFromDraft(
 			context.projectKey,
-			{ money, name, slug, quantity, taxCategory, custom, priceMode, key },
+			{
+				money,
+				name,
+				slug,
+				quantity,
+				taxCategory,
+				externalTaxRate,
+				custom,
+				priceMode,
+				key,
+			},
 			this._storage,
 			resource.shippingAddress?.country ?? resource.country,
+			resource.taxMode,
+			resource.taxRoundingMode,
 		);
 
 		resource.customLineItems.push(customLineItem);
@@ -466,6 +539,10 @@ export class CartUpdateHandler
 					quantity,
 				),
 			});
+			customLineItem.taxedPrice = computeItemTaxedPrice(
+				customLineItem,
+				resource.taxRoundingMode,
+			);
 		};
 
 		if (customLineItemId) {
@@ -512,6 +589,10 @@ export class CartUpdateHandler
 					customLineItem.quantity,
 				),
 			});
+			customLineItem.taxedPrice = computeItemTaxedPrice(
+				customLineItem,
+				resource.taxRoundingMode,
+			);
 		};
 
 		if (customLineItemId) {
@@ -637,25 +718,44 @@ export class CartUpdateHandler
 			externalTaxRate,
 		}: CartSetCustomShippingMethodAction,
 	) {
-		if (externalTaxRate) {
+		const isTaxExternal = resource.taxMode === "External";
+
+		if (externalTaxRate && !isTaxExternal) {
 			throw new CommercetoolsError<InvalidOperationError>({
 				code: "InvalidOperation",
-				message: "External tax rate is not supported",
+				message:
+					"An external tax rate can only be set for a Cart with External tax mode.",
 			});
 		}
 
-		const tax = taxCategory
-			? await this._storage.getByResourceIdentifier<"tax-category">(
-					context.projectKey,
-					taxCategory,
+		const tax =
+			!isTaxExternal && taxCategory
+				? await this._storage.getByResourceIdentifier<"tax-category">(
+						context.projectKey,
+						taxCategory,
+					)
+				: undefined;
+
+		const taxRate =
+			isTaxExternal && externalTaxRate
+				? taxRateFromExternalDraft(externalTaxRate)
+				: undefined;
+
+		const price = createCentPrecisionMoney(shippingRate.price);
+		const taxedPrice = taxRate
+			? calculateTaxedPriceFromRate(
+					price.centAmount,
+					price.currencyCode,
+					taxRate,
+					resource.taxRoundingMode,
 				)
 			: undefined;
 
 		resource.shippingInfo = {
 			shippingMethodName,
-			price: createCentPrecisionMoney(shippingRate.price),
+			price,
 			shippingRate: {
-				price: createCentPrecisionMoney(shippingRate.price),
+				price,
 				tiers: [],
 			},
 			taxCategory: tax
@@ -664,6 +764,8 @@ export class CartUpdateHandler
 						id: tax?.id,
 					}
 				: undefined,
+			taxRate,
+			taxedPrice,
 			shippingMethodState: "MatchesCart",
 		};
 	}
@@ -840,6 +942,10 @@ export class CartUpdateHandler
 			currencyCode: lineItem.price!.value.currencyCode,
 			centAmount: lineItemTotal,
 		});
+		lineItem.taxedPrice = computeItemTaxedPrice(
+			lineItem,
+			resource.taxRoundingMode,
+		);
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
 	}
 
@@ -952,17 +1058,300 @@ export class CartUpdateHandler
 	async setShippingMethod(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
-		{ shippingMethod }: CartSetShippingMethodAction,
+		{ shippingMethod, externalTaxRate }: CartSetShippingMethodAction,
 	) {
 		if (shippingMethod) {
 			resource.shippingInfo = await this.repository.createShippingInfo(
 				context,
 				resource,
 				shippingMethod,
+				externalTaxRate ?? undefined,
 			);
 		} else {
 			resource.shippingInfo = undefined;
 		}
+	}
+
+	setLineItemTaxRate(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ lineItemId, lineItemKey, externalTaxRate }: CartSetLineItemTaxRateAction,
+	) {
+		if (resource.taxMode !== "External") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A line item tax rate can only be set for a Cart with External tax mode.",
+			});
+		}
+
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+		if (!lineItem) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		const writable = lineItem as Writable<LineItem>;
+		writable.taxRate = externalTaxRate
+			? taxRateFromExternalDraft(externalTaxRate)
+			: undefined;
+		writable.taxedPrice = computeItemTaxedPrice(
+			writable,
+			resource.taxRoundingMode,
+		);
+	}
+
+	setCustomLineItemTaxRate(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			customLineItemId,
+			customLineItemKey,
+			externalTaxRate,
+		}: CartSetCustomLineItemTaxRateAction,
+	) {
+		if (resource.taxMode !== "External") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A custom line item tax rate can only be set for a Cart with External tax mode.",
+			});
+		}
+
+		const customLineItem = resource.customLineItems.find(
+			(x) =>
+				(customLineItemId && x.id === customLineItemId) ||
+				(customLineItemKey && x.key === customLineItemKey),
+		);
+		if (!customLineItem) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: customLineItemKey
+					? `A custom line item with key '${customLineItemKey}' not found.`
+					: `A custom line item with ID '${customLineItemId}' not found.`,
+			});
+		}
+
+		const writable = customLineItem as Writable<CustomLineItem>;
+		writable.taxRate = externalTaxRate
+			? taxRateFromExternalDraft(externalTaxRate)
+			: undefined;
+		writable.taxedPrice = computeItemTaxedPrice(
+			writable,
+			resource.taxRoundingMode,
+		);
+	}
+
+	setShippingMethodTaxRate(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ externalTaxRate }: CartSetShippingMethodTaxRateAction,
+	) {
+		if (resource.taxMode !== "External") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A shipping method tax rate can only be set for a Cart with External tax mode.",
+			});
+		}
+		if (!resource.shippingInfo) {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Cart has no shipping method.",
+			});
+		}
+
+		const shippingInfo = resource.shippingInfo as Writable<
+			typeof resource.shippingInfo
+		>;
+		const taxRate: TaxRate | undefined = externalTaxRate
+			? taxRateFromExternalDraft(externalTaxRate)
+			: undefined;
+		shippingInfo.taxRate = taxRate;
+		shippingInfo.taxedPrice = taxRate
+			? calculateTaxedPriceFromRate(
+					shippingInfo.price.centAmount,
+					shippingInfo.price.currencyCode,
+					taxRate,
+					resource.taxRoundingMode,
+				)
+			: undefined;
+	}
+
+	setLineItemTaxAmount(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			lineItemId,
+			lineItemKey,
+			externalTaxAmount,
+		}: CartSetLineItemTaxAmountAction,
+	) {
+		if (resource.taxMode !== "ExternalAmount") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A line item tax amount can only be set for a Cart with ExternalAmount tax mode.",
+			});
+		}
+
+		const lineItem = resource.lineItems.find(
+			(x) =>
+				(lineItemId && x.id === lineItemId) ||
+				(lineItemKey && x.key === lineItemKey),
+		);
+		if (!lineItem) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: lineItemKey
+					? `A line item with key '${lineItemKey}' not found.`
+					: `A line item with ID '${lineItemId}' not found.`,
+			});
+		}
+
+		const writable = lineItem as Writable<LineItem>;
+		if (externalTaxAmount) {
+			writable.taxRate = taxRateFromExternalDraft(externalTaxAmount.taxRate);
+			writable.taxedPrice = buildTaxedPriceFromExternalAmount(
+				externalTaxAmount,
+				resource.taxRoundingMode,
+			);
+		} else {
+			writable.taxRate = undefined;
+			writable.taxedPrice = undefined;
+		}
+	}
+
+	setCustomLineItemTaxAmount(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{
+			customLineItemId,
+			customLineItemKey,
+			externalTaxAmount,
+		}: CartSetCustomLineItemTaxAmountAction,
+	) {
+		if (resource.taxMode !== "ExternalAmount") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A custom line item tax amount can only be set for a Cart with ExternalAmount tax mode.",
+			});
+		}
+
+		const customLineItem = resource.customLineItems.find(
+			(x) =>
+				(customLineItemId && x.id === customLineItemId) ||
+				(customLineItemKey && x.key === customLineItemKey),
+		);
+		if (!customLineItem) {
+			throw new CommercetoolsError<GeneralError>({
+				code: "General",
+				message: customLineItemKey
+					? `A custom line item with key '${customLineItemKey}' not found.`
+					: `A custom line item with ID '${customLineItemId}' not found.`,
+			});
+		}
+
+		const writable = customLineItem as Writable<CustomLineItem>;
+		if (externalTaxAmount) {
+			writable.taxRate = taxRateFromExternalDraft(externalTaxAmount.taxRate);
+			writable.taxedPrice = buildTaxedPriceFromExternalAmount(
+				externalTaxAmount,
+				resource.taxRoundingMode,
+			);
+		} else {
+			writable.taxRate = undefined;
+			writable.taxedPrice = undefined;
+		}
+	}
+
+	setShippingMethodTaxAmount(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ externalTaxAmount }: CartSetShippingMethodTaxAmountAction,
+	) {
+		if (resource.taxMode !== "ExternalAmount") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A shipping method tax amount can only be set for a Cart with ExternalAmount tax mode.",
+			});
+		}
+		if (!resource.shippingInfo) {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Cart has no shipping method.",
+			});
+		}
+
+		const shippingInfo = resource.shippingInfo as Writable<
+			typeof resource.shippingInfo
+		>;
+		if (externalTaxAmount) {
+			shippingInfo.taxRate = taxRateFromExternalDraft(
+				externalTaxAmount.taxRate,
+			);
+			shippingInfo.taxedPrice = buildTaxedPriceFromExternalAmount(
+				externalTaxAmount,
+				resource.taxRoundingMode,
+			);
+		} else {
+			shippingInfo.taxRate = undefined;
+			shippingInfo.taxedPrice = undefined;
+		}
+	}
+
+	setCartTotalTax(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ externalTotalGross, externalTaxPortions }: CartSetCartTotalTaxAction,
+	) {
+		if (resource.taxMode !== "ExternalAmount") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message:
+					"A cart total tax can only be set for a Cart with ExternalAmount tax mode.",
+			});
+		}
+
+		const totalGross = createCentPrecisionMoney(externalTotalGross);
+		const currencyCode = totalGross.currencyCode;
+		const portions =
+			externalTaxPortions?.map((portion) => ({
+				name: portion.name,
+				rate: portion.rate,
+				amount: createCentPrecisionMoney(portion.amount),
+			})) ?? [];
+		const totalTaxCentAmount = portions.reduce(
+			(acc, portion) => acc + portion.amount.centAmount,
+			0,
+		);
+		const totalNet = createCentPrecisionMoney({
+			currencyCode,
+			centAmount: totalGross.centAmount - totalTaxCentAmount,
+		});
+
+		resource.taxedPrice = {
+			totalNet,
+			totalGross,
+			totalTax:
+				totalTaxCentAmount > 0
+					? createCentPrecisionMoney({
+							currencyCode,
+							centAmount: totalTaxCentAmount,
+						})
+					: undefined,
+			taxPortions: portions,
+		};
 	}
 
 	setShippingAddressCustomField(

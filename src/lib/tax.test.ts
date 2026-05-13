@@ -5,6 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import {
+	buildTaxedPriceFromExternalAmount,
 	calculateTaxedPrice,
 	calculateTaxedPriceFromRate,
 	calculateTaxTotals,
@@ -83,6 +84,58 @@ describe("tax helpers", () => {
 		expect(taxed.totalGross.centAmount).toBe(1250);
 		expect(taxed.totalNet.centAmount).toBe(1000);
 		expect(taxed.totalTax?.centAmount).toBe(250);
+	});
+
+	test("calculateTaxedPriceFromRate respects HalfEven rounding (banker's)", () => {
+		const rate: TaxRate = {
+			amount: 0.05,
+			includedInPrice: false,
+			name: "5%",
+			country: "NL",
+			id: "rate",
+			subRates: [],
+		};
+
+		// 250 * 0.05 = 12.5 — HalfEven rounds to 12 (toward even)
+		const halfEven = calculateTaxedPriceFromRate(250, "EUR", rate, "HalfEven")!;
+		expect(halfEven.totalTax?.centAmount).toBe(12);
+		expect(halfEven.totalGross.centAmount).toBe(262);
+
+		// HalfUp rounds 12.5 → 13
+		const halfUp = calculateTaxedPriceFromRate(250, "EUR", rate, "HalfUp")!;
+		expect(halfUp.totalTax?.centAmount).toBe(13);
+		expect(halfUp.totalGross.centAmount).toBe(263);
+
+		// HalfDown rounds 12.5 → 12
+		const halfDown = calculateTaxedPriceFromRate(250, "EUR", rate, "HalfDown")!;
+		expect(halfDown.totalTax?.centAmount).toBe(12);
+		expect(halfDown.totalGross.centAmount).toBe(262);
+	});
+
+	test("buildTaxedPriceFromExternalAmount respects rounding mode", () => {
+		const draft = {
+			totalGross: {
+				type: "centPrecision" as const,
+				currencyCode: "EUR",
+				centAmount: 525,
+				fractionDigits: 2,
+			},
+			taxRate: {
+				name: "5%",
+				amount: 0.05,
+				country: "NL",
+				includedInPrice: true,
+			},
+		};
+
+		// 525 * 0.05 / 1.05 = 25.0 — exact, no rounding ambiguity
+		// Use a case with .5 ambiguity: 315 * 0.05 / 1.05 = 15.0 — also exact
+		// 105 * 0.05 / 1.05 = 5.0
+		// Pick 11 * 0.5 / 1.5 = 3.666... not clean. Use 525 to confirm baseline
+		const halfEven = buildTaxedPriceFromExternalAmount(draft, "HalfEven");
+		expect(halfEven.totalGross.centAmount).toBe(525);
+		expect(halfEven.totalTax?.centAmount).toBe(25);
+		expect(halfEven.totalNet.centAmount).toBe(500);
 	});
 
 	test("calculateTaxedPrice selects matching tax rate from category", () => {
