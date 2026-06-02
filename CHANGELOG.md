@@ -1,5 +1,129 @@
 # CHANGELOG
 
+## 3.0.0
+
+### Major Changes
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`48ca265`](https://github.com/labd/commercetools-node-mock/commit/48ca2656ddde72f9996abdd5c652d2a187a86df4) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Make the storage engine async to support pluggable persistent storage backends (e.g., SQLite, PostgreSQL). All `AbstractStorage` methods now return Promises. This is a breaking change for users who call `ctMock.project().unsafeAdd()`, `ctMock.project().get()`, or `ctMock.clear()` — these methods are now async and must be awaited.
+
+  ### Breaking changes
+
+  - `ctMock.project().unsafeAdd(type, resource)` is now async — use `await ctMock.project().unsafeAdd(type, resource)`
+  - `ctMock.project().get(type, id)` is now async — use `await ctMock.project().get(type, id)`
+  - `ctMock.clear()` is now async — use `await ctMock.clear()`
+
+  ### New features
+
+  - `AbstractStorage` and `InMemoryStorage` are now exported from the package, allowing custom storage backend implementations
+  - New `storage` option on `CommercetoolsMockOptions` to inject a custom storage backend
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`50bcd7d`](https://github.com/labd/commercetools-node-mock/commit/50bcd7defba1eecd5be045a4c2fd315a71ec7811) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Replace the internal HTTP server with Fastify. The standalone mock server now uses Fastify for routing and request handling, improving performance and maintainability.
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`ba62b38`](https://github.com/labd/commercetools-node-mock/commit/ba62b38cb5bfb5feb829569275848b9ff8952c4e) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Remove deprecated `start()`, `stop()`, and `add()` methods. Use `registerHandlers()` to bind to an msw server and `unsafeAdd()` for adding resources directly.
+
+### Minor Changes
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`50bcd7d`](https://github.com/labd/commercetools-node-mock/commit/50bcd7defba1eecd5be045a4c2fd315a71ec7811) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add `createdBy` and `lastModifiedBy` fields to all resources, reflecting the client credentials used when creating or updating them.
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`5056e4a`](https://github.com/labd/commercetools-node-mock/commit/5056e4aa75525d5385516e0cf97d84c79a3887d2) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add draft validation for resource creation when strict mode is enabled. Generated Zod schemas validate incoming request bodies against the commercetools API spec before passing them to repositories.
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`35bd4ca`](https://github.com/labd/commercetools-node-mock/commit/35bd4cae1c6a489d4c8bf4bced4a6f2cbbc7e102) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add `SQLiteStorage` backend using Node.js built-in `node:sqlite` module (available since v22.5.0). This provides a persistent storage option that stores data in a SQLite database file while maintaining full compatibility with the existing in-memory backend.
+
+  `SQLiteStorage` is available as a separate entry point to avoid breaking compatibility with Node.js < 22.5.0:
+
+  ### Usage
+
+  ```typescript
+  import { CommercetoolsMock } from "@labdigital/commercetools-mock";
+  import { SQLiteStorage } from "@labdigital/commercetools-mock/sqlite";
+
+  // File-based persistent storage
+  const storage = new SQLiteStorage({ filename: "my-mock.db" });
+  const ctMock = new CommercetoolsMock({ storage });
+
+  // In-memory SQLite (useful for tests)
+  const storage = new SQLiteStorage({ filename: ":memory:" });
+  ```
+
+  ### New exports
+
+  - `@labdigital/commercetools-mock/sqlite` — Separate entry point exporting `SQLiteStorage` and `SQLiteStorageOptions`
+
+- [#388](https://github.com/labd/commercetools-node-mock/pull/388) [`f053fb9`](https://github.com/labd/commercetools-node-mock/commit/f053fb9106128719dc1088634bf1fc02ffe80296) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for `External` and `ExternalAmount` tax modes on carts.
+
+  ### New behavior
+
+  - **`External` tax mode** — `LineItem`, `CustomLineItem`, and shipping methods can now carry an `externalTaxRate`:
+    - `createCart` honors `LineItemDraft.externalTaxRate`, `CustomLineItemDraft.externalTaxRate`, and `CartDraft.externalTaxRateForShippingMethod`.
+    - `addLineItem`, `addCustomLineItem`, and `setShippingMethod`/`setCustomShippingMethod` accept `externalTaxRate`.
+    - New update actions: `setLineItemTaxRate`, `setCustomLineItemTaxRate`, `setShippingMethodTaxRate`.
+  - **`ExternalAmount` tax mode** — explicit gross amounts can be supplied per item and at the cart level:
+    - New update actions: `setLineItemTaxAmount`, `setCustomLineItemTaxAmount`, `setShippingMethodTaxAmount`, `setCartTotalTax`.
+    - In this mode the cart's `taxedPrice` is whatever `setCartTotalTax` last set; it is no longer aggregated from line items. `taxedShippingPrice` continues to mirror `shippingInfo.taxedPrice`.
+  - All tax calculations now respect `cart.taxRoundingMode` (`HalfEven` / `HalfUp` / `HalfDown`) instead of always using `Math.round`.
+
+  ### Cart total recomputation after update actions
+
+  `CartUpdateHandler.apply` now recomputes `cart.taxedPrice` and `cart.taxedShippingPrice` after every update batch (except in `ExternalAmount` mode, where the cart total is authoritative via `setCartTotalTax`).
+
+  This fixes a pre-existing latent bug: previously these fields were only computed once during `create()` and were never refreshed after update actions, so e.g. running `setShippingMethod` after cart creation would leave the cart-level aggregate stale. It didn't show up before because `LineItem.taxedPrice` was never populated in any mode, so the aggregate had no contributors that could drift. With the new tax-mode work, line items and custom line items now actually carry `taxedPrice`, which made the gap observable and required fixing.
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`90d3287`](https://github.com/labd/commercetools-node-mock/commit/90d3287d7e439d58afe937571cf7a8fa26cf4ed7) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Unify logging to use Pino (via Fastify's built-in logger) instead of
+  console.error. Add support for passing a custom Pino logger instance via the
+  new `logger` option on `CommercetoolsMockOptions`. The standalone server now
+  uses pino-pretty for human-readable output.
+
+### Patch Changes
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`16dc10e`](https://github.com/labd/commercetools-node-mock/commit/16dc10e7122e26d20cf04318251fcf1ab9aca62f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Add setKey, changeName, and changeDescription update actions for product types
+
+- [`708b7b3`](https://github.com/labd/commercetools-node-mock/commit/708b7b3f4d5f687ec42ea8eb6d582d01ecaa7d66) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update dependencies
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`50bcd7d`](https://github.com/labd/commercetools-node-mock/commit/50bcd7defba1eecd5be045a4c2fd315a71ec7811) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix cart discount code handling based on review feedback from PR [#360](https://github.com/labd/commercetools-node-mock/issues/360).
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`5f269f2`](https://github.com/labd/commercetools-node-mock/commit/5f269f2397cb050cfedd7a59eb77f5b05b2c2b0f) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix creating categories with a parent specified by key instead of id. Previously, only the `id` field was used when storing the parent reference, causing a "ResourceIdentifier requires an 'id' xor a 'key'" error when the parent was specified by key.
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`c8511f9`](https://github.com/labd/commercetools-node-mock/commit/c8511f9e2469e07a18c287ba4a4687356c9ef64e) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix Fastify rejecting DELETE requests with an empty JSON body by adding a custom content-type parser that tolerates empty bodies.
+
+- [`3ef1b3f`](https://github.com/labd/commercetools-node-mock/commit/3ef1b3f51dc45d12db5cda1411b3622fec244a50) Thanks [@mvantellingen](https://github.com/mvantellingen)! - return type `AnyHandler[]` for the `.getHandlers()` call
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`7dc5dcc`](https://github.com/labd/commercetools-node-mock/commit/7dc5dcc1f2195c3b6830cb822fd7f26fb5bad96e) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Route all error responses through the central error handler by converting direct
+  `reply.status(4xx).send()` calls to throw `CommercetoolsError` instead. This
+  ensures all error responses are logged when the `silent` option is set to `false`
+  and provides consistent error response bodies with `statusCode`, `message`, and
+  `errors` fields.
+
+- [#381](https://github.com/labd/commercetools-node-mock/pull/381) [`2d16f79`](https://github.com/labd/commercetools-node-mock/commit/2d16f79f24a12a84a87f1cc7e73ba6bb650d6c4c) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Made generated optional fields nullish instead of optional, as the commercetools API also accepts null as input and treats it as empty, but the mock explicitly expects undefined
+
+- [#383](https://github.com/labd/commercetools-node-mock/pull/383) [`11acea0`](https://github.com/labd/commercetools-node-mock/commit/11acea0e61ba18ae8a06cf1fac40c5514059503c) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Add experimental, opt-in SQLite storage enabled via the EXPERIMENTAL_SQLITE_STORAGE environment variable
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`1e9b331`](https://github.com/labd/commercetools-node-mock/commit/1e9b331204ee212d5cf2238c56249db1b0d668be) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Optimize custom object lookups by container and key from O(n) to O(1):
+
+  - Add a secondary in-memory index (container+key -> id) in InMemoryStorage, maintained on add/delete
+  - Add a `json_extract` expression index in SQLiteStorage for direct SQL lookup instead of loading all rows
+  - Replace the full-scan `all()` + `find()` in `CustomObjectRepository.getWithContainerAndKey()` with the new indexed lookup
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`b573a84`](https://github.com/labd/commercetools-node-mock/commit/b573a8487d22105cfe297503e4ab72a4da7da307) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Improve resource creation performance, especially noticeable with SQLite storage and large numbers of resources:
+
+  - Eliminate redundant re-fetch after inserting a resource in both SQLite and InMemory storage backends
+  - Cache known project keys in SQLite storage to skip repeated INSERT+SELECT on the projects table
+  - Avoid double-fetching the resource in the service POST handler by reusing the already-created resource instead of re-fetching from storage
+
+- [#379](https://github.com/labd/commercetools-node-mock/pull/379) [`1e9b331`](https://github.com/labd/commercetools-node-mock/commit/1e9b331204ee212d5cf2238c56249db1b0d668be) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Fix performance degradation with large datasets (40k+ resources) in SQLite storage:
+
+  - Add indexed `container` and `co_key` columns to the SQLite resources table, replacing the O(n) `json_extract`-based custom object lookup with an O(log n) indexed query
+  - Include automatic schema migration for existing databases
+  - Add `count()` method to storage backends, enabling fast O(1) existence checks
+  - Short-circuit review statistics calculation when no reviews exist, avoiding a full table scan on every product creation/retrieval
+
+- [#381](https://github.com/labd/commercetools-node-mock/pull/381) [`2d16f79`](https://github.com/labd/commercetools-node-mock/commit/2d16f79f24a12a84a87f1cc7e73ba6bb650d6c4c) Thanks [@demeyerthom](https://github.com/demeyerthom)! - Push multiple docker image tags so we can pin versions if necessary, ignore beta tags for latest
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`50bcd7d`](https://github.com/labd/commercetools-node-mock/commit/50bcd7defba1eecd5be045a4c2fd315a71ec7811) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update project dependencies to their latest compatible versions.
+
+- [#377](https://github.com/labd/commercetools-node-mock/pull/377) [`0b36231`](https://github.com/labd/commercetools-node-mock/commit/0b3623102790ebb4b20398d84ee5438d78f7364d) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Upgrade zod from v3 to v4 and remove zod-validation-error dependency. Validation error messages now use a built-in formatter that produces commercetools-style error details.
+
+- [#385](https://github.com/labd/commercetools-node-mock/pull/385) [`886fd3b`](https://github.com/labd/commercetools-node-mock/commit/886fd3bee79403a4e8c10de3ef41da9e41692ae5) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Allow for deliveries on order import
+
 ## 3.0.0-beta.5
 
 ### Patch Changes
