@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.0.0-beta.5
+
+### Patch Changes
+
+- [`708b7b3`](https://github.com/labd/commercetools-node-mock/commit/708b7b3f4d5f687ec42ea8eb6d582d01ecaa7d66) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update dependencies
+
+- [`3ef1b3f`](https://github.com/labd/commercetools-node-mock/commit/3ef1b3f51dc45d12db5cda1411b3622fec244a50) Thanks [@mvantellingen](https://github.com/mvantellingen)! - return type `AnyHandler[]` for the `.getHandlers()` call
+
 ## 3.0.0-beta.4
 
 ### Minor Changes
