@@ -8,7 +8,7 @@ export type { FastifyBaseLogger } from "fastify";
 export {
 	AbstractStorage,
 	CommercetoolsMock,
-	InMemoryStorage,
-	getBaseResourceProperties,
 	type CommercetoolsMockOptions,
+	getBaseResourceProperties,
+	InMemoryStorage,
 };

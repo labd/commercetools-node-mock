@@ -235,7 +235,7 @@ export const calculateTaxedPrice = (
 	country: string | undefined,
 	roundingMode: RoundingMode = "HalfEven",
 ): TaxedPrice | undefined => {
-	if (!taxCategory || !taxCategory.rates.length) {
+	if (!taxCategory?.rates.length) {
 		return undefined;
 	}
 
