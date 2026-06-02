@@ -1,6 +1,6 @@
 import Fastify, { type FastifyBaseLogger, type FastifyInstance } from "fastify";
-import { HttpResponse, http } from "msw";
-import type { SetupServer, SetupServerApi } from "msw/node";
+import { type AnyHandler, HttpResponse, http } from "msw";
+import type { SetupServer } from "msw/node";
 import qs from "qs";
 import type { Config } from "./config.ts";
 import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants.ts";
@@ -212,12 +212,12 @@ export class CommercetoolsMock {
 	// registerHandlers is an alternative way to work with commercetools-mock, it
 	// allows you to manage msw server yourself and register the handlers needed
 	// for commercetools-mock to work.
-	public registerHandlers(server: SetupServerApi) {
+	public registerHandlers(server: SetupServer): void {
 		const handlers = this.getHandlers();
 		server.use(...handlers);
 	}
 
-	public getHandlers() {
+	public getHandlers(): AnyHandler[] {
 		const app = this.app;
 		return [
 			http.post(`${this.options.authHost}/oauth/*`, async ({ request }) => {
