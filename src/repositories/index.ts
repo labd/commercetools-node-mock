@@ -1,6 +1,7 @@
 import type { Config } from "#src/config.ts";
 import { ProductTailoringRepository } from "#src/repositories/product-tailoring.ts";
 import {
+	AsAssociateBusinessUnitRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
@@ -51,6 +52,7 @@ export type RepositoryMap = ReturnType<typeof createRepositories>;
 
 export const createRepositories = (config: Config) => ({
 	"as-associate": {
+		"business-unit": new AsAssociateBusinessUnitRepository(config),
 		cart: new AsAssociateCartRepository(config),
 		order: new AsAssociateOrderRepository(config),
 		"quote-request": new AsAssociateQuoteRequestRepository(config),
