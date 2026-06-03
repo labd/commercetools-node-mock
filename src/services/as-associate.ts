@@ -43,10 +43,7 @@ export class AsAssociateService {
 							scoped,
 							repositories.order,
 						);
-						const cart = new AsAssociateCartService(
-							scoped,
-							repositories.cart,
-						);
+						const cart = new AsAssociateCartService(scoped, repositories.cart);
 						const quoteRequest = new AsAssociateQuoteRequestService(
 							scoped,
 							repositories["quote-request"],
