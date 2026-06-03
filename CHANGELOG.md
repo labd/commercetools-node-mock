@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.1.0
+
+### Minor Changes
+
+- [#392](https://github.com/labd/commercetools-node-mock/pull/392) [`66aa543`](https://github.com/labd/commercetools-node-mock/commit/66aa543b1ec840e446ee670611caf20a63f6d4b8) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for the `asAssociate` business-units endpoint.
+
 ## 3.0.0
 
 ### Major Changes
