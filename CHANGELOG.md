@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.2.0
+
+### Minor Changes
+
+- [#394](https://github.com/labd/commercetools-node-mock/pull/394) [`57adbff`](https://github.com/labd/commercetools-node-mock/commit/57adbff9222b9dc8a64833e9a1403f630b5385df) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Declare `@commercetools/platform-sdk` as a peer dependency (`>=8.25.0`) instead of a dev-only dependency. The published type declarations reference the SDK's types, so consumers using TypeScript need it installed to resolve them. Make sure `@commercetools/platform-sdk` is present in your project (most consumers already have it).
+
 ## 3.1.0
 
 ### Minor Changes
