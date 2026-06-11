@@ -33,6 +33,9 @@
 		"test:watch": "vitest --watch",
 		"generate:schemas": "node --experimental-strip-types scripts/generate-schemas.ts"
 	},
+	"peerDependencies": {
+		"@commercetools/platform-sdk": ">=8.25.0"
+	},
 	"dependencies": {
 		"@fastify/formbody": "8.0.2",
 		"basic-auth": "2.0.1",
