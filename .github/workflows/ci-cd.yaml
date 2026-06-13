@@ -16,12 +16,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
     strategy:
       matrix:
-        node: ["20.x", "22.x", "24.x"]
+        node: ["22.x", "24.x"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
         storage-engine: [in-memory, sqlite]
-        exclude:
-          - node: "20.x"
-            storage-engine: sqlite
     runs-on: ${{ matrix.os }}
     env:
       CI: true

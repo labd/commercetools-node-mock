@@ -1,4 +1,4 @@
-name: Pinact
+name: Security Checks
 
 on:
   push:
@@ -12,9 +12,8 @@ on:
 permissions: {}
 
 jobs:
-  pinact:
-    # Run on push, and only run pull_request jobs from the same repository
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+  workflows:
+    # Only run on pull requests from the same repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,8 +24,16 @@ jobs:
           persist-credentials: false
 
       - name: Pin actions
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: suzuki-shunsuke/pinact-action@cf51507d80d4d6522a07348e3d58790290eaf0b6 # v2.0.0
         with:
           skip_push: true
           verify: true
           min_age: 7
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+        with:
+          advanced-security: false
+          annotations: true
+          min-severity: high
