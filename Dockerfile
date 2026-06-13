@@ -12,7 +12,7 @@ USER node
 WORKDIR /app
 
 # Files required by pnpm install
-COPY --chown=node package.json pnpm-lock.yaml tsdown.config.js tsconfig.json /app/
+COPY --chown=node package.json pnpm-lock.yaml tsdown.config.js tsdown.server.config.js tsconfig.json /app/
 
 RUN pnpm install --frozen-lockfile
 

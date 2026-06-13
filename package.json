@@ -22,7 +22,7 @@
 	],
 	"scripts": {
 		"build": "tsdown",
-		"build:server": "tsdown src/server.ts --platform=node",
+		"build:server": "tsdown --config tsdown.server.config.js",
 		"check": "biome check && tsc",
 		"format": "biome check --fix",
 		"lint": "biome check",
