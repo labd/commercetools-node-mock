@@ -2,7 +2,9 @@ import type { ShoppingListDraft } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
 import type { Config } from "#src/config.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
+import type { ApprovalFlowDraft } from "./approval-flow.ts";
 import {
+	AsAssociateApprovalFlowRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
@@ -124,6 +126,31 @@ describe("As Associate Repositories", () => {
 		const retrieved = await repository.get(ctx, quoteRequest.id);
 		expect(retrieved).toBeDefined();
 		expect(retrieved?.id).toBe(quoteRequest.id);
+	});
+
+	test("AsAssociateApprovalFlowRepository can create and retrieve approval flows", async () => {
+		const repository = new AsAssociateApprovalFlowRepository(config);
+		const ctx = { projectKey: "test-project" };
+
+		const approvalFlowDraft: ApprovalFlowDraft = {
+			order: { typeId: "order", id: "order-1" },
+			businessUnit: { typeId: "business-unit", key: "bu-1" },
+		};
+
+		const approvalFlow = await repository.create(ctx, approvalFlowDraft);
+		expect(approvalFlow.id).toBeDefined();
+		expect(approvalFlow.version).toBe(1);
+		expect(approvalFlow.status).toBe("Pending");
+
+		// Test query
+		const result = await repository.query(ctx);
+		expect(result.count).toBe(1);
+		expect(result.results[0].id).toBe(approvalFlow.id);
+
+		// Test get
+		const retrieved = await repository.get(ctx, approvalFlow.id);
+		expect(retrieved).toBeDefined();
+		expect(retrieved?.id).toBe(approvalFlow.id);
 	});
 
 	test("AsAssociateShoppingListRepository can create and retrieve shopping lists", async () => {
