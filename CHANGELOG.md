@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 4.1.0
+
+### Minor Changes
+
+- [#397](https://github.com/labd/commercetools-node-mock/pull/397) [`4e9f673`](https://github.com/labd/commercetools-node-mock/commit/4e9f6739f3f5e48fdc68a43678ecaac6a18504b8) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for `ApprovalFlow`. Exposes the `as-associate` approval-flows routes (list, get by id, update with `approve`/`reject`/`setCustomField`/`setCustomType` actions) and a synthetic top-level `/{projectKey}/approval-flows` POST endpoint with an `approvalFlowDraftFactory` so test fixtures can seed approval flows directly.
+
+- [#397](https://github.com/labd/commercetools-node-mock/pull/397) [`4e9f673`](https://github.com/labd/commercetools-node-mock/commit/4e9f6739f3f5e48fdc68a43678ecaac6a18504b8) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Add support for `ApprovalRule`. Exposes the `as-associate` approval-rules routes (list, create, get/update by id and by key) with full update-action handling (`setApprovers`, `setRequesters`, `setName`, `setDescription`, `setKey`, `setPredicate`, `setStatus`, `setCustomField`, `setCustomType`). Adds a synthetic top-level `/{projectKey}/approval-rules` endpoint and an `approvalRuleDraftFactory` for test fixtures. Also renames the as-associate route param `:businessUnitId` to `:businessUnitKey` to match the value it actually captures.
+
 ## 4.0.0
 
 ### Major Changes
