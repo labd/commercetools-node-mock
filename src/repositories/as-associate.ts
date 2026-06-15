@@ -1,3 +1,4 @@
+import { ApprovalFlowRepository } from "./approval-flow.ts";
 import { BusinessUnitRepository } from "./business-unit.ts";
 import { CartRepository } from "./cart/index.ts";
 import { OrderRepository } from "./order/index.ts";
@@ -9,3 +10,4 @@ export class AsAssociateCartRepository extends CartRepository {}
 export class AsAssociateQuoteRequestRepository extends QuoteRequestRepository {}
 export class AsAssociateShoppingListRepository extends ShoppingListRepository {}
 export class AsAssociateBusinessUnitRepository extends BusinessUnitRepository {}
+export class AsAssociateApprovalFlowRepository extends ApprovalFlowRepository {}

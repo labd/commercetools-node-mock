@@ -43,6 +43,7 @@ export type RepositoryContext = {
 	projectKey: string;
 	storeKey?: string;
 	clientId?: string;
+	associateId?: string;
 };
 
 export abstract class AbstractRepository<R extends BaseResource | Project> {

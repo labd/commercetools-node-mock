@@ -390,6 +390,7 @@ export const getRepositoryContext = (
 	projectKey: request.params.projectKey,
 	storeKey: request.params.storeKey,
 	clientId: request.credentials?.clientId,
+	associateId: request.params.associateId,
 });
 
 export const createAssociate = async (

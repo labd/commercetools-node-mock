@@ -1,4 +1,5 @@
 import type { createRepositories } from "../repositories/index.ts";
+import { ApprovalFlowService } from "./approval-flow.ts";
 import { AsAssociateService } from "./as-associate.ts";
 import { AssociateRoleServices } from "./associate-roles.ts";
 import { AttributeGroupService } from "./attribute-group.ts";
@@ -47,6 +48,7 @@ export const createServices = (
 	router: any,
 	repos: ReturnType<typeof createRepositories>,
 ) => ({
+	"approval-flow": new ApprovalFlowService(router, repos["approval-flow"]),
 	"associate-role": new AssociateRoleServices(router, repos["associate-role"]),
 	"as-associate": new AsAssociateService(router, repos["as-associate"]),
 	"business-unit": new BusinessUnitServices(router, repos["business-unit"]),

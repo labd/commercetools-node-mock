@@ -1,4 +1,5 @@
 import type {
+	ApprovalFlow,
 	AssociateRole,
 	AttributeGroup,
 	BusinessUnit,
@@ -124,6 +125,7 @@ export class InMemoryStorage extends AbstractStorage {
 		let projectStorage = this.resources[projectKey];
 		if (!projectStorage) {
 			projectStorage = this.resources[projectKey] = {
+				"approval-flow": new StorageMap<string, ApprovalFlow>(),
 				"associate-role": new StorageMap<string, AssociateRole>(),
 				"attribute-group": new StorageMap<string, AttributeGroup>(),
 				"business-unit": new StorageMap<string, BusinessUnit>(),

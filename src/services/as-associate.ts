@@ -1,11 +1,13 @@
 import type { FastifyInstance } from "fastify";
 import type {
+	AsAssociateApprovalFlowRepository,
 	AsAssociateBusinessUnitRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
 	AsAssociateQuoteRequestRepository,
 	AsAssociateShoppingListRepository,
 } from "#src/repositories/as-associate.ts";
+import { AsAssociateApprovalFlowService } from "./as-associate-approval-flow.ts";
 import { AsAssociateBusinessUnitService } from "./as-associate-business-unit.ts";
 import { AsAssociateCartService } from "./as-associate-cart.ts";
 import { AsAssociateOrderService } from "./as-associate-order.ts";
@@ -13,6 +15,7 @@ import { AsAssociateQuoteRequestService } from "./as-associate-quote-request.ts"
 import { AsAssociateShoppingListService } from "./as-associate-shopping-list.ts";
 
 type Repositories = {
+	"approval-flow": AsAssociateApprovalFlowRepository;
 	"business-unit": AsAssociateBusinessUnitRepository;
 	cart: AsAssociateCartRepository;
 	order: AsAssociateOrderRepository;
@@ -22,6 +25,7 @@ type Repositories = {
 
 export class AsAssociateService {
 	subServices!: {
+		"approval-flow": AsAssociateApprovalFlowService;
 		"business-unit": AsAssociateBusinessUnitService;
 		cart: AsAssociateCartService;
 		order: AsAssociateOrderService;
@@ -52,8 +56,13 @@ export class AsAssociateService {
 							scoped,
 							repositories["shopping-list"],
 						);
+						const approvalFlow = new AsAssociateApprovalFlowService(
+							scoped,
+							repositories["approval-flow"],
+						);
 
 						this.subServices = {
+							"approval-flow": approvalFlow,
 							"business-unit": businessUnitService,
 							order,
 							cart,

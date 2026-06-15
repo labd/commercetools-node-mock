@@ -1,6 +1,8 @@
 import type { Config } from "#src/config.ts";
 import { ProductTailoringRepository } from "#src/repositories/product-tailoring.ts";
+import { ApprovalFlowRepository } from "./approval-flow.ts";
 import {
+	AsAssociateApprovalFlowRepository,
 	AsAssociateBusinessUnitRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
@@ -52,12 +54,14 @@ export type RepositoryMap = ReturnType<typeof createRepositories>;
 
 export const createRepositories = (config: Config) => ({
 	"as-associate": {
+		"approval-flow": new AsAssociateApprovalFlowRepository(config),
 		"business-unit": new AsAssociateBusinessUnitRepository(config),
 		cart: new AsAssociateCartRepository(config),
 		order: new AsAssociateOrderRepository(config),
 		"quote-request": new AsAssociateQuoteRequestRepository(config),
 		"shopping-list": new AsAssociateShoppingListRepository(config),
 	},
+	"approval-flow": new ApprovalFlowRepository(config),
 	"associate-role": new AssociateRoleRepository(config),
 	"attribute-group": new AttributeGroupRepository(config),
 	"business-unit": new BusinessUnitRepository(config),
