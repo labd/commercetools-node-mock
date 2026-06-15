@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type {
 	AsAssociateApprovalFlowRepository,
+	AsAssociateApprovalRuleRepository,
 	AsAssociateBusinessUnitRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
@@ -8,6 +9,7 @@ import type {
 	AsAssociateShoppingListRepository,
 } from "#src/repositories/as-associate.ts";
 import { AsAssociateApprovalFlowService } from "./as-associate-approval-flow.ts";
+import { AsAssociateApprovalRuleService } from "./as-associate-approval-rule.ts";
 import { AsAssociateBusinessUnitService } from "./as-associate-business-unit.ts";
 import { AsAssociateCartService } from "./as-associate-cart.ts";
 import { AsAssociateOrderService } from "./as-associate-order.ts";
@@ -16,6 +18,7 @@ import { AsAssociateShoppingListService } from "./as-associate-shopping-list.ts"
 
 type Repositories = {
 	"approval-flow": AsAssociateApprovalFlowRepository;
+	"approval-rule": AsAssociateApprovalRuleRepository;
 	"business-unit": AsAssociateBusinessUnitRepository;
 	cart: AsAssociateCartRepository;
 	order: AsAssociateOrderRepository;
@@ -26,6 +29,7 @@ type Repositories = {
 export class AsAssociateService {
 	subServices!: {
 		"approval-flow": AsAssociateApprovalFlowService;
+		"approval-rule": AsAssociateApprovalRuleService;
 		"business-unit": AsAssociateBusinessUnitService;
 		cart: AsAssociateCartService;
 		order: AsAssociateOrderService;
@@ -60,9 +64,14 @@ export class AsAssociateService {
 							scoped,
 							repositories["approval-flow"],
 						);
+						const approvalRule = new AsAssociateApprovalRuleService(
+							scoped,
+							repositories["approval-rule"],
+						);
 
 						this.subServices = {
 							"approval-flow": approvalFlow,
+							"approval-rule": approvalRule,
 							"business-unit": businessUnitService,
 							order,
 							cart,
@@ -71,7 +80,7 @@ export class AsAssociateService {
 						};
 						scopedDone();
 					},
-					{ prefix: "/in-business-unit/key=:businessUnitId" },
+					{ prefix: "/in-business-unit/key=:businessUnitKey" },
 				);
 
 				done();

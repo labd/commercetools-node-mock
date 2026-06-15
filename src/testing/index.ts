@@ -1,4 +1,5 @@
 export { approvalFlowDraftFactory } from "./approval-flow.ts";
+export { approvalRuleDraftFactory } from "./approval-rule.ts";
 export { associateRoleDraftFactory } from "./associate-role.ts";
 export { attributeGroupDraftFactory } from "./attribute-group.ts";
 export { businessUnitDraftFactory } from "./business-unit.ts";

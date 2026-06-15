@@ -40,6 +40,7 @@ export type ResourceType = keyof ResourceMap & keyof RepositoryMap;
 
 export type ResourceMap = {
 	"approval-flow": ctp.ApprovalFlow;
+	"approval-rule": ctp.ApprovalRule;
 	"attribute-group": ctp.AttributeGroup;
 	"associate-role": ctp.AssociateRole;
 	"business-unit": ctp.BusinessUnit;
@@ -85,6 +86,7 @@ export type ResourceMap = {
 
 export type PagedQueryResponseMap = {
 	"approval-flow": ctp.ApprovalFlowPagedQueryResponse;
+	"approval-rule": ctp.ApprovalRulePagedQueryResponse;
 	"attribute-group": ctp.AttributeGroupPagedQueryResponse;
 	"associate-role": ctp.AssociateRolePagedQueryResponse;
 	"business-unit": ctp.BusinessUnitPagedQueryResponse;

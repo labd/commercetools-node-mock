@@ -9,8 +9,8 @@ import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
 import {
-	ApprovalFlowRepository,
 	type ApprovalFlowDraft,
+	ApprovalFlowRepository,
 } from "./approval-flow.ts";
 
 describe("ApprovalFlow Repository", () => {
