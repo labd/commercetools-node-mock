@@ -83,11 +83,11 @@ describe("Product search filter", () => {
 
 		expect(
 			match({
-				not: {
+				not: [{
 					exists: {
 						field: "key",
 					},
-				},
+				}],
 			}).isMatch,
 		).toBeFalsy();
 
@@ -123,11 +123,11 @@ describe("Product search filter", () => {
 
 		expect(
 			match({
-				not: {
+				not: [{
 					exists: {
 						field: "variants.sku",
 					},
-				},
+				}],
 			}).isMatch,
 		).toBeFalsy();
 

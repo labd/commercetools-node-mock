@@ -54,7 +54,7 @@ export const parseSearchQuery = (
 
 	if (isSearchNotExpression(searchQuery)) {
 		return (obj, markMatchingVariant) =>
-			!parseSearchQuery(searchQuery.not)(obj, markMatchingVariant);
+			searchQuery.not.every((expr) => !parseSearchQuery(expr)(obj, markMatchingVariant));
 	}
 
 	if (isSearchFilterExpression(searchQuery)) {
