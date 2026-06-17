@@ -2,6 +2,7 @@ import type {
 	_SearchQuery,
 	_SearchQueryExpression,
 	_SearchQueryExpressionValue,
+	CategoryReference,
 	ProductProjection,
 	ProductVariant,
 	SearchAndExpression,
@@ -54,7 +55,9 @@ export const parseSearchQuery = (
 
 	if (isSearchNotExpression(searchQuery)) {
 		return (obj, markMatchingVariant) =>
-			!parseSearchQuery(searchQuery.not)(obj, markMatchingVariant);
+			searchQuery.not.every(
+				(expr) => !parseSearchQuery(expr)(obj, markMatchingVariant),
+			);
 	}
 
 	if (isSearchFilterExpression(searchQuery)) {
@@ -203,7 +206,11 @@ const generateFieldMatchFunc = (
 			return false;
 		}
 
-		return matchFunc(resolveFieldValue(obj, searchQuery));
+		const value = resolveFieldValue(obj, searchQuery);
+
+		return Array.isArray(value)
+			? value.some((v) => matchFunc(v))
+			: matchFunc(value);
 	};
 
 	return generateMatchFunc;
@@ -241,6 +248,19 @@ const resolveFieldValue = (
 		return obj.prices && obj.prices.length > 0
 			? obj.prices[0].value.centAmount
 			: undefined;
+	}
+
+	if (fieldPath === "categoriesSubTree") {
+		if (!Array.isArray(obj.categories) || obj.categories.length === 0) {
+			return undefined;
+		}
+
+		return obj.categories.flatMap((category: CategoryReference) => {
+			const ancestorIds =
+				category.obj?.ancestors?.map((ancestor) => ancestor.id) ?? [];
+
+			return [category.id, ...ancestorIds];
+		});
 	}
 
 	return nestedLookupByLanguage(obj, fieldPath, language);
