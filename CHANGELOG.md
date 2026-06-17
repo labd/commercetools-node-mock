@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 4.2.0
+
+### Minor Changes
+
+- [#399](https://github.com/labd/commercetools-node-mock/pull/399) [`5c3f279`](https://github.com/labd/commercetools-node-mock/commit/5c3f2793789a7c31b3c9b862ea334457b2e74930) Thanks [@jsm1t](https://github.com/jsm1t)! - Support categoriesSubTree as field in Product Search
+
+### Patch Changes
+
+- [#399](https://github.com/labd/commercetools-node-mock/pull/399) [`5c3f279`](https://github.com/labd/commercetools-node-mock/commit/5c3f2793789a7c31b3c9b862ea334457b2e74930) Thanks [@jsm1t](https://github.com/jsm1t)! - Parse Product Search not expressions values as array, instead of object
+
 ## 4.1.0
 
 ### Minor Changes
