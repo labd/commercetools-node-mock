@@ -424,4 +424,81 @@ describe("Product search filter", () => {
 			).isMatch,
 		).toBeFalsy();
 	});
+
+	test("by categoriesSubTree", async () => {
+		const productWithCategories: ProductProjection = {
+			...exampleProduct,
+			categories: [
+				{
+					typeId: "category",
+					id: "category-1",
+					obj: {
+						id: "category-1",
+						version: 1,
+						createdAt: "2022-07-22T10:02:40.851Z",
+						lastModifiedAt: "2022-07-22T10:02:44.427Z",
+						name: {
+							"nl-NL": "Category 1",
+							"en-US": "Category 1",
+						},
+						slug: {
+							"nl-NL": "category-1",
+							"en-US": "category-1",
+						},
+						orderHint: "0.1",
+						ancestors: [
+							{
+								typeId: "category",
+								id: "ancestor-1",
+							},
+							{
+								typeId: "category",
+								id: "ancestor-2",
+							},
+						],
+					}
+				},
+				{
+					typeId: "category",
+					id: "category-2",
+				},
+			],
+		};
+
+		expect(
+			match(
+				{
+					exact: {
+						field: "categoriesSubTree",
+						value: "category-1",
+					},
+				},
+				productWithCategories,
+			).isMatch,
+		).toBeTruthy();
+
+		expect(
+			match(
+				{
+					exact: {
+						field: "categoriesSubTree",
+						value: "ancestor-1",
+					},
+				},
+				productWithCategories,
+			).isMatch,
+		).toBeTruthy();
+
+		expect(
+			match(
+				{
+					exact: {
+						field: "categoriesSubTree",
+						value: "other-category",
+					},
+				},
+				productWithCategories,
+			).isMatch,
+		).toBeFalsy();
+	});
 });

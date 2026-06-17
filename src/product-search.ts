@@ -1,4 +1,5 @@
 import type {
+	Category,
 	InvalidInputError,
 	InventoryEntry,
 	Product,
@@ -57,6 +58,14 @@ export class ProductSearch {
 			new Map<string, ProductSearchVariantAvailability>(),
 		);
 
+		const categories = await this._storage.all(projectKey, "category");
+		const categoriesById = categories.reduce(
+			(acc: Map<string, Category>, category: Category) => {
+				return acc.set(category.id, category);
+			},
+			new Map<string, Category>(),
+		);
+
 		const allProducts = await this._storage.all(projectKey, "product");
 		let productResources = allProducts
 			.map((r: Product) =>
@@ -64,6 +73,7 @@ export class ProductSearch {
 					r,
 					params.productProjectionParameters?.staged ?? false,
 					availabilityBySku,
+					categoriesById,
 				),
 			)
 			.filter((p: ProductProjection) => {
@@ -151,6 +161,7 @@ export class ProductSearch {
 		product: Product,
 		staged: boolean,
 		availabilityBySku: Map<string, ProductSearchVariantAvailability>,
+		categoriesById: Map<string, Category>,
 	): ProductProjection {
 		const obj = !staged
 			? product.masterData.current
@@ -183,7 +194,10 @@ export class ProductSearch {
 			description: obj.description,
 			metaDescription: obj.metaDescription,
 			slug: obj.slug,
-			categories: obj.categories,
+			categories: obj.categories.map((category) => ({
+				...category,
+				obj: categoriesById.get(category.id),
+			})),
 			attributes: obj.attributes,
 			masterVariant: {
 				...obj.masterVariant,
