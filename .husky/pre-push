@@ -1,0 +1,3 @@
+pnpm tsc
+pnpm lint
+pnpm test
