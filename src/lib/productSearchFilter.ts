@@ -2,7 +2,6 @@ import type {
 	_SearchQuery,
 	_SearchQueryExpression,
 	_SearchQueryExpressionValue,
-	Category,
 	CategoryReference,
 	ProductProjection,
 	ProductVariant,
@@ -56,7 +55,9 @@ export const parseSearchQuery = (
 
 	if (isSearchNotExpression(searchQuery)) {
 		return (obj, markMatchingVariant) =>
-			searchQuery.not.every((expr) => !parseSearchQuery(expr)(obj, markMatchingVariant));
+			searchQuery.not.every(
+				(expr) => !parseSearchQuery(expr)(obj, markMatchingVariant),
+			);
 	}
 
 	if (isSearchFilterExpression(searchQuery)) {
@@ -255,7 +256,8 @@ const resolveFieldValue = (
 		}
 
 		return obj.categories.flatMap((category: CategoryReference) => {
-			const ancestorIds = category.obj?.ancestors?.map((ancestor) => ancestor.id) ?? [];
+			const ancestorIds =
+				category.obj?.ancestors?.map((ancestor) => ancestor.id) ?? [];
 
 			return [category.id, ...ancestorIds];
 		});

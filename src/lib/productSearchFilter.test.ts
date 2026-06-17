@@ -83,11 +83,13 @@ describe("Product search filter", () => {
 
 		expect(
 			match({
-				not: [{
-					exists: {
-						field: "key",
+				not: [
+					{
+						exists: {
+							field: "key",
+						},
 					},
-				}],
+				],
 			}).isMatch,
 		).toBeFalsy();
 
@@ -123,11 +125,13 @@ describe("Product search filter", () => {
 
 		expect(
 			match({
-				not: [{
-					exists: {
-						field: "variants.sku",
+				not: [
+					{
+						exists: {
+							field: "variants.sku",
+						},
 					},
-				}],
+				],
 			}).isMatch,
 		).toBeFalsy();
 
@@ -456,7 +460,7 @@ describe("Product search filter", () => {
 								id: "ancestor-2",
 							},
 						],
-					}
+					},
 				},
 				{
 					typeId: "category",
