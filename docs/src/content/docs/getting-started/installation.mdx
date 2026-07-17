@@ -1,0 +1,83 @@
+---
+title: Installation
+description: Install @labdigital/commercetools-mock and its peer dependencies with pnpm, npm or yarn.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Install the package
+
+Install the mock as a **dev dependency** — it is a testing tool and should not
+ship in your production bundle.
+
+<Tabs syncKey="pkg">
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add -D @labdigital/commercetools-mock
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    npm install --save-dev @labdigital/commercetools-mock
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add --dev @labdigital/commercetools-mock
+    ```
+  </TabItem>
+</Tabs>
+
+## Peer dependencies
+
+The package declares two peer dependencies that you install alongside it:
+
+| Package | Version | Why |
+| --- | --- | --- |
+| [`msw`](https://mswjs.io/) | `^2.14.6` | Intercepts the HTTP requests your code makes. |
+| [`@commercetools/platform-sdk`](https://www.npmjs.com/package/@commercetools/platform-sdk) | `>= 8.25.0` | Provides the resource type definitions the mock is typed against. |
+
+<Tabs syncKey="pkg">
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add -D msw @commercetools/platform-sdk
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    npm install --save-dev msw @commercetools/platform-sdk
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add --dev msw @commercetools/platform-sdk
+    ```
+  </TabItem>
+</Tabs>
+
+:::tip[Already using the SDK?]
+If your application already depends on `@commercetools/platform-sdk` you don't
+need to install it again — the mock will use the version already present.
+:::
+
+## Requirements
+
+- **Node.js ≥ 22.** The library is published as ESM (`"type": "module"`) and
+  uses modern Node APIs (the optional SQLite backend relies on the built-in
+  `node:sqlite` module).
+- A test runner such as [Vitest](https://vitest.dev/) or
+  [Jest](https://jestjs.io/) — the examples in these docs use Vitest.
+
+## Entry points
+
+The package exposes two entry points:
+
+```typescript
+// Main entry — the mock, storage and helpers
+import { CommercetoolsMock } from '@labdigital/commercetools-mock'
+
+// Optional SQLite storage backend
+import { SQLiteStorage } from '@labdigital/commercetools-mock/sqlite'
+```
+
+Next: build a working test in the [Quick start](/commercetools-node-mock/getting-started/quick-start/).

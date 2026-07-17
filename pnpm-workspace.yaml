@@ -1,3 +1,5 @@
+packages:
+  - docs
 minimumReleaseAge: 20160
 trustPolicy: no-downgrade
 onlyBuiltDependencies:
@@ -5,5 +7,6 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - rolldown
+  - sharp
 minimumReleaseAgeExclude:
   - '@types/node'

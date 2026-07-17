@@ -1,0 +1,187 @@
+---
+title: "@labdigital/commercetools-mock"
+description: A comprehensive mock of the commercetools REST API for testing TypeScript codebases. Create data through the API, run your code against it, and assert on the results — no real project required.
+template: splash
+hero:
+  title: "@labdigital/commercetools-mock"
+  tagline: A comprehensive mock of the commercetools REST API, built for testing TypeScript code. Create data through the API, run your code against it, and assert on the results — no real commercetools project required.
+  image:
+    file: ../../assets/logo.svg
+  actions:
+    - text: Get started
+      link: /commercetools-node-mock/getting-started/introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/labd/commercetools-node-mock
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
+import LabDigitalLogo from '../../assets/labdigital.svg';
+import EvolveLogo from '../../assets/evolve.svg';
+
+## Why @labdigital/commercetools-mock?
+
+Testing code that talks to commercetools is hard. Hitting a real project is slow,
+flaky, requires credentials, and pollutes shared data. Hand-written stubs drift
+from the real API and never cover update actions, predicates, or reference
+expansion.
+
+`@labdigital/commercetools-mock` runs a faithful, in-memory implementation of the
+commercetools REST API inside your test process. It speaks the same HTTP, so the
+official [`@commercetools/platform-sdk`](https://www.npmjs.com/package/@commercetools/platform-sdk)
+and any other HTTP client work against it unchanged.
+
+<CardGrid stagger>
+	<Card title="Faithful behaviour" icon="approve-check">
+		Real update actions, `where` predicates, reference `expand`, price
+		selection, product search and OAuth token flows — not just canned
+		responses.
+	</Card>
+	<Card title="Fast and isolated" icon="rocket">
+		Everything runs in-memory in your test process. No network, no
+		containers, no shared state between tests.
+	</Card>
+	<Card title="Built on msw" icon="puzzle">
+		Intercepts requests with [Mock Service Worker](https://mswjs.io/), so it
+		composes with the rest of your mocked APIs.
+	</Card>
+	<Card title="Broad coverage" icon="list-format">
+		Products, carts, orders, customers, B2B business units, quotes, discounts,
+		custom objects and much more.
+	</Card>
+</CardGrid>
+
+## Install
+
+Add the mock and its peer dependencies as dev dependencies:
+
+<Tabs syncKey="pkg">
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add -D @labdigital/commercetools-mock msw @commercetools/platform-sdk
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    npm install --save-dev @labdigital/commercetools-mock msw @commercetools/platform-sdk
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add --dev @labdigital/commercetools-mock msw @commercetools/platform-sdk
+    ```
+  </TabItem>
+</Tabs>
+
+See [Installation](/commercetools-node-mock/getting-started/installation/) for
+requirements and peer-dependency details.
+
+## Quick taste
+
+```typescript
+import { CommercetoolsMock } from '@labdigital/commercetools-mock'
+import { setupServer } from 'msw/node'
+
+const ctMock = new CommercetoolsMock({ defaultProjectKey: 'my-project' })
+const server = setupServer()
+
+beforeAll(() => server.listen())
+beforeEach(() => ctMock.registerHandlers(server))
+afterEach(async () => {
+  server.resetHandlers()
+  await ctMock.clear()
+})
+afterAll(() => server.close())
+
+test('the order is placed', async () => {
+  // Create the data your code expects, through the API…
+  await apiRoot.customers().post({ body: customerDraft }).execute()
+
+  // …run the code under test (it uses the commercetools SDK)…
+  const order = await placeOrder('jane@example.com')
+
+  // …and assert on the result.
+  expect(order.orderState).toBe('Open')
+})
+```
+
+## Where to next?
+
+<CardGrid>
+	<LinkCard title="Introduction" href="/commercetools-node-mock/getting-started/introduction/" description="What the library is and when to reach for it." />
+	<LinkCard title="Quick start" href="/commercetools-node-mock/getting-started/quick-start/" description="A working vitest + msw setup in a few minutes." />
+	<LinkCard title="Configuration options" href="/commercetools-node-mock/configuration/options/" description="Every option on CommercetoolsMock explained." />
+	<LinkCard title="API coverage" href="/commercetools-node-mock/reference/resources/" description="What the mock implements and how it maps to the commercetools API." />
+</CardGrid>
+
+## Built by Lab Digital and Evolve
+
+<div className="built-by">
+
+<div className="built-by-text">
+
+`@labdigital/commercetools-mock` is an open-source project from
+[Lab Digital](https://www.labdigital.nl), a digital commerce agency specialising
+in composable, MACH-based commerce with commercetools — and the team behind
+[Evolve](https://www.evolve-platform.com), a composable agentic commerce
+platform. We build and rely on this mock to test real commercetools integrations
+every day, and we maintain it in the open under the MIT license.
+[Contributions are welcome](https://github.com/labd/commercetools-node-mock).
+
+</div>
+
+<div className="brand-logos">
+	<a href="https://www.labdigital.nl" target="_blank" rel="noopener" aria-label="Lab Digital">
+		<LabDigitalLogo />
+	</a>
+	<a href="https://www.evolve-platform.com" target="_blank" rel="noopener" aria-label="Evolve">
+		<EvolveLogo />
+	</a>
+</div>
+
+</div>
+
+<style>{`
+	.built-by {
+		display: flex;
+		align-items: center;
+		gap: 2rem 4rem;
+		flex-wrap: wrap;
+	}
+	.built-by-text {
+		flex: 1 1 24rem;
+		min-width: 0;
+	}
+	.brand-logos {
+		flex: 0 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 2rem;
+		margin-left: auto;
+	}
+	.brand-logos a {
+		display: inline-flex;
+		color: var(--sl-color-white);
+		opacity: 0.85;
+		transition: opacity 0.15s ease;
+	}
+	.brand-logos a:hover {
+		opacity: 1;
+	}
+	.brand-logos svg {
+		height: 2.25rem;
+		width: auto;
+	}
+	@media (max-width: 50rem) {
+		.brand-logos {
+			flex-direction: row;
+			flex-wrap: wrap;
+			margin-left: 0;
+			gap: 2rem 3rem;
+		}
+	}
+`}</style>

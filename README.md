@@ -14,6 +14,21 @@ and use the `registerHandlers` method to register the handlers on this server.
 
 This allows you to use the same server for mocking other API's as well.
 
+## Documentation
+
+Full documentation is available at
+**https://labd.github.io/commercetools-node-mock/** — getting started, a
+configuration reference, usage guides (seeding, querying, predicates, search,
+authentication), storage backends, running as a server, recipes and the full
+API reference.
+
+The documentation site lives in [`docs/`](./docs) and is built with
+[Astro Starlight](https://starlight.astro.build/):
+
+```bash
+pnpm --filter @labdigital/commercetools-mock-docs dev
+```
+
 ## Installation
 
 ```bash

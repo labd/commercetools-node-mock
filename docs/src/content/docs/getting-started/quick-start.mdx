@@ -1,0 +1,190 @@
+---
+title: Quick start
+description: A complete, working Vitest + msw test setup using commercetools-node-mock, explained step by step.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide gets you from an empty test file to a passing test that seeds data,
+runs code against the commercetools SDK, and asserts on the result. It uses
+[Vitest](https://vitest.dev/), but the same pattern works in Jest.
+
+## The recommended pattern
+
+Since version 2, the mock is built on [msw](https://mswjs.io/). The recommended
+approach is to **manage the msw server yourself** and register the mock's
+handlers on it with `registerHandlers`. That way the same server can also mock
+your other APIs.
+
+<Steps>
+
+1. **Create the mock and an msw server.**
+
+   ```typescript title="setup.test.ts"
+   import { CommercetoolsMock } from '@labdigital/commercetools-mock'
+   import { setupServer } from 'msw/node'
+
+   const ctMock = new CommercetoolsMock({
+     defaultProjectKey: 'my-project',
+   })
+
+   const mswServer = setupServer()
+   ```
+
+2. **Wire up the lifecycle hooks.**
+
+   ```typescript title="setup.test.ts"
+   beforeAll(() => {
+     mswServer.listen({ onUnhandledRequest: 'error' })
+   })
+
+   beforeEach(() => {
+     ctMock.registerHandlers(mswServer)
+   })
+
+   afterEach(async () => {
+     mswServer.resetHandlers()
+     await ctMock.clear()
+   })
+
+   afterAll(() => {
+     mswServer.close()
+   })
+   ```
+
+   - `registerHandlers` adds the mock's request handlers to your server.
+   - `mswServer.resetHandlers()` removes them after each test.
+   - `ctMock.clear()` wipes the in-memory data so tests stay isolated.
+
+3. **Point your commercetools client at an intercepted host.**
+
+   By default the mock intercepts the wildcard hosts
+   `https://api.*.commercetools.com` and `https://auth.*.commercetools.com`, so a
+   client already configured for a real commercetools region is intercepted
+   automatically:
+
+   ```typescript
+   import { ClientBuilder } from '@commercetools/sdk-client-v2'
+   import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk'
+
+   const host = 'https://api.europe-west1.gcp.commercetools.com'
+   const authHost = 'https://auth.europe-west1.gcp.commercetools.com'
+
+   const client = new ClientBuilder()
+     .withClientCredentialsFlow({
+       host: authHost,
+       projectKey: 'my-project',
+       credentials: { clientId: 'foo', clientSecret: 'bar' },
+     })
+     .withHttpMiddleware({ host })
+     .build()
+
+   export const apiRoot = createApiBuilderFromCtpClient(client)
+     .withProjectKey({ projectKey: 'my-project' })
+   ```
+
+   Prefer an explicit host? Set `apiHost`/`authHost` on the mock and use the same
+   value in your client. See
+   [Configuration options](/commercetools-node-mock/configuration/options/).
+
+   <Aside type="tip" title="Authentication is off by default">
+   With the default options the mock does not enforce authentication or
+   validate credentials, so any client id/secret works. See
+   [Authentication](/commercetools-node-mock/configuration/authentication/) to
+   turn it on.
+   </Aside>
+
+4. **Create data, run, assert.**
+
+   Create the data your code needs through the commercetools API — the same
+   calls your production code makes — then run the code under test and assert.
+
+   ```typescript title="order.test.ts"
+   test('creates an order for the customer', async () => {
+     // Create data through the API
+     await apiRoot
+       .customers()
+       .post({ body: { email: 'jane@example.com', password: 's3cret' } })
+       .execute()
+
+     // Run the code under test — it uses the SDK, which hits the mock
+     const order = await placeOrderForCustomer('jane@example.com')
+
+     // Assert
+     expect(order.orderState).toBe('Open')
+   })
+   ```
+
+</Steps>
+
+## Full example
+
+```typescript title="type.test.ts"
+import { CommercetoolsMock } from '@labdigital/commercetools-mock'
+import { setupServer } from 'msw/node'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'vitest'
+import { apiRoot } from './ct-client'
+
+const ctMock = new CommercetoolsMock({
+  defaultProjectKey: 'my-project',
+})
+
+describe('custom types', () => {
+  const mswServer = setupServer()
+
+  beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
+  beforeEach(() => ctMock.registerHandlers(mswServer))
+  afterEach(async () => {
+    mswServer.resetHandlers()
+    await ctMock.clear()
+  })
+  afterAll(() => mswServer.close())
+
+  test('creates a custom type', async () => {
+    // Create through the API
+    await apiRoot
+      .types()
+      .post({
+        body: {
+          key: 'my-custom-type',
+          name: { en: 'My type' },
+          resourceTypeIds: ['customer'],
+          fieldDefinitions: [],
+        },
+      })
+      .execute()
+
+    // Read it back through the API
+    const type = await apiRoot
+      .types()
+      .withKey({ key: 'my-custom-type' })
+      .get()
+      .execute()
+
+    expect(type.body.key).toBe('my-custom-type')
+  })
+})
+```
+
+## Alternative: build the server from `getHandlers()`
+
+If you'd rather construct the msw server directly — for example to register
+handlers for other APIs in the same call — use `getHandlers()`:
+
+```typescript
+import { setupServer } from 'msw/node'
+
+const mswServer = setupServer(...ctMock.getHandlers())
+```
+
+See [msw integration](/commercetools-node-mock/usage/msw/) for the difference
+between `registerHandlers` and `getHandlers`.
+
+## Next steps
+
+- [How it works](/commercetools-node-mock/getting-started/how-it-works/) — the
+  moving parts behind the mock.
+- [Seeding data](/commercetools-node-mock/usage/seeding-data/) — creating test
+  data through the API, and fixtures.
+- [Configuration options](/commercetools-node-mock/configuration/options/) — tune
+  the mock to your needs.
