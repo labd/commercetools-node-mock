@@ -1,4 +1,5 @@
 packages:
+  - '.'
   - docs
 minimumReleaseAge: 20160
 trustPolicy: no-downgrade
