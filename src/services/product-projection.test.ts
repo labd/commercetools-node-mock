@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
 	productDraftFactory,
 	productTypeDraftFactory,
+	taxCategoryDraftFactory,
 } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -21,6 +22,7 @@ let unpublishedProduct: Product;
 
 const productTypeFactory = productTypeDraftFactory(ctMock);
 const productFactory = productDraftFactory(ctMock);
+const taxCategoryFactory = taxCategoryDraftFactory(ctMock);
 
 beforeEach(async () => {
 	timekeeper.freeze(new Date("2022-07-22T13:31:49.840Z"));
@@ -177,6 +179,7 @@ beforeEach(async () => {
 			name: product.masterData.current.name,
 			slug: product.masterData.current.slug,
 			categories: [],
+			searchKeywords: {},
 			productType: {
 				typeId: "product-type",
 				id: productType.id,
@@ -201,6 +204,67 @@ describe("Product Projection Get By ID", () => {
 
 		expect(result).toBeDefined();
 		expect(result.id).toBe(publishedProduct.id);
+	});
+
+	test("includes the product-level references and meta fields", async () => {
+		const taxCategory = await taxCategoryFactory.create({
+			key: "standard",
+			name: "Standard",
+			rates: [
+				{ name: "NL 21%", amount: 0.21, includedInPrice: true, country: "NL" },
+			],
+		});
+		const product = await productFactory.create({
+			publish: true,
+			productType: { typeId: "product-type", id: productType.id },
+			taxCategory: { typeId: "tax-category", key: "standard" },
+			metaTitle: { "nl-NL": "Meta titel" },
+			metaKeywords: { "nl-NL": "cactus, plant" },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/product-projections/${product.id}`,
+		});
+		const result: ProductProjection = response.json();
+
+		expect(result.taxCategory).toEqual({
+			typeId: "tax-category",
+			id: taxCategory.id,
+		});
+		expect(result.metaTitle).toEqual({ "nl-NL": "Meta titel" });
+		expect(result.metaKeywords).toEqual({ "nl-NL": "cactus, plant" });
+		expect(result.searchKeywords).toEqual({});
+	});
+
+	test("expands the tax category", async () => {
+		await taxCategoryFactory.create({
+			key: "standard",
+			name: "Standard",
+			rates: [
+				{ name: "NL 21%", amount: 0.21, includedInPrice: true, country: "NL" },
+			],
+		});
+		const product = await productFactory.create({
+			publish: true,
+			productType: { typeId: "product-type", id: productType.id },
+			taxCategory: { typeId: "tax-category", key: "standard" },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/product-projections/${product.id}`,
+			query: { expand: "taxCategory" },
+		});
+		const result: ProductProjection = response.json();
+
+		expect(result.taxCategory?.obj?.rates).toEqual([
+			expect.objectContaining({
+				country: "NL",
+				amount: 0.21,
+				includedInPrice: true,
+			}),
+		]);
 	});
 });
 
