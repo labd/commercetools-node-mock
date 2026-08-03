@@ -192,7 +192,10 @@ export class ProductSearch {
 			name: obj.name,
 			key: product.key,
 			description: obj.description,
+			metaTitle: obj.metaTitle,
 			metaDescription: obj.metaDescription,
+			metaKeywords: obj.metaKeywords,
+			searchKeywords: obj.searchKeywords,
 			slug: obj.slug,
 			categories: obj.categories.map((category) => ({
 				...category,
@@ -208,6 +211,9 @@ export class ProductSearch {
 				availability: getVariantAvailability(variant.sku),
 			})),
 			productType: product.productType,
+			taxCategory: product.taxCategory,
+			state: product.state,
+			priceMode: product.priceMode,
 			hasStagedChanges: product.masterData.hasStagedChanges,
 			published: product.masterData.published,
 		};
