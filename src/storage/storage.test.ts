@@ -333,6 +333,96 @@ describe(`Storage (${storageEngineName})`, () => {
 			const fresh = await storage.query(projectKey, "category", { limit: 1 });
 			expect(fresh.results[0].name).not.toEqual({ en: "Mutated" });
 		});
+
+		test("sorts ascending", async () => {
+			const result = await storage.query(projectKey, "category", {
+				sort: "id asc",
+				limit: 3,
+			});
+
+			expect(result.results.map((entry) => entry.id)).toEqual([
+				"cat-1",
+				"cat-10",
+				"cat-11",
+			]);
+		});
+
+		test("sorts descending", async () => {
+			const result = await storage.query(projectKey, "category", {
+				sort: "id desc",
+				limit: 2,
+			});
+
+			expect(result.results.map((entry) => entry.id)).toEqual([
+				"cat-9",
+				"cat-8",
+			]);
+		});
+
+		test("sorts on a nested field", async () => {
+			const result = await storage.query(projectKey, "category", {
+				sort: "name.en desc",
+				limit: 1,
+			});
+
+			expect(result.results[0].name).toEqual({ en: "Category 9" });
+		});
+
+		test("sorts before paging, not after", async () => {
+			// Slicing first and sorting the page would make each page internally
+			// ordered but the sequence across pages meaningless.
+			const first = await storage.query(projectKey, "category", {
+				sort: "id asc",
+				limit: 10,
+			});
+			const second = await storage.query(projectKey, "category", {
+				sort: "id asc",
+				limit: 10,
+				offset: 10,
+			});
+
+			const ids = [...first.results, ...second.results].map((e) => e.id);
+			expect(ids).toEqual([...ids].sort());
+		});
+
+		test("supports cursor paging with a where predicate", async () => {
+			// The pattern every commercetools consumer uses to walk a large
+			// collection: sort by id, then ask for everything after the last id seen.
+			// It only terminates and only visits each resource once if sort and
+			// predicate agree on the ordering.
+			const seen: string[] = [];
+			let lastId: string | undefined;
+
+			for (;;) {
+				const page = await storage.query(projectKey, "category", {
+					where: lastId ? `id > "${lastId}"` : undefined,
+					sort: "id asc",
+					limit: 4,
+				});
+
+				seen.push(...page.results.map((entry) => entry.id));
+				if (page.results.length < 4) {
+					break;
+				}
+				lastId = page.results[page.results.length - 1].id;
+			}
+
+			expect(seen).toHaveLength(25);
+			expect(new Set(seen).size).toBe(25);
+			expect(seen).toEqual([...seen].sort());
+		});
+
+		test("returns a stable order without a sort", async () => {
+			// Which order that is belongs to the backend — in-memory keeps insertion
+			// order, sqlite returns rows by id — so only the guarantee both make is
+			// asserted here: repeating a query does not reshuffle it.
+			const first = await storage.query(projectKey, "category", { limit: 5 });
+			const second = await storage.query(projectKey, "category", { limit: 5 });
+
+			expect(second.results.map((entry) => entry.id)).toEqual(
+				first.results.map((entry) => entry.id),
+			);
+		});
 	});
 
 	describe("search", () => {
