@@ -8,6 +8,7 @@ import type {
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { cloneObject } from "../helpers.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
+import { applySort } from "../lib/sortParser.ts";
 import type {
 	PagedQueryResponseMap,
 	ResourceMap,
@@ -400,6 +401,10 @@ export class SQLiteStorage extends AbstractStorage {
 				);
 			}
 		}
+
+		// Apply sorting before paging: a cursor-based pager (`where id > "..."`
+		// with `sort id asc`) depends on a deterministic order.
+		resources = applySort(resources, params.sort);
 
 		// Get the total before slicing the array
 		const totalResources = resources.length;
