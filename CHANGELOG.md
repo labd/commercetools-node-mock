@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 4.3.1
+
+### Patch Changes
+
+- [#407](https://github.com/labd/commercetools-node-mock/pull/407) [`f994ceb`](https://github.com/labd/commercetools-node-mock/commit/f994ceb153ea4e9914a19e0f9f528a6c5d85edc7) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Apply `sort` on `/product-projections` too.
+
+  `ProductProjectionRepository.query()` does not go through
+  `AbstractStorage.query()` — it transforms products itself, then filters, expands
+  and slices — so it did not pick up the `sort` support added in 4.3.0, even though
+  `ProductProjectionQueryParams` declares the parameter.
+
+  That left the endpoint most likely to be walked with a cursor
+  (`sort: "id asc"` with `where: 'id > "<last>"'`) still returning products in
+  insertion order, so such a walk skipped products against the mock while being
+  correct against the real API.
+
 ## 4.3.0
 
 ### Minor Changes
