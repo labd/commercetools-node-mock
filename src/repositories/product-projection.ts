@@ -8,6 +8,7 @@ import type {
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
+import { applySort } from "../lib/sortParser.ts";
 import { applyPriceSelector } from "../priceSelector.ts";
 import { ProductProjectionSearch } from "../product-projection-search.ts";
 import type { GetParams, RepositoryContext } from "./abstract.ts";
@@ -140,6 +141,12 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 				),
 			);
 		}
+
+		// Sort before paging. This repository does not go through
+		// AbstractStorage.query, so it needs its own call — without it a
+		// cursor-paged walk (`sort: "id asc"` with `where: 'id > "<last>"'`) takes
+		// its cursor from an unsorted page and skips products.
+		resources = applySort(resources, params.sort);
 
 		// Create a slice for the pagination. If we were working with large datasets
 		// then we should have done this before transforming. But that isn't the

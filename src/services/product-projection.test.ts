@@ -636,3 +636,87 @@ describe("Product Projection Search - Facets", () => {
 		});
 	});
 });
+
+describe("Product Projection Query - sorting", () => {
+	const many = 6;
+
+	beforeEach(async () => {
+		for (let index = 0; index < many; index++) {
+			await productFactory.create({
+				publish: true,
+				key: `sortable-${index}`,
+				name: { "nl-NL": `sortable ${index}` },
+				slug: { "nl-NL": `sortable-${index}` },
+				masterVariant: { sku: `sortable-sku-${index}` },
+			});
+		}
+	});
+
+	const query = async (
+		params: Record<string, string>,
+	): Promise<ProductProjectionPagedSearchResponse> => {
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections",
+			query: params,
+		});
+		return response.json();
+	};
+
+	test("sorts ascending by id", async () => {
+		const result = await query({ sort: "id asc", limit: "50" });
+		const ids = result.results.map((entry) => entry.id);
+
+		expect(ids).toEqual([...ids].sort());
+	});
+
+	test("sorts descending by id", async () => {
+		const result = await query({ sort: "id desc", limit: "50" });
+		const ids = result.results.map((entry) => entry.id);
+
+		expect(ids).toEqual([...ids].sort().reverse());
+	});
+
+	test("sorts on a localized field", async () => {
+		const result = await query({ sort: "name.nl-NL asc", limit: "50" });
+		const names = result.results.map((entry) => entry.name["nl-NL"]);
+
+		expect(names).toEqual([...names].sort());
+	});
+
+	test("sorts before paging, not within a page", async () => {
+		const first = await query({ sort: "id asc", limit: "3" });
+		const second = await query({ sort: "id asc", limit: "3", offset: "3" });
+		const ids = [...first.results, ...second.results].map((entry) => entry.id);
+
+		expect(ids).toEqual([...ids].sort());
+	});
+
+	test("supports cursor paging with a where predicate", async () => {
+		// How a consumer walks a catalog larger than one page. It only terminates
+		// and only visits each product once if `sort` and `where` agree on the
+		// ordering — which is what this repository was missing.
+		const seen: string[] = [];
+		let lastId: string | undefined;
+
+		for (;;) {
+			const page = await query({
+				...(lastId ? { where: `id > "${lastId}"` } : {}),
+				sort: "id asc",
+				limit: "2",
+			});
+
+			seen.push(...page.results.map((entry) => entry.id));
+			if (page.results.length < 2) {
+				break;
+			}
+			lastId = page.results[page.results.length - 1].id;
+		}
+
+		// Every published product exactly once: the ones created here plus the
+		// published product from the outer setup.
+		expect(seen).toHaveLength(many + 1);
+		expect(new Set(seen).size).toBe(many + 1);
+		expect(seen).toEqual([...seen].sort());
+	});
+});
