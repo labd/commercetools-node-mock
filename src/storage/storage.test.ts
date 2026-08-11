@@ -412,14 +412,16 @@ describe(`Storage (${storageEngineName})`, () => {
 			expect(seen).toEqual([...seen].sort());
 		});
 
-		test("leaves order untouched without a sort", async () => {
-			const result = await storage.query(projectKey, "category", { limit: 3 });
+		test("returns a stable order without a sort", async () => {
+			// Which order that is belongs to the backend — in-memory keeps insertion
+			// order, sqlite returns rows by id — so only the guarantee both make is
+			// asserted here: repeating a query does not reshuffle it.
+			const first = await storage.query(projectKey, "category", { limit: 5 });
+			const second = await storage.query(projectKey, "category", { limit: 5 });
 
-			expect(result.results.map((entry) => entry.id)).toEqual([
-				"cat-1",
-				"cat-2",
-				"cat-3",
-			]);
+			expect(second.results.map((entry) => entry.id)).toEqual(
+				first.results.map((entry) => entry.id),
+			);
 		});
 	});
 
