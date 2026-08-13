@@ -1,6 +1,7 @@
 import type {
 	InvalidJsonInputError,
 	QuoteRequest,
+	QuoteRequestChangeQuoteRequestStateAction,
 	QuoteRequestSetCustomFieldAction,
 	QuoteRequestSetCustomTypeAction,
 	QuoteRequestTransitionStateAction,
@@ -18,6 +19,14 @@ export class QuoteRequestUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<QuoteRequest, QuoteRequestUpdateAction>>
 {
+	changeQuoteRequestState(
+		context: RepositoryContext,
+		resource: Writable<QuoteRequest>,
+		{ quoteRequestState }: QuoteRequestChangeQuoteRequestStateAction,
+	) {
+		resource.quoteRequestState = quoteRequestState;
+	}
+
 	setCustomField(
 		context: RepositoryContext,
 		resource: QuoteRequest,
