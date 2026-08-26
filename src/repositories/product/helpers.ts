@@ -3,12 +3,14 @@ import type {
 	Asset,
 	AssetDraft,
 	ChannelReference,
+	CustomerGroupReference,
 	Price,
 	PriceDraft,
 	Product,
 	ProductData,
 	ProductVariant,
 	ProductVariantDraft,
+	RecurrencePolicyReference,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import type { AbstractStorage } from "#src/storage/index.ts";
@@ -126,4 +128,31 @@ export const priceFromDraft = async (
 				storage,
 			)
 		: undefined,
+	customerGroup: draft.customerGroup
+		? await getReferenceFromResourceIdentifier<CustomerGroupReference>(
+				draft.customerGroup,
+				context.projectKey,
+				storage,
+			)
+		: undefined,
+	recurrencePolicy: draft.recurrencePolicy
+		? await getReferenceFromResourceIdentifier<RecurrencePolicyReference>(
+				draft.recurrencePolicy,
+				context.projectKey,
+				storage,
+			)
+		: undefined,
+	validFrom: draft.validFrom,
+	validUntil: draft.validUntil,
+	discounted: draft.discounted
+		? {
+				value: createTypedMoney(draft.discounted.value),
+				discount: draft.discounted.discount,
+			}
+		: undefined,
+	tiers: draft.tiers?.map((tier) => ({
+		minimumQuantity: tier.minimumQuantity,
+		value: createTypedMoney(tier.value),
+	})),
+	custom: await createCustomFields(draft.custom, context.projectKey, storage),
 });

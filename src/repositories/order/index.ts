@@ -47,10 +47,10 @@ import {
 	createAddress,
 	createCentPrecisionMoney,
 	createCustomFields,
-	createPrice,
 	createTypedMoney,
 	resolveStoreReference,
 } from "../helpers.ts";
+import { priceFromDraft } from "../product/helpers.ts";
 import { OrderUpdateHandler } from "./actions.ts";
 
 export class OrderRepository extends AbstractResourceRepository<"order"> {
@@ -290,7 +290,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			discountedPricePerQuantity: [],
 			lineItemMode: "Standard",
 			name: draft.name,
-			price: createPrice(draft.price),
+			price: await priceFromDraft(context, this._storage, draft.price),
 			priceMode: "Platform",
 			productId: product.id,
 			productType: product.productType,
@@ -308,7 +308,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			variant: {
 				id: variant.id,
 				sku: variant.sku,
-				price: createPrice(draft.price),
+				price: await priceFromDraft(context, this._storage, draft.price),
 				attributes: variant.attributes,
 			},
 		} satisfies LineItem;
