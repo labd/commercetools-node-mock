@@ -1404,9 +1404,7 @@ describe("Order addParcelToDelivery", () => {
 			url: `/dummy/orders/${order.id}`,
 			payload: {
 				version: order.version,
-				actions: [
-					{ action: "addParcelToDelivery", deliveryKey: "delivery-1" },
-				],
+				actions: [{ action: "addParcelToDelivery", deliveryKey: "delivery-1" }],
 			},
 		});
 
