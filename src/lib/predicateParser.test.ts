@@ -244,9 +244,9 @@ describe("Predicate filter", () => {
 	});
 
 	test("array filters on property", async () => {
-		expect(match(`array(nestedArray(stringProperty="foo")))`)).toBeTruthy();
+		expect(match(`array(nestedArray(stringProperty="foo"))`)).toBeTruthy();
 		expect(
-			match(`array(nestedArray(nested(stringProperty="foo"))))`),
+			match(`array(nestedArray(nested(stringProperty="foo")))`),
 		).toBeTruthy();
 	});
 
@@ -269,9 +269,9 @@ describe("Predicate filter", () => {
 		expect(match("not (numberProperty = 1235)")).toBeTruthy();
 		expect(match("not (numberProperty = 1235)")).toBeTruthy();
 
-		expect(match("nested(numberProperty=1234))")).toBeTruthy();
-		expect(match("nested(not(numberProperty=1230)))")).toBeTruthy();
-		expect(match("nested(not(numberProperty=1234)))")).toBeFalsy();
+		expect(match("nested(numberProperty=1234)")).toBeTruthy();
+		expect(match("nested(not(numberProperty=1230))")).toBeTruthy();
+		expect(match("nested(not(numberProperty=1234))")).toBeFalsy();
 	});
 
 	test("and clause (implicit)", async () => {
@@ -306,6 +306,84 @@ describe("Predicate filter", () => {
 				"numberProperty=1234 and (numberProperty=1230 or (numberProperty=1234 or numberProperty=1235))",
 			),
 		).toBeTruthy();
+	});
+
+	test("group followed by another clause", async () => {
+		expect(
+			match(
+				`(stringProperty="foobar" or stringProperty="nope") and numberProperty=1234`,
+			),
+		).toBeTruthy();
+		expect(
+			match(
+				`(stringProperty="nope" or stringProperty="nope2") and numberProperty=1234`,
+			),
+		).toBeFalsy();
+		expect(
+			match(
+				`(stringProperty="foobar" or stringProperty="nope") and numberProperty=1230`,
+			),
+		).toBeFalsy();
+		expect(
+			match(
+				`(numberProperty=1230) or (numberProperty=1234 and booleanProperty=true)`,
+			),
+		).toBeTruthy();
+		expect(
+			match("not (numberProperty=1230) and booleanProperty=true"),
+		).toBeTruthy();
+		expect(
+			match("not (numberProperty=1234) and booleanProperty=true"),
+		).toBeFalsy();
+	});
+
+	test("in (...) followed by another clause", async () => {
+		expect(
+			match(`stringProperty in ("foobar", "other") and numberProperty=1234`),
+		).toBeTruthy();
+		expect(
+			match(`stringProperty in ("nope", "other") and numberProperty=1234`),
+		).toBeFalsy();
+		expect(
+			match(`stringProperty in ("nope") or numberProperty in (1234)`),
+		).toBeTruthy();
+	});
+
+	test("contains (...) followed by another clause", async () => {
+		expect(
+			match(
+				`arrayProperty contains all ("foo", "bar") and numberProperty=1234`,
+			),
+		).toBeTruthy();
+		expect(
+			match(`arrayProperty contains any ("nope") or numberProperty=1234`),
+		).toBeTruthy();
+		expect(
+			match(`arrayProperty contains any ("nope") and numberProperty=1234`),
+		).toBeFalsy();
+	});
+
+	test("nested group followed by another clause", async () => {
+		expect(
+			match(
+				`nested(objectProperty(stringProperty="foobar")) and numberProperty=1234`,
+			),
+		).toBeTruthy();
+		expect(
+			match(
+				`nested(objectProperty(stringProperty="nope")) and numberProperty=1234`,
+			),
+		).toBeFalsy();
+	});
+
+	test("trailing input is rejected instead of ignored", async () => {
+		expect(() => match(`(numberProperty=1234))`)).toThrow(PredicateError);
+		expect(() => match(`(numberProperty=1234))`)).toThrow(
+			"Invalid input ')' (line 1, column 22)",
+		);
+		expect(() =>
+			match(`stringProperty="foobar" numberProperty=1234`),
+		).toThrow();
 	});
 	test("nested attribute access", async () => {
 		expect(
