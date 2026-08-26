@@ -536,6 +536,56 @@ describe("Cart Update Actions", () => {
 		expect(response.json().lineItems).toHaveLength(1);
 	});
 
+	test("setPurchaseOrderNumber", async () => {
+		assert(cart, "cart not created");
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{ action: "setPurchaseOrderNumber", purchaseOrderNumber: "PO-4711" },
+				],
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().purchaseOrderNumber).toBe("PO-4711");
+
+		const unset = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 2,
+				actions: [{ action: "setPurchaseOrderNumber" }],
+			},
+		});
+		expect(unset.statusCode).toBe(200);
+		expect(unset.json().purchaseOrderNumber).toBeUndefined();
+	});
+
+	test("purchaseOrderNumber from the draft carries through to the order", async () => {
+		const created = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/carts",
+			payload: { currency: "EUR", purchaseOrderNumber: "PO-4711" },
+		});
+		expect(created.statusCode).toBe(201);
+		expect(created.json().purchaseOrderNumber).toBe("PO-4711");
+
+		const order = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/orders",
+			payload: {
+				cart: { typeId: "cart", id: created.json().id },
+				version: created.json().version,
+			},
+		});
+		expect(order.statusCode).toBe(201);
+		expect(order.json().purchaseOrderNumber).toBe("PO-4711");
+	});
+
 	test.each([
 		["EUR", 29800],
 		["GBP", 37800],

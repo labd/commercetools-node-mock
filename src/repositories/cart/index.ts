@@ -176,6 +176,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			shipping: [],
 			shippingInfo: undefined,
 			origin: draft.origin ?? "Customer",
+			purchaseOrderNumber: draft.purchaseOrderNumber,
 			refusedGifts: [],
 			custom: await createCustomFields(
 				draft.custom,
