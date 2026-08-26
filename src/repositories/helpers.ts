@@ -18,8 +18,6 @@ import type {
 	HighPrecisionMoneyDraft,
 	InvalidInputError,
 	InvalidJsonInputError,
-	Price,
-	PriceDraft,
 	Reference,
 	ReferencedResourceNotFoundError,
 	ResourceIdentifier,
@@ -33,7 +31,6 @@ import type {
 } from "@commercetools/platform-sdk";
 import { Decimal } from "decimal.js/decimal";
 import type { FastifyRequest } from "fastify";
-import { v4 as uuidv4 } from "uuid";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import type { AbstractStorage } from "../storage/index.ts";
 import type { RepositoryContext } from "./abstract.ts";
@@ -98,11 +95,6 @@ export const createCustomFields = async (
 		fields: draft.fields ?? {},
 	};
 };
-
-export const createPrice = (draft: PriceDraft): Price => ({
-	id: uuidv4(),
-	value: createTypedMoney(draft.value),
-});
 
 /**
  * Rounds a decimal to the nearest whole number using the specified
