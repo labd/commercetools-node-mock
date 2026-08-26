@@ -1,4 +1,6 @@
 import type {
+	InvalidInputError,
+	OrderFromQuoteDraft,
 	OrderImportDraft,
 	OrderSearchRequest,
 	ResourceNotFoundError,
@@ -22,12 +24,38 @@ export class OrderService extends AbstractService {
 	}
 
 	extraRoutes(instance: FastifyInstance) {
+		instance.post("/quotes", this.createFromQuote.bind(this));
 		instance.post("/import", this.import.bind(this));
 		instance.post("/search", this.search.bind(this));
 		instance.get(
 			"/order-number=:orderNumber",
 			this.getWithOrderNumber.bind(this),
 		);
+	}
+
+	async createFromQuote(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: OrderFromQuoteDraft;
+		}>,
+		reply: FastifyReply,
+	) {
+		const draft = request.body;
+		if (!draft?.quote?.id && !draft?.quote?.key) {
+			throw new CommercetoolsError<InvalidInputError>(
+				{
+					code: "InvalidInput",
+					message: "Request body does not contain a quote reference.",
+				},
+				400,
+			);
+		}
+
+		const resource = await this.repository.createFromQuote(
+			getRepositoryContext(request),
+			draft,
+		);
+		return reply.status(this.createStatusCode).send(resource);
 	}
 
 	async import(

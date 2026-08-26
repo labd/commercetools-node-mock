@@ -1,4 +1,6 @@
-import type { FastifyInstance } from "fastify";
+import type { MyOrderFromQuoteDraft } from "@commercetools/platform-sdk";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { MyOrderRepository } from "../repositories/my-order.ts";
 import AbstractService from "./abstract.ts";
 
@@ -26,6 +28,7 @@ export class MyOrderService extends AbstractService {
 
 				instance.delete("/orders/:id", this.deleteWithId.bind(this));
 
+				instance.post("/orders/quotes", this.createFromQuote.bind(this));
 				instance.post("/orders", this.post.bind(this));
 				instance.post("/orders/:id", this.postWithId.bind(this));
 
@@ -33,5 +36,24 @@ export class MyOrderService extends AbstractService {
 			},
 			{ prefix: `/${basePath}` },
 		);
+	}
+
+	async createFromQuote(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: MyOrderFromQuoteDraft;
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id, version, quoteStateToAccepted } = request.body;
+		const resource = await this.repository.createFromQuote(
+			getRepositoryContext(request),
+			{
+				quote: { typeId: "quote", id },
+				version,
+				quoteStateToAccepted,
+			},
+		);
+		return reply.status(this.createStatusCode).send(resource);
 	}
 }
