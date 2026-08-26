@@ -6,6 +6,7 @@ import type {
 	LineItemReturnItem,
 	Order,
 	OrderAddDeliveryAction,
+	OrderAddParcelToDeliveryAction,
 	OrderAddPaymentAction,
 	OrderAddReturnInfoAction,
 	OrderChangeOrderStateAction,
@@ -246,6 +247,56 @@ export class OrderUpdateHandler
 		};
 
 		resource.shippingInfo.deliveries.push(delivery);
+	}
+
+	async addParcelToDelivery(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ deliveryId, deliveryKey, ...parcelDraft }: OrderAddParcelToDeliveryAction,
+	) {
+		if (!resource.shippingInfo) {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: "Resource has no shipping info",
+			});
+		}
+
+		if (!deliveryId && !deliveryKey) {
+			throw new CommercetoolsError<RequiredFieldError>({
+				code: "RequiredField",
+				message: "Either deliveryId or deliveryKey is required",
+				field: "deliveryId",
+			});
+		}
+
+		const delivery = resource.shippingInfo.deliveries?.find((d) =>
+			deliveryId ? d.id === deliveryId : d.key === deliveryKey,
+		) as Writable<Delivery> | undefined;
+
+		if (!delivery) {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: `A delivery with ${
+					deliveryId ? `ID '${deliveryId}'` : `key '${deliveryKey}'`
+				} was not found on this order.`,
+			});
+		}
+
+		const { parcelKey, ...parcel } = parcelDraft;
+		if (!delivery.parcels) {
+			delivery.parcels = [];
+		}
+
+		delivery.parcels.push({
+			...getBaseResourceProperties(),
+			...parcel,
+			key: parcelKey,
+			custom: await createCustomFields(
+				parcel.custom,
+				context.projectKey,
+				this._storage,
+			),
+		});
 	}
 
 	setDeliveryCustomField(
