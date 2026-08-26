@@ -6,6 +6,7 @@ import type {
 	CartAddCustomLineItemAction,
 	CartAddItemShippingAddressAction,
 	CartAddLineItemAction,
+	CartAddPaymentAction,
 	CartChangeCustomLineItemMoneyAction,
 	CartChangeCustomLineItemQuantityAction,
 	CartChangeLineItemQuantityAction,
@@ -13,6 +14,7 @@ import type {
 	CartRemoveCustomLineItemAction,
 	CartRemoveDiscountCodeAction,
 	CartRemoveLineItemAction,
+	CartRemovePaymentAction,
 	CartRemoveShippingMethodAction,
 	CartSetAnonymousIdAction,
 	CartSetBillingAddressAction,
@@ -284,6 +286,65 @@ export class CartUpdateHandler
 
 		// Update cart total price
 		resource.totalPrice.centAmount = calculateCartTotalPrice(resource);
+	}
+
+	async addPayment(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ payment }: CartAddPaymentAction,
+	) {
+		const resolvedPayment = await this._storage.getByResourceIdentifier(
+			context.projectKey,
+			payment,
+		);
+		if (!resolvedPayment) {
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Payment ${payment.id} not found`,
+				typeId: "payment",
+			});
+		}
+
+		if (!resource.paymentInfo) {
+			resource.paymentInfo = {
+				payments: [],
+			};
+		}
+
+		resource.paymentInfo.payments.push({
+			typeId: "payment",
+			id: resolvedPayment.id,
+		});
+	}
+
+	async removePayment(
+		context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ payment }: CartRemovePaymentAction,
+	) {
+		const resolvedPayment = await this._storage.getByResourceIdentifier(
+			context.projectKey,
+			payment,
+		);
+		if (!resolvedPayment) {
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Payment ${payment.id} not found`,
+				typeId: "payment",
+			});
+		}
+
+		if (!resource.paymentInfo) {
+			return;
+		}
+
+		resource.paymentInfo.payments = resource.paymentInfo.payments.filter(
+			(reference) => reference.id !== resolvedPayment.id,
+		);
+
+		if (resource.paymentInfo.payments.length === 0) {
+			resource.paymentInfo = undefined;
+		}
 	}
 
 	changeLineItemQuantity(

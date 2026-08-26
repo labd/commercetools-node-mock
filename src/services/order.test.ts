@@ -19,6 +19,7 @@ import {
 	cartDraftFactory,
 	channelDraftFactory,
 	orderDraftFactory,
+	paymentDraftFactory,
 	typeDraftFactory,
 } from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
@@ -368,6 +369,49 @@ describe("Order Update Actions", () => {
 		expect(responseAgain.statusCode).toBe(200);
 		expect(responseAgain.json().version).toBe(2);
 		expect(responseAgain.json().locale).toBe("nl-NL");
+	});
+
+	test("addPayment and removePayment", async () => {
+		assert(order, "order not created");
+
+		const payment = await paymentDraftFactory(ctMock).create({
+			amountPlanned: { currencyCode: "EUR", centAmount: 1000 },
+		});
+
+		const added = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "addPayment",
+						payment: { typeId: "payment", id: payment.id },
+					},
+				],
+			},
+		});
+		expect(added.statusCode).toBe(200);
+		expect(added.json().paymentInfo).toEqual({
+			payments: [{ typeId: "payment", id: payment.id }],
+		});
+
+		const removed = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
+				version: 2,
+				actions: [
+					{
+						action: "removePayment",
+						payment: { typeId: "payment", id: payment.id },
+					},
+				],
+			},
+		});
+		expect(removed.statusCode).toBe(200);
+		expect(removed.json().version).toBe(3);
+		expect(removed.json().paymentInfo).toBeUndefined();
 	});
 
 	test("setCustomerEmail", async () => {
