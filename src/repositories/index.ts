@@ -8,6 +8,7 @@ import {
 	AsAssociateBusinessUnitRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
+	AsAssociateQuoteRepository,
 	AsAssociateQuoteRequestRepository,
 	AsAssociateShoppingListRepository,
 } from "./as-associate.ts";
@@ -61,6 +62,7 @@ export const createRepositories = (config: Config) => ({
 		"business-unit": new AsAssociateBusinessUnitRepository(config),
 		cart: new AsAssociateCartRepository(config),
 		order: new AsAssociateOrderRepository(config),
+		quote: new AsAssociateQuoteRepository(config),
 		"quote-request": new AsAssociateQuoteRequestRepository(config),
 		"shopping-list": new AsAssociateShoppingListRepository(config),
 	},

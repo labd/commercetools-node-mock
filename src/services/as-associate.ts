@@ -5,6 +5,7 @@ import type {
 	AsAssociateBusinessUnitRepository,
 	AsAssociateCartRepository,
 	AsAssociateOrderRepository,
+	AsAssociateQuoteRepository,
 	AsAssociateQuoteRequestRepository,
 	AsAssociateShoppingListRepository,
 } from "#src/repositories/as-associate.ts";
@@ -13,6 +14,7 @@ import { AsAssociateApprovalRuleService } from "./as-associate-approval-rule.ts"
 import { AsAssociateBusinessUnitService } from "./as-associate-business-unit.ts";
 import { AsAssociateCartService } from "./as-associate-cart.ts";
 import { AsAssociateOrderService } from "./as-associate-order.ts";
+import { AsAssociateQuoteService } from "./as-associate-quote.ts";
 import { AsAssociateQuoteRequestService } from "./as-associate-quote-request.ts";
 import { AsAssociateShoppingListService } from "./as-associate-shopping-list.ts";
 
@@ -22,6 +24,7 @@ type Repositories = {
 	"business-unit": AsAssociateBusinessUnitRepository;
 	cart: AsAssociateCartRepository;
 	order: AsAssociateOrderRepository;
+	quote: AsAssociateQuoteRepository;
 	"quote-request": AsAssociateQuoteRequestRepository;
 	"shopping-list": AsAssociateShoppingListRepository;
 };
@@ -33,6 +36,7 @@ export class AsAssociateService {
 		"business-unit": AsAssociateBusinessUnitService;
 		cart: AsAssociateCartService;
 		order: AsAssociateOrderService;
+		quote: AsAssociateQuoteService;
 		"quote-request": AsAssociateQuoteRequestService;
 		"shopping-list": AsAssociateShoppingListService;
 	};
@@ -52,6 +56,10 @@ export class AsAssociateService {
 							repositories.order,
 						);
 						const cart = new AsAssociateCartService(scoped, repositories.cart);
+						const quote = new AsAssociateQuoteService(
+							scoped,
+							repositories.quote,
+						);
 						const quoteRequest = new AsAssociateQuoteRequestService(
 							scoped,
 							repositories["quote-request"],
@@ -75,6 +83,7 @@ export class AsAssociateService {
 							"business-unit": businessUnitService,
 							order,
 							cart,
+							quote,
 							"quote-request": quoteRequest,
 							"shopping-list": shoppingList,
 						};
