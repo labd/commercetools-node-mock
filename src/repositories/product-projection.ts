@@ -4,6 +4,8 @@ import type {
 	ProductDraft,
 	ProductProjection,
 	QueryParam,
+	SearchKeyword,
+	SuggestionResult,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
@@ -29,6 +31,76 @@ export type ProductProjectionQueryParams = {
 	withTotal?: boolean;
 	where?: string | string[];
 	[key: string]: QueryParam;
+};
+
+export type ProductProjectionSuggestParams = {
+	searchKeywords: Record<string, string>;
+	staged?: boolean;
+	fuzzy?: boolean;
+	fuzzyLevel?: number;
+	limit?: number;
+};
+
+const DEFAULT_SUGGEST_LIMIT = 10;
+
+/**
+ * commercetools suggests on the tokens of a search keyword, so "tool" only
+ * matches "Multi tool" when the keyword is tokenized.
+ */
+const keywordTokens = (keyword: SearchKeyword): string[] => {
+	const tokenizer = keyword.suggestTokenizer;
+	if (!tokenizer) {
+		return [keyword.text];
+	}
+	if (tokenizer.type === "custom") {
+		return tokenizer.inputs;
+	}
+	return keyword.text.split(/\s+/).filter(Boolean);
+};
+
+/**
+ * The fuzzy level commercetools derives from the length of the search term when
+ * `fuzzyLevel` is not given.
+ *
+ * @see https://docs.commercetools.com/api/projects/products-search#fuzzy-search
+ */
+const defaultFuzzyLevel = (term: string) => {
+	if (term.length < 3) return 0;
+	if (term.length < 6) return 1;
+	return 2;
+};
+
+/**
+ * Damerau-Levenshtein (optimal string alignment) distance: the same metric
+ * Elasticsearch uses for fuzziness, so a transposed pair of characters counts
+ * as one edit rather than two.
+ */
+const editDistance = (a: string, b: string): number => {
+	const rows: number[][] = [Array.from({ length: b.length + 1 }, (_, i) => i)];
+
+	for (let i = 1; i <= a.length; i++) {
+		const current = [i];
+		for (let j = 1; j <= b.length; j++) {
+			const previous = rows[i - 1];
+			current[j] = Math.min(
+				previous[j] + 1,
+				current[j - 1] + 1,
+				previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+			);
+			if (
+				i > 1 &&
+				j > 1 &&
+				a[i - 1] === b[j - 2] &&
+				a[i - 2] === b[j - 1] &&
+				rows[i - 2] !== undefined
+			) {
+				current[j] = Math.min(current[j], rows[i - 2][j - 2] + 1);
+			}
+		}
+		rows[i] = current;
+	}
+
+	return rows[a.length][b.length];
 };
 
 export class ProductProjectionRepository extends AbstractResourceRepository<"product-projection"> {
@@ -167,5 +239,51 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 
 	search(context: RepositoryContext, query: ProductProjectionQueryParams) {
 		return this._searchService.search(context.projectKey, query);
+	}
+
+	async suggest(
+		context: RepositoryContext,
+		params: ProductProjectionSuggestParams,
+	): Promise<SuggestionResult> {
+		const staged = params.staged ?? false;
+		const allProducts = await this._storage.all(context.projectKey, "product");
+		const projections = (
+			await Promise.all(
+				allProducts.map((product) =>
+					this._searchService.transform(product, staged, context.projectKey),
+				),
+			)
+		).filter((projection) => staged || projection.published);
+
+		const limit = params.limit ?? DEFAULT_SUGGEST_LIMIT;
+		const result: SuggestionResult = {};
+
+		for (const [locale, term] of Object.entries(params.searchKeywords)) {
+			const needle = term.toLowerCase();
+			const level = params.fuzzy
+				? (params.fuzzyLevel ?? defaultFuzzyLevel(term))
+				: 0;
+
+			const texts = new Set<string>();
+			for (const projection of projections) {
+				for (const keyword of projection.searchKeywords?.[locale] ?? []) {
+					const matches = keywordTokens(keyword).some((token) => {
+						const prefix = token.slice(0, needle.length).toLowerCase();
+						return level === 0
+							? prefix === needle
+							: editDistance(prefix, needle) <= level;
+					});
+					if (matches) {
+						texts.add(keyword.text);
+					}
+				}
+			}
+
+			result[`searchKeywords.${locale}`] = [...texts]
+				.slice(0, limit)
+				.map((text) => ({ text }));
+		}
+
+		return result;
 	}
 }
