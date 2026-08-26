@@ -11,6 +11,7 @@ import type {
 	OrderChangeOrderStateAction,
 	OrderChangePaymentStateAction,
 	OrderChangeShipmentStateAction,
+	OrderRemovePaymentAction,
 	OrderSetBillingAddressAction,
 	OrderSetCustomerEmailAction,
 	OrderSetCustomerIdAction,
@@ -75,6 +76,36 @@ export class OrderUpdateHandler
 			typeId: "payment",
 			id: payment.id!,
 		});
+	}
+
+	async removePayment(
+		context: RepositoryContext,
+		resource: Writable<Order>,
+		{ payment }: OrderRemovePaymentAction,
+	) {
+		const resolvedPayment = await this._storage.getByResourceIdentifier(
+			context.projectKey,
+			payment,
+		);
+		if (!resolvedPayment) {
+			throw new CommercetoolsError<ReferencedResourceNotFoundError>({
+				code: "ReferencedResourceNotFound",
+				message: `Payment ${payment.id} not found`,
+				typeId: "payment",
+			});
+		}
+
+		if (!resource.paymentInfo) {
+			return;
+		}
+
+		resource.paymentInfo.payments = resource.paymentInfo.payments.filter(
+			(reference) => reference.id !== resolvedPayment.id,
+		);
+
+		if (resource.paymentInfo.payments.length === 0) {
+			resource.paymentInfo = undefined;
+		}
 	}
 
 	async addReturnInfo(

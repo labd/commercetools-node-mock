@@ -13,6 +13,7 @@ import { calculateMoneyTotalCentAmount } from "#src/repositories/helpers.ts";
 import {
 	cartDraftFactory,
 	customerDraftFactory,
+	paymentDraftFactory,
 	productDraftFactory,
 	productTypeDraftFactory,
 	shippingMethodDraftFactory,
@@ -130,6 +131,7 @@ describe("Cart Update Actions", () => {
 	const typeFactory = typeDraftFactory(ctMock);
 	const zoneFactory = zoneDraftFactory(ctMock);
 	const shippingMethodFactory = shippingMethodDraftFactory(ctMock);
+	const paymentFactory = paymentDraftFactory(ctMock);
 
 	beforeEach(async () => {
 		const productType = await productTypeDraftFactory(ctMock).create({
@@ -294,6 +296,93 @@ describe("Cart Update Actions", () => {
 		expect(response.json().version).toBe(2);
 		expect(response.json().lineItems).toHaveLength(1);
 		expect(response.json().totalPrice.centAmount).toEqual(29800);
+	});
+
+	test("addPayment", async () => {
+		const payment = await paymentFactory.create({
+			amountPlanned: { currencyCode: "EUR", centAmount: 14900 },
+		});
+
+		assert(cart, "cart not created");
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "addPayment",
+						payment: { typeId: "payment", id: payment.id },
+					},
+				],
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().paymentInfo).toEqual({
+			payments: [{ typeId: "payment", id: payment.id }],
+		});
+	});
+
+	test("addPayment with an unknown payment", async () => {
+		assert(cart, "cart not created");
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "addPayment",
+						payment: { typeId: "payment", id: "does-not-exist" },
+					},
+				],
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("ReferencedResourceNotFound");
+	});
+
+	test("removePayment", async () => {
+		const payment = await paymentFactory.create({
+			amountPlanned: { currencyCode: "EUR", centAmount: 14900 },
+		});
+
+		assert(cart, "cart not created");
+
+		const added = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "addPayment",
+						payment: { typeId: "payment", id: payment.id },
+					},
+				],
+			},
+		});
+		expect(added.statusCode).toBe(200);
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 2,
+				actions: [
+					{
+						action: "removePayment",
+						payment: { typeId: "payment", id: payment.id },
+					},
+				],
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().paymentInfo).toBeUndefined();
 	});
 
 	test.each([
