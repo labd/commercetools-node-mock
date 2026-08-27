@@ -122,6 +122,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			orderState: "Open",
 			origin: "Customer",
 			paymentInfo: cart.paymentInfo,
+			purchaseOrderNumber: cart.purchaseOrderNumber,
 			refusedGifts: [],
 			shipping: cart.shipping,
 			shippingAddress: cart.shippingAddress,

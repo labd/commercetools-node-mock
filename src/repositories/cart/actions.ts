@@ -37,6 +37,7 @@ import type {
 	CartSetLineItemTaxAmountAction,
 	CartSetLineItemTaxRateAction,
 	CartSetLocaleAction,
+	CartSetPurchaseOrderNumberAction,
 	CartSetShippingAddressAction,
 	CartSetShippingAddressCustomFieldAction,
 	CartSetShippingAddressCustomTypeAction,
@@ -1118,6 +1119,14 @@ export class CartUpdateHandler
 			...shippingDetails,
 			valid: true,
 		} as ItemShippingDetails;
+	}
+
+	setPurchaseOrderNumber(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		{ purchaseOrderNumber }: CartSetPurchaseOrderNumberAction,
+	) {
+		resource.purchaseOrderNumber = purchaseOrderNumber;
 	}
 
 	setLocale(
