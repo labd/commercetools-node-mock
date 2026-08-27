@@ -3,8 +3,8 @@
 
 import { z } from "zod";
 import {
-	CustomFieldsDraftSchema,
 	CustomerResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
 	LocaleSchema,
 	StateResourceIdentifierSchema,
 } from "./common.ts";

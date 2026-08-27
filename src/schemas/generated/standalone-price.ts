@@ -5,8 +5,8 @@ import { z } from "zod";
 import {
 	ChannelResourceIdentifierSchema,
 	CountryCodeSchema,
-	CustomFieldsDraftSchema,
 	CustomerGroupResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
 	DiscountedPriceDraftSchema,
 	MoneySchema,
 	PriceTierDraftSchema,

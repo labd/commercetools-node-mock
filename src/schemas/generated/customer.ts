@@ -6,9 +6,9 @@ import {
 	AuthenticationModeSchema,
 	BaseAddressSchema,
 	CartResourceIdentifierSchema,
-	CustomFieldsDraftSchema,
 	CustomerGroupAssignmentDraftSchema,
 	CustomerGroupResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
 	LocaleSchema,
 	StoreResourceIdentifierSchema,
 } from "./common.ts";

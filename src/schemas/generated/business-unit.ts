@@ -10,10 +10,8 @@ import {
 	BusinessUnitStatusSchema,
 	BusinessUnitStoreModeSchema,
 	BusinessUnitTypeSchema,
-	CompanyDraftSchema,
-	CustomFieldsDraftSchema,
 	CustomerGroupAssignmentDraftSchema,
-	DivisionDraftSchema,
+	CustomFieldsDraftSchema,
 	StoreResourceIdentifierSchema,
 } from "./common.ts";
 

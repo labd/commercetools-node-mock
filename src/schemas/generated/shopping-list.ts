@@ -4,8 +4,8 @@
 import { z } from "zod";
 import {
 	BusinessUnitResourceIdentifierSchema,
-	CustomFieldsDraftSchema,
 	CustomerResourceIdentifierSchema,
+	CustomFieldsDraftSchema,
 	LocalizedStringSchema,
 	ShoppingListLineItemDraftSchema,
 	StoreResourceIdentifierSchema,
