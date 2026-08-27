@@ -1300,6 +1300,153 @@ describe("Order Update Actions", () => {
 	});
 });
 
+describe("Order addParcelToDelivery", () => {
+	const ctMock = new CommercetoolsMock({ defaultProjectKey: "dummy" });
+
+	const buildOrder = (): Order => ({
+		...getBaseResourceProperties(),
+		customLineItems: [],
+		lineItems: [],
+		lastMessageSequenceNumber: 0,
+		orderNumber: generateRandomString(10),
+		orderState: "Open",
+		origin: "Customer",
+		refusedGifts: [],
+		shipping: [],
+		shippingMode: "Single",
+		syncInfo: [],
+		totalPrice: {
+			type: "centPrecision",
+			fractionDigits: 2,
+			centAmount: 2000,
+			currencyCode: "EUR",
+		},
+		shippingInfo: {
+			shippingMethodName: "Home delivery",
+			price: {
+				type: "centPrecision",
+				currencyCode: "EUR",
+				centAmount: 999,
+				fractionDigits: 2,
+			},
+			shippingRate: {
+				price: {
+					type: "centPrecision",
+					currencyCode: "EUR",
+					centAmount: 999,
+					fractionDigits: 2,
+				},
+				tiers: [],
+			},
+			shippingMethodState: "MatchesCart",
+			deliveries: [
+				{
+					id: "6a458cad-dd46-4f5f-8b73-deb0ede6a17d",
+					key: "delivery-1",
+					createdAt: "2024-07-29T13:37:48.047Z",
+					items: [],
+					parcels: [],
+				},
+			],
+		},
+	});
+
+	afterEach(() => {
+		ctMock.clear();
+	});
+
+	const addOrder = async () => {
+		const order = buildOrder();
+		await ctMock.project().unsafeAdd("order", order);
+		return order;
+	};
+
+	test("add a parcel by delivery id", async () => {
+		const order = await addOrder();
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
+				version: order.version,
+				actions: [
+					{
+						action: "addParcelToDelivery",
+						deliveryId: "6a458cad-dd46-4f5f-8b73-deb0ede6a17d",
+						parcelKey: "parcel-1",
+						measurements: {
+							heightInMillimeter: 100,
+							lengthInMillimeter: 200,
+							widthInMillimeter: 300,
+							weightInGram: 400,
+						},
+						trackingData: { trackingId: "1Z999", isReturn: false },
+					},
+				],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+
+		const parcels = response.json().shippingInfo.deliveries[0].parcels;
+		expect(parcels).toHaveLength(1);
+		expect(parcels[0].id).toBeDefined();
+		expect(parcels[0].key).toBe("parcel-1");
+		expect(parcels[0].measurements.weightInGram).toBe(400);
+		expect(parcels[0].trackingData.trackingId).toBe("1Z999");
+	});
+
+	test("add a parcel by delivery key", async () => {
+		const order = await addOrder();
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
+				version: order.version,
+				actions: [{ action: "addParcelToDelivery", deliveryKey: "delivery-1" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().shippingInfo.deliveries[0].parcels).toHaveLength(1);
+	});
+
+	test("add a parcel to an unknown delivery", async () => {
+		const order = await addOrder();
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
+				version: order.version,
+				actions: [
+					{ action: "addParcelToDelivery", deliveryKey: "does-not-exist" },
+				],
+			},
+		});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidOperation");
+	});
+
+	test("add a parcel without a delivery reference", async () => {
+		const order = await addOrder();
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/orders/${order.id}`,
+			payload: {
+				version: order.version,
+				actions: [{ action: "addParcelToDelivery" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("RequiredField");
+	});
+});
+
 describe("Order Import", () => {
 	const ctMock = new CommercetoolsMock();
 
