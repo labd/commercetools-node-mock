@@ -637,6 +637,119 @@ describe("Product Projection Search - Facets", () => {
 	});
 });
 
+describe("Product Projection Suggest", () => {
+	const suggest = (query: Record<string, string>) =>
+		ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/product-projections/suggest",
+			query,
+		});
+
+	beforeEach(async () => {
+		await productFactory.create({
+			publish: true,
+			key: "multi-tool",
+			name: { en: "Multi tool" },
+			slug: { en: "multi-tool" },
+			productType: { typeId: "product-type", id: productType.id },
+			searchKeywords: {
+				en: [
+					{ text: "Multi tool" },
+					{
+						text: "Swiss army knife",
+						suggestTokenizer: { type: "whitespace" },
+					},
+				],
+				"nl-NL": [{ text: "Zakmes" }],
+			},
+		});
+
+		await productFactory.create({
+			publish: false,
+			key: "unpublished-tool",
+			name: { en: "Draft tool" },
+			slug: { en: "draft-tool" },
+			productType: { typeId: "product-type", id: productType.id },
+			searchKeywords: {
+				en: [{ text: "Staged only keyword" }],
+			},
+		});
+	});
+
+	test("suggests on a keyword prefix", async () => {
+		const response = await suggest({ "searchKeywords.en": "multi" });
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual({
+			"searchKeywords.en": [{ text: "Multi tool" }],
+		});
+	});
+
+	test("only matches a prefix of the keyword", async () => {
+		const response = await suggest({ "searchKeywords.en": "tool" });
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json()["searchKeywords.en"]).toEqual([]);
+	});
+
+	test("a whitespace tokenizer makes every word a prefix", async () => {
+		const response = await suggest({ "searchKeywords.en": "army" });
+
+		expect(response.json()["searchKeywords.en"]).toEqual([
+			{ text: "Swiss army knife" },
+		]);
+	});
+
+	test("suggests per requested locale", async () => {
+		const response = await suggest({
+			"searchKeywords.en": "multi",
+			"searchKeywords.nl-NL": "zak",
+		});
+
+		expect(response.json()).toEqual({
+			"searchKeywords.en": [{ text: "Multi tool" }],
+			"searchKeywords.nl-NL": [{ text: "Zakmes" }],
+		});
+	});
+
+	test("a typo only matches with fuzzy", async () => {
+		const exact = await suggest({ "searchKeywords.en": "mutli" });
+		expect(exact.json()["searchKeywords.en"]).toEqual([]);
+
+		const fuzzy = await suggest({
+			"searchKeywords.en": "mutli",
+			fuzzy: "true",
+		});
+		expect(fuzzy.json()["searchKeywords.en"]).toEqual([{ text: "Multi tool" }]);
+	});
+
+	test("unpublished keywords need staged", async () => {
+		const current = await suggest({ "searchKeywords.en": "staged" });
+		expect(current.json()["searchKeywords.en"]).toEqual([]);
+
+		const staged = await suggest({
+			"searchKeywords.en": "staged",
+			staged: "true",
+		});
+		expect(staged.json()["searchKeywords.en"]).toEqual([
+			{ text: "Staged only keyword" },
+		]);
+	});
+
+	test("limit caps the suggestions", async () => {
+		const response = await suggest({ "searchKeywords.en": "s", limit: "0" });
+
+		expect(response.json()["searchKeywords.en"]).toEqual([]);
+	});
+
+	test("without a searchKeywords parameter", async () => {
+		const response = await suggest({});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidInput");
+	});
+});
+
 describe("Product Projection Query - sorting", () => {
 	const many = 6;
 
