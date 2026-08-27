@@ -3,8 +3,8 @@
 
 import { z } from "zod";
 import {
-	CustomerResourceIdentifierSchema,
 	CustomFieldsDraftSchema,
+	CustomerResourceIdentifierSchema,
 	MoneySchema,
 	PaymentMethodInfoDraftSchema,
 	PaymentStatusDraftSchema,

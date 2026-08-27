@@ -225,3 +225,32 @@ describe("Order from Quote", () => {
 		expect(updated.json().quoteState).toBe("Accepted");
 	});
 });
+
+describe("Order from Quote draft validation", () => {
+	const strictMock = new CommercetoolsMock({
+		defaultProjectKey: "dummy",
+		strict: true,
+	});
+
+	test("a draft without a quote reference is rejected", async () => {
+		const response = await strictMock.app.inject({
+			method: "POST",
+			url: "/dummy/orders/quotes",
+			payload: { version: 1 },
+		});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidJsonInput");
+	});
+
+	test("a /me draft without a version is rejected", async () => {
+		const response = await strictMock.app.inject({
+			method: "POST",
+			url: "/dummy/me/orders/quotes",
+			payload: { id: "2c4bb2c1-0f4f-4c1e-9d2f-9a1d3e4b5c6a" },
+		});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].detailedErrorMessage).toContain("version");
+	});
+});

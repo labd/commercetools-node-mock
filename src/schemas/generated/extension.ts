@@ -3,7 +3,9 @@
 
 import { z } from "zod";
 import {
+	ExtensionAdditionalContextDraftSchema,
 	ExtensionDestinationSchema,
+	ExtensionResourceIdentifierSchema,
 	ExtensionTriggerSchema,
 } from "./common.ts";
 
@@ -12,4 +14,7 @@ export const ExtensionDraftSchema = z.object({
 	destination: ExtensionDestinationSchema,
 	triggers: z.array(ExtensionTriggerSchema),
 	timeoutInMs: z.number().int().nullish(),
+	dependencies: z.array(ExtensionResourceIdentifierSchema).nullish(),
+	expansionPaths: z.array(z.string()).nullish(),
+	additionalContext: ExtensionAdditionalContextDraftSchema.nullish(),
 });

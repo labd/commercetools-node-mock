@@ -1,5 +1,7 @@
 import type { MyOrderFromQuoteDraft } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { MyOrderFromQuoteDraftSchema } from "#src/schemas/generated/my-order-from-quote.ts";
+import { validateDraft } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { MyOrderRepository } from "../repositories/my-order.ts";
 import AbstractService from "./abstract.ts";
@@ -45,6 +47,10 @@ export class MyOrderService extends AbstractService {
 		}>,
 		reply: FastifyReply,
 	) {
+		if (this.repository.strict) {
+			validateDraft(request.body, MyOrderFromQuoteDraftSchema);
+		}
+
 		const { id, version, quoteStateToAccepted } = request.body;
 		const resource = await this.repository.createFromQuote(
 			getRepositoryContext(request),

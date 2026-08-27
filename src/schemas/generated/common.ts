@@ -87,6 +87,7 @@ export const ReferenceTypeIdSchema = z.enum([
 	"quote-request",
 	"recurrence-policy",
 	"recurring-order",
+	"reservation",
 	"review",
 	"shipping-method",
 	"shopping-list",
@@ -97,6 +98,7 @@ export const ReferenceTypeIdSchema = z.enum([
 	"subscription",
 	"tax-category",
 	"type",
+	"variant",
 	"zone",
 ]);
 
@@ -127,6 +129,7 @@ export const InventoryModeSchema = z.enum([
 	"None",
 	"TrackOnly",
 	"ReserveOnOrder",
+	"ReserveOnCart",
 ]);
 
 export const PriceSelectionModeSchema = z.enum(["Fixed", "Dynamic"]);
@@ -402,6 +405,7 @@ export const ResourceTypeIdSchema = z.enum([
 	"product-selection",
 	"product-tailoring",
 	"quote",
+	"reservation",
 	"review",
 	"recurring-order",
 	"shipping",
@@ -1031,6 +1035,25 @@ export const ExtensionTriggerSchema = z.object({
 	condition: z.string().nullish(),
 });
 
+export const ExtensionResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().nullish(),
+		key: z.string().nullish(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
+
+export const ExtensionAdditionalContextDraftSchema = z.object({
+	includeOldResource: z.boolean().nullish(),
+});
+
+export const InventoryEntryStockLevelsSchema = z.object({
+	reorderPoint: z.number().int().nullish(),
+	safetyStock: z.number().int().nullish(),
+});
+
 export const OrderReferenceSchema = z.object({
 	typeId: ReferenceTypeIdSchema,
 	id: z.string(),
@@ -1041,6 +1064,16 @@ export const StagedOrderUpdateActionSchema = z.object({
 });
 
 export const StateResourceIdentifierSchema = z
+	.object({
+		typeId: ReferenceTypeIdSchema,
+		id: z.string().nullish(),
+		key: z.string().nullish(),
+	})
+	.refine((data) => data.id !== undefined || data.key !== undefined, {
+		message: "Either 'id' or 'key' must be provided",
+	});
+
+export const QuoteResourceIdentifierSchema = z
 	.object({
 		typeId: ReferenceTypeIdSchema,
 		id: z.string().nullish(),
@@ -1309,6 +1342,19 @@ export const ProductSelectionResourceIdentifierSchema = z
 export const ProductSelectionSettingDraftSchema = z.object({
 	productSelection: ProductSelectionResourceIdentifierSchema,
 	active: z.boolean().nullish(),
+});
+
+export const StorefrontSchema = z.object({
+	checkoutUrlTemplate: z.string().nullish(),
+	orderUrlTemplate: z.string().nullish(),
+	termsOfServiceUrl: z.string().nullish(),
+	privacyPolicyUrl: z.string().nullish(),
+	refundPolicyUrl: z.string().nullish(),
+	shippingPolicyUrl: z.string().nullish(),
+	cookiePolicyUrl: z.string().nullish(),
+	imprintUrl: z.string().nullish(),
+	faqUrl: z.string().nullish(),
+	contactUrl: z.string().nullish(),
 });
 
 export const DestinationSchema = z.object({

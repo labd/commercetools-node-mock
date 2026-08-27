@@ -1,5 +1,4 @@
 import type {
-	InvalidInputError,
 	OrderFromQuoteDraft,
 	OrderImportDraft,
 	OrderSearchRequest,
@@ -7,6 +6,8 @@ import type {
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { OrderFromQuoteDraftSchema } from "#src/schemas/generated/order-from-quote.ts";
+import { validateDraft } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
 import AbstractService from "./abstract.ts";
@@ -40,20 +41,13 @@ export class OrderService extends AbstractService {
 		}>,
 		reply: FastifyReply,
 	) {
-		const draft = request.body;
-		if (!draft?.quote?.id && !draft?.quote?.key) {
-			throw new CommercetoolsError<InvalidInputError>(
-				{
-					code: "InvalidInput",
-					message: "Request body does not contain a quote reference.",
-				},
-				400,
-			);
+		if (this.repository.strict) {
+			validateDraft(request.body, OrderFromQuoteDraftSchema);
 		}
 
 		const resource = await this.repository.createFromQuote(
 			getRepositoryContext(request),
-			draft,
+			request.body,
 		);
 		return reply.status(this.createStatusCode).send(resource);
 	}
