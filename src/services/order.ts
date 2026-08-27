@@ -1,10 +1,13 @@
 import type {
+	OrderFromQuoteDraft,
 	OrderImportDraft,
 	OrderSearchRequest,
 	ResourceNotFoundError,
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import { OrderFromQuoteDraftSchema } from "#src/schemas/generated/order-from-quote.ts";
+import { validateDraft } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
 import AbstractService from "./abstract.ts";
@@ -22,12 +25,31 @@ export class OrderService extends AbstractService {
 	}
 
 	extraRoutes(instance: FastifyInstance) {
+		instance.post("/quotes", this.createFromQuote.bind(this));
 		instance.post("/import", this.import.bind(this));
 		instance.post("/search", this.search.bind(this));
 		instance.get(
 			"/order-number=:orderNumber",
 			this.getWithOrderNumber.bind(this),
 		);
+	}
+
+	async createFromQuote(
+		request: FastifyRequest<{
+			Params: Record<string, string>;
+			Body: OrderFromQuoteDraft;
+		}>,
+		reply: FastifyReply,
+	) {
+		if (this.repository.strict) {
+			validateDraft(request.body, OrderFromQuoteDraftSchema);
+		}
+
+		const resource = await this.repository.createFromQuote(
+			getRepositoryContext(request),
+			request.body,
+		);
+		return reply.status(this.createStatusCode).send(resource);
 	}
 
 	async import(

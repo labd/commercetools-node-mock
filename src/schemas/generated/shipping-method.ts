@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
 	CustomFieldsDraftSchema,
 	LocalizedStringSchema,
+	StoreResourceIdentifierSchema,
 	TaxCategoryResourceIdentifierSchema,
 	ZoneRateDraftSchema,
 } from "./common.ts";
@@ -21,4 +22,6 @@ export const ShippingMethodDraftSchema = z.object({
 	isDefault: z.boolean(),
 	predicate: z.string().nullish(),
 	custom: CustomFieldsDraftSchema.nullish(),
+	stores: z.array(StoreResourceIdentifierSchema).nullish(),
+	carrier: z.string().nullish(),
 });

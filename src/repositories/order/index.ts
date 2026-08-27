@@ -7,15 +7,18 @@ import type {
 	Delivery,
 	DuplicateFieldError,
 	GeneralError,
+	InvalidOperationError,
 	LineItem,
 	LineItemImportDraft,
 	Order,
 	OrderFromCartDraft,
+	OrderFromQuoteDraft,
 	OrderImportDraft,
 	OrderPagedSearchResponse,
 	OrderSearchRequest,
 	Product,
 	ProductVariant,
+	Quote,
 	ReferencedResourceNotFoundError,
 	ResourceNotFoundError,
 	ShippingInfo,
@@ -42,6 +45,7 @@ import {
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext } from "../abstract.ts";
 import { AbstractResourceRepository, type QueryParams } from "../abstract.ts";
+import { checkConcurrentModification } from "../errors.ts";
 import {
 	calculateMoneyTotalCentAmount,
 	createAddress,
@@ -143,6 +147,91 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		resource.taxedShippingPrice =
 			resource.taxedShippingPrice ?? taxedShippingPrice;
 		return await this.saveNew(context, resource);
+	}
+
+	async createFromQuote(
+		context: RepositoryContext,
+		draft: OrderFromQuoteDraft,
+	): Promise<Order> {
+		// Resolving the reference raises ReferencedResourceNotFound when the quote
+		// does not exist
+		const quote = await this._storage.getByResourceIdentifier<"quote">(
+			context.projectKey,
+			draft.quote,
+		);
+
+		checkConcurrentModification(quote.version, draft.version, quote.id);
+
+		if (quote.quoteState !== "Pending") {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `The quote with ID '${quote.id}' cannot be ordered because it is in state '${quote.quoteState}'.`,
+				},
+				400,
+			);
+		}
+
+		if (quote.validTo && new Date(quote.validTo) < new Date()) {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `The quote with ID '${quote.id}' cannot be ordered because it expired on ${quote.validTo}.`,
+				},
+				400,
+			);
+		}
+
+		// Converting a quote reuses its prices; nothing is recalculated
+		const resource: Writable<Order> = {
+			...getBaseResourceProperties(context.clientId),
+			billingAddress: quote.billingAddress,
+			businessUnit: quote.businessUnit,
+			country: quote.country,
+			custom: quote.custom,
+			customerGroup: quote.customerGroup,
+			customerId: quote.customer?.id,
+			customLineItems: quote.customLineItems,
+			directDiscounts: quote.directDiscounts,
+			itemShippingAddresses: quote.itemShippingAddresses,
+			lastMessageSequenceNumber: 0,
+			lineItems: quote.lineItems,
+			orderNumber: draft.orderNumber ?? generateRandomString(10),
+			orderState: draft.orderState ?? "Open",
+			origin: "Quote",
+			paymentState: draft.paymentState,
+			purchaseOrderNumber: quote.purchaseOrderNumber,
+			quote: {
+				typeId: "quote",
+				id: quote.id,
+			},
+			refusedGifts: [],
+			shipmentState: draft.shipmentState,
+			shipping: [],
+			shippingAddress: quote.shippingAddress,
+			shippingInfo: quote.shippingInfo,
+			shippingMode: "Single",
+			store: quote.store,
+			syncInfo: [],
+			taxCalculationMode: quote.taxCalculationMode,
+			taxedPrice: quote.taxedPrice,
+			taxMode: quote.taxMode,
+			taxRoundingMode: quote.taxRoundingMode,
+			totalPrice: createCentPrecisionMoney(quote.totalPrice),
+		};
+
+		const order = await this.saveNew(context, resource);
+
+		if (draft.quoteStateToAccepted) {
+			const accepted = {
+				...quote,
+				quoteState: "Accepted",
+				version: quote.version + 1,
+			} as Writable<Quote>;
+			await this._storage.add(context.projectKey, "quote", accepted);
+		}
+
+		return order;
 	}
 
 	async import(

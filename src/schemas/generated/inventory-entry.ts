@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
 	ChannelResourceIdentifierSchema,
 	CustomFieldsDraftSchema,
+	InventoryEntryStockLevelsSchema,
 } from "./common.ts";
 
 export const InventoryEntryDraftSchema = z.object({
@@ -16,5 +17,7 @@ export const InventoryEntryDraftSchema = z.object({
 	maxCartQuantity: z.number().int().nullish(),
 	restockableInDays: z.number().int().nullish(),
 	expectedDelivery: z.string().nullish(),
+	reservationExpirationInMinutes: z.number().int().nullish(),
+	stockLevels: InventoryEntryStockLevelsSchema.nullish(),
 	custom: CustomFieldsDraftSchema.nullish(),
 });

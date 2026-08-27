@@ -9,6 +9,7 @@ import {
 	LocalizedStringSchema,
 	ProductSelectionSettingDraftSchema,
 	StoreCountrySchema,
+	StorefrontSchema,
 } from "./common.ts";
 
 export const StoreDraftSchema = z.object({
@@ -20,4 +21,5 @@ export const StoreDraftSchema = z.object({
 	supplyChannels: z.array(ChannelResourceIdentifierSchema).nullish(),
 	productSelections: z.array(ProductSelectionSettingDraftSchema).nullish(),
 	custom: CustomFieldsDraftSchema.nullish(),
+	storefront: StorefrontSchema.nullish(),
 });
