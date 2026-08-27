@@ -385,6 +385,157 @@ describe("Cart Update Actions", () => {
 		expect(response.json().paymentInfo).toBeUndefined();
 	});
 
+	test("freezeCart", async () => {
+		assert(cart, "cart not created");
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "freezeCart" }] },
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(2);
+		expect(response.json().cartState).toBe("Frozen");
+	});
+
+	test("unfreezeCart", async () => {
+		assert(cart, "cart not created");
+
+		const frozen = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "freezeCart" }] },
+		});
+		expect(frozen.statusCode).toBe(200);
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 2, actions: [{ action: "unfreezeCart" }] },
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().version).toBe(3);
+		expect(response.json().cartState).toBe("Active");
+	});
+
+	test("freezeCart on an already frozen cart", async () => {
+		assert(cart, "cart not created");
+
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "freezeCart" }] },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 2, actions: [{ action: "freezeCart" }] },
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidOperation");
+	});
+
+	test("unfreezeCart on a cart that is not frozen", async () => {
+		assert(cart, "cart not created");
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "unfreezeCart" }] },
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidOperation");
+	});
+
+	test("a frozen cart rejects actions that change its price", async () => {
+		const product = await productFactory.create(productDraft);
+
+		assert(cart, "cart not created");
+
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "freezeCart" }] },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 2,
+				actions: [
+					{
+						action: "addLineItem",
+						productId: product.id,
+						variantId: product.masterData.current.variants[0].id,
+					},
+				],
+			},
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json().errors[0].code).toBe("InvalidOperation");
+
+		const unchanged = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/carts/${cart.id}`,
+		});
+		expect(unchanged.json().version).toBe(2);
+		expect(unchanged.json().lineItems).toHaveLength(0);
+	});
+
+	test("a frozen cart accepts actions that do not change its price", async () => {
+		assert(cart, "cart not created");
+
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "freezeCart" }] },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 2,
+				actions: [{ action: "setCustomerEmail", email: "john@doe.com" }],
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().customerEmail).toBe("john@doe.com");
+	});
+
+	test("unfreezeCart in the same request as a price changing action", async () => {
+		const product = await productFactory.create(productDraft);
+
+		assert(cart, "cart not created");
+
+		await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: { version: 1, actions: [{ action: "freezeCart" }] },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/carts/${cart.id}`,
+			payload: {
+				version: 2,
+				actions: [
+					{ action: "unfreezeCart" },
+					{
+						action: "addLineItem",
+						productId: product.id,
+						variantId: product.masterData.current.variants[0].id,
+					},
+				],
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json().cartState).toBe("Active");
+		expect(response.json().lineItems).toHaveLength(1);
+	});
+
 	test.each([
 		["EUR", 29800],
 		["GBP", 37800],

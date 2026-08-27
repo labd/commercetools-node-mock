@@ -372,6 +372,15 @@ export class AbstractUpdateHandler {
 		}
 	}
 
+	/**
+	 * Hook to reject an action based on the state the resource is in at the
+	 * point the action is applied, rather than the state it started in.
+	 */
+	protected beforeAction(
+		resource: BaseResource | Project,
+		action: UpdateAction,
+	): void {}
+
 	async apply<R extends BaseResource | Project>(
 		context: RepositoryContext,
 		resource: R,
@@ -402,6 +411,11 @@ export class AbstractUpdateHandler {
 					],
 				});
 			}
+
+			this.beforeAction(
+				updatedResource as unknown as BaseResource | Project,
+				action,
+			);
 
 			// @ts-expect-error
 			const updateFunc = this[action.action].bind(this);

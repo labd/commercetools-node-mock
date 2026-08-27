@@ -11,6 +11,7 @@ import type {
 	CartChangeCustomLineItemQuantityAction,
 	CartChangeLineItemQuantityAction,
 	CartChangeTaxRoundingModeAction,
+	CartFreezeCartAction,
 	CartRemoveCustomLineItemAction,
 	CartRemoveDiscountCodeAction,
 	CartRemoveLineItemAction,
@@ -42,6 +43,7 @@ import type {
 	CartSetShippingMethodAction,
 	CartSetShippingMethodTaxAmountAction,
 	CartSetShippingMethodTaxRateAction,
+	CartUnfreezeCartAction,
 	CartUpdateAction,
 	CustomFields,
 	GeneralError,
@@ -89,6 +91,38 @@ import {
 } from "./helpers.ts";
 import type { CartRepository } from "./index.ts";
 
+/**
+ * Freezing a cart locks in its prices, so the actions that would change what
+ * the cart costs are rejected while it is frozen.
+ * See https://docs.commercetools.com/api/projects/carts#freeze-cart
+ */
+const PRICE_CHANGING_ACTIONS = new Set([
+	"addCustomLineItem",
+	"addDiscountCode",
+	"addLineItem",
+	"changeCustomLineItemMoney",
+	"changeCustomLineItemQuantity",
+	"changeLineItemQuantity",
+	"changeTaxRoundingMode",
+	"recalculate",
+	"removeCustomLineItem",
+	"removeDiscountCode",
+	"removeLineItem",
+	"removeShippingMethod",
+	"setCartTotalTax",
+	"setCountry",
+	"setCustomLineItemTaxAmount",
+	"setCustomLineItemTaxRate",
+	"setCustomShippingMethod",
+	"setDirectDiscounts",
+	"setLineItemPrice",
+	"setLineItemTaxAmount",
+	"setLineItemTaxRate",
+	"setShippingMethod",
+	"setShippingMethodTaxAmount",
+	"setShippingMethodTaxRate",
+]);
+
 export class CartUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Cart, CartUpdateAction>>
@@ -121,6 +155,50 @@ export class CartUpdateHandler
 			}
 		}
 		return updated;
+	}
+
+	protected beforeAction(
+		resource: BaseResource | Project,
+		action: UpdateAction,
+	) {
+		const cart = resource as unknown as Cart;
+		if (
+			cart.cartState === "Frozen" &&
+			PRICE_CHANGING_ACTIONS.has(action.action)
+		) {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: `The cart with ID '${cart.id}' is frozen and cannot be modified by the action '${action.action}'.`,
+			});
+		}
+	}
+
+	freezeCart(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		_action: CartFreezeCartAction,
+	) {
+		if (resource.cartState !== "Active") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: `The cart with ID '${resource.id}' cannot be frozen because it is in state '${resource.cartState}'.`,
+			});
+		}
+		resource.cartState = "Frozen";
+	}
+
+	unfreezeCart(
+		_context: RepositoryContext,
+		resource: Writable<Cart>,
+		_action: CartUnfreezeCartAction,
+	) {
+		if (resource.cartState !== "Frozen") {
+			throw new CommercetoolsError<InvalidOperationError>({
+				code: "InvalidOperation",
+				message: `The cart with ID '${resource.id}' cannot be unfrozen because it is in state '${resource.cartState}'.`,
+			});
+		}
+		resource.cartState = "Active";
 	}
 
 	addItemShippingAddress(
