@@ -124,7 +124,7 @@ export const getShippingMethodsMatchingCart = async (
 
 	// Get all shipping methods that have a zone that matches the shipping address
 	const zones = await storage.query<"zone">(context.projectKey, "zone", {
-		where: [`locations(country="${cart.shippingAddress.country}"))`],
+		where: [`locations(country="${cart.shippingAddress.country}")`],
 		limit: 100,
 	});
 	const zoneIds = zones.results.map((zone) => zone.id);

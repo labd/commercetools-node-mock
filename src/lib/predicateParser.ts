@@ -254,6 +254,9 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 		})
 		.nud("(", 100, (t) => {
 			const expr: any = parser.parse({ terminals: [")"] });
+			// Consume the closing parenthesis so a following operator (`and`, `or`)
+			// is still seen by the caller instead of being silently dropped
+			lexer.expect(")");
 			return expr;
 		})
 		.led("(", 100, ({ left, bp }) => {
@@ -381,13 +384,9 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			}
 		})
 		.led("IN", 20, ({ left, bp }) => {
-			const firstToken = lexer.peek();
+			// IN can be a single value or a list of values; the parenthesized list
+			// is consumed by the `(` nud
 			const expr = parser.parse({ terminals: [bp - 1] });
-
-			// IN can be a single value or a list of values
-			if (firstToken.match === "(") {
-				lexer.expect(")");
-			}
 
 			return (obj: any, vars: object) => {
 				let symbols = expr;
@@ -461,7 +460,7 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 		.led("CONTAINS", 20, ({ left, bp }) => {
 			const keyword = lexer.next();
 
-			let expr = parser.parse();
+			let expr = parser.parse({ terminals: [bp - 1] });
 			if (!Array.isArray(expr)) {
 				expr = [expr];
 			}
@@ -486,6 +485,15 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 		.build();
 
 	const result = parser.parse();
+
+	// A predicate we cannot fully consume must not silently match everything
+	const remainder = lexer.peek();
+	if (!remainder.isEof()) {
+		const { start } = remainder.strpos();
+		throw new PredicateError(
+			`Invalid input '${remainder.match}' (line ${start.line}, column ${start.column})`,
+		);
+	}
 
 	if (typeof result !== "function") {
 		const lines = predicate.split("\n");
