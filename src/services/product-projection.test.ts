@@ -761,6 +761,7 @@ describe("Product Projection Query - sorting", () => {
 				name: { "nl-NL": `sortable ${index}` },
 				slug: { "nl-NL": `sortable-${index}` },
 				masterVariant: { sku: `sortable-sku-${index}` },
+				productType: { typeId: "product-type", id: productType.id },
 			});
 		}
 	});
