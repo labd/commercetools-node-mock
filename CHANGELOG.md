@@ -1,5 +1,175 @@
 # CHANGELOG
 
+## 4.4.0
+
+### Minor Changes
+
+- [#420](https://github.com/labd/commercetools-node-mock/pull/420) [`7cc9e2f`](https://github.com/labd/commercetools-node-mock/commit/7cc9e2f46dd7c9a18c55f3eaae87a9286ff2ce28) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Add the associate-scoped quote routes.
+  
+  The associate scope covered quote requests but not quotes, so any
+  `.asAssociate().…​.quotes()` read returned a 404 and the correct way to read a
+  colleague's quote was the one path that could not be tested. The service
+  registers what commercetools documents for associate quotes — query, get by id,
+  get by key, update by id and update by key — and no create or delete route,
+  since quotes are created by the seller.
+
+- [#418](https://github.com/labd/commercetools-node-mock/pull/418) [`f5b71dd`](https://github.com/labd/commercetools-node-mock/commit/f5b71dddc100baec86e16c9e2ff28a1c1c5af990) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Support the `addPayment` and `removePayment` update actions on carts, and
+  `removePayment` on orders.
+  
+  `addPayment` existed only on the order handler, so the payment-first checkout
+  flow — attach the payment to the cart, then create the order from the provider
+  callback — could not be exercised against the mock. Because carts and `/me`
+  carts share a repository, both scopes get the actions. `removePayment` was
+  missing on carts and orders alike and is the natural pair.
+
+- [#419](https://github.com/labd/commercetools-node-mock/pull/419) [`f5bfb3a`](https://github.com/labd/commercetools-node-mock/commit/f5bfb3a43aa3d53484739173b3b6dfc7ba67bf03) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Support the `freezeCart` and `unfreezeCart` update actions on carts.
+  
+  `cartState: "Frozen"` was unreachable, so a checkout that freezes a cart while a
+  payment is in flight could not be exercised — and, worse, a test asserting that
+  a code path left the cart alone passed whether or not the guard existed.
+  
+  `freezeCart` requires the cart to be `Active` and `unfreezeCart` requires it to
+  be `Frozen`; both raise `InvalidOperation` otherwise. While a cart is frozen,
+  update actions that would change what it costs are rejected with
+  `InvalidOperation`, matching the documented purpose of freezing. Actions that
+  leave the price alone (`setCustomerEmail`, `setCustomField`, addresses, …) are
+  still applied, and `unfreezeCart` earlier in the same action list lifts the
+  restriction for the actions that follow it.
+
+- [#422](https://github.com/labd/commercetools-node-mock/pull/422) [`3926536`](https://github.com/labd/commercetools-node-mock/commit/392653697b842fe8882d2457fdd3508e9b8afa48) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Model `purchaseOrderNumber` on carts: store it from `CartDraft` and support the
+  `setPurchaseOrderNumber` update action.
+  
+  B2B checkout captures the buyer's purchase order number on the cart before the
+  order exists, but the mock dropped the draft field and rejected the action, so
+  that write path had no coverage available. The cart's `purchaseOrderNumber` now
+  also carries through to an order created from it, the way it does on
+  commercetools.
+
+- [#427](https://github.com/labd/commercetools-node-mock/pull/427) [`a1707d0`](https://github.com/labd/commercetools-node-mock/commit/a1707d012fd348844dc3b77e8f18b8c4918f8ace) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Generate real discriminated unions for small unions in the draft schemas.
+  
+  The generator collected the variants of a discriminated union as dependencies
+  but then emitted only the flattened base shape, so `business-unit.ts` imported
+  `CompanyDraftSchema` and `DivisionDraftSchema` without ever referencing them —
+  `pnpm generate:schemas` produced a file biome rejected as having unused imports.
+  
+  Unions with five or fewer variants are now emitted as
+  `z.discriminatedUnion(...)`, and each variant gets a literal discriminator
+  property instead of the shared enum. This validates what the flattened shape
+  could not: in strict mode a `Division` business unit without `parentUnit` is now
+  a 400 `parentUnit: Missing required value` rather than a 500, and an unknown
+  `unitType` reports the valid discriminator values. The same applies to cart
+  discount values, product discount values, extension destinations, shipping rate
+  input drafts and tiers, recurrence policy schedules, recurring order scopes,
+  delivery formats and HTTP destination authentication.
+  
+  Larger unions (`AttributeType`, `FieldType`, `StagedOrderUpdateAction`,
+  `Reference` and friends) still flatten, as enumerating dozens of variants adds
+  little validation value.
+
+- [#427](https://github.com/labd/commercetools-node-mock/pull/427) [`8e3cdda`](https://github.com/labd/commercetools-node-mock/commit/8e3cdda4eaa17f4e127483e33fbc1bd9b4134324) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Only mount resources under `/{projectKey}/in-store/key={storeKey}` that
+  commercetools actually exposes there.
+  
+  The in-store prefix reused the project plugin wholesale, so all ~40 resource
+  families got an in-store twin while the API documents in-store endpoints for 18.
+  Requests like `POST /{projectKey}/in-store/key={storeKey}/extensions` returned
+  201 from the mock and 404 from commercetools, which is the wrong direction for a
+  mock to be wrong in: it let tests pass against calls that fail in production.
+  
+  In-store now serves business units, cart discounts, carts, customers, discount
+  codes, `me/*`, orders, product projections, products, quote requests, quotes,
+  shipping methods, shopping lists and staged quotes. Everything else under that
+  prefix — including the project endpoint itself — now returns 404, as it does on
+  the real API. Project-level routes are unchanged.
+  
+  This also cuts the router from 1408 route entries to 945, so building the
+  Fastify instance is roughly 40% faster.
+
+- [#423](https://github.com/labd/commercetools-node-mock/pull/423) [`2ae98b3`](https://github.com/labd/commercetools-node-mock/commit/2ae98b398d4cc9217f905fcf770cd30db04d3dda) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Support the `addParcelToDelivery` update action on orders.
+  
+  Parcels could only be supplied inline through `addDelivery`, so adding one to a
+  delivery that already exists — which is what happens when a shipment is handed
+  over in parts — had no route. The action accepts either `deliveryId` or
+  `deliveryKey`, and rejects an unknown delivery instead of quietly doing nothing.
+
+- [#421](https://github.com/labd/commercetools-node-mock/pull/421) [`c131aae`](https://github.com/labd/commercetools-node-mock/commit/c131aae414c19d5abd88b38f051997d4a2e769e9) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Support creating an order from a quote, on `POST /{projectKey}/orders/quotes`
+  and `POST /{projectKey}/me/orders/quotes`.
+  
+  Turning a quote into an order is the endpoint of the B2B quote flow and was the
+  one step that could not be exercised. The guards around it are modelled too,
+  since those are what a consumer wants to assert: the quote must be `Pending`
+  and not past its `validTo`, a stale `version` raises `ConcurrentModification`,
+  and `quoteStateToAccepted: true` moves the quote to `Accepted` as part of
+  creating the order. The order carries the quote's line items and prices —
+  nothing is re-priced — and references the quote it came from with
+  `origin: "Quote"`.
+
+- [#427](https://github.com/labd/commercetools-node-mock/pull/427) [`af0cf4f`](https://github.com/labd/commercetools-node-mock/commit/af0cf4f428095fd0a250f56bd17e743be677ff04) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update dependencies and adapt to `@commercetools/platform-sdk` 9.4.0.
+  
+  The SDK now requires `stores` on `ShippingMethod` and `DiscountCode` and
+  `inventory` on `Project`, so those are modelled and returned. It also adds
+  update actions the mock did not implement: `addStore`, `removeStore` and
+  `setStores` on shipping methods, and `setAdditionalContext`, `setDependencies`
+  and `setExpansionPaths` on extensions.
+  
+  `basic-auth` 3.0.0 is ESM-only and dropped its default export, which broke every
+  OAuth token request; the import is now a named one.
+
+- [#424](https://github.com/labd/commercetools-node-mock/pull/424) [`0a36033`](https://github.com/labd/commercetools-node-mock/commit/0a360332b1d63924aa87cfc0a9df10fb30286137) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Map the remaining `PriceDraft` fields when creating prices.
+  
+  `priceFromDraft` only carried `key`, `country`, `value` and `channel`, so
+  `customerGroup`, `validFrom`, `validUntil`, `discounted`, `tiers`, `custom` and
+  `recurrencePolicy` were silently dropped — a price created with a customer group
+  read back without one, which makes customer-group price selection untestable.
+  
+  The order import used a second, even smaller mapping (`createPrice`, which kept
+  only the value). Both paths now go through `priceFromDraft`.
+
+- [#425](https://github.com/labd/commercetools-node-mock/pull/425) [`06dbd1b`](https://github.com/labd/commercetools-node-mock/commit/06dbd1b32ae01e35960633c892b3b41fa0871f42) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Implement the product-projection suggest endpoint,
+  `GET /{projectKey}/product-projections/suggest`.
+  
+  Suggestions come from the products' `searchKeywords` for each requested locale.
+  Matching is a case-insensitive prefix match on the keyword's tokens, so a
+  keyword only matches mid-word when it carries a `whitespace` or `custom`
+  `suggestTokenizer` — the same rule as commercetools. `fuzzy` allows edits up to
+  `fuzzyLevel`, defaulting to the level commercetools derives from the length of
+  the search term, and `staged` and `limit` are honoured. A request without a
+  `searchKeywords.{language}` parameter is rejected with `InvalidInput`.
+  
+  No search dependency was added; the matching is a few lines in the repository.
+
+- [#409](https://github.com/labd/commercetools-node-mock/pull/409) [`2a84115`](https://github.com/labd/commercetools-node-mock/commit/2a84115d8475de35164d52cde5edb66c68122367) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Support the `changeQuoteRequestState` update action on quote requests.
+  
+  The quote-request update handler implemented `setCustomField`, `setCustomType`
+  and `transitionState`, but not `changeQuoteRequestState` — so a buyer
+  cancelling a quote request, which maps to that action, could not be exercised
+  against the mock. `transitionState` is not a substitute: it moves a quote
+  request through a custom State machine, while `changeQuoteRequestState` sets
+  the built-in `quoteRequestState` enum.
+
+### Patch Changes
+
+- [#421](https://github.com/labd/commercetools-node-mock/pull/421) [`c131aae`](https://github.com/labd/commercetools-node-mock/commit/c131aae414c19d5abd88b38f051997d4a2e769e9) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Regenerate the zod draft schemas from the current commercetools OpenAPI spec.
+  
+  Picks up optional fields added upstream since the last run — extension
+  dependencies, expansion paths and additional context, inventory entry stock
+  levels and reservation expiry, shipping method stores and carrier, store
+  storefront URLs — plus the `reservation` and `variant` reference type ids and
+  the `ReserveOnCart` inventory mode.
+
+- [#417](https://github.com/labd/commercetools-node-mock/pull/417) [`aea0410`](https://github.com/labd/commercetools-node-mock/commit/aea0410b658ffc58c0e74246e57e56a0fbf76763) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Fix query predicates where a parenthesized group is followed by another clause.
+  
+  The `(` nud did not consume its closing parenthesis, so the outer parse loop
+  stopped on it and everything after the group was silently dropped:
+  `(status="OPEN" or status="OVERDUE") and dueDate < "..."` was evaluated as just
+  the group, quietly widening a filter that should narrow. The same applied to
+  `in (...)`, `contains all/any (...)` and `nested(...)` groups followed by a
+  clause.
+  
+  A predicate that cannot be consumed completely now raises a `PredicateError`
+  instead of matching against a partially parsed expression, so an unsupported or
+  malformed predicate surfaces at the point of use rather than returning the whole
+  collection.
+
 ## 4.3.1
 
 ### Patch Changes
