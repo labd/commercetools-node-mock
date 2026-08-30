@@ -1,5 +1,5 @@
 import type { InvalidTokenError } from "@commercetools/platform-sdk";
-import auth from "basic-auth";
+import { parse as parseBasicAuth } from "basic-auth";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { AuthError, InvalidRequestError } from "#src/exceptions.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
@@ -125,7 +125,7 @@ export class OAuth2Server {
 				401,
 			);
 		}
-		const credentials = auth.parse(authHeader);
+		const credentials = parseBasicAuth(authHeader);
 		if (!credentials) {
 			throw new CommercetoolsError<InvalidClientError>(
 				{

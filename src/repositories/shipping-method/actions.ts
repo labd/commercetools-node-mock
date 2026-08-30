@@ -2,12 +2,14 @@ import { isDeepStrictEqual } from "node:util";
 import type {
 	ShippingMethod,
 	ShippingMethodAddShippingRateAction,
+	ShippingMethodAddStoreAction,
 	ShippingMethodAddZoneAction,
 	ShippingMethodChangeActiveAction,
 	ShippingMethodChangeIsDefaultAction,
 	ShippingMethodChangeNameAction,
 	ShippingMethodChangeTaxCategoryAction,
 	ShippingMethodRemoveShippingRateAction,
+	ShippingMethodRemoveStoreAction,
 	ShippingMethodRemoveZoneAction,
 	ShippingMethodSetCustomFieldAction,
 	ShippingMethodSetCustomTypeAction,
@@ -16,13 +18,17 @@ import type {
 	ShippingMethodSetLocalizedDescriptionAction,
 	ShippingMethodSetLocalizedNameAction,
 	ShippingMethodSetPredicateAction,
+	ShippingMethodSetStoresAction,
 	ShippingMethodUpdateAction,
 	ZoneReference,
 } from "@commercetools/platform-sdk";
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
-import { getReferenceFromResourceIdentifier } from "../helpers.ts";
+import {
+	getReferenceFromResourceIdentifier,
+	getStoreKeyReference,
+} from "../helpers.ts";
 import { transformShippingRate } from "./helpers.ts";
 
 export class ShippingMethodUpdateHandler
@@ -117,6 +123,48 @@ export class ShippingMethodUpdateHandler
 				);
 			}
 		});
+	}
+
+	async addStore(
+		context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ store }: ShippingMethodAddStoreAction,
+	) {
+		const reference = await getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
+		);
+		if (!resource.stores.some((s) => s.key === reference.key)) {
+			resource.stores.push(reference);
+		}
+	}
+
+	async removeStore(
+		context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ store }: ShippingMethodRemoveStoreAction,
+	) {
+		const reference = await getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
+		);
+		resource.stores = resource.stores.filter((s) => s.key !== reference.key);
+	}
+
+	async setStores(
+		context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ stores }: ShippingMethodSetStoresAction,
+	) {
+		resource.stores = stores
+			? await Promise.all(
+					stores.map((s) =>
+						getStoreKeyReference(s, context.projectKey, this._storage),
+					),
+				)
+			: [];
 	}
 
 	removeZone(

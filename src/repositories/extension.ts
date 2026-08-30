@@ -3,6 +3,10 @@ import type {
 	ExtensionChangeDestinationAction,
 	ExtensionChangeTriggersAction,
 	ExtensionDraft,
+	ExtensionReference,
+	ExtensionSetAdditionalContextAction,
+	ExtensionSetDependenciesAction,
+	ExtensionSetExpansionPathsAction,
 	ExtensionSetKeyAction,
 	ExtensionSetTimeoutInMsAction,
 	ExtensionUpdateAction,
@@ -81,6 +85,37 @@ class ExtensionUpdateHandler
 		action: ExtensionChangeTriggersAction,
 	): void {
 		resource.triggers = action.triggers;
+	}
+
+	setAdditionalContext(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionSetAdditionalContextAction,
+	): void {
+		resource.additionalContext = {
+			includeOldResource: action.additionalContext.includeOldResource ?? false,
+		};
+	}
+
+	setDependencies(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionSetDependenciesAction,
+	): void {
+		resource.dependencies = action.dependencies.map(
+			(identifier): ExtensionReference => ({
+				typeId: "extension",
+				id: identifier.id!,
+			}),
+		);
+	}
+
+	setExpansionPaths(
+		context: RepositoryContext,
+		resource: Writable<Extension>,
+		action: ExtensionSetExpansionPathsAction,
+	): void {
+		resource.expansionPaths = action.expansionPaths;
 	}
 
 	setKey(

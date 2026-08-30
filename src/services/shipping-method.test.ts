@@ -64,6 +64,7 @@ describe("Shipping method", () => {
 				id: expect.anything(),
 				typeId: "tax-category",
 			},
+			stores: [],
 			version: 1,
 			zoneRates: [],
 			active: true,

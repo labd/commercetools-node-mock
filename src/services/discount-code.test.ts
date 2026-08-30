@@ -66,6 +66,7 @@ describe("DiscountCode", () => {
 				en: "Save 10% Discount",
 			},
 			references: [],
+			stores: [],
 			version: 1,
 		});
 	});

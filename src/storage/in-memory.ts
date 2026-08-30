@@ -83,6 +83,7 @@ export class InMemoryStorage extends AbstractStorage {
 					deleteDaysAfterLastModification: 360,
 				},
 				messages: { enabled: false, deleteDaysAfterCreation: 15 },
+				inventory: { releaseExpiredReservations: false },
 				shippingRateInputType: undefined,
 				externalOAuth: undefined,
 				searchIndexing: {

@@ -135,7 +135,7 @@ export abstract class AbstractStorage {
 		if (identifier.id) {
 			const resource = await this.get(
 				projectKey,
-				identifier.typeId,
+				identifier.typeId as ResourceType,
 				identifier.id,
 			);
 			if (resource) {
@@ -153,7 +153,7 @@ export abstract class AbstractStorage {
 		if (identifier.key) {
 			const resource = await this.getByKey(
 				projectKey,
-				identifier.typeId,
+				identifier.typeId as ResourceType,
 				identifier.key,
 			);
 			if (resource) {
