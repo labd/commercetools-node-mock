@@ -12,7 +12,7 @@ import { ProjectAPI } from "./projectAPI.ts";
 import type { RepositoryMap } from "./repositories/index.ts";
 import { createRepositories } from "./repositories/index.ts";
 import type { ProjectRepository } from "./repositories/project.ts";
-import { createServices } from "./services/index.ts";
+import { createServices, IN_STORE_SERVICES } from "./services/index.ts";
 import { ProjectService } from "./services/project.ts";
 import type { AbstractStorage } from "./storage/index.ts";
 import { InMemoryStorage } from "./storage/index.ts";
@@ -167,8 +167,18 @@ export class CommercetoolsMock {
 			new ProjectService(instance, repositories.project as ProjectRepository);
 		};
 
+		// Only the resources commercetools documents under
+		// /{projectKey}/in-store/key={storeKey} are mounted there; the rest 404,
+		// as they do on the real API.
+		const inStorePlugin = async (instance: FastifyInstance) => {
+			if (enableAuth) {
+				instance.addHook("preHandler", oauth2.createMiddleware());
+			}
+			createServices(instance, repositories, IN_STORE_SERVICES);
+		};
+
 		app.register(projectPlugin, { prefix: "/:projectKey" });
-		app.register(projectPlugin, {
+		app.register(inStorePlugin, {
 			prefix: "/:projectKey/in-store/key=:storeKey",
 		});
 
