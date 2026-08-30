@@ -952,7 +952,7 @@ describe("generateDiscriminatedUnionSchema", () => {
 		expect(result).toContain("coordinates: z.array(z.number()),");
 	});
 
-	it("flattens to base shape with multiple variants", () => {
+	it("builds a discriminated union for a small number of variants", () => {
 		const schemas: Record<string, OpenAPISchema> = {
 			MyUnion: {
 				type: "object",
@@ -976,8 +976,72 @@ describe("generateDiscriminatedUnionSchema", () => {
 			"MyUnion",
 			schemas.MyUnion,
 		);
+		expect(result).toBe(
+			'export const MyUnionSchema = z.discriminatedUnion("type", [VariantASchema, VariantBSchema]);',
+		);
+	});
+
+	it("flattens to base shape when there are too many variants", () => {
+		const mapping = Object.fromEntries(
+			Array.from({ length: 8 }, (_, i) => [
+				`v${i}`,
+				`#/components/schemas/Variant${i}`,
+			]),
+		);
+		const schemas: Record<string, OpenAPISchema> = {
+			BigUnion: {
+				type: "object",
+				required: ["type"],
+				properties: {
+					type: { type: "string" },
+					value: { type: "string" },
+				},
+				discriminator: { propertyName: "type", mapping },
+			},
+		};
+
+		const result = generateDiscriminatedUnionSchema(
+			schemas,
+			"BigUnion",
+			schemas.BigUnion,
+		);
+		expect(result).not.toContain("z.discriminatedUnion");
 		expect(result).toContain("type: z.string(),");
 		expect(result).toContain("value: z.string().nullish(),");
+	});
+
+	it("gives a union variant a literal discriminator property", () => {
+		const schemas: Record<string, OpenAPISchema> = {
+			MyUnion: {
+				type: "object",
+				properties: { type: { type: "string" } },
+				discriminator: {
+					propertyName: "type",
+					mapping: {
+						Alpha: "#/components/schemas/AlphaVariant",
+						Beta: "#/components/schemas/BetaVariant",
+					},
+				},
+			},
+			AlphaVariant: {
+				type: "object",
+				required: ["type", "alpha"],
+				properties: { type: { type: "string" }, alpha: { type: "string" } },
+			},
+			BetaVariant: {
+				type: "object",
+				required: ["type"],
+				properties: { type: { type: "string" } },
+			},
+		};
+
+		const result = generateObjectSchema(
+			schemas,
+			"AlphaVariant",
+			schemas.AlphaVariant,
+		);
+		expect(result).toContain('type: z.literal("Alpha"),');
+		expect(result).toContain("alpha: z.string(),");
 	});
 
 	it("adds .refine() for ResourceIdentifier base type", () => {

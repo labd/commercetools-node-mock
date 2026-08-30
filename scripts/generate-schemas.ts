@@ -333,7 +333,7 @@ export function collectDependencies(
 	// discriminated unions we flatten to the base object shape.
 	if (schema.discriminator?.mapping) {
 		const variants = Object.values(schema.discriminator.mapping);
-		if (variants.length <= 5) {
+		if (variants.length <= MAX_UNION_VARIANTS) {
 			for (const ref of variants) {
 				collectDependencies(schemas, resolveRef(ref), collected);
 			}
@@ -430,6 +430,81 @@ export function propertyToZod(
 	return "z.unknown()";
 }
 
+// Discriminated unions with at most this many variants are emitted as real
+// z.discriminatedUnion(...) schemas. Larger ones (Reference, AttributeType,
+// StagedOrderUpdateAction, ...) are flattened to their base object shape, since
+// enumerating dozens of variants adds little validation value.
+const MAX_UNION_VARIANTS = 5;
+
+const variantDiscriminatorCache = new WeakMap<
+	Record<string, OpenAPISchema>,
+	Map<string, { property: string; value: string }>
+>();
+
+/**
+ * Maps each variant of a small discriminated union to the property and literal
+ * value that identifies it, e.g. CompanyDraft -> { unitType, "Company" }.
+ *
+ * The spec types those properties as the shared enum (BusinessUnitType), which
+ * z.discriminatedUnion cannot key on, so variants need a literal instead.
+ */
+function variantDiscriminators(
+	schemas: Record<string, OpenAPISchema>,
+): Map<string, { property: string; value: string }> {
+	const cached = variantDiscriminatorCache.get(schemas);
+	if (cached) return cached;
+
+	const result = new Map<string, { property: string; value: string }>();
+	for (const schema of Object.values(schemas)) {
+		const disc = schema?.discriminator;
+		const mapping = disc?.mapping;
+		if (!disc || !mapping) continue;
+		const entries = Object.entries(mapping);
+		if (entries.length > MAX_UNION_VARIANTS) continue;
+		for (const [value, ref] of entries) {
+			result.set(resolveRef(ref), { property: disc.propertyName, value });
+		}
+	}
+	variantDiscriminatorCache.set(schemas, result);
+	return result;
+}
+
+/**
+ * Whether a schema is emitted as a real z.discriminatedUnion rather than being
+ * flattened to its base object shape. The emitter, the dependency collector and
+ * the draft-file import list must all agree on this, or the generated file ends
+ * up importing schemas it never references.
+ */
+export function emitsAsDiscriminatedUnion(
+	name: string,
+	schema: OpenAPISchema,
+): boolean {
+	// The Reference / ResourceIdentifier base types are deliberately flattened;
+	// see generateAllOfSchema.
+	if (name === "Reference" || name === "ResourceIdentifier") return false;
+	const mapping = schema?.discriminator?.mapping;
+	if (!mapping) return false;
+	const count = Object.keys(mapping).length;
+	return count > 1 && count <= MAX_UNION_VARIANTS;
+}
+
+/** Renders one `name: <zod>` line, forcing a literal for discriminator props. */
+function propertyLine(
+	propName: string,
+	propDef: OpenAPIProperty,
+	isRequired: boolean,
+	schemas: Record<string, OpenAPISchema>,
+	discriminator: { property: string; value: string } | undefined,
+): string {
+	if (discriminator && propName === discriminator.property) {
+		return `\t${propName}: z.literal(${JSON.stringify(discriminator.value)}),`;
+	}
+	const zodType = propertyToZod(propDef, schemas);
+	return isRequired
+		? `\t${propName}: ${zodType},`
+		: `\t${propName}: ${zodType}.nullish(),`;
+}
+
 export function generateObjectSchema(
 	schemas: Record<string, OpenAPISchema>,
 	name: string,
@@ -455,16 +530,19 @@ export function generateObjectSchema(
 		(schema.required || []).filter((r) => !r.startsWith("/")),
 	);
 	const props = schema.properties || {};
+	const discriminator = variantDiscriminators(schemas).get(name);
 
 	const lines: string[] = [];
 	for (const [propName, propDef] of Object.entries(props)) {
-		const zodType = propertyToZod(propDef, schemas);
-		const isRequired = required.has(propName);
-		if (isRequired) {
-			lines.push(`\t${propName}: ${zodType},`);
-		} else {
-			lines.push(`\t${propName}: ${zodType}.nullish(),`);
-		}
+		lines.push(
+			propertyLine(
+				propName,
+				propDef,
+				required.has(propName),
+				schemas,
+				discriminator,
+			),
+		);
 	}
 
 	return `export const ${schemaToVarName(name)} = z.object({\n${lines.join("\n")}\n});`;
@@ -507,15 +585,18 @@ export function generateAllOfSchema(
 		}
 	}
 
+	const discriminator = variantDiscriminators(schemas).get(name);
 	const lines: string[] = [];
 	for (const [propName, propDef] of Object.entries(allProps)) {
-		const zodType = propertyToZod(propDef, schemas);
-		const isRequired = allRequired.has(propName);
-		if (isRequired) {
-			lines.push(`\t${propName}: ${zodType},`);
-		} else {
-			lines.push(`\t${propName}: ${zodType}.nullish(),`);
-		}
+		lines.push(
+			propertyLine(
+				propName,
+				propDef,
+				allRequired.has(propName),
+				schemas,
+				discriminator,
+			),
+		);
 	}
 
 	// ResourceIdentifier subtypes require at least id or key
@@ -579,6 +660,16 @@ export function generateDiscriminatedUnionSchema(
 		}
 
 		return `export const ${schemaToVarName(name)} = z.object({\n${lines.join("\n")}\n});`;
+	}
+
+	// Small unions are worth modelling exactly: their variants differ in required
+	// fields (a DivisionDraft needs parentUnit, a CompanyDraft does not), which a
+	// flattened base shape cannot express.
+	if (emitsAsDiscriminatedUnion(name, schema)) {
+		const options = variants.map(([, ref]) => schemaToVarName(resolveRef(ref)));
+		return `export const ${schemaToVarName(name)} = z.discriminatedUnion(${JSON.stringify(
+			disc.propertyName,
+		)}, [${options.join(", ")}]);`;
 	}
 
 	// Multiple variants: generate flattened base shape
@@ -764,7 +855,15 @@ export function generateDraftFile(
 
 	// Collect which common schemas this draft references
 	const deps = new Set<string>();
-	collectDirectDeps(schema, deps);
+	if (emitsAsDiscriminatedUnion(draftName, schema)) {
+		// The draft is just `z.discriminatedUnion(prop, [...variants])`, so its
+		// own properties are never referenced.
+		for (const ref of Object.values(schema.discriminator!.mapping!)) {
+			deps.add(resolveRef(ref));
+		}
+	} else {
+		collectDirectDeps(schema, deps);
+	}
 
 	// Also collect transitive deps from allOf if present
 	if (schema.allOf) {
