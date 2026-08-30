@@ -536,7 +536,7 @@ export const CompanyDraftSchema = z.object({
 	status: BusinessUnitStatusSchema.nullish(),
 	stores: z.array(StoreResourceIdentifierSchema).nullish(),
 	storeMode: BusinessUnitStoreModeSchema.nullish(),
-	unitType: BusinessUnitTypeSchema,
+	unitType: z.literal("Company"),
 	name: z.string(),
 	contactEmail: z.string().nullish(),
 	associateMode: BusinessUnitAssociateModeSchema.nullish(),
@@ -568,7 +568,7 @@ export const DivisionDraftSchema = z.object({
 	status: BusinessUnitStatusSchema.nullish(),
 	stores: z.array(StoreResourceIdentifierSchema).nullish(),
 	storeMode: BusinessUnitStoreModeSchema.nullish(),
-	unitType: BusinessUnitTypeSchema,
+	unitType: z.literal("Division"),
 	name: z.string(),
 	contactEmail: z.string().nullish(),
 	associateMode: BusinessUnitAssociateModeSchema.nullish(),
@@ -708,21 +708,22 @@ export const ShippingMethodResourceIdentifierSchema = z
 	});
 
 export const ClassificationShippingRateInputDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("Classification"),
 	key: z.string(),
 });
 
 export const ScoreShippingRateInputDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("Score"),
 	score: z.number().int(),
 });
 
-export const ShippingRateInputDraftSchema = z.object({
-	type: z.string(),
-});
+export const ShippingRateInputDraftSchema = z.discriminatedUnion("type", [
+	ClassificationShippingRateInputDraftSchema,
+	ScoreShippingRateInputDraftSchema,
+]);
 
 export const CartClassificationTierSchema = z.object({
-	type: ShippingRateTierTypeSchema,
+	type: z.literal("CartClassification"),
 	value: z.string(),
 	price: MoneySchema,
 	isMatching: z.boolean().nullish(),
@@ -734,7 +735,7 @@ export const PriceFunctionSchema = z.object({
 });
 
 export const CartScoreTierSchema = z.object({
-	type: ShippingRateTierTypeSchema,
+	type: z.literal("CartScore"),
 	score: z.number().int(),
 	price: MoneySchema.nullish(),
 	priceFunction: PriceFunctionSchema.nullish(),
@@ -742,15 +743,17 @@ export const CartScoreTierSchema = z.object({
 });
 
 export const CartValueTierSchema = z.object({
-	type: ShippingRateTierTypeSchema,
+	type: z.literal("CartValue"),
 	minimumCentAmount: z.number().int(),
 	price: MoneySchema,
 	isMatching: z.boolean().nullish(),
 });
 
-export const ShippingRatePriceTierSchema = z.object({
-	type: ShippingRateTierTypeSchema,
-});
+export const ShippingRatePriceTierSchema = z.discriminatedUnion("type", [
+	CartClassificationTierSchema,
+	CartScoreTierSchema,
+	CartValueTierSchema,
+]);
 
 export const ShippingRateDraftSchema = z.object({
 	price: MoneySchema,
@@ -851,7 +854,7 @@ export const ShippingDraftSchema = z.object({
 });
 
 export const CartDiscountValueAbsoluteDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("absolute"),
 	money: z.array(MoneySchema),
 	applicationMode: DiscountApplicationModeSchema.nullish(),
 });
@@ -864,7 +867,7 @@ export const TypedMoneyDraftSchema = z.object({
 });
 
 export const CartDiscountValueFixedDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("fixed"),
 	money: z.array(TypedMoneyDraftSchema),
 	applicationMode: DiscountApplicationModeSchema.nullish(),
 });
@@ -880,7 +883,7 @@ export const ProductResourceIdentifierSchema = z
 	});
 
 export const CartDiscountValueGiftLineItemDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("giftLineItem"),
 	product: ProductResourceIdentifierSchema,
 	variantId: z.number().int(),
 	supplyChannel: ChannelResourceIdentifierSchema.nullish(),
@@ -888,14 +891,17 @@ export const CartDiscountValueGiftLineItemDraftSchema = z.object({
 });
 
 export const CartDiscountValueRelativeDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("relative"),
 	permyriad: z.number().int(),
 	applicationMode: DiscountApplicationModeSchema.nullish(),
 });
 
-export const CartDiscountValueDraftSchema = z.object({
-	type: z.string(),
-});
+export const CartDiscountValueDraftSchema = z.discriminatedUnion("type", [
+	CartDiscountValueAbsoluteDraftSchema,
+	CartDiscountValueFixedDraftSchema,
+	CartDiscountValueGiftLineItemDraftSchema,
+	CartDiscountValueRelativeDraftSchema,
+]);
 
 export const CartDiscountTargetSchema = z.object({
 	type: z.string(),
@@ -912,25 +918,28 @@ export const DiscountGroupResourceIdentifierSchema = z
 	});
 
 export const AnyOrderDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("AnyOrder"),
 });
 
 export const ApplicableRecurrencePoliciesDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("ApplicableRecurrencePolicies"),
 	recurrencePolicies: z.array(RecurrencePolicyResourceIdentifierSchema),
 });
 
 export const NonRecurringOrdersOnlyDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("NonRecurringOrdersOnly"),
 });
 
 export const RecurringOrdersOnlyDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("RecurringOrdersOnly"),
 });
 
-export const RecurringOrderScopeDraftSchema = z.object({
-	type: z.string(),
-});
+export const RecurringOrderScopeDraftSchema = z.discriminatedUnion("type", [
+	AnyOrderDraftSchema,
+	ApplicableRecurrencePoliciesDraftSchema,
+	NonRecurringOrdersOnlyDraftSchema,
+	RecurringOrdersOnlyDraftSchema,
+]);
 
 export const CategoryResourceIdentifierSchema = z
 	.object({
@@ -964,7 +973,7 @@ export const AssetDraftSchema = z.object({
 });
 
 export const GeoJsonPointSchema = z.object({
-	type: z.string(),
+	type: z.literal("Point"),
 	coordinates: z.array(z.number()),
 });
 
@@ -994,40 +1003,43 @@ export const CartDiscountResourceIdentifierSchema = z
 	});
 
 export const AWSLambdaDestinationSchema = z.object({
-	type: z.string(),
+	type: z.literal("AWSLambda"),
 	arn: z.string(),
 	accessKey: z.string(),
 	accessSecret: z.string(),
 });
 
 export const GoogleCloudFunctionDestinationSchema = z.object({
-	type: z.string(),
+	type: z.literal("GoogleCloudFunction"),
 	url: z.string(),
 });
 
 export const AuthorizationHeaderAuthenticationSchema = z.object({
-	type: z.string(),
+	type: z.literal("AuthorizationHeader"),
 	headerValue: z.string(),
 });
 
 export const AzureFunctionsAuthenticationSchema = z.object({
-	type: z.string(),
+	type: z.literal("AzureFunctions"),
 	key: z.string(),
 });
 
-export const HttpDestinationAuthenticationSchema = z.object({
-	type: z.string(),
-});
+export const HttpDestinationAuthenticationSchema = z.discriminatedUnion(
+	"type",
+	[AuthorizationHeaderAuthenticationSchema, AzureFunctionsAuthenticationSchema],
+);
 
 export const HttpDestinationSchema = z.object({
-	type: z.string(),
+	type: z.literal("HTTP"),
 	url: z.string(),
 	authentication: HttpDestinationAuthenticationSchema.nullish(),
 });
 
-export const ExtensionDestinationSchema = z.object({
-	type: z.string(),
-});
+export const ExtensionDestinationSchema = z.discriminatedUnion("type", [
+	AWSLambdaDestinationSchema,
+	GoogleCloudFunctionDestinationSchema,
+	HttpDestinationSchema,
+]);
 
 export const ExtensionTriggerSchema = z.object({
 	resourceTypeId: ExtensionResourceTypeIdSchema,
@@ -1181,22 +1193,24 @@ export const ProductVariantDraftSchema = z.object({
 export const SearchKeywordsSchema = z.record(z.string(), z.string());
 
 export const ProductDiscountValueAbsoluteDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("absolute"),
 	money: z.array(MoneySchema),
 });
 
 export const ProductDiscountValueExternalDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("external"),
 });
 
 export const ProductDiscountValueRelativeDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("relative"),
 	permyriad: z.number().int(),
 });
 
-export const ProductDiscountValueDraftSchema = z.object({
-	type: z.string(),
-});
+export const ProductDiscountValueDraftSchema = z.discriminatedUnion("type", [
+	ProductDiscountValueAbsoluteDraftSchema,
+	ProductDiscountValueExternalDraftSchema,
+	ProductDiscountValueRelativeDraftSchema,
+]);
 
 export const TypeReferenceSchema = z.object({
 	typeId: ReferenceTypeIdSchema,
@@ -1263,19 +1277,20 @@ export const StateReferenceSchema = z.object({
 });
 
 export const DayOfMonthScheduleDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("dayOfMonth"),
 	day: z.number().int(),
 });
 
 export const StandardScheduleDraftSchema = z.object({
-	type: z.string(),
+	type: z.literal("standard"),
 	value: z.number().int(),
 	intervalUnit: IntervalUnitSchema,
 });
 
-export const RecurrencePolicyScheduleDraftSchema = z.object({
-	type: z.string(),
-});
+export const RecurrencePolicyScheduleDraftSchema = z.discriminatedUnion(
+	"type",
+	[DayOfMonthScheduleDraftSchema, StandardScheduleDraftSchema],
+);
 
 export const ZoneResourceIdentifierSchema = z
 	.object({
@@ -1376,17 +1391,18 @@ export const EventSubscriptionSchema = z.object({
 });
 
 export const CloudEventsFormatSchema = z.object({
-	type: z.string(),
+	type: z.literal("CloudEvents"),
 	cloudEventsVersion: z.string(),
 });
 
 export const PlatformFormatSchema = z.object({
-	type: z.string(),
+	type: z.literal("Platform"),
 });
 
-export const DeliveryFormatSchema = z.object({
-	type: z.string(),
-});
+export const DeliveryFormatSchema = z.discriminatedUnion("type", [
+	CloudEventsFormatSchema,
+	PlatformFormatSchema,
+]);
 
 export const TaxRateDraftSchema = z.object({
 	name: z.string(),

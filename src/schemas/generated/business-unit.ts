@@ -2,37 +2,9 @@
 // Do not edit manually.
 
 import { z } from "zod";
-import {
-	AssociateDraftSchema,
-	BaseAddressSchema,
-	BusinessUnitApprovalRuleModeSchema,
-	BusinessUnitAssociateModeSchema,
-	BusinessUnitStatusSchema,
-	BusinessUnitStoreModeSchema,
-	BusinessUnitTypeSchema,
-	CustomerGroupAssignmentDraftSchema,
-	CustomFieldsDraftSchema,
-	StoreResourceIdentifierSchema,
-} from "./common.ts";
+import { CompanyDraftSchema, DivisionDraftSchema } from "./common.ts";
 
-export const BusinessUnitDraftSchema = z.object({
-	key: z.string(),
-	status: BusinessUnitStatusSchema.nullish(),
-	stores: z.array(StoreResourceIdentifierSchema).nullish(),
-	storeMode: BusinessUnitStoreModeSchema.nullish(),
-	unitType: BusinessUnitTypeSchema,
-	name: z.string(),
-	contactEmail: z.string().nullish(),
-	associateMode: BusinessUnitAssociateModeSchema.nullish(),
-	associates: z.array(AssociateDraftSchema).nullish(),
-	approvalRuleMode: BusinessUnitApprovalRuleModeSchema.nullish(),
-	addresses: z.array(BaseAddressSchema).nullish(),
-	shippingAddresses: z.array(z.number().int()).nullish(),
-	defaultShippingAddress: z.number().int().nullish(),
-	billingAddresses: z.array(z.number().int()).nullish(),
-	defaultBillingAddress: z.number().int().nullish(),
-	custom: CustomFieldsDraftSchema.nullish(),
-	customerGroupAssignments: z
-		.array(CustomerGroupAssignmentDraftSchema)
-		.nullish(),
-});
+export const BusinessUnitDraftSchema = z.discriminatedUnion("unitType", [
+	CompanyDraftSchema,
+	DivisionDraftSchema,
+]);
