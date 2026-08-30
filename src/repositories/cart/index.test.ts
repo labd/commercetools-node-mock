@@ -113,6 +113,7 @@ describe("Cart repository", () => {
 		});
 
 		await storage.add("dummy", "shipping-method", {
+			stores: [],
 			...getBaseResourceProperties(),
 			id: "shipping-method-id",
 			key: "standard-shipping",
@@ -473,6 +474,7 @@ describe("createShippingInfo", () => {
 
 	test("should calculate shipping info", async () => {
 		await storage.add("dummy", "shipping-method", {
+			stores: [],
 			...getBaseResourceProperties(),
 			id: "basic-shipping-id",
 			name: "Standard Shipping",
@@ -552,6 +554,7 @@ describe("createShippingInfo", () => {
 
 	test("should apply free shipping when cart total is above freeAbove threshold", async () => {
 		await storage.add("dummy", "shipping-method", {
+			stores: [],
 			...getBaseResourceProperties(),
 			id: "free-above-shipping-id",
 			key: "free-above-shipping",
@@ -637,6 +640,7 @@ describe("createShippingInfo", () => {
 
 	test("should charge normal shipping when cart total is below freeAbove threshold", async () => {
 		await storage.add("dummy", "shipping-method", {
+			stores: [],
 			...getBaseResourceProperties(),
 			id: "free-above-shipping-id-2",
 			key: "free-above-shipping-2",
@@ -722,6 +726,7 @@ describe("createShippingInfo", () => {
 
 	test("should use external tax rate when cart taxMode is External", async () => {
 		await storage.add("dummy", "shipping-method", {
+			stores: [],
 			...getBaseResourceProperties(),
 			id: "external-tax-shipping-id",
 			name: "Standard Shipping",
@@ -798,6 +803,7 @@ describe("createShippingInfo", () => {
 
 	test("create cart with discount code", async () => {
 		const code = await storage.add("dummy", "discount-code", {
+			stores: [],
 			...getBaseResourceProperties(),
 			code: "test-1234",
 			cartDiscounts: [],
@@ -844,6 +850,7 @@ describe("createShippingInfo", () => {
 
 	test("create cart with duplicate discount codes deduplicates them", async () => {
 		const code = await storage.add("dummy", "discount-code", {
+			stores: [],
 			...getBaseResourceProperties(),
 			code: "duplicate-test",
 			cartDiscounts: [],
@@ -875,6 +882,7 @@ describe("createShippingInfo", () => {
 
 	test("addDiscountCode action adds discount code to cart", async () => {
 		const code = await storage.add("dummy", "discount-code", {
+			stores: [],
 			...getBaseResourceProperties(),
 			code: "action-test-code",
 			cartDiscounts: [],

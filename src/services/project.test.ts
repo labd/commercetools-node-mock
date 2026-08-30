@@ -25,6 +25,9 @@ describe("Project", () => {
 			currencies: [],
 			key: "dummy",
 			languages: [],
+			inventory: {
+				releaseExpiredReservations: false,
+			},
 			messages: {
 				deleteDaysAfterCreation: 15,
 				enabled: false,

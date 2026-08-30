@@ -717,6 +717,7 @@ describe("Order repository", () => {
 
 			// Create a shipping method first
 			const shippingMethod = {
+				stores: [],
 				...getBaseResourceProperties(),
 				id: "shipping-method-123",
 				name: "Express Shipping",
@@ -829,6 +830,7 @@ describe("Order repository", () => {
 			};
 
 			const shippingMethod = {
+				stores: [],
 				...getBaseResourceProperties(),
 				id: "shipping-method-456",
 				name: "Standard Shipping",

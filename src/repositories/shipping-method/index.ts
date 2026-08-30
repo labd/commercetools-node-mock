@@ -14,6 +14,7 @@ import { AbstractResourceRepository } from "../abstract.ts";
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
+	getStoreKeyReference,
 } from "../helpers.ts";
 import { ShippingMethodUpdateHandler } from "./actions.ts";
 import { transformShippingRate } from "./helpers.ts";
@@ -35,10 +36,19 @@ export class ShippingMethodRepository extends AbstractResourceRepository<"shippi
 				)
 			: [];
 
+		const stores = draft.stores
+			? await Promise.all(
+					draft.stores.map((s) =>
+						getStoreKeyReference(s, context.projectKey, this._storage),
+					),
+				)
+			: [];
+
 		const resource: ShippingMethod = {
 			...getBaseResourceProperties(context.clientId),
 			...draft,
 			active: draft.active ?? true,
+			stores,
 			taxCategory: await getReferenceFromResourceIdentifier(
 				draft.taxCategory,
 				context.projectKey,

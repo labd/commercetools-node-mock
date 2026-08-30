@@ -40,6 +40,7 @@ export class DiscountCodeRepository extends AbstractResourceRepository<"discount
 			isActive: draft.isActive || true,
 			name: draft.name,
 			references: [],
+			stores: [],
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
 			maxApplications: draft.maxApplications,

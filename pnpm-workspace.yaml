@@ -1,7 +1,7 @@
 packages:
   - '.'
   - docs
-minimumReleaseAge: 20160
+minimumReleaseAge: 10080
 trustPolicy: no-downgrade
 onlyBuiltDependencies:
   - '@biomejs/*'
@@ -10,4 +10,4 @@ onlyBuiltDependencies:
   - rolldown
   - sharp
 minimumReleaseAgeExclude:
-  - '@types/node'
+  - "zod"
