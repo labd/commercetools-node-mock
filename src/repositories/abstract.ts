@@ -43,6 +43,13 @@ export type RepositoryContext = {
 	projectKey: string;
 	storeKey?: string;
 	clientId?: string;
+
+	/** Set when the request carries a customer-scoped token */
+	customerId?: string;
+
+	/** Set when the request carries an anonymous-scoped token */
+	anonymousId?: string;
+
 	associateId?: string;
 	businessUnitKey?: string;
 };
@@ -132,6 +139,14 @@ export abstract class AbstractResourceRepository<
 	 */
 	get strict(): boolean {
 		return this.config.strict;
+	}
+
+	/**
+	 * The storage this repository reads from. Scoped services need it to resolve
+	 * the caller before they can decide what the caller may see.
+	 */
+	get storage(): AbstractStorage {
+		return this._storage;
 	}
 
 	abstract create(

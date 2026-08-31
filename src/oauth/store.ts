@@ -30,6 +30,25 @@ export class OAuth2Store {
 		return this.tokenClientMap.get(accessToken);
 	}
 
+	/**
+	 * The identity a token was issued for. Customer and anonymous tokens carry
+	 * it in their scope as `customer_id:<id>` / `anonymous_id:<id>`, the way
+	 * commercetools does.
+	 */
+	getTokenIdentity(accessToken: string): {
+		customerId?: string;
+		anonymousId?: string;
+	} {
+		const token = this.tokens.find((t) => t.access_token === accessToken);
+		if (!token?.scope) {
+			return {};
+		}
+		return {
+			customerId: /(?:^|\s)customer_id:(\S+)/.exec(token.scope)?.[1],
+			anonymousId: /(?:^|\s)anonymous_id:(\S+)/.exec(token.scope)?.[1],
+		};
+	}
+
 	getClientToken(clientId: string, clientSecret: string, scope?: string) {
 		const token: Token = {
 			access_token: randomBytes(16).toString("base64"),

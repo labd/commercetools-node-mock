@@ -1,4 +1,5 @@
 import type {
+	CustomerReference,
 	Payment,
 	PaymentDraft,
 	StateReference,
@@ -46,6 +47,14 @@ export class PaymentRepository extends AbstractResourceRepository<"payment"> {
 		const resource: Payment = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
+			customer: draft.customer
+				? await getReferenceFromResourceIdentifier<CustomerReference>(
+						draft.customer,
+						context.projectKey,
+						this._storage,
+					)
+				: undefined,
+			anonymousId: draft.anonymousId,
 			amountPlanned: createCentPrecisionMoney(draft.amountPlanned),
 			paymentMethodInfo: { ...draft.paymentMethodInfo!, custom: undefined },
 			paymentStatus: draft.paymentStatus

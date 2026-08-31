@@ -14,6 +14,8 @@ declare module "fastify" {
 		credentials?: {
 			clientId: string;
 			clientSecret: string;
+			customerId?: string;
+			anonymousId?: string;
 		};
 	}
 }
@@ -62,50 +64,48 @@ export class OAuth2Server {
 		};
 	}
 
+	/**
+	 * Resolves who a request is for, and enforces the token when the mock is
+	 * configured to.
+	 *
+	 * Resolving the identity is not the same as requiring one: the `/me` and
+	 * associate-scoped endpoints need to know which customer a token was issued
+	 * for even when the mock is not validating credentials, so this always runs
+	 * and only the enforcement is conditional.
+	 */
 	createMiddleware() {
-		if (!this.options.validate) {
-			return async (request: FastifyRequest, reply: FastifyReply) => {
-				// When validation is disabled, still populate credentials
-				// so createdBy/lastModifiedBy can be set on resources
-				const token = getBearerToken(request);
-				const clientId = token
-					? this.store.getClientIdForToken(token)
-					: undefined;
-				request.credentials = {
-					clientId: clientId ?? "",
-					clientSecret: "",
-				};
-			};
-		}
-
 		return async (request: FastifyRequest, reply: FastifyReply) => {
 			const token = getBearerToken(request);
-			if (!token) {
-				throw new CommercetoolsError<InvalidTokenError>(
-					{
-						code: "invalid_token",
-						message:
-							"This endpoint requires an access token. You can get one from the authorization server.",
-					},
-					401,
-				);
+
+			if (this.options.validate) {
+				if (!token) {
+					throw new CommercetoolsError<InvalidTokenError>(
+						{
+							code: "invalid_token",
+							message:
+								"This endpoint requires an access token. You can get one from the authorization server.",
+						},
+						401,
+					);
+				}
+
+				if (!this.store.validateToken(token)) {
+					throw new CommercetoolsError<InvalidTokenError>(
+						{
+							code: "invalid_token",
+							message: "invalid_token",
+						},
+						401,
+					);
+				}
 			}
 
-			if (!token || !this.store.validateToken(token)) {
-				throw new CommercetoolsError<InvalidTokenError>(
-					{
-						code: "invalid_token",
-						message: "invalid_token",
-					},
-					401,
-				);
-			}
-
-			// Populate credentials so createdBy/lastModifiedBy can be set
-			const clientId = this.store.getClientIdForToken(token);
+			// Populate credentials so createdBy/lastModifiedBy can be set, and so
+			// the scoped endpoints know whose request this is
 			request.credentials = {
-				clientId: clientId ?? "",
+				clientId: token ? (this.store.getClientIdForToken(token) ?? "") : "",
 				clientSecret: "",
+				...(token ? this.store.getTokenIdentity(token) : {}),
 			};
 		};
 	}
@@ -360,11 +360,13 @@ export class OAuth2Server {
 		if (grantType === "client_credentials") {
 			const scope = query.scope?.toString() || body?.scope?.toString();
 
-			const anonymous_id = undefined;
+			// The client may bring its own anonymous id to continue a session
+			const anonymousId =
+				query.anonymous_id?.toString() || body?.anonymous_id?.toString();
 
 			const token = this.store.getAnonymousToken(
 				projectKey,
-				anonymous_id,
+				anonymousId,
 				scope,
 				request.credentials?.clientId,
 			);

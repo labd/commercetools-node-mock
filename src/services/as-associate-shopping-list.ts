@@ -1,36 +1,42 @@
 import type { FastifyInstance } from "fastify";
-import type { ShoppingListRepository } from "#src/repositories/shopping-list/index.ts";
-import AbstractService from "./abstract.ts";
+import { SHOPPING_LIST_PERMISSIONS } from "#src/associate-permissions.ts";
+import type { AsAssociateShoppingListRepository } from "#src/repositories/as-associate.ts";
+import AbstractAssociateService, {
+	type AssociateResourceRules,
+} from "./abstract-associate.ts";
 
-export class AsAssociateShoppingListService extends AbstractService {
-	public repository: ShoppingListRepository;
+export class AsAssociateShoppingListService extends AbstractAssociateService {
+	public repository: AsAssociateShoppingListRepository;
 
-	constructor(parent: FastifyInstance, repository: ShoppingListRepository) {
+	protected rules: AssociateResourceRules = {
+		view: SHOPPING_LIST_PERMISSIONS.view,
+		create: SHOPPING_LIST_PERMISSIONS.create,
+		update: SHOPPING_LIST_PERMISSIONS.update,
+		delete: SHOPPING_LIST_PERMISSIONS.delete,
+		businessUnitWhere: (key) => `businessUnit(key="${key}")`,
+		ownerWhere: (associateId) => `customer(id="${associateId}")`,
+		ownerOf: (list) => list.customer?.id,
+		businessUnitOf: (list) => list.businessUnit?.key,
+		ownerOfDraft: (draft) => draft.customer?.id,
+		stampDraft: (draft, scope) => ({
+			...draft,
+			customer: draft.customer ?? { typeId: "customer", id: scope.associateId },
+			businessUnit: draft.businessUnit ?? {
+				typeId: "business-unit",
+				key: scope.businessUnitKey,
+			},
+		}),
+	};
+
+	constructor(
+		parent: FastifyInstance,
+		repository: AsAssociateShoppingListRepository,
+	) {
 		super(parent);
 		this.repository = repository;
 	}
 
 	getBasePath() {
 		return "shopping-lists";
-	}
-
-	registerRoutes(parent: FastifyInstance) {
-		const basePath = this.getBasePath();
-		parent.register(
-			(instance, opts, done) => {
-				this.extraRoutes(instance);
-
-				instance.get("/", this.get.bind(this));
-				instance.get("/:id", this.getWithId.bind(this));
-
-				instance.delete("/:id", this.deleteWithId.bind(this));
-
-				instance.post("/", this.post.bind(this));
-				instance.post("/:id", this.postWithId.bind(this));
-
-				done();
-			},
-			{ prefix: `/${basePath}` },
-		);
 	}
 }

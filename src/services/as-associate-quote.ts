@@ -1,9 +1,24 @@
 import type { FastifyInstance } from "fastify";
+import {
+	QUOTE_PERMISSIONS,
+	quoteActionPermission,
+} from "#src/associate-permissions.ts";
 import type { AsAssociateQuoteRepository } from "#src/repositories/as-associate.ts";
-import AbstractService from "./abstract.ts";
+import AbstractAssociateService, {
+	type AssociateResourceRules,
+} from "./abstract-associate.ts";
 
-export class AsAssociateQuoteService extends AbstractService {
+export class AsAssociateQuoteService extends AbstractAssociateService {
 	public repository: AsAssociateQuoteRepository;
+
+	protected rules: AssociateResourceRules = {
+		view: QUOTE_PERMISSIONS.view,
+		businessUnitWhere: (key) => `businessUnit(key="${key}")`,
+		ownerWhere: (associateId) => `customer(id="${associateId}")`,
+		ownerOf: (quote) => quote.customer?.id,
+		businessUnitOf: (quote) => quote.businessUnit?.key,
+		actionPermission: quoteActionPermission,
+	};
 
 	constructor(parent: FastifyInstance, repository: AsAssociateQuoteRepository) {
 		super(parent);

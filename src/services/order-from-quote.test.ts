@@ -1,5 +1,6 @@
 import type { LineItem, Quote } from "@commercetools/platform-sdk";
 import { afterEach, describe, expect, test } from "vitest";
+import { customerSession } from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
 const ctMock = new CommercetoolsMock({ defaultProjectKey: "dummy" });
@@ -213,6 +214,7 @@ describe("Order from Quote", () => {
 				version: quote.version,
 				quoteStateToAccepted: true,
 			},
+			headers: customerSession(ctMock, customerId).headers,
 		});
 
 		expect(response.statusCode).toBe(201);
@@ -248,6 +250,7 @@ describe("Order from Quote draft validation", () => {
 			method: "POST",
 			url: "/dummy/me/orders/quotes",
 			payload: { id: "2c4bb2c1-0f4f-4c1e-9d2f-9a1d3e4b5c6a" },
+			headers: customerSession(strictMock, customerId).headers,
 		});
 
 		expect(response.statusCode).toBe(400);

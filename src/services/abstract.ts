@@ -27,6 +27,38 @@ export default abstract class AbstractService {
 
 	extraRoutes(instance: FastifyInstance) {}
 
+	/**
+	 * Extra predicates to narrow a list request to what the caller may see.
+	 * Empty for the unscoped endpoints; the `/me` and associate-scoped services
+	 * override it.
+	 */
+	protected async scopeWhere(
+		_request: FastifyRequest<{ Params: Record<string, string> }>,
+	): Promise<string[]> {
+		return [];
+	}
+
+	/**
+	 * Called with a resource that was resolved by id or key, before it is
+	 * returned or modified. Throws when the caller may not touch it.
+	 */
+	protected async authorizeResource(
+		_request: FastifyRequest<{ Params: Record<string, string> }>,
+		_operation: "view" | "update" | "delete",
+		_resource: unknown,
+	): Promise<void> {}
+
+	/**
+	 * Called with the draft of a create request. Returns the draft to store, so
+	 * a scoped endpoint can stamp the identity it is scoped to onto it.
+	 */
+	protected async authorizeCreate(
+		_request: FastifyRequest<{ Params: Record<string, string> }>,
+		draft: unknown,
+	): Promise<unknown> {
+		return draft;
+	}
+
 	registerRoutes(parent: FastifyInstance) {
 		const basePath = this.getBasePath();
 		parent.register(
@@ -60,9 +92,10 @@ export default abstract class AbstractService {
 		const query = request.query;
 		const limit = this._parseParam(query.limit);
 		const offset = this._parseParam(query.offset);
+		const scoped = await this.scopeWhere(request);
 		const params: QueryParams = {
 			expand: this._parseParam(query.expand),
-			where: this._parseParam(query.where),
+			where: [...(this._parseParam(query.where) ?? []), ...scoped],
 			limit: limit !== undefined ? Number(limit) : undefined,
 			offset: offset !== undefined ? Number(offset) : undefined,
 		};
@@ -101,6 +134,7 @@ export default abstract class AbstractService {
 				404,
 			);
 		}
+		await this.authorizeResource(request, "view", result);
 		return reply.status(200).send(result);
 	}
 
@@ -129,6 +163,7 @@ export default abstract class AbstractService {
 				404,
 			);
 		}
+		await this.authorizeResource(request, "view", result);
 		return reply.status(200).send(result);
 	}
 
@@ -141,6 +176,13 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
+		const current = await this.repository.get(
+			getRepositoryContext(request),
+			params.id,
+		);
+		if (current) {
+			await this.authorizeResource(request, "delete", current);
+		}
 		const result = await this.repository.delete(
 			getRepositoryContext(request),
 			params.id,
@@ -183,6 +225,8 @@ export default abstract class AbstractService {
 			);
 		}
 
+		await this.authorizeResource(request, "delete", resource);
+
 		const result = await this.repository.delete(
 			getRepositoryContext(request),
 			resource.id,
@@ -214,9 +258,11 @@ export default abstract class AbstractService {
 			validateDraft(request.body, this.repository.draftSchema);
 		}
 
+		const draft = await this.authorizeCreate(request, request.body);
+
 		const resource = await this.repository.create(
 			getRepositoryContext(request),
-			request.body,
+			draft,
 		);
 
 		const query = request.query;
@@ -260,6 +306,8 @@ export default abstract class AbstractService {
 			);
 		}
 
+		await this.authorizeResource(request, "update", resource);
+
 		const updatedResource = await this.repository.processUpdateActions(
 			getRepositoryContext(request),
 			resource,
@@ -297,6 +345,8 @@ export default abstract class AbstractService {
 				404,
 			);
 		}
+
+		await this.authorizeResource(request, "update", resource);
 
 		const updatedResource = await this.repository.processUpdateActions(
 			getRepositoryContext(request),

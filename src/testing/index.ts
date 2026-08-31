@@ -1,6 +1,7 @@
 export { approvalFlowDraftFactory } from "./approval-flow.ts";
 export { approvalRuleDraftFactory } from "./approval-rule.ts";
 export { associateRoleDraftFactory } from "./associate-role.ts";
+export { createAssociateScope } from "./associate-scope.ts";
 export { attributeGroupDraftFactory } from "./attribute-group.ts";
 export { businessUnitDraftFactory } from "./business-unit.ts";
 export { cartDraftFactory } from "./cart.ts";
@@ -10,6 +11,11 @@ export { channelDraftFactory } from "./channel.ts";
 export { customObjectDraftFactory } from "./custom-object.ts";
 export { customerDraftFactory } from "./customer.ts";
 export { customerGroupDraftFactory } from "./customer-group.ts";
+export {
+	anonymousSession,
+	customerSession,
+	loginCustomer,
+} from "./customer-token.ts";
 export { discountCodeDraftFactory } from "./discount-code.ts";
 export { discountGroupDraftFactory } from "./discount-group.ts";
 export { extensionDraftFactory } from "./extension.ts";

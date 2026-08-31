@@ -91,13 +91,67 @@ await apiRoot
 ```
 
 A matching customer yields a token whose scope carries `customer_id:<id>`; no
-match returns `400 invalid_customer_account_credentials`.
+match returns `400 invalid_customer_account_credentials`. That `customer_id` is
+what the `/me` endpoints answer for — see [Scoped endpoints](#scoped-endpoints).
 
 ## Anonymous grant
 
 `POST /oauth/{projectKey}/anonymous/token` issues a token with an
 `anonymous_id:<uuid>` appended to the scope — useful for testing anonymous cart
-flows.
+flows. Pass `anonymous_id` yourself to continue an existing session.
+
+## Scoped endpoints
+
+The `/me` and `as-associate` endpoints answer for a particular caller, and both
+**fail closed**: a request that does not establish who is asking is refused
+rather than served from the whole collection. Returning another customer's order
+to an unidentified caller would make an ownership test pass without asserting
+anything.
+
+### `/me`
+
+The caller is the customer (or anonymous session) the bearer token was issued
+for. Without such a token, `/me` returns `403 insufficient_scope`.
+
+```typescript
+import { customerSession } from '@labdigital/commercetools-mock/testing'
+
+const { headers } = customerSession(ctMock, customer.id)
+
+await ctMock.app.inject({ method: 'GET', url: '/my-project/me/orders', headers })
+```
+
+`loginCustomer` does the same through the password grant when you want to
+exercise sign-in, and `anonymousSession` starts an anonymous one. Resources
+created through `/me` are stamped with the caller, so they can be read back.
+
+### `as-associate`
+
+The caller is the associate named in the path,
+`/as-associate/{associateId}/in-business-unit/key={key}/…`. The mock resolves
+the business unit, finds that associate on it, and collects the permissions of
+their AssociateRoles. What each request needs follows commercetools:
+
+- The `My` permission (`ViewMyOrders`) covers resources whose customer is the
+  associate; the `Others` permission (`ViewOthersOrders`) covers the rest of the
+  business unit.
+- A list request with only the `My` permission is narrowed to the caller instead
+  of being refused.
+- Missing permissions return `403 AssociateMissingPermission`, carrying the
+  permissions that would have sufficed.
+- A resource of another business unit is `404`, not `403`.
+
+`createAssociateScope` seeds the customer, role and business unit for you:
+
+```typescript
+import { createAssociateScope } from '@labdigital/commercetools-mock/testing'
+
+const scope = await createAssociateScope(ctMock, {
+  permissions: ['ViewMyCarts', 'CreateMyCarts'],
+})
+
+await ctMock.app.inject({ method: 'GET', url: `${scope.basePath}/carts` })
+```
 
 ## Gotchas & limitations
 
@@ -112,9 +166,9 @@ These differ from real commercetools and are worth knowing when writing tests:
   cannot be simulated; `validateCredentials` only checks that a token exists.
 - **Scope defaults to the literal `"todo"`** for client tokens when none is
   requested.
-- **`/me` endpoints do not consume the token's `customer_id` scope.** Customer
-  identity for `/me` routes comes from the request payload (e.g. login), not from
-  the bearer token. Per-customer data isolation on `/me` is therefore not
-  enforced based on the token.
+- **Identity resolution is independent of `enableAuthentication`.** The mock
+  always reads the identity out of a bearer token it issued, so `/me` and
+  `as-associate` can be scoped without turning on authentication. Turning
+  `validateCredentials` on additionally *requires* a token on every API call.
 
 See also: [API coverage & limitations](/commercetools-node-mock/reference/resources/).

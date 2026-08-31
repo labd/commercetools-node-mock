@@ -157,12 +157,12 @@ export class CommercetoolsMock {
 		// Register project routes
 		const repositories = this._repositories;
 		const oauth2 = this._oauth2;
-		const enableAuth = this.options.enableAuthentication;
 
 		const projectPlugin = async (instance: FastifyInstance) => {
-			if (enableAuth) {
-				instance.addHook("preHandler", oauth2.createMiddleware());
-			}
+			// Always installed: it resolves the identity a token was issued for,
+			// which the /me and associate-scoped endpoints need whether or not
+			// authentication is enforced
+			instance.addHook("preHandler", oauth2.createMiddleware());
 			createServices(instance, repositories);
 			new ProjectService(instance, repositories.project as ProjectRepository);
 		};
@@ -171,9 +171,7 @@ export class CommercetoolsMock {
 		// /{projectKey}/in-store/key={storeKey} are mounted there; the rest 404,
 		// as they do on the real API.
 		const inStorePlugin = async (instance: FastifyInstance) => {
-			if (enableAuth) {
-				instance.addHook("preHandler", oauth2.createMiddleware());
-			}
+			instance.addHook("preHandler", oauth2.createMiddleware());
 			createServices(instance, repositories, IN_STORE_SERVICES);
 		};
 
