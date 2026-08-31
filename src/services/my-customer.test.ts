@@ -4,7 +4,7 @@ import type {
 	CustomerToken,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { customerDraftFactory } from "#src/testing/index.ts";
+import { customerDraftFactory, customerSession } from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 import { hashPassword } from "../lib/password.ts";
 
@@ -63,14 +63,51 @@ describe("Me", () => {
 		const response = await ctMock.app.inject({
 			method: "GET",
 			url: "/dummy/me",
+			headers: customerSession(ctMock, customer.id).headers,
 		});
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json()).toEqual(customer);
 	});
+
+	test("Get me without a customer token", async () => {
+		await customerFactory.create({
+			email: "test@example.org",
+			password: "p4ssw0rd",
+		});
+
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me",
+		});
+
+		expect(response.statusCode).toBe(403);
+		expect(response.json().errors[0].code).toBe("insufficient_scope");
+	});
+
+	test("Get me returns the customer the token was issued for", async () => {
+		const mine = await customerFactory.create({
+			email: "mine@example.org",
+			password: "p4ssw0rd",
+		});
+		await customerFactory.create({
+			email: "someone-else@example.org",
+			password: "p4ssw0rd",
+		});
+
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me",
+			headers: customerSession(ctMock, mine.id).headers,
+		});
+
+		expect(response.json().id).toBe(mine.id);
+	});
 });
 
 describe("/me", () => {
+	const headers = customerSession(ctMock, "123").headers;
+
 	afterEach(() => {
 		ctMock.clear();
 	});
@@ -97,6 +134,7 @@ describe("/me", () => {
 		const response = await ctMock.app.inject({
 			method: "GET",
 			url: "/dummy/me",
+			headers,
 		});
 
 		expect(response.statusCode).toBe(200);
@@ -129,6 +167,7 @@ describe("/me", () => {
 		const response = await ctMock.app.inject({
 			method: "DELETE",
 			url: "/dummy/me",
+			headers,
 		});
 
 		expect(response.statusCode).toBe(200);
@@ -159,6 +198,7 @@ describe("/me", () => {
 		const newResponse = await ctMock.app.inject({
 			method: "GET",
 			url: "/dummy/me",
+			headers,
 		});
 		expect(newResponse.statusCode).toBe(404);
 	});
@@ -345,6 +385,7 @@ describe("/me", () => {
 				version: 2,
 				actions: [{ action: "setCustomField", name: "foobar", value: true }],
 			},
+			headers,
 		});
 		expect(response.statusCode).toBe(200);
 		expect(response.json().version).toBe(3);
@@ -355,6 +396,7 @@ describe("/me", () => {
 		const response = await ctMock.app.inject({
 			method: "DELETE",
 			url: "/dummy/me",
+			headers,
 		});
 		expect(response.statusCode).toBe(200);
 		expect(response.json().id).toBeDefined();

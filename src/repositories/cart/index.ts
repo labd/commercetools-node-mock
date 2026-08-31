@@ -208,10 +208,19 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 		return await this.saveNew(context, resource);
 	}
 
-	async getActiveCart(projectKey: string): Promise<Cart | undefined> {
-		// Get first active cart
+	async getActiveCart(
+		projectKey: string,
+		owner?: { customerId?: string; anonymousId?: string },
+	): Promise<Cart | undefined> {
+		const where = [`cartState="Active"`];
+		if (owner?.customerId) {
+			where.push(`customerId="${owner.customerId}"`);
+		} else if (owner?.anonymousId) {
+			where.push(`anonymousId="${owner.anonymousId}"`);
+		}
+
 		const results = await this._storage.query(projectKey, this.getTypeId(), {
-			where: [`cartState="Active"`],
+			where,
 		});
 		if (results.count > 0) {
 			return results.results[0] as Cart;

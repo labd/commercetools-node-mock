@@ -1,13 +1,36 @@
 import type { FastifyInstance } from "fastify";
 import type { BusinessUnitRepository } from "#src/repositories/business-unit.ts";
-import AbstractService from "./abstract.ts";
+import AbstractMyService, { type MyResourceRules } from "./abstract-my.ts";
 
-export class MyBusinessUnitService extends AbstractService {
+export class MyBusinessUnitService extends AbstractMyService {
 	public repository: BusinessUnitRepository;
+
+	// A customer's business units are the ones they are an associate of
+	protected myRules: MyResourceRules = {
+		customerWhere: (customerId) => `associates(customer(id="${customerId}"))`,
+		customerOf: () => undefined,
+	};
 
 	constructor(parent: FastifyInstance, repository: BusinessUnitRepository) {
 		super(parent);
 		this.repository = repository;
+	}
+
+	protected override owns(
+		identity: { type: "customer" | "anonymous"; id: string },
+		resource: unknown,
+	): boolean {
+		if (identity.type !== "customer") {
+			return false;
+		}
+		const businessUnit = resource as {
+			associates?: { customer: { id: string } }[];
+			inheritedAssociates?: { customer: { id: string } }[];
+		};
+		return [
+			...(businessUnit.associates ?? []),
+			...(businessUnit.inheritedAssociates ?? []),
+		].some((associate) => associate.customer.id === identity.id);
 	}
 
 	getBasePath() {

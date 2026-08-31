@@ -167,7 +167,7 @@ describe("CustomObject retrieve", () => {
 	});
 
 	test("can use the add function with the custom object name", async () => {
-		ctMock.project("dummy").unsafeAdd("key-value-document", {
+		await ctMock.project("dummy").unsafeAdd("key-value-document", {
 			...getBaseResourceProperties(),
 			container: "my-container",
 			key: "my-key",
@@ -190,7 +190,7 @@ describe("CustomObject retrieve", () => {
 			lastModifiedAt: expect.anything(),
 			lastModifiedBy: expect.anything(),
 			value: "my-value",
-			version: 1,
+			version: 2,
 		});
 	});
 

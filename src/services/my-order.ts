@@ -4,10 +4,17 @@ import { MyOrderFromQuoteDraftSchema } from "#src/schemas/generated/my-order-fro
 import { validateDraft } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { MyOrderRepository } from "../repositories/my-order.ts";
-import AbstractService from "./abstract.ts";
+import AbstractMyService, { type MyResourceRules } from "./abstract-my.ts";
 
-export class MyOrderService extends AbstractService {
+export class MyOrderService extends AbstractMyService {
 	public repository: MyOrderRepository;
+
+	protected myRules: MyResourceRules = {
+		customerWhere: (customerId) => `customerId="${customerId}"`,
+		anonymousWhere: (anonymousId) => `anonymousId="${anonymousId}"`,
+		customerOf: (order) => order.customerId,
+		anonymousOf: (order) => order.anonymousId,
+	};
 
 	constructor(parent: FastifyInstance, repository: MyOrderRepository) {
 		super(parent);
@@ -51,15 +58,15 @@ export class MyOrderService extends AbstractService {
 			validateDraft(request.body, MyOrderFromQuoteDraftSchema);
 		}
 
+		const context = getRepositoryContext(request);
+		this.identityOf(context);
+
 		const { id, version, quoteStateToAccepted } = request.body;
-		const resource = await this.repository.createFromQuote(
-			getRepositoryContext(request),
-			{
-				quote: { typeId: "quote", id },
-				version,
-				quoteStateToAccepted,
-			},
-		);
+		const resource = await this.repository.createFromQuote(context, {
+			quote: { typeId: "quote", id },
+			version,
+			quoteStateToAccepted,
+		});
 		return reply.status(this.createStatusCode).send(resource);
 	}
 }

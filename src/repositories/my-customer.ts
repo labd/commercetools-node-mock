@@ -1,5 +1,6 @@
 import type {
 	Customer,
+	InsufficientScopeError,
 	InvalidCurrentPasswordError,
 	MyCustomerChangePassword,
 	MyCustomerEmailVerify,
@@ -10,6 +11,24 @@ import { hashPassword, validateEmailVerifyToken } from "../lib/password.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext } from "./abstract.ts";
 import { CustomerRepository } from "./customer/index.ts";
+
+/**
+ * `/me` answers for the customer the token was issued to. Without one there is
+ * no answer to give, so the request is refused rather than served with whichever
+ * customer happens to be stored first.
+ */
+const requireCustomerId = (context: RepositoryContext): string => {
+	if (!context.customerId) {
+		throw new CommercetoolsError<InsufficientScopeError>(
+			{
+				code: "insufficient_scope",
+				message: "This endpoint requires a token issued for a customer.",
+			},
+			403,
+		);
+	}
+	return context.customerId;
+};
 
 export class MyCustomerRepository extends CustomerRepository {
 	async changePassword(
@@ -81,35 +100,17 @@ export class MyCustomerRepository extends CustomerRepository {
 	}
 
 	async deleteMe(context: RepositoryContext): Promise<Customer | undefined> {
-		// grab the first customer you can find for now. In the future we should
-		// use the customer id from the scope of the token
-		const results = await this._storage.query(
-			context.projectKey,
-			this.getTypeId(),
-			{},
-		);
-
-		if (results.count > 0) {
-			const deleted = await this.delete(context, results.results[0].id);
-			return deleted as Customer;
-		}
-
-		return;
+		const customerId = requireCustomerId(context);
+		const deleted = await this.delete(context, customerId);
+		return deleted as Customer | undefined;
 	}
 
 	async getMe(context: RepositoryContext): Promise<Customer | undefined> {
-		// grab the first customer you can find for now. In the future we should
-		// use the customer id from the scope of the token
-		const results = await this._storage.query(
+		const customerId = requireCustomerId(context);
+		return (await this._storage.get(
 			context.projectKey,
-			this.getTypeId(),
-			{},
-		);
-
-		if (results.count > 0) {
-			return results.results[0] as Customer;
-		}
-
-		return;
+			"customer",
+			customerId,
+		)) as Customer | undefined;
 	}
 }

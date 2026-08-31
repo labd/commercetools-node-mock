@@ -7,7 +7,8 @@
 	"sideEffects": false,
 	"exports": {
 		".": "./dist/index.mjs",
-		"./sqlite": "./dist/storage/sqlite.mjs"
+		"./sqlite": "./dist/storage/sqlite.mjs",
+		"./testing": "./dist/testing/index.mjs"
 	},
 	"imports": {
 		"#src/*": "./src/*",

@@ -382,6 +382,8 @@ export const getRepositoryContext = (
 	projectKey: request.params.projectKey,
 	storeKey: request.params.storeKey,
 	clientId: request.credentials?.clientId,
+	customerId: request.credentials?.customerId,
+	anonymousId: request.credentials?.anonymousId,
 	associateId: request.params.associateId,
 	businessUnitKey: request.params.businessUnitKey,
 });

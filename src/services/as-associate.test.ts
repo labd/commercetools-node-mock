@@ -1,40 +1,55 @@
-import { describe, expect, test } from "vitest";
-import { cartDraftFactory } from "#src/testing/index.ts";
+import { afterEach, describe, expect, test } from "vitest";
+import { cartDraftFactory, createAssociateScope } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
-const projectKey = "dummy";
-const customerId = "5fac8fca-2484-4b14-a1d1-cfdce2f8d3c4";
-const businessUnitKey = "test-business-unit";
 
 describe("AsAssociate", () => {
 	const cartFactory = cartDraftFactory(ctMock);
 
+	afterEach(async () => {
+		await ctMock.clear();
+	});
+
 	test("Access as-associate service routes", async () => {
-		// Test that the as-associate service sets up routes correctly by testing cart endpoint
-		const response = await ctMock.app.inject({
-			method: "GET",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
+		const scope = await createAssociateScope(ctMock, {
+			permissions: ["ViewMyCarts"],
 		});
 
-		// Should return 200 with empty results or 404 if not configured
-		expect([200, 404]).toContain(response.statusCode);
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `${scope.basePath}/carts`,
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().results).toEqual([]);
 	});
 
 	test("Create cart via as-associate", async () => {
-		const draft = cartFactory.build({
-			currency: "EUR",
+		const scope = await createAssociateScope(ctMock, {
+			permissions: ["CreateMyCarts"],
 		});
 
 		const response = await ctMock.app.inject({
 			method: "POST",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/carts`,
-			payload: draft,
+			url: `${scope.basePath}/carts`,
+			payload: cartFactory.build({ currency: "EUR" }),
 		});
 
 		expect(response.statusCode).toBe(201);
+		expect(response.json().id).toBeDefined();
+	});
 
-		const cart = response.json();
-		expect(cart.id).toBeDefined();
+	test("An associate without any role is refused", async () => {
+		const scope = await createAssociateScope(ctMock, { permissions: [] });
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `${scope.basePath}/carts`,
+			payload: cartFactory.build({ currency: "EUR" }),
+		});
+
+		expect(response.statusCode).toBe(403);
+		expect(response.json().errors[0].code).toBe("AssociateMissingPermission");
 	});
 });

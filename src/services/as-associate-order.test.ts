@@ -1,7 +1,11 @@
 import assert from "node:assert";
 import type { Order } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { cartDraftFactory, orderDraftFactory } from "#src/testing/index.ts";
+import {
+	cartDraftFactory,
+	createAssociateScope,
+	orderDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Order Query", () => {
@@ -9,13 +13,17 @@ describe("Order Query", () => {
 	const cartFactory = cartDraftFactory(ctMock);
 	const orderFactory = orderDraftFactory(ctMock);
 	let order: Order | undefined;
-	const projectKey = "dummy";
-	const customerId = "5fac8fca-2484-4b14-a1d1-cfdce2f8d3c4";
-	const businessUnitKey = "business-unit";
+	let scope: Awaited<ReturnType<typeof createAssociateScope>>;
 
 	beforeEach(async () => {
+		scope = await createAssociateScope(ctMock, {
+			permissions: ["ViewMyOrders"],
+		});
+
 		const cart = await cartFactory.create({
 			currency: "EUR",
+			customerId: scope.associateId,
+			businessUnit: { typeId: "business-unit", key: scope.businessUnitKey },
 			custom: {
 				type: {
 					key: "my-cart",
@@ -45,7 +53,7 @@ describe("Order Query", () => {
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/${projectKey}/as-associate/${customerId}/in-business-unit/key=${businessUnitKey}/orders`,
+			url: `${scope.basePath}/orders`,
 		});
 		expect(response.statusCode).toBe(200);
 		const body = response.json();

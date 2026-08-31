@@ -105,6 +105,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 			...getBaseResourceProperties(context.clientId),
 			anonymousId: cart.anonymousId,
 			billingAddress: cart.billingAddress,
+			businessUnit: cart.businessUnit,
 			cart: cartReference,
 			country: cart.country,
 			custom: cart.custom,

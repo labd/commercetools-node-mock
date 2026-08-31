@@ -1,5 +1,9 @@
-import { afterEach, describe, expect, test } from "vitest";
-import { businessUnitDraftFactory } from "#src/testing/business-unit.ts";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import {
+	businessUnitDraftFactory,
+	createAssociateScope,
+	loginCustomer,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
@@ -7,163 +11,97 @@ const ctMock = new CommercetoolsMock();
 describe("MyBusinessUnit", () => {
 	const businessUnitFactory = businessUnitDraftFactory(ctMock);
 
+	let scope: Awaited<ReturnType<typeof createAssociateScope>>;
+	let headers: { authorization: string };
+
+	beforeEach(async () => {
+		scope = await createAssociateScope(ctMock);
+		const customer = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/customers/${scope.associateId}`,
+		});
+		headers = (
+			await loginCustomer(ctMock, {
+				email: customer.json().email,
+				password: "my-secret-pw",
+			})
+		).headers;
+	});
+
 	afterEach(async () => {
 		await ctMock.clear();
 	});
 
 	test("Get my business units", async () => {
+		// A unit the caller is not an associate of
 		await businessUnitFactory.create({
-			key: "my-business-unit",
+			key: "someone-elses-unit",
 			unitType: "Company",
-			name: "My Business Unit",
+			name: "Someone else",
 			contactEmail: "contact@example.com",
 		});
 
 		const response = await ctMock.app.inject({
 			method: "GET",
 			url: "/dummy/me/business-units",
+			headers,
 		});
 
 		expect(response.statusCode).toBe(200);
-		expect(response.json().count).toBeGreaterThanOrEqual(0);
-		expect(response.json().results).toBeDefined();
-	});
-
-	test("Get my business unit by ID", async () => {
-		const businessUnit = await businessUnitFactory.create({
-			key: "my-business-unit",
-			unitType: "Company",
-			name: "My Business Unit",
-			contactEmail: "contact@example.com",
-		});
-
-		const response = await ctMock.app.inject({
-			method: "GET",
-			url: `/dummy/me/business-units/${businessUnit.id}`,
-		});
-
-		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(businessUnit);
+		expect(response.json().results).toHaveLength(1);
+		expect(response.json().results[0].key).toBe(scope.businessUnitKey);
 	});
 
 	test("Get my business unit by key", async () => {
-		const businessUnit = await businessUnitFactory.create({
-			key: "my-business-unit",
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/me/business-units/key=${scope.businessUnitKey}`,
+			headers,
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().key).toBe(scope.businessUnitKey);
+	});
+
+	test("Get a business unit the caller is not an associate of", async () => {
+		const other = await businessUnitFactory.create({
+			key: "someone-elses-unit",
 			unitType: "Company",
-			name: "My Business Unit",
+			name: "Someone else",
 			contactEmail: "contact@example.com",
 		});
 
 		const response = await ctMock.app.inject({
 			method: "GET",
-			url: `/dummy/me/business-units/key=${businessUnit.key}`,
+			url: `/dummy/me/business-units/${other.id}`,
+			headers,
 		});
 
-		expect(response.statusCode).toBe(200);
-		expect(response.json()).toEqual(businessUnit);
-	});
-
-	test("Delete my business unit", async () => {
-		const businessUnit = await businessUnitFactory.create({
-			key: "my-business-unit",
-			unitType: "Company",
-			name: "My Business Unit",
-			contactEmail: "contact@example.com",
-		});
-
-		// Now delete the business unit
-		const deleteResponse = await ctMock.app.inject({
-			method: "DELETE",
-			url: `/dummy/me/business-units/${businessUnit.id}`,
-		});
-
-		expect(deleteResponse.statusCode).toBe(200);
-		expect(deleteResponse.json()).toEqual(businessUnit);
-
-		// Verify that the business unit is deleted
-		const newResponse = await ctMock.app.inject({
-			method: "GET",
-			url: `/dummy/me/business-units/${businessUnit.id}`,
-		});
-		expect(newResponse.statusCode).toBe(404);
-	});
-
-	test("Delete my business unit by key", async () => {
-		const businessUnit = await businessUnitFactory.create({
-			key: "my-business-unit",
-			unitType: "Company",
-			name: "My Business Unit",
-			contactEmail: "contact@example.com",
-		});
-
-		// Now delete the business unit
-		const deleteResponse = await ctMock.app.inject({
-			method: "DELETE",
-			url: `/dummy/me/business-units/key=${businessUnit.key}`,
-		});
-
-		expect(deleteResponse.statusCode).toBe(200);
-		expect(deleteResponse.json()).toEqual(businessUnit);
-
-		// Verify that the business unit is deleted
-		const newResponse = await ctMock.app.inject({
-			method: "GET",
-			url: `/dummy/me/business-units/key=${businessUnit.key}`,
-		});
-		expect(newResponse.statusCode).toBe(404);
+		expect(response.statusCode).toBe(404);
 	});
 
 	test("Update my business unit", async () => {
-		const businessUnit = await businessUnitFactory.create({
-			key: "my-business-unit",
-			unitType: "Company",
-			name: "My Business Unit",
-			contactEmail: "contact@example.com",
-		});
-
-		const updateResponse = await ctMock.app.inject({
+		const response = await ctMock.app.inject({
 			method: "POST",
-			url: `/dummy/me/business-units/${businessUnit.id}`,
+			url: `/dummy/me/business-units/key=${scope.businessUnitKey}`,
 			payload: {
-				id: businessUnit.id,
-				version: businessUnit.version,
-				actions: [
-					{
-						action: "changeName",
-						name: "Updated Business Unit Name",
-					},
-				],
+				version: 1,
+				actions: [{ action: "changeName", name: "Updated Name" }],
 			},
+			headers,
 		});
 
-		expect(updateResponse.statusCode).toBe(200);
-		expect(updateResponse.json().name).toBe("Updated Business Unit Name");
+		expect(response.statusCode).toBe(200);
+		expect(response.json().name).toBe("Updated Name");
 	});
 
-	test("Update my business unit by key", async () => {
-		const businessUnit = await businessUnitFactory.create({
-			key: "my-business-unit",
-			unitType: "Company",
-			name: "My Business Unit",
-			contactEmail: "contact@example.com",
+	test("Without a customer token", async () => {
+		const response = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/me/business-units",
 		});
 
-		const updateResponse = await ctMock.app.inject({
-			method: "POST",
-			url: `/dummy/me/business-units/key=${businessUnit.key}`,
-			payload: {
-				id: businessUnit.id,
-				version: businessUnit.version,
-				actions: [
-					{
-						action: "changeName",
-						name: "Updated Business Unit Name",
-					},
-				],
-			},
-		});
-
-		expect(updateResponse.statusCode).toBe(200);
-		expect(updateResponse.json().name).toBe("Updated Business Unit Name");
+		expect(response.statusCode).toBe(403);
+		expect(response.json().errors[0].code).toBe("insufficient_scope");
 	});
 });
