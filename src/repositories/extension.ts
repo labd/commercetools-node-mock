@@ -4,6 +4,7 @@ import type {
 	ExtensionChangeTriggersAction,
 	ExtensionDraft,
 	ExtensionReference,
+	ExtensionResourceIdentifier,
 	ExtensionSetAdditionalContextAction,
 	ExtensionSetDependenciesAction,
 	ExtensionSetExpansionPathsAction,
@@ -15,6 +16,7 @@ import type { Config } from "#src/config.ts";
 import { ExtensionDraftSchema } from "#src/schemas/generated/extension.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import { maskSecretValue } from "../lib/masking.ts";
+import type { AbstractStorage } from "../storage/abstract.ts";
 import type { Writable } from "../types.ts";
 import type { UpdateHandlerInterface } from "./abstract.ts";
 import {
@@ -22,6 +24,7 @@ import {
 	AbstractUpdateHandler,
 	type RepositoryContext,
 } from "./abstract.ts";
+import { getReferenceFromResourceIdentifier } from "./helpers.ts";
 
 export class ExtensionRepository extends AbstractResourceRepository<"extension"> {
 	constructor(config: Config) {
@@ -40,6 +43,20 @@ export class ExtensionRepository extends AbstractResourceRepository<"extension">
 			timeoutInMs: draft.timeoutInMs,
 			destination: draft.destination,
 			triggers: draft.triggers,
+			dependencies: draft.dependencies
+				? await resolveExtensionDependencies(
+						context,
+						this._storage,
+						draft.dependencies,
+					)
+				: undefined,
+			expansionPaths: draft.expansionPaths ?? undefined,
+			additionalContext: draft.additionalContext
+				? {
+						includeOldResource:
+							draft.additionalContext.includeOldResource ?? false,
+					}
+				: undefined,
 		};
 		return await this.saveNew(context, resource);
 	}
@@ -97,16 +114,15 @@ class ExtensionUpdateHandler
 		};
 	}
 
-	setDependencies(
+	async setDependencies(
 		context: RepositoryContext,
 		resource: Writable<Extension>,
 		action: ExtensionSetDependenciesAction,
-	): void {
-		resource.dependencies = action.dependencies.map(
-			(identifier): ExtensionReference => ({
-				typeId: "extension",
-				id: identifier.id!,
-			}),
+	): Promise<void> {
+		resource.dependencies = await resolveExtensionDependencies(
+			context,
+			this._storage,
+			action.dependencies,
 		);
 	}
 
@@ -134,3 +150,20 @@ class ExtensionUpdateHandler
 		resource.timeoutInMs = action.timeoutInMs;
 	}
 }
+
+// Dependencies are given as resource identifiers (by `id` or `key`) but stored
+// as references, so the referenced extensions are resolved here.
+const resolveExtensionDependencies = async (
+	context: RepositoryContext,
+	storage: AbstractStorage,
+	dependencies: ExtensionResourceIdentifier[],
+): Promise<ExtensionReference[]> =>
+	Promise.all(
+		dependencies.map((identifier) =>
+			getReferenceFromResourceIdentifier<ExtensionReference>(
+				identifier,
+				context.projectKey,
+				storage,
+			),
+		),
+	);
