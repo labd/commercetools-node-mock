@@ -3,6 +3,9 @@ import type {
 	ExtensionChangeDestinationAction,
 	ExtensionChangeTriggersAction,
 	ExtensionDraft,
+	ExtensionSetAdditionalContextAction,
+	ExtensionSetDependenciesAction,
+	ExtensionSetExpansionPathsAction,
 	ExtensionSetKeyAction,
 	ExtensionSetTimeoutInMsAction,
 } from "@commercetools/platform-sdk";
@@ -74,6 +77,119 @@ describe("Extension Repository", () => {
 		expect(result.key).toBe(draft.key);
 		expect(result.destination.type).toBe("AWSLambda");
 		expect(result.triggers).toEqual(draft.triggers);
+	});
+
+	test("create extension with expansion paths", async () => {
+		const draft: ExtensionDraft = {
+			key: "expansion-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [
+				{
+					resourceTypeId: "cart",
+					actions: ["Create"],
+				},
+			],
+			expansionPaths: ["lineItems[*].variant", "shippingInfo.shippingMethod"],
+		};
+
+		const ctx = { projectKey: "dummy" };
+		const result = await repository.create(ctx, draft);
+
+		expect(result.expansionPaths).toEqual([
+			"lineItems[*].variant",
+			"shippingInfo.shippingMethod",
+		]);
+	});
+
+	test("create extension without expansion paths", async () => {
+		const draft: ExtensionDraft = {
+			key: "no-expansion-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+		};
+
+		const ctx = { projectKey: "dummy" };
+		const result = await repository.create(ctx, draft);
+
+		expect(result.expansionPaths).toBeUndefined();
+		expect(result.dependencies).toBeUndefined();
+		expect(result.additionalContext).toBeUndefined();
+	});
+
+	test("create extension with additional context", async () => {
+		const draft: ExtensionDraft = {
+			key: "context-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+			additionalContext: { includeOldResource: true },
+		};
+
+		const ctx = { projectKey: "dummy" };
+		const result = await repository.create(ctx, draft);
+
+		expect(result.additionalContext).toEqual({ includeOldResource: true });
+	});
+
+	test("create extension with dependencies", async () => {
+		const ctx = { projectKey: "dummy" };
+		const dependency = await repository.create(ctx, {
+			key: "dependency-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/dependency",
+			},
+			triggers: [],
+		});
+
+		const byId = await repository.create(ctx, {
+			key: "dependent-by-id",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+			dependencies: [{ typeId: "extension", id: dependency.id }],
+		});
+		expect(byId.dependencies).toEqual([
+			{ typeId: "extension", id: dependency.id },
+		]);
+
+		const byKey = await repository.create(ctx, {
+			key: "dependent-by-key",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+			dependencies: [{ typeId: "extension", key: "dependency-extension" }],
+		});
+		expect(byKey.dependencies).toEqual([
+			{ typeId: "extension", id: dependency.id },
+		]);
+	});
+
+	test("create extension with unknown dependency", async () => {
+		const ctx = { projectKey: "dummy" };
+		await expect(
+			repository.create(ctx, {
+				key: "dependent-on-nothing",
+				destination: {
+					type: "HTTP",
+					url: "https://example.com/webhook",
+				},
+				triggers: [],
+				dependencies: [{ typeId: "extension", key: "does-not-exist" }],
+			}),
+		).rejects.toThrow(/was not found/);
 	});
 
 	test("postProcessResource masks HTTP authentication header", async () => {
@@ -268,6 +384,114 @@ describe("Extension Repository", () => {
 		);
 
 		expect(result.timeoutInMs).toBe(5000);
+		expect(result.version).toBe(extension.version + 1);
+	});
+
+	test("update extension - setExpansionPaths", async () => {
+		const ctx = { projectKey: "dummy" };
+		const extension = await repository.create(ctx, {
+			key: "expansion-update-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+			expansionPaths: ["lineItems[*].variant"],
+		});
+
+		const result = await repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "setExpansionPaths",
+					expansionPaths: ["custom.type"],
+				} as ExtensionSetExpansionPathsAction,
+			],
+		);
+
+		expect(result.expansionPaths).toEqual(["custom.type"]);
+		expect(result.version).toBe(extension.version + 1);
+
+		// An empty array removes all expansion paths
+		const cleared = await repository.processUpdateActions(
+			ctx,
+			result,
+			result.version,
+			[
+				{
+					action: "setExpansionPaths",
+					expansionPaths: [],
+				} as ExtensionSetExpansionPathsAction,
+			],
+		);
+
+		expect(cleared.expansionPaths).toEqual([]);
+		expect(cleared.version).toBe(result.version + 1);
+	});
+
+	test("update extension - setDependencies", async () => {
+		const ctx = { projectKey: "dummy" };
+		const dependency = await repository.create(ctx, {
+			key: "dependency-for-update",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/dependency",
+			},
+			triggers: [],
+		});
+		const extension = await repository.create(ctx, {
+			key: "dependency-update-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+		});
+
+		const result = await repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "setDependencies",
+					dependencies: [{ typeId: "extension", key: "dependency-for-update" }],
+				} as ExtensionSetDependenciesAction,
+			],
+		);
+
+		expect(result.dependencies).toEqual([
+			{ typeId: "extension", id: dependency.id },
+		]);
+		expect(result.version).toBe(extension.version + 1);
+	});
+
+	test("update extension - setAdditionalContext", async () => {
+		const ctx = { projectKey: "dummy" };
+		const extension = await repository.create(ctx, {
+			key: "context-update-extension",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [],
+		});
+
+		const result = await repository.processUpdateActions(
+			ctx,
+			extension,
+			extension.version,
+			[
+				{
+					action: "setAdditionalContext",
+					additionalContext: { includeOldResource: true },
+				} as ExtensionSetAdditionalContextAction,
+			],
+		);
+
+		expect(result.additionalContext).toEqual({ includeOldResource: true });
 		expect(result.version).toBe(extension.version + 1);
 	});
 

@@ -50,6 +50,56 @@ describe("Extension", () => {
 		});
 	});
 
+	test("Create extension with expansion paths", async () => {
+		const draft = extensionDraft.build({
+			key: "cart-expansion",
+			destination: {
+				type: "HTTP",
+				url: "https://example.com/webhook",
+			},
+			triggers: [
+				{
+					resourceTypeId: "cart",
+					actions: ["Create"],
+				},
+			],
+			expansionPaths: ["lineItems[*].variant"],
+			additionalContext: { includeOldResource: true },
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/extensions",
+			payload: draft,
+		});
+
+		expect(response.statusCode).toBe(201);
+		expect(response.json().expansionPaths).toEqual(["lineItems[*].variant"]);
+		expect(response.json().additionalContext).toEqual({
+			includeOldResource: true,
+		});
+
+		const updated = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/extensions/${response.json().id}`,
+			payload: {
+				version: response.json().version,
+				actions: [
+					{
+						action: "setExpansionPaths",
+						expansionPaths: ["custom.type", "shippingInfo.shippingMethod"],
+					},
+				],
+			},
+		});
+
+		expect(updated.statusCode).toBe(200);
+		expect(updated.json().expansionPaths).toEqual([
+			"custom.type",
+			"shippingInfo.shippingMethod",
+		]);
+	});
+
 	test("Get extension", async () => {
 		const extension = await extensionDraft.create({
 			key: "test-extension",
