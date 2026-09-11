@@ -69,7 +69,6 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		context: RepositoryContext,
 		draft: BusinessUnitDraft,
 	): Promise<BusinessUnit> {
-		// The key of a BusinessUnit is unique within a project.
 		const existing = await this._storage.getByKey(
 			context.projectKey,
 			"business-unit",
