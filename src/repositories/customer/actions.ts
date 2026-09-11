@@ -45,7 +45,12 @@ import { hashPassword } from "#src/lib/password.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
-import { createAddress } from "../helpers.ts";
+import {
+	createAddress,
+	getStoreKeyReference,
+	getStoreKeyReferences,
+} from "../helpers.ts";
+import { checkEmailUniqueness } from "./helpers.ts";
 
 export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
@@ -96,18 +101,33 @@ export class CustomerUpdateHandler
 		}
 	}
 
-	addStore(
+	async addStore(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
-		action: CustomerAddStoreAction,
+		{ store }: CustomerAddStoreAction,
 	) {
-		throw new CommercetoolsError<InvalidOperationError>(
-			{
-				code: "InvalidOperation",
-				message: "The action 'addStore' is not implemented yet",
-			},
-			400,
+		const reference = await getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
 		);
+
+		const stores = resource.stores ?? [];
+		if (stores.some((s) => s.key === reference.key)) {
+			return;
+		}
+
+		// The customer enters a new uniqueness scope, so the email has to be
+		// available in the store that is being added.
+		await checkEmailUniqueness(
+			this._storage,
+			context.projectKey,
+			resource.email,
+			[reference.key],
+			resource.id,
+		);
+
+		resource.stores = [...stores, reference];
 	}
 
 	changeAddress(
@@ -133,11 +153,19 @@ export class CustomerUpdateHandler
 		}
 	}
 
-	changeEmail(
-		_context: RepositoryContext,
+	async changeEmail(
+		context: RepositoryContext,
 		resource: Writable<Customer>,
 		{ email }: CustomerChangeEmailAction,
 	) {
+		await checkEmailUniqueness(
+			this._storage,
+			context.projectKey,
+			email,
+			resource.stores?.map((store) => store.key) ?? [],
+			resource.id,
+		);
+
 		resource.email = email;
 	}
 
@@ -214,18 +242,37 @@ export class CustomerUpdateHandler
 		}
 	}
 
-	removeStore(
+	async removeStore(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
-		action: CustomerRemoveStoreAction,
+		{ store }: CustomerRemoveStoreAction,
 	) {
-		throw new CommercetoolsError<InvalidOperationError>(
-			{
-				code: "InvalidOperation",
-				message: "The action 'removeStore' is not implemented yet",
-			},
-			400,
+		const reference = await getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
 		);
+
+		const stores = resource.stores ?? [];
+		if (!stores.some((s) => s.key === reference.key)) {
+			return;
+		}
+
+		const remaining = stores.filter((s) => s.key !== reference.key);
+
+		// Without any stores left the customer becomes a global customer, which
+		// requires the email to be unique across the project.
+		if (remaining.length === 0) {
+			await checkEmailUniqueness(
+				this._storage,
+				context.projectKey,
+				resource.email,
+				[],
+				resource.id,
+			);
+		}
+
+		resource.stores = remaining;
 	}
 
 	setAddressCustomField(
@@ -464,18 +511,43 @@ export class CustomerUpdateHandler
 		resource.salutation = salutation;
 	}
 
-	setStores(
+	async setStores(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
-		action: CustomerSetStoresAction,
+		{ stores }: CustomerSetStoresAction,
 	) {
-		throw new CommercetoolsError<InvalidOperationError>(
-			{
-				code: "InvalidOperation",
-				message: "The action 'setStores' is not implemented yet",
-			},
-			400,
+		const references = await getStoreKeyReferences(
+			stores,
+			context.projectKey,
+			this._storage,
 		);
+
+		const currentKeys = (resource.stores ?? []).map((s) => s.key);
+		// Scopes the customer is already part of don't need to be re-validated.
+		const addedKeys = references
+			.map((s) => s.key)
+			.filter((key) => !currentKeys.includes(key));
+
+		if (references.length === 0) {
+			// Becoming a global customer requires project wide uniqueness.
+			await checkEmailUniqueness(
+				this._storage,
+				context.projectKey,
+				resource.email,
+				[],
+				resource.id,
+			);
+		} else if (addedKeys.length > 0) {
+			await checkEmailUniqueness(
+				this._storage,
+				context.projectKey,
+				resource.email,
+				addedKeys,
+				resource.id,
+			);
+		}
+
+		resource.stores = references;
 	}
 
 	setTitle(
