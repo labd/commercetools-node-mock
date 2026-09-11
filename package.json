@@ -37,7 +37,7 @@
 	},
 	"peerDependencies": {
 		"@commercetools/platform-sdk": ">=8.25.0",
-		"msw": ">= 2.14.6, < 3.0.0"
+		"msw": ">=2.14.6 <3.0.0"
 	},
 	"dependencies": {
 		"@fastify/formbody": "9.0.0",
