@@ -106,8 +106,6 @@ describe("Me", () => {
 });
 
 describe("/me", () => {
-	// Issued per test: clear() drops the token along with the customer it was
-	// issued for.
 	let headers: { authorization: string };
 
 	afterEach(() => {
