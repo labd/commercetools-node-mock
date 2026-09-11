@@ -40,7 +40,11 @@ export class ChannelRepository extends AbstractResourceRepository<"channel"> {
 			description: draft.description,
 			roles: draft.roles || [],
 			geoLocation: draft.geoLocation,
-			address: createAddress(draft.address, context.projectKey, this._storage),
+			address: await createAddress(
+				draft.address,
+				context.projectKey,
+				this._storage,
+			),
 			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,
@@ -79,12 +83,12 @@ class ChannelUpdateHandler
 		resource.name = name;
 	}
 
-	setAddress(
+	async setAddress(
 		context: RepositoryContext,
 		resource: Writable<Channel>,
 		{ address }: ChannelSetAddressAction,
 	) {
-		resource.address = createAddress(
+		resource.address = await createAddress(
 			address,
 			context.projectKey,
 			this._storage,

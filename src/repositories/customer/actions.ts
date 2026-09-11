@@ -1,7 +1,6 @@
 import assert from "node:assert";
 import type {
 	Address,
-	BaseAddress,
 	Customer,
 	CustomerAddAddressAction,
 	CustomerAddBillingAddressIdAction,
@@ -51,15 +50,20 @@ export class CustomerUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Customer, CustomerUpdateAction>>
 {
-	addAddress(
-		_context: RepositoryContext,
+	async addAddress(
+		context: RepositoryContext,
 		resource: Writable<Customer>,
 		{ address }: CustomerAddAddressAction,
 	) {
-		resource.addresses.push({
-			...address,
-			id: address.id ?? generateRandomString(5),
-		} as BaseAddress);
+		const newAddress = await createAddress(
+			{ ...address, id: address.id ?? generateRandomString(5) },
+			context.projectKey,
+			this._storage,
+		);
+
+		if (newAddress) {
+			resource.addresses.push(newAddress);
+		}
 	}
 
 	addBillingAddressId(
@@ -110,7 +114,7 @@ export class CustomerUpdateHandler
 		);
 	}
 
-	changeAddress(
+	async changeAddress(
 		context: RepositoryContext,
 		resource: Writable<Customer>,
 		{ addressId, addressKey, address }: CustomerChangeAddressAction,
@@ -122,7 +126,7 @@ export class CustomerUpdateHandler
 			(a) => a.id === current.id,
 		);
 
-		const newAddress = createAddress(
+		const newAddress = await createAddress(
 			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,

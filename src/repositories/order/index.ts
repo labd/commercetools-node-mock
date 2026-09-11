@@ -256,12 +256,12 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		const resource: Writable<Order> = {
 			...getBaseResourceProperties(context.clientId),
 
-			billingAddress: createAddress(
+			billingAddress: await createAddress(
 				draft.billingAddress,
 				context.projectKey,
 				this._storage,
 			),
-			shippingAddress: createAddress(
+			shippingAddress: await createAddress(
 				draft.shippingAddress,
 				context.projectKey,
 				this._storage,
@@ -581,7 +581,7 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 						),
 					})) ?? [],
 				),
-				address: createAddress(
+				address: await createAddress(
 					deliveryDraft.address,
 					context.projectKey,
 					this._storage,

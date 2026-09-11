@@ -4,6 +4,7 @@ import type {
 	Money,
 } from "@commercetools/platform-sdk";
 import { describe, expect, test } from "vitest";
+import { getBaseResourceProperties } from "#src/helpers.ts";
 import { InMemoryStorage } from "#src/storage/index.ts";
 import {
 	calculateCentAmountFromPreciseAmount,
@@ -17,18 +18,64 @@ describe("Helpers", () => {
 	const projectKey = "test-project";
 
 	describe("createAddress", () => {
-		test("should generate random id when id is not provided", () => {
+		test("should generate random id when id is not provided", async () => {
 			const baseAddress: BaseAddress = {
 				country: "US",
 				streetName: "Test Street",
 				city: "Test City",
 			};
 
-			const result = createAddress(baseAddress, projectKey, storage);
+			const result = await createAddress(baseAddress, projectKey, storage);
 			expect(result).toBeDefined();
 			expect(result?.id).toBeDefined();
 			expect(typeof result?.id).toBe("string");
 			expect(result?.id).toMatch(/^[a-z0-9]{8}$/);
+		});
+
+		test("should resolve custom fields on the address", async () => {
+			await storage.add(projectKey, "type", {
+				...getBaseResourceProperties(),
+				id: "address-type-id",
+				key: "address-type-key",
+				name: { "en-US": "Address Type" },
+				resourceTypeIds: ["address"],
+				fieldDefinitions: [
+					{
+						name: "deliveryInstructions",
+						label: { "en-US": "Delivery instructions" },
+						required: false,
+						type: { name: "String" },
+						inputHint: "SingleLine",
+					},
+				],
+			});
+
+			const result = await createAddress(
+				{
+					country: "US",
+					custom: {
+						type: { typeId: "type", key: "address-type-key" },
+						fields: { deliveryInstructions: "Leave at the door" },
+					},
+				},
+				projectKey,
+				storage,
+			);
+
+			expect(result?.custom).toEqual({
+				type: { typeId: "type", id: "address-type-id" },
+				fields: { deliveryInstructions: "Leave at the door" },
+			});
+		});
+
+		test("should not set custom when the draft has no custom fields", async () => {
+			const result = await createAddress(
+				{ country: "US" },
+				projectKey,
+				storage,
+			);
+
+			expect(result).not.toHaveProperty("custom");
 		});
 	});
 

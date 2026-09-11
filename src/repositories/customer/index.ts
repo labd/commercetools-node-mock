@@ -33,7 +33,7 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract.ts";
-import { createCustomFields } from "../helpers.ts";
+import { createAddress, createCustomFields } from "../helpers.ts";
 import { CustomerUpdateHandler } from "./actions.ts";
 
 export class CustomerRepository extends AbstractResourceRepository<"customer"> {
@@ -72,11 +72,15 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		}
 
-		const addresses: Address[] =
-			draft.addresses?.map((address) => ({
-				...address,
-				id: generateRandomString(5),
-			})) ?? [];
+		const addresses = (await Promise.all(
+			draft.addresses?.map((address) =>
+				createAddress(
+					{ ...address, id: generateRandomString(5) },
+					context.projectKey,
+					this._storage,
+				),
+			) ?? [],
+		)) as Address[];
 
 		const lookupAdressId = (
 			addresses: Address[],

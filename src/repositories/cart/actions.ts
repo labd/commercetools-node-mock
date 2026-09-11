@@ -202,12 +202,12 @@ export class CartUpdateHandler
 		resource.cartState = "Active";
 	}
 
-	addItemShippingAddress(
+	async addItemShippingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ action, address }: CartAddItemShippingAddressAction,
 	) {
-		const newAddress = createAddress(
+		const newAddress = await createAddress(
 			address,
 			context.projectKey,
 			this._storage,
@@ -762,12 +762,12 @@ export class CartUpdateHandler
 		resource.customerId = undefined;
 	}
 
-	setBillingAddress(
+	async setBillingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ address }: CartSetBillingAddressAction,
 	) {
-		resource.billingAddress = createAddress(
+		resource.billingAddress = await createAddress(
 			address,
 			context.projectKey,
 			this._storage,

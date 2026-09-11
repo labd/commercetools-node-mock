@@ -515,6 +515,7 @@ export const BaseAddressSchema = z.object({
 	fax: z.string().nullish(),
 	additionalAddressInfo: z.string().nullish(),
 	externalId: z.string().nullish(),
+	custom: CustomFieldsDraftSchema.nullish(),
 });
 
 export const CustomerGroupResourceIdentifierSchema = z

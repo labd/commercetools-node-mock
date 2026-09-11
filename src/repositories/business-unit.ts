@@ -68,11 +68,15 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		context: RepositoryContext,
 		draft: BusinessUnitDraft,
 	): Promise<BusinessUnit> {
-		const addresses =
-			draft.addresses?.map((address) => ({
-				...address,
-				id: generateRandomString(5),
-			})) ?? [];
+		const addresses = (await Promise.all(
+			draft.addresses?.map((address) =>
+				createAddress(
+					{ ...address, id: generateRandomString(5) },
+					context.projectKey,
+					this._storage,
+				),
+			) ?? [],
+		)) as Address[];
 
 		const defaultBillingAddressId =
 			addresses.length > 0 && draft.defaultBillingAddress !== undefined
@@ -197,7 +201,7 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ address }: BusinessUnitAddAddressAction,
 	) {
-		const newAddress = createAddress(
+		const newAddress = await createAddress(
 			address,
 			context.projectKey,
 			this._storage,
@@ -241,7 +245,7 @@ class BusinessUnitUpdateHandler
 		}
 	}
 
-	changeAddress(
+	async changeAddress(
 		context: RepositoryContext,
 		resource: Writable<BusinessUnit>,
 		{ addressId, addressKey, address }: BusinessUnitChangeAddressAction,
@@ -253,7 +257,7 @@ class BusinessUnitUpdateHandler
 			(a) => a.id === current.id,
 		);
 
-		const newAddress = createAddress(
+		const newAddress = await createAddress(
 			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,

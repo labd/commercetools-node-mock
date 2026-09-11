@@ -221,6 +221,65 @@ describe("Draft validation (strict mode)", () => {
 			});
 			expect(response.statusCode).toBe(201);
 		});
+
+		test("accepts draft with custom fields on an address", async () => {
+			await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/types",
+				payload: {
+					key: "address-type",
+					name: { en: "Address type" },
+					resourceTypeIds: ["address"],
+					fieldDefinitions: [],
+				},
+			});
+
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/customers",
+				payload: {
+					email: "address-custom@example.com",
+					password: "secret123",
+					addresses: [
+						{
+							country: "DE",
+							custom: {
+								type: { typeId: "type", key: "address-type" },
+								fields: { deliveryInstructions: "Leave at the door" },
+							},
+						},
+					],
+				},
+			});
+			expect(response.statusCode, JSON.stringify(response.json())).toBe(201);
+			expect(response.json().customer.addresses[0].custom.type).toEqual({
+				typeId: "type",
+				id: expect.any(String),
+			});
+		});
+
+		test("rejects address custom fields without a type", async () => {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/customers",
+				payload: {
+					email: "address-custom-invalid@example.com",
+					password: "secret123",
+					addresses: [
+						{
+							country: "DE",
+							custom: { fields: { deliveryInstructions: "Leave at the door" } },
+						},
+					],
+				},
+			});
+			expect(response.statusCode).toBe(400);
+			const body = response.json();
+			expect(body.errors[0].code).toBe("InvalidJsonInput");
+			expect(body.errors[0].detailedErrorMessage).toBe(
+				"addresses.0.custom.type: Missing required value",
+			);
+		});
 	});
 });
 
