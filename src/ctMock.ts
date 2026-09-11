@@ -79,6 +79,7 @@ export class CommercetoolsMock {
 
 	async clear() {
 		await this._storage.clear();
+		this._oauth2.store.clear();
 	}
 
 	project(projectKey?: string) {

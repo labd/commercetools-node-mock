@@ -106,7 +106,9 @@ describe("Me", () => {
 });
 
 describe("/me", () => {
-	const headers = customerSession(ctMock, "123").headers;
+	// Issued per test: clear() drops the token along with the customer it was
+	// issued for.
+	let headers: { authorization: string };
 
 	afterEach(() => {
 		ctMock.clear();
@@ -128,6 +130,8 @@ describe("/me", () => {
 			billingAddressIds: [],
 			customerGroupAssignments: [],
 		});
+
+		headers = customerSession(ctMock, "123").headers;
 	});
 
 	test("Get me", async () => {
