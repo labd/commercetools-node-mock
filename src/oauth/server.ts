@@ -313,7 +313,13 @@ export class OAuth2Server {
 				},
 			);
 
-			if (result.count === 0) {
+			// Emails are only unique per store, so make sure we only sign in the
+			// customer that is actually assigned to this store.
+			const customer = result.results.find((c) =>
+				c.stores?.some((store) => store.key === storeKey),
+			);
+
+			if (!customer) {
 				throw new CommercetoolsError<any>(
 					{
 						code: "invalid_customer_account_credentials",
@@ -323,7 +329,6 @@ export class OAuth2Server {
 				);
 			}
 
-			const customer = result.results[0];
 			const token = this.store.getCustomerToken(
 				projectKey,
 				customer.id,

@@ -5,14 +5,11 @@ import type {
 	CustomerDraft,
 	CustomerResetPassword,
 	CustomerToken,
-	DuplicateFieldError,
 	InvalidInputError,
 	MyCustomerResetPassword,
 	RequiredFieldError,
 	ResourceNotFoundError,
-	Store,
 	StoreKeyReference,
-	StoreResourceIdentifier,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
@@ -33,8 +30,13 @@ import {
 	AbstractResourceRepository,
 	type RepositoryContext,
 } from "../abstract.ts";
-import { createCustomFields } from "../helpers.ts";
+import {
+	createCustomFields,
+	getStoreByPathKey,
+	getStoreKeyReferences,
+} from "../helpers.ts";
 import { CustomerUpdateHandler } from "./actions.ts";
+import { checkEmailUniqueness } from "./helpers.ts";
 
 export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 	constructor(config: Config) {
@@ -47,30 +49,15 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		context: RepositoryContext,
 		draft: CustomerDraft,
 	): Promise<Customer> {
-		// Check uniqueness
-		const results = await this._storage.query(
+		const storesForCustomer = await this.getStores(context, draft);
+
+		// Email uniqueness is scoped to the stores the customer is assigned to
+		await checkEmailUniqueness(
+			this._storage,
 			context.projectKey,
-			this.getTypeId(),
-			{
-				where: [`lowercaseEmail="${draft.email.toLowerCase()}"`],
-			},
+			draft.email,
+			storesForCustomer.map((store) => store.key),
 		);
-		if (results.count > 0) {
-			throw new CommercetoolsError<any>({
-				code: "CustomerAlreadyExists",
-				statusCode: 400,
-				message:
-					"There is already an existing customer with the provided email.",
-				errors: [
-					{
-						code: "DuplicateField",
-						message: `Customer with email '${draft.email}' already exists.`,
-						duplicateValue: draft.email,
-						field: "email",
-					} as DuplicateFieldError,
-				],
-			});
-		}
 
 		const addresses: Address[] =
 			draft.addresses?.map((address) => ({
@@ -125,15 +112,6 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			draft.billingAddresses?.map((addressId) =>
 				lookupAdressId(addresses, addressId),
 			) ?? [];
-
-		let storesForCustomer: StoreKeyReference[] = [];
-
-		if (draft.stores && draft.stores.length > 0) {
-			storesForCustomer = await this.storeReferenceToStoreKeyReference(
-				draft.stores,
-				context.projectKey,
-			);
-		}
 
 		const resource: Customer = {
 			...getBaseResourceProperties(context.clientId),
@@ -320,35 +298,33 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 		return customer;
 	}
 
-	private async storeReferenceToStoreKeyReference(
-		draftStores: StoreResourceIdentifier[],
-		projectKey: string,
+	/**
+	 * Resolve the stores the customer will be assigned to. When the customer is
+	 * created through an in-store endpoint that store is always part of the
+	 * assignment.
+	 */
+	private async getStores(
+		context: RepositoryContext,
+		draft: CustomerDraft,
 	): Promise<StoreKeyReference[]> {
-		const storeIds = draftStores
-			.map((storeReference) => storeReference.id)
-			.filter(Boolean);
+		const references = await getStoreKeyReferences(
+			draft.stores ?? [],
+			context.projectKey,
+			this._storage,
+		);
 
-		let stores: Store[] = [];
-
-		if (storeIds.length > 0) {
-			const storeResult = await this._storage.query(projectKey, "store", {
-				where: storeIds.map((id) => `id="${id}"`),
-			});
-			stores = storeResult.results;
-
-			if (storeIds.length !== stores.length) {
-				throw new CommercetoolsError<ResourceNotFoundError>({
-					code: "ResourceNotFound",
-					message: `Store with ID '${storeIds.find((id) => !stores.some((store) => store.id === id))}' was not found.`,
-				});
+		if (context.storeKey) {
+			// An unknown store in the path is a 404, not a bad reference in the draft
+			const store = await getStoreByPathKey(
+				context.storeKey,
+				context.projectKey,
+				this._storage,
+			);
+			if (!references.some((r) => r.key === store.key)) {
+				references.push({ typeId: "store", key: store.key });
 			}
 		}
 
-		return draftStores.map((storeReference) => ({
-			typeId: "store",
-			key:
-				storeReference.key ??
-				(stores.find((store) => store.id === storeReference.id)?.key as string),
-		}));
+		return references;
 	}
 }

@@ -2,7 +2,7 @@ import assert from "node:assert";
 import type { Customer, CustomerToken } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { hashPassword } from "#src/lib/password.ts";
-import { customerDraftFactory } from "#src/testing/index.ts";
+import { customerDraftFactory, storeDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
@@ -1038,5 +1038,74 @@ describe("Customer email verification", () => {
 		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
 		expect(response.json().id).toEqual(customer.id);
 		expect(response.json().isEmailVerified).toEqual(true);
+	});
+});
+
+describe("Customer in-store endpoints", () => {
+	const storeFactory = storeDraftFactory(ctMock);
+
+	test("returns a 404 when the store in the path doesn't exist", async () => {
+		const res = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/in-store/key=does-not-exist/customers",
+			payload: { email: "in-store@example.com", password: "supersecret" },
+		});
+
+		expect(res.statusCode).toBe(404);
+		expect(res.json()).toEqual({
+			statusCode: 404,
+			message: "The Store with key 'does-not-exist' was not found.",
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: "The Store with key 'does-not-exist' was not found.",
+				},
+			],
+		});
+	});
+
+	test("returns a 404 on in-store reads for an unknown store", async () => {
+		const res = await ctMock.app.inject({
+			method: "GET",
+			url: "/dummy/in-store/key=does-not-exist/customers",
+		});
+
+		expect(res.statusCode).toBe(404);
+		expect(res.json().errors[0].code).toBe("ResourceNotFound");
+	});
+
+	test("assigns the store from the path and scopes email uniqueness", async () => {
+		await storeFactory.create({ key: "store-lab" });
+		await storeFactory.create({ key: "store-bal" });
+
+		const created = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/in-store/key=store-lab/customers",
+			payload: { email: "test@labdigital.nl", password: "supersecret" },
+		});
+		expect(created.statusCode, JSON.stringify(created.json())).toBe(201);
+		expect(created.json().customer.stores).toEqual([
+			{ typeId: "store", key: "store-lab" },
+		]);
+
+		// Same email in the same store conflicts
+		const duplicate = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/in-store/key=store-lab/customers",
+			payload: { email: "test@labdigital.nl", password: "supersecret" },
+		});
+		expect(duplicate.statusCode).toBe(400);
+		expect(duplicate.json().errors[0].code).toBe("DuplicateField");
+
+		// Same email in another store is fine
+		const other = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/in-store/key=store-bal/customers",
+			payload: { email: "test@labdigital.nl", password: "supersecret" },
+		});
+		expect(other.statusCode, JSON.stringify(other.json())).toBe(201);
+		expect(other.json().customer.stores).toEqual([
+			{ typeId: "store", key: "store-bal" },
+		]);
 	});
 });
