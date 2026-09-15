@@ -185,11 +185,9 @@ export class OrderUpdateHandler
 		resource: Writable<Order>,
 		{ address }: OrderSetBillingAddressAction,
 	) {
-		resource.billingAddress = await createAddress(
-			address,
-			context.projectKey,
-			this._storage,
-		);
+		resource.billingAddress = address
+			? await createAddress(address, context.projectKey, this._storage)
+			: undefined;
 	}
 
 	setCustomerEmail(
@@ -265,11 +263,13 @@ export class OrderUpdateHandler
 			...deliveryDraft,
 			parcels,
 			items,
-			address: await createAddress(
-				deliveryDraft.address,
-				context.projectKey,
-				this._storage,
-			),
+			address: deliveryDraft.address
+				? await createAddress(
+						deliveryDraft.address,
+						context.projectKey,
+						this._storage,
+					)
+				: undefined,
 			custom: await createCustomFields(
 				deliveryDraft.custom,
 				context.projectKey,
@@ -476,11 +476,9 @@ export class OrderUpdateHandler
 		resource: Writable<Order>,
 		{ address }: OrderSetShippingAddressAction,
 	) {
-		resource.shippingAddress = await createAddress(
-			address,
-			context.projectKey,
-			this._storage,
-		);
+		resource.shippingAddress = address
+			? await createAddress(address, context.projectKey, this._storage)
+			: undefined;
 	}
 
 	async setStore(

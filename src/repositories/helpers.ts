@@ -38,13 +38,11 @@ import type { AbstractStorage } from "../storage/index.ts";
 import type { RepositoryContext } from "./abstract.ts";
 
 export const createAddress = async (
-	base: BaseAddress | AddressDraft | undefined,
+	base: BaseAddress | AddressDraft,
 	projectKey: string,
 	storage: AbstractStorage,
-): Promise<Address | undefined> => {
-	if (!base) return undefined;
-
-	if (!base?.country) {
+): Promise<Address> => {
+	if (!base.country) {
 		throw new CommercetoolsError<InvalidJsonInputError>(
 			{
 				code: "InvalidJsonInput",

@@ -55,15 +55,13 @@ export class CustomerUpdateHandler
 		resource: Writable<Customer>,
 		{ address }: CustomerAddAddressAction,
 	) {
-		const newAddress = await createAddress(
-			{ ...address, id: address.id ?? generateRandomString(5) },
-			context.projectKey,
-			this._storage,
+		resource.addresses.push(
+			await createAddress(
+				{ ...address, id: address.id ?? generateRandomString(5) },
+				context.projectKey,
+				this._storage,
+			),
 		);
-
-		if (newAddress) {
-			resource.addresses.push(newAddress);
-		}
 	}
 
 	addBillingAddressId(
@@ -126,15 +124,11 @@ export class CustomerUpdateHandler
 			(a) => a.id === current.id,
 		);
 
-		const newAddress = await createAddress(
+		resource.addresses[oldAddressIndex] = await createAddress(
 			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,
 		);
-
-		if (newAddress) {
-			resource.addresses[oldAddressIndex] = newAddress;
-		}
 	}
 
 	changeEmail(

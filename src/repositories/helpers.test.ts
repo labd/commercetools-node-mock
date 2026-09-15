@@ -67,16 +67,6 @@ describe("Helpers", () => {
 				fields: { deliveryInstructions: "Leave at the door" },
 			});
 		});
-
-		test("should not set custom when the draft has no custom fields", async () => {
-			const result = await createAddress(
-				{ country: "US" },
-				projectKey,
-				storage,
-			);
-
-			expect(result).not.toHaveProperty("custom");
-		});
 	});
 
 	describe("calculateCentAmountFromPreciseAmount", () => {

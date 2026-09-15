@@ -256,16 +256,20 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 		const resource: Writable<Order> = {
 			...getBaseResourceProperties(context.clientId),
 
-			billingAddress: await createAddress(
-				draft.billingAddress,
-				context.projectKey,
-				this._storage,
-			),
-			shippingAddress: await createAddress(
-				draft.shippingAddress,
-				context.projectKey,
-				this._storage,
-			),
+			billingAddress: draft.billingAddress
+				? await createAddress(
+						draft.billingAddress,
+						context.projectKey,
+						this._storage,
+					)
+				: undefined,
+			shippingAddress: draft.shippingAddress
+				? await createAddress(
+						draft.shippingAddress,
+						context.projectKey,
+						this._storage,
+					)
+				: undefined,
 
 			custom: await createCustomFields(
 				draft.custom,
@@ -581,11 +585,13 @@ export class OrderRepository extends AbstractResourceRepository<"order"> {
 						),
 					})) ?? [],
 				),
-				address: await createAddress(
-					deliveryDraft.address,
-					context.projectKey,
-					this._storage,
-				),
+				address: deliveryDraft.address
+					? await createAddress(
+							deliveryDraft.address,
+							context.projectKey,
+							this._storage,
+						)
+					: undefined,
 				custom: await createCustomFields(
 					deliveryDraft.custom,
 					context.projectKey,

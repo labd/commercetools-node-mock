@@ -68,7 +68,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		context: RepositoryContext,
 		draft: BusinessUnitDraft,
 	): Promise<BusinessUnit> {
-		const addresses = (await Promise.all(
+		const addresses = await Promise.all(
 			draft.addresses?.map((address) =>
 				createAddress(
 					{ ...address, id: generateRandomString(5) },
@@ -76,7 +76,7 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 					this._storage,
 				),
 			) ?? [],
-		)) as Address[];
+		);
 
 		const defaultBillingAddressId =
 			addresses.length > 0 && draft.defaultBillingAddress !== undefined
@@ -201,14 +201,9 @@ class BusinessUnitUpdateHandler
 		resource: Writable<BusinessUnit>,
 		{ address }: BusinessUnitAddAddressAction,
 	) {
-		const newAddress = await createAddress(
-			address,
-			context.projectKey,
-			this._storage,
+		resource.addresses.push(
+			await createAddress(address, context.projectKey, this._storage),
 		);
-		if (newAddress) {
-			resource.addresses.push(newAddress);
-		}
 	}
 
 	async addAssociate(
@@ -257,15 +252,11 @@ class BusinessUnitUpdateHandler
 			(a) => a.id === current.id,
 		);
 
-		const newAddress = await createAddress(
+		resource.addresses[oldAddressIndex] = await createAddress(
 			{ ...address, id: current.id },
 			context.projectKey,
 			this._storage,
 		);
-
-		if (newAddress) {
-			resource.addresses[oldAddressIndex] = newAddress;
-		}
 	}
 
 	changeApprovalRuleMode(

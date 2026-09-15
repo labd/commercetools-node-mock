@@ -72,7 +72,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			});
 		}
 
-		const addresses = (await Promise.all(
+		const addresses = await Promise.all(
 			draft.addresses?.map((address) =>
 				createAddress(
 					{ ...address, id: generateRandomString(5) },
@@ -80,7 +80,7 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 					this._storage,
 				),
 			) ?? [],
-		)) as Address[];
+		);
 
 		const lookupAdressId = (
 			addresses: Address[],

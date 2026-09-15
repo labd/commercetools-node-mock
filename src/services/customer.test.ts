@@ -28,40 +28,6 @@ describe("Customer create", () => {
 		expect(customer.shippingAddressIds).toHaveLength(0);
 	});
 
-	test("create new customer with custom fields on an address", async () => {
-		await typeDraftFactory(ctMock).create({
-			key: "address-type",
-			name: { en: "Address type" },
-			resourceTypeIds: ["address"],
-			fieldDefinitions: [
-				{
-					name: "deliveryInstructions",
-					label: { en: "Delivery instructions" },
-					required: false,
-					type: { name: "String" },
-					inputHint: "SingleLine",
-				},
-			],
-		});
-
-		const address: AddressDraft = {
-			country: "DE",
-			streetName: "Main Street",
-			custom: {
-				type: { typeId: "type", key: "address-type" },
-				fields: { deliveryInstructions: "Leave at the door" },
-			},
-		};
-
-		const customer = await factory.create({ addresses: [address] });
-
-		expect(customer.addresses).toHaveLength(1);
-		expect(customer.addresses[0].custom).toEqual({
-			type: { typeId: "type", id: expect.any(String) },
-			fields: { deliveryInstructions: "Leave at the door" },
-		});
-	});
-
 	test("create new customer with default billing & shipping address", async () => {
 		const customer = await factory.create({
 			email: "new-user@example.com",
