@@ -19,6 +19,16 @@ export class OAuth2Store {
 		this.validate = validate;
 	}
 
+	/**
+	 * Drops every issued token. Tokens reference resources (customers,
+	 * anonymous sessions) that are gone once the storage is cleared, so they
+	 * must not outlive it.
+	 */
+	clear() {
+		this.tokens = [];
+		this.tokenClientMap.clear();
+	}
+
 	addToken(token: Token, clientId?: string) {
 		this.tokens.push(token);
 		if (clientId) {
