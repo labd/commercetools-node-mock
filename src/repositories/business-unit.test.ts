@@ -399,6 +399,36 @@ describe("BusinessUnit Repository", () => {
 		expect(result.version).toBe(businessUnit.version + 1);
 	});
 
+	test("rejects a duplicate key within the same project", async () => {
+		const ctx = { projectKey: "dummy" };
+		const draft: CompanyDraft = {
+			key: "duplicate-key-test",
+			unitType: "Company",
+			name: "First Company",
+		};
+
+		await repository.create(ctx, draft);
+
+		await expect(
+			repository.create(ctx, { ...draft, name: "Second Company" }),
+		).rejects.toThrowError(
+			"A business unit with key 'duplicate-key-test' already exists.",
+		);
+	});
+
+	test("allows the same key in another project", async () => {
+		const draft: CompanyDraft = {
+			key: "cross-project-key",
+			unitType: "Company",
+			name: "Company",
+		};
+
+		await repository.create({ projectKey: "dummy" }, draft);
+		const other = await repository.create({ projectKey: "other" }, draft);
+
+		expect(other.key).toBe("cross-project-key");
+	});
+
 	test("get and delete business unit", async () => {
 		const draft: CompanyDraft = {
 			key: "delete-test",

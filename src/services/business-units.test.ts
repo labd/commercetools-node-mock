@@ -39,6 +39,33 @@ describe("Business units query", () => {
 		businessUnit = body.results[0] as BusinessUnit;
 		expect(businessUnit!.key).toBe("test-business-unit");
 	});
+
+	test("rejects a business unit with an existing key", async () => {
+		const draft = businessUnitDraftFactory(ctMock).build({
+			key: "test-business-unit",
+		});
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/business-units",
+			payload: draft,
+		});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toEqual({
+			statusCode: 400,
+			message: "A business unit with key 'test-business-unit' already exists.",
+			errors: [
+				{
+					code: "DuplicateField",
+					message:
+						"A business unit with key 'test-business-unit' already exists.",
+					field: "key",
+					duplicateValue: "test-business-unit",
+				},
+			],
+		});
+	});
 });
 
 describe("Business Unit Update Actions", () => {
