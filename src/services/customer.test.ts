@@ -1,9 +1,5 @@
 import assert from "node:assert";
-import type {
-	AddressDraft,
-	Customer,
-	CustomerToken,
-} from "@commercetools/platform-sdk";
+import type { Customer, CustomerToken } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { hashPassword } from "#src/lib/password.ts";
 import {
