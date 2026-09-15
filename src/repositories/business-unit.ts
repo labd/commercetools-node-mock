@@ -35,6 +35,7 @@ import type {
 	CompanyDraft,
 	Division,
 	DivisionDraft,
+	DuplicateFieldError,
 	InvalidJsonInputError,
 	InvalidOperationError,
 } from "@commercetools/platform-sdk";
@@ -68,6 +69,20 @@ export class BusinessUnitRepository extends AbstractResourceRepository<"business
 		context: RepositoryContext,
 		draft: BusinessUnitDraft,
 	): Promise<BusinessUnit> {
+		const existing = await this._storage.getByKey(
+			context.projectKey,
+			"business-unit",
+			draft.key,
+		);
+		if (existing) {
+			throw new CommercetoolsError<DuplicateFieldError>({
+				code: "DuplicateField",
+				message: `A business unit with key '${draft.key}' already exists.`,
+				field: "key",
+				duplicateValue: draft.key,
+			});
+		}
+
 		const addresses = await Promise.all(
 			draft.addresses?.map((address) =>
 				createAddress(

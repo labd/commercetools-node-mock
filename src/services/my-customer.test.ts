@@ -106,7 +106,7 @@ describe("Me", () => {
 });
 
 describe("/me", () => {
-	const headers = customerSession(ctMock, "123").headers;
+	let headers: { authorization: string };
 
 	afterEach(() => {
 		ctMock.clear();
@@ -128,6 +128,8 @@ describe("/me", () => {
 			billingAddressIds: [],
 			customerGroupAssignments: [],
 		});
+
+		headers = customerSession(ctMock, "123").headers;
 	});
 
 	test("Get me", async () => {

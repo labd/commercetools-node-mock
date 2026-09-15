@@ -22,10 +22,10 @@ import type {
 	Reference,
 	ReferencedResourceNotFoundError,
 	ResourceIdentifier,
+	ResourceNotFoundError,
 	RoundingMode,
 	Store,
 	StoreKeyReference,
-	StoreReference,
 	StoreResourceIdentifier,
 	Type,
 	TypedMoney,
@@ -358,32 +358,85 @@ export const getStoreKeyReference = async (
 	projectKey: string,
 	storage: AbstractStorage,
 ): Promise<StoreKeyReference> => {
-	if (id.key) {
-		return {
-			typeId: "store",
-			key: id.key,
-		};
-	}
-	const value = await getReferenceFromResourceIdentifier<StoreReference>(
-		id,
-		projectKey,
-		storage,
-	);
-
-	if (!value.obj?.key) {
-		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+	if (!id.id && !id.key) {
+		throw new CommercetoolsError<InvalidJsonInputError>(
 			{
-				code: "ReferencedResourceNotFound",
-				typeId: "store",
-				message: "The referenced object of type 'store' was not found.",
+				code: "InvalidJsonInput",
+				message: "store: ResourceIdentifier requires an 'id' xor a 'key'",
+				detailedErrorMessage: "ResourceIdentifier requires an 'id' xor a 'key'",
 			},
 			400,
 		);
 	}
+
+	const store = id.id
+		? await storage.get(projectKey, "store", id.id)
+		: await storage.getByKey(projectKey, "store", id.key as string);
+
+	if (!store) {
+		const errIdentifier = id.id ? `identifier '${id.id}'` : `key '${id.key}'`;
+		throw new CommercetoolsError<ReferencedResourceNotFoundError>(
+			{
+				code: "ReferencedResourceNotFound",
+				typeId: "store",
+				message: `The referenced object of type 'store' with ${errIdentifier} was not found. It either doesn't exist, or it can't be accessed from this endpoint (e.g., if the endpoint filters by store or customer account).`,
+			},
+			400,
+		);
+	}
+
 	return {
 		typeId: "store",
-		key: value.obj?.key,
+		key: store.key,
 	};
+};
+
+/**
+ * Resolves the store addressed by an in-store endpoint (`/in-store/key={key}`).
+ *
+ * Unlike a store referenced from a draft, which yields a 400
+ * ReferencedResourceNotFound, an unknown store in the path is a 404
+ * ResourceNotFound.
+ */
+export const getStoreByPathKey = async (
+	storeKey: string,
+	projectKey: string,
+	storage: AbstractStorage,
+): Promise<Store> => {
+	const store = await storage.getByKey(projectKey, "store", storeKey);
+
+	if (!store) {
+		throw new CommercetoolsError<ResourceNotFoundError>(
+			{
+				code: "ResourceNotFound",
+				message: `The Store with key '${storeKey}' was not found.`,
+			},
+			404,
+		);
+	}
+
+	return store;
+};
+
+/**
+ * Resolves a list of store resource identifiers, dropping duplicates while
+ * keeping the order in which they were given.
+ */
+export const getStoreKeyReferences = async (
+	ids: StoreResourceIdentifier[],
+	projectKey: string,
+	storage: AbstractStorage,
+): Promise<StoreKeyReference[]> => {
+	const references: StoreKeyReference[] = [];
+
+	for (const id of ids) {
+		const reference = await getStoreKeyReference(id, projectKey, storage);
+		if (!references.some((r) => r.key === reference.key)) {
+			references.push(reference);
+		}
+	}
+
+	return references;
 };
 
 export const getRepositoryContext = (

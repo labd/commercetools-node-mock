@@ -1,4 +1,5 @@
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
+import { storeDraftFactory } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
@@ -11,6 +12,12 @@ const get = (url: string) => ctMock.app.inject({ method: "GET", url });
  * real API, so the mock must not accept it either.
  */
 describe("in-store routes", () => {
+	// In-store endpoints 404 when the store in the path doesn't exist, so the
+	// store has to exist for these tests to be about route mounting.
+	beforeAll(async () => {
+		await storeDraftFactory(ctMock).create({ key: "my-store" });
+	});
+
 	test.each([
 		"business-units",
 		"cart-discounts",

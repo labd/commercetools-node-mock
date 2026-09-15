@@ -9,6 +9,7 @@ import { mapHeaderType } from "./helpers.ts";
 import { copyHeaders } from "./lib/proxy.ts";
 import { OAuth2Server } from "./oauth/server.ts";
 import { ProjectAPI } from "./projectAPI.ts";
+import { getStoreByPathKey } from "./repositories/helpers.ts";
 import type { RepositoryMap } from "./repositories/index.ts";
 import { createRepositories } from "./repositories/index.ts";
 import type { ProjectRepository } from "./repositories/project.ts";
@@ -79,6 +80,7 @@ export class CommercetoolsMock {
 
 	async clear() {
 		await this._storage.clear();
+		this._oauth2.store.clear();
 	}
 
 	project(projectKey?: string) {
@@ -158,6 +160,8 @@ export class CommercetoolsMock {
 		const repositories = this._repositories;
 		const oauth2 = this._oauth2;
 
+		const storage = this._storage;
+
 		const projectPlugin = async (instance: FastifyInstance) => {
 			// Always installed: it resolves the identity a token was issued for,
 			// which the /me and associate-scoped endpoints need whether or not
@@ -172,6 +176,17 @@ export class CommercetoolsMock {
 		// as they do on the real API.
 		const inStorePlugin = async (instance: FastifyInstance) => {
 			instance.addHook("preHandler", oauth2.createMiddleware());
+
+			// commercetools returns a 404 for in-store endpoints when the store
+			// in the path doesn't exist, before handling the request itself.
+			instance.addHook("preHandler", async (request) => {
+				const { projectKey, storeKey } = request.params as Record<
+					string,
+					string
+				>;
+				await getStoreByPathKey(storeKey, projectKey, storage);
+			});
+
 			createServices(instance, repositories, IN_STORE_SERVICES);
 		};
 
