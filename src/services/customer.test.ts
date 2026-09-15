@@ -2,7 +2,11 @@ import assert from "node:assert";
 import type { Customer, CustomerToken } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { hashPassword } from "#src/lib/password.ts";
-import { customerDraftFactory, storeDraftFactory } from "#src/testing/index.ts";
+import {
+	customerDraftFactory,
+	storeDraftFactory,
+	typeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock, getBaseResourceProperties } from "../index.ts";
 
 const ctMock = new CommercetoolsMock();
@@ -81,6 +85,53 @@ describe("Customer Update Actions", () => {
 		expect(response.statusCode).toBe(200);
 		expect(response.json().version).toBe(2);
 		expect(response.json().addresses).toHaveLength(2);
+	});
+
+	test("addAddress with custom fields", async () => {
+		await typeDraftFactory(ctMock).create({
+			key: "address-type",
+			name: { en: "Address type" },
+			resourceTypeIds: ["address"],
+			fieldDefinitions: [
+				{
+					name: "deliveryInstructions",
+					label: { en: "Delivery instructions" },
+					required: false,
+					type: { name: "String" },
+					inputHint: "SingleLine",
+				},
+			],
+		});
+		const customer = await factory.create();
+
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/customers/${customer.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "addAddress",
+						address: {
+							country: "NL",
+							streetName: "Baz Street",
+							custom: {
+								type: { typeId: "type", key: "address-type" },
+								fields: { deliveryInstructions: "Leave at the door" },
+							},
+						},
+					},
+				],
+			},
+		});
+
+		expect(response.statusCode, JSON.stringify(response.json())).toBe(200);
+		const result = response.json() as Customer;
+		expect(result.addresses).toHaveLength(2);
+		expect(result.addresses[1].custom).toEqual({
+			type: { typeId: "type", id: expect.any(String) },
+			fields: { deliveryInstructions: "Leave at the door" },
+		});
 	});
 
 	test("removeAddress by ID", async () => {

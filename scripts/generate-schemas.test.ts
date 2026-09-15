@@ -11,6 +11,7 @@ import {
 	generateRecordSchema,
 	isReferenceType,
 	isResourceIdentifierType,
+	patchSpec,
 	propertyToZod,
 	resolveRef,
 	schemaToVarName,
@@ -1196,5 +1197,60 @@ describe("topoSort", () => {
 
 		expect(sorted).toEqual(["A"]);
 		expect(sorted).not.toContain("B");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// patchSpec
+// ---------------------------------------------------------------------------
+describe("patchSpec", () => {
+	it("adds the write-only custom field to BaseAddress", () => {
+		const schemas: Record<string, OpenAPISchema> = {
+			BaseAddress: {
+				type: "object",
+				required: ["country"],
+				properties: {
+					country: { type: "string" },
+				},
+			},
+			CustomFieldsDraft: { type: "object", properties: {} },
+		};
+
+		patchSpec(schemas);
+
+		expect(schemas.BaseAddress.properties?.custom).toEqual({
+			$ref: "#/components/schemas/CustomFieldsDraft",
+		});
+
+		// The patched property is emitted and collected like any other, so it
+		// needs no special casing downstream.
+		const deps = new Set<string>();
+		collectDependencies(schemas, "BaseAddress", deps);
+		expect(deps).toContain("CustomFieldsDraft");
+
+		const result = generateObjectSchema(
+			schemas,
+			"BaseAddress",
+			schemas.BaseAddress,
+		);
+		expect(result).toContain("country: z.string(),");
+		expect(result).toContain("custom: CustomFieldsDraftSchema.nullish(),");
+	});
+
+	it("leaves a property the spec already models alone", () => {
+		const schemas: Record<string, OpenAPISchema> = {
+			BaseAddress: {
+				type: "object",
+				properties: {
+					custom: { type: "string" },
+				},
+			},
+		};
+
+		patchSpec(schemas);
+
+		expect(schemas.BaseAddress.properties?.custom).toEqual({
+			type: "string",
+		});
 	});
 });

@@ -26,6 +26,23 @@ const SPEC_PATH = resolve(
 const OUTPUT_DIR = resolve(PROJECT_ROOT, "src/schemas/generated");
 
 // ---------------------------------------------------------------------------
+// Configuration: properties the spec omits but the API accepts on write
+// ---------------------------------------------------------------------------
+// A few types are polymorphic between read and write, and the spec only models
+// the read side. BaseAddress is documented as "either Address or AddressDraft
+// that only differ in the data type for the optional custom field", yet the
+// spec declares it without `custom` at all.
+//
+// These are patched into the parsed spec (see patchSpec) rather than into the
+// emitted code, so dependency collection and topological sorting treat them as
+// any other property.
+const EXTRA_PROPERTIES: Record<string, Record<string, OpenAPIProperty>> = {
+	BaseAddress: {
+		custom: { $ref: "#/components/schemas/CustomFieldsDraft" },
+	},
+};
+
+// ---------------------------------------------------------------------------
 // Configuration: which draft schemas to generate
 // ---------------------------------------------------------------------------
 const DRAFT_SCHEMAS = [
@@ -144,6 +161,31 @@ export interface OpenAPIProperty {
 }
 
 // ---------------------------------------------------------------------------
+// Spec patching
+// ---------------------------------------------------------------------------
+/**
+ * Adds the EXTRA_PROPERTIES to the parsed spec, so the rest of the generator
+ * sees them as regular properties of their schema.
+ */
+export function patchSpec(schemas: Record<string, OpenAPISchema>) {
+	for (const [name, properties] of Object.entries(EXTRA_PROPERTIES)) {
+		const schema = schemas[name];
+		if (!schema) {
+			console.warn(`  Warning: cannot patch ${name}, not found in spec`);
+			continue;
+		}
+
+		for (const [propName, propDef] of Object.entries(properties)) {
+			// The spec stays the source of truth: once it models the property
+			// itself, the entry in EXTRA_PROPERTIES can be dropped.
+			if (schema.properties?.[propName]) continue;
+
+			schema.properties = { ...schema.properties, [propName]: propDef };
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 function main() {
@@ -159,6 +201,8 @@ function main() {
 	const schemas: Record<string, OpenAPISchema> = spec.components.schemas;
 
 	console.log(`Found ${Object.keys(schemas).length} schemas`);
+
+	patchSpec(schemas);
 
 	// Collect all schemas we need (drafts + transitive deps)
 	const needed = new Set<string>();

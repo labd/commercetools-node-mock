@@ -31,6 +31,7 @@ import {
 	type RepositoryContext,
 } from "../abstract.ts";
 import {
+	createAddress,
 	createCustomFields,
 	getStoreByPathKey,
 	getStoreKeyReferences,
@@ -59,11 +60,15 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 			storesForCustomer.map((store) => store.key),
 		);
 
-		const addresses: Address[] =
-			draft.addresses?.map((address) => ({
-				...address,
-				id: generateRandomString(5),
-			})) ?? [];
+		const addresses = await Promise.all(
+			draft.addresses?.map((address) =>
+				createAddress(
+					{ ...address, id: generateRandomString(5) },
+					context.projectKey,
+					this._storage,
+				),
+			) ?? [],
+		);
 
 		const lookupAdressId = (
 			addresses: Address[],

@@ -142,7 +142,11 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 						}
 					: undefined,
 			billingAddress: draft.billingAddress
-				? createAddress(draft.billingAddress, context.projectKey, this._storage)
+				? await createAddress(
+						draft.billingAddress,
+						context.projectKey,
+						this._storage,
+					)
 				: undefined,
 			cartState: "Active",
 			country: draft.country,
@@ -167,7 +171,7 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 			},
 			shippingMode: "Single",
 			shippingAddress: draft.shippingAddress
-				? createAddress(
+				? await createAddress(
 						draft.shippingAddress,
 						context.projectKey,
 						this._storage,

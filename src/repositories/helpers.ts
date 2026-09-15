@@ -1,6 +1,7 @@
 import type {
 	_Money,
 	Address,
+	AddressDraft,
 	Associate,
 	AssociateDraft,
 	AssociateRoleAssignment,
@@ -32,17 +33,16 @@ import type {
 import { Decimal } from "decimal.js/decimal";
 import type { FastifyRequest } from "fastify";
 import { CommercetoolsError } from "#src/exceptions.ts";
+import type { ShallowWritable } from "#src/types.ts";
 import type { AbstractStorage } from "../storage/index.ts";
 import type { RepositoryContext } from "./abstract.ts";
 
-export const createAddress = (
-	base: BaseAddress | undefined,
+export const createAddress = async (
+	base: BaseAddress | AddressDraft,
 	projectKey: string,
 	storage: AbstractStorage,
-): Address | undefined => {
-	if (!base) return undefined;
-
-	if (!base?.country) {
+): Promise<Address> => {
+	if (!base.country) {
 		throw new CommercetoolsError<InvalidJsonInputError>(
 			{
 				code: "InvalidJsonInput",
@@ -57,10 +57,20 @@ export const createAddress = (
 	// which is what addresses use instead of uuid
 	const generateRandomId = (): string =>
 		Math.random().toString(36).substring(2, 10).padEnd(8, "0");
-	return {
-		...base,
+
+	// BaseAddress is polymorphic: on write it carries a `custom` field holding a
+	// CustomFieldsDraft, which needs resolving to CustomFields for the response.
+	const { custom, ...rest } = base as AddressDraft;
+	const address: ShallowWritable<Address> = {
+		...rest,
 		id: base.id ?? generateRandomId(),
 	};
+
+	if (custom) {
+		address.custom = await createCustomFields(custom, projectKey, storage);
+	}
+
+	return address;
 };
 
 export const createCustomFields = async (

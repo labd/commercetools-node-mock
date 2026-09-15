@@ -202,19 +202,14 @@ export class CartUpdateHandler
 		resource.cartState = "Active";
 	}
 
-	addItemShippingAddress(
+	async addItemShippingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ action, address }: CartAddItemShippingAddressAction,
 	) {
-		const newAddress = createAddress(
-			address,
-			context.projectKey,
-			this._storage,
+		resource.itemShippingAddresses.push(
+			await createAddress(address, context.projectKey, this._storage),
 		);
-		if (newAddress) {
-			resource.itemShippingAddresses.push(newAddress);
-		}
 	}
 
 	async addLineItem(
@@ -762,16 +757,14 @@ export class CartUpdateHandler
 		resource.customerId = undefined;
 	}
 
-	setBillingAddress(
+	async setBillingAddress(
 		context: RepositoryContext,
 		resource: Writable<Cart>,
 		{ address }: CartSetBillingAddressAction,
 	) {
-		resource.billingAddress = createAddress(
-			address,
-			context.projectKey,
-			this._storage,
-		);
+		resource.billingAddress = address
+			? await createAddress(address, context.projectKey, this._storage)
+			: undefined;
 	}
 
 	async setBillingAddressCustomType(
