@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 5.0.0-beta.2
+
+### Patch Changes
+
+- [#436](https://github.com/labd/commercetools-node-mock/pull/436) [`8a8a282`](https://github.com/labd/commercetools-node-mock/commit/8a8a282d59094aec509650066cae97695f8f9be2) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix `contains any` / `contains all` throwing on resources where the field is not
+  set.
+  
+  The handler rejected any non-array value, so a predicate such as
+  `custom(fields(orderNumbers contains any ("R-123")))` raised
+  `The field 'orderNumbers' does not support this expression.` as soon as one
+  resource in the collection lacked the field — failing the entire query rather
+  than filtering that resource out. Real commercetools treats an unset set as
+  having no members, so it simply does not match.
+  
+  An unset (`undefined` or `null`) field now evaluates to `false`. A field that is
+  present but is not a set still raises a `PredicateError`, since that is a
+  genuine type mismatch.
+
 ## 5.0.0-beta.1
 
 ### Minor Changes
