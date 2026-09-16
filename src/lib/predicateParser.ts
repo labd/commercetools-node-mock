@@ -468,6 +468,12 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			return (obj: any, vars: object) => {
 				const value = resolveValue(obj, left);
 
+				// An unset set simply has no members, so it matches nothing. Only a
+				// value that is present but not a set is a type error.
+				if (value === undefined || value === null) {
+					return false;
+				}
+
 				if (!Array.isArray(value)) {
 					throw new PredicateError(
 						`The field '${left.value}' does not support this expression.`,
