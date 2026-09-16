@@ -187,6 +187,30 @@ describe("Predicate filter", () => {
 		).toBeTruthy();
 	});
 
+	test("contains on an unset field does not match", async () => {
+		// Real commercetools filters these resources out; it does not reject the
+		// predicate. Throwing here would fail the whole query as soon as a single
+		// resource in the collection lacks the field.
+		expect(match(`notDefined contains any ("foo")`)).toBeFalsy();
+		expect(match(`notDefined contains all ("foo")`)).toBeFalsy();
+		expect(match(`missingProperty contains any ("foo")`)).toBeFalsy();
+
+		// ...so it can be combined with other clauses without poisoning them
+		expect(
+			match(`missingProperty contains any ("foo") or numberProperty=1234`),
+		).toBeTruthy();
+		expect(match(`nested(missingProperty contains any ("foo"))`)).toBeFalsy();
+	});
+
+	test("contains on a non-set field is still an error", async () => {
+		expect(() => match(`stringProperty contains any ("foo")`)).toThrow(
+			PredicateError,
+		);
+		expect(() => match(`numberProperty contains all (1234)`)).toThrow(
+			PredicateError,
+		);
+	});
+
 	test("nestedArray filters on property", async () => {
 		expect(match(`nested(array(stringProperty="foo"))`)).toBeTruthy();
 		expect(match(`nested(array(stringProperty="bar"))`)).toBeTruthy();
