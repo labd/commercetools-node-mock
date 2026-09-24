@@ -1,6 +1,9 @@
 import type {
 	InvalidJsonInputError,
+	InvalidOperationError,
 	Quote,
+	QuoteChangeQuoteStateAction,
+	QuoteRequestQuoteRenegotiationAction,
 	QuoteSetCustomFieldAction,
 	QuoteSetCustomTypeAction,
 	QuoteTransitionStateAction,
@@ -17,6 +20,46 @@ export class QuoteUpdateHandler
 	extends AbstractUpdateHandler
 	implements Partial<UpdateHandlerInterface<Quote, QuoteUpdateAction>>
 {
+	changeQuoteState(
+		context: RepositoryContext,
+		resource: Writable<Quote>,
+		{ quoteState }: QuoteChangeQuoteStateAction,
+	) {
+		// Only a renegotiation request may decline a quote for renegotiation,
+		// because that is what carries the buyer's comment
+		if (quoteState === "DeclinedForRenegotiation") {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message:
+						"The state 'DeclinedForRenegotiation' can only be set by the 'requestQuoteRenegotiation' update action.",
+				},
+				400,
+			);
+		}
+
+		resource.quoteState = quoteState;
+	}
+
+	requestQuoteRenegotiation(
+		context: RepositoryContext,
+		resource: Writable<Quote>,
+		{ buyerComment }: QuoteRequestQuoteRenegotiationAction,
+	) {
+		if (resource.quoteState !== "Pending") {
+			throw new CommercetoolsError<InvalidOperationError>(
+				{
+					code: "InvalidOperation",
+					message: `The quote with ID '${resource.id}' cannot be renegotiated because it is in state '${resource.quoteState}'.`,
+				},
+				400,
+			);
+		}
+
+		resource.quoteState = "DeclinedForRenegotiation";
+		resource.buyerComment = buyerComment;
+	}
+
 	setCustomField(
 		context: RepositoryContext,
 		resource: Quote,
