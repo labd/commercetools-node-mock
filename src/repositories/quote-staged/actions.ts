@@ -1,8 +1,11 @@
 import type {
 	InvalidJsonInputError,
 	StagedQuote,
+	StagedQuoteChangeStagedQuoteStateAction,
 	StagedQuoteSetCustomFieldAction,
 	StagedQuoteSetCustomTypeAction,
+	StagedQuoteSetSellerCommentAction,
+	StagedQuoteSetValidToAction,
 	StagedQuoteTransitionStateAction,
 	StagedQuoteUpdateAction,
 	StateReference,
@@ -18,6 +21,14 @@ export class StagedQuoteUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<StagedQuote, StagedQuoteUpdateAction>>
 {
+	changeStagedQuoteState(
+		context: RepositoryContext,
+		resource: Writable<StagedQuote>,
+		{ stagedQuoteState }: StagedQuoteChangeStagedQuoteStateAction,
+	) {
+		resource.stagedQuoteState = stagedQuoteState;
+	}
+
 	setCustomField(
 		context: RepositoryContext,
 		resource: StagedQuote,
@@ -32,6 +43,22 @@ export class StagedQuoteUpdateHandler
 		{ type, fields }: StagedQuoteSetCustomTypeAction,
 	) {
 		await this._setCustomType(context, resource, { type, fields });
+	}
+
+	setSellerComment(
+		context: RepositoryContext,
+		resource: Writable<StagedQuote>,
+		{ sellerComment }: StagedQuoteSetSellerCommentAction,
+	) {
+		resource.sellerComment = sellerComment;
+	}
+
+	setValidTo(
+		context: RepositoryContext,
+		resource: Writable<StagedQuote>,
+		{ validTo }: StagedQuoteSetValidToAction,
+	) {
+		resource.validTo = validTo;
 	}
 
 	async transitionState(
