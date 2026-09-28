@@ -158,6 +158,45 @@ describe("Predicate filter", () => {
 		expect(match("numberProperty in :val", { val: [1235] })).toBeFalsy();
 	});
 
+	test("numberProperty not in (...)", async () => {
+		expect(match("numberProperty not in (1233, 1235)")).toBeTruthy();
+		expect(match("numberProperty not in (1233, 1234, 1235)")).toBeFalsy();
+		expect(match("numberProperty not in (1234)")).toBeFalsy();
+	});
+
+	test("not in operator works with variables", async () => {
+		expect(match("numberProperty not in :val", { val: 1235 })).toBeTruthy();
+		expect(match("numberProperty not in :val", { val: [1234] })).toBeFalsy();
+		expect(
+			match("numberProperty not in (:a, :b)", { a: 1233, b: 1235 }),
+		).toBeTruthy();
+	});
+
+	test("not in (...) combined with other clauses", async () => {
+		expect(
+			match(`stringProperty not in ("nope") and numberProperty=1234`),
+		).toBeTruthy();
+		expect(
+			match(`stringProperty not in ("foobar") or numberProperty=1234`),
+		).toBeTruthy();
+		expect(
+			match(`notDefined is not defined or notDefined not in ("foo")`),
+		).toBeTruthy();
+		expect(
+			match(`nested(objectProperty(stringProperty not in ("foobar")))`),
+		).toBeFalsy();
+	});
+
+	test("not in operator with array values", async () => {
+		expect(match(`arrayProperty not in ("missing")`)).toBeTruthy();
+		expect(match(`arrayProperty not in ("foo", "missing")`)).toBeFalsy();
+	});
+
+	test("negated in (...) keeps variables", async () => {
+		expect(match("not (numberProperty in :val)", { val: [1234] })).toBeFalsy();
+		expect(match("not (numberProperty in :val)", { val: [1] })).toBeTruthy();
+	});
+
 	test("arrayProperty contains all (...)", async () => {
 		expect(match(`arrayProperty contains all ("foo", "bar")`)).toBeTruthy();
 		expect(
@@ -484,5 +523,11 @@ describe("Predicate filter", () => {
 describe("Report parse errors", () => {
 	test("unexpect input", () => {
 		expect(() => parseQueryExpression("foo=bar")).toThrow(PredicateError);
+	});
+
+	test("infix not without in", () => {
+		expect(() => parseQueryExpression('foo not = "bar"')).toThrow(
+			PredicateError,
+		);
 	});
 });
