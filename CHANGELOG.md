@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 5.0.0-beta.3
+
+### Patch Changes
+
+- [#439](https://github.com/labd/commercetools-node-mock/pull/439) [`b120400`](https://github.com/labd/commercetools-node-mock/commit/b12040025171759064d9a8655eaefc52a0cbd920) Thanks [@jsm1t](https://github.com/jsm1t)! - Support the infix `not in` operator in query predicates.
+  
+  A predicate such as `custom(fields(externalOrderType not in :hiddenOrderTypes))`
+  failed with `Unexpected token: not`, because `not` was only understood as a
+  prefix (`not (...)`). Real commercetools documents `age not in (42, 43, 44)` as
+  a membership check, so `not in` now matches every resource that `in` would not.
+  
+  The prefix `not (...)` form also forwards query variables to the negated
+  expression now, so `not (field in :values)` no longer ignores `:values`.
+
 ## 5.0.0-beta.2
 
 ### Patch Changes
