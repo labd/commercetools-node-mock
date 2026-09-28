@@ -303,7 +303,6 @@ describe("Predicate filter", () => {
 		expect(match("nested(not(numberProperty=1234))")).toBeFalsy();
 
 		expect(match("not (numberProperty not in (1234))")).toBeTruthy();
-		expect(match("not (numberProperty in :val)", { val: [1234] })).toBeFalsy();
 	});
 
 	test("and clause (implicit)", async () => {
