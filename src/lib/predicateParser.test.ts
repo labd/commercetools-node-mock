@@ -158,6 +158,11 @@ describe("Predicate filter", () => {
 		expect(match("numberProperty in :val", { val: [1235] })).toBeFalsy();
 	});
 
+	test("numberProperty not in (...)", async () => {
+		expect(match("numberProperty not in (1233, 1235)")).toBeTruthy();
+		expect(match("numberProperty not in (1233, 1234)")).toBeFalsy();
+	});
+
 	test("arrayProperty contains all (...)", async () => {
 		expect(match(`arrayProperty contains all ("foo", "bar")`)).toBeTruthy();
 		expect(
@@ -296,6 +301,8 @@ describe("Predicate filter", () => {
 		expect(match("nested(numberProperty=1234)")).toBeTruthy();
 		expect(match("nested(not(numberProperty=1230))")).toBeTruthy();
 		expect(match("nested(not(numberProperty=1234))")).toBeFalsy();
+
+		expect(match("not (numberProperty not in (1234))")).toBeTruthy();
 	});
 
 	test("and clause (implicit)", async () => {
@@ -370,6 +377,18 @@ describe("Predicate filter", () => {
 		).toBeFalsy();
 		expect(
 			match(`stringProperty in ("nope") or numberProperty in (1234)`),
+		).toBeTruthy();
+	});
+
+	test("not in (...) followed by another clause", async () => {
+		expect(
+			match(`stringProperty not in ("nope") and numberProperty=1235`),
+		).toBeFalsy();
+		expect(
+			match(`stringProperty not in ("foobar") or numberProperty=1234`),
+		).toBeTruthy();
+		expect(
+			match(`notDefined is not defined or notDefined not in ("foo")`),
 		).toBeTruthy();
 	});
 
@@ -484,5 +503,11 @@ describe("Predicate filter", () => {
 describe("Report parse errors", () => {
 	test("unexpect input", () => {
 		expect(() => parseQueryExpression("foo=bar")).toThrow(PredicateError);
+	});
+
+	test("infix not without in", () => {
+		expect(() => parseQueryExpression('foo not = "bar"')).toThrow(
+			PredicateError,
+		);
 	});
 });

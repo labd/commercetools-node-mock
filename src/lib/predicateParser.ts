@@ -114,6 +114,27 @@ const resolveValue = (obj: any, val: TypeSymbol): any => {
 	return obj[val.value];
 };
 
+const inMatcher =
+	(left: TypeSymbol, expr: any): MatchFunc =>
+	(obj: any, vars: VariableMap) => {
+		const symbols = Array.isArray(expr) ? expr : [expr];
+
+		// The expression can be a list of variables, like
+		// :value_1, :value_2, but it can also be one variable
+		// containing a list, like :values.
+		// So to support both we just flatten the list.
+		const inValues = symbols.flatMap((item: TypeSymbol) =>
+			resolveSymbol(item, vars),
+		);
+		const value = resolveValue(obj, left);
+
+		if (Array.isArray(value)) {
+			return inValues.some((inValue: any) => value.includes(inValue));
+		}
+
+		return inValues.includes(value);
+	};
+
 const getLexer = (value: string) =>
 	new Lexer(value)
 
@@ -230,9 +251,11 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 					pos: t.token.strpos(),
 				}) as TypeSymbol,
 		)
-		.nud("NOT", 100, ({ bp }) => {
-			const expr = parser.parse({ terminals: [bp - 1] });
-			return (obj: any) => !expr(obj);
+		.nud("NOT", 100, () => {
+			// Only negate the next operand (usually a parenthesised group). This can't
+			// use `bp - 1` because NOT's bp is 20, shared with the infix `not in` led.
+			const expr = parser.parse({ terminals: [99] });
+			return (obj: any, vars: VariableMap) => !expr(obj, vars);
 		})
 		.nud("EMPTY", 10, ({ bp }) => "empty")
 		.nud("DEFINED", 10, ({ bp }) => "defined")
@@ -387,28 +410,20 @@ const generateMatchFunc = (predicate: string): MatchFunc => {
 			// IN can be a single value or a list of values; the parenthesized list
 			// is consumed by the `(` nud
 			const expr = parser.parse({ terminals: [bp - 1] });
-
-			return (obj: any, vars: object) => {
-				let symbols = expr;
-				if (!Array.isArray(symbols)) {
-					symbols = [expr];
-				}
-
-				// The expression can be a list of variables, like
-				// :value_1, :value_2, but it can also be one variable
-				// containing a list, like :values.
-				// So to support both we just flatten the list.
-				const inValues = symbols.flatMap((item: TypeSymbol) =>
-					resolveSymbol(item, vars),
+			return inMatcher(left, expr);
+		})
+		.led("NOT", 20, ({ left, bp }) => {
+			// `not` is only valid as an infix operator in `not in`
+			const next = lexer.next();
+			if (next.type !== "IN") {
+				const { start } = next.strpos();
+				throw new PredicateError(
+					`Invalid input '${next.match}', expected in (line ${start.line}, column ${start.column})`,
 				);
-				const value = resolveValue(obj, left);
-
-				if (Array.isArray(value)) {
-					return inValues.some((inValue: any) => value.includes(inValue));
-				}
-
-				return inValues.includes(value);
-			};
+			}
+			const expr = parser.parse({ terminals: [bp - 1] });
+			const matcher = inMatcher(left, expr);
+			return (obj: any, vars: VariableMap) => !matcher(obj, vars);
 		})
 		.led("MATCHES_IGNORE_CASE", 20, ({ left, bp }) => {
 			const expr = parser.parse({ terminals: [bp - 1] });
