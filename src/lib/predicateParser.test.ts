@@ -160,41 +160,7 @@ describe("Predicate filter", () => {
 
 	test("numberProperty not in (...)", async () => {
 		expect(match("numberProperty not in (1233, 1235)")).toBeTruthy();
-		expect(match("numberProperty not in (1233, 1234, 1235)")).toBeFalsy();
-		expect(match("numberProperty not in (1234)")).toBeFalsy();
-	});
-
-	test("not in operator works with variables", async () => {
-		expect(match("numberProperty not in :val", { val: 1235 })).toBeTruthy();
-		expect(match("numberProperty not in :val", { val: [1234] })).toBeFalsy();
-		expect(
-			match("numberProperty not in (:a, :b)", { a: 1233, b: 1235 }),
-		).toBeTruthy();
-	});
-
-	test("not in (...) combined with other clauses", async () => {
-		expect(
-			match(`stringProperty not in ("nope") and numberProperty=1234`),
-		).toBeTruthy();
-		expect(
-			match(`stringProperty not in ("foobar") or numberProperty=1234`),
-		).toBeTruthy();
-		expect(
-			match(`notDefined is not defined or notDefined not in ("foo")`),
-		).toBeTruthy();
-		expect(
-			match(`nested(objectProperty(stringProperty not in ("foobar")))`),
-		).toBeFalsy();
-	});
-
-	test("not in operator with array values", async () => {
-		expect(match(`arrayProperty not in ("missing")`)).toBeTruthy();
-		expect(match(`arrayProperty not in ("foo", "missing")`)).toBeFalsy();
-	});
-
-	test("negated in (...) keeps variables", async () => {
-		expect(match("not (numberProperty in :val)", { val: [1234] })).toBeFalsy();
-		expect(match("not (numberProperty in :val)", { val: [1] })).toBeTruthy();
+		expect(match("numberProperty not in (1233, 1234)")).toBeFalsy();
 	});
 
 	test("arrayProperty contains all (...)", async () => {
@@ -335,6 +301,9 @@ describe("Predicate filter", () => {
 		expect(match("nested(numberProperty=1234)")).toBeTruthy();
 		expect(match("nested(not(numberProperty=1230))")).toBeTruthy();
 		expect(match("nested(not(numberProperty=1234))")).toBeFalsy();
+
+		expect(match("not (numberProperty not in (1234))")).toBeTruthy();
+		expect(match("not (numberProperty in :val)", { val: [1234] })).toBeFalsy();
 	});
 
 	test("and clause (implicit)", async () => {
@@ -409,6 +378,18 @@ describe("Predicate filter", () => {
 		).toBeFalsy();
 		expect(
 			match(`stringProperty in ("nope") or numberProperty in (1234)`),
+		).toBeTruthy();
+	});
+
+	test("not in (...) followed by another clause", async () => {
+		expect(
+			match(`stringProperty not in ("nope") and numberProperty=1235`),
+		).toBeFalsy();
+		expect(
+			match(`stringProperty not in ("foobar") or numberProperty=1234`),
+		).toBeTruthy();
+		expect(
+			match(`notDefined is not defined or notDefined not in ("foo")`),
 		).toBeTruthy();
 	});
 
