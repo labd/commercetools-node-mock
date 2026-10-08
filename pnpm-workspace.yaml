@@ -3,11 +3,9 @@ packages:
   - docs
 minimumReleaseAge: 10080
 trustPolicy: no-downgrade
-onlyBuiltDependencies:
-  - '@biomejs/*'
-  - esbuild
-  - msw
-  - rolldown
-  - sharp
 minimumReleaseAgeExclude:
   - "zod"
+allowBuilds:
+  esbuild: true
+  msw: true
+  sharp: true
