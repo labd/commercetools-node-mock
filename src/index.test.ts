@@ -6,7 +6,7 @@ import { CommercetoolsMock } from "./index.ts";
 const mswServer = setupServer();
 
 beforeAll(() => {
-	mswServer.listen({ onUnhandledRequest: "error" });
+	mswServer.listen({ onUnhandledFrame: "error" });
 });
 
 afterEach(() => {
