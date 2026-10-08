@@ -1,5 +1,126 @@
 # CHANGELOG
 
+## 5.0.0
+
+### Major Changes
+
+- [#428](https://github.com/labd/commercetools-node-mock/pull/428) [`28773de`](https://github.com/labd/commercetools-node-mock/commit/28773de9b2fd92eedc7504fb26a548b650e35412) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Scope the `/me` and `as-associate` endpoints to the caller, and fail closed.
+  
+  **This is a breaking change.** Both scopes used to answer from the whole
+  collection: `/me/orders/{id}` returned any order, and an associate-scoped
+  request accepted any `associateId` and ignored the business unit in the path.
+  A test asserting that a shopper cannot read someone else's order, or that an
+  associate cannot see a colleague's cart, passed whether or not the code under
+  test actually scoped its request.
+  
+  **`/me`** now answers for the customer or anonymous session the bearer token was
+  issued for, and returns `403 insufficient_scope` without one. A resource
+  belonging to someone else is `404`, not a leak. Resources created through `/me`
+  are stamped with the caller.
+  
+  **`as-associate`** resolves the associate named in the path against the business
+  unit named in the path, collects the permissions of their AssociateRoles, and
+  enforces all 47 of them. `My` means the resource's customer is the acting
+  associate; `Others` means a different customer in the same business unit. A list
+  request with only the `My` permission is narrowed rather than refused; anything
+  else missing returns `403 AssociateMissingPermission` carrying the permissions
+  that would have sufficed. A resource of another business unit is `404`.
+  
+  **Migrating.** Tests that call these endpoints now need to say who is calling.
+  A new `@labdigital/commercetools-mock/testing` entrypoint exports
+  `customerSession`, `loginCustomer` and `anonymousSession` for `/me`, and
+  `createAssociateScope` for the associate scope, which seeds the customer,
+  associate role and business unit in one call.
+  
+  Identity resolution no longer depends on `enableAuthentication`: the mock always
+  reads the identity from a token it issued, so scoping works without turning
+  authentication on.
+  
+  Also in this change, because the scopes are unusable without them:
+  
+  - `POST /oauth/{projectKey}/anonymous/token` honours a supplied `anonymous_id`
+    instead of always generating one.
+  - `PaymentDraft.customer` and `anonymousId` are stored.
+  - An order and a quote request created from a cart carry the cart's
+    `businessUnit`.
+  - `GET /me/active-cart` answers for the caller instead of returning the first
+    active cart in the project.
+
+### Minor Changes
+
+- [#438](https://github.com/labd/commercetools-node-mock/pull/438) [`88f3808`](https://github.com/labd/commercetools-node-mock/commit/88f3808294c7cf494ab8f5eeb645cf5cd44d5db3) Thanks [@korsvanloon](https://github.com/korsvanloon)! - Support the seller's side of the quote flow:
+  
+  - Staged quotes and quotes are now stored when created, so they can be read and updated afterwards.
+  - A staged quote is created from a submitted quote request only, checks `quoteRequestVersion`, prices the offer in a copy of the requested cart, and honours `quoteRequestStateToAccepted`.
+  - A quote is created in the `Pending` state (it was `Accepted`) from an `InProgress` staged quote only, checks `stagedQuoteVersion`, carries the staged quote's `validTo`, `sellerComment`, business unit and store, and honours `stagedQuoteStateToSent`.
+  - New staged quote update actions: `changeStagedQuoteState`, `setSellerComment` and `setValidTo`.
+  - New quote update actions: `changeQuoteState` and `requestQuoteRenegotiation`. `DeclinedForRenegotiation` can only be reached through a renegotiation request.
+
+- [#442](https://github.com/labd/commercetools-node-mock/pull/442) [`74ac7b5`](https://github.com/labd/commercetools-node-mock/commit/74ac7b503a5d70a11235e250a2354cca48076da0) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Support the `setCarrier` update action on shipping methods
+
+- [#435](https://github.com/labd/commercetools-node-mock/pull/435) [`7a33c6b`](https://github.com/labd/commercetools-node-mock/commit/7a33c6b3ad6de5c3b519e4fb7c9666c47ce44cec) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Support custom fields on addresses. `BaseAddress` is polymorphic between read and write, so address drafts can carry a `custom` field holding a `CustomFieldsDraft`. Drafts and update actions carrying such an address (customer, business unit, cart, order and channel) now resolve it to `CustomFields` against the referenced type, returning a 400 `ReferencedResourceNotFound` when the type does not exist. In strict mode the generated draft schemas accept and validate `custom` on an address.
+  
+  Customer and business unit creation, and the `addAddress` customer action, now go through the shared `createAddress` helper, which means the address `country` field is enforced there as well.
+
+- [#430](https://github.com/labd/commercetools-node-mock/pull/430) [`2e8ae39`](https://github.com/labd/commercetools-node-mock/commit/2e8ae39d3090c677bde0252bb4b4438aca0d2e72) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Persist `expansionPaths`, `dependencies` and `additionalContext` when creating
+  an API Extension.
+  
+  The Extension repository only copied `key`, `timeoutInMs`, `destination` and
+  `triggers` out of the draft, so the three fields added by the 2026-03-12 API
+  release were silently dropped on create. `POST /{projectKey}/extensions` with
+  `expansionPaths` returned an extension without them, which made it look like
+  the field was rejected. The `setExpansionPaths`, `setDependencies` and
+  `setAdditionalContext` update actions were already implemented, so only the
+  create path was affected.
+  
+  `dependencies` are now resolved through the storage layer like every other
+  resource identifier, so they can be given by `key` as well as by `id` (on both
+  create and `setDependencies`, which previously assumed `id` was set) and an
+  unknown dependency returns a `ReferencedResourceNotFound` error instead of a
+  reference with `id: undefined`.
+
+### Patch Changes
+
+- [#442](https://github.com/labd/commercetools-node-mock/pull/442) [`f45820e`](https://github.com/labd/commercetools-node-mock/commit/f45820e3ea8ab198c5b2681c884154d608ce8136) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Update dependencies
+
+- [#433](https://github.com/labd/commercetools-node-mock/pull/433) [`74adf7c`](https://github.com/labd/commercetools-node-mock/commit/74adf7c49052ffea5807b5aa671303d1ad419663) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Update astro (docs) to v7.* for security reasons
+
+- [#432](https://github.com/labd/commercetools-node-mock/pull/432) [`756eb56`](https://github.com/labd/commercetools-node-mock/commit/756eb56ee0181719c55537e90cf84d9db25087ea) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Enforce BusinessUnit key uniqueness within a project. Creating a business unit with a key that is already taken now returns a 400 `DuplicateField` error on the `key` field instead of silently storing a second unit under the same key.
+
+- [#432](https://github.com/labd/commercetools-node-mock/pull/432) [`756eb56`](https://github.com/labd/commercetools-node-mock/commit/756eb56ee0181719c55537e90cf84d9db25087ea) Thanks [@robertmoelker](https://github.com/robertmoelker)! - `clear()` now also resets the auth store. Tokens issued before a `clear()` used to stay valid and keep resolving to customers and anonymous sessions that no longer existed, leaking identity between tests. Tests that issue a token (for example through `customerSession`) must do so after each `clear()`.
+
+- [#436](https://github.com/labd/commercetools-node-mock/pull/436) [`8a8a282`](https://github.com/labd/commercetools-node-mock/commit/8a8a282d59094aec509650066cae97695f8f9be2) Thanks [@jsm1t](https://github.com/jsm1t)! - Fix `contains any` / `contains all` throwing on resources where the field is not
+  set.
+  
+  The handler rejected any non-array value, so a predicate such as
+  `custom(fields(orderNumbers contains any ("R-123")))` raised
+  `The field 'orderNumbers' does not support this expression.` as soon as one
+  resource in the collection lacked the field — failing the entire query rather
+  than filtering that resource out. Real commercetools treats an unset set as
+  having no members, so it simply does not match.
+  
+  An unset (`undefined` or `null`) field now evaluates to `false`. A field that is
+  present but is not a set still raises a `PredicateError`, since that is a
+  genuine type mismatch.
+
+- [#434](https://github.com/labd/commercetools-node-mock/pull/434) [`cb56f14`](https://github.com/labd/commercetools-node-mock/commit/cb56f14e0686e6d7dba0e7c1ec0d889506387283) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Scope customer email uniqueness to the stores a customer is assigned to. The same email can now be used in different stores, matching commercetools behaviour. Customers created through an in-store endpoint are assigned to that store, and the in-store password flow only matches customers of that store.
+  
+  Implement the `addStore`, `removeStore` and `setStores` customer update actions, which re-validate email uniqueness for any store scope the customer newly enters (including becoming a global customer again).
+  
+  Store resource identifiers are now validated by `key` as well as by `id`, so referencing a non-existent store in a draft returns a 400 `ReferencedResourceNotFound` error instead of silently passing through. This also fixes `getStoreKeyReference`, which previously always failed for `id`-based references.
+  
+  In-store endpoints (`/{projectKey}/in-store/key={storeKey}/...`) now return a 404 `ResourceNotFound` when the store in the path does not exist, matching commercetools.
+
+- [#439](https://github.com/labd/commercetools-node-mock/pull/439) [`b120400`](https://github.com/labd/commercetools-node-mock/commit/b12040025171759064d9a8655eaefc52a0cbd920) Thanks [@jsm1t](https://github.com/jsm1t)! - Support the infix `not in` operator in query predicates.
+  
+  A predicate such as `custom(fields(externalOrderType not in :hiddenOrderTypes))`
+  failed with `Unexpected token: not`, because `not` was only understood as a
+  prefix (`not (...)`). Real commercetools documents `age not in (42, 43, 44)` as
+  a membership check, so `not in` now matches every resource that `in` would not.
+  
+  The prefix `not (...)` form also forwards query variables to the negated
+  expression now, so `not (field in :values)` no longer ignores `:values`.
+
 ## 5.0.0-beta.3
 
 ### Patch Changes
