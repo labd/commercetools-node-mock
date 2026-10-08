@@ -222,5 +222,54 @@ describe("OAuth2Server", () => {
 				token_type: "Bearer",
 			});
 		});
+
+		const addCustomer = (projectKey: string, stores: string[]) =>
+			storage.add(projectKey, "customer", {
+				...getBaseResourceProperties(),
+				email: "j.doe@example.org",
+				password: hashPassword("password"),
+				addresses: [],
+				authenticationMode: "password",
+				isEmailVerified: true,
+				stores: stores.map((key) => ({ typeId: "store" as const, key })),
+				shippingAddressIds: [],
+				billingAddressIds: [],
+				customerGroupAssignments: [],
+			});
+
+		const requestToken = (projectKey: string, storeKey: string) =>
+			app.inject({
+				method: "POST",
+				url: `/${projectKey}/in-store/key=${storeKey}/customers/token?${new URLSearchParams(
+					{
+						grant_type: "password",
+						username: "j.doe@example.org",
+						password: "password",
+						scope: `${projectKey}:manage_my_profile`,
+					},
+				)}`,
+				headers: {
+					Authorization: `Basic ${Buffer.from("validClientId:validClientSecret").toString("base64")}`,
+				},
+			});
+
+		it("should return a token for a global customer", async () => {
+			addCustomer("test-project", []);
+
+			const response = await requestToken("test-project", "test-store");
+
+			expect(response.statusCode).toBe(200);
+		});
+
+		it("should refuse a customer assigned to another store", async () => {
+			addCustomer("test-project", ["other-store"]);
+
+			const response = await requestToken("test-project", "test-store");
+
+			expect(response.statusCode).toBe(400);
+			expect(response.json().errors[0].code).toBe(
+				"invalid_customer_account_credentials",
+			);
+		});
 	});
 });
