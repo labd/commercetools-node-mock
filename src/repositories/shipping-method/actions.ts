@@ -11,6 +11,7 @@ import type {
 	ShippingMethodRemoveShippingRateAction,
 	ShippingMethodRemoveStoreAction,
 	ShippingMethodRemoveZoneAction,
+	ShippingMethodSetCarrierAction,
 	ShippingMethodSetCustomFieldAction,
 	ShippingMethodSetCustomTypeAction,
 	ShippingMethodSetDescriptionAction,
@@ -191,6 +192,14 @@ export class ShippingMethodUpdateHandler
 		{ type, fields }: ShippingMethodSetCustomTypeAction,
 	) {
 		await this._setCustomType(context, resource, { type, fields });
+	}
+
+	setCarrier(
+		_context: RepositoryContext,
+		resource: Writable<ShippingMethod>,
+		{ carrier }: ShippingMethodSetCarrierAction,
+	) {
+		resource.carrier = carrier;
 	}
 
 	setDescription(

@@ -88,6 +88,39 @@ describe("Shipping method", () => {
 		expect(response.json()).toEqual(shippingMethod);
 	});
 
+	test("Update shipping method carrier", async () => {
+		const shippingMethod = await shippingMethodDraft.create({
+			name: "foo",
+			taxCategory: { typeId: "tax-category", key: "standard" },
+			isDefault: true,
+			zoneRates: [],
+		});
+
+		let response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shipping-methods/${shippingMethod.id}`,
+			payload: {
+				version: shippingMethod.version,
+				actions: [{ action: "setCarrier", carrier: "DHL" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().carrier).toBe("DHL");
+
+		response = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/shipping-methods/${shippingMethod.id}`,
+			payload: {
+				version: response.json().version,
+				actions: [{ action: "setCarrier" }],
+			},
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json().carrier).toBeUndefined();
+	});
+
 	test("Get shipping methods matching cart", async () => {
 		const cart = await cartDraft.create({
 			currency: "EUR",
