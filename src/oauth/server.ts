@@ -313,11 +313,13 @@ export class OAuth2Server {
 				},
 			);
 
-			// Emails are only unique per store, so make sure we only sign in the
-			// customer that is actually assigned to this store.
-			const customer = result.results.find((c) =>
-				c.stores?.some((store) => store.key === storeKey),
-			);
+			// Emails are only unique per store, so the customer assigned to this
+			// store wins. A global customer, assigned to no store, may sign in to
+			// any store; one assigned to other stores only may not.
+			const customer =
+				result.results.find((c) =>
+					c.stores?.some((store) => store.key === storeKey),
+				) ?? result.results.find((c) => !c.stores?.length);
 
 			if (!customer) {
 				throw new CommercetoolsError<any>(
