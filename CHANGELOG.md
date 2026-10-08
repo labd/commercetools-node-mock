@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.0.1
+
+### Patch Changes
+
+- [#443](https://github.com/labd/commercetools-node-mock/pull/443) [`db5c4fb`](https://github.com/labd/commercetools-node-mock/commit/db5c4fb5719fb59d5081bc7b689044b40595bd6a) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Issue an in-store password token to a global customer. A customer assigned to no store can sign in to any store again; a customer assigned only to other stores is still refused.
+
 ## 5.0.0
 
 ### Major Changes
