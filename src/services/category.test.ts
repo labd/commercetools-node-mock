@@ -5,7 +5,11 @@ import type {
 	CategoryRemoveAssetAction,
 } from "@commercetools/platform-sdk";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { categoryDraftFactory } from "#src/testing/index.ts";
+import {
+	categoryDraftFactory,
+	productDraftFactory,
+	productTypeDraftFactory,
+} from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
 describe("Categories Query", () => {
@@ -198,6 +202,13 @@ describe("categories changeParent", () => {
 	});
 
 	test("changeParent", async () => {
+		const child = await categoryDraft.create({
+			parent: { typeId: "category", id: category2?.id as string },
+		});
+		const grandchild = await categoryDraft.create({
+			parent: { typeId: "category", id: child.id },
+		});
+
 		const changeNameResponse = await ctMock.app.inject({
 			method: "POST",
 			url: `/dummy/categories/${category2?.id}`,
@@ -222,6 +233,62 @@ describe("categories changeParent", () => {
 		});
 		expect(changeNameResponse.json().ancestors).toHaveLength(1);
 		expect(changeNameResponse.json().ancestors[0].id).toEqual(category1?.id);
+
+		const grandchildResponse = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/categories/${grandchild.id}`,
+			query: { expand: "parent" },
+		});
+		expect(grandchildResponse.json().parent.obj.ancestors).toEqual([
+			{ typeId: "category", id: category2?.id },
+			{ typeId: "category", id: category1?.id },
+		]);
+	});
+});
+
+describe("Categories delete", () => {
+	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
+	const productDraft = productDraftFactory(ctMock);
+	const productTypeDraft = productTypeDraftFactory(ctMock);
+
+	test("deletes the subtree and removes it from products", async () => {
+		const parent = await categoryDraft.create();
+		const child = await categoryDraft.create({
+			parent: { typeId: "category", id: parent.id },
+		});
+		const sibling = await categoryDraft.create();
+		const productType = await productTypeDraft.create();
+		const product = await productDraft.create({
+			publish: true,
+			productType: { typeId: "product-type", id: productType.id },
+			categories: [child, sibling].map(({ id }) => ({
+				typeId: "category",
+				id,
+			})),
+		});
+
+		const response = await ctMock.app.inject({
+			method: "DELETE",
+			url: `/dummy/categories/${parent.id}`,
+			query: { version: String(parent.version) },
+		});
+		expect(response.statusCode).toBe(200);
+
+		const childResponse = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/categories/${child.id}`,
+		});
+		expect(childResponse.statusCode).toBe(404);
+
+		const productResponse = await ctMock.app.inject({
+			method: "GET",
+			url: `/dummy/products/${product.id}`,
+		});
+		const { current, staged } = productResponse.json().masterData;
+		const remaining = [{ typeId: "category", id: sibling.id }];
+		expect(current.categories).toEqual(remaining);
+		expect(staged.categories).toEqual(remaining);
 	});
 });
 

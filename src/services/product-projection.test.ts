@@ -240,7 +240,11 @@ describe("Product Projection Get By ID", () => {
 	});
 
 	test("expands as expected", async () => {
-		const category = await categoryFactory.create({ key: "cactus" });
+		const parentCategory = await categoryFactory.create({ key: "plants" });
+		const category = await categoryFactory.create({
+			key: "cactus",
+			parent: { typeId: "category", id: parentCategory.id },
+		});
 		await taxCategoryFactory.create({
 			key: "standard",
 			name: "Standard",
@@ -269,7 +273,11 @@ describe("Product Projection Get By ID", () => {
 				includedInPrice: true,
 			}),
 		]);
-		expect(result.categories[0].obj?.key).toBe("cactus");
+		expect(result.categories.length).toEqual(1);
+		expect(result.categories[0].obj).toMatchObject({
+			key: "cactus",
+			ancestors: [{ typeId: "category", id: parentCategory.id }],
+		});
 	});
 });
 

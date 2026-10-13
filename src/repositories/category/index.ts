@@ -2,16 +2,16 @@ import type {
 	Category,
 	CategoryDraft,
 	CategoryReference,
+	Product,
 } from "@commercetools/platform-sdk";
 import { v4 as uuidv4 } from "uuid";
 import type { Config } from "#src/config.ts";
 import { getBaseResourceProperties } from "#src/helpers.ts";
-import { parseExpandClause } from "#src/lib/expandParser.ts";
 import { CategoryDraftSchema } from "#src/schemas/generated/category.ts";
 import type { Writable } from "#src/types.ts";
-import type { GetParams } from "../abstract.ts";
 import {
 	AbstractResourceRepository,
+	type GetParams,
 	type RepositoryContext,
 } from "../abstract.ts";
 import {
@@ -19,6 +19,7 @@ import {
 	getReferenceFromResourceIdentifier,
 } from "../helpers.ts";
 import { CategoryUpdateHandler } from "./actions.ts";
+import { getAncestors } from "./ancestors.ts";
 
 export class CategoryRepository extends AbstractResourceRepository<"category"> {
 	constructor(config: Config) {
@@ -66,7 +67,11 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 						this._storage,
 					)
 				: undefined,
-			ancestors: [], // Resolved at runtime
+			ancestors: await getAncestors(
+				this._storage,
+				context.projectKey,
+				draft.parent,
+			),
 			assets,
 			custom: await createCustomFields(
 				draft.custom,
@@ -77,37 +82,48 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 		return await this.saveNew(context, resource);
 	}
 
-	async postProcessResource(
+	async delete(
 		context: RepositoryContext,
-		resource: Writable<Category>,
-		params?: GetParams,
-	): Promise<Category> {
-		let node: Category = resource;
-		const ancestors: CategoryReference[] = [];
-
-		// TODO: The expand clause here is a hack, the current expand architecture
-		// is not able to handle the case for 'dynamic' fields like ancestors which
-		// are resolved at runtime.  We should do the expand resolution post query
-		// execution for all resources
-
-		const expandClauses = params?.expand?.map(parseExpandClause) ?? [];
-		const addExpand = expandClauses?.find(
-			(c) => c.element === "ancestors" && c.index === "*",
-		);
-
-		while (node.parent) {
-			node = await this._storage.getByResourceIdentifier<"category">(
-				context.projectKey,
-				node.parent,
-			);
-			ancestors.push({
-				typeId: "category",
-				id: node.id,
-				obj: addExpand ? node : undefined,
-			});
+		id: string,
+		params: GetParams = {},
+	): Promise<Category | null> {
+		const resource = await super.delete(context, id, params);
+		if (!resource) {
+			return null;
 		}
 
-		resource.ancestors = ancestors;
+		const descendants = (
+			await this._storage.all(context.projectKey, "category")
+		).filter((category) => category.ancestors.some((ref) => ref.id === id));
+		for (const descendant of descendants) {
+			await this._storage.delete(
+				context.projectKey,
+				"category",
+				descendant.id,
+				{},
+			);
+		}
+
+		const deletedIds = new Set([id, ...descendants.map(({ id }) => id)]);
+		const products = await this._storage.all(context.projectKey, "product");
+		for (const product of products as Writable<Product>[]) {
+			const { current, staged } = product.masterData;
+			if (
+				![...current.categories, ...staged.categories].some((ref) =>
+					deletedIds.has(ref.id),
+				)
+			) {
+				continue;
+			}
+			current.categories = current.categories.filter(
+				(ref) => !deletedIds.has(ref.id),
+			);
+			staged.categories = staged.categories.filter(
+				(ref) => !deletedIds.has(ref.id),
+			);
+			await this._storage.add(context.projectKey, "product", product);
+		}
+
 		return resource;
 	}
 }

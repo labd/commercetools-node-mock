@@ -26,6 +26,7 @@ import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
 import { createCustomFields } from "../helpers.ts";
+import { getAncestors, updateDescendantAncestors } from "./ancestors.ts";
 
 export class CategoryUpdateHandler
 	extends AbstractUpdateHandler
@@ -91,6 +92,16 @@ export class CategoryUpdateHandler
 			typeId: "category",
 			id: category.id,
 		};
+		resource.ancestors = await getAncestors(
+			this._storage,
+			context.projectKey,
+			resource.parent,
+		);
+		await updateDescendantAncestors(
+			this._storage,
+			context.projectKey,
+			resource,
+		);
 	}
 
 	changeSlug(
