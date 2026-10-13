@@ -129,20 +129,27 @@ export class ProductProjectionRepository extends AbstractResourceRepository<"pro
 		id: string,
 		params: GetParams = {},
 	): Promise<ProductProjection | null> {
-		const resource = await this._storage.get(
-			context.projectKey,
-			"product",
-			id,
-			params,
-		);
-		if (resource) {
-			return await this._searchService.transform(
-				resource,
-				false,
-				context.projectKey,
-			);
+		const resource = await this._storage.get(context.projectKey, "product", id);
+
+		if (!resource) {
+			return null;
 		}
-		return null;
+
+		const projection = await this._searchService.transform(
+			resource,
+			false,
+			context.projectKey,
+		);
+
+		if (!params.expand) {
+			return projection;
+		}
+
+		return await this._storage.expand(
+			context.projectKey,
+			projection,
+			params.expand,
+		);
 	}
 
 	async query(
