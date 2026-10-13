@@ -7,6 +7,7 @@ import type {
 import * as timekeeper from "timekeeper";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
+	categoryDraftFactory,
 	productDraftFactory,
 	productTypeDraftFactory,
 	taxCategoryDraftFactory,
@@ -21,6 +22,7 @@ let publishedProduct: Product;
 let unpublishedProduct: Product;
 
 const productTypeFactory = productTypeDraftFactory(ctMock);
+const categoryFactory = categoryDraftFactory(ctMock);
 const productFactory = productDraftFactory(ctMock);
 const taxCategoryFactory = taxCategoryDraftFactory(ctMock);
 
@@ -237,7 +239,8 @@ describe("Product Projection Get By ID", () => {
 		expect(result.searchKeywords).toEqual({});
 	});
 
-	test("expands the tax category", async () => {
+	test("expands as expected", async () => {
+		const category = await categoryFactory.create({ key: "cactus" });
 		await taxCategoryFactory.create({
 			key: "standard",
 			name: "Standard",
@@ -249,12 +252,13 @@ describe("Product Projection Get By ID", () => {
 			publish: true,
 			productType: { typeId: "product-type", id: productType.id },
 			taxCategory: { typeId: "tax-category", key: "standard" },
+			categories: [{ typeId: "category", id: category.id }],
 		});
 
 		const response = await ctMock.app.inject({
 			method: "GET",
 			url: `/dummy/product-projections/${product.id}`,
-			query: { expand: "taxCategory" },
+			query: { expand: ["taxCategory", "categories[*]"] },
 		});
 		const result: ProductProjection = response.json();
 
@@ -265,6 +269,7 @@ describe("Product Projection Get By ID", () => {
 				includedInPrice: true,
 			}),
 		]);
+		expect(result.categories[0].obj?.key).toBe("cactus");
 	});
 });
 
