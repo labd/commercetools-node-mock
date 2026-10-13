@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.0.2
+
+### Patch Changes
+
+- [#445](https://github.com/labd/commercetools-node-mock/pull/445) [`db3fd05`](https://github.com/labd/commercetools-node-mock/commit/db3fd0515b4f4d449b1349bf9313e8b54e224e5c) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Expand references on product projections fetched by id
+
 ## 5.0.1
 
 ### Patch Changes
