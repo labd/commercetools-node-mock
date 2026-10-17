@@ -73,6 +73,7 @@ export const ReferenceTypeIdSchema = z.enum([
 	"extension",
 	"inventory-entry",
 	"key-value-document",
+	"mcp-server",
 	"order",
 	"order-edit",
 	"payment-method",
@@ -124,6 +125,8 @@ export const BusinessUnitApprovalRuleModeSchema = z.enum([
 	"Explicit",
 	"ExplicitAndFromParent",
 ]);
+
+export const TaxRoundingTargetSchema = z.enum(["Net", "Tax"]);
 
 export const InventoryModeSchema = z.enum([
 	"None",
@@ -197,6 +200,7 @@ export const ExtensionResourceTypeIdSchema = z.enum([
 	"quote",
 	"business-unit",
 	"shopping-list",
+	"product",
 ]);
 
 export const ExtensionActionSchema = z.enum(["Create", "Update"]);
@@ -265,6 +269,140 @@ export const AttributeConstraintEnumSchema = z.enum([
 
 export const TextInputHintSchema = z.enum(["SingleLine", "MultiLine"]);
 
+export const McpServerAuthenticationModeSchema = z.enum([
+	"ClientCredentials",
+	"CommercetoolsIdentity",
+]);
+
+export const McpServerStateSchema = z.enum(["Enabled", "Disabled"]);
+
+export const McpServerToolSchema = z.enum([
+	"all",
+	"read_all",
+	"create_applications",
+	"read_applications",
+	"update_applications",
+	"create_attribute_groups",
+	"read_attribute_groups",
+	"update_attribute_groups",
+	"create_bulk",
+	"update_bulk",
+	"create_business_units",
+	"read_business_units",
+	"update_business_units",
+	"create_cart_discounts",
+	"read_cart_discounts",
+	"update_cart_discounts",
+	"create_carts",
+	"read_carts",
+	"update_carts",
+	"replicate_carts",
+	"create_categories",
+	"read_categories",
+	"update_categories",
+	"create_channels",
+	"read_channels",
+	"update_channels",
+	"create_custom_objects",
+	"read_custom_objects",
+	"update_custom_objects",
+	"create_customer_groups",
+	"read_customer_groups",
+	"update_customer_groups",
+	"read_customer_search",
+	"create_customers",
+	"read_customers",
+	"update_customers",
+	"create_discount_codes",
+	"read_discount_codes",
+	"update_discount_codes",
+	"create_extensions",
+	"read_extensions",
+	"update_extensions",
+	"create_inventory",
+	"read_inventory",
+	"update_inventory",
+	"read_messages",
+	"create_orders",
+	"read_orders",
+	"update_orders",
+	"create_payment_integrations",
+	"read_payment_integrations",
+	"update_payment_integrations",
+	"update_payment_intents",
+	"create_payment_methods",
+	"read_payment_methods",
+	"update_payment_methods",
+	"create_payments",
+	"read_payments",
+	"update_payments",
+	"create_product_discounts",
+	"read_product_discounts",
+	"update_product_discounts",
+	"read_product_projections",
+	"read_product_search",
+	"create_product_selections",
+	"read_product_selections",
+	"update_product_selections",
+	"create_product_tailoring",
+	"read_product_tailoring",
+	"update_product_tailoring",
+	"create_product_types",
+	"read_product_types",
+	"update_product_types",
+	"create_products",
+	"read_products",
+	"update_products",
+	"read_project",
+	"update_project",
+	"create_quote_requests",
+	"read_quote_requests",
+	"update_quote_requests",
+	"create_quotes",
+	"read_quotes",
+	"update_quotes",
+	"create_recurring_orders",
+	"read_recurring_orders",
+	"update_recurring_orders",
+	"create_reviews",
+	"read_reviews",
+	"update_reviews",
+	"create_shipping_methods",
+	"read_shipping_methods",
+	"update_shipping_methods",
+	"create_shopping_lists",
+	"read_shopping_lists",
+	"update_shopping_lists",
+	"create_staged_quotes",
+	"read_staged_quotes",
+	"update_staged_quotes",
+	"create_standalone_prices",
+	"read_standalone_prices",
+	"update_standalone_prices",
+	"create_states",
+	"read_states",
+	"update_states",
+	"create_stores",
+	"read_stores",
+	"update_stores",
+	"create_subscriptions",
+	"read_subscriptions",
+	"update_subscriptions",
+	"create_tax_categories",
+	"read_tax_categories",
+	"update_tax_categories",
+	"create_transactions",
+	"read_transactions",
+	"create_types",
+	"read_types",
+	"update_types",
+	"create_zones",
+	"read_zones",
+	"update_zones",
+]);
+
+export const McpServerToolOutputFormattingSchema = z.enum(["JsonToTabular"]);
+
 export const IntervalUnitSchema = z.enum(["Days", "Weeks", "Months"]);
 
 export const StateTypeEnumSchema = z.enum([
@@ -307,6 +445,7 @@ export const MessageSubscriptionResourceTypeIdSchema = z.enum([
 	"staged-quote",
 	"standalone-price",
 	"store",
+	"variant",
 ]);
 
 export const ChangeSubscriptionResourceTypeIdSchema = z.enum([
@@ -350,6 +489,7 @@ export const ChangeSubscriptionResourceTypeIdSchema = z.enum([
 	"subscription",
 	"tax-category",
 	"type",
+	"variant",
 	"zone",
 ]);
 
@@ -619,6 +759,7 @@ export const ExternalTaxRateDraftSchema = z.object({
 	country: CountryCodeSchema,
 	state: z.string().nullish(),
 	subRates: z.array(SubRateSchema).nullish(),
+	taxRoundingTarget: TaxRoundingTargetSchema.nullish(),
 });
 
 export const MethodExternalTaxRateDraftSchema = z.object({
@@ -1277,6 +1418,51 @@ export const StateReferenceSchema = z.object({
 	id: z.string(),
 });
 
+export const ParameterOverrideSchema = z.object({
+	name: z.string(),
+	description: z.string().nullish(),
+	const: z.unknown().nullish(),
+	default: z.unknown().nullish(),
+	allowedTypes: z.array(z.unknown()).nullish(),
+});
+
+export const ToolCustomizationSchema = z.object({
+	tool: McpServerToolSchema,
+	description: z.string().nullish(),
+	parameters: z.array(ParameterOverrideSchema).nullish(),
+});
+
+export const McpServerJsonOutputFilteringMatcherSchema = z.object({
+	fieldPaths: z.array(z.string()).nullish(),
+	fieldNames: z.array(z.string()).nullish(),
+	fieldNameContains: z.array(z.string()).nullish(),
+});
+
+export const McpServerJsonOutputFilteringSchema = z.object({
+	redact: McpServerJsonOutputFilteringMatcherSchema.nullish(),
+	drop: McpServerJsonOutputFilteringMatcherSchema.nullish(),
+	fieldPathsToKeep: z.array(z.string()).nullish(),
+	redactedWith: z.string().nullish(),
+});
+
+export const CommerceMcpServerConfigDraftSchema = z.object({
+	type: z.literal("CommerceMCP"),
+	majorVersion: z.string(),
+	tools: z.array(McpServerToolSchema),
+	toolCustomizations: z.array(ToolCustomizationSchema).nullish(),
+	jsonOutputFiltering: McpServerJsonOutputFilteringSchema.nullish(),
+	toolOutputFormatting: McpServerToolOutputFormattingSchema.nullish(),
+});
+
+export const McpServerConfigDraftSchema = z.object({
+	type: z.string(),
+	majorVersion: z.string(),
+	tools: z.array(McpServerToolSchema),
+	toolCustomizations: z.array(ToolCustomizationSchema).nullish(),
+	jsonOutputFiltering: McpServerJsonOutputFilteringSchema.nullish(),
+	toolOutputFormatting: McpServerToolOutputFormattingSchema.nullish(),
+});
+
 export const DayOfMonthScheduleDraftSchema = z.object({
 	type: z.literal("dayOfMonth"),
 	day: z.number().int(),
@@ -1413,6 +1599,7 @@ export const TaxRateDraftSchema = z.object({
 	state: z.string().nullish(),
 	subRates: z.array(SubRateSchema).nullish(),
 	key: z.string().nullish(),
+	taxRoundingTarget: TaxRoundingTargetSchema.nullish(),
 });
 
 export const FieldTypeSchema = z.object({

@@ -1,6 +1,7 @@
 import type {
 	DiscountGroup,
 	DiscountGroupSetDescriptionAction,
+	DiscountGroupSetIsActiveAction,
 	DiscountGroupSetKeyAction,
 	DiscountGroupSetNameAction,
 	DiscountGroupSetSortOrderAction,
@@ -21,6 +22,14 @@ export class DiscountGroupUpdateHandler
 		{ description }: DiscountGroupSetDescriptionAction,
 	) {
 		resource.description = description;
+	}
+
+	setIsActive(
+		context: RepositoryContext,
+		resource: Writable<DiscountGroup>,
+		{ isActive }: DiscountGroupSetIsActiveAction,
+	) {
+		resource.isActive = isActive;
 	}
 
 	setKey(

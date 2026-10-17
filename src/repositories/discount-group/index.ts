@@ -28,7 +28,7 @@ export class DiscountGroupRepository extends AbstractResourceRepository<"discoun
 			name: draft.name,
 			key: draft.key,
 			sortOrder: draft.sortOrder,
-			isActive: true,
+			isActive: draft.isActive ?? true,
 		};
 		return await this.saveNew(context, resource);
 	}

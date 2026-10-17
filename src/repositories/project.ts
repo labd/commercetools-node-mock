@@ -16,7 +16,10 @@ import type {
 	ProjectChangeProductSearchIndexingEnabledAction,
 	ProjectChangeShoppingListsConfigurationAction,
 	ProjectChangeTaxRoundingModeAction,
+	ProjectSetDiscountsConfigurationAction,
 	ProjectSetExternalOAuthAction,
+	ProjectSetReleaseExpiredReservationsAction,
+	ProjectSetReservationExpirationInMinutesAction,
 	ProjectSetShippingRateInputTypeAction,
 	ProjectUpdateAction,
 } from "@commercetools/platform-sdk";
@@ -271,6 +274,38 @@ class ProjectUpdateHandler
 			? "Activated"
 			: "Deactivated";
 		resource.searchIndexing.products.lastModifiedAt = new Date().toISOString();
+	}
+
+	setDiscountsConfiguration(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ discountsConfiguration }: ProjectSetDiscountsConfigurationAction,
+	) {
+		resource.discounts = discountsConfiguration;
+	}
+
+	setReservationExpirationInMinutes(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{
+			reservationExpirationInMinutes,
+		}: ProjectSetReservationExpirationInMinutesAction,
+	) {
+		resource.inventory = {
+			...resource.inventory,
+			reservationExpirationInMinutes,
+		};
+	}
+
+	setReleaseExpiredReservations(
+		context: RepositoryContext,
+		resource: Writable<Project>,
+		{ releaseExpiredReservations }: ProjectSetReleaseExpiredReservationsAction,
+	) {
+		resource.inventory = {
+			...resource.inventory,
+			releaseExpiredReservations,
+		};
 	}
 
 	setExternalOAuth(

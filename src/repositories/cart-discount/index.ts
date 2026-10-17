@@ -6,6 +6,8 @@ import type {
 	CartDiscountValueFixed,
 	CartDiscountValueGiftLineItem,
 	CartDiscountValueRelative,
+	DiscountGroupReference,
+	DiscountGroupResourceIdentifier,
 	RecurringOrderScope,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
@@ -18,6 +20,7 @@ import {
 import {
 	createCustomFields,
 	createTypedMoney,
+	getReferenceFromResourceIdentifier,
 	getStoreKeyReference,
 } from "../helpers.ts";
 import { CartDiscountUpdateHandler } from "./actions.ts";
@@ -39,6 +42,11 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 			) ?? [],
 		);
 
+		const discountGroup = await this.discountGroupReference(
+			context,
+			draft.discountGroup,
+		);
+
 		const resource: CartDiscount = {
 			...getBaseResourceProperties(context.clientId),
 			key: draft.key,
@@ -50,7 +58,12 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 			references: [],
 			target: draft.target,
 			requiresDiscountCode: draft.requiresDiscountCode || false,
-			sortOrder: draft.sortOrder ?? "0.1",
+			// A discount in a group takes the group's sort order.
+			sortOrder:
+				(await this.discountGroupSortOrder(context, discountGroup)) ??
+				draft.sortOrder ??
+				"0.1",
+			discountGroup,
 			stackingMode: draft.stackingMode || "Stacking",
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
@@ -65,6 +78,33 @@ export class CartDiscountRepository extends AbstractResourceRepository<"cart-dis
 				: ({ type: "AnyOrder" } as RecurringOrderScope),
 		};
 		return await this.saveNew(context, resource);
+	}
+
+	async discountGroupReference(
+		context: RepositoryContext,
+		identifier: DiscountGroupResourceIdentifier | undefined,
+	): Promise<DiscountGroupReference | undefined> {
+		if (!identifier) return undefined;
+		const reference =
+			await getReferenceFromResourceIdentifier<DiscountGroupReference>(
+				identifier,
+				context.projectKey,
+				this._storage,
+			);
+		return { typeId: "discount-group", id: reference.id };
+	}
+
+	async discountGroupSortOrder(
+		context: RepositoryContext,
+		reference: DiscountGroupReference | undefined,
+	): Promise<string | undefined> {
+		if (!reference) return undefined;
+		const group = await this._storage.get(
+			context.projectKey,
+			"discount-group",
+			reference.id,
+		);
+		return group?.sortOrder;
 	}
 
 	private transformValueDraft(value: CartDiscountValueDraft) {

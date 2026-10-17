@@ -221,6 +221,26 @@ describe("DiscountGroup", () => {
 		expect(updateResponse.json().version).toBe(2);
 	});
 
+	test("Update discount group - setIsActive", async () => {
+		const discountGroup = await discountGroupDraft.create({
+			key: "is-active-group",
+			sortOrder: "0.2",
+		});
+		expect(discountGroup.isActive).toBe(true);
+
+		const updateResponse = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/discount-groups/${discountGroup.id}`,
+			payload: {
+				version: discountGroup.version,
+				actions: [{ action: "setIsActive", isActive: false }],
+			},
+		});
+
+		expect(updateResponse.statusCode).toBe(200);
+		expect(updateResponse.json().isActive).toBe(false);
+	});
+
 	test("Delete discount group", async () => {
 		const discountGroup = await discountGroupDraft.create({
 			key: "delete-group",

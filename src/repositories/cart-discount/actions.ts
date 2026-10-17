@@ -6,14 +6,19 @@ import type {
 	CartDiscountSetCustomFieldAction,
 	CartDiscountSetCustomTypeAction,
 	CartDiscountSetDescriptionAction,
+	CartDiscountSetDiscountGroupAction,
 	CartDiscountSetKeyAction,
 	CartDiscountSetStoresAction,
 	CartDiscountSetValidFromAction,
 	CartDiscountSetValidFromAndUntilAction,
 	CartDiscountSetValidUntilAction,
 	CartDiscountUpdateAction,
+	DiscountGroupReference,
 } from "@commercetools/platform-sdk";
-import { getStoreKeyReference } from "#src/repositories/helpers.ts";
+import {
+	getReferenceFromResourceIdentifier,
+	getStoreKeyReference,
+} from "#src/repositories/helpers.ts";
 import type { Writable } from "#src/types.ts";
 import type { UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler, type RepositoryContext } from "../abstract.ts";
@@ -69,6 +74,33 @@ export class CartDiscountUpdateHandler
 		{ description }: CartDiscountSetDescriptionAction,
 	) {
 		resource.description = description;
+	}
+
+	async setDiscountGroup(
+		context: RepositoryContext,
+		resource: Writable<CartDiscount>,
+		{ discountGroup }: CartDiscountSetDiscountGroupAction,
+	) {
+		if (!discountGroup) {
+			resource.discountGroup = undefined;
+			return;
+		}
+		const reference =
+			await getReferenceFromResourceIdentifier<DiscountGroupReference>(
+				discountGroup,
+				context.projectKey,
+				this._storage,
+			);
+		resource.discountGroup = { typeId: "discount-group", id: reference.id };
+		// A discount in a group takes the group's sort order.
+		const group = await this._storage.get(
+			context.projectKey,
+			"discount-group",
+			reference.id,
+		);
+		if (group) {
+			resource.sortOrder = group.sortOrder;
+		}
 	}
 
 	setKey(

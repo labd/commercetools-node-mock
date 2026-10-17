@@ -52,6 +52,7 @@ export const CartDraftSchema = z.object({
 	shipping: z.array(ShippingDraftSchema).nullish(),
 	itemShippingAddresses: z.array(BaseAddressSchema).nullish(),
 	discountCodes: z.array(z.string()).nullish(),
+	directDiscountsIgnoreCartDiscounts: z.boolean().nullish(),
 	country: CountryCodeSchema.nullish(),
 	locale: LocaleSchema.nullish(),
 	origin: CartOriginSchema.nullish(),

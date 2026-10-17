@@ -86,4 +86,37 @@ describe("Project", () => {
 		expect(response.json().name).toBe("Updated Project Name");
 		expect(response.json().version).toBe(2);
 	});
+
+	test("Set the discounts and inventory configuration", async () => {
+		const mock = new CommercetoolsMock();
+		const response = await mock.app.inject({
+			method: "POST",
+			url: "/dummy",
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "setDiscountsConfiguration",
+						discountsConfiguration: { discountCombinationMode: "BestDeal" },
+					},
+					{
+						action: "setReservationExpirationInMinutes",
+						reservationExpirationInMinutes: 30,
+					},
+					{
+						action: "setReleaseExpiredReservations",
+						releaseExpiredReservations: true,
+					},
+				],
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject({
+			discounts: { discountCombinationMode: "BestDeal" },
+			inventory: {
+				reservationExpirationInMinutes: 30,
+				releaseExpiredReservations: true,
+			},
+		});
+	});
 });

@@ -16,6 +16,7 @@ import type {
 	Extension,
 	InvalidInputError,
 	InventoryEntry,
+	McpServer,
 	Order,
 	Payment,
 	Product,
@@ -38,6 +39,7 @@ import type {
 	Type,
 	Zone,
 } from "@commercetools/platform-sdk";
+import type { Application, PaymentIntegration } from "#src/checkout-types.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
 import { cloneObject } from "../helpers.ts";
 import { parseQueryExpression } from "../lib/predicateParser.ts";
@@ -155,6 +157,9 @@ export class InMemoryStorage extends AbstractStorage {
 				"product-type": new StorageMap<string, ProductType>(),
 				"product-projection": new StorageMap<string, ProductProjection>(),
 				"product-tailoring": new StorageMap<string, ProductTailoring>(),
+				"mcp-server": new StorageMap<string, McpServer>(),
+				application: new StorageMap<string, Application>(),
+				"payment-integration": new StorageMap<string, PaymentIntegration>(),
 				"recurrence-policy": new StorageMap<string, RecurrencePolicy>(),
 				"recurring-order": new StorageMap<string, RecurringOrder>(),
 				review: new StorageMap<string, any>(),

@@ -9,13 +9,17 @@ import { CartService } from "./cart.ts";
 import { CartDiscountService } from "./cart-discount.ts";
 import { CategoryServices } from "./category.ts";
 import { ChannelService } from "./channel.ts";
+import { CheckoutApplicationService } from "./checkout-application.ts";
+import { CheckoutPaymentIntegrationService } from "./checkout-payment-integration.ts";
 import { CustomObjectService } from "./custom-object.ts";
 import { CustomerService } from "./customer.ts";
 import { CustomerGroupService } from "./customer-group.ts";
 import { DiscountCodeService } from "./discount-code.ts";
 import { DiscountGroupService } from "./discount-group.ts";
 import { ExtensionServices } from "./extension.ts";
+import { IntegrationLayerService } from "./integration-layer.ts";
 import { InventoryEntryService } from "./inventory-entry.ts";
+import { McpServerService } from "./mcp-server.ts";
 import { MyBusinessUnitService } from "./my-business-unit.ts";
 import { MyCartService } from "./my-cart.ts";
 import { MyCustomerService } from "./my-customer.ts";
@@ -106,6 +110,16 @@ const serviceFactories = {
 	quotes: (router, repos) => new QuoteService(router, repos.quote),
 	"quote-request": (router, repos) =>
 		new QuoteRequestService(router, repos["quote-request"]),
+	"mcp-server": (router, repos) =>
+		new McpServerService(router, repos["mcp-server"]),
+	// The Checkout API, served on the same project routes as the platform API.
+	application: (router, repos) =>
+		new CheckoutApplicationService(router, repos.application),
+	"payment-integration": (router, repos) =>
+		new CheckoutPaymentIntegrationService(router, repos["payment-integration"]),
+	// The Commerce Integration Layer's management API, under /{projectKey}/main.
+	"integration-layer": (router, repos) =>
+		new IntegrationLayerService(router, repos["integration-layer"]),
 	"recurrence-policy": (router, repos) =>
 		new RecurrencePolicyService(router, repos["recurrence-policy"]),
 	"recurring-order": (router, repos) =>

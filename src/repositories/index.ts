@@ -19,13 +19,17 @@ import { CartRepository } from "./cart/index.ts";
 import { CartDiscountRepository } from "./cart-discount/index.ts";
 import { CategoryRepository } from "./category/index.ts";
 import { ChannelRepository } from "./channel.ts";
+import { CheckoutApplicationRepository } from "./checkout-application/index.ts";
+import { CheckoutPaymentIntegrationRepository } from "./checkout-payment-integration/index.ts";
 import { CustomObjectRepository } from "./custom-object.ts";
 import { CustomerRepository } from "./customer/index.ts";
 import { CustomerGroupRepository } from "./customer-group.ts";
 import { DiscountCodeRepository } from "./discount-code/index.ts";
 import { DiscountGroupRepository } from "./discount-group/index.ts";
 import { ExtensionRepository } from "./extension.ts";
+import { IntegrationLayerRepository } from "./integration-layer.ts";
 import { InventoryEntryRepository } from "./inventory-entry/index.ts";
+import { McpServerRepository } from "./mcp-server/index.ts";
 import { MyCustomerRepository } from "./my-customer.ts";
 import { MyOrderRepository } from "./my-order.ts";
 import { OrderRepository } from "./order/index.ts";
@@ -98,6 +102,10 @@ export const createRepositories = (config: Config) => ({
 	"product-tailoring": new ProductTailoringRepository(config),
 	project: new ProjectRepository(config),
 	"recurring-order": new RecurringOrderRepository(config),
+	"mcp-server": new McpServerRepository(config),
+	application: new CheckoutApplicationRepository(config),
+	"payment-integration": new CheckoutPaymentIntegrationRepository(config),
+	"integration-layer": new IntegrationLayerRepository(config),
 	"recurrence-policy": new RecurrencePolicyRepository(config),
 	review: new ReviewRepository(config),
 	quote: new QuoteRepository(config),
