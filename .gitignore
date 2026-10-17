@@ -19,3 +19,5 @@ coverage/
 
 # MacOS
 .DS_Store
+# Vitest output
+.vitest/
