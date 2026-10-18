@@ -68,7 +68,11 @@ export class CheckoutPaymentIntegrationRepository extends AbstractResourceReposi
 			},
 			displayInfo: draft.displayInfo,
 			sortingInfo: draft.sortingInfo,
-			automatedReversalConfiguration: draft.automatedReversalConfiguration,
+			// Checkout always answers with a configuration, Inactive when the
+			// draft gives none.
+			automatedReversalConfiguration: draft.automatedReversalConfiguration ?? {
+				status: "Inactive",
+			},
 		};
 		return await this.saveNew(context, resource);
 	}
