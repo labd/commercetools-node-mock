@@ -1260,6 +1260,7 @@ export const AttributeDefinitionDraftSchema = z.object({
 	inputTip: LocalizedStringSchema.nullish(),
 	inputHint: TextInputHintSchema.nullish(),
 	isSearchable: z.boolean().nullish(),
+	savedToLineItem: z.boolean().nullish(),
 });
 
 export const StagedQuoteResourceIdentifierSchema = z

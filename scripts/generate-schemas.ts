@@ -33,10 +33,16 @@ const OUTPUT_DIR = resolve(PROJECT_ROOT, "src/schemas/generated");
 // that only differ in the data type for the optional custom field", yet the
 // spec declares it without `custom` at all.
 //
+// AttributeDefinitionDraft.savedToLineItem is in the RAML spec (released
+// 2026-09-30) but missing from the OpenAPI spec this script reads.
+//
 // These are patched into the parsed spec (see patchSpec) rather than into the
 // emitted code, so dependency collection and topological sorting treat them as
 // any other property.
 const EXTRA_PROPERTIES: Record<string, Record<string, OpenAPIProperty>> = {
+	AttributeDefinitionDraft: {
+		savedToLineItem: { type: "boolean" },
+	},
 	BaseAddress: {
 		custom: { $ref: "#/components/schemas/CustomFieldsDraft" },
 	},
