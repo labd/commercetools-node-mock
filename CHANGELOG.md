@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.1.0
+
+### Minor Changes
+
+- [#452](https://github.com/labd/commercetools-node-mock/pull/452) [`87109fa`](https://github.com/labd/commercetools-node-mock/commit/87109fa730ae8d49278fbae66aca00122e7cad16) Thanks [@kapilbathija-ct](https://github.com/kapilbathija-ct)! - Support `savedToLineItem` on product type attribute definitions (defaults to `true`) and the `setSavedToLineItem` update action
+
 ## 5.0.3
 
 ### Patch Changes
