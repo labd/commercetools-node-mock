@@ -201,6 +201,71 @@ describe("Cart Discounts Update Actions", () => {
 		await ctMock.clear();
 	});
 
+	test("set and remove the discount group", async () => {
+		assert(cartDiscount, "cart discount not created");
+
+		const group = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: { key: "summer", sortOrder: "0.6" },
+		});
+		expect(group.statusCode).toBe(201);
+
+		const joined = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
+				version: 1,
+				actions: [
+					{
+						action: "setDiscountGroup",
+						discountGroup: { typeId: "discount-group", key: "summer" },
+					},
+				],
+			},
+		});
+		expect(joined.statusCode).toBe(200);
+		expect(joined.json().discountGroup).toEqual({
+			typeId: "discount-group",
+			id: group.json().id,
+		});
+		// A discount in a group takes the group's sort order.
+		expect(joined.json().sortOrder).toBe("0.6");
+
+		const left = await ctMock.app.inject({
+			method: "POST",
+			url: `/dummy/cart-discounts/${cartDiscount.id}`,
+			payload: {
+				version: joined.json().version,
+				actions: [{ action: "setDiscountGroup" }],
+			},
+		});
+		expect(left.statusCode).toBe(200);
+		expect(left.json().discountGroup).toBeUndefined();
+	});
+
+	test("create in a discount group", async () => {
+		const group = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/discount-groups",
+			payload: { key: "winter", sortOrder: "0.7" },
+		});
+		const response = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/cart-discounts",
+			payload: {
+				name: { en: "In a group" },
+				value: { type: "relative", permyriad: 500 },
+				cartPredicate: "1=1",
+				target: { type: "lineItems", predicate: "1=1" },
+				discountGroup: { typeId: "discount-group", id: group.json().id },
+			},
+		});
+		expect(response.statusCode).toBe(201);
+		expect(response.json().discountGroup.id).toBe(group.json().id);
+		expect(response.json().sortOrder).toBe("0.7");
+	});
+
 	test("set key", async () => {
 		assert(cartDiscount, "cart discount not created");
 

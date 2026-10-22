@@ -1,4 +1,5 @@
 import type * as ctp from "@commercetools/platform-sdk";
+import type * as checkout from "./checkout-types.ts";
 import type { RepositoryMap } from "./repositories/index.ts";
 
 export const isType = <T>(x: T) => x;
@@ -78,6 +79,9 @@ export type ResourceMap = {
 	store: ctp.Store;
 	subscription: ctp.Subscription;
 	"recurring-order": ctp.RecurringOrder;
+	"mcp-server": ctp.McpServer;
+	application: checkout.Application;
+	"payment-integration": checkout.PaymentIntegration;
 	"recurrence-policy": ctp.RecurrencePolicy;
 	"tax-category": ctp.TaxCategory;
 	type: ctp.Type;
@@ -124,6 +128,11 @@ export type PagedQueryResponseMap = {
 	store: ctp.StorePagedQueryResponse;
 	subscription: ctp.SubscriptionPagedQueryResponse;
 	"recurring-order": ctp.RecurringOrderPagedQueryResponse;
+	"mcp-server": ctp.McpServerPagedQueryResponse;
+	application: Omit<checkout.PaginatedApplication, "results"> & {
+		results: checkout.Application[];
+	};
+	"payment-integration": checkout.PaginatedPaymentIntegration;
 	"recurrence-policy": ctp.RecurrencePolicyPagedQueryResponse;
 	"tax-category": ctp.TaxCategoryPagedQueryResponse;
 	type: ctp.TypePagedQueryResponse;

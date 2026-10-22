@@ -203,6 +203,9 @@ importers:
       '@changesets/cli':
         specifier: 3.0.3
         version: 3.0.3
+      '@commercetools/checkout-sdk':
+        specifier: 2.1.0
+        version: 2.1.0
       '@commercetools/platform-sdk':
         specifier: 9.5.0
         version: 9.5.0
@@ -576,12 +579,20 @@ packages:
     resolution: {integrity: sha512-dlT1m5e/0yUL0kRNcQn7yGLVThkgbB0Ga/1AmfDDC/8ik6AIiSf2QLQO2zPYvefsHP0aFgxO93cVLCCfDp7kzQ==}
     engines: {node: '>= 20.12.0'}
 
+  '@commercetools/checkout-sdk@2.1.0':
+    resolution: {integrity: sha512-Q/Q1KPhI5nLRnq2Vv2aNIesgIvtLo3Nt/QoH1I7dsotNbjkCR0FJ1AKI7Mt9cNJyJd/iVzM/JaD0wekyEI2XCw==}
+    engines: {node: '>=22'}
+
   '@commercetools/platform-sdk@9.5.0':
     resolution: {integrity: sha512-hEiCi2YXGTa6l98KvRax9I/eWSxyIRtbMVWZ1ainNCKXuG97D9UiSapSwd2evkO/Rs3fnrjWx79A38eWdHEonw==}
     engines: {node: '>=22'}
 
   '@commercetools/ts-client@5.0.3':
     resolution: {integrity: sha512-yGZztxK7Mmwq6ol68yBZjW6BFHvKcbqMStUSdsDAUzqKlN7Zf+K71MK/QwrEJroqChHzcM+t9FOgBcHQJWy7qA==}
+    engines: {node: '>=22'}
+
+  '@commercetools/ts-client@5.1.1':
+    resolution: {integrity: sha512-hV5SCms3f9kB3DDxpHcXthwoPS8wKazp4vThbXqvch9SVpvS/5Y/27b3epWUHHVNXY4QaWjiOf78yjS8eWxbEw==}
     engines: {node: '>=22'}
 
   '@ctrl/tinycolor@4.2.1':
@@ -3615,11 +3626,19 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
+  '@commercetools/checkout-sdk@2.1.0':
+    dependencies:
+      '@commercetools/ts-client': 5.1.1
+
   '@commercetools/platform-sdk@9.5.0':
     dependencies:
       '@commercetools/ts-client': 5.0.3
 
   '@commercetools/ts-client@5.0.3':
+    dependencies:
+      buffer: 6.0.3
+
+  '@commercetools/ts-client@5.1.1':
     dependencies:
       buffer: 6.0.3
 

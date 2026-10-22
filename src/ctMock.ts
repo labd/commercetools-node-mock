@@ -3,7 +3,12 @@ import { type AnyHandler, HttpResponse, http } from "msw";
 import type { SetupServer } from "msw/node";
 import qs from "qs";
 import type { Config } from "./config.ts";
-import { DEFAULT_API_HOSTNAME, DEFAULT_AUTH_HOSTNAME } from "./constants.ts";
+import {
+	DEFAULT_API_HOSTNAME,
+	DEFAULT_AUTH_HOSTNAME,
+	DEFAULT_CHECKOUT_HOSTNAME,
+	DEFAULT_INTEGRATION_LAYER_HOSTNAME,
+} from "./constants.ts";
 import { CommercetoolsError } from "./exceptions.ts";
 import { mapHeaderType } from "./helpers.ts";
 import { copyHeaders } from "./lib/proxy.ts";
@@ -24,6 +29,10 @@ export type CommercetoolsMockOptions = {
 	defaultProjectKey: string | undefined;
 	apiHost: RegExp | string;
 	authHost: RegExp | string;
+	/** Host of the Checkout API, whose applications and payment integrations the mock holds. */
+	checkoutHost: RegExp | string;
+	/** Host of the Commerce Integration Layer's management API. */
+	integrationLayerHost: RegExp | string;
 	silent: boolean;
 	strict: boolean;
 	storage: AbstractStorage | undefined;
@@ -36,6 +45,8 @@ const DEFAULT_OPTIONS: CommercetoolsMockOptions = {
 	defaultProjectKey: undefined,
 	apiHost: DEFAULT_API_HOSTNAME,
 	authHost: DEFAULT_AUTH_HOSTNAME,
+	checkoutHost: DEFAULT_CHECKOUT_HOSTNAME,
+	integrationLayerHost: DEFAULT_INTEGRATION_LAYER_HOSTNAME,
 	silent: true,
 	strict: false,
 	storage: undefined,
@@ -81,6 +92,7 @@ export class CommercetoolsMock {
 	async clear() {
 		await this._storage.clear();
 		this._oauth2.store.clear();
+		this._repositories?.["integration-layer"].clear();
 	}
 
 	project(projectKey?: string) {
@@ -259,7 +271,20 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
-			http.head(`${this.options.apiHost}/*`, async ({ request }) => {
+			...[
+				this.options.apiHost,
+				this.options.checkoutHost,
+				this.options.integrationLayerHost,
+			].flatMap((host) => this.apiHandlers(host)),
+		];
+	}
+
+	// The platform, Checkout and Integration Layer APIs are all served from the
+	// same routes.
+	private apiHandlers(host: RegExp | string): AnyHandler[] {
+		const app = this.app;
+		return [
+			http.head(`${host}/*`, async ({ request }) => {
 				const body = await request.text();
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
@@ -289,7 +314,7 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
-			http.get(`${this.options.apiHost}/*`, async ({ request }) => {
+			http.get(`${host}/*`, async ({ request }) => {
 				const body = await request.text();
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
@@ -305,7 +330,7 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
-			http.post(`${this.options.apiHost}/*`, async ({ request }) => {
+			http.post(`${host}/*`, async ({ request }) => {
 				const body = await request.text();
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
@@ -321,7 +346,7 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
-			http.delete(`${this.options.apiHost}/*`, async ({ request }) => {
+			http.delete(`${host}/*`, async ({ request }) => {
 				const body = await request.text();
 				const url = new URL(request.url);
 				const headers = copyHeaders(request.headers);
@@ -337,6 +362,29 @@ export class CommercetoolsMock {
 					headers: mapHeaderType(res.headers),
 				});
 			}),
+			// The Integration Layer's management API replaces with PUT and
+			// patches its config with PATCH.
+			...(["PUT", "PATCH"] as const).map((method) =>
+				(method === "PUT" ? http.put : http.patch)(
+					`${host}/*`,
+					async ({ request }) => {
+						const body = await request.text();
+						const url = new URL(request.url);
+						const headers = copyHeaders(request.headers);
+
+						const res = await app.inject({
+							method,
+							url: `${url.pathname}?${url.searchParams.toString()}`,
+							body,
+							headers,
+						});
+						return new HttpResponse(res.body, {
+							status: res.statusCode,
+							headers: mapHeaderType(res.headers),
+						});
+					},
+				),
+			),
 		];
 	}
 

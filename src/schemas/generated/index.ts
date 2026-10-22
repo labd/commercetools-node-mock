@@ -16,6 +16,7 @@ export * from "./discount-code.ts";
 export * from "./discount-group.ts";
 export * from "./extension.ts";
 export * from "./inventory-entry.ts";
+export * from "./mcp-server.ts";
 export * from "./my-order-from-quote.ts";
 export * from "./my-quote-request.ts";
 export * from "./order-edit.ts";

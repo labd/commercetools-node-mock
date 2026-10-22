@@ -36,8 +36,14 @@
 		"generate:schemas": "node scripts/generate-schemas.ts"
 	},
 	"peerDependencies": {
+		"@commercetools/checkout-sdk": ">=2.1.0",
 		"@commercetools/platform-sdk": ">=8.25.0",
 		"msw": ">=2.14.6 || ^3.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@commercetools/checkout-sdk": {
+			"optional": true
+		}
 	},
 	"dependencies": {
 		"@fastify/formbody": "9.0.0",
@@ -54,6 +60,7 @@
 		"@biomejs/biome": "2.5.15",
 		"@changesets/changelog-github": "1.0.1",
 		"@changesets/cli": "3.0.3",
+		"@commercetools/checkout-sdk": "2.1.0",
 		"@commercetools/platform-sdk": "9.5.0",
 		"@types/node": "26.6.3",
 		"@types/qs": "6.15.1",
