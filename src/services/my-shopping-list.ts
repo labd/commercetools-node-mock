@@ -1,9 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import type { ShoppingListRepository } from "../repositories/shopping-list/index.ts";
+import { singleStoreScope } from "./abstract.ts";
 import AbstractMyService, { type MyResourceRules } from "./abstract-my.ts";
 
 export class MyShoppingListService extends AbstractMyService {
 	public repository: ShoppingListRepository;
+
+	protected override storeScope = singleStoreScope;
 
 	protected myRules: MyResourceRules = {
 		customerWhere: (customerId) => `customer(id="${customerId}")`,
