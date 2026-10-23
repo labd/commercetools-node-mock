@@ -112,7 +112,6 @@ describe("in-store scoping", () => {
 		expect(ids).not.toContain(inB.id);
 		expect(response.json().total).toBe(3);
 
-		// The store filter combines with the where of the request
 		const filtered = await get(
 			`/dummy/in-store/key=store-a/customers?where=${encodeURIComponent('email="a@example.com"')}`,
 		);
@@ -180,7 +179,6 @@ describe("in-store scoping", () => {
 				.statusCode,
 		).toBe(404);
 
-		// The project-level endpoint still serves every cart
 		expect((await get("/dummy/carts")).json().total).toBe(3);
 	});
 
