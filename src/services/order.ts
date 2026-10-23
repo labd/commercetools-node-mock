@@ -10,10 +10,12 @@ import { OrderFromQuoteDraftSchema } from "#src/schemas/generated/order-from-quo
 import { validateDraft } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
-import AbstractService from "./abstract.ts";
+import AbstractService, { singleStoreScope } from "./abstract.ts";
 
 export class OrderService extends AbstractService {
 	public repository: OrderRepository;
+
+	protected override storeScope = singleStoreScope;
 
 	constructor(parent: FastifyInstance, repository: OrderRepository) {
 		super(parent);

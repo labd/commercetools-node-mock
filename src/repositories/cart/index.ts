@@ -215,8 +215,12 @@ export class CartRepository extends AbstractResourceRepository<"cart"> {
 	async getActiveCart(
 		projectKey: string,
 		owner?: { customerId?: string; anonymousId?: string },
+		storeKey?: string,
 	): Promise<Cart | undefined> {
 		const where = [`cartState="Active"`];
+		if (storeKey) {
+			where.push(`store(key="${storeKey}")`);
+		}
 		if (owner?.customerId) {
 			where.push(`customerId="${owner.customerId}"`);
 		} else if (owner?.anonymousId) {

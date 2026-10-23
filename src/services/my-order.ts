@@ -4,10 +4,13 @@ import { MyOrderFromQuoteDraftSchema } from "#src/schemas/generated/my-order-fro
 import { validateDraft } from "#src/validate.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { MyOrderRepository } from "../repositories/my-order.ts";
+import { singleStoreScope } from "./abstract.ts";
 import AbstractMyService, { type MyResourceRules } from "./abstract-my.ts";
 
 export class MyOrderService extends AbstractMyService {
 	public repository: MyOrderRepository;
+
+	protected override storeScope = singleStoreScope;
 
 	protected myRules: MyResourceRules = {
 		customerWhere: (customerId) => `customerId="${customerId}"`,

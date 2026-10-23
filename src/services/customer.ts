@@ -5,15 +5,27 @@ import type {
 	CustomerEmailVerify,
 	CustomerResetPassword,
 	CustomerSignInResult,
+	StoreKeyReference,
 } from "@commercetools/platform-sdk";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { validateDraft } from "#src/validate.ts";
 import type { CustomerRepository } from "../repositories/customer/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
-import AbstractService from "./abstract.ts";
+import AbstractService, { type StoreScope } from "./abstract.ts";
 
 export class CustomerService extends AbstractService {
 	public repository: CustomerRepository;
+
+	protected override storeScope: StoreScope = {
+		// Global customers, assigned to no store, are part of every store
+		where: (storeKey) =>
+			`stores is not defined or stores is empty or stores(key="${storeKey}")`,
+		matches: (customer, storeKey) =>
+			!customer.stores?.length ||
+			customer.stores.some(
+				(store: StoreKeyReference) => store.key === storeKey,
+			),
+	};
 
 	constructor(parent: FastifyInstance, repository: CustomerRepository) {
 		super(parent);
