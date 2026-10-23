@@ -10,10 +10,12 @@ import { CommercetoolsError } from "#src/exceptions.ts";
 import type { CartRepository } from "../repositories/cart/index.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 import type { OrderRepository } from "../repositories/order/index.ts";
-import AbstractService from "./abstract.ts";
+import AbstractService, { singleStoreScope } from "./abstract.ts";
 
 export class CartService extends AbstractService {
 	public repository: CartRepository;
+
+	protected override storeScope = singleStoreScope;
 
 	public orderRepository: OrderRepository;
 

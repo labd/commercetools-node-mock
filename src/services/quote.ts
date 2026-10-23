@@ -1,9 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import type { QuoteRepository } from "#src/repositories/quote/index.ts";
-import AbstractService from "./abstract.ts";
+import AbstractService, { singleStoreScope } from "./abstract.ts";
 
 export class QuoteService extends AbstractService {
 	public repository: QuoteRepository;
+
+	protected override storeScope = singleStoreScope;
 
 	constructor(parent: FastifyInstance, repository: QuoteRepository) {
 		super(parent);

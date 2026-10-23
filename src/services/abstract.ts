@@ -14,10 +14,23 @@ import type {
 } from "../repositories/abstract.ts";
 import { getRepositoryContext } from "../repositories/helpers.ts";
 
+export type StoreScope = {
+	where: (storeKey: string) => string;
+	matches: (resource: any, storeKey: string) => boolean;
+};
+
+export const singleStoreScope: StoreScope = {
+	where: (storeKey) => `store(key="${storeKey}")`,
+	matches: (resource, storeKey) => resource.store?.key === storeKey,
+};
+
 export default abstract class AbstractService {
 	public abstract repository: AbstractResourceRepository<any>;
 
 	createStatusCode = 201;
+
+	/** Without it, in-store endpoints serve the whole collection. */
+	protected storeScope?: StoreScope;
 
 	constructor(parent: FastifyInstance) {
 		this.registerRoutes(parent);
@@ -47,6 +60,25 @@ export default abstract class AbstractService {
 		_operation: "view" | "update" | "delete",
 		_resource: unknown,
 	): Promise<void> {}
+
+	protected storeWhere(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+	): string[] {
+		const { storeKey } = getRepositoryContext(request);
+		return storeKey && this.storeScope ? [this.storeScope.where(storeKey)] : [];
+	}
+
+	/** A resource of another Store is a 404 on an in-store endpoint. */
+	protected inStore<T>(
+		request: FastifyRequest<{ Params: Record<string, string> }>,
+		resource: T | null,
+	): T | null {
+		const { storeKey } = getRepositoryContext(request);
+		if (!resource || !storeKey || !this.storeScope) {
+			return resource;
+		}
+		return this.storeScope.matches(resource, storeKey) ? resource : null;
+	}
 
 	/**
 	 * Called with the draft of a create request. Returns the draft to store, so
@@ -92,7 +124,10 @@ export default abstract class AbstractService {
 		const query = request.query;
 		const limit = this._parseParam(query.limit);
 		const offset = this._parseParam(query.offset);
-		const scoped = await this.scopeWhere(request);
+		const scoped = [
+			...(await this.scopeWhere(request)),
+			...this.storeWhere(request),
+		];
 		const params: QueryParams = {
 			expand: this._parseParam(query.expand),
 			where: [...(this._parseParam(query.where) ?? []), ...scoped],
@@ -147,12 +182,15 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
-		const result = await this.repository.getByKey(
-			getRepositoryContext(request),
-			params.key,
-			{
-				expand: this._parseParam(query.expand),
-			},
+		const result = this.inStore(
+			request,
+			await this.repository.getByKey(
+				getRepositoryContext(request),
+				params.key,
+				{
+					expand: this._parseParam(query.expand),
+				},
+			),
 		);
 		if (!result) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
@@ -176,13 +214,20 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
-		const current = await this.repository.get(
-			getRepositoryContext(request),
-			params.id,
+		const current = this.inStore(
+			request,
+			await this.repository.get(getRepositoryContext(request), params.id),
 		);
-		if (current) {
-			await this.authorizeResource(request, "delete", current);
+		if (!current) {
+			throw new CommercetoolsError<ResourceNotFoundError>(
+				{
+					code: "ResourceNotFound",
+					message: `The Resource with ID '${params.id}' was not found.`,
+				},
+				404,
+			);
 		}
+		await this.authorizeResource(request, "delete", current);
 		const result = await this.repository.delete(
 			getRepositoryContext(request),
 			params.id,
@@ -211,9 +256,9 @@ export default abstract class AbstractService {
 	) {
 		const params = request.params;
 		const query = request.query;
-		const resource = await this.repository.getByKey(
-			getRepositoryContext(request),
-			params.key,
+		const resource = this.inStore(
+			request,
+			await this.repository.getByKey(getRepositoryContext(request), params.key),
 		);
 		if (!resource) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
@@ -292,9 +337,9 @@ export default abstract class AbstractService {
 			request.body,
 			updateRequestSchema,
 		);
-		const resource = await this.repository.get(
-			getRepositoryContext(request),
-			params.id,
+		const resource = this.inStore(
+			request,
+			await this.repository.get(getRepositoryContext(request), params.id),
 		);
 		if (!resource) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
@@ -332,9 +377,9 @@ export default abstract class AbstractService {
 			updateRequestSchema,
 		);
 
-		const resource = await this.repository.getByKey(
-			getRepositoryContext(request),
-			params.key,
+		const resource = this.inStore(
+			request,
+			await this.repository.getByKey(getRepositoryContext(request), params.key),
 		);
 		if (!resource) {
 			throw new CommercetoolsError<ResourceNotFoundError>(
@@ -374,7 +419,7 @@ export default abstract class AbstractService {
 				expand: this._parseParam(query.expand),
 			},
 		);
-		return result;
+		return this.inStore(request, result);
 	}
 
 	// No idea what i'm doing
