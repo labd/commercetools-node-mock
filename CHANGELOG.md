@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 5.0.3
+
+### Patch Changes
+
+- [#448](https://github.com/labd/commercetools-node-mock/pull/448) [`58b01d7`](https://github.com/labd/commercetools-node-mock/commit/58b01d78abcc9fe9df5cc925ed73fd9de2bf9ff5) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Store category ancestors so they expand from other resources, and delete a category's subtree (removing it from products) like commercetools does
+
+## 5.0.2
+
+### Patch Changes
+
+- [#445](https://github.com/labd/commercetools-node-mock/pull/445) [`db3fd05`](https://github.com/labd/commercetools-node-mock/commit/db3fd0515b4f4d449b1349bf9313e8b54e224e5c) Thanks [@BramKaashoek](https://github.com/BramKaashoek)! - Expand references on product projections fetched by id
+
 ## 5.0.1
 
 ### Patch Changes

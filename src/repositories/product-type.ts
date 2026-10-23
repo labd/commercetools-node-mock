@@ -52,10 +52,21 @@ export class ProductTypeRepository extends AbstractResourceRepository<"product-t
 	}
 }
 
+// `savedToLineItem` (released 2026-09-30) is typed in @commercetools/platform-sdk
+// 9.7.0, but that version also makes Category.stores required. Typed locally
+// until the SDK is bumped.
+type WithSavedToLineItem<T> = T & { savedToLineItem?: boolean };
+
+type ProductTypeSetSavedToLineItemAction = {
+	action: "setSavedToLineItem";
+	attributeName: string;
+	savedToLineItem: boolean;
+};
+
 const attributeDefinitionFromAttributeDefinitionDraft = (
 	_context: RepositoryContext,
-	draft: AttributeDefinitionDraft,
-): AttributeDefinition => ({
+	draft: WithSavedToLineItem<AttributeDefinitionDraft>,
+): WithSavedToLineItem<AttributeDefinition> => ({
 	...draft,
 	level: draft.level ?? "Variant",
 	attributeConstraint: draft.attributeConstraint ?? "None",
@@ -65,6 +76,7 @@ const attributeDefinitionFromAttributeDefinitionDraft = (
 			? draft.inputTip
 			: undefined,
 	isSearchable: draft.isSearchable ?? true,
+	savedToLineItem: draft.savedToLineItem ?? true,
 });
 
 class ProductTypeUpdateHandler
@@ -196,6 +208,20 @@ class ProductTypeUpdateHandler
 		{ key }: ProductTypeSetKeyAction,
 	) {
 		resource.key = key;
+	}
+
+	setSavedToLineItem(
+		_context: RepositoryContext,
+		resource: Writable<ProductType>,
+		{ attributeName, savedToLineItem }: ProductTypeSetSavedToLineItemAction,
+	) {
+		resource.attributes?.forEach(
+			(value: Writable<WithSavedToLineItem<AttributeDefinition>>) => {
+				if (value.name === attributeName) {
+					value.savedToLineItem = savedToLineItem;
+				}
+			},
+		);
 	}
 
 	changeName(
