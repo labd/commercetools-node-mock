@@ -55,7 +55,6 @@ export class ShoppingListRepository extends AbstractResourceRepository<"shopping
 						this._storage,
 					)
 				: undefined,
-			// A shopping list created in a store belongs to that store
 			store: context.storeKey
 				? await getStoreKeyReference(
 						{ typeId: "store", key: context.storeKey },
