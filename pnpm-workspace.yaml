@@ -1,7 +1,5 @@
 minimumReleaseAge: 10080
 trustPolicy: no-downgrade
-minimumReleaseAgeExclude:
-  - "zod"
 allowBuilds:
   esbuild: true
   msw: true
