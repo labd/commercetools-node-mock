@@ -1,13 +1,17 @@
 import type {
 	InvalidInputError,
 	Subscription,
+	SubscriptionChangeDestinationAction,
 	SubscriptionDraft,
+	SubscriptionSetChangesAction,
+	SubscriptionSetEventsAction,
 	SubscriptionSetKeyAction,
+	SubscriptionSetMessagesAction,
 	SubscriptionUpdateAction,
 } from "@commercetools/platform-sdk";
 import type { Config } from "#src/config.ts";
 import { CommercetoolsError } from "#src/exceptions.ts";
-import { SubscriptionDraftSchema } from "#src/schemas/generated/subscription.ts";
+import { SubscriptionDraftWithDestinationSchema } from "#src/schemas/subscription.ts";
 import { getBaseResourceProperties } from "../helpers.ts";
 import type { Writable } from "../types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "./abstract.ts";
@@ -20,7 +24,7 @@ export class SubscriptionRepository extends AbstractResourceRepository<"subscrip
 	constructor(config: Config) {
 		super("subscription", config);
 		this.actions = new SubscriptionUpdateHandler(config.storage);
-		this.draftSchema = SubscriptionDraftSchema;
+		this.draftSchema = SubscriptionDraftWithDestinationSchema;
 	}
 
 	async create(
@@ -65,11 +69,43 @@ class SubscriptionUpdateHandler
 	implements
 		Partial<UpdateHandlerInterface<Subscription, SubscriptionUpdateAction>>
 {
+	changeDestination(
+		_context: RepositoryContext,
+		resource: Writable<Subscription>,
+		{ destination }: SubscriptionChangeDestinationAction,
+	) {
+		resource.destination = destination;
+	}
+
+	setChanges(
+		_context: RepositoryContext,
+		resource: Writable<Subscription>,
+		{ changes }: SubscriptionSetChangesAction,
+	) {
+		resource.changes = changes ?? [];
+	}
+
+	setEvents(
+		_context: RepositoryContext,
+		resource: Writable<Subscription>,
+		{ events }: SubscriptionSetEventsAction,
+	) {
+		resource.events = events ?? [];
+	}
+
 	setKey(
 		_context: RepositoryContext,
 		resource: Writable<Subscription>,
 		{ key }: SubscriptionSetKeyAction,
 	) {
 		resource.key = key;
+	}
+
+	setMessages(
+		_context: RepositoryContext,
+		resource: Writable<Subscription>,
+		{ messages }: SubscriptionSetMessagesAction,
+	) {
+		resource.messages = messages ?? [];
 	}
 }
