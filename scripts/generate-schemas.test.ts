@@ -1253,4 +1253,49 @@ describe("patchSpec", () => {
 			type: "string",
 		});
 	});
+
+	it("makes the type of a TypedMoneyDraft optional", () => {
+		// Mirrors the spec: the required `type` sits on an allOf part.
+		const schemas: Record<string, OpenAPISchema> = {
+			Money: {
+				type: "object",
+				required: ["centAmount", "currencyCode"],
+				properties: {
+					centAmount: { type: "integer" },
+					currencyCode: { type: "string" },
+				},
+			},
+			MoneyType: {
+				type: "string",
+				enum: ["centPrecision", "highPrecision"],
+			},
+			TypedMoneyDraft: {
+				allOf: [
+					{ $ref: "#/components/schemas/Money" },
+					{
+						type: "object",
+						required: ["type"],
+						properties: {
+							centAmount: { type: "integer" },
+							currencyCode: { type: "string" },
+							type: { $ref: "#/components/schemas/MoneyType" },
+						},
+					},
+				],
+			},
+		};
+
+		patchSpec(schemas);
+
+		const result = generateObjectSchema(
+			schemas,
+			"TypedMoneyDraft",
+			schemas.TypedMoneyDraft,
+		);
+		expect(result).toContain("centAmount: z.number().int(),");
+		expect(result).toContain("currencyCode: z.string(),");
+		expect(result).toContain("type: MoneyTypeSchema.nullish(),");
+		// Money itself is shared with other schemas and stays untouched.
+		expect(schemas.Money.required).toEqual(["centAmount", "currencyCode"]);
+	});
 });

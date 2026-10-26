@@ -281,6 +281,144 @@ describe("Draft validation (strict mode)", () => {
 			);
 		});
 	});
+	// The API accepts a plain Money wherever a TypedMoneyDraft is expected and
+	// treats it as centPrecision.
+	describe("TypedMoneyDraft", () => {
+		const cartDiscountDraft = (value: unknown) => ({
+			cartPredicate: "1=1",
+			description: {},
+			isActive: true,
+			name: { en: "fixed name" },
+			requiresDiscountCode: false,
+			sortOrder: "0.9",
+			stackingMode: "Stacking",
+			stores: [],
+			target: { type: "shipping" },
+			value,
+		});
+
+		test("accepts a fixed cart discount value with plain money", async () => {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/cart-discounts",
+				payload: cartDiscountDraft({
+					type: "fixed",
+					money: [
+						{ centAmount: 1000, currencyCode: "USD" },
+						{ centAmount: 2000, currencyCode: "EUR" },
+					],
+				}),
+			});
+			expect(response.statusCode).toBe(201);
+			expect(response.json().value).toEqual({
+				type: "fixed",
+				money: [
+					{
+						type: "centPrecision",
+						centAmount: 1000,
+						currencyCode: "USD",
+						fractionDigits: 2,
+					},
+					{
+						type: "centPrecision",
+						centAmount: 2000,
+						currencyCode: "EUR",
+						fractionDigits: 2,
+					},
+				],
+			});
+		});
+
+		test("accepts an absolute cart discount value with plain money", async () => {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/cart-discounts",
+				payload: cartDiscountDraft({
+					type: "absolute",
+					money: [{ centAmount: 500, currencyCode: "JPY" }],
+				}),
+			});
+			expect(response.statusCode).toBe(201);
+			expect(response.json().value).toEqual({
+				type: "absolute",
+				money: [
+					{
+						type: "centPrecision",
+						centAmount: 500,
+						currencyCode: "JPY",
+						fractionDigits: 0,
+					},
+				],
+			});
+		});
+
+		test("still accepts typed money on a fixed cart discount value", async () => {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/cart-discounts",
+				payload: cartDiscountDraft({
+					type: "fixed",
+					money: [
+						{
+							type: "highPrecision",
+							centAmount: 1235,
+							currencyCode: "EUR",
+							preciseAmount: 12345,
+							fractionDigits: 3,
+						},
+					],
+				}),
+			});
+			expect(response.statusCode).toBe(201);
+			expect(response.json().value.money).toEqual([
+				{
+					type: "highPrecision",
+					centAmount: 1235,
+					currencyCode: "EUR",
+					fractionDigits: 3,
+					preciseAmount: 12345,
+				},
+			]);
+		});
+
+		test("rejects an unknown money type", async () => {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/cart-discounts",
+				payload: cartDiscountDraft({
+					type: "fixed",
+					money: [{ type: "foo", centAmount: 1000, currencyCode: "USD" }],
+				}),
+			});
+			expect(response.statusCode).toBe(400);
+			const body = response.json();
+			expect(body.errors[0].code).toBe("InvalidJsonInput");
+			expect(body.errors[0].detailedErrorMessage).toContain(
+				"value.money.0.type",
+			);
+		});
+
+		test("accepts a staged standalone price with plain money", async () => {
+			const response = await ctMock.app.inject({
+				method: "POST",
+				url: "/dummy/standalone-prices",
+				payload: {
+					sku: "typed-money-draft",
+					value: { centAmount: 100, currencyCode: "EUR" },
+					staged: { value: { centAmount: 90, currencyCode: "EUR" } },
+				},
+			});
+			expect(response.statusCode).toBe(201);
+			expect(response.json().staged).toEqual({
+				value: {
+					type: "centPrecision",
+					centAmount: 90,
+					currencyCode: "EUR",
+					fractionDigits: 2,
+				},
+			});
+		});
+	});
 });
 
 describe("Draft validation (non-strict mode - default)", () => {
