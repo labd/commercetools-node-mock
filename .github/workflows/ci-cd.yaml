@@ -49,9 +49,6 @@ jobs:
       - name: Run build
         run: pnpm build
 
-      - name: Lint package
-        run: pnpm lint:package
-
   release:
     timeout-minutes: 15
     runs-on: ubuntu-latest

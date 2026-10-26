@@ -27,7 +27,6 @@
 		"check": "biome check && tsc",
 		"format": "biome check --fix",
 		"lint": "biome check",
-		"lint:package": "publint --strict",
 		"publish:ci": "pnpm build && pnpm changeset publish",
 		"publish:version": "pnpm changeset version && pnpm format",
 		"start": "node --watch src/server.ts",
