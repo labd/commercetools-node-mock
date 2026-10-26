@@ -25,9 +25,11 @@ jobs:
         uses: labd/gh-actions-typescript/pnpm-install@ada4548df9a365c62c8b396b583953c6d4bc113f # v1.1.0
         with:
           cache: false
+          cwd: docs
 
       - name: Build docs
-        run: pnpm --filter @labdigital/commercetools-mock-docs build
+        working-directory: docs
+        run: pnpm build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
