@@ -17,6 +17,7 @@ import {
 import {
 	createCustomFields,
 	getReferenceFromResourceIdentifier,
+	getStoreKeyReferences,
 } from "../helpers.ts";
 import { CategoryUpdateHandler } from "./actions.ts";
 import { getAncestors } from "./ancestors.ts";
@@ -73,6 +74,11 @@ export class CategoryRepository extends AbstractResourceRepository<"category"> {
 				draft.parent,
 			),
 			assets,
+			stores: await getStoreKeyReferences(
+				draft.stores ?? [],
+				context.projectKey,
+				this._storage,
+			),
 			custom: await createCustomFields(
 				draft.custom,
 				context.projectKey,

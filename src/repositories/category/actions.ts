@@ -3,11 +3,13 @@ import type {
 	AssetDraft,
 	Category,
 	CategoryAddAssetAction,
+	CategoryAddStoreAction,
 	CategoryChangeAssetNameAction,
 	CategoryChangeNameAction,
 	CategoryChangeParentAction,
 	CategoryChangeSlugAction,
 	CategoryRemoveAssetAction,
+	CategoryRemoveStoreAction,
 	CategorySetAssetDescriptionAction,
 	CategorySetAssetSourcesAction,
 	CategorySetCustomFieldAction,
@@ -17,6 +19,7 @@ import type {
 	CategorySetMetaDescriptionAction,
 	CategorySetMetaKeywordsAction,
 	CategorySetMetaTitleAction,
+	CategorySetStoresAction,
 	CategoryUpdateAction,
 	ReferencedResourceNotFoundError,
 } from "@commercetools/platform-sdk";
@@ -25,7 +28,11 @@ import { CommercetoolsError } from "#src/exceptions.ts";
 import type { Writable } from "#src/types.ts";
 import type { RepositoryContext, UpdateHandlerInterface } from "../abstract.ts";
 import { AbstractUpdateHandler } from "../abstract.ts";
-import { createCustomFields } from "../helpers.ts";
+import {
+	createCustomFields,
+	getStoreKeyReference,
+	getStoreKeyReferences,
+} from "../helpers.ts";
 import { getAncestors, updateDescendantAncestors } from "./ancestors.ts";
 
 export class CategoryUpdateHandler
@@ -41,6 +48,24 @@ export class CategoryUpdateHandler
 			resource.assets = [await this.assetFromAssetDraft(asset, context)];
 		} else {
 			resource.assets.push(await this.assetFromAssetDraft(asset, context));
+		}
+	}
+
+	async addStore(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ store }: CategoryAddStoreAction,
+	) {
+		const reference = await getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
+		);
+		if (!resource.stores) {
+			resource.stores = [];
+		}
+		if (!resource.stores.some((s) => s.key === reference.key)) {
+			resource.stores.push(reference);
 		}
 	}
 
@@ -110,6 +135,21 @@ export class CategoryUpdateHandler
 		{ slug }: CategoryChangeSlugAction,
 	) {
 		resource.slug = slug;
+	}
+
+	async removeStore(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ store }: CategoryRemoveStoreAction,
+	) {
+		const reference = await getStoreKeyReference(
+			store,
+			context.projectKey,
+			this._storage,
+		);
+		resource.stores = (resource.stores ?? []).filter(
+			(s) => s.key !== reference.key,
+		);
 	}
 
 	removeAsset(
@@ -218,6 +258,18 @@ export class CategoryUpdateHandler
 		{ metaTitle }: CategorySetMetaTitleAction,
 	) {
 		resource.metaTitle = metaTitle;
+	}
+
+	async setStores(
+		context: RepositoryContext,
+		resource: Writable<Category>,
+		{ stores }: CategorySetStoresAction,
+	) {
+		resource.stores = await getStoreKeyReferences(
+			stores ?? [],
+			context.projectKey,
+			this._storage,
+		);
 	}
 
 	assetFromAssetDraft = async (

@@ -7,6 +7,7 @@ import {
 	CategoryResourceIdentifierSchema,
 	CustomFieldsDraftSchema,
 	LocalizedStringSchema,
+	StoreResourceIdentifierSchema,
 } from "./common.ts";
 
 export const CategoryDraftSchema = z.object({
@@ -22,4 +23,5 @@ export const CategoryDraftSchema = z.object({
 	custom: CustomFieldsDraftSchema.nullish(),
 	assets: z.array(AssetDraftSchema).nullish(),
 	key: z.string().nullish(),
+	stores: z.array(StoreResourceIdentifierSchema).nullish(),
 });

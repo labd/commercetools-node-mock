@@ -34,7 +34,8 @@ const OUTPUT_DIR = resolve(PROJECT_ROOT, "src/schemas/generated");
 // spec declares it without `custom` at all.
 //
 // AttributeDefinitionDraft.savedToLineItem is in the RAML spec (released
-// 2026-09-30) but missing from the OpenAPI spec this script reads.
+// 2026-09-30) but missing from the OpenAPI spec this script reads. The same
+// applies to CategoryDraft.stores.
 //
 // These are patched into the parsed spec (see patchSpec) rather than into the
 // emitted code, so dependency collection and topological sorting treat them as
@@ -45,6 +46,12 @@ const EXTRA_PROPERTIES: Record<string, Record<string, OpenAPIProperty>> = {
 	},
 	BaseAddress: {
 		custom: { $ref: "#/components/schemas/CustomFieldsDraft" },
+	},
+	CategoryDraft: {
+		stores: {
+			type: "array",
+			items: { $ref: "#/components/schemas/StoreResourceIdentifier" },
+		},
 	},
 };
 
