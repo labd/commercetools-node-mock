@@ -73,6 +73,7 @@ export const ReferenceTypeIdSchema = z.enum([
 	"extension",
 	"inventory-entry",
 	"key-value-document",
+	"mcp-server",
 	"order",
 	"order-edit",
 	"payment-method",
@@ -124,6 +125,8 @@ export const BusinessUnitApprovalRuleModeSchema = z.enum([
 	"Explicit",
 	"ExplicitAndFromParent",
 ]);
+
+export const TaxRoundingTargetSchema = z.enum(["Net", "Tax"]);
 
 export const InventoryModeSchema = z.enum([
 	"None",
@@ -197,6 +200,7 @@ export const ExtensionResourceTypeIdSchema = z.enum([
 	"quote",
 	"business-unit",
 	"shopping-list",
+	"product",
 ]);
 
 export const ExtensionActionSchema = z.enum(["Create", "Update"]);
@@ -307,6 +311,7 @@ export const MessageSubscriptionResourceTypeIdSchema = z.enum([
 	"staged-quote",
 	"standalone-price",
 	"store",
+	"variant",
 ]);
 
 export const ChangeSubscriptionResourceTypeIdSchema = z.enum([
@@ -350,6 +355,7 @@ export const ChangeSubscriptionResourceTypeIdSchema = z.enum([
 	"subscription",
 	"tax-category",
 	"type",
+	"variant",
 	"zone",
 ]);
 
@@ -619,6 +625,7 @@ export const ExternalTaxRateDraftSchema = z.object({
 	country: CountryCodeSchema,
 	state: z.string().nullish(),
 	subRates: z.array(SubRateSchema).nullish(),
+	taxRoundingTarget: TaxRoundingTargetSchema.nullish(),
 });
 
 export const MethodExternalTaxRateDraftSchema = z.object({
@@ -1414,6 +1421,7 @@ export const TaxRateDraftSchema = z.object({
 	state: z.string().nullish(),
 	subRates: z.array(SubRateSchema).nullish(),
 	key: z.string().nullish(),
+	taxRoundingTarget: TaxRoundingTargetSchema.nullish(),
 });
 
 export const FieldTypeSchema = z.object({

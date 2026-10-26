@@ -9,6 +9,7 @@ import {
 	categoryDraftFactory,
 	productDraftFactory,
 	productTypeDraftFactory,
+	storeDraftFactory,
 } from "#src/testing/index.ts";
 import { CommercetoolsMock } from "../index.ts";
 
@@ -394,5 +395,57 @@ describe("Categories remove asset", () => {
 
 		expect(response.statusCode).toBe(200);
 		expect(response.json().assets).toHaveLength(0);
+	});
+});
+
+describe("Categories stores", () => {
+	const ctMock = new CommercetoolsMock();
+	const categoryDraft = categoryDraftFactory(ctMock);
+	const storeDraft = storeDraftFactory(ctMock);
+
+	afterEach(async () => {
+		await ctMock.clear();
+	});
+
+	test("create with stores and update them", async () => {
+		await storeDraft.create({ key: "store-a" });
+		await storeDraft.create({ key: "store-b" });
+
+		const category = await categoryDraft.create({
+			name: { en: "Top hat" },
+			slug: { en: "top-hat" },
+			stores: [{ typeId: "store", key: "store-a" }],
+		});
+		expect(category.stores).toEqual([{ typeId: "store", key: "store-a" }]);
+
+		const update = async (version: number, actions: unknown[]) =>
+			ctMock.app.inject({
+				method: "POST",
+				url: `/dummy/categories/${category.id}`,
+				payload: { version, actions },
+			});
+
+		let response = await update(1, [
+			{ action: "addStore", store: { typeId: "store", key: "store-b" } },
+		]);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().stores).toEqual([
+			{ typeId: "store", key: "store-a" },
+			{ typeId: "store", key: "store-b" },
+		]);
+
+		response = await update(response.json().version, [
+			{ action: "removeStore", store: { typeId: "store", key: "store-a" } },
+		]);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().stores).toEqual([
+			{ typeId: "store", key: "store-b" },
+		]);
+
+		response = await update(response.json().version, [
+			{ action: "setStores", stores: [] },
+		]);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().stores).toEqual([]);
 	});
 });
