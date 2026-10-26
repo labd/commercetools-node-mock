@@ -1,6 +1,7 @@
 # Commercetools Mocking library for Node
 
-[<img src="https://img.shields.io/npm/v/@labdigital/commercetools-mock">](https://www.npmjs.com/package/@labdigital/commercetools-mock)
+[![npm](https://img.shields.io/npm/v/@labdigital/commercetools-mock)](https://www.npmjs.com/package/@labdigital/commercetools-mock)
+[![CI](https://github.com/labd/commercetools-node-mock/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/labd/commercetools-node-mock/actions/workflows/ci-cd.yaml)
 
 This library mocks the Commercetools rest API to ease testing of your typescript
 codebases interacting with the commercetools api. It uses the same proven
