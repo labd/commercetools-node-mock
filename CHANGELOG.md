@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 5.1.0
+
+### Minor Changes
+
+- [#456](https://github.com/labd/commercetools-node-mock/pull/456) [`e595ad6`](https://github.com/labd/commercetools-node-mock/commit/e595ad6b30353747491e1850c83cf4358671805b) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Support `stores` on categories (`CategoryDraft.stores` and the `addStore`, `removeStore` and `setStores` update actions) and regenerate the draft schemas against the latest API reference.
+
+- [#452](https://github.com/labd/commercetools-node-mock/pull/452) [`87109fa`](https://github.com/labd/commercetools-node-mock/commit/87109fa730ae8d49278fbae66aca00122e7cad16) Thanks [@kapilbathija-ct](https://github.com/kapilbathija-ct)! - Support `savedToLineItem` on product type attribute definitions (defaults to `true`) and the `setSavedToLineItem` update action
+
+### Patch Changes
+
+- [#454](https://github.com/labd/commercetools-node-mock/pull/454) [`5889da2`](https://github.com/labd/commercetools-node-mock/commit/5889da28a07ef6b7ffc221f29ab70fc5eb42e583) Thanks [@robertmoelker](https://github.com/robertmoelker)! - Scope in-store endpoints to the store in the path. Resources of another store are no longer listed and return a 404 by id or key. Global customers stay visible in every store.
+
 ## 5.0.3
 
 ### Patch Changes
