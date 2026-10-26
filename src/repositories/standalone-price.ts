@@ -45,6 +45,9 @@ export class StandAlonePriceRepository extends AbstractResourceRepository<"stand
 				: undefined,
 			validFrom: draft.validFrom,
 			validUntil: draft.validUntil,
+			staged: draft.staged
+				? { value: createTypedMoney(draft.staged.value) }
+				: undefined,
 		};
 		return await this.saveNew(context, resource);
 	}

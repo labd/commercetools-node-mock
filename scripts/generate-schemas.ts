@@ -56,6 +56,16 @@ const EXTRA_PROPERTIES: Record<string, Record<string, OpenAPIProperty>> = {
 };
 
 // ---------------------------------------------------------------------------
+// Configuration: properties the spec requires but the API accepts without
+// ---------------------------------------------------------------------------
+// TypedMoneyDraft is documented with a required `type`, but the API accepts a
+// plain Money wherever a TypedMoneyDraft is expected and treats it as
+// centPrecision (e.g. the `money` of a fixed CartDiscountValueDraft).
+const OPTIONAL_PROPERTIES: Record<string, string[]> = {
+	TypedMoneyDraft: ["type"],
+};
+
+// ---------------------------------------------------------------------------
 // Configuration: which draft schemas to generate
 // ---------------------------------------------------------------------------
 const DRAFT_SCHEMAS = [
@@ -177,8 +187,9 @@ export interface OpenAPIProperty {
 // Spec patching
 // ---------------------------------------------------------------------------
 /**
- * Adds the EXTRA_PROPERTIES to the parsed spec, so the rest of the generator
- * sees them as regular properties of their schema.
+ * Adds the EXTRA_PROPERTIES to the parsed spec and drops the
+ * OPTIONAL_PROPERTIES from its required lists, so the rest of the generator
+ * sees them as regular (optional) properties of their schema.
  */
 export function patchSpec(schemas: Record<string, OpenAPISchema>) {
 	for (const [name, properties] of Object.entries(EXTRA_PROPERTIES)) {
@@ -194,6 +205,20 @@ export function patchSpec(schemas: Record<string, OpenAPISchema>) {
 			if (schema.properties?.[propName]) continue;
 
 			schema.properties = { ...schema.properties, [propName]: propDef };
+		}
+	}
+
+	for (const [name, propNames] of Object.entries(OPTIONAL_PROPERTIES)) {
+		const schema = schemas[name];
+		if (!schema) {
+			console.warn(`  Warning: cannot patch ${name}, not found in spec`);
+			continue;
+		}
+
+		// `required` can sit on the schema itself or on any of its allOf parts.
+		for (const part of [schema, ...(schema.allOf ?? [])]) {
+			if (!part.required) continue;
+			part.required = part.required.filter((r) => !propNames.includes(r));
 		}
 	}
 }

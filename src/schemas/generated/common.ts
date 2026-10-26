@@ -870,7 +870,7 @@ export const CartDiscountValueAbsoluteDraftSchema = z.object({
 export const TypedMoneyDraftSchema = z.object({
 	centAmount: z.number().int(),
 	currencyCode: CurrencyCodeSchema,
-	type: MoneyTypeSchema,
+	type: MoneyTypeSchema.nullish(),
 	fractionDigits: z.number().int().nullish(),
 });
 
