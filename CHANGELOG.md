@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.1.1
+
+### Patch Changes
+
+- [#458](https://github.com/labd/commercetools-node-mock/pull/458) [`29b4f36`](https://github.com/labd/commercetools-node-mock/commit/29b4f3635457aaea3e71339ca11e1eaf9a484a95) Thanks [@mvantellingen](https://github.com/mvantellingen)! - Accept Money without type where TypedMoneyDraft is expected
+
 ## 5.1.0
 
 ### Minor Changes
