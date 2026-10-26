@@ -450,6 +450,7 @@ describe("Product search filter", () => {
 							"en-US": "category-1",
 						},
 						orderHint: "0.1",
+						stores: [],
 						ancestors: [
 							{
 								typeId: "category",
