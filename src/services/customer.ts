@@ -78,6 +78,7 @@ export class CustomerService extends AbstractService {
 		const customer = await this.repository.passwordResetToken(
 			getRepositoryContext(request),
 			request.body,
+			this.storeWhere(request),
 		);
 
 		return reply.status(200).send(customer);

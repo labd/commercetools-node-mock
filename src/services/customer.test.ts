@@ -1094,6 +1094,7 @@ describe("Customer email verification", () => {
 
 describe("Customer in-store endpoints", () => {
 	const storeFactory = storeDraftFactory(ctMock);
+	const customerFactory = customerDraftFactory(ctMock);
 
 	test("returns a 404 when the store in the path doesn't exist", async () => {
 		const res = await ctMock.app.inject({
@@ -1158,5 +1159,54 @@ describe("Customer in-store endpoints", () => {
 		expect(other.json().customer.stores).toEqual([
 			{ typeId: "store", key: "store-bal" },
 		]);
+	});
+
+	test("issues a password token for the customer in the path's store", async () => {
+		await storeFactory.create({ key: "store-a" });
+		await storeFactory.create({ key: "store-b" });
+		await storeFactory.create({ key: "store-c" });
+
+		// The other store's customer is created first, so an unscoped lookup
+		// would return it
+		await customerFactory.create({
+			email: "shared@example.com",
+			stores: [{ typeId: "store", key: "store-a" }],
+		});
+		const customerB = await customerFactory.create({
+			email: "shared@example.com",
+			stores: [{ typeId: "store", key: "store-b" }],
+		});
+
+		const token = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/in-store/key=store-b/customers/password-token",
+			payload: { email: "shared@example.com" },
+		});
+		expect(token.statusCode, JSON.stringify(token.json())).toBe(200);
+		expect(token.json()).toEqual({
+			id: expect.any(String),
+			createdAt: expect.any(String),
+			lastModifiedAt: expect.any(String),
+			customerId: customerB.id,
+			expiresAt: expect.any(String),
+			value: expect.any(String),
+			invalidateOlderTokens: false,
+		});
+
+		const missing = await ctMock.app.inject({
+			method: "POST",
+			url: "/dummy/in-store/key=store-c/customers/password-token",
+			payload: { email: "shared@example.com" },
+		});
+		expect(missing.json()).toEqual({
+			statusCode: 400,
+			message: "The Customer with ID 'shared@example.com' was not found.",
+			errors: [
+				{
+					code: "ResourceNotFound",
+					message: "The Customer with ID 'shared@example.com' was not found.",
+				},
+			],
+		});
 	});
 });
