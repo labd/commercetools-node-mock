@@ -168,12 +168,13 @@ export class CustomerRepository extends AbstractResourceRepository<"customer"> {
 	async passwordResetToken(
 		context: RepositoryContext,
 		request: CustomerCreatePasswordResetToken,
+		storeWhere: string[] = [],
 	): Promise<CustomerToken> {
 		const results = await this._storage.query(
 			context.projectKey,
 			this.getTypeId(),
 			{
-				where: [`email="${request.email.toLocaleLowerCase()}"`],
+				where: [`email="${request.email.toLocaleLowerCase()}"`, ...storeWhere],
 			},
 		);
 		if (results.count === 0) {
