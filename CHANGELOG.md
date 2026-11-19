@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.1.2
+
+### Patch Changes
+
+- [#462](https://github.com/labd/commercetools-node-mock/pull/462) [`fa6f2e2`](https://github.com/labd/commercetools-node-mock/commit/fa6f2e20e9b467b3f4b2109693f88e6597ef7002) Thanks [@jsm1t](https://github.com/jsm1t)! - Scope the in-store customer `password-token` endpoint to the store in the path, so it no longer issues a token for a customer with the same email in another store.
+
 ## 5.1.1
 
 ### Patch Changes
